@@ -34,11 +34,11 @@ INPUT_PORTS_EXTERN( coco_rtc );
 
 SLOT_INTERFACE_EXTERN( coco_cart );
 
-/* constants */
+// constants
 #define JOYSTICK_DELTA          10
 #define JOYSTICK_SENSITIVITY    100
 
-/* devices */
+// devices
 #define MAINCPU_TAG                 "maincpu"
 #define PIA0_TAG                    "pia0"
 #define PIA1_TAG                    "pia1"
@@ -51,7 +51,7 @@ SLOT_INTERFACE_EXTERN( coco_cart );
 #define VHD0_TAG                    "vhd0"
 #define VHD1_TAG                    "vhd1"
 
-/* inputs */
+// inputs
 #define CTRL_SEL_TAG                "ctrl_sel"
 #define HIRES_INTF_TAG              "hires_intf"
 #define CART_AUTOSTART_TAG          "cart_autostart"
@@ -82,21 +82,7 @@ MACHINE_CONFIG_EXTERN( coco_sound );
 class coco_state : public driver_device
 {
 public:
-	coco_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, MAINCPU_TAG),
-		m_pia_0(*this, PIA0_TAG),
-		m_pia_1(*this, PIA1_TAG),
-		m_dac(*this, DAC_TAG),
-		m_wave(*this, WAVE_TAG),
-		m_cococart(*this, CARTRIDGE_TAG),
-		m_ram(*this, RAM_TAG),
-		m_cassette(*this, CASSETTE_TAG),
-		m_bitbanger(*this, BITBANGER_TAG),
-		m_vhd_0(*this, VHD0_TAG),
-		m_vhd_1(*this, VHD1_TAG)
-	{
-	}
+	coco_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_0;
@@ -116,12 +102,12 @@ public:
 	static const bitbanger_config coco_bitbanger_config;
 	static const cassette_interface coco_cassette_interface;
 
-	/* driver update handlers */
+	// driver update handlers
 	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
 	static void bitbanger_callback(running_machine &machine, UINT8 bit);
 
-	/* IO */
+	// IO
 	virtual DECLARE_READ8_MEMBER( ff00_read );
 	virtual DECLARE_WRITE8_MEMBER( ff00_write );
 	virtual DECLARE_READ8_MEMBER( ff20_read );
@@ -131,33 +117,33 @@ public:
 	DECLARE_READ8_MEMBER( ff60_read );
 	DECLARE_WRITE8_MEMBER( ff60_write );
 
-	/* floating bus */
+	// floating bus
 	DECLARE_READ8_MEMBER( floating_bus_read )   { return floating_bus_read(); }
 
 protected:
-	/* device-level overrides */
+	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	/* interrupts */
+	// interrupts
 	virtual bool firq_get_line(void);
 	virtual bool irq_get_line(void);
 	void recalculate_irq(void);
 	void recalculate_firq(void);
 
-	/* changed handlers */
+	// changed handlers
 	virtual void pia1_pa_changed(void);
 	virtual void pia1_pb_changed(void);
 	virtual void bitbanger_changed(bool newvalue);
 
-	/* miscellaneous */
+	// miscellaneous
 	virtual void update_keyboard_input(UINT8 value, UINT8 z);
 	virtual void cart_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
 	virtual void update_cart_base(UINT8 *cart_base) = 0;
 
-	/* PIA0 */
+	// PIA0
 	DECLARE_WRITE8_MEMBER( pia0_pa_w );
 	DECLARE_WRITE8_MEMBER( pia0_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
@@ -165,7 +151,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
 	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
 
-	/* PIA1 */
+	// PIA1
 	DECLARE_READ8_MEMBER( pia1_pa_r );
 	DECLARE_READ8_MEMBER( pia1_pb_r );
 	DECLARE_WRITE8_MEMBER( pia1_pa_w );
@@ -216,7 +202,7 @@ private:
 
 	void analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag);
 
-	/* wrappers for configuration */
+	// wrappers for configuration
 	joystick_type_t joystick_type(int index);
 	hires_type_t hires_interface_type(void);
 	bool is_joystick_hires(int joystick_index);
@@ -233,22 +219,22 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( bitbanger_callback );
 	void diecom_lightgun_clock(void);
 
-	/* thin wrappers for PIA output */
-	UINT8 dac_output(void)  { return m_dac_output; }    /* PA drives the DAC */
+	// thin wrappers for PIA output
+	UINT8 dac_output(void)  { return m_dac_output; }    // PA drives the DAC
 	bool sel1(void)         { return m_pia_0->ca2_output() ? true : false; }
 	bool sel2(void)         { return m_pia_0->cb2_output() ? true : false; }
 	bool snden(void)        { return m_pia_1->cb2_output() ? true : false; }
 
-	/* VHD selection */
+	// VHD selection
 	coco_vhd_image_device *current_vhd(void);
 
-	/* floating bus */
+	// floating bus
 	UINT8 floating_bus_read(void);
 
-	/* disassembly override */
+	// disassembly override
 	static offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
-	/* input ports */
+	// input ports
 	ioport_port *m_keyboard[7];
 	ioport_port *m_joystick_type_control;
 	ioport_port *m_joystick_hires_control;
@@ -256,14 +242,14 @@ private:
 	analog_input_t m_rat_mouse;
 	analog_input_t m_diecom_lightgun;
 
-	/* DAC output */
+	// DAC output
 	UINT8 m_dac_output;
 
-	/* hires interface */
+	// hires interface
 	emu_timer *m_hiresjoy_transition_timer[2];
 	bool m_hiresjoy_ca;
 
-	/* diecom lightgun */
+	// diecom lightgun
 	emu_timer *m_diecom_lightgun_timer;
 	bool m_dclg_previous_bit;
 	UINT8 m_dclg_output_h;
@@ -271,8 +257,8 @@ private:
 	UINT8 m_dclg_state;
 	UINT16 m_dclg_timer;
 
-	/* VHD selection */
+	// VHD selection
 	UINT8 m_vhd_select;
 };
 
-#endif /* __COCO__ */
+#endif // __COCO__
