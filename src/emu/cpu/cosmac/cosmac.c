@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cosmac.h"
+#include "coreutil.h"
 
 
 /*
@@ -307,7 +308,7 @@ void cosmac_device::device_reset()
 	m_ie = 0;
 	m_q = 0;
 	m_df = 0;
-	memset(m_r, 0, sizeof(m_r));
+	rand_memory(m_r, sizeof(m_r));
 }
 
 
