@@ -214,7 +214,10 @@ WRITE8_MEMBER( sns_rom21_necdsp_device::chip_write )
 
 READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 {
-	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
+	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
+		m_upd96050->snesdsp_read((offset & 0x01) ? FALSE : TRUE);
+	
+	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
 		UINT16 address = offset & 0xffff;
 		UINT16 temp = m_upd96050->dataram_r(address/2);
@@ -223,8 +226,6 @@ READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 		else
 			return temp & 0xff;
 	}
-	if (offset == 0x600000 || offset == 0x600001)
-		return (offset & 1) ? m_upd96050->snesdsp_read(FALSE) : m_upd96050->snesdsp_read(TRUE);
 
 	return 0xff;
 }
@@ -232,7 +233,13 @@ READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 
 WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 {
-	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
+	if (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000)
+	{
+		m_upd96050->snesdsp_write((offset & 0x01) ? FALSE : TRUE, data);
+		return;
+	}
+
+	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
 		UINT16 address = offset & 0xffff;
 		UINT16 temp = m_upd96050->dataram_r(address/2);
@@ -251,10 +258,6 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 		m_upd96050->dataram_w(address/2, temp);
 		return;
 	}
-	if (offset == 0x600000)
-		m_upd96050->snesdsp_write(TRUE, data);
-	if (offset == 0x600001)
-		m_upd96050->snesdsp_write(FALSE, data);
 }
 
 

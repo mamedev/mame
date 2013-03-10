@@ -2215,11 +2215,11 @@ READ8_MEMBER( snsnew_state::snesnew_lo_r )
 	else if (m_slotcart->get_type() == SNES_OBC1
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000))
+	else if ((m_slotcart->get_type() == SNES_ST010 /*|| m_slotcart->get_type() == SNES_ST011*/) // why does this break moritash?
+				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
 		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 /*|| m_slotcart->get_type() == SNES_ST011*/) // why does this freeze moritash?
-				&& (offset == 0x600000 || offset == 0x600001))
+	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset);
 	else if (m_slotcart->get_type() == SNES_SRTC
 				&& (offset < 0x400000 && (offset & 0xffff) == 0x2800))
@@ -2280,10 +2280,10 @@ READ8_MEMBER( snsnew_state::snesnew_hi_r )
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000))
+				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
 		return m_slotcart->m_cart->chip_read(space, offset);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset == 0x600000 || offset == 0x600001))
+				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset);
 	else if (m_slotcart->get_type() == SNES_SRTC
 				&& (offset < 0x400000 && (offset & 0xffff) == 0x2800))
@@ -2350,10 +2350,10 @@ WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		m_slotcart->m_cart->chip_write(space, offset, data);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000))
+				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
 		m_slotcart->m_cart->chip_write(space, offset, data);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset == 0x600000 || offset == 0x600001))
+				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
 		m_slotcart->m_cart->chip_write(space, offset, data);
 	else if (m_slotcart->get_type() == SNES_SRTC
 				&& (offset < 0x400000 && (offset & 0xffff) == 0x2801))
@@ -2425,10 +2425,10 @@ WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_write(space, offset, data);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000))
+				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
 		m_slotcart->m_cart->chip_write(space, offset, data);
 	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset == 0x600000 || offset == 0x600001))
+				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
 		m_slotcart->m_cart->chip_write(space, offset, data);
 	else if (m_slotcart->get_type() == SNES_SRTC
 				&& (offset < 0x400000 && (offset & 0xffff) == 0x2801))
