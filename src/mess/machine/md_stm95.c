@@ -176,12 +176,20 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, co
 
 void md_eeprom_stm95_device::device_start()
 {
+	nvram_alloc(machine(), M95320_SIZE);
+	m_stm95.eeprom_data = (UINT8*)get_nvram_base();
+
+	save_item(NAME(m_rdcnt));
+	save_item(NAME(m_bank));
+	//TODO: save and restore the m_stm95...
+}
+
+void md_eeprom_stm95_device::device_reset()
+{
 	m_rdcnt = 0;
 	m_bank[0] = 0;
 	m_bank[1] = 0;
 	m_bank[2] = 0;
-	nvram_alloc(machine(), M95320_SIZE);
-	m_stm95.eeprom_data = (UINT8*)get_nvram_base();
 }
 
 /*-------------------------------------------------

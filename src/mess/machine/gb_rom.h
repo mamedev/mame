@@ -15,9 +15,13 @@ public:
 	gb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom"; }
-
+	
+	void shared_start();
+	void shared_reset();
+	
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -33,6 +37,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_tama5"; }
 
 	// reading and writing
@@ -52,7 +57,8 @@ public:
 	gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_wisdom"; }
 
 	// reading and writing
@@ -68,7 +74,8 @@ public:
 	gb_rom_yong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_yong"; }
 
 	// reading and writing
@@ -84,7 +91,8 @@ public:
 	gb_rom_atvrac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_atvrac"; }
 
 	// reading and writing
@@ -100,15 +108,14 @@ public:
 	gb_rom_lasama_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_lasama"; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 };
-
-
 
 
 // ======================> megaduck_rom_device
@@ -122,8 +129,9 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "megaduck_rom"; }
-
+	
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);

@@ -108,16 +108,12 @@ gb_rom_sm3sp_device::gb_rom_sm3sp_device(const machine_config &mconfig, const ch
 }
 
 
-void gb_rom_mbc_device::device_start()
-{
-	has_timer = FALSE;
-	has_rumble = FALSE;
+//-------------------------------------------------
+//  shared_start
+//-------------------------------------------------
 
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_enable = 0;
-	m_ram_bank = 0;
-	m_mode = 0;
+void gb_rom_mbc_device::shared_start()
+{
 	save_item(NAME(m_latch_bank));
 	save_item(NAME(m_latch_bank2));
 	save_item(NAME(m_ram_bank));
@@ -125,109 +121,41 @@ void gb_rom_mbc_device::device_start()
 	save_item(NAME(m_mode));
 }
 
-void gb_rom_mbc1_device::device_start()
-{
-	has_timer = FALSE;
-	has_rumble = FALSE;
+//-------------------------------------------------
+//  shared_reset
+//-------------------------------------------------
 
+void gb_rom_mbc_device::shared_reset()
+{
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
 	m_ram_enable = 0;
 	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
-}
-
-void gb_rom_mbc1col_device::device_start()
-{
-	has_timer = FALSE;
+	
 	has_rumble = FALSE;
-
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
-}
-
-void gb_rom_mbc2_device::device_start()
-{
 	has_timer = FALSE;
-	has_rumble = FALSE;
-
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	has_battery = FALSE;
 }
+
+//-------------------------------------------------
+//  mapper specific start/reset
+//-------------------------------------------------
 
 void gb_rom_mbc3_device::device_start()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	memset(m_rtc_map, 0, sizeof(m_rtc_map));
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	shared_start();
 	save_item(NAME(m_rtc_map));
 }
 
-void gb_rom_mbc5_device::device_start()
+void gb_rom_mbc3_device::device_reset()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	shared_reset();
+	memset(m_rtc_map, 0, sizeof(m_rtc_map));
 }
 
 void gb_rom_mbc6_device::device_start()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-
-	m_bank_4000 = 2;    // correct default?
-	m_bank_6000 = 3;    // correct default?
-	m_latch1 = 0;   // correct default?
-	m_latch2 = 0;   // correct default?
-
-	m_latch_bank = 2;   // correct default?
-	m_latch_bank2 = 3;  // correct default?
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-
 	save_item(NAME(m_bank_4000));
 	save_item(NAME(m_bank_6000));
 	save_item(NAME(m_latch1));
@@ -239,63 +167,41 @@ void gb_rom_mbc6_device::device_start()
 	save_item(NAME(m_mode));
 }
 
-void gb_rom_mbc7_device::device_start()
+void gb_rom_mbc6_device::device_reset()
 {
-	has_timer = FALSE;
-	has_rumble = TRUE;
-
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
+	m_bank_4000 = 2;    // correct default?
+	m_bank_6000 = 3;    // correct default?
+	m_latch1 = 0;   // correct default?
+	m_latch2 = 0;   // correct default?
+	
+	m_latch_bank = 2;   // correct default?
+	m_latch_bank2 = 3;  // correct default?
 	m_ram_bank = 0;
 	m_ram_enable = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
+	m_mode = 0;
 }
 
 void gb_rom_mmm01_device::device_start()
 {
-	has_timer = FALSE;
-	has_rumble = TRUE;
+	shared_start();
+	save_item(NAME(m_bank_mask));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_reg));
+}
 
+void gb_rom_mmm01_device::device_reset()
+{
 	m_latch_bank = 0x200 - 2;
 	m_latch_bank2 = 0x200 - 1;
 	m_ram_bank = 0;
 	m_bank_mask = 0xff;
 	m_bank = 0;
 	m_reg = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_bank_mask));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_reg));
 }
 
 void gb_rom_sintax_device::device_start()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-	
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-
-	m_sintax_mode = 0;
-	m_currentxor = 0;
-	m_xor2 = 0;
-	m_xor3 = 0;
-	m_xor4 = 0;
-	m_xor5 = 0;
-
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	shared_start();
 	save_item(NAME(m_sintax_mode));
 	save_item(NAME(m_currentxor));
 	save_item(NAME(m_xor2));
@@ -304,74 +210,27 @@ void gb_rom_sintax_device::device_start()
 	save_item(NAME(m_xor5));
 }
 
+void gb_rom_sintax_device::device_reset()
+{
+	shared_reset();	
+	m_sintax_mode = 0;
+	m_currentxor = 0;
+	m_xor2 = 0;
+	m_xor3 = 0;
+	m_xor4 = 0;
+	m_xor5 = 0;
+}
+
 void gb_rom_chongwu_device::device_start()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-	
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	m_protection_checked = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	shared_start();
 	save_item(NAME(m_protection_checked));
 }
 
-void gb_rom_digimon_device::device_start()
+void gb_rom_chongwu_device::device_reset()
 {
-	has_timer = FALSE;
-	has_rumble = FALSE;
-	
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
-}
-
-void gb_rom_rockman8_device::device_start()
-{
-	has_timer = FALSE;
-	has_rumble = FALSE;
-	
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
-}
-
-void gb_rom_sm3sp_device::device_start()
-{
-	has_timer = FALSE;
-	has_rumble = FALSE;
-	
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	m_ram_enable = 0;
-	m_mode = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_ram_enable));
-	save_item(NAME(m_mode));
+	shared_reset();
+	m_protection_checked = 0;
 }
 
 
@@ -1160,7 +1019,7 @@ WRITE8_MEMBER(gb_rom_sm3sp_device::write_bank)
 	}
 	else if (offset < 0x5000)
 	{
-//		printf("write $5 %x\n", data);
+//		printf("write $5 %X at %X\n", data, offset);
 		//maybe rumble??
 	}
 	else if (offset < 0x6000)

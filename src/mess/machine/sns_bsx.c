@@ -58,13 +58,13 @@ sns_rom_bsmempak_device::sns_rom_bsmempak_device(const machine_config &mconfig, 
 void sns_rom_bsx_device::device_start()
 {
 	m_base_unit = auto_alloc(machine(), BSX_base(machine()));
+	m_base_unit->init();
+
 	memset(m_cart_regs, 0x00, sizeof(m_cart_regs));
 	m_cart_regs[7] = 0x80;
 	m_cart_regs[8] = 0x80;
 	access_update();
-
-	memset(m_pram, 0xff, sizeof(m_pram));
-
+	
 	save_item(NAME(m_cart_regs));
 	save_item(NAME(access_00_1f));
 	save_item(NAME(access_80_9f));
@@ -74,6 +74,11 @@ void sns_rom_bsx_device::device_start()
 	save_item(NAME(rom_access));
 	save_item(NAME(m_pram));
 	// TODO: save unit-related items and fix their restore...
+}
+
+void sns_rom_bsx_device::device_reset()
+{	
+	memset(m_pram, 0xff, sizeof(m_pram));
 }
 
 void sns_rom_bsxlo_device::device_start()
@@ -86,20 +91,23 @@ void sns_rom_bsxhi_device::device_start()
 
 void sns_rom_bsmempak_device::device_start()
 {
-	m_command = 0;
-	m_write_old = 0;
-	m_write_new = 0;
-
-	m_flash_enable = 0;
-	m_read_enable = 0;
-	m_write_enable = 0;
-
 	save_item(NAME(m_command));
 	save_item(NAME(m_write_old));
 	save_item(NAME(m_write_new));
 	save_item(NAME(m_flash_enable));
 	save_item(NAME(m_read_enable));
 	save_item(NAME(m_write_enable));
+}
+
+void sns_rom_bsmempak_device::device_reset()
+{
+	m_command = 0;
+	m_write_old = 0;
+	m_write_new = 0;
+	
+	m_flash_enable = 0;
+	m_read_enable = 0;
+	m_write_enable = 0;
 }
 
 

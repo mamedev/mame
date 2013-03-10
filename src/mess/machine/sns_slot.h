@@ -67,26 +67,26 @@ public:
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 
-	virtual void rom_alloc(running_machine &machine, UINT32 size);
-	virtual void nvram_alloc(running_machine &machine, UINT32 size);
-	virtual void rtc_ram_alloc(running_machine &machine, UINT32 size);
-	virtual void addon_bios_alloc(running_machine &machine, UINT32 size);
-	virtual UINT8* get_rom_base() { return m_rom; };
-	virtual UINT8* get_nvram_base() { return m_nvram; };
-	virtual UINT8* get_addon_bios_base() { return m_bios; };
-	virtual UINT8* get_rtc_ram_base() { return m_rtc_ram; };
-	virtual UINT32 get_rom_size() { return m_rom_size; };
-	virtual UINT32 get_nvram_size() { return m_nvram_size; };
-	virtual UINT32 get_addon_bios_size() { return m_bios_size; };
-	virtual UINT32 get_rtc_ram_size() { return m_rtc_ram_size; };
+	void rom_alloc(running_machine &machine, UINT32 size);
+	void nvram_alloc(running_machine &machine, UINT32 size);
+	void rtc_ram_alloc(running_machine &machine, UINT32 size);
+	void addon_bios_alloc(running_machine &machine, UINT32 size);
+	UINT8* get_rom_base() { return m_rom; };
+	UINT8* get_nvram_base() { return m_nvram; };
+	UINT8* get_addon_bios_base() { return m_bios; };
+	UINT8* get_rtc_ram_base() { return m_rtc_ram; };
+	UINT32 get_rom_size() { return m_rom_size; };
+	UINT32 get_nvram_size() { return m_nvram_size; };
+	UINT32 get_addon_bios_size() { return m_bios_size; };
+	UINT32 get_rtc_ram_size() { return m_rtc_ram_size; };
 
-	virtual void rom_map_setup(UINT32 size);
+	void rom_map_setup(UINT32 size);
 
 	// internal state
-	UINT8      *m_rom;
-	UINT8      *m_nvram;
-	UINT8      *m_bios;
-	UINT8      *m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
+	UINT8  *m_rom;
+	UINT8  *m_nvram;
+	UINT8  *m_bios;
+	UINT8  *m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 	UINT32 m_rom_size;
 	UINT32 m_nvram_size;
 	UINT32 m_bios_size;
@@ -117,12 +117,13 @@ public:
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
-	virtual int get_cart_type(UINT8 *ROM, UINT32 len);
-	virtual UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
-	virtual int get_type() { return m_type; }
+	int get_cart_type(UINT8 *ROM, UINT32 len);
+	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
+	int get_type() { return m_type; }
 
-	virtual void setup_custom_mappers();
-	virtual void setup_nvram();
+	void setup_custom_mappers();
+	void setup_nvram();
+	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
@@ -134,7 +135,6 @@ public:
 
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-	virtual void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -189,8 +189,6 @@ public:
 	virtual const char *file_extensions() const { return "bs"; }
 	virtual bool must_be_loaded() const { return 0; }
 };
-
-
 
 
 // device type definition

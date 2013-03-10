@@ -77,6 +77,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_spc7110"; }
 
 	// reading and writing
@@ -89,6 +90,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 
 	void spc7110_start();
+	void spc7110_reset();
 	UINT32 spc7110_datarom_addr(UINT32 addr, UINT32 len);
 	UINT32 spc7110_data_pointer();
 	UINT32 spc7110_data_adjust();
@@ -192,6 +194,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_spc7110rtc"; }
 
 	// reading and writing

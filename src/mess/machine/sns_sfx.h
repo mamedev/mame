@@ -16,6 +16,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_superfx"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 

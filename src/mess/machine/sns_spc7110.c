@@ -46,63 +46,6 @@ sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconf
 
 void sns_rom_spc7110_device::spc7110_start()
 {
-	memset(m_ram, 0, sizeof(m_ram));
-	m_r4801 = 0x00;
-	m_r4802 = 0x00;
-	m_r4803 = 0x00;
-	m_r4804 = 0x00;
-	m_r4805 = 0x00;
-	m_r4806 = 0x00;
-	m_r4807 = 0x00;
-	m_r4808 = 0x00;
-	m_r4809 = 0x00;
-	m_r480a = 0x00;
-	m_r480b = 0x00;
-	m_r480c = 0x00;
-
-	m_r4811 = 0x00;
-	m_r4812 = 0x00;
-	m_r4813 = 0x00;
-	m_r4814 = 0x00;
-	m_r4815 = 0x00;
-	m_r4816 = 0x00;
-	m_r4817 = 0x00;
-	m_r4818 = 0x00;
-
-	m_r481x = 0x00;
-	m_r4814_latch = 0;
-	m_r4815_latch = 0;
-
-	m_r4820 = 0x00;
-	m_r4821 = 0x00;
-	m_r4822 = 0x00;
-	m_r4823 = 0x00;
-	m_r4824 = 0x00;
-	m_r4825 = 0x00;
-	m_r4826 = 0x00;
-	m_r4827 = 0x00;
-	m_r4828 = 0x00;
-	m_r4829 = 0x00;
-	m_r482a = 0x00;
-	m_r482b = 0x00;
-	m_r482c = 0x00;
-	m_r482d = 0x00;
-	m_r482e = 0x00;
-	m_r482f = 0x00;
-
-	m_r4830 = 0x00;
-	m_r4831 = 0;
-	m_dx_offset = spc7110_datarom_addr(0 * 0x100000, 0x200000); // we would need the rom length here...
-	m_r4832 = 1;
-	m_ex_offset = spc7110_datarom_addr(1 * 0x100000, 0x200000); // we would need the rom length here...
-	m_r4833 = 2;
-	m_fx_offset = spc7110_datarom_addr(2 * 0x100000, 0x200000); // we would need the rom length here...
-	m_r4834 = 0x00;
-
-	m_r4840 = 0x00;
-	m_r4841 = 0x00;
-	m_r4842 = 0x00;
-
 	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
 
 	save_item(NAME(m_ram));
@@ -159,32 +102,98 @@ void sns_rom_spc7110_device::spc7110_start()
 	// TODO: save decomp-related items and fix their restore...
 }
 
+void sns_rom_spc7110_device::spc7110_reset()
+{
+	memset(m_ram, 0, sizeof(m_ram));
+	m_r4801 = 0x00;
+	m_r4802 = 0x00;
+	m_r4803 = 0x00;
+	m_r4804 = 0x00;
+	m_r4805 = 0x00;
+	m_r4806 = 0x00;
+	m_r4807 = 0x00;
+	m_r4808 = 0x00;
+	m_r4809 = 0x00;
+	m_r480a = 0x00;
+	m_r480b = 0x00;
+	m_r480c = 0x00;
+	
+	m_r4811 = 0x00;
+	m_r4812 = 0x00;
+	m_r4813 = 0x00;
+	m_r4814 = 0x00;
+	m_r4815 = 0x00;
+	m_r4816 = 0x00;
+	m_r4817 = 0x00;
+	m_r4818 = 0x00;
+	
+	m_r481x = 0x00;
+	m_r4814_latch = 0;
+	m_r4815_latch = 0;
+	
+	m_r4820 = 0x00;
+	m_r4821 = 0x00;
+	m_r4822 = 0x00;
+	m_r4823 = 0x00;
+	m_r4824 = 0x00;
+	m_r4825 = 0x00;
+	m_r4826 = 0x00;
+	m_r4827 = 0x00;
+	m_r4828 = 0x00;
+	m_r4829 = 0x00;
+	m_r482a = 0x00;
+	m_r482b = 0x00;
+	m_r482c = 0x00;
+	m_r482d = 0x00;
+	m_r482e = 0x00;
+	m_r482f = 0x00;
+	
+	m_r4830 = 0x00;
+	m_r4831 = 0;
+	m_dx_offset = spc7110_datarom_addr(0 * 0x100000, 0x200000); // we would need the rom length here...
+	m_r4832 = 1;
+	m_ex_offset = spc7110_datarom_addr(1 * 0x100000, 0x200000); // we would need the rom length here...
+	m_r4833 = 2;
+	m_fx_offset = spc7110_datarom_addr(2 * 0x100000, 0x200000); // we would need the rom length here...
+	m_r4834 = 0x00;
+	
+	m_r4840 = 0x00;
+	m_r4841 = 0x00;
+	m_r4842 = 0x00;
+}
+
 void sns_rom_spc7110_device::device_start()
 {
-	memset(rom_bank_map, 0, sizeof(rom_bank_map));
-
 	spc7110_start();
+}
+
+void sns_rom_spc7110_device::device_reset()
+{
+	spc7110_reset();
 }
 
 void sns_rom_spc7110rtc_device::device_start()
 {
-	memset(rom_bank_map, 0, sizeof(rom_bank_map));
-
 	spc7110_start();
-
-	// RTC
-	m_rtc_state = RTCS_Inactive;
-	m_rtc_mode  = RTCM_Linear;
-	m_rtc_index = 0;
-	m_rtc_offset = 0;
-
-// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
-//  spc7110_update_time(0);
 
 	save_item(NAME(m_rtc_state));
 	save_item(NAME(m_rtc_mode));
 	save_item(NAME(m_rtc_index));
 	save_item(NAME(m_rtc_offset));
+}
+
+void sns_rom_spc7110rtc_device::device_reset()
+{
+	spc7110_reset();
+	
+	// RTC
+	m_rtc_state = RTCS_Inactive;
+	m_rtc_mode  = RTCM_Linear;
+	m_rtc_index = 0;
+	m_rtc_offset = 0;
+	
+	// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
+//  spc7110_update_time(0);
 }
 
 

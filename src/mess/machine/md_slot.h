@@ -109,8 +109,8 @@ public:
 	virtual UINT32 get_rom_size() { return m_rom_size; };
 	virtual UINT32 get_nvram_size() { return m_nvram_size; };
 
-	virtual void rom_map_setup(UINT32 size);
-	virtual UINT32 get_padded_size(UINT32 size);
+	void rom_map_setup(UINT32 size);
+	UINT32 get_padded_size(UINT32 size);
 
 	int m_nvram_start, m_nvram_end;
 	int m_nvram_active, m_nvram_readonly;
@@ -121,8 +121,8 @@ public:
 	int m_nvram_handlers_installed;
 
 	// internal state
-	UINT16      *m_rom;
-	UINT16      *m_nvram;
+	UINT16 *m_rom;
+	UINT16 *m_nvram;
 	UINT32 m_rom_size;
 	UINT32 m_nvram_size;
 
@@ -151,14 +151,6 @@ public:
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
-	virtual int load_list();
-	virtual int load_nonlist();
-	virtual int get_cart_type(UINT8 *ROM, UINT32 len);
-
-
-	virtual void setup_custom_mappers();
-	virtual void setup_nvram();
-
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -169,7 +161,14 @@ public:
 
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-
+	
+	int load_list();
+	int load_nonlist();
+	int get_cart_type(UINT8 *ROM, UINT32 len);
+	
+	void setup_custom_mappers();
+	void setup_nvram();
+	
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);

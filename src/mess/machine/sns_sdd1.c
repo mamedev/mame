@@ -427,22 +427,6 @@ sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const ch
 
 void sns_rom_sdd1_device::device_start()
 {
-	UINT8 i;
-
-	m_sdd1_enable = 0x00;
-	m_xfer_enable = 0x00;
-
-	m_mmc[0] = 0 << 20;
-	m_mmc[1] = 1 << 20;
-	m_mmc[2] = 2 << 20;
-	m_mmc[3] = 3 << 20;
-
-	for(i = 0; i < 8; i++)
-	{
-		m_dma[i].addr = 0;
-		m_dma[i].size = 0;
-	}
-
 	m_sdd1emu = auto_alloc(machine(), SDD1__emu(machine()));
 
 	m_buffer.data = (UINT8*)auto_alloc_array(machine(), UINT8, 0x10000);
@@ -452,6 +436,23 @@ void sns_rom_sdd1_device::device_start()
 	save_item(NAME(m_xfer_enable));
 	save_item(NAME(m_mmc));
 	// TODO: save decomp-related and dma-related items and fix their restore...
+}
+
+void sns_rom_sdd1_device::device_reset()
+{
+	m_sdd1_enable = 0x00;
+	m_xfer_enable = 0x00;
+	
+	m_mmc[0] = 0 << 20;
+	m_mmc[1] = 1 << 20;
+	m_mmc[2] = 2 << 20;
+	m_mmc[3] = 3 << 20;
+	
+	for(int i = 0; i < 8; i++)
+	{
+		m_dma[i].addr = 0;
+		m_dma[i].size = 0;
+	}	
 }
 
 /*-------------------------------------------------

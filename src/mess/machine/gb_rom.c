@@ -78,74 +78,76 @@ megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, const ch
 }
 
 
-void gb_rom_device::device_start()
-{
-	// these actually never change for base carts, so no need to save them
-	m_latch_bank = 0;
-	m_ram_bank = 0;
-}
+//-------------------------------------------------
+//  shared_start
+//-------------------------------------------------
 
-void megaduck_rom_device::device_start()
+void gb_rom_device::shared_start()
 {
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
 	save_item(NAME(m_latch_bank));
 	save_item(NAME(m_latch_bank2));
+	save_item(NAME(m_ram_bank));
 }
+
+//-------------------------------------------------
+//  shared_reset
+//-------------------------------------------------
+
+void gb_rom_device::shared_reset()
+{
+	m_ram_bank = 0;
+	m_latch_bank = 0;
+	m_latch_bank2 = 1;
+	
+	has_rumble = FALSE;
+	has_timer = FALSE;
+	has_battery = FALSE;
+}
+
+//-------------------------------------------------
+//  mapper specific start/reset
+//-------------------------------------------------
 
 void gb_rom_tama5_device::device_start()
 {
-	m_tama5_data = 0;
-	m_tama5_addr= 0;
-	m_tama5_cmd = 0;
-	memset(m_regs, 0xff, sizeof(m_regs));
-	m_rtc_reg = 0xff;
-	m_ram_bank = 0;
+	shared_start();
 	save_item(NAME(m_tama5_data));
 	save_item(NAME(m_tama5_addr));
 	save_item(NAME(m_tama5_cmd));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_rtc_reg));
-	save_item(NAME(m_ram_bank));
 }
 
-void gb_rom_wisdom_device::device_start()
+void gb_rom_tama5_device::device_reset()
 {
-	m_latch_bank = 0;
-	m_ram_bank = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_ram_bank));
+	shared_reset();
+	m_tama5_data = 0;
+	m_tama5_addr= 0;
+	m_tama5_cmd = 0;
+	memset(m_regs, 0xff, sizeof(m_regs));
+	m_rtc_reg = 0xff;
 }
 
-void gb_rom_yong_device::device_start()
-{
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
-}
 
-void gb_rom_atvrac_device::device_start()
+// these are identical to shared ones above, but megaduck cart class is not derived from gb cart class...
+void megaduck_rom_device::device_start()
 {
-	m_latch_bank = 0;
-	m_latch_bank2 = 1;
-	m_ram_bank = 0;
 	save_item(NAME(m_latch_bank));
 	save_item(NAME(m_latch_bank2));
 	save_item(NAME(m_ram_bank));
 }
 
-void gb_rom_lasama_device::device_start()
+void megaduck_rom_device::device_reset()
 {
+	m_ram_bank = 0;
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
-	m_ram_bank = 0;
-	save_item(NAME(m_latch_bank));
-	save_item(NAME(m_latch_bank2));
-	save_item(NAME(m_ram_bank));
+	
+	has_rumble = FALSE;
+	has_timer = FALSE;
+	has_battery = FALSE;
 }
+
 
 /*-------------------------------------------------
  mapper specific handlers

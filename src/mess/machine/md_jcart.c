@@ -144,20 +144,28 @@ ioport_constructor md_jcart_device::device_input_ports() const
 
 void md_jcart_device::device_start()
 {
-	m_jcart_io_data[0] = 0;
-	m_jcart_io_data[1] = 0;
 	save_item(NAME(m_jcart_io_data));
 }
 
+void md_jcart_device::device_reset()
+{
+	m_jcart_io_data[0] = 0;
+	m_jcart_io_data[1] = 0;
+}
+
 void md_seprom_codemast_device::device_start()
+{
+	save_item(NAME(m_i2c_mem));
+	save_item(NAME(m_i2c_clk));
+	save_item(NAME(m_jcart_io_data));
+}
+
+void md_seprom_codemast_device::device_reset()
 {
 	m_i2c_mem = 0;
 	m_i2c_clk = 0;
 	m_jcart_io_data[0] = 0;
 	m_jcart_io_data[1] = 0;
-	save_item(NAME(m_i2c_mem));
-	save_item(NAME(m_i2c_clk));
-	save_item(NAME(m_jcart_io_data));
 }
 
 

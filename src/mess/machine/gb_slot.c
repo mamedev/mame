@@ -130,6 +130,7 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 		ram_bank_map[i] = i & mask;
 }
 
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -219,6 +220,8 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_DIGIMON, "rom_digimon" },
 	{ GB_MBC_ROCKMAN8, "rom_rock8" },
 	{ GB_MBC_SM3SP, "rom_sm3sp" },
+	{ GB_MBC_UNK01, "rom_unk01" },
+	{ GB_MBC_DKONG5, "rom_dkong5" },
 	{ GB_MBC_CAMERA, "rom_camera" }
 };
 

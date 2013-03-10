@@ -216,106 +216,157 @@ md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const 
 
 void md_rom_ssf2_device::device_start()
 {
-	for (int i = 0; i < 7; i++)
-		m_bank[i] = i;
-	m_lastoff = -1;
-	m_lastdata = -1;
 	save_item(NAME(m_bank));
 	save_item(NAME(m_lastoff));
 	save_item(NAME(m_lastdata));
 }
 
+void md_rom_ssf2_device::device_reset()
+{
+	for (int i = 0; i < 7; i++)
+		m_bank[i] = i;
+	m_lastoff = -1;
+	m_lastdata = -1;
+}
+
 void md_rom_mcpirate_device::device_start()
 {
-	m_bank = 0;
 	save_item(NAME(m_bank));
+}
+
+void md_rom_mcpirate_device::device_reset()
+{
+	m_bank = 0;
 }
 
 void md_rom_chinf3_device::device_start()
 {
-	m_bank = 0;
 	save_item(NAME(m_bank));
+}
+
+void md_rom_chinf3_device::device_reset()
+{
+	m_bank = 0;
 }
 
 void md_rom_lion2_device::device_start()
 {
-	m_prot1_data = 0;
-	m_prot2_data = 0;
 	save_item(NAME(m_prot1_data));
 	save_item(NAME(m_prot2_data));
 }
 
+void md_rom_lion2_device::device_reset()
+{
+	m_prot1_data = 0;
+	m_prot2_data = 0;
+}
+
 void md_rom_lion3_device::device_start()
+{
+	save_item(NAME(m_reg));
+	save_item(NAME(m_bank));
+}
+
+void md_rom_lion3_device::device_reset()
 {
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 	m_reg[2] = 0;
 	m_bank = 0;
-	save_item(NAME(m_reg));
-	save_item(NAME(m_bank));
 }
 
 void md_rom_pokestad_device::device_start()
 {
-	m_bank = 0;
 	save_item(NAME(m_bank));
+}
+
+void md_rom_pokestad_device::device_reset()
+{
+	m_bank = 0;
 }
 
 void md_rom_realtec_device::device_start()
 {
-	m_bank_addr = 0;
-	m_bank_size = 0;
-	m_old_bank_addr = -1;
 	save_item(NAME(m_bank_addr));
 	save_item(NAME(m_bank_size));
 	save_item(NAME(m_old_bank_addr));
 }
 
+void md_rom_realtec_device::device_reset()
+{
+	m_bank_addr = 0;
+	m_bank_size = 0;
+	m_old_bank_addr = -1;
+}
+
 void md_rom_squir_device::device_start()
 {
-	m_latch = 0;
 	save_item(NAME(m_latch));
+}
+
+void md_rom_squir_device::device_reset()
+{
+	m_latch = 0;
 }
 
 void md_rom_smw64_device::device_start()
 {
-	m_latch0 = 0xf;
-	m_latch1 = 0xf;
-	memset(m_reg, 0, sizeof(m_reg));
-	memset(m_ctrl, 0, sizeof(m_ctrl));
-
 	save_item(NAME(m_latch0));
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_ctrl));
 }
 
+void md_rom_smw64_device::device_reset()
+{
+	m_latch0 = 0xf;
+	m_latch1 = 0xf;
+	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_ctrl, 0, sizeof(m_ctrl));
+}
+
 void md_rom_topf_device::device_start()
 {
-	m_latch = 0;
-	m_bank[0] = m_bank[1] = m_bank[2] = 0;
 	save_item(NAME(m_latch));
 	save_item(NAME(m_bank));
 }
 
+void md_rom_topf_device::device_reset()
+{
+	m_latch = 0;
+	m_bank[0] = m_bank[1] = m_bank[2] = 0;
+}
+
 void md_rom_radica_device::device_start()
 {
-	m_bank = 0;
 	save_item(NAME(m_bank));
+}
+
+void md_rom_radica_device::device_reset()
+{
+	m_bank = 0;
 }
 
 void md_rom_beggarp_device::device_start()
 {
-	m_mode = 0;
-	m_lock = 0;
 	save_item(NAME(m_mode));
 	save_item(NAME(m_lock));
 }
 
-void md_rom_wukong_device::device_start()
+void md_rom_beggarp_device::device_reset()
 {
 	m_mode = 0;
+	m_lock = 0;
+}
+
+void md_rom_wukong_device::device_start()
+{
 	save_item(NAME(m_mode));
+}
+
+void md_rom_wukong_device::device_reset()
+{
+	m_mode = 0;
 }
 
 /*-------------------------------------------------
@@ -946,7 +997,6 @@ READ16_MEMBER(md_rom_smw64_device::read)
 			return data;
 		}
 	}
-	
 	return 0xffff;
 }
 
@@ -1107,7 +1157,7 @@ READ16_MEMBER(md_rom_beggarp_device::read)
 		return m_mode ? m_rom[offset + 0x380000/2] : m_rom[offset];
 	else if (offset < 0x400000/2)
 		return m_rom[offset & 0x1fffff];
-	
+
 	return 0xffff;
 }
 

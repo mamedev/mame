@@ -16,6 +16,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom21"; }
 
 	// reading and writing
@@ -33,6 +34,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom21_srtc"; }
 
 	// reading and writing

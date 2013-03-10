@@ -14,9 +14,13 @@ public:
 	gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc_base"; }
-
+	
+	void shared_start();
+	void shared_reset();
+	
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -35,7 +39,8 @@ public:
 	gb_rom_mbc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc1"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -53,7 +58,8 @@ public:
 	gb_rom_mbc1col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc1col"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -71,7 +77,8 @@ public:
 	gb_rom_mbc2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc2"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -90,6 +97,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc3"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -109,7 +117,8 @@ public:
 	gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc5"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -128,6 +137,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc6"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -147,7 +157,8 @@ public:
 	gb_rom_mbc7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc7"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -165,12 +176,36 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_mmm01"; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	UINT8 m_bank_mask, m_bank, m_reg;
+};
+
+// ======================> gb_rom_sintax_device
+class gb_rom_sintax_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "gb_rom_sintax"; }
+	void set_xor_for_bank(UINT8 bank);
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	UINT8 m_bank_mask, m_bank, m_reg;
+
+	UINT8 m_currentxor, m_xor2, m_xor3, m_xor4, m_xor5, m_sintax_mode;
 };
 
 // ======================> gb_rom_chongwu_device
@@ -183,6 +218,7 @@ public:
 	
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_chongwu"; }
 	
 	virtual DECLARE_READ8_MEMBER(read_rom);
@@ -198,35 +234,14 @@ public:
 	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_digimon"; }
 	
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
-};
-
-// ======================> gb_rom_sintax_device
-class gb_rom_sintax_device : public gb_rom_mbc_device
-{
-public:
-	// construction/destruction
-	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	// device-level overrides
-	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "gb_rom_sintax"; }
-	void set_xor_for_bank(UINT8 bank);
-	
-	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_WRITE8_MEMBER(write_bank);
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
-	UINT8 m_bank_mask, m_bank, m_reg;
-
-	UINT8 m_currentxor, m_xor2, m_xor3, m_xor4, m_xor5, m_sintax_mode;
 };
 
 // ======================> gb_rom_rockman8_device
@@ -237,7 +252,8 @@ public:
 	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_rockman8"; }
 	
 	// reading and writing
@@ -256,7 +272,8 @@ public:
 	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	
 	// device-level overrides
-	virtual void device_start();
+	virtual void device_start() { shared_start(); };
+	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_sm3sp"; }
 	
 	// reading and writing

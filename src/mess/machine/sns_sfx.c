@@ -30,6 +30,11 @@ void sns_rom_superfx_device::device_start()
 	save_item(NAME(sfx_ram));
 }
 
+void sns_rom_superfx_device::device_reset()
+{
+	memset(sfx_ram, 0x00, sizeof(sfx_ram));
+}
+
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/

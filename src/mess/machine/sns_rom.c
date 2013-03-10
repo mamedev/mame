@@ -47,27 +47,33 @@ sns_rom_obc1_device::sns_rom_obc1_device(const machine_config &mconfig, const ch
 
 void sns_rom_device::device_start()
 {
-	memset(rom_bank_map, 0, sizeof(rom_bank_map));
 }
 
 void sns_rom_pokemon_device::device_start()
 {
-	m_latch = 0;
 	save_item(NAME(m_latch));
 }
 
+void sns_rom_pokemon_device::device_reset()
+{
+	m_latch = 0;
+}
+
 void sns_rom_obc1_device::device_start()
+{
+	save_item(NAME(m_ram));
+	save_item(NAME(m_address));
+	save_item(NAME(m_offset));
+	save_item(NAME(m_shift));
+}
+
+void sns_rom_obc1_device::device_reset()
 {
 	memset(m_ram, 0xff, sizeof(m_ram));
 	// or from rom?
 	m_offset  = (m_ram[0x1ff5] & 0x01) ? 0x1800 : 0x1c00;
 	m_address = (m_ram[0x1ff6] & 0x7f);
 	m_shift   = (m_ram[0x1ff6] & 0x03) << 1;
-
-	save_item(NAME(m_ram));
-	save_item(NAME(m_address));
-	save_item(NAME(m_offset));
-	save_item(NAME(m_shift));
 }
 
 

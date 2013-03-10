@@ -40,21 +40,27 @@ sns_rom21_srtc_device::sns_rom21_srtc_device(const machine_config &mconfig, cons
 
 void sns_rom21_device::device_start()
 {
-	memset(rom_bank_map, 0, sizeof(rom_bank_map));
+}
+
+void sns_rom21_device::device_reset()
+{
 }
 
 void sns_rom21_srtc_device::device_start()
 {
-	memset(rom_bank_map, 0, sizeof(rom_bank_map));
-
-	m_mode = RTCM_Read;
-	m_index = -1;
-
-// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
-//  update_time();
-
 	save_item(NAME(m_mode));
 	save_item(NAME(m_index));
+	save_item(NAME(m_rtc_ram));
+}
+
+void sns_rom21_srtc_device::device_reset()
+{
+	m_mode = RTCM_Read;
+	m_index = -1;
+	memset(m_rtc_ram, 0, sizeof(m_rtc_ram));	
+	
+// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
+//  update_time();
 }
 
 /*-------------------------------------------------

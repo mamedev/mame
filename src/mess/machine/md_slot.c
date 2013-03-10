@@ -141,8 +141,7 @@ void device_md_cart_interface::rom_map_setup(UINT32 size)
 }
 
 //-------------------------------------------------
-//
-//
+// get_padded_size
 //-------------------------------------------------
 
 UINT32 device_md_cart_interface::get_padded_size(UINT32 size)

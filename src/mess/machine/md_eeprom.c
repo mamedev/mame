@@ -195,10 +195,14 @@ machine_config_constructor md_eeprom_blara_device::device_mconfig_additions() co
 
 void md_std_eeprom_device::device_start()
 {
-	m_i2c_mem = 0;
-	m_i2c_clk = 0;
 	save_item(NAME(m_i2c_mem));
 	save_item(NAME(m_i2c_clk));
+}
+
+void md_std_eeprom_device::device_reset()
+{
+	m_i2c_mem = 0;
+	m_i2c_clk = 0;
 }
 
 /*-------------------------------------------------

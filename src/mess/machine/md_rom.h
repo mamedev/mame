@@ -71,6 +71,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_ssf2"; }
 
 	// reading and writing
@@ -92,6 +93,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_mcpirate"; }
 
 	// reading and writing
@@ -128,6 +130,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_chinf3"; }
 
 	// reading and writing
@@ -208,6 +211,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_lion2"; }
 
 	// reading and writing
@@ -228,6 +232,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_lion3"; }
 
 	// reading and writing
@@ -279,6 +284,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_pokestad"; }
 
 	// reading and writing
@@ -299,6 +305,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_realtec"; }
 
 	// reading and writing
@@ -394,6 +401,7 @@ public:
 	
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_smw64"; }
 	
 	// reading and writing
@@ -447,6 +455,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_squir"; }
 
 	// reading and writing
@@ -467,6 +476,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_topf"; }
 
 	// reading and writing
@@ -488,6 +498,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_radica"; }
 
 	// reading and writing
@@ -508,6 +519,7 @@ public:
 	
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_beggarp"; }
 	
 	// reading and writing
@@ -515,6 +527,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write);
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
 
+private:
 	UINT8 m_mode, m_lock;
 };
 
@@ -528,6 +541,7 @@ public:
 	
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_wukong"; }
 	
 	// reading and writing
@@ -535,6 +549,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write);
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
 	
+private:
 	UINT8 m_mode;
 };
 

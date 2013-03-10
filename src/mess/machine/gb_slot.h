@@ -32,6 +32,8 @@ enum
 	GB_MBC_DIGIMON,
 	GB_MBC_ROCKMAN8,
 	GB_MBC_SM3SP,
+	GB_MBC_DKONG5,
+	GB_MBC_UNK01,
 	GB_MBC_MEGADUCK,     /* MEGADUCK style banking                        */
 	GB_MBC_UNKNOWN       /* Unknown mapper                                */
 };
@@ -59,24 +61,24 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ram) {}
 
-	virtual void rom_alloc(running_machine &machine, UINT32 size);
-	virtual void ram_alloc(running_machine &machine, UINT32 size);
-	virtual UINT8* get_rom_base() { return m_rom; }
-	virtual UINT8* get_ram_base() { return m_ram; }
-	virtual UINT32 get_rom_size() { return m_rom_size; }
-	virtual UINT32 get_ram_size() { return m_ram_size; }
+	void rom_alloc(running_machine &machine, UINT32 size);
+	void ram_alloc(running_machine &machine, UINT32 size);
+	UINT8* get_rom_base() { return m_rom; }
+	UINT8* get_ram_base() { return m_ram; }
+	UINT32 get_rom_size() { return m_rom_size; }
+	UINT32 get_ram_size() { return m_ram_size; }
 
-	virtual void rom_map_setup(UINT32 size);
-	virtual void ram_map_setup(UINT8 banks);
+	void rom_map_setup(UINT32 size);
+	void ram_map_setup(UINT8 banks);
 
-	virtual void set_has_timer(bool val) { has_timer = val; }
-	virtual void set_has_rumble(bool val) { has_rumble = val; }
-	virtual void set_has_battery(bool val) { has_battery = val; }
-	virtual bool get_has_battery() { return has_battery; }
+	void set_has_timer(bool val) { has_timer = val; }
+	void set_has_rumble(bool val) { has_rumble = val; }
+	void set_has_battery(bool val) { has_battery = val; }
+	bool get_has_battery() { return has_battery; }
 
 	// internal state
-	UINT8      *m_rom;
-	UINT8      *m_ram;
+	UINT8  *m_rom;
+	UINT8  *m_ram;
 	UINT32 m_rom_size;
 	UINT32 m_ram_size;
 
@@ -117,12 +119,12 @@ public:
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
-	virtual int get_type() { return m_type; }
-	virtual int get_cart_type(UINT8 *ROM, UINT32 len);
-	virtual bool get_mmm01_candidate(UINT8 *ROM, UINT32 len);
+	int get_type() { return m_type; }
+	int get_cart_type(UINT8 *ROM, UINT32 len);
+	bool get_mmm01_candidate(UINT8 *ROM, UINT32 len);
 
-	virtual void setup_ram(UINT8 banks);
-	virtual void internal_header_logging(UINT8 *ROM, UINT32 len);
+	void setup_ram(UINT8 banks);
+	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
