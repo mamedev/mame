@@ -57,7 +57,7 @@ void sns_rom21_srtc_device::device_reset()
 {
 	m_mode = RTCM_Read;
 	m_index = -1;
-	memset(m_rtc_ram, 0, sizeof(m_rtc_ram));	
+	memset(m_rtc_ram, 0, m_rtc_ram_size);	
 	
 // at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
 //  update_time();
