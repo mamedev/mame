@@ -43,16 +43,6 @@ cococart_slot_device::cococart_slot_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
-//  cococart_slot_device - destructor
-//-------------------------------------------------
-
-cococart_slot_device::~cococart_slot_device()
-{
-}
-
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -60,9 +50,9 @@ void cococart_slot_device::device_start()
 {
 	for(int i=0; i<TIMER_POOL; i++ )
 	{
-		m_cart_line.timer[i]        = machine().scheduler().timer_alloc(FUNC(cart_timer_callback), (void *) this);
-		m_nmi_line.timer[i]     = machine().scheduler().timer_alloc(FUNC(nmi_timer_callback), (void *)  this);
-		m_halt_line.timer[i]        = machine().scheduler().timer_alloc(FUNC(halt_timer_callback), (void *) this);
+		m_cart_line.timer[i]	= timer_alloc(TIMER_CART);
+		m_nmi_line.timer[i]     = timer_alloc(TIMER_NMI);
+		m_halt_line.timer[i]    = timer_alloc(TIMER_HALT);
 	}
 
 	m_cart_line.timer_index     = 0;
@@ -123,6 +113,30 @@ void cococart_slot_device::device_config_complete()
 
 
 //-------------------------------------------------
+//  device_timer - handle timer callbacks
+//-------------------------------------------------
+
+void cococart_slot_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_CART:
+			set_line("CART", m_cart_line, (cococart_line_value) param);
+			break;
+
+		case TIMER_NMI:
+			set_line("NMI", m_nmi_line, (cococart_line_value) param);
+			break;
+
+		case TIMER_HALT:
+			set_line("HALT", m_halt_line, (cococart_line_value) param);
+			break;
+	}
+}
+
+
+
+//-------------------------------------------------
 //  coco_cartridge_r
 //-------------------------------------------------
 
@@ -178,73 +192,38 @@ static const char *line_value_string(cococart_line_value value)
 //  set_line
 //-------------------------------------------------
 
-void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line *line, cococart_line_value value)
+void cococart_slot_device::set_line(const char *line_name, coco_cartridge_line &line, cococart_line_value value)
 {
-	if ((line->value != value) || (value == COCOCART_LINE_VALUE_Q))
+	if ((line.value != value) || (value == COCOCART_LINE_VALUE_Q))
 	{
-		line->value = value;
+		line.value = value;
 
 		if (LOG_LINE)
 			logerror("[%s]: set_line(): %s <= %s\n", machine().describe_context(), line_name, line_value_string(value));
 		/* engage in a bit of gymnastics for this odious 'Q' value */
-		switch(line->value)
+		switch(line.value)
 		{
 			case COCOCART_LINE_VALUE_CLEAR:
-				line->line = 0x00;
-				line->q_count = 0;
+				line.line = 0x00;
+				line.q_count = 0;
 				break;
 
 			case COCOCART_LINE_VALUE_ASSERT:
-				line->line = 0x01;
-				line->q_count = 0;
+				line.line = 0x01;
+				line.q_count = 0;
 				break;
 
 			case COCOCART_LINE_VALUE_Q:
-				line->line = line->line ? 0x00 : 0x01;
-				if (line->q_count++ < 4)
+				line.line = line.line ? 0x00 : 0x01;
+				if (line.q_count++ < 4)
 					set_line_timer(line, value);
 				break;
 		}
 
 		/* invoke the callback, if present */
-		if (!line->callback.isnull())
-			line->callback(line->line);
+		if (!line.callback.isnull())
+			line.callback(line.line);
 	}
-}
-
-
-
-//-------------------------------------------------
-//  TIMER_CALLBACK( cart_timer_callback )
-//-------------------------------------------------
-
-TIMER_CALLBACK( cococart_slot_device::cart_timer_callback )
-{
-	cococart_slot_device *device = (cococart_slot_device *) ptr;
-	device->set_line("CART", &device->m_cart_line, (cococart_line_value) param);
-}
-
-
-
-//-------------------------------------------------
-//  TIMER_CALLBACK( nmi_timer_callback )
-//-------------------------------------------------
-
-TIMER_CALLBACK( cococart_slot_device::nmi_timer_callback )
-{
-	cococart_slot_device *device = (cococart_slot_device *) ptr;
-	device->set_line("NMI", &device->m_nmi_line, (cococart_line_value) param);
-}
-
-
-//-------------------------------------------------
-//  TIMER_CALLBACK( halt_timer_callback )
-//-------------------------------------------------
-
-TIMER_CALLBACK( cococart_slot_device::halt_timer_callback )
-{
-	cococart_slot_device *device = (cococart_slot_device *) ptr;
-	device->set_line("HALT", &device->m_halt_line, (cococart_line_value) param);
 }
 
 
@@ -253,15 +232,15 @@ TIMER_CALLBACK( cococart_slot_device::halt_timer_callback )
 //  set_line_timer()
 //-------------------------------------------------
 
-void cococart_slot_device::set_line_timer(coco_cartridge_line *line, cococart_line_value value)
+void cococart_slot_device::set_line_timer(coco_cartridge_line &line, cococart_line_value value)
 {
 	/* calculate delay; delay dependant on cycles per second */
-	attotime delay = (line->delay != 0)
-		? machine().firstcpu->cycles_to_attotime(line->delay)
+	attotime delay = (line.delay != 0)
+		? machine().firstcpu->cycles_to_attotime(line.delay)
 		: attotime::zero;
 
-	line->timer[line->timer_index]->adjust(delay, (int) value);
-	line->timer_index = (line->timer_index + 1) % TIMER_POOL;
+	line.timer[line.timer_index]->adjust(delay, (int) value);
+	line.timer_index = (line.timer_index + 1) % TIMER_POOL;
 }
 
 
@@ -270,11 +249,11 @@ void cococart_slot_device::set_line_timer(coco_cartridge_line *line, cococart_li
 //  twiddle_line_if_q
 //-------------------------------------------------
 
-void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line *line)
+void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line &line)
 {
-	if (line->value == COCOCART_LINE_VALUE_Q)
+	if (line.value == COCOCART_LINE_VALUE_Q)
 	{
-		line->q_count = 0;
+		line.q_count = 0;
 		set_line_timer(line, COCOCART_LINE_VALUE_Q);
 	}
 }
@@ -288,9 +267,9 @@ void cococart_slot_device::twiddle_line_if_q(coco_cartridge_line *line)
 
 void cococart_slot_device::twiddle_q_lines()
 {
-	twiddle_line_if_q(&m_cart_line);
-	twiddle_line_if_q(&m_nmi_line);
-	twiddle_line_if_q(&m_halt_line);
+	twiddle_line_if_q(m_cart_line);
+	twiddle_line_if_q(m_nmi_line);
+	twiddle_line_if_q(m_halt_line);
 }
 
 
@@ -303,19 +282,19 @@ void cococart_slot_device::cart_set_line(cococart_line line, cococart_line_value
 	switch (line)
 	{
 		case COCOCART_LINE_CART:
-			set_line_timer(&m_cart_line, value);
+			set_line_timer(m_cart_line, value);
 			break;
 
 		case COCOCART_LINE_NMI:
-			set_line_timer(&m_nmi_line, value);
+			set_line_timer(m_nmi_line, value);
 			break;
 
 		case COCOCART_LINE_HALT:
-			set_line_timer(&m_halt_line, value);
+			set_line_timer(m_halt_line, value);
 			break;
 
 		case COCOCART_LINE_SOUND_ENABLE:
-			/* do nothing for now */
+			// do nothing for now 
 			break;
 	}
 }

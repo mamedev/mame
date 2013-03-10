@@ -76,11 +76,11 @@ class cococart_slot_device : public device_t,
 public:
 	// construction/destruction
 	cococart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~cococart_slot_device();
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// image-level overrides
 	virtual bool call_load();
@@ -100,35 +100,40 @@ public:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	/* reading and writing to $FF40-$FF7F */
+	// reading and writing to $FF40-$FF7F
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	/* sets a cartridge line */
+	// sets a cartridge line
 	void cart_set_line(cococart_line line, cococart_line_value value);
 
-	/* hack to support twiddling the Q line */
+	// hack to support twiddling the Q line
 	void twiddle_q_lines();
 
-	/* cart base */
+	// cart base
 	UINT8* get_cart_base();
 	void set_cart_base_update(cococart_base_update_delegate update);
 
-protected:
-	static TIMER_CALLBACK( cart_timer_callback );
-	static TIMER_CALLBACK( nmi_timer_callback );
-	static TIMER_CALLBACK( halt_timer_callback );
-
-	void set_line(const char *line_name, coco_cartridge_line *line, cococart_line_value value);
-	void set_line_timer(coco_cartridge_line *line, cococart_line_value value);
-	void twiddle_line_if_q(coco_cartridge_line *line);
+private:
+	enum
+	{
+		TIMER_CART,
+		TIMER_NMI,
+		TIMER_HALT
+	};
 
 	// configuration
 	coco_cartridge_line         m_cart_line;
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
 
+	// cartridge
 	device_cococart_interface   *m_cart;
+
+	// methods
+	void set_line(const char *line_name, coco_cartridge_line &line, cococart_line_value value);
+	void set_line_timer(coco_cartridge_line &line, cococart_line_value value);
+	void twiddle_line_if_q(coco_cartridge_line &line);
 };
 
 // device type definition
