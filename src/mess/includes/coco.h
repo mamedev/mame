@@ -259,6 +259,9 @@ private:
 
 	// VHD selection
 	UINT8 m_vhd_select;
+
+	// safety to prevent stack overflow when reading floating bus
+	bool m_in_floating_bus_read;
 };
 
 #endif // __COCO__

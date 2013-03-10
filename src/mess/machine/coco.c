@@ -162,6 +162,9 @@ void coco_state::device_start()
 	{
 		m_maincpu->debug()->set_dasm_override(dasm_override);
 	}
+
+	// miscellaneous
+	m_in_floating_bus_read = false;
 }
 
 
@@ -254,27 +257,45 @@ void coco_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 UINT8 coco_state::floating_bus_read(void)
 {
-	UINT8 byte;
+	UINT8 result;
 
-	// set up the ability to read address spaces
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+	// this method calls program.read_byte() - therefore we run the risk of a stack overflow if we don't check for
+	// a reentrant invocation
+	if (m_in_floating_bus_read)
+	{
+		// not sure what should really happen in this extremely degenerate scenario (the PC is probably
+		// in $FFxx never-never land), but I guess 0xFF is as good as anything.
+		result = 0xFF;
+	}
+	else
+	{
+		// prevent stack overflows
+		m_in_floating_bus_read = true;
 
-	// get the previous and current PC
-	UINT16 prev_pc = m_maincpu->pcbase();
-	UINT16 pc = m_maincpu->pc();
+		// set up the ability to read address spaces
+		address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	// get the byte; and skip over header bytes
-	byte = program.read_byte(prev_pc);
-	if ((byte == 0x10) || (byte == 0x11))
-		byte = program.read_byte(++prev_pc);
+		// get the previous and current PC
+		UINT16 prev_pc = m_maincpu->pcbase();
+		UINT16 pc = m_maincpu->pc();
 
-	// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
-	// specifies no-offset
-	bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
-		&& ((program.read_byte(prev_pc + 1) & 0xBF) == 0x84);
+		// get the byte; and skip over header bytes
+		UINT8 byte = program.read_byte(prev_pc);
+		if ((byte == 0x10) || (byte == 0x11))
+			byte = program.read_byte(++prev_pc);
 
-	// finally read the byte
-	return program.read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+		// check to see if the opcode specifies the indexed addressing mode, and the secondary byte
+		// specifies no-offset
+		bool is_nooffset_indexed = (((byte & 0xF0) == 0x60) || ((byte & 0xF0) == 0xA0) || ((byte & 0xF0) == 0xE0))
+			&& ((program.read_byte(prev_pc + 1) & 0xBF) == 0x84);
+
+		// finally read the byte
+		result = program.read_byte(is_nooffset_indexed ? pc : 0xFFFF);
+
+		// we're done reading
+		m_in_floating_bus_read = false;
+	}
+	return result;
 }
 
 
