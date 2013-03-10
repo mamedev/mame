@@ -532,6 +532,7 @@ void duart68681_channel::device_reset()
 	write_CR(0x40); // reset errors
 
 	tx_baud_rate = rx_baud_rate = 0;
+	CSR = 0;
 }
 
 // serial device virtual overrides
