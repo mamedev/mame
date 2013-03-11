@@ -389,8 +389,9 @@ READ8_MEMBER( snes_state::snes_r_io )
 		return snes_io_dma_r(space, offset);
 	}
 
-	/* offset is from 0x000000 */
-	switch (offset)
+
+	// other accesses (notice that WRMPYA, WRMPYB, WRDIVL, WRDIVH, WRDVDD, MEMSEL, RDDIVL, RDDIVH, RDMPYL, RDMPYH are handled by the CPU directly)
+	switch (offset)	// offset is from 0x000000
 	{
 		case WMDATA:    /* Data to read from WRAM */
 			value = space.read_byte(0x7e0000 + m_wram_address++);
@@ -593,7 +594,6 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			return;
 	}
 
-	snes_ram[offset] = data;
 }
 
 WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
