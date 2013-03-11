@@ -720,11 +720,11 @@ ROM_START(pf2012)
 	ROM_CONTINUE(                                 0x0001, 0x4000 )
 	#endif
 
-	ROM_REGION32_LE(0x400000, "user3", 0)       // Program ROM disk
+	ROM_REGION(0x400000, "user3", 0)       // Program ROM disk
 	ROM_LOAD("u1.bin", 0x000000, 0x200000, CRC(8f4c09cb) SHA1(0969a92fec819868881683c580f9e01cbedf4ad2))
 	ROM_LOAD("u2.bin", 0x200000, 0x200000, CRC(59881781) SHA1(85ff074ab2a922eac37cf96f0bf153a2dac55aa4))
 
-	ROM_REGION32_LE(0x4000000, "user4", 0)      // Data ROM disk
+	ROM_REGION(0x4000000, "user4", 0)      // Data ROM disk
 	ROM_LOAD("e59-01.u20", 0x0000000, 0x800000, CRC(701d3a9a) SHA1(34c9f34f4da34bb8eed85a4efd1d9eea47a21d77) )
 	ROM_LOAD("e59-02.u23", 0x0800000, 0x800000, CRC(626df682) SHA1(35bb4f91201734ce7ccdc640a75030aaca3d1151) )
 	ROM_LOAD("e59-03.u26", 0x1000000, 0x800000, CRC(74e4efde) SHA1(630235c2e4a11f615b5f3b8c93e1e645da09eefe) )
