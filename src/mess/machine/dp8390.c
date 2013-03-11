@@ -147,6 +147,15 @@ void dp8390_device::recv(UINT8 *buf, int len) {
 			if((offset >> 8) == m_regs.bnry) return recv_overflow();
 		}
 	}
+	if(len < 60) {
+		// this can't pass to the next page
+		for(; i < 60; i++) {
+			mem_write(high16 + offset, 0);
+			offset++;
+		}
+		len = 60;
+	}
+
 	m_regs.rsr |= 1;
 	m_regs.isr |= 1;
 	m_regs.curr = (offset >> 8) + ((offset & 0xff)?1:0);
