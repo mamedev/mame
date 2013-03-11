@@ -899,8 +899,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(snes_state,snes_mess)
 {
-	snes_ram = machine().root_device().memregion("maincpu")->base();
-	memset(snes_ram, 0, 0x1000000);
 }
 
 DRIVER_INIT_MEMBER(snes_state,snesst)

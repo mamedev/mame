@@ -28,11 +28,7 @@
 #include "audio/snes_snd.h"
 
 
-/* -- Globals -- */
-UINT8  *snes_ram = NULL;        /* 65816 ram */
-
 #define DMA_REG(a) m_dma_regs[a - 0x4300]   // regs 0x4300-0x437f
-
 
 void snes_state::video_start()
 {
@@ -1055,20 +1051,6 @@ void snes_state::snes_init_ram()
 		m_ppu.m_beam.current_vert = SNES_VTOTAL_PAL;
 }
 
-#if 0
-DIRECT_UPDATE_MEMBER(snes_state::snes_spc_direct)
-{
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine().device("spc700")));
-	return ~0;
-}
-#endif
-
-DIRECT_UPDATE_MEMBER(snes_state::snes_direct)
-{
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, snes_ram);
-	return ~0;
-}
-
 MACHINE_START( snes )
 {
 	snes_state *state = machine.driver_data<snes_state>();
@@ -1077,9 +1059,6 @@ MACHINE_START( snes )
 	state->m_soundcpu = machine.device<spc700_device>("soundcpu");
 	state->m_spc700 = machine.device<snes_sound_device>("spc700");
 	state->m_superfx = machine.device<cpu_device>("superfx");
-
-	state->m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_direct), state));
-//  state->m_soundcpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_spc_direct), state));
 
 	// power-on sets these registers like this
 	SNES_CPU_REG_STATE(WRIO) = 0xff;
@@ -1201,8 +1180,6 @@ void snes_state::rom_map_setup(UINT32 size)
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT_MEMBER(snes_state,snes)
 {
-	snes_ram = auto_alloc_array_clear(machine(), UINT8, 0x1400000);
-
 	m_cart[0].m_rom_size = memregion("user3")->bytes();
 	m_cart[0].m_rom = memregion("user3")->base();
 	rom_map_setup(m_cart[0].m_rom_size);
@@ -1225,9 +1202,6 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 
 DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 {
-	snes_ram = auto_alloc_array(machine(), UINT8, 0x1400000);
-	memset(snes_ram, 0, 0x1400000);
-
 	m_cart[0].m_rom_size = memregion("user3")->bytes();
 	m_cart[0].m_rom = memregion("user3")->base();
 	rom_map_setup(m_cart[0].m_rom_size);

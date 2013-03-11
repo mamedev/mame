@@ -761,6 +761,4 @@ extern MACHINE_RESET( snes );
 
 DECLARE_READ8_HANDLER( snes_open_bus_r );
 
-extern UINT8  *snes_ram;            /* Main memory */
-
 #endif /* _SNES_H_ */
