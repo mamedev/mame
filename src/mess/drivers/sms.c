@@ -70,7 +70,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 
 #include "sms1.lh"
 
-#define MASTER_CLOCK_PAL    53203400    /* This might be a tiny bit too low */
+#define MASTER_CLOCK_PAL    53203425    /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
 static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )

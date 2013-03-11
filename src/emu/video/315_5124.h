@@ -103,6 +103,7 @@ protected:
 	void draw_scanline_mode2( int *line_buffer, int line );
 	void draw_scanline_mode0( int *line_buffer, int line );
 	void select_sprites( int pixel_plot_y, int line );
+	void check_pending_flags( int hpos );
 
 	// device-level overrides
 	virtual void device_config_complete();
@@ -114,13 +115,15 @@ protected:
 
 	UINT8            m_reg[16];                  /* All the registers */
 	UINT8            m_status;                   /* Status register */
+	UINT8            m_pending_status;           /* Pending status flags */
 	UINT8            m_reg9copy;                 /* Internal copy of register 9 */
 	UINT8            m_addrmode;                 /* Type of VDP action */
 	UINT16           m_addr;                     /* Contents of internal VDP address register */
 	UINT8            m_cram_size;                /* CRAM size */
 	UINT8            m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
 	int              m_cram_dirty;               /* Have there been any changes to the CRAM area */
-	int              m_pending;
+	int              m_pending_reg_write;
+	int              m_pending_sprcol_x;
 	UINT8            m_buffer;
 	bool             m_sega315_5124_compatibility_mode;    /* Shrunk SMS screen on GG lcd mode flag */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
@@ -132,7 +135,7 @@ protected:
 	memory_region    *m_CRAM;                    /* Pointer to CRAM */
 	const UINT8      *m_frame_timing;
 	bitmap_rgb32     m_tmpbitmap;
-	bitmap_ind8  m_y1_bitmap;
+	bitmap_ind8      m_y1_bitmap;
 	UINT8            m_collision_buffer[SEGA315_5124_WIDTH];
 	UINT8            m_palette_offset;
 	bool             m_supports_224_240;
@@ -150,9 +153,6 @@ protected:
 	devcb_resolved_write_line   m_cb_int;
 	devcb_resolved_write_line   m_cb_pause;
 	emu_timer        *m_display_timer;
-	emu_timer        *m_set_status_vint_timer;
-	emu_timer        *m_set_status_sprovr_timer;
-	emu_timer        *m_set_status_sprcol_timer;
 	emu_timer        *m_check_hint_timer;
 	emu_timer        *m_check_vint_timer;
 	emu_timer        *m_draw_timer;
@@ -162,12 +162,9 @@ protected:
 
 	/* Timers */
 	static const device_timer_id TIMER_LINE = 0;
-	static const device_timer_id TIMER_SET_STATUS_VINT = 1;
-	static const device_timer_id TIMER_SET_STATUS_SPROVR = 2;
-	static const device_timer_id TIMER_CHECK_HINT = 3;
-	static const device_timer_id TIMER_CHECK_VINT = 4;
-	static const device_timer_id TIMER_SET_STATUS_SPRCOL = 5;
-	static const device_timer_id TIMER_DRAW = 6;
+	static const device_timer_id TIMER_DRAW = 1;
+	static const device_timer_id TIMER_CHECK_HINT = 2;
+	static const device_timer_id TIMER_CHECK_VINT = 3;
 };
 
 

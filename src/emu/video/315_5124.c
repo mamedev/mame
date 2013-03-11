@@ -54,13 +54,13 @@ PAL frame timing
 #define STATUS_SPRCOL         0x20  /* Object collision flag */
 #define STATUS_HINT           0x02  /* Pending horizontal interrupt flag */
 
-#define VINT_HPOS             23
-#define HINT_HPOS             23
-#define VCOUNT_CHANGE_HPOS    22
-#define VINT_FLAG_HPOS        7
-#define SPROVR_HPOS           6
-#define SPRCOL_BASEHPOS       42
-#define DISPLAY_CB_HPOS       5  /* fix X-Scroll latchtime (Flubba's VDPTest) */
+#define VINT_HPOS             24
+#define VINT_FLAG_HPOS        23
+#define HINT_HPOS             25
+#define VCOUNT_CHANGE_HPOS    23
+#define SPROVR_HPOS           23
+#define SPRCOL_BASEHPOS       59
+#define DISPLAY_CB_HPOS       6  /* fix X-Scroll latchtime (Flubba's VDPTest) */
 
 #define DRAW_TIME_GG        86      /* 1 + 2 + 14 +8 + 96/2 */
 #define DRAW_TIME_SMS       0
@@ -294,45 +294,29 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, param, m_screen->vpos() - param );
 		break;
 
-	case TIMER_SET_STATUS_VINT:
-		m_status |= STATUS_VINT;
-		break;
-
-	case TIMER_SET_STATUS_SPROVR:
-		m_status |= STATUS_SPROVR;
-		break;
-
-	case TIMER_SET_STATUS_SPRCOL:
-		m_status |= STATUS_SPRCOL;
-		break;
-
 	case TIMER_CHECK_HINT:
-		if (m_line_counter == 0x00)
+		if ((m_pending_status & STATUS_HINT) || (m_status & STATUS_HINT))
 		{
-			m_line_counter = m_reg[0x0a];
-			m_status |= STATUS_HINT;
-		}
-		else
-		{
-			m_line_counter--;
-		}
+			if ((m_reg[0x00] & 0x10))
+			{
+				m_irq_state = 1;
 
-		if ((m_status & STATUS_HINT) && (m_reg[0x00] & 0x10))
-		{
-			m_irq_state = 1;
-
-			if ( !m_cb_int.isnull() )
-				m_cb_int(ASSERT_LINE);
+				if ( !m_cb_int.isnull() )
+					m_cb_int(ASSERT_LINE);
+			}
 		}
 		break;
 
 	case TIMER_CHECK_VINT:
-		if ((m_status & STATUS_VINT) && (m_reg[0x01] & 0x20))
+		if ((m_pending_status & STATUS_VINT) || (m_status & STATUS_VINT))
 		{
-			m_irq_state = 1;
+			if ((m_reg[0x01] & 0x20))
+			{
+				m_irq_state = 1;
 
-			if ( !m_cb_int.isnull() )
-				m_cb_int(ASSERT_LINE);
+				if ( !m_cb_int.isnull() )
+					m_cb_int(ASSERT_LINE);
+			}
 		}
 		break;
 	}
@@ -349,6 +333,9 @@ void sega315_5124_device::process_line_timer()
 
 	rec.min_y = rec.max_y = vpos;
 
+	/* Activate flags that were pending until the end of previous line. */
+	check_pending_flags(m_screen->width());
+	
 	/* Check if we're on the last line of a frame */
 	if (vpos == vpos_limit - 1)
 	{
@@ -375,7 +362,16 @@ void sega315_5124_device::process_line_timer()
 	{
 		if (vpos == vpos_limit)
 		{
-			m_check_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+			if (m_line_counter == 0x00)
+			{
+				m_line_counter = m_reg[0x0a];
+				m_check_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+				m_pending_status |= STATUS_HINT;
+			}
+			else
+			{
+				m_line_counter--;
+			}
 		}
 		else
 		{
@@ -384,8 +380,8 @@ void sega315_5124_device::process_line_timer()
 
 		if (vpos == vpos_limit + 1)
 		{
-			m_set_status_vint_timer->adjust( m_screen->time_until_pos( vpos, VINT_FLAG_HPOS ) );
 			m_check_vint_timer->adjust( m_screen->time_until_pos( vpos, VINT_HPOS ) );
+			m_pending_status |= STATUS_VINT;
 		}
 
 		update_palette();
@@ -419,7 +415,16 @@ void sega315_5124_device::process_line_timer()
 			m_reg9copy = m_reg[0x09];
 		}
 
-		m_check_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+		if (m_line_counter == 0x00)
+		{
+			m_line_counter = m_reg[0x0a];
+			m_check_hint_timer->adjust( m_screen->time_until_pos( vpos, HINT_HPOS ) );
+			m_pending_status |= STATUS_HINT;
+		}
+		else
+		{
+			m_line_counter--;
+		}
 
 		update_palette();
 
@@ -488,7 +493,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	/* to the address register when in the middle of doing a command.               */
 	/* Cosmic Spacehead needs this, among others                                    */
 	/* Clear pending write flag */
-	m_pending = 0;
+	m_pending_reg_write = 0;
 
 	/* Return read buffer contents */
 	temp = m_buffer;
@@ -505,14 +510,43 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 }
 
 
+void sega315_5124_device::check_pending_flags( int hpos )
+{
+	if ((m_pending_status & STATUS_HINT) && hpos >= HINT_HPOS)
+	{
+		m_pending_status &= ~STATUS_HINT;
+		m_status |= STATUS_HINT;
+	}
+	if ((m_pending_status & STATUS_VINT) && hpos >= VINT_FLAG_HPOS)
+	{
+		m_pending_status &= ~STATUS_VINT;
+		m_status |= STATUS_VINT;
+	}
+	if ((m_pending_status & STATUS_SPROVR) && hpos >= SPROVR_HPOS)
+	{
+		m_pending_status &= ~STATUS_SPROVR;
+		m_status |= STATUS_SPROVR;
+	}
+	if ((m_pending_status & STATUS_SPRCOL) && hpos >= m_pending_sprcol_x)
+	{
+		m_pending_status &= ~STATUS_SPRCOL;
+		m_status |= STATUS_SPRCOL;
+		m_pending_sprcol_x = 0;
+	}
+}
+
+
 READ8_MEMBER( sega315_5124_device::register_read )
 {
-	UINT8 temp = m_status;
+	UINT8 temp;
 
+	check_pending_flags(m_screen->hpos());
+	temp = m_status;
+	
 	if ( !space.debugger_access() )
 	{
 		/* Clear pending write flag */
-		m_pending = 0;
+		m_pending_reg_write = 0;
 
 		m_status &= ~(STATUS_VINT | STATUS_SPROVR | STATUS_SPRCOL | STATUS_HINT);
 
@@ -536,7 +570,7 @@ WRITE8_MEMBER( sega315_5124_device::vram_write )
 	/* to the address register when in the middle of doing a command.               */
 	/* Cosmic Spacehead needs this, among others                                    */
 	/* Clear pending write flag */
-	m_pending = 0;
+	m_pending_reg_write = 0;
 
 	switch(m_addrmode)
 	{
@@ -567,15 +601,17 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 {
 	int reg_num;
 
-	if (m_pending == 0)
+	check_pending_flags(m_screen->hpos());
+
+	if (m_pending_reg_write == 0)
 	{
 		m_addr = (m_addr & 0xff00) | data;
-		m_pending = 1;
+		m_pending_reg_write = 1;
 	}
 	else
 	{
 		/* Clear pending write flag */
-		m_pending = 0;
+		m_pending_reg_write = 0;
 
 		m_addrmode = (data >> 6) & 0x03;
 		m_addr = (data << 8) | (m_addr & 0xff);
@@ -599,17 +635,22 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			if (reg_num == 0 || reg_num == 1)
 				set_display_settings();
 
-			if (reg_num == 1)
+			if ( ( reg_num == 0 && (m_status & STATUS_HINT) ) ||
+			     ( reg_num == 1 && (m_status & STATUS_VINT) ) )
 			{
-				m_check_vint_timer->adjust( m_screen->time_until_pos( m_screen->vpos(), VINT_HPOS) );
-
+				// For HINT disabling through register 00:
+				// "Line IRQ VCount" test, of Flubba's VDPTest ROM, disables HINT to wait
+				// for next VINT, but HINT occurs when the operation is about to execute.
+				// So here, where the setting is done, the irq_state needs to be cleared.
 				//
-				// When running eagles5 on the ssm2kr driver the irq_state is 1 because of some
+				// For VINT disabling through register 01:
+				// When running eagles5 on the sms2kr driver the irq_state is 1 because of some
 				// previos HINTs that occured. eagles5 sets register 01 to 0x02 and expects
 				// the irq state to be cleared after that.
 				// The following bit of code takes care of that.
 				//
-				if ((m_status & STATUS_VINT) && !(m_reg[0x01] & 0x20))
+				if ( ( (m_status & STATUS_HINT) && !(m_reg[0x00] & 0x10) ) ||
+				     ( (m_status & STATUS_VINT) && !(m_reg[0x01] & 0x20) ) )
 				{
 					if (m_irq_state == 1)
 					{
@@ -621,7 +662,19 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 						}
 					}
 				}
+				else
+				{
+					// For register 01 and VINT enabling:
+					// Assert the IRQ line for the scoreboard of robocop3,
+					// on the sms/smspal driver, be displayed correctly.
+					//
+					// Assume the same behavior for reg0+HINT.
+					//
+					m_irq_state = 1;
 
+					if ( !m_cb_int.isnull() )
+						m_cb_int(ASSERT_LINE);
+				}
 			}
 			m_addrmode = 0;
 			break;
@@ -842,7 +895,7 @@ void sega315_5124_device::select_sprites( int pixel_plot_y, int line )
 
 		if (line >= 0 && line < m_frame_timing[ACTIVE_DISPLAY_V])
 		{
-			m_set_status_sprovr_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPROVR_HPOS ) );
+			m_pending_status |= STATUS_SPROVR;
 		}
 	}
 }
@@ -999,7 +1052,8 @@ void sega315_5124_device::draw_sprites_mode4( int *line_buffer, int *priority_se
 		}
 		if (sprite_col_occurred)
 		{
-			m_set_status_sprcol_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
+			m_pending_status |= STATUS_SPRCOL;
+			m_pending_sprcol_x = SPRCOL_BASEHPOS + sprite_col_x;
 		}
 	}
 }
@@ -1188,7 +1242,8 @@ void sega315_5124_device::draw_sprites_tms9918_mode( int *line_buffer, int pixel
 		}
 		if (sprite_col_occurred)
 		{
-			m_set_status_sprcol_timer->adjust( m_screen->time_until_pos( pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x ) );
+			m_pending_status |= STATUS_SPRCOL;
+			m_pending_sprcol_x = SPRCOL_BASEHPOS + sprite_col_x;
 		}
 	}
 }
@@ -1644,19 +1699,18 @@ void sega315_5124_device::device_start()
 	m_display_timer = timer_alloc(TIMER_LINE);
 	m_display_timer->adjust(m_screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, m_screen->scan_period());
 	m_draw_timer = timer_alloc(TIMER_DRAW);
-	m_set_status_vint_timer = timer_alloc( TIMER_SET_STATUS_VINT );
-	m_set_status_sprovr_timer = timer_alloc( TIMER_SET_STATUS_SPROVR );
-	m_set_status_sprcol_timer = timer_alloc( TIMER_SET_STATUS_SPRCOL );
-	m_check_hint_timer = timer_alloc( TIMER_CHECK_HINT );
-	m_check_vint_timer = timer_alloc( TIMER_CHECK_VINT );
+	m_check_hint_timer = timer_alloc(TIMER_CHECK_HINT);
+	m_check_vint_timer = timer_alloc(TIMER_CHECK_VINT);
 
 	save_item(NAME(m_status));
+	save_item(NAME(m_pending_status));
+	save_item(NAME(m_pending_sprcol_x));
 	save_item(NAME(m_reg9copy));
 	save_item(NAME(m_addrmode));
 	save_item(NAME(m_addr));
 	save_item(NAME(m_cram_mask));
 	save_item(NAME(m_cram_dirty));
-	save_item(NAME(m_pending));
+	save_item(NAME(m_pending_reg_write));
 	save_item(NAME(m_buffer));
 	save_item(NAME(m_sega315_5124_compatibility_mode));
 	save_item(NAME(m_irq_state));
@@ -1686,13 +1740,15 @@ void sega315_5124_device::device_reset()
 	m_reg[0x0a] = 0xff;
 
 	m_status = 0;
+	m_pending_status = 0;
+	m_pending_sprcol_x = 0;
+	m_pending_reg_write = 0;
 	m_reg9copy = 0;
 	m_addrmode = 0;
 	m_addr = 0;
 	m_sega315_5124_compatibility_mode = false;
 	m_cram_mask = m_cram_size - 1;
 	m_cram_dirty = 1;
-	m_pending = 0;
 	m_buffer = 0;
 	m_irq_state = 0;
 	m_line_counter = 0;

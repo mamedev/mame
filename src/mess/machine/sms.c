@@ -391,30 +391,28 @@ int sms_state::lgun_bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 
 UINT8 sms_state::sms_vdp_hcount()
 {
-	UINT8 tmp;
-	int hpos = m_main_scr->hpos();
+	UINT64 cycles_per_line;
+	attotime line_remaining_time;
+	UINT64 line_remaining_cycles;
+	UINT64 line_elapsed_cycles;
 
-	/* alternative method: pass HCounter test, but some others fail */
-	//int hpos_tmp = hpos;
-	//if ((hpos + 2) % 6 == 0) hpos_tmp--;
-	//tmp = ((hpos_tmp - 46) >> 1) & 0xff;
+	/* Calculate amount of CPU cycles according to screen references.
+	   If some day the screen become always synced to the CPU, in the
+	   proportion of their speeds, this may be replaced by the screen
+	   hpos position only and the function be moved to the VDP file. */
+	cycles_per_line = m_main_cpu->attotime_to_clocks(m_main_scr->scan_period());
+	line_remaining_time = m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->width());
+	line_remaining_cycles = m_main_cpu->attotime_to_clocks(line_remaining_time) % cycles_per_line;
+	line_elapsed_cycles = cycles_per_line - line_remaining_cycles;
 
-	UINT64 calc_cycles;
-	attotime time_end;
-	int vpos = m_main_scr->vpos();
-	int max_hpos = m_main_scr->width() - 1;
+	/* HCount equation, being hpos = VDP hclocks: "(hpos - 47) / 2"
+	   Screen hpos based on CPU cycles: "cycles * width / cycles per line"
+	   Do both in same line for one-step rounding only (required). */
+	return ((line_elapsed_cycles * m_main_scr->width() / cycles_per_line) - 47) / 2;
 
-	if (hpos == max_hpos)
-		time_end = attotime::zero;
-	else
-		time_end = m_main_scr->time_until_pos(vpos, max_hpos);
-	calc_cycles = m_main_cpu->attotime_to_clocks(time_end);
-
-	/* equation got from SMSPower forum, posted by Flubba. */
-	tmp = ((590 - (calc_cycles * 3)) / 4) & 0xff;
-
-	//printf ("sms_vdp_hcount: hpos %3d => hcount %2X\n", hpos, tmp);
-	return tmp;
+	/* Alternative hcount equation, restricted to the SMS clock:
+	   "(590 - (line_remaining_cycles * 3)) / 4"
+	   Posted by Flubba on SMSPower forum. */
 }
 
 
@@ -1927,11 +1925,8 @@ MACHINE_START_MEMBER(sms_state,sms)
 	// the "call $4010" without a following RET statement. That is basically
 	// a bug in the program code. The only way this cartridge could have run
 	// successfully on a real unit is if the RAM would be initialized with
-	// a F0 pattern on power up; F0 = RET P.
-	//
-	// alibaba and blockhol SMS cartridges rely on uninitialized RAM,
-	// then fill it with a F0 pattern ("RET P"), but only for consoles
-	// in Japan region (including KR), until confirmed on other consoles.
+	// a F0 pattern on power up; F0 = RET P. Do that only for consoles in
+	// Japan region (including KR), until confirmed on other consoles.
 	if (m_is_region_japan)
 	{
 		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1FFF);
