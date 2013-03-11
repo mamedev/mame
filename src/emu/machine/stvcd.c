@@ -144,7 +144,7 @@ void saturn_state::cd_exec_command( void )
 				cr2 = prev_cr2;
 				cr3 = prev_cr3;
 				cr4 = prev_cr4;
-				status_type = 0; /* Road Blaster and friends needs this. */
+				status_type = 0; /* Road Blaster and friends needs this otherwise they won't boot. */
 			}
 			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;

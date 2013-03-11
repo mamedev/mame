@@ -3,6 +3,9 @@
  probably impossible to emulate right now due to the bad / missing (blank when read) rom
  although it would be a good idea if somebody checked for sure
 
+TODO:
+- bp 932d1, ROM banking that reads at 0xffffe???
+
 */
 
 /*
@@ -114,15 +117,19 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pangofun_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
+	AM_RANGE(0x000e0000, 0x000effff) AM_ROM AM_REGION("game_prg", 0)
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("bios", 0 )
+	/* TODO: correct RAM mapping/size? */
 	AM_RANGE(0x00100000, 0x00ffffff) AM_NOP
-	AM_RANGE(0x01000000, 0xfffeffff) AM_NOP
+	AM_RANGE(0x01000000, 0x01ffffff) AM_RAM
+	AM_RANGE(0x02000000, 0xfffeffff) AM_NOP
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pangofun_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
+	AM_RANGE(0x00e0, 0x00e3) AM_WRITENOP
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
@@ -221,13 +228,14 @@ ROM_START(pangofun)
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0xa00000, "game_prg", 0)    /* rom board */
-	ROM_LOAD32_WORD("bank0.u11", 0x000000, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
-	ROM_LOAD32_WORD("bank0.u31", 0x000002, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
-	ROM_LOAD32_WORD("bank1.u12", 0x100000, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
-	ROM_LOAD32_WORD("bank1.u32", 0x100002, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
-	ROM_LOAD32_WORD("bank2.u13", 0x200000, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (BAD?)
-	ROM_LOAD32_WORD("bank2.u33", 0x200002, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
+	ROM_REGION(0xa00000, "game_prg", 0)    /* rom board */
+	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
+	ROM_LOAD32_WORD("bank0.u11", 0x100000, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
+	ROM_LOAD32_WORD("bank0.u31", 0x100002, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
+	ROM_LOAD32_WORD("bank1.u12", 0x200000, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
+	ROM_LOAD32_WORD("bank1.u32", 0x200002, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
+	ROM_LOAD32_WORD("bank2.u13", 0x300000, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (BAD?)
+	ROM_LOAD32_WORD("bank2.u33", 0x300002, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
 					/*bank3.u14 , NOT POPULATED */
 					/*bank3.u34 , NOT POPULATED */
 					/*bank4.u15 , NOT POPULATED */
@@ -239,7 +247,6 @@ ROM_START(pangofun)
 					/*bank7.u18 , NOT POPULATED */
 					/*bank7.u37 , NOT POPULATED */
 					/*bank8.u19 , NOT POPULATED */
-	ROM_LOAD32_WORD("bank8.u39", 0x900002, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 ROM_END
 
 DRIVER_INIT_MEMBER(pangofun_state,pangofun)
