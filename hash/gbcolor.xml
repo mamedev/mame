@@ -9033,6 +9033,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="karatej" supported="no">
+		<!-- Notes: GBC only -->
 		<description>Karate Joe (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -14209,7 +14210,6 @@ Undumped Pirates:
 	</software>
 
 	<software name="painter" supported="no">
-		<!-- Notes: GBC only -->
 		<description>Painter (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -22929,6 +22929,95 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="mgear2">
+		<description>He Jin Zhuang Bei II (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="合金裝備II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="he jin zhuang bei ii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="ef4bbb34" sha1="6a15fc7dbb3b9d7c130b9a25b568d39c655d68ca" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shaolin">
+		<description>Fantasic ShaoLin Kungfu (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Shaoling Legend - Hero, the saver (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="fantasic shaolin kungfu (unlicensed, english) [raw dump].bin" size="2097152" crc="a321ff7d" sha1="b1194edd0962c50cf909262004a102f01f556723" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shaolinc" cloneof="shaolin">
+		<description>Shao Lin Shi San Gun - Ying Xiong Jiu Zhu (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="少林十三棍-英雄救主"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shao lin shi san gun - ying xiong jiu zhu (unlicensed, chinese) [raw dump].bin" size="2097152" crc="25a857af" sha1="2fbbf4e3a40eda75b0876d207502727f8dacca11" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digiyjad">
+		<description>Digimon Yellow Jade (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="digimon yellow jade (unlicensed, english) [raw dump].bin" size="2097152" crc="96662e76" sha1="743bf9b07245ae5df98898b7794f304ac09d2ed4" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpotter2">
+		<description>Xiao Shi Mi Shi (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003哈利波特2-消失的密室 ~ 2003 Harry Potter 2 - Xiao Shi De Mi Shi"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 ha li bo te 2 - xiao shi de mi shi (unlicensed, chinese) [raw dump].bin" size="2097152" crc="1b3e1243" sha1="0829cbcab3ef5d03c94d5efe769f4f4a93ac47fa" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpotter4">
+		<description>Harry Xiao Zi IV (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="哈利小子IV, 2003哈利小子IV ~ 2003 Ha Li Xiao Zi IV (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 ha li xiao zi iv (unlicensed, chinese) [raw dump].bin" size="2097152" crc="db3c8b95" sha1="0d230b20388f4396d6345b8eb59f54fc169ad8ee" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="emodao">
 		<description>E Mo Dao (Chi, Ripped from 8 in 1 multicart)</description>
 		<year>200?</year>
@@ -23937,7 +24026,7 @@ Undumped Pirates:
 		<publisher>Waixing</publisher>
 		<info name="alt_title" value="英雄传说 (Legend of Heroes) "/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
+			<feature name="slot" value="rom_digimon" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="legend of heroes (unl).bin" size="1048576" crc="0dd2b42b" sha1="b62bff46fb8d5962598445bd113370dd0717f170" offset="000000" />
@@ -24031,7 +24120,7 @@ Undumped Pirates:
 	</software>
 
 	<software name="pokegogo" cloneof="smurfnig">
-		<description>Pocket Monsters GO!GO! GO! (Chi)</description>
+		<description>Pocket Monsters GO!GO! GO!! (Chi)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">

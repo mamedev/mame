@@ -54,7 +54,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * やさしくおてあて ピコクリニック! かんごふさんピコ - Yasashiku Oteate Pico Clinic! Kangofusan Pico (Sega Toys - 2001xxxx - HPC-6095)
 * ハローキティとマクドナルドであそぼ! - Hello Kitty to McDonald de Asobo! (Sega Toys - 20011001 - HPC-????)
 * パソコン接続キット ピコタウンにでかけよう! - Pasokon Setsuzoku Kit PicoTown ni Dekakeyou! (Sega Toys - 20010601 - HPC-6097)
-* リカちゃんになりたい! - Likka-chan ni Naritai! (Sega Toys - 200110xx - HPC-6098)
 * アンパンマンのはじめてマウスピコ アンパンマンとパソコンれんしゅう! <同梱> - Anpanman no Hajimete Mouse Pico with Anpanman to Pasokon renshuu! (Sega Toys - 20020124 - HPC-6102)
 * ECCジュニアの はじめてえいご Vol.1 - Patty And Her Family パティちゃんファミリー - ECC Junior no Hajimete Eigo Vol. 1 - Patty And Her Family - Patty-chan Family (Sega Toys - 20020307 - HPC-6103)
 * ECCジュニアの はじめてえいご Vol.2 - Patty Goes On A Picnic パティちゃんのピクニック - ECC Junior no Hajimete Eigo Vol. 2 - Patty Goes On A Picnic - Patty-chan no Picnic (Sega Toys - 20020307 - HPC-6104)
@@ -134,7 +133,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
 * 学研ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
-* はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
@@ -315,7 +313,7 @@ Games for the MIXT BOOK PLAYER COPERA
 	</software>
 
 	<software name="poohcornj" cloneof="poohcorn">
-		<description>Pooh-san no Ichi Nichi (Jpn)</description>
+		<description>Pooh-san no Ichi Nichi (Jpn, Rev. 1)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HPC-6019"/>
@@ -323,6 +321,21 @@ Games for the MIXT BOOK PLAYER COPERA
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="a year at pooh corner (japan).bin" size="524288" crc="bd9626b7" sha1="6d9dd74c9b1b22bd173d00be88ce87d3e32bde55" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornj1" cloneof="poohcorn">
+		<description>Pooh-san no Ichi Nichi (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6019"/>
+		<info name="alt_title" value="プーさんのいちにち"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18115-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18115-t.ic1" size="524288" crc="654cc2a0" sha1="8d88b726a9558f1925398b561616ed3bfee3d1b2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -584,7 +597,7 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="alt_title" value="ドナルドのテレビショー"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
-			<feature name="ic1" value="MPR-18678 J43" />
+			<feature name="ic1" value="MPR-18678 J43, MPR-18678-U" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18678 j43.ic1" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
@@ -649,14 +662,16 @@ Games for the MIXT BOOK PLAYER COPERA
 	</software>
 
 	<software name="doranmk">
-		<description>Doraemon - Nobita to Maigo no Kyouryuu (Jpn, Rev. 2)</description>
+		<description>Doraemon - Nobita to Maigo no Kyouryuu (Jpn, Rev. B)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="HPC-6004"/>
 		<info name="alt_title" value="ラえもん のびたとまいごのきょうりゅう"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-15701B-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="doraemon - nobita to maigo no kyouryuu (j) (rev02).bin" size="524288" crc="190dadbe" sha1="4ba7a3b30033f1c5b5adfd3ec7a1500ac912790d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15701b-h.ic1" size="524288" crc="190dadbe" sha1="4ba7a3b30033f1c5b5adfd3ec7a1500ac912790d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1037,6 +1052,22 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="hatakuru">
+		<description>Hataraku Kuruma Daiya Pet Daishuugou (Jpn)</description>
+		<year>1995</year>
+		<publisher>Yonezawa</publisher>
+		<info name="serial" value="T-193010"/>
+		<info name="release" value="19950925"/>
+		<info name="alt_title" value="はたらくくるま ダイヤペットだいしゅうごう"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18303-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18303-t.ic1" size="524288" crc="48ff9900" sha1="7bc48b393c815d7a596d8d8a422ed1e99172679e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hucklowlj" cloneof="hucklowl">
 		<description>Richard Scarry's - Huckle to Lowly (Jpn)</description>
 		<year>1995</year>
@@ -1351,6 +1382,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18686-U" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18686-u.ic1" size="1048576" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liccachn">
+		<description>Licca-chan ni Naritai! (Jpn)</description>
+		<year>2001</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6098"/>
+		<info name="release" value="200110xx"/>
+		<info name="alt_title" value="リカちゃんになりたい!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K2-0047-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k2-0047-rv.ic1" size="2097152" crc="a0e18b3e" sha1="a1ac56d43eeade0fa57ee3791f43a5447a8da824" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3638,7 +3685,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="poohcornj1" cloneof="poohcorn">
+	<software name="poohcornjp" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Jpn, Prototype)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>

@@ -38018,6 +38018,28 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+	<software name="digiadv">
+		<description>DigimonAdventure (Chi)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="3759280">
+				<rom name="digiadventure.bin" size="3759280" crc="d6d7a9c6" sha1="ea4eb7676bf4e83276ec059744224aca34a2173c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koudaiyg">
+		<description>Kou Dai Yao Guai - Zhi Hong Lan Dui Jue (Chi)</description>
+		<year>200?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2043964">
+				<rom name="kou dai yao guai zhi hong lan dui.bin" size="2043964" crc="12edcbcc" sha1="95d947d1c890442d31c193a607ae66fb8dcc4e9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="digimnsp">
 		<description>Digimon Sapphire (Chi)</description>
 		<year>200?</year>
