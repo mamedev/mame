@@ -7,21 +7,17 @@ const device_type NAOMI_M2_BOARD = &device_creator<naomi_m2_board>;
 naomi_m2_board::naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M2_BOARD, "NAOMI-M2-BOARD", tag, owner, clock)
 {
-	key_tag = 0;
 }
 
-void naomi_m2_board::static_set_tags(device_t &device, const char *_key_tag)
+void naomi_m2_board::static_set_tags(device_t &device)
 {
-	naomi_m2_board &dev = downcast<naomi_m2_board &>(device);
-	dev.key_tag = _key_tag;
 }
 
 void naomi_m2_board::device_start()
 {
 	naomi_board::device_start();
 
-	const UINT8 *key_data = memregion(key_tag)->base();
-	key = (key_data[0] << 24) | (key_data[1] << 16) | (key_data[2] << 8) | key_data[3];
+	key = get_naomi_key(machine());
 
 	ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
