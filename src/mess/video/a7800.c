@@ -61,7 +61,6 @@ void a7800_state::video_start()
 	}
 
 	m_maria_write_mode=0;
-	m_maria_scanline=0;
 	m_maria_dmaon=0;
 	m_maria_vblank=0x80;
 	m_maria_dll=0;
@@ -94,7 +93,7 @@ void a7800_state::maria_draw_scanline()
 	UINT16 *scanline;
 
 	/* set up scanline */
-	scanline = &m_bitmap.pix16(m_maria_scanline);
+	scanline = &m_bitmap.pix16(m_screen->vpos());
 	for (i = 0; i < 320; i++)
 		scanline[i] = m_maria_backcolor;
 
@@ -128,7 +127,7 @@ void a7800_state::maria_draw_scanline()
 
 		mode = m_maria_rm | m_maria_write_mode;
 
-		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n",m_maria_scanline,graph_adr,width,hpos,pal,mode,ind );*/
+		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n",m_screen->vpos(),graph_adr,width,hpos,pal,mode,ind );*/
 
 		for (x=0; x<width; x++) // 20030621 ericball get graphic data first, then switch (mode)
 		{
@@ -319,11 +318,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 	int frame_scanline;
 	UINT8 *ROM = m_region_maincpu->base();
 	address_space& space = m_maincpu->space(AS_PROGRAM);
-
-	m_maria_scanline++;
+	int maria_scanline = m_screen->vpos();
 
 	/* why + 1? */
-	frame_scanline = m_maria_scanline % ( m_lines + 1 );
+	frame_scanline = maria_scanline % ( m_lines + 1 );
 
 	if( frame_scanline == 1 )
 	{
@@ -389,7 +387,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 
 	if( ( frame_scanline > 15 ) && m_maria_dodma )
 	{
-		if (m_maria_scanline < ( m_lines - 4 ) )
+		if (maria_scanline < ( m_lines - 4 ) )
 			maria_draw_scanline();
 
 		if( m_maria_offset == 0 )
@@ -427,7 +425,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::a7800_interrupt)
 /* This routine is called at the start of vblank to refresh the screen */
 UINT32 a7800_state::screen_update_a7800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_maria_scanline = 0;
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

@@ -21,6 +21,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_pokey(*this, "pokey")
 		, m_tia(*this, "tia")
+		, m_screen(*this, "screen")
 		, m_region_maincpu(*this, "maincpu")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -51,7 +52,6 @@ public:
 	UINT8 *m_ROM;
 	int m_maria_palette[8][4];
 	int m_maria_write_mode;
-	int m_maria_scanline;
 	unsigned int m_maria_dll;
 	unsigned int m_maria_dl;
 	int m_maria_holey;
@@ -97,6 +97,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<pokey_device> m_pokey;
 	required_device<tia_device> m_tia;
+	required_device<screen_device> m_screen;
 	required_memory_region m_region_maincpu;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
