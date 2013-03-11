@@ -804,7 +804,7 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		case SNES_ST010:
 		case SNES_ST011:
 		case SNES_ST018:
-		case SNES_CX4:
+//		case SNES_CX4:
 			printf("This type of cart requires the dump of on-cart CPU. You need to load it from softlist!\n");
 			type = SNES_MODE20;
 			break;
