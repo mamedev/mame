@@ -48,62 +48,6 @@ void sns_rom_spc7110_device::spc7110_start()
 {
 	m_decomp = auto_alloc(machine(), SPC7110_Decomp(machine()));
 
-	save_item(NAME(m_ram));
-	save_item(NAME(m_r4801));
-	save_item(NAME(m_r4802));
-	save_item(NAME(m_r4803));
-	save_item(NAME(m_r4804));
-	save_item(NAME(m_r4805));
-	save_item(NAME(m_r4806));
-	save_item(NAME(m_r4807));
-	save_item(NAME(m_r4808));
-	save_item(NAME(m_r4809));
-	save_item(NAME(m_r480a));
-	save_item(NAME(m_r480b));
-	save_item(NAME(m_r480c));
-	save_item(NAME(m_r4811));
-	save_item(NAME(m_r4812));
-	save_item(NAME(m_r4813));
-	save_item(NAME(m_r4814));
-	save_item(NAME(m_r4815));
-	save_item(NAME(m_r4816));
-	save_item(NAME(m_r4817));
-	save_item(NAME(m_r4818));
-	save_item(NAME(m_r481x));
-	save_item(NAME(m_r4814_latch));
-	save_item(NAME(m_r4815_latch));
-	save_item(NAME(m_r4820));
-	save_item(NAME(m_r4821));
-	save_item(NAME(m_r4822));
-	save_item(NAME(m_r4823));
-	save_item(NAME(m_r4824));
-	save_item(NAME(m_r4825));
-	save_item(NAME(m_r4826));
-	save_item(NAME(m_r4827));
-	save_item(NAME(m_r4828));
-	save_item(NAME(m_r4829));
-	save_item(NAME(m_r482a));
-	save_item(NAME(m_r482b));
-	save_item(NAME(m_r482c));
-	save_item(NAME(m_r482d));
-	save_item(NAME(m_r482e));
-	save_item(NAME(m_r482f));
-	save_item(NAME(m_r4830));
-	save_item(NAME(m_r4831));
-	save_item(NAME(m_r4832));
-	save_item(NAME(m_r4833));
-	save_item(NAME(m_r4834));
-	save_item(NAME(m_r4840));
-	save_item(NAME(m_r4841));
-	save_item(NAME(m_r4842));
-	save_item(NAME(m_dx_offset));
-	save_item(NAME(m_ex_offset));
-	save_item(NAME(m_fx_offset));
-	// TODO: save decomp-related items and fix their restore...
-}
-
-void sns_rom_spc7110_device::spc7110_reset()
-{
 	memset(m_ram, 0, sizeof(m_ram));
 	m_r4801 = 0x00;
 	m_r4802 = 0x00;
@@ -160,6 +104,59 @@ void sns_rom_spc7110_device::spc7110_reset()
 	m_r4840 = 0x00;
 	m_r4841 = 0x00;
 	m_r4842 = 0x00;
+
+	save_item(NAME(m_ram));
+	save_item(NAME(m_r4801));
+	save_item(NAME(m_r4802));
+	save_item(NAME(m_r4803));
+	save_item(NAME(m_r4804));
+	save_item(NAME(m_r4805));
+	save_item(NAME(m_r4806));
+	save_item(NAME(m_r4807));
+	save_item(NAME(m_r4808));
+	save_item(NAME(m_r4809));
+	save_item(NAME(m_r480a));
+	save_item(NAME(m_r480b));
+	save_item(NAME(m_r480c));
+	save_item(NAME(m_r4811));
+	save_item(NAME(m_r4812));
+	save_item(NAME(m_r4813));
+	save_item(NAME(m_r4814));
+	save_item(NAME(m_r4815));
+	save_item(NAME(m_r4816));
+	save_item(NAME(m_r4817));
+	save_item(NAME(m_r4818));
+	save_item(NAME(m_r481x));
+	save_item(NAME(m_r4814_latch));
+	save_item(NAME(m_r4815_latch));
+	save_item(NAME(m_r4820));
+	save_item(NAME(m_r4821));
+	save_item(NAME(m_r4822));
+	save_item(NAME(m_r4823));
+	save_item(NAME(m_r4824));
+	save_item(NAME(m_r4825));
+	save_item(NAME(m_r4826));
+	save_item(NAME(m_r4827));
+	save_item(NAME(m_r4828));
+	save_item(NAME(m_r4829));
+	save_item(NAME(m_r482a));
+	save_item(NAME(m_r482b));
+	save_item(NAME(m_r482c));
+	save_item(NAME(m_r482d));
+	save_item(NAME(m_r482e));
+	save_item(NAME(m_r482f));
+	save_item(NAME(m_r4830));
+	save_item(NAME(m_r4831));
+	save_item(NAME(m_r4832));
+	save_item(NAME(m_r4833));
+	save_item(NAME(m_r4834));
+	save_item(NAME(m_r4840));
+	save_item(NAME(m_r4841));
+	save_item(NAME(m_r4842));
+	save_item(NAME(m_dx_offset));
+	save_item(NAME(m_ex_offset));
+	save_item(NAME(m_fx_offset));
+	// TODO: save decomp-related items and fix their restore...
 }
 
 void sns_rom_spc7110_device::device_start()
@@ -167,24 +164,9 @@ void sns_rom_spc7110_device::device_start()
 	spc7110_start();
 }
 
-void sns_rom_spc7110_device::device_reset()
-{
-	spc7110_reset();
-}
-
 void sns_rom_spc7110rtc_device::device_start()
 {
 	spc7110_start();
-
-	save_item(NAME(m_rtc_state));
-	save_item(NAME(m_rtc_mode));
-	save_item(NAME(m_rtc_index));
-	save_item(NAME(m_rtc_offset));
-}
-
-void sns_rom_spc7110rtc_device::device_reset()
-{
-	spc7110_reset();
 	
 	// RTC
 	m_rtc_state = RTCS_Inactive;
@@ -192,8 +174,13 @@ void sns_rom_spc7110rtc_device::device_reset()
 	m_rtc_index = 0;
 	m_rtc_offset = 0;
 	
-	// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
+// at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
 //  spc7110_update_time(0);
+	
+	save_item(NAME(m_rtc_state));
+	save_item(NAME(m_rtc_mode));
+	save_item(NAME(m_rtc_index));
+	save_item(NAME(m_rtc_offset));
 }
 
 
