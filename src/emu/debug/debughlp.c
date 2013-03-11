@@ -66,6 +66,7 @@ static const help_item static_help_list[] =
 		"  Execution\n"
 		"  Breakpoints\n"
 		"  Watchpoints\n"
+		"  Registerpoints\n"
 		"  Expressions\n"
 		"  Comments\n"
 		"  Cheats\n"
@@ -161,6 +162,18 @@ static const help_item static_help_list[] =
 		"  wpenable [<wpnum>] -- enables a given watchpoint or all if no <wpnum> specified\n"
 		"  wplist -- lists all the watchpoints\n"
 		"  hotspot [<cpu>,[<depth>[,<hits>]]] -- attempt to find hotspots\n"
+	},
+	{
+		"registerpoints",
+		"\n"
+		"Registerpoint Commands\n"
+		"Type help <command> for further details on each command\n"
+		"\n"
+		"  rp[set] {<condition>}[,<action>] -- sets a registerpoint to trigger on <condition>\n"
+		"  rpclear [<rpnum>] -- clears a given registerpoint or all if no <rpnum> specified\n"
+		"  rpdisable [<rpnum>] -- disabled a given registerpoint or all if no <rpnum> specified\n"
+		"  rpenable [<rpnum>]  -- enables a given registerpoint or all if no <rpnum> specified\n"
+		"  rplist -- lists all the registerpoints\n"
 	},
 	{
 		"expressions",
@@ -1004,6 +1017,90 @@ static const help_item static_help_list[] =
 		"hotspot 1,40,#1000\n"
 		"  Looks for hotspots on CPU 1 using a search buffer of 64 entries, reporting any entries which "
 		"end up with 1000 or more hits.\n"
+	},
+	{
+		"rpset",
+		"\n"
+		"  rp[set] {<condition>}[,<action>]]\n"
+		"\n"
+		"Sets a new registerpoint which will be triggered when <condition> is met. The condition must "
+		"be specified between curly braces to prevent the condition from being evaluated as an "
+		"assignment.\n"
+		"\n"
+		"The optional <action> parameter provides a command that is executed whenever the registerpoint "
+		"is hit. Note that you may need to embed the action within braces { } in "
+		"order to prevent commas and semicolons from being interpreted as applying to the rpset command "
+		"itself. Each registerpoint that is set is assigned an index which can be used in other "
+		"registerpoint commands to reference this registerpoint.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"rp {PC==0150}\n"
+		"  Set a registerpoint that will halt execution whenever the PC register equals 0x150.\n"
+		"\n"
+		"temp0=0; rp {PC==0150},{temp0++; g}\n"
+		"  Set a registerpoint that will increment the variable temp0 whenever the PC register "
+		"equals 0x0150.\n"
+		"\n"
+		"rp {temp0==5}\n"
+		"  Set a registerpoint that will halt execution whenever the temp0 variable equals 5.\n"
+	},
+	{
+		"rpclear",
+		"\n"
+		"  rpclear [<rpnum>]\n"
+		"\n"
+		"The rpclear command clears a registerpoint. If <rpnum> is specified, only the requested "
+		"registerpoint is cleared, otherwise all registerpoints are cleared.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"rpclear 3\n"
+		"  Clear registerpoint index 3.\n"
+		"\n"
+		"rpclear\n"
+		"  Clear all registerpoints.\n"
+	},
+	{
+		"rpdisable",
+		"\n"
+		"  rpdisable [<rpnum>]\n"
+		"\n"
+		"The rpdisable command disables a registerpoint. If <rpnum> is specified, only the requested "
+		"registerpoint is disabled, otherwise all registerpoints are disabled. Note that disabling a "
+		"registerpoint does not delete it, it just temporarily marks the registerpoint as inactive.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"rpdisable 3\n"
+		"  Disable registerpoint index 3.\n"
+		"\n"
+		"rpdisable\n"
+		"  Disable all registerpoints.\n"
+	},
+	{
+		"rpenable",
+		"\n"
+		"  rpenable [<rpnum>]\n"
+		"\n"
+		"The rpenable command enables a registerpoint. If <rpnum> is specified, only the requested "
+		"registerpoint is enabled, otherwise all registerpoints are enabled.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"rpenable 3\n"
+		"  Enable registerpoint index 3.\n"
+		"\n"
+		"rpenable\n"
+		"  Enable all registerpoints.\n"
+	},
+	{
+		"rplist",
+		"\n"
+		"  rplist\n"
+		"\n"
+		"The rplist command lists all the current registerpoints, along with their index and any "
+		"actions attached to them.\n"
 	},
 	{
 		"map",

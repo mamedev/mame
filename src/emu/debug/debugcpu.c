@@ -91,6 +91,7 @@ struct debugcpu_private
 
 	UINT32          bpindex;
 	UINT32          wpindex;
+	UINT32          rpindex;
 
 	UINT64          wpdata;
 	UINT64          wpaddr;
@@ -150,6 +151,7 @@ void debug_cpu_init(running_machine &machine)
 	global->execution_state = EXECUTION_STATE_STOPPED;
 	global->bpindex = 1;
 	global->wpindex = 1;
+	global->rpindex = 1;
 
 	/* create a global symbol table */
 	global->symtable = global_alloc(symbol_table(&machine));
@@ -1653,6 +1655,7 @@ device_debug::device_debug(device_t &device)
 		m_last_total_cycles(0),
 		m_pc_history_index(0),
 		m_bplist(NULL),
+		m_rplist(NULL),
 		m_trace(NULL),
 		m_hotspots(NULL),
 		m_hotspot_count(0),
@@ -1721,6 +1724,7 @@ device_debug::~device_debug()
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
+	registerpoint_clear_all();
 }
 
 
@@ -2457,6 +2461,95 @@ void device_debug::watchpoint_enable_all(bool enable)
 
 
 //-------------------------------------------------
+//  registerpoint_set - set a new registerpoint,
+//  returning its index
+//-------------------------------------------------
+
+int device_debug::registerpoint_set(const char *condition, const char *action)
+{
+	// allocate a new one
+	registerpoint *rp = auto_alloc(m_device.machine(), registerpoint(m_symtable, m_device.machine().debugcpu_data->rpindex++, condition, action));
+
+	// hook it into our list
+	rp->m_next = m_rplist;
+	m_rplist = rp;
+
+	// update the flags and return the index
+	breakpoint_update_flags();
+	return rp->m_index;
+}
+
+
+//-------------------------------------------------
+//  registerpoint_clear - clear a registerpoint by index,
+//  returning true if we found it
+//-------------------------------------------------
+
+bool device_debug::registerpoint_clear(int index)
+{
+	// scan the list to see if we own this registerpoint
+	for (registerpoint **rp = &m_rplist; *rp != NULL; rp = &(*rp)->m_next)
+		if ((*rp)->m_index == index)
+		{
+			registerpoint *deleteme = *rp;
+			*rp = deleteme->m_next;
+			auto_free(m_device.machine(), deleteme);
+			breakpoint_update_flags();
+			return true;
+		}
+
+	// we don't own it, return false
+	return false;
+}
+
+
+//-------------------------------------------------
+//  registerpoint_clear_all - clear all registerpoints
+//-------------------------------------------------
+
+void device_debug::registerpoint_clear_all()
+{
+	// clear the head until we run out
+	while (m_rplist != NULL)
+		registerpoint_clear(m_rplist->index());
+}
+
+
+//-------------------------------------------------
+//  registerpoint_enable - enable/disable a registerpoint
+//  by index, returning true if we found it
+//-------------------------------------------------
+
+bool device_debug::registerpoint_enable(int index, bool enable)
+{
+	// scan the list to see if we own this conditionpoint
+	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->next())
+		if (rp->m_index == index)
+		{
+			rp->m_enabled = enable;
+			breakpoint_update_flags();
+			return true;
+		}
+
+	// we don't own it, return false
+	return false;
+}
+
+
+//-------------------------------------------------
+//  registerpoint_enable_all - enable/disable all
+//  registerpoints
+//-------------------------------------------------
+
+void device_debug::registerpoint_enable_all(bool enable)
+{
+	// apply the enable to all registerpoints we own
+	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->next())
+		registerpoint_enable(rp->index(), enable);
+}
+
+
+//-------------------------------------------------
 //  hotspot_track - enable/disable tracking of
 //  hotspots
 //-------------------------------------------------
@@ -2824,6 +2917,18 @@ void device_debug::breakpoint_update_flags()
 			break;
 		}
 
+	if ( ! ( m_flags & DEBUG_FLAG_LIVE_BP ) )
+	{
+		// see if there are any enabled registerpoints
+		for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->m_next)
+		{
+			if (rp->m_enabled)
+			{
+				m_flags |= DEBUG_FLAG_LIVE_BP;
+			}
+		}
+	}
+
 	// push the flags out globally
 	debugcpu_private *global = m_device.machine().debugcpu_data;
 	if (global->livecpu != NULL)
@@ -2855,6 +2960,30 @@ void device_debug::breakpoint_check(offs_t pc)
 				debug_console_printf(m_device.machine(), "Stopped at breakpoint %X\n", bp->m_index);
 			break;
 		}
+
+	// see if we have any matching registerpoints
+	for (registerpoint *rp = m_rplist; rp != NULL; rp = rp->m_next)
+	{
+		if (rp->hit())
+		{
+			// halt in the debugger by default
+			debugcpu_private *global = m_device.machine().debugcpu_data;
+			global->execution_state = EXECUTION_STATE_STOPPED;
+
+			// if we hit, evaluate the action
+			if (rp->m_action)
+			{
+				debug_console_execute_command(m_device.machine(), rp->m_action, 0);
+			}
+
+			// print a notification, unless the action made us go again
+			if (global->execution_state == EXECUTION_STATE_STOPPED)
+			{
+				debug_console_printf(m_device.machine(), "Stopped at registerpoint %X\n", rp->m_index);
+			}
+			break;
+		}
+	}
 }
 
 
@@ -3251,6 +3380,52 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 			return false;
 		}
 	}
+	return true;
+}
+
+
+
+//**************************************************************************
+//  DEBUG REGISTERPOINT
+//**************************************************************************
+
+//-------------------------------------------------
+//  registerpoint - constructor
+//-------------------------------------------------
+
+device_debug::registerpoint::registerpoint(symbol_table &symbols, int index, const char *condition, const char *action)
+	: m_next(NULL),
+		m_index(index),
+		m_enabled(true),
+		m_condition(&symbols, (condition != NULL) ? condition : "1"),
+		m_action((action != NULL) ? action : "")
+{
+}
+
+
+//-------------------------------------------------
+//  hit - detect a hit
+//-------------------------------------------------
+
+bool device_debug::registerpoint::hit()
+{
+	// don't hit if disabled
+	if (!m_enabled)
+		return false;
+
+	// must satisfy the condition
+	if (!m_condition.is_empty())
+	{
+		try
+		{
+			return (m_condition.execute() != 0);
+		}
+		catch (expression_error &)
+		{
+			return false;
+		}
+	}
+
 	return true;
 }
 
