@@ -1586,27 +1586,36 @@ public:
 	DECLARE_WRITE8_MEMBER( snesbsx_hi_w );
 	DECLARE_READ8_MEMBER( snesbsx_lo_r );
 	DECLARE_WRITE8_MEMBER( snesbsx_lo_w );
-	DECLARE_READ8_MEMBER( snesnew_lo_r );
-	DECLARE_READ8_MEMBER( snesnew_hi_r );
-	DECLARE_WRITE8_MEMBER( snesnew_lo_w );
-	DECLARE_WRITE8_MEMBER( snesnew_hi_w );
 
 	optional_device<sns_cart_slot_device> m_slotcart;
 	int m_type;
 };
 
-
-// FIXME: merge these add-on specific maps into something more sane!
+//---------------------------------------------------------------------------------
+// LoROM & LoROM + BSX slot & LoROM + some add-on chips
+//---------------------------------------------------------------------------------
 
 // In general LoROM games have perfect mirror between 0x00-0x7d and 0x80-0xff
 // But BSX+LoROM games use different read handlers (to access ROM beyond 2MB)
 // so we use two different set of handlers...
 
-// LoROM
+// Also we have here LoROM + CX4, until the Hitachi CPU is emulated,
+// and the LoROM + Seta DSP, because their chip_read/chip_write need global offset
 
 READ8_MEMBER( snsnew_state::snes20_hi_r )
 {
 	UINT16 address = offset & 0xffff;
+
+	// take care of add-on IO
+	if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+			&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
+		return m_slotcart->m_cart->chip_read(space, offset);
+	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+			&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
+		return m_slotcart->m_cart->chip_read(space, offset);
+	else if (m_slotcart->get_type() == SNES_CX4
+			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
+		return CX4_read((offset & 0xffff) - 0x6000);
 
 	if (offset < 0x400000)
 	{
@@ -1654,7 +1663,18 @@ WRITE8_MEMBER( snsnew_state::snes20_hi_w )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (m_type == SNES_SUFAMITURBO && address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
+	// take care of add-on IO
+	if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+			&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
+	{ m_slotcart->m_cart->chip_write(space, offset, data); return; }
+	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+			&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
+	{ m_slotcart->m_cart->chip_write(space, offset, data); return; }
+	else if (m_slotcart->get_type() == SNES_CX4
+			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
+	{ CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data); return; }
+	else if (m_type == SNES_SUFAMITURBO
+			&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_h(space, offset, data); return; }
 
 	if (offset < 0x400000)
@@ -1680,6 +1700,17 @@ WRITE8_MEMBER( snsnew_state::snes20_hi_w )
 READ8_MEMBER( snsnew_state::snes20_lo_r )
 {
 	UINT16 address = offset & 0xffff;
+
+	// take care of add-on IO
+	if ((m_slotcart->get_type() == SNES_ST010 /*|| m_slotcart->get_type() == SNES_ST011*/) // why does this break moritash?
+			&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
+		return m_slotcart->m_cart->chip_read(space, offset);
+	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
+			&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
+		return m_slotcart->m_cart->chip_read(space, offset);
+	else if (m_slotcart->get_type() == SNES_CX4
+			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
+		return CX4_read((offset & 0xffff) - 0x6000);
 
 	if (offset < 0x400000)
 	{
@@ -1725,14 +1756,25 @@ READ8_MEMBER( snsnew_state::snes20_lo_r )
 
 WRITE8_MEMBER( snsnew_state::snes20_lo_w )
 {
-	if (m_type == SNES_SUFAMITURBO && (offset & 0xffff) >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
+	if (m_type == SNES_SUFAMITURBO
+				&& (offset & 0xffff) >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_l(space, offset, data); return; }
+	else if (m_slotcart->get_type() == SNES_BANANA
+				&& (offset & 0x78000) == 0x8000)
+	{
+//      printf("lo write %x\n", offset);
+		m_slotcart->m_cart->chip_write(space, offset, data);
+		return;
+	}
 
+	// other add-on writes matches the hi handler
 	snes20_hi_w(space, offset, data, 0xff);
 }
 
 
-// HiROM
+//---------------------------------------------------------------------------------
+// HiROM & HiROM + BSX slot
+//---------------------------------------------------------------------------------
 
 READ8_MEMBER( snsnew_state::snes21_lo_r )
 {
@@ -1858,7 +1900,9 @@ WRITE8_MEMBER( snsnew_state::snes21_hi_w )
 	}
 }
 
-// SuperFX / GSU
+//---------------------------------------------------------------------------------
+// LoROM + SuperFX / GSU
+//---------------------------------------------------------------------------------
 
 READ8_MEMBER( snsnew_state::snessfx_hi_r )
 {
@@ -1938,7 +1982,9 @@ WRITE8_MEMBER( snsnew_state::snessfx_lo_w )
 	snessfx_hi_w(space, offset, data, 0xff);
 }
 
-// SPC-7110
+//---------------------------------------------------------------------------------
+// HiROM + SPC-7110
+//---------------------------------------------------------------------------------
 
 READ8_MEMBER( snsnew_state::snes7110_hi_r )
 {
@@ -2034,7 +2080,9 @@ WRITE8_MEMBER( snsnew_state::snes7110_lo_w )
 }
 
 
-// S-DD1
+//---------------------------------------------------------------------------------
+// LoROM + S-DD1
+//---------------------------------------------------------------------------------
 
 READ8_MEMBER( snsnew_state::snessdd1_lo_r )
 {
@@ -2102,7 +2150,9 @@ WRITE8_MEMBER( snsnew_state::snessdd1_hi_w )
 }
 
 
-// BS-X (Base unit)
+//---------------------------------------------------------------------------------
+// LoROM + BS-X (Base unit)
+//---------------------------------------------------------------------------------
 
 READ8_MEMBER( snsnew_state::snesbsx_hi_r )
 {
@@ -2200,323 +2250,10 @@ WRITE8_MEMBER( snsnew_state::snesbsx_lo_w )
 }
 
 
-READ8_MEMBER( snsnew_state::snesnew_lo_r )
-{
-	// take care of add-on IO
-	if (m_slotcart->get_type() == SNES_DSP
-				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
-	else if (m_slotcart->get_type() == SNES_DSP_2MB
-				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);	
-	else if (m_slotcart->get_type() == SNES_DSP_MODE21
-				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x1fff);
-	else if (m_slotcart->get_type() == SNES_DSP4
-				&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
-	else if (m_slotcart->get_type() == SNES_OBC1
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 /*|| m_slotcart->get_type() == SNES_ST011*/) // why does this break moritash?
-				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if (m_slotcart->get_type() == SNES_SRTC
-				&& (offset < 0x400000 && (offset & 0xffff) == 0x2800))
-		return m_slotcart->m_cart->chip_read(space, offset & 0xffff);
-	else if (m_slotcart->get_type() == SNES_CX4
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))	// hack until we emulate the real CPU
-		return CX4_read((offset & 0xffff) - 0x6000);
-	else
-	{
-		switch (m_type)
-		{
-			case SNES_MODE20:
-			case SNES_CX4:
-			case SNES_ST010:
-			case SNES_ST011:
-			case SNES_DSP:
-			case SNES_DSP_2MB:
-			case SNES_DSP4:
-			case SNES_OBC1:
-			case SNES_SUFAMITURBO:
-			case SNES_BSXLO:
-			case SNES_POKEMON:
-			case SNES_BANANA:
-				return snes20_lo_r(space, offset, 0xff);
-
-			case SNES_MODE21:
-			case SNES_DSP_MODE21:
-			case SNES_SRTC:
-			case SNES_BSXHI:
-				return snes21_lo_r(space, offset, 0xff);
-
-			case SNES_SFX:
-				return snessfx_lo_r(space, offset, 0xff);
-
-			case SNES_SPC7110:
-			case SNES_SPC7110_RTC:
-				return snes7110_lo_r(space, offset, 0xff);
-
-			case SNES_SDD1:
-				return snessdd1_lo_r(space, offset, 0xff);
-
-			case SNES_BSX:
-				return snesbsx_lo_r(space, offset, 0xff);
-		}
-	}
-	return snes_open_bus_r(space, 0);
-}
-
-READ8_MEMBER( snsnew_state::snesnew_hi_r )
-{
-	// take care of add-on IO
-	if (m_slotcart->get_type() == SNES_DSP
-				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
-	else if (m_slotcart->get_type() == SNES_DSP_2MB
-				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);	
-	else if (m_slotcart->get_type() == SNES_DSP_MODE21
-				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x1fff);
-	else if (m_slotcart->get_type() == SNES_DSP4
-				&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
-	else if (m_slotcart->get_type() == SNES_OBC1
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_read(space, offset);
-	else if (m_slotcart->get_type() == SNES_SRTC
-				&& (offset < 0x400000 && (offset & 0xffff) == 0x2800))
-		return m_slotcart->m_cart->chip_read(space, offset & 0xffff);
-	else if (m_slotcart->get_type() == SNES_CX4
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))	// hack until we emulate the real CPU
-		return CX4_read((offset & 0xffff) - 0x6000);
-	else if ((m_slotcart->get_type() == SNES_POKEMON || m_slotcart->get_type() == SNES_BANANA)
-				&& (offset & 0x70000) == 0x0000)
-	{
-//      printf("hi read %x\n", offset);
-		return m_slotcart->m_cart->chip_read(space, offset);
-	}
-	else
-	{
-		switch (m_type)
-		{
-			case SNES_MODE20:
-			case SNES_CX4:
-			case SNES_ST010:
-			case SNES_ST011:
-			case SNES_DSP:
-			case SNES_DSP_2MB:
-			case SNES_DSP4:
-			case SNES_OBC1:
-			case SNES_SUFAMITURBO:
-			case SNES_BSXLO:
-			case SNES_POKEMON:
-			case SNES_BANANA:
-				return snes20_hi_r(space, offset, 0xff);
-
-			case SNES_MODE21:
-			case SNES_DSP_MODE21:
-			case SNES_SRTC:
-			case SNES_BSXHI:
-				return snes21_hi_r(space, offset, 0xff);
-
-			case SNES_SFX:
-				return snessfx_hi_r(space, offset, 0xff);
-
-			case SNES_SPC7110:
-			case SNES_SPC7110_RTC:
-				return snes7110_hi_r(space, offset, 0xff);
-
-			case SNES_SDD1:
-				return snessdd1_hi_r(space, offset, 0xff);
-
-			case SNES_BSX:
-				return snesbsx_hi_r(space, offset, 0xff);
-		}
-	}
-	return snes_open_bus_r(space, 0);
-}
-
-WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
-{
-	// take care of add-on IO
-	if (m_slotcart->get_type() == SNES_DSP
-				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP_2MB
-				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP_MODE21
-				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x1fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP4
-				&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_OBC1
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	else if (m_slotcart->get_type() == SNES_SRTC
-				&& (offset < 0x400000 && (offset & 0xffff) == 0x2801))
-		m_slotcart->m_cart->chip_write(space, offset & 0xffff, data);
-	else if (m_slotcart->get_type() == SNES_CX4
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))	// hack until we emulate the real CPU
-		CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data);
-	else if (m_slotcart->get_type() == SNES_BANANA
-				&& (offset & 0x78000) == 0x8000)
-	{
-//      printf("lo write %x\n", offset);
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	}
-	else
-	{
-		switch (m_type)
-		{
-			case SNES_MODE20:
-			case SNES_CX4:
-			case SNES_ST010:
-			case SNES_ST011:
-			case SNES_DSP:
-			case SNES_DSP_2MB:
-			case SNES_DSP4:
-			case SNES_OBC1:
-			case SNES_SUFAMITURBO:
-			case SNES_BSXLO:
-			case SNES_POKEMON:
-			case SNES_BANANA:
-				snes20_lo_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_MODE21:
-			case SNES_DSP_MODE21:
-			case SNES_SRTC:
-			case SNES_BSXHI:
-				snes21_lo_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SFX:
-				snessfx_lo_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SPC7110:
-			case SNES_SPC7110_RTC:
-				snes7110_lo_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SDD1:
-				snessdd1_lo_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_BSX:
-				snesbsx_lo_w(space, offset, data, 0xff);
-				break;
-		}
-	}
-}
-
-WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
-{
-	// take care of add-on IO
-	if (m_slotcart->get_type() == SNES_DSP
-				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP_2MB
-				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP_MODE21
-				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x1fff, data);
-	else if (m_slotcart->get_type() == SNES_DSP4
-				&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
-	else if (m_slotcart->get_type() == SNES_OBC1
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return m_slotcart->m_cart->chip_write(space, offset, data);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x600000 && offset < 0x680000 && (offset & 0xffff) < 0x4000))
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	else if ((m_slotcart->get_type() == SNES_ST010 || m_slotcart->get_type() == SNES_ST011)
-				&& (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000))
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	else if (m_slotcart->get_type() == SNES_SRTC
-				&& (offset < 0x400000 && (offset & 0xffff) == 0x2801))
-		m_slotcart->m_cart->chip_write(space, offset & 0xffff, data);
-	else if (m_slotcart->get_type() == SNES_CX4
-				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))	// hack until we emulate the real CPU
-		CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data);
-	else if ((m_slotcart->get_type() == SNES_POKEMON)
-				&& (offset & 0x70000) == 0x0000)
-	{
-//      printf("hi write %x\n", offset);
-		m_slotcart->m_cart->chip_write(space, offset, data);
-	}
-	else
-	{
-		switch (m_type)
-		{
-			case SNES_MODE20:
-			case SNES_CX4:
-			case SNES_ST010:
-			case SNES_ST011:
-			case SNES_DSP:
-			case SNES_DSP_2MB:
-			case SNES_DSP4:
-			case SNES_OBC1:
-			case SNES_SUFAMITURBO:
-			case SNES_BSXLO:
-			case SNES_POKEMON:
-			case SNES_BANANA:
-				snes20_hi_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_MODE21:
-			case SNES_DSP_MODE21:
-			case SNES_SRTC:
-			case SNES_BSXHI:
-				snes21_hi_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SFX:
-				snessfx_hi_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SPC7110:
-			case SNES_SPC7110_RTC:
-				snes7110_hi_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_SDD1:
-				snessdd1_hi_w(space, offset, data, 0xff);
-				break;
-
-			case SNES_BSX:
-				snesbsx_hi_w(space, offset, data, 0xff);
-				break;
-		}
-	}
-}
-
-
 static ADDRESS_MAP_START( snesnew_map, AS_PROGRAM, 8, snsnew_state )
-	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snesnew_lo_r, snesnew_lo_w)
+	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes20_lo_r, snes20_lo_w)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snesnew_hi_r, snesnew_hi_w)
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes20_hi_r, snes20_hi_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(snes_cart)
@@ -2555,22 +2292,25 @@ static MACHINE_START( snesnew )
 	MACHINE_START_CALL(snes_mess);
 
 	// in progress...
-#if 0
 	switch (state->m_type)
 	{
 		case SNES_MODE20:
 		case SNES_BSXLO:
 		case SNES_SUFAMITURBO:
-		case SNES_POKEMON:
 		case SNES_BANANA:
-		case SNES_CX4:		// this still uses the old simulation instead of emulating the CPU
-		case SNES_ST010:	// this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
-		case SNES_ST011:	// this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
-			break;			
+		case SNES_CX4:      // this still uses the old simulation instead of emulating the CPU
+		case SNES_ST010:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
+		case SNES_ST011:    // this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
+			break;
+		case SNES_POKEMON:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800000, 0x80ffff, 0, 0x780000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800000, 0x80ffff, 0, 0x780000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+//          set_5a22_map(*state->m_maincpu);
+			break;
 		case SNES_DSP:
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x208000, 0x20ffff, 0, 0x9f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x208000, 0x20ffff, 0, 0x9f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
-			break;			
+			break;
 		case SNES_DSP_2MB:
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x600000, 0x607fff, 0, 0x8f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x600000, 0x607fff, 0, 0x8f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
@@ -2607,7 +2347,7 @@ static MACHINE_START( snesnew )
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snessfx_lo_r),state), write8_delegate(FUNC(snsnew_state::snessfx_lo_w),state));
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snessfx_hi_r),state), write8_delegate(FUNC(snsnew_state::snessfx_hi_w),state));
 			set_5a22_map(*state->m_maincpu);
-			break;			
+			break;
 		case SNES_SPC7110:
 		case SNES_SPC7110_RTC:
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes7110_lo_r),state), write8_delegate(FUNC(snsnew_state::snes7110_lo_w),state));
@@ -2625,7 +2365,6 @@ static MACHINE_START( snesnew )
 			set_5a22_map(*state->m_maincpu);
 			break;
 	}
-#endif
 }
 
 static MACHINE_CONFIG_START( snesnew, snsnew_state )
