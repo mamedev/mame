@@ -1570,18 +1570,18 @@ public:
 	DECLARE_WRITE8_MEMBER( snes21_lo_w );
 	DECLARE_READ8_MEMBER( snes21_hi_r );
 	DECLARE_WRITE8_MEMBER( snes21_hi_w );
-	DECLARE_READ8_MEMBER( snesfx_hi_r );
-	DECLARE_READ8_MEMBER( snesfx_lo_r );
-	DECLARE_WRITE8_MEMBER( snesfx_hi_w );
-	DECLARE_WRITE8_MEMBER( snesfx_lo_w );
-	DECLARE_READ8_MEMBER( snespc7110_hi_r );
-	DECLARE_READ8_MEMBER( snespc7110_lo_r );
-	DECLARE_WRITE8_MEMBER( snespc7110_hi_w );
-	DECLARE_WRITE8_MEMBER( snespc7110_lo_w );
-	DECLARE_READ8_MEMBER( snesdd1_lo_r );
-	DECLARE_WRITE8_MEMBER( snesdd1_lo_w );
-	DECLARE_READ8_MEMBER( snesdd1_hi_r );
-	DECLARE_WRITE8_MEMBER( snesdd1_hi_w );
+	DECLARE_READ8_MEMBER( snessfx_hi_r );
+	DECLARE_READ8_MEMBER( snessfx_lo_r );
+	DECLARE_WRITE8_MEMBER( snessfx_hi_w );
+	DECLARE_WRITE8_MEMBER( snessfx_lo_w );
+	DECLARE_READ8_MEMBER( snes7110_hi_r );
+	DECLARE_READ8_MEMBER( snes7110_lo_r );
+	DECLARE_WRITE8_MEMBER( snes7110_hi_w );
+	DECLARE_WRITE8_MEMBER( snes7110_lo_w );
+	DECLARE_READ8_MEMBER( snessdd1_lo_r );
+	DECLARE_WRITE8_MEMBER( snessdd1_lo_w );
+	DECLARE_READ8_MEMBER( snessdd1_hi_r );
+	DECLARE_WRITE8_MEMBER( snessdd1_hi_w );
 	DECLARE_READ8_MEMBER( snesbsx_hi_r );
 	DECLARE_WRITE8_MEMBER( snesbsx_hi_w );
 	DECLARE_READ8_MEMBER( snesbsx_lo_r );
@@ -1860,7 +1860,7 @@ WRITE8_MEMBER( snsnew_state::snes21_hi_w )
 
 // SuperFX / GSU
 
-READ8_MEMBER( snsnew_state::snesfx_hi_r )
+READ8_MEMBER( snsnew_state::snessfx_hi_r )
 {
 	UINT16 address = offset & 0xffff;
 
@@ -1886,7 +1886,7 @@ READ8_MEMBER( snsnew_state::snesfx_hi_r )
 		return m_slotcart->m_cart->read_ram(space, offset);
 }
 
-READ8_MEMBER( snsnew_state::snesfx_lo_r )
+READ8_MEMBER( snsnew_state::snessfx_lo_r )
 {
 	UINT16 address = offset & 0xffff;
 
@@ -1912,7 +1912,7 @@ READ8_MEMBER( snsnew_state::snesfx_lo_r )
 		return m_slotcart->m_cart->read_ram(space, offset);
 }
 
-WRITE8_MEMBER( snsnew_state::snesfx_hi_w )
+WRITE8_MEMBER( snsnew_state::snessfx_hi_w )
 {
 	UINT16 address = offset & 0xffff;
 	if (offset < 0x400000)
@@ -1933,14 +1933,14 @@ WRITE8_MEMBER( snsnew_state::snesfx_hi_w )
 		m_slotcart->m_cart->write_ram(space, offset, data);
 }
 
-WRITE8_MEMBER( snsnew_state::snesfx_lo_w )
+WRITE8_MEMBER( snsnew_state::snessfx_lo_w )
 {
-	snesfx_hi_w(space, offset, data, 0xff);
+	snessfx_hi_w(space, offset, data, 0xff);
 }
 
 // SPC-7110
 
-READ8_MEMBER( snsnew_state::snespc7110_hi_r )
+READ8_MEMBER( snsnew_state::snes7110_hi_r )
 {
 	UINT16 address = offset & 0xffff;
 
@@ -1969,7 +1969,7 @@ READ8_MEMBER( snsnew_state::snespc7110_hi_r )
 	return m_slotcart->m_cart->read_h(space, offset);
 }
 
-READ8_MEMBER( snsnew_state::snespc7110_lo_r )
+READ8_MEMBER( snsnew_state::snes7110_lo_r )
 {
 	UINT16 address = offset & 0xffff;
 
@@ -2001,12 +2001,12 @@ READ8_MEMBER( snsnew_state::snespc7110_lo_r )
 	return snes_open_bus_r(space, 0);
 }
 
-WRITE8_MEMBER( snsnew_state::snespc7110_hi_w )
+WRITE8_MEMBER( snsnew_state::snes7110_hi_w )
 {
-	snespc7110_lo_w(space, offset, data, 0xff);
+	snes7110_lo_w(space, offset, data, 0xff);
 }
 
-WRITE8_MEMBER( snsnew_state::snespc7110_lo_w )
+WRITE8_MEMBER( snsnew_state::snes7110_lo_w )
 {
 	UINT16 address = offset & 0xffff;
 	if (offset < 0x400000)
@@ -2036,7 +2036,7 @@ WRITE8_MEMBER( snsnew_state::snespc7110_lo_w )
 
 // S-DD1
 
-READ8_MEMBER( snsnew_state::snesdd1_lo_r )
+READ8_MEMBER( snsnew_state::snessdd1_lo_r )
 {
 	UINT16 address = offset & 0xffff;
 
@@ -2062,20 +2062,20 @@ READ8_MEMBER( snsnew_state::snesdd1_lo_r )
 		return m_slotcart->m_cart->read_l(space, offset);
 }
 
-READ8_MEMBER( snsnew_state::snesdd1_hi_r )
+READ8_MEMBER( snsnew_state::snessdd1_hi_r )
 {
 	if (offset >= 0x400000)
 		return m_slotcart->m_cart->read_h(space, offset);
 	else
-		return snesdd1_lo_r(space, offset, 0xff);
+		return snessdd1_lo_r(space, offset, 0xff);
 }
 
-WRITE8_MEMBER( snsnew_state::snesdd1_lo_w )
+WRITE8_MEMBER( snsnew_state::snessdd1_lo_w )
 {
-	snesdd1_hi_w(space, offset, data, 0xff);
+	snessdd1_hi_w(space, offset, data, 0xff);
 }
 
-WRITE8_MEMBER( snsnew_state::snesdd1_hi_w )
+WRITE8_MEMBER( snsnew_state::snessdd1_hi_w )
 {
 	UINT16 address = offset & 0xffff;
 	if (offset < 0x400000)
@@ -2243,7 +2243,6 @@ READ8_MEMBER( snsnew_state::snesnew_lo_r )
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
-			case SNES_STROM:
 			case SNES_BSXLO:
 			case SNES_POKEMON:
 			case SNES_BANANA:
@@ -2256,14 +2255,14 @@ READ8_MEMBER( snsnew_state::snesnew_lo_r )
 				return snes21_lo_r(space, offset, 0xff);
 
 			case SNES_SFX:
-				return snesfx_lo_r(space, offset, 0xff);
+				return snessfx_lo_r(space, offset, 0xff);
 
 			case SNES_SPC7110:
 			case SNES_SPC7110_RTC:
-				return snespc7110_lo_r(space, offset, 0xff);
+				return snes7110_lo_r(space, offset, 0xff);
 
 			case SNES_SDD1:
-				return snesdd1_lo_r(space, offset, 0xff);
+				return snessdd1_lo_r(space, offset, 0xff);
 
 			case SNES_BSX:
 				return snesbsx_lo_r(space, offset, 0xff);
@@ -2321,7 +2320,6 @@ READ8_MEMBER( snsnew_state::snesnew_hi_r )
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
-			case SNES_STROM:
 			case SNES_BSXLO:
 			case SNES_POKEMON:
 			case SNES_BANANA:
@@ -2334,14 +2332,14 @@ READ8_MEMBER( snsnew_state::snesnew_hi_r )
 				return snes21_hi_r(space, offset, 0xff);
 
 			case SNES_SFX:
-				return snesfx_hi_r(space, offset, 0xff);
+				return snessfx_hi_r(space, offset, 0xff);
 
 			case SNES_SPC7110:
 			case SNES_SPC7110_RTC:
-				return snespc7110_hi_r(space, offset, 0xff);
+				return snes7110_hi_r(space, offset, 0xff);
 
 			case SNES_SDD1:
-				return snesdd1_hi_r(space, offset, 0xff);
+				return snessdd1_hi_r(space, offset, 0xff);
 
 			case SNES_BSX:
 				return snesbsx_hi_r(space, offset, 0xff);
@@ -2399,7 +2397,6 @@ WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
-			case SNES_STROM:
 			case SNES_BSXLO:
 			case SNES_POKEMON:
 			case SNES_BANANA:
@@ -2414,16 +2411,16 @@ WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
 				break;
 
 			case SNES_SFX:
-				snesfx_lo_w(space, offset, data, 0xff);
+				snessfx_lo_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_SPC7110:
 			case SNES_SPC7110_RTC:
-				snespc7110_lo_w(space, offset, data, 0xff);
+				snes7110_lo_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_SDD1:
-				snesdd1_lo_w(space, offset, data, 0xff);
+				snessdd1_lo_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_BSX:
@@ -2482,7 +2479,6 @@ WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
-			case SNES_STROM:
 			case SNES_BSXLO:
 			case SNES_POKEMON:
 			case SNES_BANANA:
@@ -2497,16 +2493,16 @@ WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
 				break;
 
 			case SNES_SFX:
-				snesfx_hi_w(space, offset, data, 0xff);
+				snessfx_hi_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_SPC7110:
 			case SNES_SPC7110_RTC:
-				snespc7110_hi_w(space, offset, data, 0xff);
+				snes7110_hi_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_SDD1:
-				snesdd1_hi_w(space, offset, data, 0xff);
+				snessdd1_hi_w(space, offset, data, 0xff);
 				break;
 
 			case SNES_BSX:
@@ -2559,28 +2555,77 @@ static MACHINE_START( snesnew )
 	MACHINE_START_CALL(snes_mess);
 
 	// in progress...
+#if 0
 	switch (state->m_type)
 	{
+		case SNES_MODE20:
+		case SNES_BSXLO:
+		case SNES_SUFAMITURBO:
+		case SNES_POKEMON:
+		case SNES_BANANA:
+		case SNES_CX4:		// this still uses the old simulation instead of emulating the CPU
+		case SNES_ST010:	// this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
+		case SNES_ST011:	// this requires two diff kinds of chip access, so we handle it in snes20_lo/hi_r/w
+			break;			
+		case SNES_DSP:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x208000, 0x20ffff, 0, 0x9f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x208000, 0x20ffff, 0, 0x9f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			break;			
+		case SNES_DSP_2MB:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x600000, 0x607fff, 0, 0x8f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x600000, 0x607fff, 0, 0x8f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			break;
+		case SNES_DSP4:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x308000, 0x30ffff, 0, 0x8f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x308000, 0x30ffff, 0, 0x8f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			break;
+		case SNES_OBC1:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0, 0xbf0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0, 0xbf0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			break;
 		case SNES_MODE21:
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
-//          set_5a22_map(*state->m_maincpu);
+		case SNES_BSXHI:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
 			break;
 		case SNES_DSP_MODE21:
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0, 0x9f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0, 0x9f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
-//          set_5a22_map(*state->m_maincpu);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0, 0x9f0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0, 0x9f0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			set_5a22_map(*state->m_maincpu);
 			break;
 		case SNES_SRTC:
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x002800, 0x002800, 0, 0xbf0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
-//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x002801, 0x002801, 0, 0xbf0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
-//          set_5a22_map(*state->m_maincpu);
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes21_lo_r),state), write8_delegate(FUNC(snsnew_state::snes21_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes21_hi_r),state), write8_delegate(FUNC(snsnew_state::snes21_hi_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x002800, 0x002800, 0, 0xbf0000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x002801, 0x002801, 0, 0xbf0000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+			set_5a22_map(*state->m_maincpu);
+			break;
+		case SNES_SFX:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snessfx_lo_r),state), write8_delegate(FUNC(snsnew_state::snessfx_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snessfx_hi_r),state), write8_delegate(FUNC(snsnew_state::snessfx_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
+			break;			
+		case SNES_SPC7110:
+		case SNES_SPC7110_RTC:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snes7110_lo_r),state), write8_delegate(FUNC(snsnew_state::snes7110_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snes7110_hi_r),state), write8_delegate(FUNC(snsnew_state::snes7110_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
+			break;
+		case SNES_SDD1:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snessdd1_lo_r),state), write8_delegate(FUNC(snsnew_state::snessdd1_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snessdd1_hi_r),state), write8_delegate(FUNC(snsnew_state::snessdd1_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
+			break;
+		case SNES_BSX:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snsnew_state::snesbsx_lo_r),state), write8_delegate(FUNC(snsnew_state::snesbsx_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snsnew_state::snesbsx_hi_r),state), write8_delegate(FUNC(snsnew_state::snesbsx_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
 			break;
 	}
+#endif
 }
 
 static MACHINE_CONFIG_START( snesnew, snsnew_state )
