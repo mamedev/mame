@@ -22,9 +22,9 @@ public:
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
 	int         m_alpha_enabled;
+	UINT16      m_zmask;
 
 	/* misc */
-	int         m_game_type;
 	UINT16      m_protram[16];
 	UINT16      m_cur_control2;
 
@@ -49,14 +49,15 @@ public:
 	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_WRITE16_MEMBER(moo_prot_w);
 	DECLARE_WRITE16_MEMBER(moobl_oki_bank_w);
-	DECLARE_DRIVER_INIT(moo);
 	DECLARE_MACHINE_START(moo);
 	DECLARE_MACHINE_RESET(moo);
 	DECLARE_VIDEO_START(moo);
+	DECLARE_VIDEO_START(bucky);
 	UINT32 screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void moo_objdma();
 };
 
 /*----------- defined in video/moo.c -----------*/

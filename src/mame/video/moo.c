@@ -40,25 +40,29 @@ VIDEO_START_MEMBER(moo_state,moo)
 	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	m_alpha_enabled = 0;
+	m_zmask = 0xffff;
 
-	if (!strcmp(machine().system().name, "bucky") || !strcmp(machine().system().name, "buckyua") || !strcmp(machine().system().name, "buckyaa"))
-	{
-		// Bucky doesn't chain tilemaps
-		k056832_set_layer_association(m_k056832, 0);
+	// other than the intro showing one blank line alignment is good through the game
+	k056832_set_layer_offs(m_k056832, 0, -2 + 1, 0);
+	k056832_set_layer_offs(m_k056832, 1,  2 + 1, 0);
+	k056832_set_layer_offs(m_k056832, 2,  4 + 1, 0);
+	k056832_set_layer_offs(m_k056832, 3,  6 + 1, 0);
+}
 
-		k056832_set_layer_offs(m_k056832, 0, -2, 0);
-		k056832_set_layer_offs(m_k056832, 1,  2, 0);
-		k056832_set_layer_offs(m_k056832, 2,  4, 0);
-		k056832_set_layer_offs(m_k056832, 3,  6, 0);
-	}
-	else
-	{
-		// other than the intro showing one blank line alignment is good through the game
-		k056832_set_layer_offs(m_k056832, 0, -2 + 1, 0);
-		k056832_set_layer_offs(m_k056832, 1,  2 + 1, 0);
-		k056832_set_layer_offs(m_k056832, 2,  4 + 1, 0);
-		k056832_set_layer_offs(m_k056832, 3,  6 + 1, 0);
-	}
+VIDEO_START_MEMBER(moo_state,bucky)
+{
+	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
+
+	m_alpha_enabled = 0;
+	m_zmask = 0x00ff;
+
+	// Bucky doesn't chain tilemaps
+	k056832_set_layer_association(m_k056832, 0);
+
+	k056832_set_layer_offs(m_k056832, 0, -2, 0);
+	k056832_set_layer_offs(m_k056832, 1,  2, 0);
+	k056832_set_layer_offs(m_k056832, 2,  4, 0);
+	k056832_set_layer_offs(m_k056832, 3,  6, 0);
 }
 
 UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
