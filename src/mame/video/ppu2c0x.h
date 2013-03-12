@@ -72,7 +72,7 @@ enum
 	PPU_VBLANK_LAST_SCANLINE_NTSC = 260,
 	PPU_VBLANK_LAST_SCANLINE_PAL  = 310
 
-	// Both the sacnline immediately before and immediately after VBLANK
+	// Both the scanline immediately before and immediately after VBLANK
 	// are non-rendering and non-vblank.
 };
 

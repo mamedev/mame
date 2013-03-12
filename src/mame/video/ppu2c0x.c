@@ -20,6 +20,9 @@
     * Micro Machines has minor rendering glitches (needs better timing).
     * Mach Rider has minor road rendering glitches (needs better timing).
     * Rad Racer demonstrates road glitches: it changes horizontal scrolling mid-line.
+    * Space Hunter (Famicom) should do a color cycling effect on title screen.
+      It also sports wrong colors for the planets and garbage for the inventory
+      menu.
 
 ******************************************************************************/
 
