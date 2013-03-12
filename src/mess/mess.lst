@@ -781,6 +781,7 @@ at  // 1987 AMI Bios and Diagnostics
 atvga    // 19?? AT VGA
 neat      // 1989 New Enhanced AT chipset, AMI BIOS
 at386    // 19?? IBM AT 386
+at386sx
 at486    // 19?? IBM AT 486
 ct486       // 1993? 486 with CS4031
 ficpio2 // 1995 FIC 486-PIO-2

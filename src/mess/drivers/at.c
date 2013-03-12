@@ -34,7 +34,6 @@ static ADDRESS_MAP_START( neat_map, AS_PROGRAM, 16, at_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at386_map, AS_PROGRAM, 32, at_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000a0000, 0x000bffff) AM_NOP
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
@@ -42,7 +41,7 @@ static ADDRESS_MAP_START( at386_map, AS_PROGRAM, 32, at_state )
 	AM_RANGE(0x000d0000, 0x000effff) AM_ROM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00ff0000, 0x00ffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
+	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
 // memory is mostly handled by the chipset
@@ -591,7 +590,7 @@ static MACHINE_CONFIG_START( at386, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M,16M,32M,64M,128M,256M")
 
 MACHINE_CONFIG_END
 
@@ -664,7 +663,7 @@ static MACHINE_CONFIG_START( at586, at586_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M")
+	MCFG_RAM_EXTRA_OPTIONS("1M,2M,8M,16M,32M,64M,128M,256M")
 
 	MCFG_PCI_BUS_ADD("pcibus", 0)
 	MCFG_PCI_BUS_DEVICE("pcibus:0", pci_devices, "i82439tx", NULL, &tx_config, 0, true)
@@ -697,10 +696,10 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa5", pc_isa16_cards, "ide_cd", ide_2nd, false) //2nd-ary IDE
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c386sx16, at386 )
-	MCFG_CPU_REPLACE("maincpu", I386, 16000000)     /* 386SX */
-	MCFG_CPU_PROGRAM_MAP(at386_map)
-	MCFG_CPU_IO_MAP(at386_io)
+static MACHINE_CONFIG_DERIVED( at386sx, atvga )
+	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)     /* 386SX */
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( megapc, at386 )
@@ -1127,6 +1126,14 @@ ROM_START( neat )
 	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( at386sx )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_SYSTEM_BIOS(0, "neatsx", "NEATsx 386sx")
+	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4AB1862D) SHA1(D4E8D0FF43731270478CA7671A129080FF350A4F),ROM_SKIP(1) | ROM_BIOS(1) )
+	//ROM_RELOAD(0xff0000,0x8000)
+	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(1) )
+	//ROM_RELOAD(0xff0000,0x8000)
+ROM_END
 
 ROM_START( at386 )
 	ROM_REGION(0x1000000,"maincpu", 0)
@@ -1135,13 +1142,9 @@ ROM_START( at386 )
 	ROM_SYSTEM_BIOS(1, "at386", "unknown 386")  // This dump possibly comes from a MITAC INC 386 board, given that the original driver had it as manufacturer
 	ROMX_LOAD("at386.bin",  0xf0000, 0x10000, CRC(3df9732a) SHA1(def71567dee373dc67063f204ef44ffab9453ead), ROM_BIOS(2))
 	//ROM_RELOAD(0xff0000,0x10000)
-	ROM_SYSTEM_BIOS(2, "neatsx", "NEATsx 386sx")
-	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4AB1862D) SHA1(D4E8D0FF43731270478CA7671A129080FF350A4F),ROM_SKIP(1) | ROM_BIOS(3) )
-	//ROM_RELOAD(0xff0000,0x8000)
-	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(3) )
-	//ROM_RELOAD(0xff0000,0x8000)
-	ROM_SYSTEM_BIOS(3, "amicg", "AMI CG")
-	ROMX_LOAD( "amicg.1",        0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(4) )
+
+	ROM_SYSTEM_BIOS(2, "amicg", "AMI CG")
+	ROMX_LOAD( "amicg.1",        0xf0000, 0x10000,CRC(8408965a) SHA1(9893d3ac851e01b06a68a67d3721df36ca2c96f5), ROM_BIOS(3) )
 ROM_END
 
 
@@ -1454,6 +1457,7 @@ COMP ( 198?, i8580111, ibm5170, 0,       at386,     atvga, at_state,      atvga,
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga, at_state,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1988, at386sx,  ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, driver_device,      0,   "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, driver_device,      0,       "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
@@ -1483,9 +1487,9 @@ COMP ( 1989, xb42664,  ibm5170, 0,       at386,     atvga, at_state,      atvga,
 COMP ( 1990, xb42664a, ibm5170, 0,       at386,     atvga, at_state,      atvga,  "Apricot",  "Apricot XEN-S (Venus II Motherboard 386)" , GAME_NOT_WORKING )
 COMP ( 1993, apxena1,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot XEN PC (A1 Motherboard)", GAME_NOT_WORKING )
 COMP ( 1993, apxenp2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "Apricot",  "Apricot XEN PC (P2 Motherboard)", GAME_NOT_WORKING )
-COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga, at_state,      atvga,  "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
+COMP ( 1990, c386sx16, ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "Commodore Business Machines", "Commodore 386SX-16", GAME_NOT_WORKING )
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "FIC", "486-PIO-2", GAME_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga, driver_device,      0,      "FIC", "VT-503", GAME_NOT_WORKING )
 COMP ( 1985, k286i,    ibm5170, 0,       k286i,     atcga, at_state,      atcga,  "Kaypro",   "286i", GAME_NOT_WORKING )
-COMP ( 1991, t2000sx,  ibm5170, 0,       c386sx16,  atvga, at_state,      atvga,  "Toshiba",  "T2000SX", GAME_NOT_WORKING )
+COMP ( 1991, t2000sx,  ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "Toshiba",  "T2000SX", GAME_NOT_WORKING )

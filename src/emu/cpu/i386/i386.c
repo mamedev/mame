@@ -3601,6 +3601,19 @@ CPU_GET_INFO( i386 )
 	}
 }
 
+CPU_GET_INFO( i386SX )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                  break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                    break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 16;                    break;
+		default:                                        CPU_GET_INFO_CALL(i386);               break;
+	}
+}
+
 /*****************************************************************************/
 /* Intel 486 */
 
@@ -4465,6 +4478,7 @@ CPU_GET_INFO( pentium4 )
 
 
 DEFINE_LEGACY_CPU_DEVICE(I386, i386);
+DEFINE_LEGACY_CPU_DEVICE(I386SX, i386SX);
 DEFINE_LEGACY_CPU_DEVICE(I486, i486);
 DEFINE_LEGACY_CPU_DEVICE(PENTIUM, pentium);
 DEFINE_LEGACY_CPU_DEVICE(MEDIAGX, mediagx);
