@@ -105,8 +105,8 @@ public:
 	required_shared_ptr<UINT16> m_spr;
 	required_shared_ptr<UINT16> m_vregs;
 
-	UINT8* m_vram;
-	UINT8* m_vram_rearranged;
+	UINT16* m_vram;
+	UINT16* m_vram_rearranged;
 
 	int tilemap_base[4];
 	int tilemap_size[4];
@@ -126,26 +126,25 @@ public:
 	TILE_GET_INFO_MEMBER(get_popobear_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(get_popobear_bg3_tile_info);
 
-	// why are we using 8-bit anyway?
-	DECLARE_WRITE8_MEMBER(popo_vram_w)
+	DECLARE_WRITE16_MEMBER(popo_vram_w)
 	{
-		m_vram[offset^1] = data;
+		COMBINE_DATA(&m_vram[offset]);
 
 		// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
-		int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20, /* end unused bits */
+		int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
 	
-		19,18,17,16,15,14,13,
+		18,17,16,15,14,13,12,
 		
-		9,8,7,6,5,4,3,
+		8,7,6,5,4,3,2,
 
-		12,11,10, /* y tile address bits */
+		11,10,9, /* y tile address bits */
 		
-		2,1,0 /* x tile address bits */);
+		1,0 /* x tile address bits */);
 
 
 
-		m_vram_rearranged[swapped_offset] = data;
-		machine().gfx[m_gfx_index]->mark_dirty((swapped_offset^1)/2);
+		COMBINE_DATA(&m_vram_rearranged[swapped_offset]);
+		machine().gfx[m_gfx_index]->mark_dirty((swapped_offset)/32);
 
 		// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
 		m_bg_tilemap[0]->mark_all_dirty();
@@ -154,7 +153,7 @@ public:
 		m_bg_tilemap[3]->mark_all_dirty();
 
 	}
-	DECLARE_READ8_MEMBER(popo_vram_r) { return m_vram[offset^1]; }
+	DECLARE_READ16_MEMBER(popo_vram_r) { return m_vram[offset]; }
 
 };
 
@@ -165,7 +164,7 @@ static const gfx_layout popobear_char_layout =
 	0x4000,
 	8,
 	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56 },
+	{ 8,0,24,16,40,32,56,48 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
 };
@@ -174,28 +173,28 @@ static const gfx_layout popobear_char_layout =
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
 {
 	int base = tilemap_base[0];
-	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	int tileno = m_vram[base/2 + tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
 {
 	int base = tilemap_base[1];
-	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	int tileno = m_vram[base/2 + tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
 {
 	int base = tilemap_base[2];
-	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	int tileno = m_vram[base/2 + tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
 {
 	int base = tilemap_base[3];
-	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	int tileno = m_vram[base/2 + tile_index];
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
 }
 
@@ -211,8 +210,8 @@ void popobear_state::video_start()
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
-	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x100000);
-	m_vram_rearranged = auto_alloc_array_clear(machine(), UINT8, 0x100000);
+	m_vram = auto_alloc_array_clear(machine(), UINT16, 0x100000/2);
+	m_vram_rearranged = auto_alloc_array_clear(machine(), UINT16, 0x100000/2);
 
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
@@ -353,8 +352,8 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE8( popo_vram_r, popo_vram_w, 0xffff )
+	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE( popo_vram_r, popo_vram_w ) // tile definitions + tilemaps
 	          
 
 	/* Most if not all of these are vregs */
