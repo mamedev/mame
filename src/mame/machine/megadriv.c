@@ -844,7 +844,7 @@ ADDRESS_MAP_END
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there
-static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_base_state )
+static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_START( md_bootleg, md_base_state )
+MACHINE_CONFIG_START( md_bootleg, md_boot_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
