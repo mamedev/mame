@@ -4337,7 +4337,6 @@ more investigation needed...
 		<description>Super 5 in 1 (Bad Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir1" />
@@ -4351,7 +4350,6 @@ more investigation needed...
 		<description>Super 6 in 1</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir1" />
@@ -4366,7 +4364,6 @@ more investigation needed...
 		<description>1997 New 7 in 1 (Bad Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir2" />
@@ -4381,7 +4378,6 @@ more investigation needed...
 		<description>Super 7-in-1 1997 (Bad Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir1" />
@@ -4396,7 +4392,6 @@ more investigation needed...
 		<description>8 in 1 and 10 in 1 (Bad Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir1" />
@@ -4411,7 +4406,6 @@ more investigation needed...
 		<description>Super 11 in 1 (Bad Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
-		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
 			<feature name="slot" value="lorom_mcpir1" />
@@ -4421,9 +4415,9 @@ more investigation needed...
 		</part>
 	</software>
 
-	<software name="super20m" supported="partial">
+	<software name="sup20hab" supported="partial">
 		<!-- single cartridge source: d4s -->
-		<description>Super 20 Collection (Kor)</description>
+		<description>Super 20 Hab (Kor)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="슈퍼20합" />

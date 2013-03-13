@@ -446,7 +446,12 @@ WRITE8_MEMBER( sns_rom_mcpirate2_device::chip_write )
 }
 
 // Korean 20 in 1 collection with NES games
-// base bank is selected (in 32KB chunks) by bits 0-4 of data written at 0x808000
+// - base bank is selected (in 32KB chunks) by bits 0-4 of data written at 0x808000
+// - bits 6-7 seem related to prg size: 0x00 means 4*32KB, 0xc0 means 2*32KB, 0x80 means 1*32KB
+//   (they are used to setup how large is the ROM to be accessed, games 15-20 don't work well if
+//   accesses in [01-3f] don't go to the only 32KB bank)
+// - bit 5 is always 0
+// it's worth to notice that for FC games size of bank is twice the size of original FC PRG
 READ8_MEMBER(sns_rom_20col_device::read_l)
 {
 	return read_h(space, offset);
@@ -454,8 +459,9 @@ READ8_MEMBER(sns_rom_20col_device::read_l)
 
 READ8_MEMBER(sns_rom_20col_device::read_h)
 {
-	int bank = (offset / 0x10000);
-	return m_rom[(rom_bank_map[bank] + m_base_bank) * 0x8000 + (offset & 0x7fff)];
+	int prg32k = (!BIT(m_base_bank, 6) && BIT(m_base_bank, 7));
+	int bank = prg32k ? 0 : (offset / 0x10000);
+	return m_rom[((m_base_bank & 0x1f) + bank) * 0x8000 + (offset & 0x7fff)];
 }
 
 WRITE8_MEMBER( sns_rom_20col_device::chip_write )
@@ -481,7 +487,7 @@ WRITE8_MEMBER( sns_rom_20col_device::chip_write )
 	// [18] donkey kong jr - 9a
 	// [19] mario bros - 9b
 	// [20] popeye - 9c
-	m_base_bank = data & 0x1f;
+	m_base_bank = data & 0xdf;
 //	printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
 }
 
