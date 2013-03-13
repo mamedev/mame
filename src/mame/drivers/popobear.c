@@ -6,11 +6,12 @@
 
     TODO:
     - auto-animation speed is erratic (way too fast);
-    - tilemap effects (scrolling, colscroll, linescroll);
-	  (high score table?)
     - BGM seems quite off, YM2413 core bug?
+	- IRQ generation;
+      - all possible related to some timers?
+ 
+    
     - I/Os;
-    - IRQ generation;
     - Port 0x620000 is quite a mystery, some silly protection?
 
 ============================================================================================
@@ -267,7 +268,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			int width = 8 << ((param & 0x30)>>4);
 			int height = width; // sprites are always square?
 
-			int color_bank = ((param & 0xc)<<4);
+			int color_bank = ((param & 0xc)>>2);
 			int x_dir = param & 0x40;
 			int y_dir = param & 0x80;
 
@@ -290,8 +291,18 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 					UINT8 pix = (vram[spr_num^1] & 0xff);
 					int x_draw = (x_dir) ? x+((width-1) - xi) : x+xi;
 
-					if(cliprect.contains(x_draw, y_draw) && pix)
-						bitmap.pix16(y_draw, x_draw) = machine().pens[pix+0x100+color_bank];
+					if(cliprect.contains(x_draw, y_draw))
+					{
+						// this is a bit strange, pix data is basically 8-bit
+						// but we have to treat 0x00, 0x20, 0x40, 0x60, 0x80, 0xa0, 0xc0 and 0xe0 as transpens?
+						// see scores when you colect an item
+						// granularity also means colour bank is applied *0x40
+						// and we have 2 more possible colour bank bits
+						if (pix&0x1f)
+						{
+							bitmap.pix16(y_draw, x_draw) = machine().pens[((pix+(color_bank*0x40))&0xff)+0x100];
+						}
+					}
 
 					spr_num++;
 				}
@@ -314,7 +325,15 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	//popmessage("%04x",m_vregs[0/2]);
 	UINT16* vreg = m_vregs;
 
-	popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
+//	popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
+
+	// vreg[0x00] also looks like it could be some enable registers
+	// 0x82ff - BMC logo
+	// 0x8aff - some attract scenes (no sprites)
+	// 0x8bff - game attract scense etc. (sprites)
+
+	// vreg[0x01] is always
+	// 0xfefb
 
 
 
@@ -327,8 +346,8 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 
 	if ((enable0 != 0x00) && (enable0 != 0x0d) && (enable0 != 0x1f)) printf("unknown enable0 value %02x\n", enable0);
 	if ((enable1 != 0x00) && (enable1 != 0x0d) && (enable1 != 0x1f)) printf("unknown enable1 value %02x\n", enable1);
-	if ((enable2 != 0x00) && (enable2 != 0x0d) && (enable2 != 0x1f)) printf("unknown enable2 value %02x\n", enable2);
-	if ((enable3 != 0x00) && (enable3 != 0x0d) && (enable3 != 0x1f)) printf("unknown enable3 value %02x\n", enable3);
+	if ((enable2 != 0x00) && (enable2 != 0x0d)) printf("unknown enable2 value %02x\n", enable2);
+	if ((enable3 != 0x00) && (enable3 != 0x0d)) printf("unknown enable3 value %02x\n", enable3);
 
 
 	// the lower 2 tilemaps use regular scrolling
@@ -574,6 +593,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::popobear_irq)
 		m_maincpu->set_input_line(5, ASSERT_LINE);
 
 	/* TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo) */
+	/* the YM2413 doesn't have interrupts? */
 	if(scanline == 64 || scanline == 192)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 }
