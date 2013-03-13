@@ -87,8 +87,8 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
 		m_vregs(*this, "vregs")
-	
-	{ 
+
+	{
 		tilemap_base[0] = 0xf0000;
 		tilemap_base[1] = 0xf4000;
 		tilemap_base[2] = 0xf8000;
@@ -97,7 +97,7 @@ public:
 		tilemap_size[0] = 0x04000;
 		tilemap_size[1] = 0x04000;
 		tilemap_size[2] = 0x04000;
-		tilemap_size[3] = 0x04000;	
+		tilemap_size[3] = 0x04000;
 	}
 
 	required_device<cpu_device> m_maincpu;
@@ -130,13 +130,13 @@ public:
 
 		// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
 		int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20,19, /* end unused bits */
-	
+
 		18,17,16,15,14,13,12,
-		
+
 		8,7,6,5,4,3,2,
 
 		11,10,9, /* y tile address bits */
-		
+
 		1,0 /* x tile address bits */);
 
 
@@ -302,7 +302,7 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	UINT16* vreg = m_vregs;
 
 	popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
-	 
+
 
 
 	// these are more than just enable, they get written with 0x0d and 0x1f (and 0x00 when a layer is off)
@@ -343,7 +343,7 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 			clip.min_y = clip.max_y = line;
 
 			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
-			m_bg_tilemap[1]->set_scrolly((0,(val&0xff00)>>8)-line);
+			m_bg_tilemap[1]->set_scrolly(0,((val&0xff00)>>8)-line);
 
 			m_bg_tilemap[1]->draw(bitmap, clip, 0, 0);
 		}
@@ -368,7 +368,7 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 			clip.min_y = clip.max_y = line;
 
 			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
-			m_bg_tilemap[0]->set_scrolly((0,(val&0xff00)>>8)-line);
+			m_bg_tilemap[0]->set_scrolly(0,((val&0xff00)>>8)-line);
 
 			m_bg_tilemap[0]->draw(bitmap, clip, 0, 0);
 		}
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list, lower area = sprite gfx
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE( popo_vram_r, popo_vram_w ) // tile definitions + tilemaps
-	          
+
 
 	/* Most if not all of these are vregs */
 	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")

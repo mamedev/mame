@@ -2069,6 +2069,8 @@ void saturn_state::video_update_vdp1( void )
 	m_vdp1.fbcr_accessed = 0;
 
 	if (VDP1_LOG) logerror( "PTM = %0x, TVM = %x\n", STV_VDP1_PTM, STV_VDP1_TVM );
+	/*Set CEF bit to 0*/
+	//CEF_0;
 	switch(STV_VDP1_PTM & 3)
 	{
 		case 0:/*Idle Mode*/
