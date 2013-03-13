@@ -183,26 +183,15 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
 	UINT8* vram = reinterpret_cast<UINT8 *>(m_spr.target());
 	int i;
-	#if 0
-	static int bank_test = 1;
-
-	if(machine().input().code_pressed_once(KEYCODE_Z))
-		bank_test<<=1;
-
-	if(machine().input().code_pressed_once(KEYCODE_X))
-		bank_test>>=1;
-
-	popmessage("%02x",bank_test);
-	#endif
 
 	/*
 	???? ---- ---- ---- unused?
 	---- xxxx ---- ---- priority?
 	---- ---- x--- ---- Y direction
 	---- ---- -x-- ---- X direction
-	---- ---- --xx ---- width
+	---- ---- --xx ---- size (height & width)
 	---- ---- ---- xx-- color bank
-	---- ---- ---- --xx height?
+	---- ---- ---- --xx ??
 	*/
 
 	/* 0x106 = 8 x 8 */
@@ -214,19 +203,17 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 		int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
 		int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
 		int width = 8 << ((param & 0x30)>>4);
-		int height = 32;
+		int height = width; // sprites are always square?
+
 		int color_bank = ((param & 0xc)<<4);
 		int x_dir = param & 0x40;
 		int y_dir = param & 0x80;
 
-		if((param & 0x3) == 3) // actually sprite mode?
-			color_bank |= 0x20;
+		if (x&0x8000) x-= 0x10000;
+		if (y&0x8000) y-= 0x10000;
 
 		if(param == 0)
 			continue;
-
-		//if(param & bank_test)
-		//  continue;
 
 		spr_num <<= 3;
 
@@ -316,8 +303,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) AM_WRITENOP
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("gfx1", 0) // u5 & u6
-	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("gfx2", 0) // u7 & u8
+	AM_RANGE(0x800000, 0xbfffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( popobear )
@@ -465,12 +451,9 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(popobear_state, screen_update_popobear)
 
-//  MCFG_GFXDECODE(popobear)
-
 	MCFG_SCREEN_SIZE(128*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 479, 0, 239)
 	MCFG_PALETTE_LENGTH(256*2)
-
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -483,17 +466,13 @@ MACHINE_CONFIG_END
 
 
 ROM_START( popobear )
-	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "popobear_en-a-301_1.6.u3", 0x000001, 0x20000, CRC(b934adf6) SHA1(93431c7a19af812b549aad35cc1176a81805ffab) )
-	ROM_LOAD16_BYTE( "popobear_en-a-401_1.6.u4", 0x000000, 0x20000, CRC(0568af9c) SHA1(920531dbc4bbde2d1db062bd5c48b97dd50b7185) )
-
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "popobear_en-a-501.u5", 0x000000, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
-	ROM_LOAD16_BYTE( "popobear_en-a-601.u6", 0x000001, 0x100000, CRC(84fa9f3f) SHA1(34dd7873f88b0dae5fb81fe84e82d2b6b49f7332) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "popobear_en-a-701.u7", 0x000000, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
-	ROM_LOAD16_BYTE( "popobear_en-a-801.u8", 0x000001, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) /* 68000 Code + gfx data */
+	ROM_LOAD16_BYTE( "popobear_en-a-301_1.6.u3", 0x000001, 0x020000, CRC(b934adf6) SHA1(93431c7a19af812b549aad35cc1176a81805ffab) )
+	ROM_LOAD16_BYTE( "popobear_en-a-401_1.6.u4", 0x000000, 0x020000, CRC(0568af9c) SHA1(920531dbc4bbde2d1db062bd5c48b97dd50b7185) )
+	ROM_LOAD16_BYTE( "popobear_en-a-501.u5",     0x800001, 0x100000, CRC(185901a9) SHA1(7ff82b5751645df53435eaa66edce589684cc5c7) )
+	ROM_LOAD16_BYTE( "popobear_en-a-601.u6",     0x800000, 0x100000, CRC(84fa9f3f) SHA1(34dd7873f88b0dae5fb81fe84e82d2b6b49f7332) )
+	ROM_LOAD16_BYTE( "popobear_en-a-701.u7",     0xa00001, 0x100000, CRC(45eba6d0) SHA1(0278602ed57ac45040619d590e6cc85e2cfeed31) )
+	ROM_LOAD16_BYTE( "popobear_en-a-801.u8",     0xa00000, 0x100000, CRC(2760f2e6) SHA1(58af59f486c9df930f7c124f89154f8f389a5bd7) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
