@@ -8,7 +8,6 @@
     - auto-animation speed is erratic (way too fast);
     - tilemap effects (scrolling, colscroll, linescroll);
 	  (high score table?)
-	- BMC logo isn't copied correctly after an attract loop, RAM not cleared on a reset either?
     - BGM seems quite off, YM2413 core bug?
     - I/Os;
     - IRQ generation;
@@ -116,7 +115,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
-	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	int m_gfx_index;
@@ -230,33 +228,6 @@ void popobear_state::video_start()
 }
 
 
-void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
-{
-	UINT16* vreg = (UINT16 *)m_vregs;
-	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
-	int xscroll,yscroll;
-
-	if(layer_n & 2)
-	{
-		xscroll = vreg[vreg_base[(layer_n & 1) ^ 1]+2/2] & 0x1ff;
-		yscroll = vreg[vreg_base[(layer_n & 1) ^ 1]+0/2] & 0x1ff;
-	}
-	else
-	{
-		xscroll = 0;
-		yscroll = 0;
-	}
-	popmessage("%04x %04x",vreg[vreg_base[0]+0/2],vreg[vreg_base[1]+0/2]);
-
-
-	m_bg_tilemap[layer_n]->set_scrolly(0, yscroll);
-	m_bg_tilemap[layer_n]->set_scrollx(0, xscroll);
-
-
-
-	m_bg_tilemap[layer_n]->draw(bitmap, cliprect, 0, 0);
-
-}
 
 
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -321,11 +292,35 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	bitmap.fill(0, cliprect);
 
 	//popmessage("%04x",m_vregs[0/2]);
+	UINT16* vreg = m_vregs;
 
-	draw_layer(bitmap,cliprect,3);
-	draw_layer(bitmap,cliprect,2);
-	draw_layer(bitmap,cliprect,1);
-	draw_layer(bitmap,cliprect,0);
+	popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
+	 
+
+
+	// these are more than just enable, they get written with 0x0d and 0x1f (and 0x00 when a layer is off)
+	// it might relate to the linescroll modes or sizes?
+	int enable0 = (m_vregs[0x0c] & 0xff00)>>8;
+	int enable1 = (m_vregs[0x0c] & 0x00ff)>>0;
+	int enable2 = (m_vregs[0x0d] & 0xff00)>>8;
+	int enable3 = (m_vregs[0x0d] & 0x00ff)>>0;
+
+	if ((enable0 != 0x00) && (enable0 != 0x0d) && (enable0 != 0x1f)) printf("unknown enable0 value %02x\n", enable0);
+	if ((enable1 != 0x00) && (enable1 != 0x0d) && (enable1 != 0x1f)) printf("unknown enable1 value %02x\n", enable1);
+	if ((enable2 != 0x00) && (enable2 != 0x0d) && (enable2 != 0x1f)) printf("unknown enable2 value %02x\n", enable2);
+	if ((enable3 != 0x00) && (enable3 != 0x0d) && (enable3 != 0x1f)) printf("unknown enable3 value %02x\n", enable3);
+
+	m_bg_tilemap[2]->set_scrollx(0, vreg[0x07]);
+	m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
+
+	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
+	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
+
+
+	if (enable3) m_bg_tilemap[3]->draw(bitmap, cliprect, 0, 0);
+	if (enable2) m_bg_tilemap[2]->draw(bitmap, cliprect, 0, 0);
+	if (enable1) m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+	if (enable0) m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap,cliprect);
 
 	return 0;
