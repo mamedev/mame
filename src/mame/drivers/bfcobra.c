@@ -1654,7 +1654,7 @@ WRITE_LINE_MEMBER(bfcobra_state::m6809_acia_tx_w)
 
 WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
@@ -1761,7 +1761,7 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 /* TODO */
 INTERRUPT_GEN_MEMBER(bfcobra_state::timer_irq)
 {
-	generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+	device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* TODO */
@@ -1779,7 +1779,7 @@ static MACHINE_CONFIG_START( bfcobra, bfcobra_state )
 
 	MCFG_CPU_ADD("audiocpu", M6809, M6809_XTAL)
 	MCFG_CPU_PROGRAM_MAP(m6809_prog_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq,  1000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(bfcobra_state, timer_irq, 1000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
