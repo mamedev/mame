@@ -2241,10 +2241,10 @@
 		</part>
 	</software>
 
-	<software name="kq3">
+	<software name="kingqst3">
 		<description>King's Quest III: To Heir is Human (Euro) (v1.02 11.18.86)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">

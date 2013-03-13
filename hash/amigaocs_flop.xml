@@ -839,8 +839,8 @@
 		<description>1869 - Erlebte Geschichte Teil I (EU) (de)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Max Design</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1921,8 +1921,8 @@
 		<description>Air Bucks (v1.2) (EU) (en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Impressions</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -12794,6 +12794,25 @@
 		</part>
 	</software>
 
+	<software name="demoniak" supported="no">
+		<description>Demoniak (Europe) (v1.0)</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="demoniak (europe) (v1.0) (disk 1).ipf" size="1049612" crc="f4709f59" sha1="304afad1824236db412610a875004575ff8a2dd2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="demoniak (europe) (v1.0) (disk 2).ipf" size="1049612" crc="4879f34c" sha1="3a21f96f2e2366c0430267ccaf3de06f9803ee1b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="demonswi" supported="no">
 		<!-- SPS (CAPS) release 1995 -->
 		<description>Demon's Winter (v1.0) (US) (en)</description>
@@ -14068,6 +14087,25 @@
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1479)dragonstrike_disk2of2.ipf" size="1049612" crc="820a5c05" sha1="a6c7d1286e4045a626c353bdefaac4294c9f23a8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragwars" supported="no">
+		<description>Dragon Wars (Europe) (v1.2)</description>
+		<year>1990</year>
+		<publisher>Interplay</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="dragon wars (europe) (v1.2) (disk 1).ipf" size="1049180" crc="feadb1e9" sha1="6885e6495694c9a4ea9a2d333e9c183874373f30" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049180">
+				<rom name="dragon wars (europe) (v1.2) (disk 2).ipf" size="1049180" crc="94de0771" sha1="e5a4bbdc6a50ceaaa4aa8b95385cb408e1a9df01" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18411,7 +18449,7 @@
 		</part>
 	</software>
 
-	<software name="futurebi" supported="no">
+	<software name="fbikesim" supported="no">
 		<!-- SPS (CAPS) release 2149 -->
 		<description>Future Bike Simulator (EU) (en)</description>
 		<!-- retail, standalone -->
@@ -18422,6 +18460,18 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="588678">
 				<rom name="(sps2149)futurebikesimulator.ipf" size="588678" crc="781e885f" sha1="bf47655ed8f40c44c88b692871743d046e53579b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fclscoll" supported="no">
+		<description>Future Classics Collection (Europe)</description>
+		<year>1990</year>
+		<publisher>Electronic Zoo / Live Studios</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="future classics collection (europe).ipf" size="1049180" crc="4fc51880" sha1="d0c95712af1b60a1537b32b2e99e26d4ee2b2768" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19153,7 +19203,7 @@
 		</part>
 	</software>
 
-	<software name="ghostsng" supported="no">
+	<software name="gng" supported="no">
 		<!-- SPS (CAPS) release 31 -->
 		<description>Ghosts 'n Goblins (EU) (en)</description>
 		<!-- retail, standalone -->
@@ -19310,6 +19360,18 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1505)glucksrad.ipf" size="1049180" crc="008b8870" sha1="b1a4bba7c96ce0c25c208d1a6f927cc674478176" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gnmrangr" supported="no">
+		<description>Gnome Ranger (Europe)</description>
+		<year>1987</year>
+		<publisher>Rainbird</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="gnome ranger (europe).ipf" size="1049612" crc="0545327a" sha1="45082df846ae8db56f44ba988855e8387b0de526" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23793,6 +23855,24 @@
 		</part>
 	</software>
 
+	<software name="jetstrik" supported="no">
+		<description>Jetstrike (Europe)</description>
+		<year>1993</year>
+		<publisher>Rasputin</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="jetstrike (europe) (disk 1 of 2).ipf" size="1049180" crc="1d383234" sha1="335958c702e6d1875c30b23d50fc7510aad5e377" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049180">
+				<rom name="jetstrike (europe) (disk 2 of 2).ipf" size="1049180" crc="cd29369b" sha1="e04fb45b85a4c68c0314c995e878e5401cbfcb84" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jigsawpu" supported="no">
 		<!-- SPS (CAPS) release 2899 -->
 		<description>Jigsaw Puzzlemania (EU) (en)</description>
@@ -23810,6 +23890,18 @@
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2899)jigsawpuzzlemania_puzzledisk.ipf" size="1049612" crc="d968a2d3" sha1="e029bc519c1b0cba4f1dba5e82472f7521e0b281" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinxter" supported="no">
+		<description>Jinxter (Europe) (V1.2)</description>
+		<year>1987</year>
+		<publisher>Firebird / Rainbird</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="jinxter (europe) (v1.2).ipf" size="1049612" crc="44a3b55f" sha1="33ff662b5029a021c945c33c0112c08b8be669cc" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24469,6 +24561,18 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps519)kennydalglishssoccermanager.ipf" size="1049304" crc="a937801b" sha1="1a653b283060681adea8493db36540a7a7598b17" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maramon" supported="no">
+		<description>The Keys To Maramon (Europe) (V1.5)</description>
+		<year>1991</year>
+		<publisher>Mindcraft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="keys to maramon, the (europe) (v1.5).ipf" size="1049180" crc="13f5508b" sha1="34b402f3881574b2ed732fce88f1c3a58d5af985" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25228,13 +25332,67 @@
 		</part>
 	</software>
 
+	<software name="kingqst5" supported="no">
+		<description>King's Quest V: Absence Makes The Heart Go Yonder (Europe) (v1.000.000)</description>
+		<year>1991</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk " />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (startup disk).ipf" size="1049612" crc="2639e123" sha1="38f4317102cd65bf336069f636f2db3ac2a2369c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 1).ipf" size="1049612" crc="fd42d079" sha1="1529ba25768312bce1dd4182fca746f3d83cbabb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 2).ipf" size="1049612" crc="414e473c" sha1="6c96b75ba2d4eef761433006b95dad2dfe855e1c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 3).ipf" size="1049612" crc="5757e04c" sha1="9883806eaaca3d465631d1b9cdc849442277320a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 4).ipf" size="1049612" crc="839d099b" sha1="b6a00e40592b894606fcf7dedcf2ce7f1ed60823" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 5).ipf" size="1049612" crc="efb6f345" sha1="b2383c468919c7b9531333e4ce2762ae86034359" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 6).ipf" size="1049612" crc="fd170d0c" sha1="25b18c0592dc7bbe82d4579b7b35cc044d428d3b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049612">
+				<rom name="king's quest v - absence makes the heart go yonder (europe) (v1.000.000) (game disk 7).ipf" size="1049612" crc="ddb5cf06" sha1="01fa35fed286e653887fbae645bb287fc5c486a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingqst6" supported="no">
 		<!-- SPS (CAPS) release 2390 -->
 		<description>King's Quest VI: Heir Today, Gone Tomorrow (EU) (fr)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -25947,6 +26105,60 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048872">
 				<rom name="(sps934)ledstorm.ipf" size="1048872" crc="9c068240" sha1="4ca8ce8e9ed34e1989a89712f0d9bad2c118bede" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legrobin" supported="no">
+		<description>The Legend Of Robin Hood: Conquests Of The Longbow</description>
+		<year>1992</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup Disk " />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (startup disk).ipf" size="1049612" crc="f531d078" sha1="0ea0fb16865d6082291de7dd42b0e56883bc725c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 1).ipf" size="1049612" crc="77570782" sha1="61223e4a468be2792a1ed5dfd34ab8ba80002acc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 2).ipf" size="1049612" crc="df33ab73" sha1="4888643716bfb0e244a07a3aa36821f692cb122a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 3).ipf" size="1049612" crc="83bfb6ac" sha1="e09b8747fc52ef38f6d50c98b3b8401c8d5b4d03" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 4).ipf" size="1049612" crc="975cc721" sha1="282b5a32cdde451cdbc70713176f68de0952ae51" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 5).ipf" size="1049612" crc="4db4c953" sha1="b8e27d5d7a295d12981c0ad89e4edff3b3b528de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 6).ipf" size="1049612" crc="e488d200" sha1="2692d266c2b699d194a17bcccf9045e98493f942" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049612">
+				<rom name="legend of robin hood, the - conquests of the longbow (europe) (v1.000) (disk 7).ipf" size="1049612" crc="6a694ca7" sha1="4bf3d2cf0a49a73d80ecaa4c33bae34e5a94ac81" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -35117,6 +35329,60 @@
 		</part>
 	</software>
 
+	<software name="qstglry2" supported="no">
+		<description>Quest For Glory II: Trial By Fire (Europe) (v1.109)</description>
+		<year>1991</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 1).ipf" size="1049612" crc="a159ea32" sha1="bb759663461096386088162355c2cf2f25fdd9b3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 2).ipf" size="1049612" crc="3d9ce13a" sha1="5c01cba14b93653ebc54cf2aee7995fa5547823b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 3).ipf" size="1049612" crc="bdc1dad6" sha1="4d546fc2e90d1a6cc79a6d8aec1cc85c762e1c4a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 4).ipf" size="1049612" crc="40eadf7a" sha1="e3534c4818e476b59432e94f2eefec530e8d4871" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 5).ipf" size="1049612" crc="f0b77a36" sha1="2eda5d9ca25802ae8e2379225e207e2b410d5080" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 6).ipf" size="1049612" crc="0d4e5d56" sha1="936552c209837a0bd2f4bcc8dd8252ea64ba27c4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 7).ipf" size="1049612" crc="6cceda53" sha1="8428b042cff7ea4d9eee75a852f2584973903ed5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1049612">
+				<rom name="quest for glory ii - trial by fire (europe) (v1.109) (game disk 8).ipf" size="1049612" crc="b4f0c23b" sha1="cf57f6f92d19d615112bc88b2175ddd70fbf415b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="questron" supported="no">
 		<!-- SPS (CAPS) release 1187 -->
 		<description>Questron II (EU) (en)</description>
@@ -40527,13 +40793,13 @@
 		</part>
 	</software>
 
-	<software name="spaceque" supported="no">
+	<software name="spacqst" supported="no">
 		<!-- SPS (CAPS) release 1484 -->
-		<description>Space Quest: The Sarien Encounter (v1.2, HLS) (US) (en)</description>
+		<description>Space Quest I: Roger Wilco in the Sarien Encounter (v1.2, HLS) (US) (en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40542,13 +40808,13 @@
 		</part>
 	</software>
 
-	<software name="spacequea" cloneof="spaceque" supported="no">
+	<software name="spacqsta" cloneof="spacqst" supported="no">
 		<!-- SPS (CAPS) release 2222 -->
-		<description>Space Quest: The Sarien Encounter (v1.000, Enhanced) (EU) (en)</description>
+		<description>Space Quest I: Roger Wilco in the Sarien Encounter (v1.000, Enhanced) (EU) (en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40587,13 +40853,25 @@
 		</part>
 	</software>
 
-	<software name="spaceq3g" cloneof="spaceq3" supported="no">
+	<software name="spacqst2" supported="no">
+		<description>Space Quest II: Vohaul's Revenge (Europe) (v2.0f)</description>
+		<year>1988</year>
+		<publisher>Sierra</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="11049180">
+				<rom name="space quest ii - vohaul's revenge (europe) (v2.0f).ipf" size="1049180" crc="1289169f" sha1="11fba98912a1003d9e4f8d6dfae2028b42dc93de" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacqst3g" cloneof="spacqst3" supported="no">
 		<!-- SPS (CAPS) release 579 -->
 		<description>Space Quest III: Die Piraten von Pestulon (v1.000) (EU) (de, en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40626,13 +40904,13 @@
 		</part>
 	</software>
 
-	<software name="spaceq3" supported="no">
+	<software name="spacqst3" supported="no">
 		<!-- SPS (CAPS) release 292 -->
 		<description>Space Quest III: The Pirates of Pestulon (v1.0V 8.17.89) (EU) (en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1989</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40659,13 +40937,13 @@
 		</part>
 	</software>
 
-	<software name="spaceq4" supported="no">
+	<software name="spacqst4" supported="no">
 		<!-- SPS (CAPS) release 1177 -->
 		<description>Space Quest IV: Roger Wilco and the Time Rippers (v1.000) (US) (en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40710,13 +40988,13 @@
 		</part>
 	</software>
 
-	<software name="spaceq4g" cloneof="spaceq4" supported="no">
+	<software name="spacqst4g" cloneof="spacqst4" supported="no">
 		<!-- SPS (CAPS) release 2369 -->
 		<description>Space Quest IV: Roger Wilco und die Zeitspringer (v1.000) (EU) (de, en)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Sierra</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -41081,6 +41359,30 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="753527">
 				<rom name="(sps977)spherical.ipf" size="753527" crc="9ddfec9b" sha1="bd8b708fb9f55be14655303d4bfc5e8b12d924ca" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sphrwrld" supported="no">
+		<description>Spherical Worlds (Europe)</description>
+		<year>1996</year>
+		<publisher>4Matted</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="spherical worlds (europe) (disk 1).ipf" size="1049180" crc="848c2fef" sha1="7c175fc8864b45a1a0f7880c892280899cb5c28a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049180">
+				<rom name="spherical worlds (europe) (disk 2).ipf" size="1049180" crc="6e7e23ba" sha1="c9e1a294af020cc32d6c4f0583960cfc042c9f0a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="11049180">
+				<rom name="spherical worlds (europe) (disk 3).ipf" size="1049180" crc="881bb8b8" sha1="590cd8caf02fe42d2590217c8f5b2ebb14db5914" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49396,6 +49698,24 @@
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049214">
 				<rom name="(sps399)xenon.ipf" size="1049214" crc="63fb4c98" sha1="70257181eed97fe4feeb64f3d4971a9aa0967bb1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenophob" supported="no">
+		<description>Xenophobe (europe)</description>
+		<year>1989</year>
+		<publisher>Visage</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="556138">
+				<rom name="xenophobe (europe) (disk 1).ipf" size="556138" crc="dba796f8" sha1="37b7c788a39eb20500d057e234b3a1ea30a203b1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="xenophobe (europe) (disk 2).ipf" size="1049612" crc="7889544c" sha1="10717a047bcb951db50e635e89fd10747b23801c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
