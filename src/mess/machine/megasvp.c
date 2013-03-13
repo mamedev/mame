@@ -350,6 +350,7 @@ void svp_init(running_machine &machine)
 		memcpy(ROM, state->m_slotcart->m_cart->get_rom_base(), state->m_slotcart->m_cart->get_rom_size());
 
 	state->m_iram = auto_alloc_array(machine, UINT8, 0x800);
+	memset(state->m_iram, 0, sizeof(UINT8) * 0x800);
 	state->membank("bank3")->set_base(state->m_iram);
 	/* SVP ROM just shares m68k region.. */
 	state->membank("bank4")->set_base(ROM + 0x800);
