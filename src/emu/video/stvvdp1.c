@@ -2072,8 +2072,12 @@ void saturn_state::video_update_vdp1( void )
 	switch(STV_VDP1_PTM & 3)
 	{
 		case 0:/*Idle Mode*/
+			/*Set CEF bit to 0*/
+			CEF_0;
 			break;
 		case 1:/*Draw by request*/
+			/*Set CEF bit to 0*/
+			CEF_0;
 			break;
 		case 2:/*Automatic Draw*/
 			if ( framebuffer_changed || VDP1_LOG )
