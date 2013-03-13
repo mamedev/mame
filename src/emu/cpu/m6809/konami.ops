@@ -209,8 +209,8 @@ MAIN:
 		case 0xBE:										set_imm();	%ASLD;		return;
 		case 0xBF:										%INDEXED;	%ASLD;		return;
 
-		case 0xC0:													%ROLD;		return;
-		case 0xC1:										%INDEXED;	%ROL16;		return;
+		case 0xC0:										set_imm();	%ROLD;		return;
+		case 0xC1:										%INDEXED;	%ROLD;		return;
 		case 0xC2:										set_d();	%CLR16;		return;
 		case 0xC3:										%INDEXED;	%CLR16;		return;
 		case 0xC4:										set_d();	%NEG16;		return;
