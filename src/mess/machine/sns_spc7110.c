@@ -176,6 +176,9 @@ void sns_rom_spc7110rtc_device::device_start()
 	
 // at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
 //  spc7110_update_time(0);
+
+	// set basetime for RTC
+	machine().current_datetime(m_rtc_basetime);
 	
 	save_item(NAME(m_rtc_state));
 	save_item(NAME(m_rtc_mode));
@@ -930,77 +933,102 @@ void sns_rom_spc7110_device::spc7110_set_data_adjust(UINT32 addr)
 // (and indeed current code fails to pass Tengai Makyou Zero tests)
 void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 {
-	system_time curtime, *systime = &curtime;
+	system_time curtime;
 	machine().current_datetime(curtime);
-	int update = 1;
-
-	m_rtc_offset += offset;
+	INT64 diff = curtime.time - m_rtc_basetime.time - offset;
+//	printf("diff %llx\n", diff);
+	bool update = TRUE;
 
 	// TEST: can we go beyond 24hrs of rounding?!? I doubt it will ever go beyond 3600, but I could be wrong...
-	assert(m_rtc_offset < 86400);
+	assert(diff < 86400);
 
 	/* do not update if CR0 or CR2 timer disable flags are set */
 	if ((m_rtc_ram[13] & 0x01) || (m_rtc_ram[15] & 0x03))
-		update = 0;
+		update = FALSE;
 
-	if (update)
+	if (update && diff > 0)
 	{
 		/* update time with offset, assuming offset < 3600s */
-		UINT8 second = systime->local_time.second;
-		UINT8 minute = systime->local_time.minute;
-		UINT8 hour = systime->local_time.hour;
-		UINT8 mday = systime->local_time.mday;
+		UINT32 second = m_rtc_ram[0] + m_rtc_ram[1] * 10;
+		UINT8 minute = m_rtc_ram[2] + m_rtc_ram[3] * 10;
+		UINT8 hour = m_rtc_ram[4] + m_rtc_ram[5] * 10;
+		UINT8 day = m_rtc_ram[6] + m_rtc_ram[7] * 10;
+		UINT8 month = m_rtc_ram[8] + m_rtc_ram[9] * 10;
+		UINT8 year = m_rtc_ram[10] + m_rtc_ram[11] * 10;
+		UINT8 weekday = m_rtc_ram[12];
+		day--;
+		month--;
+		year += (year >= 90) ? 1900 : 2000;
 
-		while (m_rtc_offset >= 3600)
+		second += (UINT32)diff;
+		while (second >= 60)
 		{
-			m_rtc_offset -= 3600;
-			hour++;
-
-			if (hour == 24)
-			{
-				mday++;
-				hour = 0;
-			}
-		}
-
-		while (m_rtc_offset >= 60)
-		{
-			m_rtc_offset -= 60;
+			second -= 60;
 			minute++;
 
-			if (minute == 60)
+			// are we below 60 minutes?
+			if (minute < 60)
+				continue;
+			// otherwise we have to increase hour!
+			minute = 0;
+			hour++;
+
+			// are we below 24 hours?
+			if (hour < 24)
+				continue;
+			// otherwise we have to increase day!
+			hour = 0;
+			day++;
+
+			weekday = (weekday + 1) % 7;
+
+			UINT8 days = spc7110_months[month % 12];
+			// check for feb 29th
+			if (days == 28) 
 			{
-				hour++;
-				minute = 0;
+				bool leap = FALSE;
+				if ((year % 4) == 0) 
+				{
+					if(year % 100 || !(year % 400))
+						leap = TRUE;
+				}
+				if (leap) 
+					days++;
 			}
+
+			// are we below end of month?
+			if (day < days) 
+				continue;
+			// otherwise we have to increase month!
+			day = 0;
+			month++;
+
+			// are we below end of year?
+			if (month < 12) 
+				continue;
+			// otherwise we have to increase year!
+			month = 0;
+			year++;
 		}
-
-		while (m_rtc_offset)
-		{
-			m_rtc_offset -= 1;
-			second++;
-
-			if (second == 60)
-			{
-				minute++;
-				second = 0;
-			}
-		}
-
+		
+		day++;
+		month++;
+		year %= 100;
+		
 		m_rtc_ram[0] = second % 10;
 		m_rtc_ram[1] = second / 10;
 		m_rtc_ram[2] = minute % 10;
 		m_rtc_ram[3] = minute / 10;
 		m_rtc_ram[4] = hour % 10;
 		m_rtc_ram[5] = hour / 10;
-		m_rtc_ram[6] = mday % 10;
-		m_rtc_ram[7] = mday / 10;
-		m_rtc_ram[8] = systime->local_time.month % 10;
-		m_rtc_ram[9] = systime->local_time.month / 10;
-		m_rtc_ram[8] = systime->local_time.month;
-		m_rtc_ram[10] = (systime->local_time.year - 1900) % 10;
-		m_rtc_ram[11] = ((systime->local_time.year - 1900) / 10) % 10;
-		m_rtc_ram[12] = systime->local_time.weekday % 7;
+		m_rtc_ram[6] = day % 10;
+		m_rtc_ram[7] = day / 10;
+		m_rtc_ram[8] = month % 10;
+		m_rtc_ram[9] = month / 10;
+		m_rtc_ram[10] = year % 10;
+		m_rtc_ram[11] = (year / 10) % 10;
+		m_rtc_ram[12] = weekday % 7;
+		m_rtc_basetime = curtime;
 	}
 }
 

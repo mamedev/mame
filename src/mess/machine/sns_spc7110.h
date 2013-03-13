@@ -176,6 +176,8 @@ public:
 
 	UINT64 m_rtc_offset;
 
+	system_time m_rtc_basetime;
+
 	//this is now allocated in the main snes cart class, to allow saving to nvram
 	//UINT8 m_rtc_ram[16];  // 0-12 secs, min, hrs, etc.; 13-14-15 control registers
 
