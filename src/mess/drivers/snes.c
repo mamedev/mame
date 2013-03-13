@@ -1616,17 +1616,6 @@ READ8_MEMBER( snsnew_state::snes20_hi_r )
 	else if (m_slotcart->get_type() == SNES_CX4
 			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
 		return CX4_read((offset & 0xffff) - 0x6000);
-	else if (m_slotcart->get_type() == SNES_BANANA
-			 && (offset & 0x78000) == 0x8000)
-	{
-		return m_slotcart->m_cart->chip_read(space, offset);
-	}
-	else if (m_slotcart->get_type() == SNES_BUGS
-			 && (offset & 0x7f000) == 0xf000)
-	{
-		printf("read hi addr %X\n", offset);
-//		return m_slotcart->m_cart->chip_read(space, offset);
-	}
 	
 	if (offset < 0x400000)
 	{
@@ -1687,18 +1676,6 @@ WRITE8_MEMBER( snsnew_state::snes20_hi_w )
 	else if (m_type == SNES_SUFAMITURBO
 			&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_h(space, offset, data); return; }
-//	else if (m_slotcart->get_type() == SNES_BANANA
-//			 && (offset & 0x8000) == 0x8000)
-//	{
-//		printf("write addr hi %X data %X\n", offset, data);
-//		m_slotcart->m_cart->chip_write(space, offset, data);
-//		return;
-//	}
-	else if (m_slotcart->get_type() == SNES_BUGS
-			 && (offset & 0x7f000) == 0xf000)
-	{
-//		printf("write hi addr %X data %X\n", offset, data);
-	}
 	
 	
 	if (offset < 0x400000)
@@ -1735,12 +1712,6 @@ READ8_MEMBER( snsnew_state::snes20_lo_r )
 	else if (m_slotcart->get_type() == SNES_CX4
 			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
 		return CX4_read((offset & 0xffff) - 0x6000);
-	else if (m_slotcart->get_type() == SNES_BUGS
-			 && (offset & 0x78000) == 0x8000)
-	{
-//		printf("read lo addr %X\n", offset);
-//		return m_slotcart->m_cart->chip_read(space, offset);
-	}
 	
 	
 	if (offset < 0x400000)
@@ -1790,21 +1761,6 @@ WRITE8_MEMBER( snsnew_state::snes20_lo_w )
 	if (m_type == SNES_SUFAMITURBO
 				&& (offset & 0xffff) >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_l(space, offset, data); return; }
-	else if (m_slotcart->get_type() == SNES_20COL
-			 && offset >= 0x8000 && offset < 0x9000)
-	{ m_slotcart->m_cart->chip_write(space, offset, data); return; }
-	else if (m_slotcart->get_type() == SNES_BANANA
-				&& (offset & 0x8000) == 0x8000)
-	{
-		printf("write addr lo %X data %X\n", offset, data);
-		m_slotcart->m_cart->chip_write(space, offset, data);
-		return;
-	}
-	else if (m_slotcart->get_type() == SNES_BUGS
-			 && (offset & 0x78000) == 0x8000)
-	{
-//		printf("write lo addr %X data %X\n", offset, data);
-	}
 	
 	// other add-on writes matches the hi handler
 	snes20_hi_w(space, offset, data, 0xff);
