@@ -1854,7 +1854,7 @@ void saturn_state::cd_writeLong(UINT32 addr, UINT32 data)
 					break;
 
 				default:
-					//printf("CD: unhandled 32-bit transfer type write\n");
+					printf("CD: unhandled 32-bit transfer type write\n");
 					break;
 			}
 			break;
