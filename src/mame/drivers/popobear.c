@@ -238,50 +238,63 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 	/*
 	???? ---- ---- ---- unused?
-	---- xxxx ---- ---- priority?
+	---- xxxx ---- ---- priority (against other sprites! used to keep the line of characters following you in order)
 	---- ---- x--- ---- Y direction
 	---- ---- -x-- ---- X direction
 	---- ---- --xx ---- size (height & width)
 	---- ---- ---- xx-- color bank
-	---- ---- ---- --xx ??
+	---- ---- ---- --x- NOT set on the enemy character / characters in your line
+	---- ---- ---- ---x set on opposite to above?
 	*/
-
-	/* 0x106 = 8 x 8 */
-	/* 0x*29 = 32 x 32 */
-	for(i = 0x800-8;i >= 0; i-=8)
+	
+	for (int drawpri = 0xf;drawpri>=0x0;drawpri--)
 	{
-		int y = vram[i+0x7f800+2]|(vram[i+0x7f800+3]<<8);
-		int x = vram[i+0x7f800+4]|(vram[i+0x7f800+5]<<8);
-		int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
-		int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
-		int width = 8 << ((param & 0x30)>>4);
-		int height = width; // sprites are always square?
-
-		int color_bank = ((param & 0xc)<<4);
-		int x_dir = param & 0x40;
-		int y_dir = param & 0x80;
-
-		if (x&0x8000) x-= 0x10000;
-		if (y&0x8000) y-= 0x10000;
-
-		if(param == 0)
-			continue;
-
-		spr_num <<= 3;
-
-		for(int yi=0;yi<height;yi++)
+		/* 0x106 = 8 x 8 */
+		/* 0x*29 = 32 x 32 */
+		for(i = 0x800-8;i >= 0; i-=8)
 		{
-			int y_draw = (y_dir) ? y+(height - yi) : y+yi;
+			int y = vram[i+0x7f800+2]|(vram[i+0x7f800+3]<<8);
+			int x = vram[i+0x7f800+4]|(vram[i+0x7f800+5]<<8);
+			int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
+			int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
+		
+			int pri = (param & 0x0f00)>>8;
+		
+			// we do this because it's sprite<->sprite priority,
+			if (pri!=drawpri)
+				continue;
 
-			for(int xi=0;xi<width;xi++)
+			int width = 8 << ((param & 0x30)>>4);
+			int height = width; // sprites are always square?
+
+			int color_bank = ((param & 0xc)<<4);
+			int x_dir = param & 0x40;
+			int y_dir = param & 0x80;
+
+			if (x&0x8000) x-= 0x10000;
+			if (y&0x8000) y-= 0x10000;
+
+			if (param&0xf000) color_bank = (machine().rand() & 0x3);
+
+			if(param == 0)
+				continue;
+
+			spr_num <<= 3;
+
+			for(int yi=0;yi<height;yi++)
 			{
-				UINT8 pix = (vram[spr_num^1] & 0xff);
-				int x_draw = (x_dir) ? x+(width - xi) : x+xi;
+				int y_draw = (y_dir) ? y+((height-1) - yi) : y+yi;
 
-				if(cliprect.contains(x_draw, y_draw) && pix)
-					bitmap.pix16(y_draw, x_draw) = machine().pens[pix+0x100+color_bank];
+				for(int xi=0;xi<width;xi++)
+				{
+					UINT8 pix = (vram[spr_num^1] & 0xff);
+					int x_draw = (x_dir) ? x+((width-1) - xi) : x+xi;
 
-				spr_num++;
+					if(cliprect.contains(x_draw, y_draw) && pix)
+						bitmap.pix16(y_draw, x_draw) = machine().pens[pix+0x100+color_bank];
+
+					spr_num++;
+				}
 			}
 		}
 	}
