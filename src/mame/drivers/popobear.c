@@ -85,13 +85,16 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
-		m_vram(*this, "vram"),
 		m_vregs(*this, "vregs"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spr;
-	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_vregs;
+
+	UINT8* m_vram;
+	UINT8* m_vram_rearranged;
+
+
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
 	virtual void video_start();
@@ -99,16 +102,69 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
+	int m_gfx_index;
+
+	// why are we using 8-bit anyway?
+	DECLARE_WRITE8_MEMBER(popo_vram_w)
+	{
+		m_vram[offset^1] = data;
+
+		// the graphic data for the tiles is in a strange order, rearrange it so that we can use it as tiles..
+		int swapped_offset = BITSWAP32(offset, /* unused bits */ 31,30,29,28,27,26,25,24,23,22,21,20, /* end unused bits */
+	
+		19,18,17,16,15,14,13,
+		
+		9,8,7,6,5,4,3,
+
+		12,11,10, /* y tile address bits */
+		
+		2,1,0 /* x tile address bits */);
+
+
+
+		m_vram_rearranged[swapped_offset] = data;
+		machine().gfx[m_gfx_index]->mark_dirty((swapped_offset^1)/2);
+	}
+	DECLARE_READ8_MEMBER(popo_vram_r) { return m_vram[offset^1]; }
+
 };
+
+
+static const gfx_layout popobear_char_layout =
+{
+	8,8,
+	0x4000,
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0,8,16,24,32,40,48,56 },
+	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
+	8*64
+};
+
+
+
 
 void popobear_state::video_start()
 {
+	/* find first empty slot to decode gfx */
+	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
+		if (machine().gfx[m_gfx_index] == 0)
+			break;
+
+	assert(m_gfx_index != MAX_GFX_ELEMENTS);
+
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x100000);
+	m_vram_rearranged = auto_alloc_array_clear(machine(), UINT8, 0x100000);
+
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, machine().total_colors() / 16, 0));
 }
 
 void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
 {
-	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	UINT8* vram = reinterpret_cast<UINT8 *>(m_vram.target());
+	UINT8* vram = m_vram;
 	UINT16* vreg = (UINT16 *)m_vregs;
 	int count;
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
@@ -134,49 +190,20 @@ void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, 
 	{
 		for(int x=0;x<128;x++)
 		{
-			int tile,xtile,ytile;
+			int tile;
 
 			tile = vram[count+0]|(vram[count+1]<<8);
-			xtile = tile & 0x7f;
-			xtile *= 8;
-			ytile = tile >> 7;
-			ytile *= 1024*8;
-
-			for(int yi=0;yi<8;yi++)
-			{
-				for(int xi=0;xi<8;xi+=2)
-				{
-					UINT8 color;
-					int xoffs,yoffs;
-
-					xoffs = x*8+xi - xscroll;
-					yoffs = y*8+yi - yscroll;
-
-					color = (vram[((xi+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
-
-					if(cliprect.contains(xoffs+1, yoffs) && color)
-						bitmap.pix16(yoffs, xoffs+1) = machine().pens[color];
-
-					if(cliprect.contains(xoffs+1, yoffs+512) && color)
-						bitmap.pix16(yoffs+512, xoffs+1) = machine().pens[color];
-
-					//if(cliprect.contains(xoffs+1, yoffs+256) && color)
-					//  bitmap.pix16(yoffs+512, xoffs+1) = machine().pens[color];
-
-					color = (vram[((xi+1+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
-
-					if(cliprect.contains(xoffs, yoffs) && color)
-						bitmap.pix16(yoffs, xoffs) = machine().pens[color];
-
-					if(cliprect.contains(xoffs, yoffs+512) && color)
-						bitmap.pix16(yoffs+512, xoffs) = machine().pens[color];
-				}
-			}
+			
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,(x*8)-xscroll,(y*8)-yscroll, 0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,(x*8)-xscroll,512+(y*8)-yscroll, 0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,1024+(x*8)-xscroll,(y*8)-yscroll, 0);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,1024+(x*8)-xscroll,512+(y*8)-yscroll, 0);
 
 			count+=2;
 		}
 	}
-}
+	}
+
 
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
@@ -219,26 +246,17 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 		for(int yi=0;yi<height;yi++)
 		{
-			for(int xi=0;xi<width;xi+=2)
+			int y_draw = (y_dir) ? y+(height - yi) : y+yi;
+
+			for(int xi=0;xi<width;xi++)
 			{
-				UINT8 color;
-				int x_res,y_res;
+				UINT8 pix = (vram[spr_num^1] & 0xff);
+				int x_draw = (x_dir) ? x+(width - xi) : x+xi;
 
-				color = (vram[spr_num] & 0xff);
-				x_res = (x_dir) ? x+0+(width - xi) : x+1+xi;
-				y_res = (y_dir) ? y+(height - yi) : y+yi;
+				if(cliprect.contains(x_draw, y_draw) && pix)
+					bitmap.pix16(y_draw, x_draw) = machine().pens[pix+0x100+color_bank];
 
-				if(cliprect.contains(x_res, y_res) && color)
-					bitmap.pix16(y_res, x_res) = machine().pens[color+0x100+color_bank];
-
-				color = (vram[spr_num+1] & 0xff);
-				x_res = (x_dir) ? x+1+(width - xi) : x+0+xi;
-				y_res = (y_dir) ? y+(height - yi) : y+yi;
-
-				if(cliprect.contains(x_res, y_res) && color)
-					bitmap.pix16(y_res, x_res) = machine().pens[color+0x100+color_bank];
-
-				spr_num+=2;
+				spr_num++;
 			}
 		}
 	}
@@ -281,7 +299,8 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
 	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_SHARE("spr") // unknown boundaries, 0x2ff800 contains a sprite list
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE8( popo_vram_r, popo_vram_w, 0xffff )
+	          
 
 	/* Most if not all of these are vregs */
 	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_SHARE("vregs")
