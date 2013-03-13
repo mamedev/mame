@@ -1798,6 +1798,7 @@ UINT32 saturn_state::cd_readLong(UINT32 addr)
 							transpart->size -= xferdnum;
 							transpart->numblks -= xfersectnum;
 
+							/* TODO: is this correct? */
 							xfertype32 = XFERTYPE32_INVALID;
 						}
 					}
@@ -1847,12 +1848,13 @@ void saturn_state::cd_writeLong(UINT32 addr, UINT32 data)
 					}
 					else    // sectors are done
 					{
-						xfertype32 = XFERTYPE32_INVALID;
+						/* Virtual On doesnt want this to be resetted. */
+						//xfertype32 = XFERTYPE32_INVALID;
 					}
 					break;
 
 				default:
-					printf("CD: unhandled 32-bit transfer type write\n");
+					//printf("CD: unhandled 32-bit transfer type write\n");
 					break;
 			}
 			break;

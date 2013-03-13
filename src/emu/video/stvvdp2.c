@@ -4440,8 +4440,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Bio Hazard 0x400 = extended color calculation enabled */
 		/* Advanced World War 0x200 = color calculation ratio mode */
 		/* Whizz = 0x8100 */
-		//if(STV_VDP2_CCCR & 0xf600)
-		if(STV_VDP2_CCCR & 0x7000)
+		/* Dark Saviour = 0x9051 on save select screen (the one with a Saturn in the background) */
+		if(STV_VDP2_CCCR & 0x6000)
 			popmessage("Gradation enabled %04x, contact MAMEdev",STV_VDP2_CCCR);
 
 		/* Advanced VG, Shining Force III */
