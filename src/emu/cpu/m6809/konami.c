@@ -325,7 +325,7 @@ ATTR_FORCE_INLINE void konami_cpu_device::divx()
 
 
 //-------------------------------------------------
-//  execute_one - try to execute a single instruction
+//  set_lines
 //-------------------------------------------------
 
 void konami_cpu_device::set_lines(UINT8 data)
