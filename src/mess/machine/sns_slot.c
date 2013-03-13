@@ -259,8 +259,13 @@ static const sns_slot slot_list[] =
 	{ SNES_STROM,       "strom"},
 	// pirate carts
 	{ SNES_POKEMON,     "lorom_poke"},
-	{ SNES_BANANA,      "lorom_paja"},  // wip
-	{ SNES_SOULBLAD,    "lorom_sbld"}   // wip
+	{ SNES_TEKKEN2,     "lorom_tekken2"},
+	{ SNES_SOULBLAD,    "lorom_sbld"},
+	{ SNES_MCPIR1,      "lorom_mcpir1"},
+	{ SNES_MCPIR2,      "lorom_mcpir2"},
+	{ SNES_20COL,       "lorom_20col"},
+	{ SNES_BANANA,      "lorom_pija"},  // wip
+	{ SNES_BUGS,        "lorom_bugs"}  // wip
 };
 
 static int sns_get_pcb_id(const char *slot)
@@ -695,7 +700,7 @@ void base_sns_cart_slot_device::setup_nvram()
 		if (sram_size)
 		{
 			UINT32 max = (hilo_mode == 0x007fc0) ? 0x80000 : 0x20000;   // MODE20 vs MODE21
-			size = 1024 << (ROM[0x00ffbd] & 0x07);
+			size = 1024 << sram_size;
 			if (size > max)
 				size = max;
 		}

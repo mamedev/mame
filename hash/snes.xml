@@ -3918,6 +3918,11 @@ List of pirate cartridges
 		</part>
 	</software>
 
+<!-- 
+protection actually seems more similar to tekken 2 than to pokemon
+the game writes (low) a lot of time to [ff00-ffff] range and reads (high) to ffcc/ffcd/ffce
+more investigation needed...
+-->
 	<software name="banpija" cloneof="chester" supported="no">
 		<!-- single cartridge source: d4s -->
 		<description>Bananas de Pijamas (Asia)</description>
@@ -3925,7 +3930,7 @@ List of pirate cartridges
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="lorom_pija" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bananas de pijamas (unl) [!].sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="0x000000" />
 			</dataarea>
@@ -3946,7 +3951,12 @@ List of pirate cartridges
 		</part>
 	</software>
 
-	<software name="abugslif" supported="no">
+<!-- 
+protection actually seems more similar to tekken 2 than to pokemon
+the game writes (high) a lot of time to [ff00-ffff] range, but it does not seem to read back (possibly it reads from the same range where it reads rom from...)
+more investigation needed...
+-->
+	<software name="bugslife" supported="no">
 		<!-- single cartridge source: d4s -->
 		<!-- Notes: highly similar to the game boy color version, this could be based on a prototype -->
 		<description>A Bug's Life (Bra)</description>
@@ -3956,7 +3966,7 @@ List of pirate cartridges
 			<feature name="pcb" value="890409C" /> <!-- epoxy board -->
 			<feature name="cart_model" value="SNS-006" />
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="lorom_bugs" />
 			<dataarea name="rom" size="2097152">
 				<rom name="u2" size="2097152" crc="014f0fcf" sha1="930ab53fded53a65824690b394d6e8c6565c083b" offset="0x000000" />
 			</dataarea>
@@ -3964,7 +3974,7 @@ List of pirate cartridges
 	</software>
 
 	<!--Notes: this is temporarily included for reference, until we fix emulation of the good dump -->
-	<software name="abugslifh" cloneof="abugslif">
+	<software name="bugslifeh" cloneof="bugslife">
 		<description>A Bug's Life (Bra, Cracked)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -4199,7 +4209,7 @@ List of pirate cartridges
 		</part>
 	</software>
 
-	<software name="soulblad" supported="no">
+	<software name="soulblad" supported="partial">
 		<!-- single cartridge source: d4s -->
 		<description>Soul Blade (Asia)</description>
 		<year>199?</year>
@@ -4210,7 +4220,7 @@ List of pirate cartridges
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="n/a" />
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="lorom_sbld" />
 			<dataarea name="rom" size="3145728">
 				<rom name="soul blade (world) (unl).sfc" size="3145728" crc="c97d1d7b" sha1="f7501045b5326255f3bde0543eb0a541b62588a9" offset="0x000000" />
 			</dataarea>
@@ -4259,14 +4269,14 @@ List of pirate cartridges
 		</part>
 	</software>
 
-	<software name="sfex" supported="no">
+	<software name="sfex">
 		<!-- single cartridge source: d4s -->
 		<description>Street Fighter EX Plus α (Asia)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 
-			<feature name="slot" value="lorom_poke" />
+			<feature name="slot" value="lorom_tekken2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="street fighter ex plus alpha (world) (unl).sfc" size="2097152" crc="dad59b9f" sha1="22f864b4a8728f08513b979d2a960eb3083b2c83" offset="0x000000" />
 			</dataarea>
@@ -4322,7 +4332,96 @@ List of pirate cartridges
 		</part>
 	</software>
 
-	<software name="super20m" supported="no"> <!-- not working probably due to custom bankswitching -->
+<!-- The image should be 8MB, while this is only 4MB. Half of game data is missing (only games 1 & 2 are present). Redump needed! -->
+	<software name="sup5in1" supported="partial">
+		<description>Super 5 in 1 (Bad Dump)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="super 5-in-1 [p1].sfc" size="4194304" crc="41975d1b" sha1="16778a78cadc54b54ba41fbed4aac8beca25d5d2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sup6in1">
+		<description>Super 6 in 1</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="super 6-in-1 [p1].sfc" size="4194304" crc="2f9169cb" sha1="9f6c4ba3a1035ca97a77eff92690bf873d0eca09" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The image should be 8MB, while this is only 2MB. Most of game data is missing (only games 2 & 6 are present). Redump needed! -->
+	<software name="new7in1" supported="partial">
+		<description>1997 New 7 in 1 (Bad Dump)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir2" />
+			<dataarea name="rom" size="2097152">
+				<rom name="super 11-in-1 [p1].sfc" size="2097152" crc="8a8f8d96" sha1="c8cde5ee5f4dafc450e12bebb0f3f74480dde739" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This actually uses a different bankswitch mechanism, and it uses bit6 to select HiROM access, not sure how to emulate it, yet... -->
+	<software name="sup7in1" supported="no">
+		<description>Super 7-in-1 1997 (Bad Dump)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="super 7-in-1 1997 [p1].sfc" size="4194304" crc="fc5036b2" sha1="04907f8b963bc1f0012f1594cbf244b05416ce58" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The image should be 8MB, while this is only 4MB. Half of game data is missing (only games 2, 3, 4 & 5 are present). Redump needed! -->
+	<software name="sup9in1" supported="partial">
+		<description>8 in 1 and 10 in 1 (Bad Dump)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="super 9-in-1 [p1].sfc" size="4194304" crc="213d6d24" sha1="80f5eb1c55292fd4d47275a13dea21e8cb0c2f91" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- The image should be ~8MB, while this is only 1MB. Most of game data is missing. Redump needed! -->
+	<software name="sup11in1" supported="partial">
+		<description>Super 11 in 1 (Bad Dump)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="슈퍼20합" />
+		<part name="cart" interface="snes_cart">
+
+			<feature name="slot" value="lorom_mcpir1" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super 11-in-1 [p1].sfc" size="1048576" crc="81747ee1" sha1="1c0ddb21cde72d4738a56e6618f81b82092c01bd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="super20m" supported="partial">
 		<!-- single cartridge source: d4s -->
 		<description>Super 20 Collection (Kor)</description>
 		<year>199?</year>
@@ -4330,21 +4429,21 @@ List of pirate cartridges
 		<info name="alt_title" value="슈퍼20합" />
 		<part name="cart" interface="snes_cart">
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="lorom_20col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="c20h.u1" size="1048576" crc="ac19b8f4" sha1="3a64c817ff3fc3819f2fd726868b6f27eb4523df" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tekken2" supported="no">
+	<software name="tekken2">
 		<!-- single cartridge source: d4s -->
 		<description>Tekken 2 (Asia)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="lorom_tekken2" />
 			<dataarea name="rom" size="2097152">
 				<rom name="tekken 2 (world) (unl).sfc" size="2097152" crc="066687ca" sha1="8aa2ee03fe40f289e30723a1c8cd4564481bdfdf" offset="0x000000" />
 			</dataarea>

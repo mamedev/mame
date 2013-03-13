@@ -37,8 +37,13 @@ enum
 	SNES_STROM,
 	// pirate carts
 	SNES_POKEMON,
+	SNES_TEKKEN2,
+	SNES_SOULBLAD,
+	SNES_MCPIR1,
+	SNES_MCPIR2,
+	SNES_20COL,
 	SNES_BANANA,    // wip
-	SNES_SOULBLAD   // wip
+	SNES_BUGS   // wip
 };
 
 
