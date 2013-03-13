@@ -10,7 +10,18 @@
 #define CRT_H_
 
 
-/*----------- defined in video/crt.c -----------*/
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CRT_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, CRT, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 struct crt_interface
 {
@@ -19,32 +30,52 @@ struct crt_interface
 	int width, height;
 };
 
-void crt_plot(device_t *device, int x, int y);
-void crt_eof(device_t *device);
-void crt_update(device_t *device, bitmap_ind16 &bitmap);
+
+struct crt_point
+{
+    crt_point() :
+      intensity(0),
+      next(0) {}
+    
+	int intensity;      /* current intensity of the pixel */
+						/* a node is not in the list when (intensity == -1) */
+	int next;           /* index of next pixel in list */
+};
+
+// ======================> crt_device
 
 class crt_device : public device_t
 {
 public:
 	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~crt_device() { global_free(m_token); }
+	~crt_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
+
+public:
+    void plot(int x, int y);
+    void eof();
+    void update(bitmap_ind16 &bitmap);
+
 private:
-	// internal state
-	void *m_token;
+	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
+	int *m_list_head;  /* head of the list of lit pixels (index in the array) */
+					   /* keep a separate list for each display line (makes the video code slightly faster) */
+
+	int m_decay_counter;  /* incremented each frame (tells for how many frames the CRT has decayed between two screen refresh) */
+
+	/* CRT window */
+	int m_num_intensity_levels;
+	int m_window_offset_x;
+    int m_window_offset_y;
+	int m_window_width;
+    int m_window_height;
 };
 
 extern const device_type CRT;
 
 
-#define MCFG_CRT_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, CRT, 0) \
-	MCFG_DEVICE_CONFIG(_interface)
 
 #endif /* CRT_H_ */

@@ -41,7 +41,7 @@ void tx0_state::video_start()
 	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
 	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 
-	m_crt = machine().device("crt");
+	m_crt = machine().device<crt_device>("crt");
 }
 
 
@@ -50,7 +50,7 @@ void tx0_state::screen_eof_tx0(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		crt_eof(m_crt);
+		m_crt->eof();
 	}
 }
 
@@ -65,7 +65,7 @@ void tx0_plot(running_machine &machine, int x, int y)
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/0777;
 	y = y*crt_window_height/0777;
-	crt_plot(state->m_crt, x, y);
+	state->m_crt->plot(x, y);
 }
 
 
@@ -74,7 +74,7 @@ void tx0_plot(running_machine &machine, int x, int y)
 */
 UINT32 tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	crt_update(m_crt, bitmap);
+	m_crt->update(bitmap);
 
 	tx0_draw_panel(machine(), m_panel_bitmap);
 	copybitmap(bitmap, m_panel_bitmap, 0, 0, panel_window_offset_x, panel_window_offset_y, cliprect);

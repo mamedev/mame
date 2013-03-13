@@ -7,6 +7,7 @@
 #ifndef PDP1_H_
 #define PDP1_H_
 
+#include <video/crt.h>
 
 /* defines for each bit and mask in input port "CSW" */
 enum
@@ -254,7 +255,7 @@ public:
 	lightpen_t m_previous_lightpen_state;
 	int m_pos;
 	int m_case_shift;
-	device_t *m_crt;
+	crt_device *m_crt;
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();

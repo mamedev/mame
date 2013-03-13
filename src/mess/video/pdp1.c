@@ -55,7 +55,7 @@ void pdp1_state::video_start()
 	const rectangle typewriter_bitmap_bounds(0, typewriter_window_width-1, 0, typewriter_window_height-1);
 	m_typewriter_bitmap.fill(pen_typewriter_bg, typewriter_bitmap_bounds);
 
-	m_crt = machine().device("crt");
+	m_crt = machine().device<crt_device>("crt");
 }
 
 
@@ -64,7 +64,7 @@ void pdp1_state::screen_eof_pdp1(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		crt_eof(m_crt);
+		m_crt->eof();
 	}
 }
 
@@ -77,7 +77,7 @@ void pdp1_plot(running_machine &machine, int x, int y)
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/01777;
 	y = y*crt_window_height/01777;
-	crt_plot(state->m_crt, x, y);
+	state->m_crt->plot(x, y);
 }
 
 
@@ -87,7 +87,7 @@ void pdp1_plot(running_machine &machine, int x, int y)
 UINT32 pdp1_state::screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pdp1_erase_lightpen(this, bitmap);
-	crt_update(m_crt, bitmap);
+	m_crt->update(bitmap);
 	pdp1_draw_lightpen(this, bitmap);
 
 	pdp1_draw_panel(machine(), m_panel_bitmap);

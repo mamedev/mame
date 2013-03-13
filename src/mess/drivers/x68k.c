@@ -902,7 +902,7 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
 WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 {
 	// ADPCM / Joystick control
-	device_t *oki = machine().device("okim6258");
+	okim6258_device *oki = machine().device<okim6258_device>("okim6258");
 
 	m_ppi_port[2] = data;
 	if((data & 0x0f) != (m_ppi_prev & 0x0f))
@@ -910,7 +910,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 		m_adpcm.pan = data & 0x03;
 		m_adpcm.rate = data & 0x0c;
 		x68k_set_adpcm();
-		okim6258_set_divider(oki, (data >> 2) & 3);
+		oki->set_divider((data >> 2) & 3);
 	}
 
 	// The joystick enable bits also handle the multiplexer for various controllers
@@ -1077,7 +1077,7 @@ READ16_MEMBER(x68k_state::x68k_fm_r)
 
 WRITE8_MEMBER(x68k_state::x68k_ct_w)
 {
-	device_t *okim = space.machine().device("okim6258");
+	okim6258_device *okim = space.machine().device<okim6258_device>("okim6258");
 
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
@@ -1085,7 +1085,7 @@ WRITE8_MEMBER(x68k_state::x68k_ct_w)
 	m_fdc.fdc->ready_w(data & 0x01);
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
-	okim6258_set_clock(okim, data & 0x02 ? 4000000 : 8000000);
+	okim->set_clock(data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -1776,14 +1776,14 @@ READ8_MEMBER( x68k_state::mfp_gpio_r )
 
 WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
 {
-	device_t *device = machine().device("okim6258");
+	okim6258_device *device = machine().device<okim6258_device>("okim6258");
 	switch(offset)
 	{
 		case 0x00:
-			okim6258_ctrl_w(device,space,0,data);
+			device->okim6258_ctrl_w(space,0,data);
 			break;
 		case 0x01:
-			okim6258_data_w(device,space,0,data);
+			device->okim6258_data_w(space,0,data);
 			break;
 	}
 }
@@ -1879,8 +1879,8 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
@@ -1917,8 +1917,8 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_device, okim6258_status_r, okim6258_data_w, 0x00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
@@ -1957,7 +1957,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 //  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
 	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
 	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
-	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8_LEGACY("okim6258", okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
+	AM_RANGE(0xe92000, 0xe92003) AM_DEVREAD8("okim6258", okim6258_device, okim6258_status_r, 0x00ff00ff) AM_WRITE8(x68030_adpcm_w, 0x00ff00ff)
 	AM_RANGE(0xe94000, 0xe94003) AM_DEVICE8("upd72065", upd72065_device, map, 0x00ff00ff)
 	AM_RANGE(0xe94004, 0xe94007) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
 //  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
@@ -2671,7 +2671,7 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(x68k_state,x68k_ct_w))  // CT1, CT2 from YM2151 port 0x1b
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-	MCFG_SOUND_ADD("okim6258", OKIM6258, 4000000)
+	MCFG_OKIM6258_ADD("okim6258", 4000000)
 	MCFG_SOUND_CONFIG(x68k_okim6258_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)

@@ -46,33 +46,57 @@
 #include "emu.h"
 #include "zsg2.h"
 
-// 16 registers per channel, 48 channels
-struct zchan
-{
-	UINT16 v[16];
-};
 
-struct zsg2_state
-{
-	zchan zc[48];
-	UINT16 act[3];
-	UINT16 alow, ahigh;
-	UINT8 *bank_samples;
+// device type definition
+const device_type ZSG2 = &device_creator<zsg2_device>;
 
-	int sample_rate;
-	sound_stream *stream;
-};
 
-INLINE zsg2_state *get_safe_token(device_t *device)
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  zsg2_device - constructor
+//-------------------------------------------------
+
+zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_alow(0),
+      m_ahigh(0),
+	  m_bank_samples(NULL),
+	  m_sample_rate(0),
+	  m_stream(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == ZSG2);
-	return (zsg2_state *)downcast<zsg2_device *>(device)->token();
+	memset(m_act, 0, sizeof(UINT16)*3);
 }
 
-static STREAM_UPDATE( update_stereo )
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void zsg2_device::device_start()
 {
-//  zsg2_state *info = (zsg2_state *)param;
+	const zsg2_interface *intf = (const zsg2_interface *)static_config();
+
+	m_sample_rate = clock();
+
+	memset(&m_zc, 0, sizeof(m_zc));
+	memset(&m_act, 0, sizeof(m_act));
+
+	m_stream = stream_alloc(0, 2, m_sample_rate);
+
+	m_bank_samples = memregion(intf->samplergn)->base();
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	stream_sample_t *dest1 = outputs[0];
 	stream_sample_t *dest2 = outputs[1];
 
@@ -80,36 +104,38 @@ static STREAM_UPDATE( update_stereo )
 	memset(dest2, 0, sizeof(stream_sample_t) * samples);
 }
 
-static void chan_w(zsg2_state *info, int chan, int reg, UINT16 data)
+
+
+void zsg2_device::chan_w(int chan, int reg, UINT16 data)
 {
-	info->zc[chan].v[reg] = data;
+	m_zc[chan].v[reg] = data;
 	//  log_event("ZOOMCHAN", "chan %02x reg %x = %04x", chan, reg, data);
 }
 
-static UINT16 chan_r(zsg2_state *info, int chan, int reg)
+UINT16 zsg2_device::chan_r(int chan, int reg)
 {
 	//  log_event("ZOOMCHAN", "chan %02x read reg %x: %04x", chan, reg, zc[chan].v[reg]);
-	return info->zc[chan].v[reg];
+	return m_zc[chan].v[reg];
 }
 
-static void check_channel(zsg2_state *info, int chan)
+void zsg2_device::check_channel(int chan)
 {
 	//  log_event("ZOOM", "chan %02x e=%04x f=%04x", chan, zc[chan].v[14], zc[chan].v[15]);
 }
 
-static void keyon(zsg2_state *info, int chan)
+void zsg2_device::keyon(int chan)
 {
 #if 0
 	log_event("ZOOM", "keyon %02x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x %04x",
 		chan,
-		info->zc[chan].v[0x0], info->zc[chan].v[0x1], info->zc[chan].v[0x2], info->zc[chan].v[0x3],
-		info->zc[chan].v[0x4], info->zc[chan].v[0x5], info->zc[chan].v[0x6], info->zc[chan].v[0x7],
-		info->zc[chan].v[0x8], info->zc[chan].v[0x9], info->zc[chan].v[0xa], info->zc[chan].v[0xb],
-		info->zc[chan].v[0xc], info->zc[chan].v[0xd], info->zc[chan].v[0xe], info->zc[chan].v[0xf]);
+		m_zc[chan].v[0x0], m_zc[chan].v[0x1], m_zc[chan].v[0x2], m_zc[chan].v[0x3],
+		m_zc[chan].v[0x4], m_zc[chan].v[0x5], m_zc[chan].v[0x6], m_zc[chan].v[0x7],
+		m_zc[chan].v[0x8], m_zc[chan].v[0x9], m_zc[chan].v[0xa], m_zc[chan].v[0xb],
+		m_zc[chan].v[0xc], m_zc[chan].v[0xd], m_zc[chan].v[0xe], m_zc[chan].v[0xf]);
 #endif
 }
 
-static void control_w(zsg2_state *info, int reg, UINT16 data)
+void zsg2_device::control_w(int reg, UINT16 data)
 {
 	switch(reg)
 	{
@@ -119,7 +145,7 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 			int i;
 			for(i=0; i<16; i++)
 				if(data & (1<<i))
-					keyon(info, base+i);
+					keyon(base+i);
 			break;
 		}
 
@@ -129,7 +155,7 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 			int i;
 			for(i=0; i<16; i++)
 				if(data & (1<<i))
-					check_channel(info, base+i);
+					check_channel(base+i);
 			break;
 		}
 
@@ -137,11 +163,11 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 			break;
 
 		case 0x38:
-			info->alow = data;
+			m_alow = data;
 			break;
 
 		case 0x3a:
-			info->ahigh = data;
+			m_ahigh = data;
 			break;
 
 		default:
@@ -150,7 +176,7 @@ static void control_w(zsg2_state *info, int reg, UINT16 data)
 	}
 }
 
-static UINT16 control_r(zsg2_state *info, int reg)
+UINT16 zsg2_device::control_r(int reg)
 {
 	switch(reg)
 	{
@@ -159,8 +185,8 @@ static UINT16 control_r(zsg2_state *info, int reg)
 
 		case 0x3c: case 0x3e:
 		{
-			UINT32 adr = (info->ahigh << 16) | info->alow;
-			UINT32 val = *(unsigned int *)(info->bank_samples+adr);
+			UINT32 adr = (m_ahigh << 16) | m_alow;
+			UINT32 val = *(unsigned int *)(m_bank_samples+adr);
 //          log_event("ZOOMCTRL", "rom read.%c %06x = %08x", reg == 0x3e ? 'h' : 'l', adr, val);
 			return (reg == 0x3e) ? (val >> 16) : val;
 		}
@@ -171,31 +197,31 @@ static UINT16 control_r(zsg2_state *info, int reg)
 	return 0xffff;
 }
 
-WRITE16_DEVICE_HANDLER( zsg2_w )
+
+WRITE16_MEMBER( zsg2_device::zsg2_w )
 {
-	zsg2_state *info = get_safe_token(device);
 	int adr = offset * 2;
 
 	assert(mem_mask == 0xffff); // we only support full 16-bit accesses
 
-	info->stream->update();
+	m_stream->update();
 
 	if (adr < 0x600)
 	{
 		int chan = adr >> 5;
 		int reg = (adr >> 1) & 15;
 
-		chan_w(info, chan, reg, data);
+		chan_w(chan, reg, data);
 	}
 	else
 	{
-		control_w(info, adr - 0x600, data);
+		control_w(adr - 0x600, data);
 	}
 }
 
-READ16_DEVICE_HANDLER( zsg2_r )
+
+READ16_MEMBER( zsg2_device::zsg2_r )
 {
-	zsg2_state *info = get_safe_token(device);
 	int adr = offset * 2;
 
 	assert(mem_mask == 0xffff); // we only support full 16-bit accesses
@@ -204,65 +230,13 @@ READ16_DEVICE_HANDLER( zsg2_r )
 	{
 		int chan = adr >> 5;
 		int reg = (adr >> 1) & 15;
-		return chan_r(info, chan, reg);
+		return chan_r(chan, reg);
 	}
 	else
 	{
-		return control_r(info, adr - 0x600);
+		return control_r(adr - 0x600);
 	}
 
 	return 0;
 }
 
-static DEVICE_START( zsg2 )
-{
-	const zsg2_interface *intf = (const zsg2_interface *)device->static_config();
-	zsg2_state *info = get_safe_token(device);
-
-	info->sample_rate = device->clock();
-
-	memset(&info->zc, 0, sizeof(info->zc));
-	memset(&info->act, 0, sizeof(info->act));
-
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, info->sample_rate, info, update_stereo);
-
-	info->bank_samples = device->machine().root_device().memregion(intf->samplergn)->base();
-}
-
-const device_type ZSG2 = &device_creator<zsg2_device>;
-
-zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(zsg2_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void zsg2_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void zsg2_device::device_start()
-{
-	DEVICE_START_NAME( zsg2 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void zsg2_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}

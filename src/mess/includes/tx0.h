@@ -7,6 +7,8 @@
 #ifndef TX0_H_
 #define TX0_H_
 
+#include <video/crt.h>
+
 enum state_t
 {
 	MTS_UNSELECTED,
@@ -144,7 +146,7 @@ public:
 	bitmap_ind16 m_typewriter_bitmap;
 	int m_pos;
 	int m_case_shift;
-	device_t *m_crt;
+	crt_device *m_crt;
 	DECLARE_DRIVER_INIT(tx0);
 	virtual void machine_start();
 	virtual void machine_reset();

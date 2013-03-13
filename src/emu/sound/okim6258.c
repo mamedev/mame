@@ -21,23 +21,6 @@
 
 static const int dividers[4] = { 1024, 768, 512, 512 };
 
-struct okim6258_state
-{
-	UINT8  status;
-
-	UINT32 master_clock;    /* master clock frequency */
-	UINT32 divider;         /* master clock divider */
-	UINT8 adpcm_type;       /* 3/4 bit ADPCM select */
-	UINT8 data_in;          /* ADPCM data-in register */
-	UINT8 nibble_shift;     /* nibble select */
-	sound_stream *stream;   /* which stream are we playing on? */
-
-	UINT8 output_bits;
-
-	INT32 signal;
-	INT32 step;
-};
-
 /* step size index shift table */
 static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
@@ -47,12 +30,37 @@ static int diff_lookup[49*16];
 /* tables computed? */
 static int tables_computed = 0;
 
-INLINE okim6258_state *get_safe_token(device_t *device)
+
+
+// device type definition
+const device_type OKIM6258 = &device_creator<okim6258_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  okim6258_device - constructor
+//-------------------------------------------------
+
+okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_status(0),
+	  m_master_clock(0),
+	  m_divider(0),
+	  m_adpcm_type(0),
+	  m_data_in(0),
+	  m_nibble_shift(0),
+	  m_stream(NULL),
+	  m_output_bits(0),
+	  m_signal(0),
+	  m_step(0)
 {
-	assert(device != NULL);
-	assert(device->type() == OKIM6258);
-	return (okim6258_state *)downcast<okim6258_device *>(device)->token();
 }
+
+
 
 /**********************************************************************************************
 
@@ -94,54 +102,67 @@ static void compute_tables(void)
 }
 
 
-static INT16 clock_adpcm(okim6258_state *chip, UINT8 nibble)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void okim6258_device::device_start()
 {
-	INT32 max = (1 << (chip->output_bits - 1)) - 1;
-	INT32 min = -(1 << (chip->output_bits - 1));
+	const okim6258_interface *intf = (const okim6258_interface *)static_config();
 
-	chip->signal += diff_lookup[chip->step * 16 + (nibble & 15)];
+	compute_tables();
 
-	/* clamp to the maximum */
-	if (chip->signal > max)
-		chip->signal = max;
-	else if (chip->signal < min)
-		chip->signal = min;
+	m_master_clock = clock();
+	m_adpcm_type = intf->adpcm_type;
 
-	/* adjust the step size and clamp */
-	chip->step += index_shift[nibble & 7];
-	if (chip->step > 48)
-		chip->step = 48;
-	else if (chip->step < 0)
-		chip->step = 0;
+	/* D/A precision is 10-bits but 12-bit data can be output serially to an external DAC */
+	m_output_bits = intf->output_12bits ? 12 : 10;
+	m_divider = dividers[intf->divider];
 
-	/* return the signal scaled up to 32767 */
-	return chip->signal << 4;
+	m_stream = stream_alloc(0, 1, clock()/m_divider);
+
+	m_signal = -2;
+	m_step = 0;
+
+	okim6258_state_save_register();
 }
 
-/**********************************************************************************************
 
-     okim6258_update -- update the sound chip so that it is in sync with CPU execution
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
 
-***********************************************************************************************/
-
-static STREAM_UPDATE( okim6258_update )
+void okim6258_device::device_reset()
 {
-	okim6258_state *chip = (okim6258_state *)param;
+	m_stream->update();
+
+	m_signal = -2;
+	m_step = 0;
+	m_status = 0;
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	stream_sample_t *buffer = outputs[0];
 
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
-	if (chip->status & STATUS_PLAYING)
+	if (m_status & STATUS_PLAYING)
 	{
-		int nibble_shift = chip->nibble_shift;
+		int nibble_shift = m_nibble_shift;
 
 		while (samples)
 		{
 			/* Compute the new amplitude and update the current step */
-			int nibble = (chip->data_in >> nibble_shift) & 0xf;
+			int nibble = (m_data_in >> nibble_shift) & 0xf;
 
 			/* Output to the buffer */
-			INT16 sample = clock_adpcm(chip, nibble);
+			INT16 sample = clock_adpcm(nibble);
 
 			nibble_shift ^= 4;
 
@@ -150,7 +171,7 @@ static STREAM_UPDATE( okim6258_update )
 		}
 
 		/* Update the parameters */
-		chip->nibble_shift = nibble_shift;
+		m_nibble_shift = nibble_shift;
 	}
 	else
 	{
@@ -168,107 +189,80 @@ static STREAM_UPDATE( okim6258_update )
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(okim6258_state *info, device_t *device)
+void okim6258_device::okim6258_state_save_register()
 {
-	device->save_item(NAME(info->status));
-	device->save_item(NAME(info->master_clock));
-	device->save_item(NAME(info->divider));
-	device->save_item(NAME(info->data_in));
-	device->save_item(NAME(info->nibble_shift));
-	device->save_item(NAME(info->signal));
-	device->save_item(NAME(info->step));
+	save_item(NAME(m_status));
+	save_item(NAME(m_master_clock));
+	save_item(NAME(m_divider));
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_nibble_shift));
+	save_item(NAME(m_signal));
+	save_item(NAME(m_step));
+}
+
+
+INT16 okim6258_device::clock_adpcm(UINT8 nibble)
+{
+	INT32 max = (1 << (m_output_bits - 1)) - 1;
+	INT32 min = -(1 << (m_output_bits - 1));
+
+	m_signal += diff_lookup[m_step * 16 + (nibble & 15)];
+
+	/* clamp to the maximum */
+	if (m_signal > max)
+		m_signal = max;
+	else if (m_signal < min)
+		m_signal = min;
+
+	/* adjust the step size and clamp */
+	m_step += index_shift[nibble & 7];
+	if (m_step > 48)
+		m_step = 48;
+	else if (m_step < 0)
+		m_step = 0;
+
+	/* return the signal scaled up to 32767 */
+	return m_signal << 4;
 }
 
 
 /**********************************************************************************************
 
-     OKIM6258_start -- start emulation of an OKIM6258-compatible chip
+     okim6258::set_divider -- set the master clock divider
 
 ***********************************************************************************************/
 
-static DEVICE_START( okim6258 )
+void okim6258_device::set_divider(int val)
 {
-	const okim6258_interface *intf = (const okim6258_interface *)device->static_config();
-	okim6258_state *info = get_safe_token(device);
-
-	compute_tables();
-
-	info->master_clock = device->clock();
-	info->adpcm_type = intf->adpcm_type;
-
-	/* D/A precision is 10-bits but 12-bit data can be output serially to an external DAC */
-	info->output_bits = intf->output_12bits ? 12 : 10;
-	info->divider = dividers[intf->divider];
-
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/info->divider, info, okim6258_update);
-
-	info->signal = -2;
-	info->step = 0;
-
-	okim6258_state_save_register(info, device);
-}
-
-
-/**********************************************************************************************
-
-     OKIM6258_stop -- stop emulation of an OKIM6258-compatible chip
-
-***********************************************************************************************/
-
-static DEVICE_RESET( okim6258 )
-{
-	okim6258_state *info = get_safe_token(device);
-
-	info->stream->update();
-
-	info->signal = -2;
-	info->step = 0;
-	info->status = 0;
-}
-
-
-/**********************************************************************************************
-
-     okim6258_set_divider -- set the master clock divider
-
-***********************************************************************************************/
-
-void okim6258_set_divider(device_t *device, int val)
-{
-	okim6258_state *info = get_safe_token(device);
 	int divider = dividers[val];
 
-	info->divider = dividers[val];
-	info->stream->set_sample_rate(info->master_clock / divider);
+	m_divider = dividers[val];
+	m_stream->set_sample_rate(m_master_clock / divider);
 }
 
 
 /**********************************************************************************************
 
-     okim6258_set_clock -- set the master clock
+     okim6258::set_clock -- set the master clock
 
 ***********************************************************************************************/
 
-void okim6258_set_clock(device_t *device, int val)
+void okim6258_device::set_clock(int val)
 {
-	okim6258_state *info = get_safe_token(device);
-
-	info->master_clock = val;
-	info->stream->set_sample_rate(info->master_clock / info->divider);
+	m_master_clock = val;
+	m_stream->set_sample_rate(m_master_clock / m_divider);
 }
 
 
 /**********************************************************************************************
 
-     okim6258_get_vclk -- get the VCLK/sampling frequency
+     okim6258::get_vclk -- get the VCLK/sampling frequency
 
 ***********************************************************************************************/
 
-int okim6258_get_vclk(device_t *device)
+int okim6258_device::get_vclk()
 {
-	okim6258_state *info = get_safe_token(device);
-
-	return (info->master_clock / info->divider);
+	return (m_master_clock / m_divider);
 }
 
 
@@ -278,13 +272,11 @@ int okim6258_get_vclk(device_t *device)
 
 ***********************************************************************************************/
 
-READ8_DEVICE_HANDLER( okim6258_status_r )
+READ8_MEMBER( okim6258_device::okim6258_status_r )
 {
-	okim6258_state *info = get_safe_token(device);
+	m_stream->update();
 
-	info->stream->update();
-
-	return (info->status & STATUS_PLAYING) ? 0x00 : 0x80;
+	return (m_status & STATUS_PLAYING) ? 0x00 : 0x80;
 }
 
 
@@ -293,15 +285,13 @@ READ8_DEVICE_HANDLER( okim6258_status_r )
      okim6258_data_w -- write to the control port of an OKIM6258-compatible chip
 
 ***********************************************************************************************/
-WRITE8_DEVICE_HANDLER( okim6258_data_w )
+WRITE8_MEMBER( okim6258_device::okim6258_data_w )
 {
-	okim6258_state *info = get_safe_token(device);
-
 	/* update the stream */
-	info->stream->update();
+	m_stream->update();
 
-	info->data_in = data;
-	info->nibble_shift = 0;
+	m_data_in = data;
+	m_nibble_shift = 0;
 }
 
 
@@ -311,90 +301,42 @@ WRITE8_DEVICE_HANDLER( okim6258_data_w )
 
 ***********************************************************************************************/
 
-WRITE8_DEVICE_HANDLER( okim6258_ctrl_w )
+WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
 {
-	okim6258_state *info = get_safe_token(device);
-
-	info->stream->update();
+	m_stream->update();
 
 	if (data & COMMAND_STOP)
 	{
-		info->status &= ~(STATUS_PLAYING | STATUS_RECORDING);
+		m_status &= ~(STATUS_PLAYING | STATUS_RECORDING);
 		return;
 	}
 
 	if (data & COMMAND_PLAY)
 	{
-		if (!(info->status & STATUS_PLAYING))
+		if (!(m_status & STATUS_PLAYING))
 		{
-			info->status |= STATUS_PLAYING;
+			m_status |= STATUS_PLAYING;
 
 			/* Also reset the ADPCM parameters */
-			info->signal = -2;
-			info->step = 0;
-			info->nibble_shift = 0;
+			m_signal = -2;
+			m_step = 0;
+			m_nibble_shift = 0;
 		}
 	}
 	else
 	{
-		info->status &= ~STATUS_PLAYING;
+		m_status &= ~STATUS_PLAYING;
 	}
 
 	if (data & COMMAND_RECORD)
 	{
 		logerror("M6258: Record enabled\n");
-		info->status |= STATUS_RECORDING;
+		m_status |= STATUS_RECORDING;
 	}
 	else
 	{
-		info->status &= ~STATUS_RECORDING;
+		m_status &= ~STATUS_RECORDING;
 	}
 }
 
 
-const device_type OKIM6258 = &device_creator<okim6258_device>;
-
-okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(okim6258_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void okim6258_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void okim6258_device::device_start()
-{
-	DEVICE_START_NAME( okim6258 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void okim6258_device::device_reset()
-{
-	DEVICE_RESET_NAME( okim6258 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
