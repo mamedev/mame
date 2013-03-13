@@ -290,6 +290,13 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+	int line;
+	rectangle clip;
+	int scrollbase;
+	int scrollbase2;
+
+	const rectangle &visarea = screen.visible_area();
+	clip = visarea;
 
 	//popmessage("%04x",m_vregs[0/2]);
 	UINT16* vreg = m_vregs;
@@ -299,7 +306,7 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 
 
 	// these are more than just enable, they get written with 0x0d and 0x1f (and 0x00 when a layer is off)
-	// it might relate to the linescroll modes or sizes?
+	// seems to be related to the linescroll mode at least? maybe sizes?
 	int enable0 = (m_vregs[0x0c] & 0xff00)>>8;
 	int enable1 = (m_vregs[0x0c] & 0x00ff)>>0;
 	int enable2 = (m_vregs[0x0d] & 0xff00)>>8;
@@ -310,17 +317,69 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	if ((enable2 != 0x00) && (enable2 != 0x0d) && (enable2 != 0x1f)) printf("unknown enable2 value %02x\n", enable2);
 	if ((enable3 != 0x00) && (enable3 != 0x0d) && (enable3 != 0x1f)) printf("unknown enable3 value %02x\n", enable3);
 
+
+	// the lower 2 tilemaps use regular scrolling
 	m_bg_tilemap[2]->set_scrollx(0, vreg[0x07]);
 	m_bg_tilemap[2]->set_scrolly(0, vreg[0x08]);
 
 	m_bg_tilemap[3]->set_scrollx(0, vreg[0x09]);
 	m_bg_tilemap[3]->set_scrolly(0, vreg[0x0a]);
 
-
 	if (enable3) m_bg_tilemap[3]->draw(bitmap, cliprect, 0, 0);
 	if (enable2) m_bg_tilemap[2]->draw(bitmap, cliprect, 0, 0);
-	if (enable1) m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
-	if (enable0) m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
+
+	// the upper 2 tilemaps have a lineselect / linescroll logic
+
+	if (enable1 == 0x1f)
+	{
+		scrollbase = 0xdf600;
+		scrollbase2 = 0xdf800;
+
+		for (line = 0; line < 240;line++)
+		{
+			UINT16 val = m_vram[scrollbase/2 + line];
+			UINT16 upper = (m_vram[scrollbase2/2 + line]&0xff00)>>8;
+
+			clip.min_y = clip.max_y = line;
+
+			m_bg_tilemap[1]->set_scrollx(0,(val&0x00ff) | (upper << 8));
+			m_bg_tilemap[1]->set_scrolly((0,(val&0xff00)>>8)-line);
+
+			m_bg_tilemap[1]->draw(bitmap, clip, 0, 0);
+		}
+	}
+	else if (enable1 != 0x00)
+	{
+		m_bg_tilemap[1]->set_scrollx(0, 0);
+		m_bg_tilemap[1]->set_scrolly(0, 0);
+		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
+	}
+
+	if (enable0 == 0x1f)
+	{
+		scrollbase = 0xdf400;
+		scrollbase2 = 0xdf800;
+
+		for (line = 0; line < 240;line++)
+		{
+			UINT16 val = m_vram[scrollbase/2 + line];
+			UINT16 upper = (m_vram[scrollbase2/2 + line]&0x00ff)>>0;
+
+			clip.min_y = clip.max_y = line;
+
+			m_bg_tilemap[0]->set_scrollx(0,(val&0x00ff) | (upper << 8));
+			m_bg_tilemap[0]->set_scrolly((0,(val&0xff00)>>8)-line);
+
+			m_bg_tilemap[0]->draw(bitmap, clip, 0, 0);
+		}
+	}
+	else if (enable0 != 0x00)
+	{
+		m_bg_tilemap[0]->set_scrollx(0, 0);
+		m_bg_tilemap[0]->set_scrolly(0, 0);
+		m_bg_tilemap[0]->draw(bitmap, cliprect, 0, 0);
+	}
+
 	draw_sprites(bitmap,cliprect);
 
 	return 0;
