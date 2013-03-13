@@ -162,6 +162,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_lv0_ended);
 	TIMER_CALLBACK_MEMBER(dma_lv1_ended);
 	TIMER_CALLBACK_MEMBER(dma_lv2_ended);
+	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
 	void scu_single_transfer(address_space &space, UINT32 src, UINT32 dst,UINT8 *src_shift);
 	void scu_dma_direct(address_space &space, UINT8 dma_ch);
 	void scu_dma_indirect(address_space &space,UINT8 dma_ch);

@@ -479,7 +479,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 
 	{
-		/*TODO: change DMA into DRQ model. Timing is a guess.  */
+		/*TODO: Timing is a guess.  */
 		switch(dma_ch)
 		{
 			case 0: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
@@ -825,22 +825,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
-	if(scanline == (0)*y_step)
-	{
-		video_update_vdp1();
-
-		if(STV_VDP1_VBE)
-			m_vdp1.framebuffer_clear_on_next_frame = 1;
-
-		if(!(m_scu.ism & IRQ_VDP1_END))
-		{
-			m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
-			scu_do_transfer(6);
-		}
-		else
-			m_scu.ist |= (IRQ_VDP1_END);
-	}
-
 	if(scanline == 0*y_step)
 	{
 		if(!(m_scu.ism & IRQ_VBLANK_OUT))
@@ -861,6 +845,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		}
 		else
 			m_scu.ist |= (IRQ_VBLANK_IN);
+
+		/* TODO: when Automatic Draw actually happens? Night Striker S is very fussy on this, and it looks like that VDP1 starts at more or less vblank-in time ... */
+		video_update_vdp1();
 	}
 	else if((scanline % y_step) == 0 && scanline < vblank_line*y_step)
 	{
@@ -872,6 +859,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 		else
 			m_scu.ist |= (IRQ_HBLANK_IN);
 	}
+
+	if(scanline == (vblank_line+1)*y_step)
+	{
+		/* docs mentions that VBE happens one line after vblank-in. */
+		if(STV_VDP1_VBE)
+			m_vdp1.framebuffer_clear_on_next_frame = 1;
+	}
+
 
 	if(scanline == (m_scu_regs[36] & 0x3ff)*y_step)
 	{

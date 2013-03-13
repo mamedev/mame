@@ -4456,7 +4456,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
 		/* Metal Slug bit 0 during gameplay */
 		/* Bug! Sega Away Logo onward 0x470 */
-		if(STV_VDP2_SFSEL & ~0x47b)
+		/* Command & Conquer 0x0004 0xc000 */
+		if(STV_VDP2_SFSEL & ~0x47f)
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */

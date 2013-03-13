@@ -1663,6 +1663,8 @@ void saturn_state::stv_vdp1_draw_scaled_sprite(const rectangle &cliprect)
 }
 
 
+
+
 void saturn_state::stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite_type)
 {
 	//UINT16 *destline;
@@ -1745,6 +1747,21 @@ void saturn_state::stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sp
 	}
 }
 
+TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
+{
+	/* set CEF to 1*/
+	CEF_1;
+
+	if(!(m_scu.ism & IRQ_VDP1_END))
+	{
+		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+		scu_do_transfer(6);
+	}
+	else
+		m_scu.ist |= (IRQ_VDP1_END);
+}
+
+
 void saturn_state::stv_vdp1_process_list( void )
 {
 	int position;
@@ -1775,6 +1792,8 @@ void saturn_state::stv_vdp1_process_list( void )
 	//      if (VDP1_LOG) logerror ("Sprite List Position Too High!\n");
 	//      position = 0;
 	//  }
+
+		spritecount++;
 
 		stv2_current_sprite.CMDCTRL = (m_vdp1_vram[position * (0x20/4)+0] & 0xffff0000) >> 16;
 
@@ -1969,15 +1988,14 @@ void saturn_state::stv_vdp1_process_list( void )
 			}
 		}
 
-		spritecount++;
-
 	}
 
 
 	end:
-	/* set CEF to 1*/
-	CEF_1;
 	m_vdp1.copr = (position * 0x20) >> 3;
+
+	/* TODO: what's the exact formula? Guess it should be a mix between number of pixels written and actual command data fetched. */
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(spritecount*16), timer_expired_delegate(FUNC(saturn_state::vdp1_draw_end),this));
 
 	if (VDP1_LOG) logerror ("End of list processing!\n");
 }
