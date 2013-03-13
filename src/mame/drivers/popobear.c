@@ -6,8 +6,9 @@
 
     TODO:
     - auto-animation speed is erratic (way too fast);
-    - sprites;
     - tilemap effects (scrolling, colscroll, linescroll);
+	  (high score table?)
+	- BMC logo isn't copied correctly after an attract loop, RAM not cleared on a reset either?
     - BGM seems quite off, YM2413 core bug?
     - I/Os;
     - IRQ generation;
@@ -73,6 +74,7 @@ Component Side   A   B   Solder Side
 *******************************************************************************************/
 
 
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
@@ -85,7 +87,19 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spr(*this, "spr"),
-		m_vregs(*this, "vregs"){ }
+		m_vregs(*this, "vregs")
+	
+	{ 
+		tilemap_base[0] = 0xf0000;
+		tilemap_base[1] = 0xf4000;
+		tilemap_base[2] = 0xf8000;
+		tilemap_base[3] = 0xfc000;
+
+		tilemap_size[0] = 0x04000;
+		tilemap_size[1] = 0x04000;
+		tilemap_size[2] = 0x04000;
+		tilemap_size[3] = 0x04000;	
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_spr;
@@ -94,6 +108,8 @@ public:
 	UINT8* m_vram;
 	UINT8* m_vram_rearranged;
 
+	int tilemap_base[4];
+	int tilemap_size[4];
 
 	DECLARE_READ8_MEMBER(popo_620000_r);
 	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
@@ -104,6 +120,11 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	int m_gfx_index;
+	tilemap_t    *m_bg_tilemap[4];
+	TILE_GET_INFO_MEMBER(get_popobear_bg0_tile_info);
+	TILE_GET_INFO_MEMBER(get_popobear_bg1_tile_info);
+	TILE_GET_INFO_MEMBER(get_popobear_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_popobear_bg3_tile_info);
 
 	// why are we using 8-bit anyway?
 	DECLARE_WRITE8_MEMBER(popo_vram_w)
@@ -125,6 +146,13 @@ public:
 
 		m_vram_rearranged[swapped_offset] = data;
 		machine().gfx[m_gfx_index]->mark_dirty((swapped_offset^1)/2);
+
+		// unfortunately tilemaps and tilegfx share the same ram so we're always dirty if we write to RAM
+		m_bg_tilemap[0]->mark_all_dirty();
+		m_bg_tilemap[1]->mark_all_dirty();
+		m_bg_tilemap[2]->mark_all_dirty();
+		m_bg_tilemap[3]->mark_all_dirty();
+
 	}
 	DECLARE_READ8_MEMBER(popo_vram_r) { return m_vram[offset^1]; }
 
@@ -141,6 +169,35 @@ static const gfx_layout popobear_char_layout =
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
 };
+
+
+TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
+{
+	int base = tilemap_base[0];
+	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
+{
+	int base = tilemap_base[1];
+	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
+{
+	int base = tilemap_base[2];
+	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
+{
+	int base = tilemap_base[3];
+	int tileno = (m_vram[base + tile_index*2 + 1]<<8) | m_vram[base + tile_index*2 + 0];
+	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+}
 
 
 
@@ -160,19 +217,26 @@ void popobear_state::video_start()
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), popobear_char_layout, (UINT8 *)m_vram_rearranged, machine().total_colors() / 16, 0));
+
+	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_bg_tilemap[3] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(popobear_state::get_popobear_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+
+	m_bg_tilemap[0]->set_transparent_pen(0);
+	m_bg_tilemap[1]->set_transparent_pen(0);
+	m_bg_tilemap[2]->set_transparent_pen(0);
+	m_bg_tilemap[3]->set_transparent_pen(0);
+
 }
+
 
 void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
 {
-	UINT8* vram = m_vram;
 	UINT16* vreg = (UINT16 *)m_vregs;
-	int count;
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
 
-//  count = (m_vregs[vreg_base[layer_n]]<<5);
-//  count &= 0xfc000;
-	count = (0xf0000+layer_n*0x4000);
 	if(layer_n & 2)
 	{
 		xscroll = vreg[vreg_base[(layer_n & 1) ^ 1]+2/2] & 0x1ff;
@@ -183,26 +247,17 @@ void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, 
 		xscroll = 0;
 		yscroll = 0;
 	}
-
 	popmessage("%04x %04x",vreg[vreg_base[0]+0/2],vreg[vreg_base[1]+0/2]);
 
-	for(int y=0;y<64;y++)
-	{
-		for(int x=0;x<128;x++)
-		{
-			int tile;
 
-			tile = vram[count+0]|(vram[count+1]<<8);
-			
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,(x*8)-xscroll,(y*8)-yscroll, 0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,(x*8)-xscroll,512+(y*8)-yscroll, 0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,1024+(x*8)-xscroll,(y*8)-yscroll, 0);
-			drawgfx_transpen(bitmap,cliprect,machine().gfx[m_gfx_index],tile,0,0,0,1024+(x*8)-xscroll,512+(y*8)-yscroll, 0);
+	m_bg_tilemap[layer_n]->set_scrolly(0, yscroll);
+	m_bg_tilemap[layer_n]->set_scrollx(0, xscroll);
 
-			count+=2;
-		}
-	}
-	}
+
+
+	m_bg_tilemap[layer_n]->draw(bitmap, cliprect, 0, 0);
+
+}
 
 
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
