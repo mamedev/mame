@@ -4562,7 +4562,7 @@ Known bad dumps, redump needed
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
 				<rom name="clay 2 1995.u1" size="524288" crc="3998e4b9" sha1="a0b91861b4e67c290d6621f607560366d8ef7ec4"                 offset="0x000000" />
 				<rom name="2.u2"           size="524288" crc="19c4b39f" sha1="86df3dd37504dba24a84eac5bbf50ba26c84b194"                 offset="0x080000" />
