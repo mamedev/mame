@@ -748,34 +748,55 @@ void es5510_device::write_reg(UINT8 reg, INT32 value)
 	switch(reg)
 	{
 	case 234: ser0r = value;
+		break;
 	case 235: ser0l = value;
+		break;
 	case 236: ser1r = value;
+		break;
 	case 237: ser1l = value;
+		break;
 	case 238: ser2r = value;
+		break;
 	case 239: ser2l = value;
+		break;
 	case 240: ser3r = value;
+		break;
 	case 241: ser3l = value;
+		break;
 	case 242: machl = (machl & ~((INT64)0x00ffffff <<  0)) | (value <<  0);
+		break;
 	case 243: machl = (machl & ~((INT64)0x00ffffff << 24)) | (value << 24);
+		break;
 	case 244:
 		memshift = countLowOnes(value);
 		memsiz = 0x00ffffff >> (24 - memshift);
 		memmask = 0x00ffffff & ~memsiz;
 		memincrement = 1 << memshift;
+		break;
 	case 245: dlength = value;
+		break;
 	case 246: abase = value;
+		break;
 	case 247: bbase = value;
+		break;
 	case 248: dbase = value;
+		break;
 	case 249: sigreg = (value != 0);
+		break;
 	case 250: ccr = (value >> 16) & FLAG_MASK;
+		break;
 	case 251: cmr = (value >> 16) & (FLAG_MASK | FLAG_NOT);
+		break;
 	case 252: // no-op
+		break;
 	case 253: // no-op
+		break;
 	case 254: // no-op
+		break;
 	case 255: // no-op
-	default:
-		// unknown register
-		;
+		break;
+	default: // unknown register
+		break;
 	}
 	}
 }
