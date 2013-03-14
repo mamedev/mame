@@ -51,7 +51,6 @@
 
 const device_type MD_CART_SLOT = &device_creator<md_cart_slot_device>;
 const device_type PICO_CART_SLOT = &device_creator<pico_cart_slot_device>;
-const device_type MD_SUBCART_SLOT = &device_creator<md_subcart_slot_device>;
 
 
 //**************************************************************************
@@ -169,17 +168,13 @@ base_md_cart_slot_device::base_md_cart_slot_device(const machine_config &mconfig
 						device_t(mconfig, type, name, tag, owner, clock),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
-						m_type(SEGA_STD)
+						m_type(SEGA_STD),
+						m_must_be_loaded(1)
 {
 }
 
 md_cart_slot_device::md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 						base_md_cart_slot_device(mconfig, MD_CART_SLOT, "MD Cartridge Slot", tag, owner, clock)
-{
-}
-
-md_subcart_slot_device::md_subcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_md_cart_slot_device(mconfig, MD_SUBCART_SLOT, "MD Cartridge SubSlot", tag, owner, clock)
 {
 }
 

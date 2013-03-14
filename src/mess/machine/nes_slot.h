@@ -113,7 +113,6 @@ public:
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return m_must_be_loaded; }
-	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "nes_cart"; }
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
@@ -142,13 +141,15 @@ public:
 	int m_vrc_ls_chr;
 	int m_crc_hack;
 
-	virtual int get_chr_open_bus() { return m_chr_open_bus; };
-	virtual int get_ce_mask() { return m_ce_mask; };
-	virtual int get_ce_state() { return m_ce_state; };
-	virtual int get_vrc_ls_prg_a() { return m_vrc_ls_prg_a; };
-	virtual int get_vrc_ls_prg_b() { return m_vrc_ls_prg_b; };
-	virtual int get_vrc_ls_chr() { return m_vrc_ls_chr; };
-	virtual int get_crc_hack() { return m_crc_hack; };
+	int get_chr_open_bus() { return m_chr_open_bus; };
+	int get_ce_mask() { return m_ce_mask; };
+	int get_ce_state() { return m_ce_state; };
+	int get_vrc_ls_prg_a() { return m_vrc_ls_prg_a; };
+	int get_vrc_ls_prg_b() { return m_vrc_ls_prg_b; };
+	int get_vrc_ls_chr() { return m_vrc_ls_chr; };
+	int get_crc_hack() { return m_crc_hack; };
+
+	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 
 	//private:
 

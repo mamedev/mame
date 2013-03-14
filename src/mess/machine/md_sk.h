@@ -24,7 +24,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write);
 
 private:
-	required_device<md_subcart_slot_device> m_exp;
+	required_device<md_cart_slot_device> m_exp;
 };
 
 

@@ -155,7 +155,7 @@ public:
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 1; }
+	virtual bool must_be_loaded() const { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const { return 1; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
@@ -168,7 +168,8 @@ public:
 	
 	void setup_custom_mappers();
 	void setup_nvram();
-	
+	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
@@ -183,6 +184,7 @@ public:
 	
 	int m_type;
 	device_md_cart_interface*       m_cart;
+	bool                            m_must_be_loaded;
 };
 
 // ======================> md_cart_slot_device
@@ -195,20 +197,6 @@ public:
 	virtual const char *image_interface() const { return "megadriv_cart"; }
 	virtual const char *file_extensions() const { return "smd,bin,md,gen"; }
 };
-
-
-// ======================> md_subcart_slot_device
-
-class md_subcart_slot_device :  public base_md_cart_slot_device
-{
-public:
-	// construction/destruction
-	md_subcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual bool must_be_loaded() const { return 0; }
-	virtual const char *image_interface() const { return "megadriv_cart"; }
-	virtual const char *file_extensions() const { return "smd,bin,md,gen"; }
-};
-
 
 // ======================> pico_cart_slot_device
 
@@ -224,7 +212,6 @@ public:
 
 // device type definition
 extern const device_type MD_CART_SLOT;
-extern const device_type MD_SUBCART_SLOT;   // needed to allow S&K pass-through to have non-mandatory cart
 extern const device_type PICO_CART_SLOT;
 
 
@@ -236,13 +223,12 @@ extern const device_type PICO_CART_SLOT;
 	MCFG_DEVICE_ADD(_tag, MD_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
-#define MCFG_MDSUB_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
-	MCFG_DEVICE_ADD(_tag, MD_SUBCART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
-
 #define MCFG_PICO_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
 	MCFG_DEVICE_ADD(_tag, PICO_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+
+#define MCFG_MD_CARTRIDGE_NOT_MANDATORY                                     \
+	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
 
 
 #endif
