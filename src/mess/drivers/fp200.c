@@ -1,6 +1,10 @@
 /***************************************************************************
 
-Casio FP-200 driver
+	Casio FP-200 driver
+
+
+	TODO:
+	- What's the LCDC type? Custom?
 
 ***************************************************************************/
 
@@ -21,12 +25,26 @@ public:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	UINT8 m_io_type;
+	UINT8 *m_chargen;
+
+	struct{
+		UINT8 x;
+		UINT8 y;
+		UINT8 status;
+		UINT8 *vram;
+		UINT8 *attr;
+	}m_lcd;
+	void write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data);
+	void write_lcd_vram(UINT16 X, UINT16 Y,UINT8 data);
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(fp200_io_r);
 	DECLARE_WRITE8_MEMBER(fp200_io_w);
+	DECLARE_READ8_MEMBER(fp200_lcd_r);
+	DECLARE_WRITE8_MEMBER(fp200_lcd_w);
+
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
@@ -41,15 +59,126 @@ protected:
 
 void fp200_state::video_start()
 {
+	m_lcd.vram = auto_alloc_array_clear(machine(), UINT8, 20*64);
+	m_lcd.attr = auto_alloc_array_clear(machine(), UINT8, 20*64);
 }
 
 UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		{
+			if(m_lcd.attr[x/8+y*20] == 0x60)
+			{
+				UINT8 vram,pix;
+
+				vram = m_lcd.vram[x/8+y*20];
+				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(y & 7))) & 1;
+				bitmap.pix16(y,x) = pix;
+			}
+		}
+	}
+
 	return 0;
 }
 
+
 /*
-i/o map:
+[8]	SSSS --YY Status code (?) / upper part of Y address
+[9] YYYY XXXX lower part of Y address / X address
+*/
+READ8_MEMBER(fp200_state::fp200_lcd_r)
+{
+	UINT8 res;
+
+	res = 0;
+
+	switch(offset)
+	{
+		case 1:
+			printf("%d %d -> (L)\n",m_lcd.x,m_lcd.y);
+			break;
+		case 2:
+			printf("%d %d -> (R)\n",m_lcd.x,m_lcd.y);
+			break;
+		case 8:
+			res =  (m_lcd.status & 0xf) << 4;
+			res |= (m_lcd.y & 0x30) >> 4;
+			break;
+		case 9:
+			res =  (m_lcd.y & 0xf) << 4;
+			res |= (m_lcd.x & 0xf);
+			break;
+	}
+
+
+	return res;
+}
+
+void fp200_state::write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data)
+{
+	UINT16 base_offs;
+
+	for(int yi=0;yi<8;yi++)
+	{
+		base_offs = X+(Y+yi)*20;
+
+		if(base_offs >= 20*64)
+			return;
+
+		m_lcd.attr[base_offs] = data;
+	}
+}
+
+void fp200_state::write_lcd_vram(UINT16 X, UINT16 Y,UINT8 data)
+{
+	UINT16 base_offs;
+
+	for(int yi=0;yi<8;yi++)
+	{
+		base_offs = X+(Y+yi)*20;
+
+		if(base_offs >= 20*64)
+			return;
+
+		m_lcd.vram[base_offs] = data;
+	}
+}
+
+WRITE8_MEMBER(fp200_state::fp200_lcd_w)
+{
+	switch(offset)
+	{
+		case 1:
+			printf("%d %d -> %02x (%c) (L %02x)\n",m_lcd.x,m_lcd.y,data,data,m_lcd.status);
+			if(m_lcd.status == 0xb)
+				write_lcd_attr(m_lcd.x,m_lcd.y,data);
+			else if(m_lcd.status == 1)
+				write_lcd_vram(m_lcd.x,m_lcd.y,data);
+			break;
+		case 2:
+			printf("%d %d -> %02x (%c) (R %02x)\n",m_lcd.x + 10,m_lcd.y,data,data,m_lcd.status);
+			if(m_lcd.status == 0xb)
+				write_lcd_attr(m_lcd.x + 10,m_lcd.y,data);
+			else if(m_lcd.status == 1)
+				write_lcd_vram(m_lcd.x + 10,m_lcd.y,data);
+			break;
+		case 8:
+			m_lcd.status = (data & 0xf0) >> 4;
+			if(m_lcd.status == 0x0b)
+				m_lcd.y = (m_lcd.y & 0xf) | ((data & 3) << 4);
+			break;
+		case 9:
+			m_lcd.y = (m_lcd.y & 0x30) | ((data & 0xf0) >> 4);
+			m_lcd.x = data & 0xf;
+			break;
+	}
+}
+
+
+/*
+Annoyingly the i/o map uses the SOD to access different devices, so we need trampolines.
 SOD = 0
 0x10 - 0x1f Timer control (RPC05 RTC)
 0x20 - 0x2f AUTO-POWER OFF
@@ -62,19 +191,23 @@ SOD = 1
 0x40 - 0x4f MT.RS-232C control
 0x80 - 0x8f Printer (Centronics)
 */
-
 READ8_MEMBER(fp200_state::fp200_io_r)
 {
 	UINT8 res;
-	logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type);
 
 	if(m_io_type == 0)
 	{
 		res = 0;
+		logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type);
 	}
 	else
 	{
-		res = 0;
+		switch(offset & 0xf0)
+		{
+			//case 0x00: return;
+			case 0x00: res = fp200_lcd_r(space, offset & 0xf); break;
+			default: res = 0; logerror("Unemulated I/O read %02x (%02x)\n",offset,m_io_type); break;
+		}
 	}
 
 	return res;
@@ -82,14 +215,20 @@ READ8_MEMBER(fp200_state::fp200_io_r)
 
 WRITE8_MEMBER(fp200_state::fp200_io_w)
 {
-	logerror("Unemulated I/O write %02x (%02x) -> %02x\n",offset,m_io_type,data);
 	if(m_io_type == 0)
 	{
-		// ....
+		switch(offset & 0xf0)
+		{
+			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
+		}
 	}
 	else
 	{
-		// ...
+		switch(offset & 0xf0)
+		{
+			case 0x00: fp200_lcd_w(space, offset & 0xf,data); break;
+			default:logerror("Unemulated I/O write %02x (%02x) <- %02x\n",offset,m_io_type,data); break;
+		}
 	}
 }
 
@@ -171,12 +310,19 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( fp200 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 
 void fp200_state::machine_start()
 {
+	UINT8 *raw_gfx = machine().root_device().memregion("raw_gfx")->base();
+	m_chargen = memregion("chargen")->base();
+
+	for(int i=0;i<0x800;i++)
+	{
+		m_chargen[i] = raw_gfx[BITSWAP16(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
+	}
 }
 
 void fp200_state::machine_reset()
@@ -186,6 +332,8 @@ void fp200_state::machine_reset()
 
 void fp200_state::palette_init()
 {
+	palette_set_color_rgb(machine(), 0, 0xa0, 0xa8, 0xa0);
+	palette_set_color_rgb(machine(), 1, 0x30, 0x38, 0x10);
 }
 
 WRITE_LINE_MEMBER( fp200_state::sod_w )
@@ -225,7 +373,7 @@ static MACHINE_CONFIG_START( fp200, fp200_state )
 
 	MCFG_GFXDECODE(fp200)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -244,8 +392,10 @@ ROM_START( fp200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "fp200rom.bin", 0x0000, 0x8000, CRC(dba6e41b) SHA1(c694fa19172eb56585a9503997655bcf9d369c34) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800, "raw_gfx", ROMREGION_ERASE00 )
 	ROM_LOAD( "chr.bin", 0x0000, 0x800, CRC(2e6501a5) SHA1(6186e25feabe6db851ee7d61dad11e182a6d3a4a) )
+
+	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 
 GAME( 1982, fp200,  0,   fp200,  fp200, driver_device,  0,       ROT0, "Casio",      "FP-200", GAME_IS_SKELETON )

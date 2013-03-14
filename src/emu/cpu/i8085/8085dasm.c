@@ -47,7 +47,7 @@
 /* 8080/8085A mnemonics were more irritation than information
    What would you guess "CP $3456" to mean? It's not compare,
    but call if plus ... therefore: */
-//#define Z80_MNEMONICS
+#define Z80_MNEMONICS
 
 #define OP(A)   oprom[(A) - PC]
 #define ARG(A)  opram[(A) - PC]
