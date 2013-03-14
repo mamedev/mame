@@ -550,7 +550,7 @@ void gb_state::sgb_refresh_border()
 				pal = 1;
 			pal <<= 4;
 
-			if( m_sgb_hack )
+			if (m_cartslot && m_cartslot->get_sgb_hack())
 			{ /* A few games do weird stuff */
 				UINT8 tileno = map[xidx];
 				if( tileno >= 128 ) tileno = ((64 + tileno) % 128) + 128;
