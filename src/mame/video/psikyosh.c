@@ -333,8 +333,11 @@ void psikyosh_state::cache_bitmap(int scanline, gfx_element *gfx, int size, int 
 	if(tilebank != last_bank[sy])
 	{
 		rectangle cliprect;
+		int minsy = sy * 16;
+		int maxsy = minsy + 16 - 1;
 
-		cliprect.set(0, m_bg_bitmap.width() - 1, sy * 16, cliprect.min_y + 16 - 1);
+		cliprect.set(0, m_bg_bitmap.width() - 1, minsy, maxsy );
+		cliprect &= m_bg_bitmap.cliprect();
 
 		m_bg_bitmap.fill(BG_TRANSPEN, cliprect);
 		int width = size * 16;
