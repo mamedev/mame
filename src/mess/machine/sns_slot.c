@@ -832,13 +832,16 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 
 	if (fullpath)
 	{
+		UINT32 offset = 0;
 		UINT32 len = core_fsize(m_file);
 		UINT8 *ROM = global_alloc_array(UINT8, len);
 		int type;
 
 		core_fread(m_file, ROM, len);
 
-		type = get_cart_type(ROM, len);
+		offset = snes_skip_header(ROM, len);
+		
+		type = get_cart_type(ROM + offset, len - offset);
 		slot_string = sns_get_slot(type);
 
 		global_free(ROM);
