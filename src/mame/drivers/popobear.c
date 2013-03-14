@@ -173,28 +173,32 @@ TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg0_tile_info)
 {
 	int base = tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	int flipyx = (tileno>>14);
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg1_tile_info)
 {
 	int base = tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	int flipyx = (tileno>>14);
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg2_tile_info)
 {
 	int base = tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	int flipyx = (tileno>>14);
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 TILE_GET_INFO_MEMBER(popobear_state::get_popobear_bg3_tile_info)
 {
 	int base = tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	int flipyx = (tileno>>14);
+	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
 
@@ -280,6 +284,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			if(param == 0)
 				continue;
 
+
 			spr_num <<= 3;
 
 			for(int yi=0;yi<height;yi++)
@@ -294,11 +299,12 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 					if(cliprect.contains(x_draw, y_draw))
 					{
 						// this is a bit strange, pix data is basically 8-bit
-						// but we have to treat 0x00, 0x20, 0x40, 0x60, 0x80, 0xa0, 0xc0 and 0xe0 as transpens?
-						// see scores when you colect an item
+						// but we have to treat 0x00, 0x40, 0x80, 0xc0 */
+						// see scores when you colect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
 						// granularity also means colour bank is applied *0x40
 						// and we have 2 more possible colour bank bits
-						if (pix&0x1f)
+						// colours on game over screen are still wrong
+						if (pix&0x3f)
 						{
 							bitmap.pix16(y_draw, x_draw) = machine().pens[((pix+(color_bank*0x40))&0xff)+0x100];
 						}
