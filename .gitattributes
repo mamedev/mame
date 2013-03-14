@@ -6010,6 +6010,7 @@ src/mess/drivers/fk1.c svneol=native#text/plain
 src/mess/drivers/fm7.c svneol=native#text/plain
 src/mess/drivers/fmtowns.c svneol=native#text/plain
 src/mess/drivers/fp1100.c svneol=native#text/plain
+src/mess/drivers/fp200.c svneol=native#text/plain
 src/mess/drivers/fp6000.c svneol=native#text/plain
 src/mess/drivers/galaxy.c svneol=native#text/plain
 src/mess/drivers/galeb.c svneol=native#text/plain

@@ -796,6 +796,7 @@ $(MESSOBJ)/cantab.a:            \
 $(MESSOBJ)/casio.a:             \
 	$(MESS_DRIVERS)/casloopy.o  \
 	$(MESS_DRIVERS)/cfx9850.o   \
+	$(MESS_DRIVERS)/fp200.o     \
 	$(MESS_DRIVERS)/fp1100.o    \
 	$(MESS_DRIVERS)/pv1000.o    \
 	$(MESS_DRIVERS)/pv2000.o    \
