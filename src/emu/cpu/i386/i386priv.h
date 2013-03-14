@@ -375,6 +375,7 @@ INLINE i386_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I386 ||
+			device->type() == I386SX ||
 			device->type() == I486 ||
 			device->type() == PENTIUM ||
 			device->type() == MEDIAGX ||
