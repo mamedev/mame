@@ -1321,6 +1321,10 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	romdata->errorstring.reset();
 	romdata->softwarningstring.reset();
 
+	romdata->romstotal = 0;
+	romdata->romstotalsize = 0;
+	romdata->romsloadedsize = 0;
+	
 	if (software_get_support(device->machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
 	{
 		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
