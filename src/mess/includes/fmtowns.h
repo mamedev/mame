@@ -78,7 +78,8 @@ class towns_state : public driver_device
 	public:
 	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_nvram(*this, "nvram")
+			m_nvram(*this, "nvram"),
+			m_nvram16(*this, "nvram16")
 	{ }
 
 	/* devices */
@@ -159,7 +160,8 @@ class towns_state : public driver_device
 	UINT8 m_prev_x;
 	UINT8 m_prev_y;
 
-	required_shared_ptr<UINT32> m_nvram;
+	optional_shared_ptr<UINT32> m_nvram;
+	optional_shared_ptr<UINT16> m_nvram16;
 
 	virtual void driver_start();
 	virtual void machine_reset();
@@ -183,12 +185,12 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_keyboard_w);
 	DECLARE_READ8_MEMBER(towns_port60_r);
 	DECLARE_WRITE8_MEMBER(towns_port60_w);
-	DECLARE_READ32_MEMBER(towns_sys5e8_r);
-	DECLARE_WRITE32_MEMBER(towns_sys5e8_w);
+	DECLARE_READ8_MEMBER(towns_sys5e8_r);
+	DECLARE_WRITE8_MEMBER(towns_sys5e8_w);
 	DECLARE_READ8_MEMBER(towns_sound_ctrl_r);
 	DECLARE_WRITE8_MEMBER(towns_sound_ctrl_w);
-	DECLARE_READ32_MEMBER(towns_padport_r);
-	DECLARE_WRITE32_MEMBER(towns_pad_mask_w);
+	DECLARE_READ8_MEMBER(towns_padport_r);
+	DECLARE_WRITE8_MEMBER(towns_pad_mask_w);
 	DECLARE_READ8_MEMBER(towns_cmos8_r);
 	DECLARE_WRITE8_MEMBER(towns_cmos8_w);
 	DECLARE_READ8_MEMBER(towns_cmos_low_r);
@@ -197,13 +199,13 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_cmos_w);
 	DECLARE_READ8_MEMBER(towns_sys480_r);
 	DECLARE_WRITE8_MEMBER(towns_sys480_w);
-	DECLARE_READ32_MEMBER(towns_video_404_r);
-	DECLARE_WRITE32_MEMBER(towns_video_404_w);
+	DECLARE_READ8_MEMBER(towns_video_404_r);
+	DECLARE_WRITE8_MEMBER(towns_video_404_w);
 	DECLARE_READ8_MEMBER(towns_cdrom_r);
 	DECLARE_WRITE8_MEMBER(towns_cdrom_w);
-	DECLARE_READ32_MEMBER(towns_rtc_r);
-	DECLARE_WRITE32_MEMBER(towns_rtc_w);
-	DECLARE_WRITE32_MEMBER(towns_rtc_select_w);
+	DECLARE_READ8_MEMBER(towns_rtc_r);
+	DECLARE_WRITE8_MEMBER(towns_rtc_w);
+	DECLARE_WRITE8_MEMBER(towns_rtc_select_w);
 	DECLARE_READ8_MEMBER(towns_volume_r);
 	DECLARE_WRITE8_MEMBER(towns_volume_w);
 	DECLARE_READ8_MEMBER(towns_41ff_r);
@@ -223,7 +225,7 @@ class towns_state : public driver_device
 	DECLARE_READ8_MEMBER(towns_video_fd90_r);
 	DECLARE_WRITE8_MEMBER(towns_video_fd90_w);
 	DECLARE_READ8_MEMBER(towns_video_ff81_r);
-	DECLARE_READ32_MEMBER(towns_video_unknown_r);
+	DECLARE_READ8_MEMBER(towns_video_unknown_r);
 	DECLARE_WRITE8_MEMBER(towns_video_ff81_w);
 	DECLARE_READ8_MEMBER(towns_spriteram_low_r);
 	DECLARE_WRITE8_MEMBER(towns_spriteram_low_w);
@@ -276,6 +278,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	IRQ_CALLBACK_MEMBER(towns_irq_callback);
+};
+
+class towns16_state : public towns_state
+{
+	public:
+	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: towns_state(mconfig, type, tag)
+	{ }
 };
 
 class marty_state : public towns_state

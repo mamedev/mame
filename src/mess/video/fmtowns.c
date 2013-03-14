@@ -574,9 +574,9 @@ WRITE8_MEMBER(towns_state::towns_video_ff81_w)
 	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",m_video.towns_vram_wplane);
 }
 
-READ32_MEMBER(towns_state::towns_video_unknown_r)
+READ8_MEMBER(towns_state::towns_video_unknown_r)
 {
-	return 0x00000000;
+	return 0x00;
 }
 
 /*

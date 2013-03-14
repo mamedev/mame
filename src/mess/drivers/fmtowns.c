@@ -810,44 +810,30 @@ WRITE8_MEMBER(towns_state::towns_port60_w)
 	//logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
-READ32_MEMBER(towns_state::towns_sys5e8_r)
+READ8_MEMBER(towns_state::towns_sys5e8_r)
 {
 	switch(offset)
 	{
 		case 0x00:
-			if(ACCESSING_BITS_0_7)
-			{
-				logerror("SYS: read RAM size port (%i)\n",m_ram->size());
-				return m_ram->size()/1048576;
-			}
-			break;
-		case 0x01:
-			if(ACCESSING_BITS_0_7)
-			{
-				logerror("SYS: read port 5ec\n");
-				return m_compat_mode & 0x01;
-			}
-			break;
+			logerror("SYS: read RAM size port (%i)\n",m_ram->size());
+			return m_ram->size()/1048576;
+		case 0x02:
+			logerror("SYS: read port 5ec\n");
+			return m_compat_mode & 0x01;
 	}
 	return 0x00;
 }
 
-WRITE32_MEMBER(towns_state::towns_sys5e8_w)
+WRITE8_MEMBER(towns_state::towns_sys5e8_w)
 {
 	switch(offset)
 	{
 		case 0x00:
-			if(ACCESSING_BITS_0_7)
-			{
-				logerror("SYS: wrote 0x%02x to port 5e8\n",data);
-			}
+			logerror("SYS: wrote 0x%02x to port 5e8\n",data);
 			break;
-		case 0x01:
-			if(ACCESSING_BITS_0_7)
-			{
-				logerror("SYS: wrote 0x%02x to port 5ec\n",data);
-				m_compat_mode = data & 0x01;
-			}
+		case 0x02:
+			logerror("SYS: wrote 0x%02x to port 5ec\n",data);
+			m_compat_mode = data & 0x01;
 			break;
 	}
 }
@@ -904,268 +890,268 @@ void towns_state::mouse_timeout()
 	m_towns_mouse_output = MOUSE_START;  // reset mouse data
 }
 
-READ32_MEMBER(towns_state::towns_padport_r)
+READ8_MEMBER(towns_state::towns_padport_r)
 {
-	UINT32 ret = 0;
+	UINT8 ret = 0x00;
 	UINT32 porttype = space.machine().root_device().ioport("ctrltype")->read();
 	UINT8 extra1;
 	UINT8 extra2;
 	UINT32 state;
 
-	if((porttype & 0x0f) == 0x00)
-		ret |= 0x000000ff;
-	if((porttype & 0xf0) == 0x00)
-		ret |= 0x00ff0000;
-	if((porttype & 0x0f) == 0x01)
+	if(offset == 0)
 	{
-		extra1 = space.machine().root_device().ioport("joy1_ex")->read();
-
-		if(m_towns_pad_mask & 0x10)
-			ret |= (space.machine().root_device().ioport("joy1")->read() & 0x3f) | 0x00000040;
-		else
-			ret |= (space.machine().root_device().ioport("joy1")->read() & 0x0f) | 0x00000030;
-
-		if(extra1 & 0x01) // Run button = left+right
-			ret &= ~0x0000000c;
-		if(extra1 & 0x02) // Select button = up+down
-			ret &= ~0x00000003;
-
-		if((extra1 & 0x10) && (m_towns_pad_mask & 0x01))
-			ret &= ~0x00000010;
-		if((extra1 & 0x20) && (m_towns_pad_mask & 0x02))
-			ret &= ~0x00000020;
-	}
-	if((porttype & 0xf0) == 0x10)
-	{
-		extra2 = space.machine().root_device().ioport("joy2_ex")->read();
-
-		if(m_towns_pad_mask & 0x20)
-			ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x3f) << 16) | 0x00400000;
-		else
-			ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x0f) << 16) | 0x00300000;
-
-		if(extra2 & 0x01)
-			ret &= ~0x000c0000;
-		if(extra2 & 0x02)
-			ret &= ~0x00030000;
-
-		if((extra2 & 0x10) && (m_towns_pad_mask & 0x04))
-			ret &= ~0x00100000;
-		if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
-			ret &= ~0x00200000;
-	}
-	if((porttype & 0x0f) == 0x04)  // 6-button joystick
-	{
-		extra1 = space.machine().root_device().ioport("6b_joy1_ex")->read();
-
-		if(m_towns_pad_mask & 0x10)
-			ret |= 0x0000007f;
-		else
-			ret |= (space.machine().root_device().ioport("6b_joy1")->read() & 0x0f) | 0x00000070;
-
-		if(!(m_towns_pad_mask & 0x10))
+		if((porttype & 0x0f) == 0x01)
 		{
+			extra1 = space.machine().root_device().ioport("joy1_ex")->read();
+
+			if(m_towns_pad_mask & 0x10)
+				ret |= (space.machine().root_device().ioport("joy1")->read() & 0x3f) | 0x40;
+			else
+				ret |= (space.machine().root_device().ioport("joy1")->read() & 0x0f) | 0x30;
+
 			if(extra1 & 0x01) // Run button = left+right
-				ret &= ~0x0000000c;
+				ret &= ~0x0c;
 			if(extra1 & 0x02) // Select button = up+down
-				ret &= ~0x00000003;
-			if((extra1 & 0x04) && (m_towns_pad_mask & 0x01))
-				ret &= ~0x00000010;
-			if((extra1 & 0x08) && (m_towns_pad_mask & 0x02))
-				ret &= ~0x00000020;
+				ret &= ~0x03;
+
+			if((extra1 & 0x10) && (m_towns_pad_mask & 0x01))
+				ret &= ~0x10;
+			if((extra1 & 0x20) && (m_towns_pad_mask & 0x02))
+				ret &= ~0x20;
 		}
-		if(m_towns_pad_mask & 0x10)
+		if((porttype & 0x0f) == 0x04)  // 6-button joystick
 		{
-			if(extra1 & 0x10)
-				ret &= ~0x00000008;
-			if(extra1 & 0x20)
-				ret &= ~0x00000004;
-			if(extra1 & 0x40)
-				ret &= ~0x00000002;
-			if(extra1 & 0x80)
-				ret &= ~0x00000001;
+			extra1 = space.machine().root_device().ioport("6b_joy1_ex")->read();
+
+			if(m_towns_pad_mask & 0x10)
+				ret |= 0x7f;
+			else
+				ret |= (space.machine().root_device().ioport("6b_joy1")->read() & 0x0f) | 0x70;
+
+			if(!(m_towns_pad_mask & 0x10))
+			{
+				if(extra1 & 0x01) // Run button = left+right
+					ret &= ~0x0c;
+				if(extra1 & 0x02) // Select button = up+down
+					ret &= ~0x03;
+				if((extra1 & 0x04) && (m_towns_pad_mask & 0x01))
+					ret &= ~0x10;
+				if((extra1 & 0x08) && (m_towns_pad_mask & 0x02))
+					ret &= ~0x20;
+			}
+			if(m_towns_pad_mask & 0x10)
+			{
+				if(extra1 & 0x10)
+					ret &= ~0x08;
+				if(extra1 & 0x20)
+					ret &= ~0x04;
+				if(extra1 & 0x40)
+					ret &= ~0x02;
+				if(extra1 & 0x80)
+					ret &= ~0x01;
+			}
 		}
+		if((porttype & 0x0f) == 0x02)  // mouse
+		{
+			switch(m_towns_mouse_output)
+			{
+				case MOUSE_X_HIGH:
+					ret |= ((m_towns_mouse_x & 0xf0) >> 4);
+					break;
+				case MOUSE_X_LOW:
+					ret |= (m_towns_mouse_x & 0x0f);
+					break;
+				case MOUSE_Y_HIGH:
+					ret |= ((m_towns_mouse_y & 0xf0) >> 4);
+					break;
+				case MOUSE_Y_LOW:
+					ret |= (m_towns_mouse_y & 0x0f);
+					break;
+				case MOUSE_START:
+				case MOUSE_SYNC:
+				default:
+					if(m_towns_mouse_output < MOUSE_Y_LOW)
+						ret |= 0x0f;
+			}
+
+			// button states are always visible
+			state = space.machine().root_device().ioport("mouse1")->read();
+			if(!(state & 0x01))
+				ret |= 0x10;
+			if(!(state & 0x02))
+				ret |= 0x20;
+			if(m_towns_pad_mask & 0x10)
+				ret |= 0x40;
+		}
+
 	}
-	if((porttype & 0xf0) == 0x40)  // 6-button joystick
+	if(offset == 1)  // second joystick port
 	{
-		extra2 = space.machine().root_device().ioport("6b_joy2_ex")->read();
-
-		if(m_towns_pad_mask & 0x20)
-			ret |= 0x007f0000;
-		else
-			ret |= ((space.machine().root_device().ioport("6b_joy2")->read() & 0x0f) << 16) | 0x00700000;
-
-		if(!(m_towns_pad_mask & 0x10))
+		if((porttype & 0xf0) == 0x10)
 		{
+			extra2 = space.machine().root_device().ioport("joy2_ex")->read();
+
+			if(m_towns_pad_mask & 0x20)
+				ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x3f)) | 0x40;
+			else
+				ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x0f)) | 0x30;
+
 			if(extra2 & 0x01)
-				ret &= ~0x000c0000;
+				ret &= ~0x0c;
 			if(extra2 & 0x02)
-				ret &= ~0x00030000;
+				ret &= ~0x03;
+
 			if((extra2 & 0x10) && (m_towns_pad_mask & 0x04))
-				ret &= ~0x00100000;
+				ret &= ~0x10;
 			if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
-				ret &= ~0x00200000;
+				ret &= ~0x20;
 		}
-		if(m_towns_pad_mask & 0x20)
+		if((porttype & 0xf0) == 0x40)  // 6-button joystick
 		{
-			if(extra2 & 0x10)
-				ret &= ~0x00080000;
-			if(extra2 & 0x20)
-				ret &= ~0x00040000;
-			if(extra2 & 0x40)
-				ret &= ~0x00020000;
-			if(extra2 & 0x80)
-				ret &= ~0x00010000;
-		}
-	}
-	if((porttype & 0x0f) == 0x02)  // mouse
-	{
-		switch(m_towns_mouse_output)
-		{
-			case MOUSE_X_HIGH:
-				ret |= ((m_towns_mouse_x & 0xf0) >> 4);
-				break;
-			case MOUSE_X_LOW:
-				ret |= (m_towns_mouse_x & 0x0f);
-				break;
-			case MOUSE_Y_HIGH:
-				ret |= ((m_towns_mouse_y & 0xf0) >> 4);
-				break;
-			case MOUSE_Y_LOW:
-				ret |= (m_towns_mouse_y & 0x0f);
-				break;
-			case MOUSE_START:
-			case MOUSE_SYNC:
-			default:
-				if(m_towns_mouse_output < MOUSE_Y_LOW)
-					ret |= 0x0000000f;
-		}
+			extra2 = space.machine().root_device().ioport("6b_joy2_ex")->read();
 
-		// button states are always visible
-		state = space.machine().root_device().ioport("mouse1")->read();
-		if(!(state & 0x01))
-			ret |= 0x00000010;
-		if(!(state & 0x02))
-			ret |= 0x00000020;
-		if(m_towns_pad_mask & 0x10)
-			ret |= 0x00000040;
-	}
-	if((porttype & 0xf0) == 0x20)  // mouse
-	{
-		switch(m_towns_mouse_output)
-		{
-			case MOUSE_X_HIGH:
-				ret |= ((m_towns_mouse_x & 0xf0) << 12);
-				break;
-			case MOUSE_X_LOW:
-				ret |= ((m_towns_mouse_x & 0x0f) << 16);
-				break;
-			case MOUSE_Y_HIGH:
-				ret |= ((m_towns_mouse_y & 0xf0) << 12);
-				break;
-			case MOUSE_Y_LOW:
-				ret |= ((m_towns_mouse_y & 0x0f) << 16);
-				break;
-			case MOUSE_START:
-			case MOUSE_SYNC:
-			default:
-				if(m_towns_mouse_output < MOUSE_Y_LOW)
-					ret |= 0x000f0000;
-		}
+			if(m_towns_pad_mask & 0x20)
+				ret |= 0x7f;
+			else
+				ret |= ((space.machine().root_device().ioport("6b_joy2")->read() & 0x0f)) | 0x70;
 
-		// button states are always visible
-		state = space.machine().root_device().ioport("mouse1")->read();
-		if(!(state & 0x01))
-			ret |= 0x00100000;
-		if(!(state & 0x02))
-			ret |= 0x00200000;
-		if(m_towns_pad_mask & 0x20)
-			ret |= 0x00400000;
+			if(!(m_towns_pad_mask & 0x10))
+			{
+				if(extra2 & 0x01)
+					ret &= ~0x0c;
+				if(extra2 & 0x02)
+					ret &= ~0x03;
+				if((extra2 & 0x10) && (m_towns_pad_mask & 0x04))
+					ret &= ~0x10;
+				if((extra2 & 0x20) && (m_towns_pad_mask & 0x08))
+					ret &= ~0x20;
+			}
+			if(m_towns_pad_mask & 0x20)
+			{
+				if(extra2 & 0x10)
+					ret &= ~0x08;
+				if(extra2 & 0x20)
+					ret &= ~0x04;
+				if(extra2 & 0x40)
+					ret &= ~0x02;
+				if(extra2 & 0x80)
+					ret &= ~0x01;
+			}
+		}
+		if((porttype & 0xf0) == 0x20)  // mouse
+		{
+			switch(m_towns_mouse_output)
+			{
+				case MOUSE_X_HIGH:
+					ret |= ((m_towns_mouse_x & 0xf0));
+					break;
+				case MOUSE_X_LOW:
+					ret |= ((m_towns_mouse_x & 0x0f));
+					break;
+				case MOUSE_Y_HIGH:
+					ret |= ((m_towns_mouse_y & 0xf0));
+					break;
+				case MOUSE_Y_LOW:
+					ret |= ((m_towns_mouse_y & 0x0f));
+					break;
+				case MOUSE_START:
+				case MOUSE_SYNC:
+				default:
+					if(m_towns_mouse_output < MOUSE_Y_LOW)
+						ret |= 0x0f;
+			}
+
+			// button states are always visible
+			state = space.machine().root_device().ioport("mouse1")->read();
+			if(!(state & 0x01))
+				ret |= 0x10;
+			if(!(state & 0x02))
+				ret |= 0x20;
+			if(m_towns_pad_mask & 0x20)
+				ret |= 0x40;
+		}
 	}
 
 	return ret;
 }
 
-WRITE32_MEMBER(towns_state::towns_pad_mask_w)
+WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 {
 	UINT8 current_x,current_y;
 	UINT32 type = space.machine().root_device().ioport("ctrltype")->read();
 
-	if(ACCESSING_BITS_16_23)
+	m_towns_pad_mask = (data & 0xff);
+	if((type & 0x0f) == 0x02)  // mouse
 	{
-		m_towns_pad_mask = (data & 0x00ff0000) >> 16;
-		if((type & 0x0f) == 0x02)  // mouse
+		if((m_towns_pad_mask & 0x10) != 0 && (m_prev_pad_mask & 0x10) == 0)
 		{
-			if((m_towns_pad_mask & 0x10) != 0 && (m_prev_pad_mask & 0x10) == 0)
+			if(m_towns_mouse_output == MOUSE_START)
 			{
-				if(m_towns_mouse_output == MOUSE_START)
-				{
-					m_towns_mouse_output = MOUSE_X_HIGH;
-					current_x = space.machine().root_device().ioport("mouse2")->read();
-					current_y = space.machine().root_device().ioport("mouse3")->read();
-					m_towns_mouse_x = m_prev_x - current_x;
-					m_towns_mouse_y = m_prev_y - current_y;
-					m_prev_x = current_x;
-					m_prev_y = current_y;
-				}
-				else
-					m_towns_mouse_output++;
-				m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+				m_towns_mouse_output = MOUSE_X_HIGH;
+				current_x = space.machine().root_device().ioport("mouse2")->read();
+				current_y = space.machine().root_device().ioport("mouse3")->read();
+				m_towns_mouse_x = m_prev_x - current_x;
+				m_towns_mouse_y = m_prev_y - current_y;
+				m_prev_x = current_x;
+				m_prev_y = current_y;
 			}
-			if((m_towns_pad_mask & 0x10) == 0 && (m_prev_pad_mask & 0x10) != 0)
-			{
-				if(m_towns_mouse_output == MOUSE_START)
-				{
-					m_towns_mouse_output = MOUSE_SYNC;
-					current_x = space.machine().root_device().ioport("mouse2")->read();
-					current_y = space.machine().root_device().ioport("mouse3")->read();
-					m_towns_mouse_x = m_prev_x - current_x;
-					m_towns_mouse_y = m_prev_y - current_y;
-					m_prev_x = current_x;
-					m_prev_y = current_y;
-				}
-				else
-					m_towns_mouse_output++;
-				m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
-			}
-			m_prev_pad_mask = m_towns_pad_mask;
+			else
+				m_towns_mouse_output++;
+			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 		}
-		if((type & 0xf0) == 0x20)  // mouse
+		if((m_towns_pad_mask & 0x10) == 0 && (m_prev_pad_mask & 0x10) != 0)
 		{
-			if((m_towns_pad_mask & 0x20) != 0 && (m_prev_pad_mask & 0x20) == 0)
+			if(m_towns_mouse_output == MOUSE_START)
 			{
-				if(m_towns_mouse_output == MOUSE_START)
-				{
-					m_towns_mouse_output = MOUSE_X_HIGH;
-					current_x = space.machine().root_device().ioport("mouse2")->read();
-					current_y = space.machine().root_device().ioport("mouse3")->read();
-					m_towns_mouse_x = m_prev_x - current_x;
-					m_towns_mouse_y = m_prev_y - current_y;
-					m_prev_x = current_x;
-					m_prev_y = current_y;
-				}
-				else
-					m_towns_mouse_output++;
-				m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+				m_towns_mouse_output = MOUSE_SYNC;
+				current_x = space.machine().root_device().ioport("mouse2")->read();
+				current_y = space.machine().root_device().ioport("mouse3")->read();
+				m_towns_mouse_x = m_prev_x - current_x;
+				m_towns_mouse_y = m_prev_y - current_y;
+				m_prev_x = current_x;
+				m_prev_y = current_y;
 			}
-			if((m_towns_pad_mask & 0x20) == 0 && (m_prev_pad_mask & 0x20) != 0)
-			{
-				if(m_towns_mouse_output == MOUSE_START)
-				{
-					m_towns_mouse_output = MOUSE_SYNC;
-					current_x = space.machine().root_device().ioport("mouse2")->read();
-					current_y = space.machine().root_device().ioport("mouse3")->read();
-					m_towns_mouse_x = m_prev_x - current_x;
-					m_towns_mouse_y = m_prev_y - current_y;
-					m_prev_x = current_x;
-					m_prev_y = current_y;
-				}
-				else
-					m_towns_mouse_output++;
-				m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
-			}
-			m_prev_pad_mask = m_towns_pad_mask;
+			else
+				m_towns_mouse_output++;
+			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
 		}
+		m_prev_pad_mask = m_towns_pad_mask;
+	}
+	if((type & 0xf0) == 0x20)  // mouse
+	{
+		if((m_towns_pad_mask & 0x20) != 0 && (m_prev_pad_mask & 0x20) == 0)
+		{
+			if(m_towns_mouse_output == MOUSE_START)
+			{
+				m_towns_mouse_output = MOUSE_X_HIGH;
+				current_x = space.machine().root_device().ioport("mouse2")->read();
+				current_y = space.machine().root_device().ioport("mouse3")->read();
+				m_towns_mouse_x = m_prev_x - current_x;
+				m_towns_mouse_y = m_prev_y - current_y;
+				m_prev_x = current_x;
+				m_prev_y = current_y;
+			}
+			else
+				m_towns_mouse_output++;
+			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+		}
+		if((m_towns_pad_mask & 0x20) == 0 && (m_prev_pad_mask & 0x20) != 0)
+		{
+			if(m_towns_mouse_output == MOUSE_START)
+			{
+				m_towns_mouse_output = MOUSE_SYNC;
+				current_x = space.machine().root_device().ioport("mouse2")->read();
+				current_y = space.machine().root_device().ioport("mouse3")->read();
+				m_towns_mouse_x = m_prev_x - current_x;
+				m_towns_mouse_y = m_prev_y - current_y;
+				m_prev_x = current_x;
+				m_prev_y = current_y;
+			}
+			else
+				m_towns_mouse_output++;
+			m_towns_mouse_timer->adjust(attotime::from_usec(600),0,attotime::zero);
+		}
+		m_prev_pad_mask = m_towns_pad_mask;
 	}
 }
 
@@ -1174,7 +1160,10 @@ READ8_MEMBER( towns_state::towns_cmos_low_r )
 	if(m_towns_mainmem_enable != 0)
 		return m_messram->pointer()[offset + 0xd8000];
 
-	return m_nvram[offset];
+	if(m_nvram)
+		return m_nvram[offset];
+	else
+		return m_nvram16[offset];
 }
 
 WRITE8_MEMBER( towns_state::towns_cmos_low_w )
@@ -1182,17 +1171,26 @@ WRITE8_MEMBER( towns_state::towns_cmos_low_w )
 	if(m_towns_mainmem_enable != 0)
 		m_messram->pointer()[offset+0xd8000] = data;
 	else
-		m_nvram[offset] = data;
+		if(m_nvram)
+			m_nvram[offset] = data;
+		else
+			m_nvram16[offset] = data;
 }
 
 READ8_MEMBER( towns_state::towns_cmos_r )
 {
-	return m_nvram[offset];
+	if(m_nvram)
+		return m_nvram[offset];
+	else
+		return m_nvram16[offset];
 }
 
 WRITE8_MEMBER( towns_state::towns_cmos_w )
 {
-	m_nvram[offset] = data;
+	if(m_nvram)
+		m_nvram[offset] = data;
+	else
+		m_nvram16[offset] = data;
 }
 
 void towns_state::towns_update_video_banks(address_space& space)
@@ -1261,23 +1259,18 @@ WRITE8_MEMBER( towns_state::towns_sys480_w )
 	towns_update_video_banks(space);
 }
 
-WRITE32_MEMBER( towns_state::towns_video_404_w )
+WRITE8_MEMBER( towns_state::towns_video_404_w )
 {
-	if(ACCESSING_BITS_0_7)
-	{
-		m_towns_mainmem_enable = data & 0x80;
-		towns_update_video_banks(space);
-	}
+	m_towns_mainmem_enable = data & 0x80;
+	towns_update_video_banks(space);
 }
 
-READ32_MEMBER( towns_state::towns_video_404_r )
+READ8_MEMBER( towns_state::towns_video_404_r )
 {
-	if(ACCESSING_BITS_0_7)
-	{
-		if(m_towns_mainmem_enable != 0)
-			return 0x00000080;
-	}
-	return 0;
+	if(m_towns_mainmem_enable != 0)
+		return 0x80;
+	else
+		return 0x00;
 }
 
 /*
@@ -1921,29 +1914,22 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
  * 0x70: Data port
  * 0x80: Register select
  */
-READ32_MEMBER(towns_state::towns_rtc_r)
+READ8_MEMBER(towns_state::towns_rtc_r)
 {
-	if(ACCESSING_BITS_0_7)
-		return 0x80 | m_towns_rtc_reg[m_towns_rtc_select];
-
-	return 0x00;
+	return 0x80 | m_towns_rtc_reg[m_towns_rtc_select];
 }
 
-WRITE32_MEMBER(towns_state::towns_rtc_w)
+WRITE8_MEMBER(towns_state::towns_rtc_w)
 {
-	if(ACCESSING_BITS_0_7)
-		m_towns_rtc_data = data;
+	m_towns_rtc_data = data;
 }
 
-WRITE32_MEMBER(towns_state::towns_rtc_select_w)
+WRITE8_MEMBER(towns_state::towns_rtc_select_w)
 {
-	if(ACCESSING_BITS_0_7)
+	if(data & 0x80)
 	{
-		if(data & 0x80)
-		{
-			if(data & 0x01)
-				m_towns_rtc_select = m_towns_rtc_data & 0x0f;
-		}
+		if(data & 0x01)
+			m_towns_rtc_select = m_towns_rtc_data & 0x0f;
 	}
 }
 
@@ -2186,56 +2172,53 @@ static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32, towns_state)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 32, towns_state)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // 386SX has only a 24-bit address range
+static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00000000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
-	AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffff)
+	AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffff)
 	AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
 	AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
-	AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
+	AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffff)
 	AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-	AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
+	AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffff) AM_SHARE("nvram16") // CMOS? RAM
 	AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
 	AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
 	AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
-	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
+	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffff) AM_MIRROR(0x180000) // VRAM
 	AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
+	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffff) // Sprite RAM
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card (is this usable on the Marty?)
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
+	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 32, towns_state)
-	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // 386SX has only a 24-bit address range
+static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00000000, 0x000bffff) AM_RAM
-	AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
-	AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
+	AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffff)
+	AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffff)
 	AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
 	AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
-	AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
+	AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffff)
 	AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-	AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_SHARE("nvram") // CMOS? RAM
+	AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffff) AM_SHARE("nvram16") // CMOS? RAM
 	AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
-//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
 //  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
-	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
+	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffff) AM_MIRROR(0x180000) // VRAM
 	AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
+	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffff) // Sprite RAM
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card
 	AM_RANGE(0x00e00000, 0x00e7ffff) AM_ROM AM_REGION("user",0x000000)  // OS
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
+	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
@@ -2253,24 +2236,24 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffffffff)
 	AM_RANGE(0x006c,0x006f) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x000000ff)
 	// 0x0070/0x0080 - CMOS RTC
-	AM_RANGE(0x0070,0x0073) AM_READWRITE(towns_rtc_r,towns_rtc_w)
-	AM_RANGE(0x0080,0x0083) AM_WRITE(towns_rtc_select_w)
+	AM_RANGE(0x0070,0x0073) AM_READWRITE8(towns_rtc_r,towns_rtc_w,0x000000ff)
+	AM_RANGE(0x0080,0x0083) AM_WRITE8(towns_rtc_select_w,0x000000ff)
 	// DMA controllers (uPD71071)
 	AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffffffff)
 	AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffffffff)
 	// Floppy controller
 	AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffffffff)
 	// CRTC / Video
-	AM_RANGE(0x0400,0x0403) AM_READ(towns_video_unknown_r)  // R/O (0x400)
-	AM_RANGE(0x0404,0x0407) AM_READWRITE(towns_video_404_r, towns_video_404_w)  // R/W (0x404)
+	AM_RANGE(0x0400,0x0403) AM_READ8(towns_video_unknown_r, 0x000000ff)  // R/O (0x400)
+	AM_RANGE(0x0404,0x0407) AM_READWRITE8(towns_video_404_r, towns_video_404_w, 0x000000ff)  // R/W (0x404)
 	AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
 	// System port
 	AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x000000ff)  // R/W (0x480)
 	// CD-ROM
 	AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff00ff)
 	// Joystick / Mouse ports
-	AM_RANGE(0x04d0,0x04d3) AM_READ(towns_padport_r)
-	AM_RANGE(0x04d4,0x04d7) AM_WRITE(towns_pad_mask_w)
+	AM_RANGE(0x04d0,0x04d3) AM_READ8(towns_padport_r, 0x00ff00ff)
+	AM_RANGE(0x04d4,0x04d7) AM_WRITE8(towns_pad_mask_w, 0x00ff0000)
 	// Sound (YM3438 [FM], RF5c68 [PCM])
 	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8_LEGACY("fm",ym3438_r,ym3438_w,0x00ff00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
@@ -2279,7 +2262,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	// CRTC / Video
 	AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
 	// System ports
-	AM_RANGE(0x05e8,0x05ef) AM_READWRITE(towns_sys5e8_r, towns_sys5e8_w)
+	AM_RANGE(0x05e8,0x05ef) AM_READWRITE8(towns_sys5e8_r, towns_sys5e8_w, 0x00ff00ff)
 	// Keyboard (8042 MCU)
 	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
 	// SCSI controller
@@ -2291,7 +2274,58 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	// CRTC / Video (again)
 	AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
 	AM_RANGE(0xff80,0xffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
+ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX based systems
+	// System ports
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x0020,0x0033) AM_READWRITE8(towns_system_r,towns_system_w, 0xffff)
+	AM_RANGE(0x0040,0x0047) AM_DEVREADWRITE8_LEGACY("pit",pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x0050,0x0057) AM_DEVREADWRITE8_LEGACY("pit2",pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x0060,0x0061) AM_READWRITE8(towns_port60_r, towns_port60_w, 0x00ff)
+	AM_RANGE(0x0068,0x006b) AM_READWRITE8(towns_intervaltimer2_r, towns_intervaltimer2_w, 0xffff)
+	AM_RANGE(0x006c,0x006d) AM_READWRITE8(towns_sys6c_r,towns_sys6c_w, 0x00ff)
+	// 0x0070/0x0080 - CMOS RTC
+	AM_RANGE(0x0070,0x0071) AM_READWRITE8(towns_rtc_r,towns_rtc_w,0x00ff)
+	AM_RANGE(0x0080,0x0081) AM_WRITE8(towns_rtc_select_w,0x00ff)
+	// DMA controllers (uPD71071)
+	AM_RANGE(0x00a0,0x00af) AM_READWRITE8(towns_dma1_r, towns_dma1_w, 0xffff)
+	AM_RANGE(0x00b0,0x00bf) AM_READWRITE8(towns_dma2_r, towns_dma2_w, 0xffff)
+	// Floppy controller
+	AM_RANGE(0x0200,0x020f) AM_READWRITE8(towns_floppy_r, towns_floppy_w, 0xffff)
+	// CRTC / Video
+	AM_RANGE(0x0400,0x0401) AM_READ8(towns_video_unknown_r, 0x00ff)  // R/O (0x400)
+	AM_RANGE(0x0404,0x0407) AM_READWRITE8(towns_video_404_r, towns_video_404_w, 0xffff)  // R/W (0x404)
+	AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffff)
+	// System port
+	AM_RANGE(0x0480,0x0481) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x00ff)  // R/W (0x480)
+	// CD-ROM
+	AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff)
+	// Joystick / Mouse ports
+	AM_RANGE(0x04d0,0x04d3) AM_READ8(towns_padport_r, 0x00ff)
+	AM_RANGE(0x04d6,0x04d7) AM_WRITE8(towns_pad_mask_w, 0x00ff)
+	// Sound (YM3438 [FM], RF5c68 [PCM])
+	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8_LEGACY("fm",ym3438_r,ym3438_w,0x00ff)
+	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffff)  // R/W  -- volume ports
+	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffff)
+	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffff)
+	// CRTC / Video
+	AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffff)
+	// System ports
+	AM_RANGE(0x05e8,0x05ef) AM_READWRITE8(towns_sys5e8_r, towns_sys5e8_w, 0x00ff)
+	// Keyboard (8042 MCU)
+	AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff)
+	// SCSI controller
+	AM_RANGE(0x0c30,0x0c37) AM_DEVREADWRITE8("scsi:fm",fmscsi_device,fmscsi_r,fmscsi_w,0x00ff)
+	// CMOS
+	AM_RANGE(0x3000,0x4fff) AM_READWRITE8(towns_cmos_r, towns_cmos_w,0x00ff)
+	// Something (MS-DOS wants this 0x41ff to be 1)
+	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+	// CRTC / Video (again)
+	AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffff)
+	AM_RANGE(0xff80,0xffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffff)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -2830,8 +2864,6 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_UPD71071_ADD("dma_1",towns_dma_config)
 	MCFG_UPD71071_ADD("dma_2",towns_dma_config)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
 	/* internal ram */
@@ -2841,21 +2873,23 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( towns, towns_state )
-
 	MCFG_FRAGMENT_ADD(towns_base)
-
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( townsux, towns )
+static MACHINE_CONFIG_START( townsux, towns16_state )
+	MCFG_FRAGMENT_ADD(towns_base)
 
-	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
+	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(ux_mem)
-	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("10M")
+
+	MCFG_NVRAM_ADD_0FILL("nvram16")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townssj, towns )
@@ -2871,7 +2905,6 @@ static MACHINE_CONFIG_DERIVED( townssj, towns )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townshr, towns )
-
 	MCFG_CPU_REPLACE("maincpu",I486, 20000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
@@ -2885,13 +2918,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( marty, marty_state )
 	MCFG_FRAGMENT_ADD(towns_base)
 
-	MCFG_CPU_REPLACE("maincpu",I386, 16000000)
+	MCFG_CPU_REPLACE("maincpu",I386SX, 16000000)
 	MCFG_CPU_PROGRAM_MAP(marty_mem)
-	MCFG_CPU_IO_MAP(towns_io)
+	MCFG_CPU_IO_MAP(towns16_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("6M")
+
+	MCFG_NVRAM_ADD_0FILL("nvram16")
 MACHINE_CONFIG_END
 
 /* ROM definitions */
