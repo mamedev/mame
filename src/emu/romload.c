@@ -469,9 +469,7 @@ static void display_loading_rom_message(romload_private *romdata, const char *na
 {
 	char buffer[200];
 
-	// 2010-04, FP - FIXME: in MESS, load_software_part_region sometimes calls this with romstotalsize = 0!
-	// as a temp workaround, I added a check for romstotalsize !=0.
-	if (name != NULL && romdata->romstotalsize)
+	if (name != NULL)
 		sprintf(buffer, "Loading (%d%%)", (UINT32)(100 * (UINT64)romdata->romsloadedsize / (UINT64)romdata->romstotalsize));
 	else
 		sprintf(buffer, "Loading Complete");
@@ -1375,7 +1373,15 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		else
 			fill_random(romdata->machine(), romdata->region->base(), romdata->region->bytes());
 #endif
-
+		
+		/* update total number of roms */
+		for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+			if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == device->system_bios())
+			{
+				romdata->romstotal++;
+				romdata->romstotalsize += rom_file_size(rom);
+			}
+		
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
 			process_rom_entries(romdata, locationtag, region, region + 1, device);
@@ -1384,7 +1390,8 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	}
 
 	/* now go back and post-process all the regions */
-	for (region = start_region; region != NULL; region = rom_next_region(region)) {
+	for (region = start_region; region != NULL; region = rom_next_region(region)) 
+	{
 		device->subtag(regiontag, ROMREGION_GETTAG(region));
 		region_post_process(romdata, regiontag.cstr(), ROMREGION_ISINVERTED(region));
 	}
