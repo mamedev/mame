@@ -285,7 +285,8 @@ READ8_MEMBER(sns_rom_bsx_device::read_l)
 	if (offset < 0x200000 && access_00_1f)
 	{
 		// 0x00-0x1f:0x8000-0xffff -> CART
-		return m_slot->read_l(space, offset);
+		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
+			return m_slot->m_cart->read_l(space, offset);
 	}
 	if (offset >= 0x200000 && offset < 0x400000)
 	{
@@ -334,7 +335,8 @@ READ8_MEMBER(sns_rom_bsx_device::read_h)
 	if (offset < 0x200000 && access_80_9f)
 	{
 		// 0x80-0x9f:0x8000-0xffff -> CART
-		return m_slot->read_l(space, offset);
+		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
+			return m_slot->m_cart->read_l(space, offset);
 	}
 
 	// if not in any of the cases above...
@@ -473,7 +475,8 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_h)
 	}
 	else if (offset < 0x700000)
 	{
-		return m_slot->read_h(space, offset);
+		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
+			return m_slot->m_cart->read_h(space, offset);
 	}
 	// RAM [70-7f]
 	return 0x00;
@@ -496,8 +499,8 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 	}
 	if (offset >= 0x200000 && offset < 0x400000)
 	{
-		if ((offset & 0xffff) >= 0x8000)
-			return m_slot->read_h(space, offset);
+		if (m_slot->m_cart && m_slot->m_cart->get_rom_size() && (offset & 0xffff) >= 0x8000)
+			return m_slot->m_cart->read_h(space, offset);
 	}
 	if (offset >= 0x400000 && offset < 0x600000)
 	{
@@ -506,7 +509,10 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	if (offset >= 0x600000)
-		return m_slot->read_h(space, offset);
+	{
+		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
+			return m_slot->m_cart->read_h(space, offset);
+	}
 	return 0xff;
 }
 
