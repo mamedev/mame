@@ -2,7 +2,7 @@
 
     Popo Bear (c) 2000 BMC
 
-    preliminary driver by Angelo Salese
+    driver by Angelo Salese, David Haywood
 
     TODO:
     - auto-animation speed is erratic (way too fast);
@@ -281,6 +281,34 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 			if (param&0xf000) color_bank = (machine().rand() & 0x3);
 
+		
+
+			int add_it = 0;
+
+			// this isn't understood, not enough evidence.
+			switch (param & 3)
+			{
+				case 0x0: // not used?
+				color_bank = (machine().rand() & 0x3);
+				add_it = color_bank*0x40;
+				break;
+
+				case 0x1: // butterflies in intro, enemy characters, line of characters, stage start text
+				//color_bank = (machine().rand() & 0x3);
+				add_it = color_bank*0x40;
+				break;
+				
+				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels (0x3f?)
+				//color_bank = (machine().rand() & 0x3);
+				add_it = color_bank*0x40;
+				break;
+				
+				case 0x3: // letters on GAME OVER need this..
+				add_it = color_bank*0x40;
+				add_it += 0x20;
+				break;
+			}
+
 			if(param == 0)
 				continue;
 
@@ -303,10 +331,10 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 						// see scores when you colect an item, must be at least steps of 0x40 or one of the female panda gfx between levels breaks.. might depend on lower bits?
 						// granularity also means colour bank is applied *0x40
 						// and we have 2 more possible colour bank bits
-						// colours on game over screen are still wrong
+						// colours on game over screen are still wrong without the weird param kludge above
 						if (pix&0x3f)
 						{
-							bitmap.pix16(y_draw, x_draw) = machine().pens[((pix+(color_bank*0x40))&0xff)+0x100];
+							bitmap.pix16(y_draw, x_draw) = machine().pens[((pix+(add_it))&0xff)+0x100];
 						}
 					}
 
@@ -644,4 +672,4 @@ ROM_START( popobear )
 	ROM_LOAD( "popobear_ta-a-901.u9", 0x00000, 0x40000,  CRC(f1e94926) SHA1(f4d6f5b5811d90d0069f6efbb44d725ff0d07e1c) )
 ROM_END
 
-GAME( 2000, popobear,    0, popobear,    popobear, driver_device,    0, ROT0,  "BMC", "PoPo Bear", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, popobear,    0, popobear,    popobear, driver_device,    0, ROT0,  "BMC", "PoPo Bear",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
