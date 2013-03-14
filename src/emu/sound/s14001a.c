@@ -53,13 +53,13 @@ labeling.
                     _|                |_
   ROM CLOCK/CKR <- |_|4             37|_| <- ROM D6
                     _|                |_
-     ?DAC TEST? ?? |_|5             36|_| -> ROM A10
+  DIGITAL OUT 0 <- |_|5             36|_| -> ROM A10
                     _|                |_
-     ?DAC TEST? ?? |_|6             35|_| -> ROM A9
+  DIGITAL OUT 1 <- |_|6             35|_| -> ROM A9
                     _|                |_
-     ?DAC TEST? ?? |_|7             34|_| <- ROM D5
+  DIGITAL OUT 2 <- |_|7             34|_| <- ROM D5
                     _|                |_
-     ?DAC TEST? ?? |_|8             33|_| -> ROM A8
+  DIGITAL OUT 3 <- |_|8             33|_| -> ROM A8
                     _|                |_
         ROM /EN <- |_|9             32|_| <- ROM D4
                     _|       S        |_
@@ -101,6 +101,10 @@ Its likely that they did this to be able to force the speech chip to stop talkin
 which is normally impossible. The later 'version 3' TSI speech board as featured in
 an advertisement in the John Cater book probably also has this feature, in addition
 to external speech rom banking.
+
+The Digital out pins supply a copy of the 4-bit waveform which also goes to the
+internal DAC. They are only valid every other clock cycle. It is possible that
+on 'invalid' cycles they act as a 4 bit input to drive the dac.
 
 Because it requires -10V to operate, the chip manufacturing process must be PMOS.
 
