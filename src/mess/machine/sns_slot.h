@@ -152,13 +152,12 @@ public:
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 
-// FIXME:
-// this should be private, but then there is some problem installing delegates in the driver...
+// m_cart cannot be made private yet, because we need to check nvram_size from the driver...
+// more work needed
 //private:
 
-	device_sns_cart_interface*      m_cart;
-
 	int m_type;
+	device_sns_cart_interface*      m_cart;
 };
 
 // ======================> sns_cart_slot_device

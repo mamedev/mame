@@ -176,14 +176,13 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
 	virtual DECLARE_READ16_MEMBER(read_a15);
 	virtual DECLARE_WRITE16_MEMBER(write_a15);
+	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data); };
 
-// FIXME:
-// this should be private, but then there is some problem installing delegates in the driver...
+// TODO: this only needs to be public because megasvp copies rom into memory region, so we need to rework that code...
 //private:
-
-	device_md_cart_interface*       m_cart;
-
+	
 	int m_type;
+	device_md_cart_interface*       m_cart;
 };
 
 // ======================> md_cart_slot_device

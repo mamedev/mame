@@ -90,30 +90,28 @@ READ8_MEMBER(sns_rom_sufami_device::read_h)
 	}
 	if (offset >= 0x200000 && offset < 0x400000)    // SLOT1 STROM
 	{
-		if (m_slot1->m_cart)
-			return m_slot1->m_cart->read_l(space, offset - 0x200000);
+		return m_slot1->read_l(space, offset - 0x200000);
 	}
 	if (offset >= 0x400000 && offset < 0x600000)    // SLOT2 STROM
 	{
-		if (m_slot2->m_cart)
-			return m_slot2->m_cart->read_l(space, offset - 0x400000);
+		return m_slot2->read_l(space, offset - 0x400000);
 	}
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
-		if (m_slot1->m_cart && (offset & 0xffff) >= 0x8000)
+		if ((offset & 0xffff) >= 0x8000)
 		{
 			offset -= 0x600000;
 			bank = offset / 0x10000;
-			return m_slot1->m_cart->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
+			return m_slot1->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
 		}
 	}
 	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
-		if (m_slot2->m_cart && (offset & 0xffff) >= 0x8000)
+		if ((offset & 0xffff) >= 0x8000)
 		{
 			offset -= 0x700000;
 			bank = offset / 0x10000;
-			return m_slot2->m_cart->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
+			return m_slot2->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
 		}
 	}
 
@@ -130,21 +128,21 @@ WRITE8_MEMBER(sns_rom_sufami_device::write_h)
 	int bank;
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
-		if (m_slot1->m_cart && (offset & 0xffff) >= 0x8000)
+		if ((offset & 0xffff) >= 0x8000)
 		{
 			offset -= 0x600000;
 			bank = offset / 0x10000;
-			m_slot1->m_cart->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
+			m_slot1->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
 		}
 	}
 
 	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
-		if (m_slot2->m_cart && (offset & 0xffff) >= 0x8000)
+		if ((offset & 0xffff) >= 0x8000)
 		{
 			offset -= 0x700000;
 			bank = offset / 0x10000;
-			m_slot2->m_cart->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
+			m_slot2->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
 		}
 	}
 

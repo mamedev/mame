@@ -145,13 +145,11 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
-// FIXME:
-// this should be private, but then there is some problem installing delegates in the driver...
+// TODO: check how to implement m_sgb_hack without accessing m_cart->m_rom
 //private:
-
-	device_gb_cart_interface*       m_cart;
-
+	
 	int m_type;
+	device_gb_cart_interface*       m_cart;
 };
 
 // ======================> gb_cart_slot_device

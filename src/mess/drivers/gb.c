@@ -459,8 +459,8 @@ static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xF
 
 READ8_MEMBER(gb_state::gb_cart_r)
 {
-	if (m_bios_disable && m_cartslot->m_cart)
-		return m_cartslot->m_cart->read_rom(space, offset);
+	if (m_bios_disable && m_cartslot)
+		return m_cartslot->read_rom(space, offset);
 	else
 	{
 		if (offset < 0x100)
@@ -468,9 +468,9 @@ READ8_MEMBER(gb_state::gb_cart_r)
 			UINT8 *ROM = m_region_maincpu->base();
 			return ROM[offset];
 		}
-		else if (m_cartslot->m_cart)
+		else if (m_cartslot)
 		{
-			return m_cartslot->m_cart->read_rom(space, offset);
+			return m_cartslot->read_rom(space, offset);
 		}
 		else
 			return 0xff;
@@ -479,8 +479,8 @@ READ8_MEMBER(gb_state::gb_cart_r)
 
 READ8_MEMBER(gb_state::gbc_cart_r)
 {
-	if (m_bios_disable && m_cartslot->m_cart)
-		return m_cartslot->m_cart->read_rom(space, offset);
+	if (m_bios_disable && m_cartslot)
+		return m_cartslot->read_rom(space, offset);
 	else
 	{
 		if (offset < 0x100)
@@ -493,9 +493,9 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 			UINT8 *ROM = m_region_maincpu->base();
 			return ROM[offset - 0x100];
 		}
-		else if (m_cartslot->m_cart)
+		else if (m_cartslot)
 		{
-			return m_cartslot->m_cart->read_rom(space, offset);
+			return m_cartslot->read_rom(space, offset);
 		}
 		else
 			return 0xff;
@@ -504,22 +504,22 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 
 WRITE8_MEMBER(gb_state::gb_bank_w)
 {
-	if (m_cartslot->m_cart)
-		m_cartslot->m_cart->write_bank(space, offset, data);
+	if (m_cartslot)
+		m_cartslot->write_bank(space, offset, data);
 }
 
 READ8_MEMBER(gb_state::gb_ram_r)
 {
-	if (m_cartslot->m_cart)
-		return m_cartslot->m_cart->read_ram(space, offset);
+	if (m_cartslot)
+		return m_cartslot->read_ram(space, offset);
 	else
 		return 0xff;
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_w)
 {
-	if (m_cartslot->m_cart)
-		m_cartslot->m_cart->write_ram(space, offset, data);
+	if (m_cartslot)
+		m_cartslot->write_ram(space, offset, data);
 }
 
 READ8_MEMBER(gb_state::gb_echo_r)
@@ -534,22 +534,22 @@ WRITE8_MEMBER(gb_state::gb_echo_w)
 
 READ8_MEMBER(megaduck_state::cart_r)
 {
-	if (m_cartslot && m_cartslot->m_cart)
-		return m_cartslot->m_cart->read_rom(space, offset);
+	if (m_cartslot)
+		return m_cartslot->read_rom(space, offset);
 	else
 		return 0xff;
 }
 
 WRITE8_MEMBER(megaduck_state::bank1_w)
 {
-	if (m_cartslot->m_cart)
-		m_cartslot->m_cart->write_bank(space, offset, data);
+	if (m_cartslot)
+		m_cartslot->write_bank(space, offset, data);
 }
 
 WRITE8_MEMBER(megaduck_state::bank2_w)
 {
-	if (m_cartslot->m_cart)
-		m_cartslot->m_cart->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */
+	if (m_cartslot)
+		m_cartslot->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */
 }
 
 
@@ -662,6 +662,8 @@ static SLOT_INTERFACE_START(gb_cart)
 	SLOT_INTERFACE_INTERNAL("rom_digimon",  GB_ROM_DIGIMON)
 	SLOT_INTERFACE_INTERNAL("rom_rock8",  GB_ROM_ROCKMAN8)
 	SLOT_INTERFACE_INTERNAL("rom_sm3sp",  GB_ROM_SM3SP)
+//	SLOT_INTERFACE_INTERNAL("rom_dkong5",  GB_ROM_DKONG5)
+//	SLOT_INTERFACE_INTERNAL("rom_unk01",  GB_ROM_UNK01)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(megaduck_cart)
