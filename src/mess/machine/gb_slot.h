@@ -122,6 +122,8 @@ public:
 	int get_type() { return m_type; }
 	int get_cart_type(UINT8 *ROM, UINT32 len);
 	bool get_mmm01_candidate(UINT8 *ROM, UINT32 len);
+	// remove me when SGB is properly emulated
+	int get_sgb_hack() { return m_sgb_hack; }
 
 	void setup_ram(UINT8 banks);
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
@@ -145,9 +147,11 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
-// TODO: check how to implement m_sgb_hack without accessing m_cart->m_rom
-//private:
 	
+protected:
+	// Donkey Kong Land 2 + 3 store SGB border tiles differently... this will be hopefully be removed when SGB is properly emulated!
+	int m_sgb_hack;
+
 	int m_type;
 	device_gb_cart_interface*       m_cart;
 };

@@ -127,7 +127,6 @@ public:
 	UINT8 *m_sgb_tile_data;
 	UINT8 m_sgb_tile_map[2048];
 	UINT8 m_sgb_window_mask;
-	UINT8 m_sgb_hack;
 	//gb_state driver_data;
 	UINT8       m_gb_io[0x10];
 

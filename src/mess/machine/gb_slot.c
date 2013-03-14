@@ -142,6 +142,7 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 						device_t(mconfig, type, name, tag, owner, clock),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
+						m_sgb_hack(0),
 						m_type(GB_MBC_UNKNOWN)
 {
 }
@@ -386,6 +387,12 @@ bool base_gb_cart_slot_device::call_load()
 
 		internal_header_logging(ROM + offset, len);
 
+		// Hack to support Donkey Kong Land 2 + 3 in SGB
+		// For some reason, these store the tile data differently. Hacks will go once it's been figured out
+		if (strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
+			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
+			m_sgb_hack = 1;
+		
 		return IMAGE_INIT_PASS;
 	}
 

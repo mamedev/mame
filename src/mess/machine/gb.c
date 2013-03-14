@@ -218,18 +218,6 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
 	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
 
-	/* HACKS for Donkey Kong Land 2 + 3.
-	   For some reason that I haven't figured out, they store the tile
-	   data differently.  Hacks will go once I figure it out */
-	m_sgb_hack = 0;
-
-	if (m_cartslot->m_cart)  // make sure cart is in
-	{
-		if (strncmp((const char*)(m_cartslot->m_cart->get_rom_base() + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
-			strncmp((const char*)(m_cartslot->m_cart->get_rom_base() + 0x134), "DONKEYKONGLAND 3", 16) == 0)
-				m_sgb_hack = 1;
-	}
-
 	m_divcount = 0x0004;
 }
 
@@ -782,7 +770,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								{
 									int I;
 									UINT16 col;
-									if( m_sgb_hack )
+									if (m_cartslot && m_cartslot->get_sgb_hack())
 									{
 										memcpy( m_sgb_tile_map, m_lcd.gb_vram_ptr + 0x1000, 2048 );
 										for( I = 0; I < 64; I++ )
