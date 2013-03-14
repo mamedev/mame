@@ -1616,7 +1616,7 @@ READ8_MEMBER( snsnew_state::snes20_hi_r )
 	else if (m_slotcart->get_type() == SNES_CX4
 			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
 		return CX4_read((offset & 0xffff) - 0x6000);
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -1676,8 +1676,7 @@ WRITE8_MEMBER( snsnew_state::snes20_hi_w )
 	else if (m_type == SNES_SUFAMITURBO
 			&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_h(space, offset, data); return; }
-	
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -1712,8 +1711,7 @@ READ8_MEMBER( snsnew_state::snes20_lo_r )
 	else if (m_slotcart->get_type() == SNES_CX4
 			&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
 		return CX4_read((offset & 0xffff) - 0x6000);
-	
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -1761,7 +1759,7 @@ WRITE8_MEMBER( snsnew_state::snes20_lo_w )
 	if (m_type == SNES_SUFAMITURBO
 				&& (offset & 0xffff) >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_slotcart->m_cart->write_l(space, offset, data); return; }
-	
+
 	// other add-on writes matches the hi handler
 	snes20_hi_w(space, offset, data, 0xff);
 }
@@ -1781,7 +1779,7 @@ READ8_MEMBER( snsnew_state::snes21_lo_r )
 			return space.read_byte(0x7e0000 + address);
 		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		else if (address < 0x8000)
+		else
 		{
 			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
@@ -1814,7 +1812,7 @@ WRITE8_MEMBER( snsnew_state::snes21_lo_w )
 			space.write_byte(0x7e0000 + address, data);
 		else if (address < 0x6000)
 			snes_w_io(space, address, data);
-		else if (address < 0x8000)
+		else
 		{
 			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
@@ -1843,7 +1841,7 @@ READ8_MEMBER( snsnew_state::snes21_hi_r )
 			return space.read_byte(0x7e0000 + address);
 		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		else if (address < 0x8000)
+		else
 		{
 			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
@@ -1876,7 +1874,7 @@ WRITE8_MEMBER( snsnew_state::snes21_hi_w )
 			space.write_byte(0x7e0000 + address, data);
 		else if (address < 0x6000)
 			snes_w_io(space, address, data);
-		else if (address < 0x8000)
+		else
 		{
 			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
@@ -2280,8 +2278,8 @@ static SLOT_INTERFACE_START(snes_cart)
 	SLOT_INTERFACE_INTERNAL("lorom_mcpir1",  SNS_LOROM_MCPIR1)
 	SLOT_INTERFACE_INTERNAL("lorom_mcpir2",  SNS_LOROM_MCPIR2)
 	SLOT_INTERFACE_INTERNAL("lorom_20col",   SNS_LOROM_20COL)
-	SLOT_INTERFACE_INTERNAL("lorom_pija",    SNS_LOROM_BANANA)	// not working yet
-	SLOT_INTERFACE_INTERNAL("lorom_bugs",    SNS_LOROM_BUGSLIFE)	// not working yet
+	SLOT_INTERFACE_INTERNAL("lorom_pija",    SNS_LOROM_BANANA)  // not working yet
+	SLOT_INTERFACE_INTERNAL("lorom_bugs",    SNS_LOROM_BUGSLIFE)    // not working yet
 SLOT_INTERFACE_END
 
 
@@ -2386,8 +2384,8 @@ static MACHINE_START( snesnew )
 			break;
 		case SNES_BUGS:
 		case SNES_BANANA:
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x808000, 0x80ffff, 0, 0x780000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x808000, 0x80ffff, 0, 0x780000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x808000, 0x80ffff, 0, 0x780000, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+//          machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x808000, 0x80ffff, 0, 0x780000, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
 //          set_5a22_map(*state->m_maincpu);
 			break;
 	}
