@@ -69,23 +69,97 @@ void fp200_state::video_start()
 	m_lcd.attr = auto_alloc_array_clear(machine(), UINT8, 20*64);
 }
 
+/* TODO: Very preliminary, I actually believe that the LCDC writes in a blitter fashion ... */
 UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	UINT16 l_offs, r_offs;
+
+	bitmap.fill(0, cliprect);
+
+	l_offs = 0;
+	r_offs = 0;
 	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
 	{
-		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		for(int x=0;x<80;x++)
 		{
-			if(m_lcd.attr[x/8+y*20] == 0x60)
+			if(m_lcd.attr[x/8+y*20] == 0x50)
+			{
+				l_offs = (y & ~7);
+				break;
+			}
+		}
+	}
+
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=80;x<160;x++)
+		{
+			if(m_lcd.attr[x/8+y*20] == 0x50)
+			{
+				r_offs = (y & ~7);
+				break;
+			}
+		}
+	}
+
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=0;x<80;x++)
+		{
+			UINT16 yoffs;
+
+			yoffs = y + l_offs;
+
+			if(yoffs >= 64)
+				yoffs -= 64;
+
+			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
 			{
 				UINT8 vram,pix;
 
-				vram = m_lcd.vram[x/8+y*20];
-				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(y & 7))) & 1;
+				vram = m_lcd.vram[x/8+yoffs*20];
+				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
 				bitmap.pix16(y,x) = pix;
 			}
-			/* fake, to see where the scrolling should stay. */
-			if(m_lcd.attr[x/8+y*20] == 0x50)
-				bitmap.pix16(y,x) = machine().rand() & 1;
+			/*
+			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
+			{
+				UINT8 vram,pix;
+
+				vram = m_lcd.vram[x/8+yoffs*20];
+				pix = (vram) >> (7-(yoffs & 7)) & 1;
+				bitmap.pix16(y,x) = pix;
+			}*/
+		}
+	}
+
+	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	{
+		for(int x=80;x<160;x++)
+		{
+			UINT16 yoffs;
+
+			yoffs = y + r_offs;
+
+			if(yoffs >= 64)
+				yoffs -= 64;
+
+			if(m_lcd.attr[x/8+yoffs*20] == 0x60 || m_lcd.attr[x/8+yoffs*20] == 0x50)
+			{
+				UINT8 vram,pix;
+
+				vram = m_lcd.vram[x/8+yoffs*20];
+				pix = ((m_chargen[vram*8+(x & 7)]) >> (7-(yoffs & 7))) & 1;
+				bitmap.pix16(y,x) = pix;
+			}
+			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
+			{
+				UINT8 vram,pix;
+
+				vram = m_lcd.vram[x/8+yoffs*20];
+				pix = (vram) >> (7-(yoffs & 7)) & 1;
+				bitmap.pix16(y,x) = pix;
+			}*/
 		}
 	}
 
@@ -144,14 +218,14 @@ READ8_MEMBER(fp200_state::fp200_lcd_r)
 	switch(offset)
 	{
 		case 1:
-			printf("%d %d -> (L) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
+			//printf("%d %d -> (L) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				res = read_lcd_attr(m_lcd.x,m_lcd.y);
 			else if(m_lcd.status == 1)
 				res = read_lcd_vram(m_lcd.x,m_lcd.y);
 			break;
 		case 2:
-			printf("%d %d -> (R) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
+			//printf("%d %d -> (R) %02x\n",m_lcd.x,m_lcd.y,m_lcd.status);
 			if(m_lcd.status == 0xb)
 				res = read_lcd_attr(m_lcd.x + 10,m_lcd.y);
 			else if(m_lcd.status == 1)
