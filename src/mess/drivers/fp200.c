@@ -5,6 +5,7 @@
 
 	TODO:
 	- What's the LCDC type? Custom?
+	- Why RAM isn't recognized?
 
 ***************************************************************************/
 
