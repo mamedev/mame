@@ -784,7 +784,7 @@ struct cdrom_interface saturn_cdrom =
 
 DEVICE_IMAGE_LOAD_MEMBER( saturn_state, sat_cart )
 {
-	UINT8 *ROM = image.device().memregion("maincpu")->base()+0x080000;
+	UINT8 *ROM = image.device().memregion(":maincpu")->base()+0x080000;
 	UINT32 length;
 
 	if (image.software_entry() != NULL)
