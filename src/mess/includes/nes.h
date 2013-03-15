@@ -133,6 +133,7 @@ public:
 	ioport_port       *m_io_fckey[9];
 	ioport_port       *m_io_subkey[13];
 	ioport_port       *m_io_pad[4];
+	ioport_port       *m_io_mahjong[4];
 	ioport_port       *m_io_cc_left;
 	ioport_port       *m_io_cc_right;
 	ioport_port       *m_io_zapper1_t;
@@ -154,7 +155,7 @@ private:
 	memory_bank       *m_prg_bank_mem[5];
 };
 
-	
+
 /*----------- defined in machine/nes.c -----------*/
 
 

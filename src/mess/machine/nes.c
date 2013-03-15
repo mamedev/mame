@@ -72,11 +72,11 @@ void nes_state::init_nes_core()
 			m_vrom = m_cartslot->m_cart->get_vrom_base();
 		if (m_cartslot->m_cart->get_vram_size())
 			m_vram = auto_alloc_array(machine(), UINT8, m_cartslot->m_cart->get_vram_size());
-		
+
 		m_pcb_id = m_cartslot->get_pcb_id();
 		m_hard_mirroring = m_cartslot->m_cart->get_mirroring();
 		m_four_screen_vram = m_cartslot->m_cart->get_four_screen_vram();
-		
+
 		// setup memory pointers and related variables
 		m_prg_ram = m_cartslot->m_cart->get_battery_size() ? 1 : 0;
 		m_wram_size = m_cartslot->m_cart->get_prgram_size();
@@ -84,7 +84,7 @@ void nes_state::init_nes_core()
 		m_mapper_bram_size = m_cartslot->m_cart->get_mapper_bram_size();
 		m_battery = m_cartslot->m_cart->get_battery_size() ? 1 : 0;
 		m_battery_size = m_cartslot->m_cart->get_battery_size();
-		
+
 		if (m_prg_ram)
 			m_wram = m_cartslot->m_cart->get_prgram_base();
 		if (m_mapper_ram_size)
@@ -93,7 +93,7 @@ void nes_state::init_nes_core()
 			m_battery_ram = m_cartslot->m_cart->get_battery_base();
 		if (m_mapper_bram_size)
 			m_mapper_bram = m_cartslot->m_cart->get_mapper_bram_base();
-		
+
 		// setup the rest of the variables involved
 		m_chr_open_bus = m_cartslot->get_chr_open_bus();
 		m_ce_mask = m_cartslot->get_ce_mask();
@@ -136,14 +136,14 @@ void nes_state::init_nes_core()
 	{
 		/* Set up the mapper callbacks */
 		pcb_handlers_setup();
-		
+
 		/* Set up the memory handlers for the mapper */
 		space.install_read_bank(0x8000, 0x9fff, "bank1");
 		space.install_read_bank(0xa000, 0xbfff, "bank2");
 		space.install_read_bank(0xc000, 0xdfff, "bank3");
 		space.install_read_bank(0xe000, 0xffff, "bank4");
 		space.install_readwrite_bank(0x6000, 0x7fff, "bank5");
-		
+
 		/* configure banks 1-4 */
 		for (i = 0; i < 4; i++)
 		{
@@ -155,14 +155,14 @@ void nes_state::init_nes_core()
 			membank(bank_names[i])->set_entry(i);
 			m_prg_bank[i] = i;
 		}
-		
+
 		/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 		/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (m_wram) */
 		membank("bank5")->configure_entries(0, prg_banks, m_prg, 0x2000);
 		m_battery_bank5_start = prg_banks;
 		m_prgram_bank5_start = prg_banks;
 		m_empty_bank5_start = prg_banks;
-		
+
 		/* add battery ram, but only if there's no trainer since they share overlapping memory. */
 		if (m_battery && !m_trainer)
 		{
@@ -178,23 +178,23 @@ void nes_state::init_nes_core()
 			membank("bank5")->configure_entries(m_prgram_bank5_start, m_wram_size / 0x2000, m_wram, 0x2000);
 			m_empty_bank5_start += m_wram_size / 0x2000;
 		}
-		
+
 		membank("bank5")->configure_entry(m_empty_bank5_start, m_rom + 0x6000);
-		
+
 		/* if we have any additional PRG RAM, point bank5 to its first bank */
 		if (m_battery || m_prg_ram)
 			m_prg_bank[4] = m_battery_bank5_start;
 		else
 			m_prg_bank[4] = m_empty_bank5_start; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
-		
+
 		membank("bank5")->set_entry(m_prg_bank[4]);
-		
+
 		if (m_four_screen_vram)
 		{
 			m_extended_ntram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 			save_pointer(NAME(m_extended_ntram), 0x2000);
 		}
-		
+
 		if (m_four_screen_vram)
 			set_nt_mirroring(PPU_MIRROR_4SCREEN);
 		else
@@ -393,6 +393,10 @@ void nes_state::machine_start()
 	m_io_zapper2_x      = ioport("ZAPPER2_X");
 	m_io_zapper2_y      = ioport("ZAPPER2_Y");
 	m_io_paddle         = ioport("PADDLE");
+	m_io_mahjong[0]     = ioport("MAH0");
+	m_io_mahjong[1]     = ioport("MAH1");
+	m_io_mahjong[2]     = ioport("MAH2");
+	m_io_mahjong[3]     = ioport("MAH3");
 	m_prg_bank_mem[0]   = membank("bank1");
 	m_prg_bank_mem[1]   = membank("bank2");
 	m_prg_bank_mem[2]   = membank("bank3");
@@ -515,7 +519,10 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 		ret = 0x40;
 
 		/* Handle data line 0's serial output */
-		ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
+		if((cfg & 0x00f0) == 0x0070)
+			ret |= (((m_in_1.i0 >> m_in_1.shift) & 0x01) << 1);
+		else
+			ret |= ((m_in_1.i0 >> m_in_1.shift) & 0x01);
 
 		/* zapper */
 		if ((cfg & 0x00f0) == 0x0030)
@@ -567,7 +574,7 @@ READ8_MEMBER(nes_state::nes_IN1_r)
 
 // FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up
 // to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
-static void nes_read_input_device( running_machine &machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
+static void nes_read_input_device( running_machine &machine, int cfg, nes_input *vals, int pad_port, int supports_zapper, int mux_data )
 {
 	nes_state *state = machine.driver_data<nes_state>();
 
@@ -611,6 +618,13 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 				state->m_in_0.i0 = state->m_io_cc_left->read();
 				state->m_in_1.i0 = state->m_io_cc_right->read();
 			}
+			break;
+
+		case 0x07: /* Mahjong Panel */
+			if(mux_data & 0xf8)
+				logerror("Error: Mahjong panel read with mux data %02x\n",mux_data);
+			else
+				vals->i0 = state->m_io_mahjong[mux_data >> 1]->read();
 			break;
 	}
 }
@@ -681,17 +695,17 @@ WRITE8_MEMBER(nes_state::nes_IN0_w)
 		/* Read the input devices */
 		if ((cfg & 0x000f) != 0x06)
 		{
-			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE);
-			nes_read_input_device(machine(), cfg >>  4, &m_in_1, 1,  TRUE);
-			nes_read_input_device(machine(), cfg >>  8, &m_in_2, 2, FALSE);
-			nes_read_input_device(machine(), cfg >> 12, &m_in_3, 3, FALSE);
+			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE,data & 0xfe);
+			nes_read_input_device(machine(), cfg >>  4, &m_in_1, 1,  TRUE,data & 0xfe);
+			nes_read_input_device(machine(), cfg >>  8, &m_in_2, 2, FALSE,data & 0xfe);
+			nes_read_input_device(machine(), cfg >> 12, &m_in_3, 3, FALSE,data & 0xfe);
 		}
 		else // crazy climber pad
 		{
-			nes_read_input_device(machine(), 0, &m_in_1, 1,  TRUE);
-			nes_read_input_device(machine(), 0, &m_in_2, 2, FALSE);
-			nes_read_input_device(machine(), 0, &m_in_3, 3, FALSE);
-			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE);
+			nes_read_input_device(machine(), 0, &m_in_1, 1,  TRUE,data & 0xfe);
+			nes_read_input_device(machine(), 0, &m_in_2, 2, FALSE,data & 0xfe);
+			nes_read_input_device(machine(), 0, &m_in_3, 3, FALSE,data & 0xfe);
+			nes_read_input_device(machine(), cfg >>  0, &m_in_0, 0,  TRUE,data & 0xfe);
 		}
 
 		if (cfg & 0x0f00)
