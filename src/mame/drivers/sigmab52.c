@@ -536,7 +536,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(sigmab52_state::timer_irq)
 {
-	generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+	device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 

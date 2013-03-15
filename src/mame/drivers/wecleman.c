@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
 {
-	generic_pulse_irq_line(device.execute(), M6809_FIRQ_LINE, 1);
+	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static const k051316_interface hotchase_k051316_intf_0 =

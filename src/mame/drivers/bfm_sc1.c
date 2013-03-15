@@ -230,7 +230,7 @@ INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
 
 		m_sc1_Inputs[2] = ioport("STROBE0")->read();
 
-		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+		machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -326,7 +326,7 @@ WRITE8_MEMBER(bfm_sc1_state::mmtr_w)
 			if ( changed & (1 << i) )
 			{
 				MechMtr_update(i, data & (1 << i) );
-				generic_pulse_irq_line(machine().device("maincpu")->execute(), M6809_FIRQ_LINE, 1);
+				machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 			}
 		}
 	}

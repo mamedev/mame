@@ -502,7 +502,7 @@ INTERRUPT_GEN_MEMBER(bfm_sc2_state::timer_irq)
 		m_irq_timer_stat = 0x01;
 		m_irq_status     = 0x02;
 
-		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 

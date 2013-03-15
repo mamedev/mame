@@ -187,7 +187,7 @@ INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
 	if ( m_is_timer_enabled )
 	{
 		m_irq_status = 0x01 |0x02; //0xff;
-		generic_pulse_irq_line(device.execute(), M6809_IRQ_LINE, 1);
+		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -246,7 +246,7 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )   MechMtr_update(i, data & (1 << i) );
 
-	if ( data ) generic_pulse_irq_line(machine().device("maincpu")->execute(), M6809_FIRQ_LINE, 1);
+	if ( data ) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 ///////////////////////////////////////////////////////////////////////////
 
