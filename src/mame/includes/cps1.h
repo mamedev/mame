@@ -165,6 +165,9 @@ public:
 	msm5205_device *m_msm_1;    // fcrash
 	msm5205_device *m_msm_2;    // fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
+	DECLARE_READ16_MEMBER(cps1_in1_r);
+	DECLARE_READ16_MEMBER(cps1_in2_r);
+	DECLARE_READ16_MEMBER(cps1_in3_r);
 	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
 	DECLARE_READ16_MEMBER(forgottn_dial_1_r);
 	DECLARE_WRITE16_MEMBER(forgottn_dial_0_reset_w);

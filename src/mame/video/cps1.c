@@ -464,6 +464,7 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_21_QS4 0x2e,0x0c01,  -1,  -1,  -1,  -1,  0x1c,0x1e,0x08,  0x16,{0x00,0x02,0x28,0x2a},0x2c, {0x04,0x08,0x10,0x00,0x00}
 #define CPS_B_21_QS5 0x1e,0x0c02,  -1,  -1,  -1,  -1,  0x0c, -1,  -1,   0x2a,{0x2c,0x2e,0x30,0x32},0x1c, {0x04,0x08,0x10,0x00,0x00}
 #define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x0e,0x0e,0x0e,0x30,0x30}
+#define HACK_H_3      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x04,{0x12,0x10,0x0e,0x0c},0x0a, {0x02,0xc4,0x18,0x00,0x00}
 
 /*
 CPS_B_21_DEF is CPS-B-21 at default settings (no battery)
@@ -1385,13 +1386,13 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m3",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m3",       HACK_H_3,     mapper_S9263B, 0,    0, 0, 1 },
 	{"sf2m4",       HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m5",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m6",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
+	{"sf2m8",       HACK_H_3,     mapper_S9263B, 0,    0, 0, 1 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	//sf2m8 unsupported
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2mdt",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },

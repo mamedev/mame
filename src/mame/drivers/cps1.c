@@ -264,6 +264,24 @@ READ16_MEMBER(cps_state::cps1_hack_dsw_r)
 	return (in << 8) | in;
 }
 
+READ16_MEMBER(cps_state::cps1_in1_r)
+{
+	int in = ioport("IN1")->read();
+	return (in << 8) | in;
+}
+
+READ16_MEMBER(cps_state::cps1_in2_r)
+{
+	int in = ioport("IN2")->read();
+	return (in << 8) | in;
+}
+
+READ16_MEMBER(cps_state::cps1_in3_r)
+{
+	int in = ioport("IN3")->read();
+	return (in << 8) | in;
+}
+
 READ16_MEMBER(cps_state::forgottn_dial_0_r)
 {
 	return ((ioport("DIAL0")->read() - m_dial[0]) >> (8 * offset)) & 0xff;
@@ -620,6 +638,21 @@ ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )   // used by cps2.
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
 	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_device, qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("qsound_ram2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sf2m3_map, AS_PROGRAM, 16, cps_state )
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
+	AM_RANGE(0x800010, 0x800011) AM_READ_PORT("IN1")            /* Player input ports */
+	AM_RANGE(0x800028, 0x80002f) AM_READ(cps1_hack_dsw_r)            /* System input ports / Dip Switches */
+	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_MIRROR(0x80) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")	/* CPS-B custom */
+	AM_RANGE(0x800186, 0x800187) AM_READ(cps1_in2_r)            /* Buttons 4,5,6 for both players */
+	AM_RANGE(0x800190, 0x800197) AM_WRITE(cps1_soundlatch_w) 	/* Sound command */
+	AM_RANGE(0x800198, 0x80019f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
+	AM_RANGE(0x8001a0, 0x8001bf) AM_WRITE(cps1_cps_a_w)
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -3274,6 +3307,11 @@ static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 
 	/* basic machine hardware */
 	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sf2m3, cps1_12MHz)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sf2m3_map)
 MACHINE_CONFIG_END
 
 
@@ -8581,8 +8619,8 @@ ROM_START( sf2m8 )
 	ROMX_LOAD( "yyc-d",    0x200004, 0x80000, CRC(92a8b572) SHA1(cbad24e519f0152989764c054da914f55e2b118c), ROM_GROUPWORD | ROM_SKIP(6) )
 	ROM_CONTINUE(          0x200006, 0x80000)
 	ROMX_LOAD( "yyc-e",    0x400000, 0x80000, CRC(61138469) SHA1(dec3b3af6e3f4fedf51600ddf0515f61b2122493), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(          0x400002, 0x80000)
-	ROMX_LOAD( "yyc-f",    0x400004, 0x80000, CRC(b800dcdb) SHA1(2ec3251b78159b15032d55a5ee5138f159e67190), ROM_GROUPWORD | ROM_SKIP(6) )
+	ROM_CONTINUE(          0x400004, 0x80000)
+	ROMX_LOAD( "yyc-f",    0x400002, 0x80000, CRC(b800dcdb) SHA1(2ec3251b78159b15032d55a5ee5138f159e67190), ROM_GROUPWORD | ROM_SKIP(6) )
 	ROM_CONTINUE(          0x400006, 0x80000)
 	/* extra gfx layer roms loaded over the former ones to remove the capcom copyright logo */
 	ROMX_LOAD( "yyc-6.1",  0x400000, 0x10000, CRC(94778332) SHA1(c0b9a05c710b89864ee5df1a53b39de30c994e2d), ROM_SKIP(7) )
@@ -11269,15 +11307,15 @@ GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state,   cps1,     
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", GAME_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2m1,       sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2m2,       sf2ce,    cps1_12MHz, sf2m2,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M2, bootleg)", GAME_SUPPORTS_SAVE )               // 920313 - based on World version
-GAME( 1992, sf2m3,       sf2ce,    cps1_12MHz, sf2,      cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M3, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2m3,       sf2ce,    sf2m3,      sf2hack,  cps_state,   cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (M3, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2m4,       sf2ce,    cps1_12MHz, sf2m4,    cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M4, bootleg)", GAME_SUPPORTS_SAVE )               // 920322 - based on Japan version
 GAME( 1992, sf2m5,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M5, bootleg)", GAME_SUPPORTS_SAVE )               // 920313 - based on World version
 GAME( 1992, sf2m6,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M6, bootleg)", GAME_SUPPORTS_SAVE )               // 811102 !!! - based on World version
 GAME( 1992, sf2m7,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M7, bootleg)", GAME_SUPPORTS_SAVE )               // 920313 - based on World version
-GAME( 1992, sf2m8,       sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M8, bootleg)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2m8,       sf2ce,    sf2m3,      sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (M8, bootleg)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2yyc,      sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (YYC, bootleg)", GAME_SUPPORTS_SAVE )              // 920313 - based on World version
 GAME( 1992, sf2koryu,    sf2ce,    cps1_12MHz, sf2hack,  cps_state,   sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Xiang Long, Chinese bootleg)", GAME_SUPPORTS_SAVE )       // 811102 !!! - based on World version
-GAME( 1992, sf2dongb,    sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2dongb, ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dongfang Bubai protection, bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 920313 - based on World version
+GAME( 1992, sf2dongb,    sf2ce,    cps1_12MHz, sf2,      cps_state,   sf2dongb, ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dongfang Bubai protection, bootleg)", GAME_SUPPORTS_SAVE ) // 920313 - based on World version
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state,   cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", GAME_SUPPORTS_SAVE )
 GAME( 1992, varth,       0,        cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (World 920714)", GAME_SUPPORTS_SAVE )  // "ETC"    // 12MHz verified
 GAME( 1992, varthr1,     varth,    cps1_12MHz, varth,    cps_state,   cps1,     ROT270, "Capcom", "Varth: Operation Thunderstorm (World 920612)", GAME_SUPPORTS_SAVE )  // "ETC"
