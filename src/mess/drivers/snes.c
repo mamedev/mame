@@ -213,7 +213,7 @@ READ8_MEMBER( snes_console_state::snes_lo_r )
 	{
 		if (offset >= 0x680000 && offset < 0x700000 && address < 0x1000)
 			return st010_read_ram(address);
-		if (offset == 0x600000 || offset == 0x600001)
+		if ((offset == 0x600000 || offset == 0x600001) &&  m_has_addon_chip == HAS_ST010) // moritash freezes due to this...
 			return (offset & 1) ? st010_get_sr() : st010_get_dr();
 	}
 	if (m_cart[0].mode == SNES_MODE_21 && m_has_addon_chip == HAS_DSP1

@@ -498,10 +498,6 @@ static int snes_find_addon_chip( running_machine &machine, UINT8 *buffer, UINT32
 				state->m_has_addon_chip = HAS_ST011;
 			else
 				state->m_has_addon_chip = HAS_ST010;
-
-			// if we are loading the game in a driver without the ST01X DSP, revert to HAS_NONE to avoid crash
-			if (!state->m_upd96050)
-				state->m_has_addon_chip = HAS_NONE;
 			break;
 
 		case 0xf9:
