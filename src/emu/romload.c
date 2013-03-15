@@ -1380,11 +1380,10 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		
 		/* update total number of roms */
 		for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-			if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == device->system_bios())
-			{
-				romdata->romstotal++;
-				romdata->romstotalsize += rom_file_size(rom);
-			}
+		{
+			romdata->romstotal++;
+			romdata->romstotalsize += rom_file_size(rom);
+		}
 		
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
