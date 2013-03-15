@@ -5,10 +5,10 @@
 
 // misc classes for the S-DD1
 
-class SDD1__IM //Input Manager
+class SDD1_IM //Input Manager
 {
 public:
-	SDD1__IM() {}
+	SDD1_IM() {}
 
 	UINT32 m_byte_ptr;
 	UINT8 m_bit_count;
@@ -17,47 +17,47 @@ public:
 	UINT8 IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len);
 };
 
-class SDD1__GCD //Golomb-Code Decoder
+class SDD1_GCD //Golomb-Code Decoder
 {
 public:
-	SDD1__GCD(SDD1__IM* associatedIM)
+	SDD1_GCD(SDD1_IM* associatedIM)
 	: m_IM(associatedIM) { }
 
-	SDD1__IM* m_IM;
+	SDD1_IM* m_IM;
 
 	void GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* MPScount, UINT8* LPSind);
 };
 
-class SDD1__BG // Bits Generator
+class SDD1_BG // Bits Generator
 {
 public:
-	SDD1__BG(SDD1__GCD* associatedGCD, UINT8 code)
+	SDD1_BG(SDD1_GCD* associatedGCD, UINT8 code)
 	: m_code_num(code),
 	m_GCD(associatedGCD) { }
 
 	UINT8 m_code_num;
 	UINT8 m_MPScount;
 	UINT8 m_LPSind;
-	SDD1__GCD* m_GCD;
+	SDD1_GCD* m_GCD;
 
 	void BG_prepareDecomp();
 	UINT8 BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun);
 } ;
 
-struct SDD1__PEM_ContextInfo
+struct SDD1_PEM_ContextInfo
 {
 	UINT8 status;
 	UINT8 MPS;
 };
 
-class SDD1__PEM //Probability Estimation Module
+class SDD1_PEM //Probability Estimation Module
 {
 public:
-	SDD1__PEM(
-				SDD1__BG* associatedBG0, SDD1__BG* associatedBG1,
-				SDD1__BG* associatedBG2, SDD1__BG* associatedBG3,
-				SDD1__BG* associatedBG4, SDD1__BG* associatedBG5,
-				SDD1__BG* associatedBG6, SDD1__BG* associatedBG7)
+	SDD1_PEM(
+				SDD1_BG* associatedBG0, SDD1_BG* associatedBG1,
+				SDD1_BG* associatedBG2, SDD1_BG* associatedBG3,
+				SDD1_BG* associatedBG4, SDD1_BG* associatedBG5,
+				SDD1_BG* associatedBG6, SDD1_BG* associatedBG7)
 	{
 		m_BG[0] = associatedBG0;
 		m_BG[1] = associatedBG1;
@@ -69,18 +69,18 @@ public:
 		m_BG[7] = associatedBG7;
 	}
 
-	SDD1__PEM_ContextInfo m_contextInfo[32];
-	SDD1__BG* m_BG[8];
+	SDD1_PEM_ContextInfo m_contextInfo[32];
+	SDD1_BG* m_BG[8];
 
 	void PEM_prepareDecomp();
 	UINT8 PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context);
 } ;
 
 
-class SDD1__CM
+class SDD1_CM
 {
 public:
-	SDD1__CM(SDD1__PEM* associatedPEM)
+	SDD1_CM(SDD1_PEM* associatedPEM)
 	: m_PEM(associatedPEM) { }
 
 	UINT8 m_bitplanesInfo;
@@ -88,42 +88,42 @@ public:
 	UINT8 m_bit_number;
 	UINT8 m_currBitplane;
 	UINT16 m_prevBitplaneBits[8];
-	SDD1__PEM* m_PEM;
+	SDD1_PEM* m_PEM;
 
 	void CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte);
 	UINT8 CM_getBit(UINT8 *ROM, UINT32 *mmc);
 } ;
 
 
-class SDD1__OL
+class SDD1_OL
 {
 public:
-	SDD1__OL(SDD1__CM* associatedCM)
+	SDD1_OL(SDD1_CM* associatedCM)
 	: m_CM(associatedCM) { }
 
 	UINT8 m_bitplanesInfo;
 	UINT16 m_length;
 	UINT8* m_buffer;
-	SDD1__CM* m_CM;
+	SDD1_CM* m_CM;
 
 	void OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf);
 	void OL_launch(UINT8 *ROM, UINT32 *mmc);
 } ;
 
-class SDD1__emu
+class SDD1_emu
 {
 public:
-	SDD1__emu(running_machine &machine);
+	SDD1_emu(running_machine &machine);
 
 	running_machine &machine() const { return m_machine; }
 
-	SDD1__IM* m_IM;
-	SDD1__GCD* m_GCD;
-	SDD1__BG* m_BG0;   SDD1__BG* m_BG1;   SDD1__BG* m_BG2;   SDD1__BG* m_BG3;
-	SDD1__BG* m_BG4;   SDD1__BG* m_BG5;   SDD1__BG* m_BG6;   SDD1__BG* m_BG7;
-	SDD1__PEM* m_PEM;
-	SDD1__CM* m_CM;
-	SDD1__OL* m_OL;
+	SDD1_IM* m_IM;
+	SDD1_GCD* m_GCD;
+	SDD1_BG* m_BG0;   SDD1_BG* m_BG1;   SDD1_BG* m_BG2;   SDD1_BG* m_BG3;
+	SDD1_BG* m_BG4;   SDD1_BG* m_BG5;   SDD1_BG* m_BG6;   SDD1_BG* m_BG7;
+	SDD1_PEM* m_PEM;
+	SDD1_CM* m_CM;
+	SDD1_OL* m_OL;
 
 	void SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf);
 
@@ -168,7 +168,7 @@ public:
 		UINT16 size;    // $43x5-$43x6 -- DMA transfer size
 	} m_dma[8];
 
-	SDD1__emu* m_sdd1emu;
+	SDD1_emu* m_sdd1emu;
 
 	struct
 	{

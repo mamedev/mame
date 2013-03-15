@@ -21,13 +21,13 @@
 
 // Input Manager
 
-void SDD1__IM::IM_prepareDecomp(UINT32 in_buf)
+void SDD1_IM::IM_prepareDecomp(UINT32 in_buf)
 {
 	m_byte_ptr = in_buf;
 	m_bit_count = 4;
 }
 
-UINT8 SDD1__IM::IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len)
+UINT8 SDD1_IM::IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len)
 {
 	UINT8 codeword = ROM[SSD1_ADD(m_byte_ptr)] << m_bit_count;
 
@@ -50,7 +50,7 @@ UINT8 SDD1__IM::IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len)
 
 // GCD
 
-void SDD1__GCD::GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* MPScount, UINT8* LPSind)
+void SDD1_GCD::GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* MPScount, UINT8* LPSind)
 {
 	const UINT8 run_count[] =
 	{
@@ -103,13 +103,13 @@ void SDD1__GCD::GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* 
 
 // BG
 
-void SDD1__BG::BG_prepareDecomp()
+void SDD1_BG::BG_prepareDecomp()
 {
 	m_MPScount = 0;
 	m_LPSind = 0;
 }
 
-UINT8 SDD1__BG::BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun)
+UINT8 SDD1_BG::BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun)
 {
 	UINT8 bit;
 
@@ -143,14 +143,14 @@ UINT8 SDD1__BG::BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun)
 
 // PEM
 
-struct SDD1__PEM_state
+struct SDD1_PEM_state
 {
 	UINT8 code_num;
 	UINT8 nextIfMPS;
 	UINT8 nextIfLPS;
 };
 
-static const SDD1__PEM_state PEM_evolution_table[33] =
+static const SDD1_PEM_state PEM_evolution_table[33] =
 {
 	{ 0,25,25},
 	{ 0, 2, 1},
@@ -187,7 +187,7 @@ static const SDD1__PEM_state PEM_evolution_table[33] =
 	{ 7,24,22}
 };
 
-void SDD1__PEM::PEM_prepareDecomp()
+void SDD1_PEM::PEM_prepareDecomp()
 {
 	for (int i = 0; i < 32; i++)
 	{
@@ -196,14 +196,14 @@ void SDD1__PEM::PEM_prepareDecomp()
 	}
 }
 
-UINT8 SDD1__PEM::PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context)
+UINT8 SDD1_PEM::PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context)
 {
 	UINT8 endOfRun;
 	UINT8 bit;
 
-	SDD1__PEM_ContextInfo *pContInfo = &(m_contextInfo)[context];
+	SDD1_PEM_ContextInfo *pContInfo = &(m_contextInfo)[context];
 	UINT8 currStatus = pContInfo->status;
-	const SDD1__PEM_state* pState = &(PEM_evolution_table[currStatus]);
+	const SDD1_PEM_state* pState = &(PEM_evolution_table[currStatus]);
 	UINT8 currentMPS = pContInfo->MPS;
 
 	bit = m_BG[pState->code_num]->BG_getBit(ROM, mmc, &endOfRun);
@@ -229,7 +229,7 @@ UINT8 SDD1__PEM::PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context)
 
 // CM
 
-void SDD1__CM::CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte)
+void SDD1_CM::CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte)
 {
 	INT32 i = 0;
 	m_bitplanesInfo = ROM[SSD1_ADD(first_byte)] & 0xc0;
@@ -253,7 +253,7 @@ void SDD1__CM::CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte)
 	}
 }
 
-UINT8 SDD1__CM::CM_getBit(UINT8 *ROM, UINT32 *mmc)
+UINT8 SDD1_CM::CM_getBit(UINT8 *ROM, UINT32 *mmc)
 {
 	UINT8 currContext;
 	UINT16 *context_bits;
@@ -310,14 +310,14 @@ UINT8 SDD1__CM::CM_getBit(UINT8 *ROM, UINT32 *mmc)
 
 // OL
 
-void SDD1__OL::OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf)
+void SDD1_OL::OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf)
 {
 	m_bitplanesInfo = ROM[SSD1_ADD(first_byte)] & 0xc0;
 	m_length = out_len;
 	m_buffer = out_buf;
 }
 
-void SDD1__OL::OL_launch(UINT8 *ROM, UINT32 *mmc)
+void SDD1_OL::OL_launch(UINT8 *ROM, UINT32 *mmc)
 {
 	UINT8 i;
 	UINT8 register1 = 0, register2 = 0;
@@ -367,26 +367,26 @@ void SDD1__OL::OL_launch(UINT8 *ROM, UINT32 *mmc)
 
 // S-DD1
 
-SDD1__emu::SDD1__emu(running_machine &machine)
+SDD1_emu::SDD1_emu(running_machine &machine)
 		: m_machine(machine)
 {
-	m_IM = auto_alloc(machine, SDD1__IM());
-	m_GCD = auto_alloc(machine, SDD1__GCD(m_IM));
-	m_BG0 = auto_alloc(machine, SDD1__BG(m_GCD, 0));
-	m_BG1 = auto_alloc(machine, SDD1__BG(m_GCD, 1));
-	m_BG2 = auto_alloc(machine, SDD1__BG(m_GCD, 2));
-	m_BG3 = auto_alloc(machine, SDD1__BG(m_GCD, 3));
-	m_BG4 = auto_alloc(machine, SDD1__BG(m_GCD, 4));
-	m_BG5 = auto_alloc(machine, SDD1__BG(m_GCD, 5));
-	m_BG6 = auto_alloc(machine, SDD1__BG(m_GCD, 6));
-	m_BG7 = auto_alloc(machine, SDD1__BG(m_GCD, 7));
-	m_PEM = auto_alloc(machine, SDD1__PEM(m_BG0, m_BG1, m_BG2, m_BG3,
+	m_IM = auto_alloc(machine, SDD1_IM());
+	m_GCD = auto_alloc(machine, SDD1_GCD(m_IM));
+	m_BG0 = auto_alloc(machine, SDD1_BG(m_GCD, 0));
+	m_BG1 = auto_alloc(machine, SDD1_BG(m_GCD, 1));
+	m_BG2 = auto_alloc(machine, SDD1_BG(m_GCD, 2));
+	m_BG3 = auto_alloc(machine, SDD1_BG(m_GCD, 3));
+	m_BG4 = auto_alloc(machine, SDD1_BG(m_GCD, 4));
+	m_BG5 = auto_alloc(machine, SDD1_BG(m_GCD, 5));
+	m_BG6 = auto_alloc(machine, SDD1_BG(m_GCD, 6));
+	m_BG7 = auto_alloc(machine, SDD1_BG(m_GCD, 7));
+	m_PEM = auto_alloc(machine, SDD1_PEM(m_BG0, m_BG1, m_BG2, m_BG3,
 											m_BG4, m_BG5, m_BG6, m_BG7));
-	m_CM = auto_alloc(machine, SDD1__CM(m_PEM));
-	m_OL = auto_alloc(machine, SDD1__OL(m_CM));
+	m_CM = auto_alloc(machine, SDD1_CM(m_PEM));
+	m_OL = auto_alloc(machine, SDD1_OL(m_CM));
 }
 
-void SDD1__emu::SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf)
+void SDD1_emu::SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf)
 {
 	m_IM->IM_prepareDecomp(in_buf);
 	m_BG0->BG_prepareDecomp();
@@ -427,7 +427,7 @@ sns_rom_sdd1_device::sns_rom_sdd1_device(const machine_config &mconfig, const ch
 
 void sns_rom_sdd1_device::device_start()
 {
-	m_sdd1emu = auto_alloc(machine(), SDD1__emu(machine()));
+	m_sdd1emu = auto_alloc(machine(), SDD1_emu(machine()));
 
 	m_buffer.data = (UINT8*)auto_alloc_array(machine(), UINT8, 0x10000);
 	m_buffer.ready = 0;
