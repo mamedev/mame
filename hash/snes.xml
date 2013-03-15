@@ -30631,7 +30631,7 @@ Alternate board (XL-1)
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-EUR" />
 
-			<feature name="slot" value="lorom_dsp" />
+			<feature name="slot" value="lorom_dsp4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="spal-a3tp-0.u1" size="1048576" crc="493fdb13" sha1="777d8732023a300a2c566f2d48bc354e0aa1da7e" offset="0x000000" />
 			</dataarea>
@@ -52873,7 +52873,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP4" />
 
-			<feature name="slot" value="lorom_dsp" />
+			<feature name="slot" value="lorom_dsp4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="planet's champ tg 3000, the (japan).sfc" size="1048576" crc="b9b9df06" sha1="3e7f10e13065424a28c93871b4a1e458817d754c" offset="0x000000" />
 			</dataarea>
@@ -62889,7 +62889,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="enhancement" value="DSP4" />
 
-			<feature name="slot" value="lorom_dsp" />
+			<feature name="slot" value="lorom_dsp4" />
 			<dataarea name="rom" size="1048576">
 				<rom name="top gear 3000 (usa).sfc" size="1048576" crc="a20be998" sha1="058aadf1ee719cb9e0c7333e665797f990a6381d" offset="0x000000" />
 			</dataarea>
