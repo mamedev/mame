@@ -682,7 +682,7 @@ void threecom3c505_device::do_receive_command()
 			else
 			{
 				buf_len = (m_rx_data_buffer.get_length() + 1) & ~1;
-				m_response.data.rcv_resp.pkt_len = uint16_to_le(buf_len);
+				m_response.data.rcv_resp.buf_len = uint16_to_le(buf_len);
 			}
 
 			m_response_length = m_response.length + 2;
