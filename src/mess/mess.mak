@@ -1401,7 +1401,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_VIDEO)/nes.o         \
 	$(MESS_MACHINE)/nes.o       \
 	$(MESS_DRIVERS)/nes.o       \
-	$(MESS_MACHINE)/snescart.o  \
+	$(MESS_MACHINE)/snescx4.o   \
 	$(MESS_MACHINE)/sns_slot.o  \
 	$(MESS_MACHINE)/sns_rom.o   \
 	$(MESS_MACHINE)/sns_rom21.o \
@@ -2116,15 +2116,10 @@ $(MESSOBJ)/skeleton.a:          \
 # miscellaneous dependencies
 #-------------------------------------------------
 
-$(MESS_MACHINE)/snescart.o: $(MESSSRC)/machine/snesobc1.c \
-				$(MESSSRC)/machine/snescx4.c \
-				$(MESSSRC)/machine/cx4ops.c \
+$(MESS_MACHINE)/snescx4.o: $(MESSSRC)/machine/cx4ops.c \
 				$(MESSSRC)/machine/cx4oam.c \
 				$(MESSSRC)/machine/cx4fn.c \
 				$(MESSSRC)/machine/cx4data.c \
-				$(MESSSRC)/machine/snesrtc.c \
-				$(MESSSRC)/machine/snessdd1.c \
-				$(MESSSRC)/machine/snes7110.c \
 
 $(MESS_VIDEO)/gba.o:        $(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbamode1.c \

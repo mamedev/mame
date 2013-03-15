@@ -68,17 +68,10 @@ gbpocket  // Nintendo Game Boy Pocket Handheld
 gblight   // Nintendo Game Boy Light Handheld
 gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld
-snesnew      // Nintendo Super Nintendo NTSC (test driver with slots)
-snespnew      // Nintendo Super Nintendo PAL (test driver with slots)
 snes      // Nintendo Super Nintendo NTSC
 snespal   // Nintendo Super Nintendo PAL
-snessfx   // Nintendo Super Nintendo NTSC w/SuperFX CPU
-snespsfx  // Nintendo Super Nintendo PAL w/SuperFX CPU
-snesdsp   // Nintendo Super Nintendo NTSC w/DSP-x CPU
-snespdsp  // Nintendo Super Nintendo PAL w/DSP-x CPU
-snesst10  // Nintendo Super Nintendo NTSC w/ST-010 CPU
-snesst11  // Nintendo Super Nintendo NTSC w/ST-011 CPU
-snesst    // Nintendo Super Nintendo NTSC w/Sufami Turbo base cart
+snes_add      // Nintendo Super Nintendo NTSC w/add-on CPUs as BIOS (legacy driver to run old dumps)
+snesp_add   // Nintendo Super Nintendo PAL w/add-on CPUs as BIOS (legacy driver to run old dumps)
 n64       // Nintendo N64
 n64dd     // Nintendo N64 (64DD Attachment)
 pokemini  // Nintendo Pokemon Mini

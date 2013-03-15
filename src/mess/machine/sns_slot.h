@@ -5,6 +5,18 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+// offset of add-on dumps inside snes_add/snesp_add bios, to support old dumps missing add-on data
+#define SNES_DSP1_OFFSET  (0x00000)
+#define SNES_DSP1B_OFFSET (0x03000)
+#define SNES_DSP2_OFFSET  (0x06000)
+#define SNES_DSP3_OFFSET  (0x09000)
+#define SNES_DSP4_OFFSET  (0x0c000)
+#define SNES_ST10_OFFSET  (0x0f000)
+#define SNES_ST11_OFFSET  (0x20000)
+#define SNES_CX4_OFFSET   (0x31000)
+#define SNES_ST18_OFFSET1 (0x32000)
+#define SNES_ST18_OFFSET2 (0x52000)
+
 
 /* PCB */
 enum
@@ -46,6 +58,28 @@ enum
 	SNES_BUGS   // wip
 };
 
+/* add-ons to handle legacy dumps in snes_add  */
+enum
+{
+	ADDON_NONE = 0,
+	ADDON_CX4,
+	ADDON_DSP1,
+	ADDON_DSP1B,
+	ADDON_DSP2,
+	ADDON_DSP3,
+	ADDON_DSP4,
+	ADDON_OBC1,
+	ADDON_SA1,
+	ADDON_SDD1,
+	ADDON_SFX,
+	ADDON_SPC7110,
+	ADDON_SPC7110_RTC,
+	ADDON_ST010,
+	ADDON_ST011,
+	ADDON_ST018,
+	ADDON_SRTC,
+	ADDON_Z80GB
+};
 
 // ======================> sns_cart_interface
 
@@ -123,11 +157,11 @@ public:
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
 
-	int get_cart_type(UINT8 *ROM, UINT32 len);
+	void get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon);
 	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
 	int get_type() { return m_type; }
+	int get_addon() { return m_addon; }
 
-	void setup_custom_mappers();
 	void setup_nvram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
 
@@ -152,9 +186,21 @@ public:
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 
+	// in order to support legacy dumps, we enable add-on CPUs even when loading from fullpath
+	// and then we stop them at MACHINE_RESET to avoid crashes
+	void snes_stop_addon_cpu(const char *cputag);
+	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we 
+	// check if the required data is present and update bank map accordingly
+	void setup_appended_addon();
+
+
 // m_cart cannot be made private yet, because we need to check nvram_size from the driver...
 // more work needed
 //private:
+
+	// this is used to support legacy DSPx/ST0xx/CX4 dumps not including the CPU data...
+	// i.e. it's only used for snes_add/snesp_add
+	int m_addon;
 
 	int m_type;
 	device_sns_cart_interface*      m_cart;

@@ -21,6 +21,12 @@
     subslots (e.g. BS-X compatible ones), that need to write to subslot (NV)RAM independently
     to accesses to their own (NV)RAM.
 
+    In order to support legacy dumps of games with add-on NEC & Seta DSPs, CX4 and Seta ST018,
+    we use not only m_type to identify the correct slot device to be used (for this DSP1B, DSP2 and
+    DSP3 are the same), but also a m_addon variable that snes_add driver uses to load CPU dump from
+    the system BIOS (for this DSP1B, DSP2 and DSP3 are not the same).
+
+
  ***********************************************************************************************************/
 
 
@@ -169,6 +175,7 @@ base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconf
 						device_t(mconfig, type, name, tag, owner, clock),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
+						m_addon(ADDON_NONE),
 						m_type(SNES_MODE20)
 {
 }
@@ -495,73 +502,78 @@ static int snes_find_addon_chip( UINT8 *buffer, UINT32 start_offs )
 
 		case 0x03:
 			if (buffer[start_offs + 0x15] == 0x30)
-				return SNES_DSP4;
+				return ADDON_DSP4;
 			else
-				return SNES_DSP;
+				return ADDON_DSP1;
 
 		case 0x04:
-			return SNES_DSP;
+			return ADDON_DSP1;
 
 		case 0x05:
 			// DSP2 can be detected by (buffer[start_offs + 0x15] == 0x20)
 			// DSP3 is harder to detect, and one has to rely on the manufacturer (Bandai)
 			//      by checking (buffer[start_offs + 0x15] == 0x30) && (buffer[start_offs + 0x1a] == 0xb2)
 			// in other cases is DSP1, but we do treat all these together...
-			return SNES_DSP;
+			if (buffer[start_offs + 0x15] == 0x20)
+				return ADDON_DSP2;
+			else if ((buffer[start_offs + 0x15] == 0x30) && (buffer[start_offs + 0x1a] == 0xb2))
+				return ADDON_DSP3;
+			else
+				return ADDON_DSP1;
 
 		case 0x13:  // Mario Chip 1
 		case 0x14:  // GSU-x
 		case 0x15:  // GSU-x
 		case 0x1a:  // GSU-1 (21 MHz at start)
 			if (buffer[start_offs + 0x15] == 0x20)
-				return SNES_SFX;
+				return ADDON_SFX;
 			break;
 
 		case 0x25:
-			return SNES_OBC1;
+			return ADDON_OBC1;
 
 		case 0x32:  // needed by a Sample game (according to ZSNES)
 		case 0x34:
 		case 0x35:
 			if (buffer[start_offs + 0x15] == 0x23)
-				return SNES_SA1;
+				return ADDON_SA1;
 			break;
 
 		case 0x43:
 		case 0x45:
 			if (buffer[start_offs + 0x15] == 0x32)
-				return SNES_SDD1;
+				return ADDON_SDD1;
 			break;
 
 		case 0x55:
 			if (buffer[start_offs + 0x15] == 0x35)
-				return SNES_SRTC;
+				return ADDON_SRTC;
 			break;
 
 		case 0xe3:
-			return SNES_Z80GB;
+			return ADDON_Z80GB;
 
 		case 0xf3:
-			return SNES_CX4;
+			return ADDON_CX4;
 
 		case 0xf5:
 			if (buffer[start_offs + 0x15] == 0x30)
-				return SNES_ST018;
+				return ADDON_ST018;
 			else if (buffer[start_offs + 0x15] == 0x3a)
-				return SNES_SPC7110;
+				return ADDON_SPC7110;
 			break;
 
 		case 0xf6:
 			/* These Seta ST-01X chips have both 0x30 at 0xffd5,
 			 they only differ for the 'size' at 0xffd7 */
 			if (buffer[start_offs + 0x17] < 0x0a)
-				return SNES_ST011;
+				return ADDON_ST011;
 			else
-				return SNES_ST010;
+				return ADDON_ST010;
 
 		case 0xf9:
 			if (buffer[start_offs + 0x15] == 0x3a)
-				return SNES_SPC7110_RTC;
+				return ADDON_SPC7110_RTC;
 			break;
 
 		default:
@@ -618,7 +630,7 @@ bool base_sns_cart_slot_device::call_load()
 
 		// get pcb type
 		if (software_entry() == NULL)
-			m_type = get_cart_type(ROM, len);
+			get_cart_type_addon(ROM, len, m_type, m_addon);
 		else
 		{
 			if ((slot_name = get_feature("slot")) == NULL)
@@ -630,7 +642,8 @@ bool base_sns_cart_slot_device::call_load()
 					m_type = SNES_DSP_2MB;
 		}
 
-		setup_custom_mappers();
+		if (software_entry() == NULL)
+			setup_appended_addon();
 
 		setup_nvram();
 
@@ -648,7 +661,7 @@ bool base_sns_cart_slot_device::call_load()
 				auto_free(machine(), temp_nvram);
 		}
 
-		printf("Type %d\n", m_type);
+		//printf("Type %d\n", m_type);
 
 		internal_header_logging(ROM, len);
 
@@ -684,9 +697,91 @@ void base_sns_cart_slot_device::call_unload()
 }
 
 
-void base_sns_cart_slot_device::setup_custom_mappers()
+void base_sns_cart_slot_device::setup_appended_addon()
 {
-	// we have to eventually support pirate mappers here
+	// if we already have an add-on bios or if no addon has been detected, we have nothing to do
+	if (m_cart->get_addon_bios_size() || m_addon == ADDON_NONE)
+		return;
+
+	// check if the add-on dump is appended to the file
+	// if this is the case, copy it in m_bios and refresh
+	// the rom_bank_map with correct game rom size
+	switch (m_addon)
+	{
+		case ADDON_DSP1:
+		case ADDON_DSP1B:
+		case ADDON_DSP2:
+		case ADDON_DSP3:
+		case ADDON_DSP4:
+			// check for add-on dump
+			if ((m_cart->get_rom_size() & 0x7fff) == 0x2800)
+			{
+				logerror("Found NEC DSP dump at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2800), 0x2800);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x2800);
+			}
+			// check for byuu's compressed version (swapped order of bytes and stripped fixed 0x00 bytes)
+			if ((m_cart->get_rom_size() & 0x7fff) == 0x2000)
+			{
+				logerror("Found NEC DSP dump (byuu's version) at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				for (int i = 0; i < 0x800; i++)
+				{
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 2, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2000) + i * 3 + 0, 1);
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 1, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2000) + i * 3 + 1, 1);
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 0, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x2000) + i * 3 + 2, 1);
+					memset(m_cart->get_addon_bios_base() + i * 4 + 3, 0xff, 1);
+				}
+				memcpy(m_cart->get_addon_bios_base() + 0x2000, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x1800), 0x800);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x2000);
+			}
+			break;
+		case ADDON_ST010:
+		case ADDON_ST011:
+			// check for add-on dump
+			if ((m_cart->get_rom_size() & 0x3ffff) == 0x11000)
+			{
+				logerror("Found Seta DSP dump at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x11000);
+				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x11000), 0x11000);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x11000);
+			}
+			// check for byuu's compressed version (swapped order of bytes and stripped fixed 0x00 bytes)
+			if ((m_cart->get_rom_size() & 0xffff) == 0xd000)
+			{
+				logerror("Found Seta DSP dump (byuu's version) at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x11000);
+				for (int i = 0; i < 0x4000; i++)
+				{
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 2, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0xd000) + i * 3 + 0, 1);
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 1, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0xd000) + i * 3 + 1, 1);
+					memcpy(m_cart->get_addon_bios_base() + i * 4 + 0, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0xd000) + i * 3 + 2, 1);
+					memset(m_cart->get_addon_bios_base() + i * 4 + 3, 0xff, 1);
+				}
+				memcpy(m_cart->get_addon_bios_base() + 0x10000, m_cart->get_rom_base() + (m_cart->get_rom_size() - 0xc000), 0x1000);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0xd000);
+			}
+			break;
+		case ADDON_CX4:
+			if ((m_cart->get_rom_size() & 0x7fff) == 0x0c00)
+			{
+				logerror("Found CX4 dump at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x0c00);
+				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x0c00), 0x0c00);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x0c00);
+			}
+			break;
+		case ADDON_ST018:
+			if ((m_cart->get_rom_size() & 0x3ffff) == 0x28000)
+			{
+				logerror("Found ST018 dump at the bottom of the ROM.\n");
+				m_cart->addon_bios_alloc(machine(), 0x28000);
+				memcpy(m_cart->get_addon_bios_base(), m_cart->get_rom_base() + (m_cart->get_rom_size() - 0x28000), 0x28000);
+				m_cart->rom_map_setup(m_cart->get_rom_size() - 0x28000);
+			}
+			break;
+	}
 }
 
 void base_sns_cart_slot_device::setup_nvram()
@@ -738,10 +833,8 @@ bool base_sns_cart_slot_device::call_softlist_load(char *swlist, char *swname, r
 	return TRUE;
 }
 
-int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+void base_sns_cart_slot_device::get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon)
 {
-	int type = 0;
-
 	// First, look if the cart is HiROM or LoROM (and set snes_cart accordingly)
 	int hilo_mode = snes_find_hilo_mode(ROM, len);
 
@@ -784,64 +877,88 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	// check for add-on chips...
 	if (len >= hilo_mode + 0x1a)
 	{
-		int addon = snes_find_addon_chip(ROM, hilo_mode);
+		addon = snes_find_addon_chip(ROM, hilo_mode);
 		if (addon != -1)
 		{
-			if (type == SNES_MODE20 && addon == SNES_DSP)
+			// m_type handles DSP1,2,3 in the same way, but snes_add requires them to be separate...
+			switch (addon)
 			{
-				if (len > 0x100000)
-					type = SNES_DSP_2MB;
-				else
-					type = SNES_DSP;
+				case ADDON_CX4:
+					type = SNES_CX4;
+					break;
+				case ADDON_DSP1:
+				case ADDON_DSP1B:
+				case ADDON_DSP2:
+				case ADDON_DSP3:
+					if (type == SNES_MODE20 && len > 0x100000)
+						type = SNES_DSP_2MB;
+					else if (type == SNES_MODE21)
+						type = SNES_DSP_MODE21;
+					else
+						type = SNES_DSP;
+					break;
+				case ADDON_DSP4:
+					type = SNES_DSP4;
+					break;
+				case ADDON_OBC1:
+					type = SNES_OBC1;
+					break;
+				case ADDON_SA1:
+					type = SNES_SA1;
+					break;
+				case ADDON_SDD1:
+					type = SNES_SDD1;
+					break;
+				case ADDON_SFX:
+					type = SNES_SFX;
+					break;
+				case ADDON_SPC7110:
+					type = SNES_SPC7110;
+					break;
+				case ADDON_SPC7110_RTC:
+					type = SNES_SPC7110_RTC;
+					break;
+				case ADDON_ST010:
+					type = SNES_ST010;
+					break;
+				case ADDON_ST011:
+					type = SNES_ST011;
+					break;
+				case ADDON_ST018:
+					type = SNES_ST018;
+					break;
+				case ADDON_SRTC:
+					type = SNES_SRTC;
+					break;
+				case ADDON_Z80GB:
+					type = SNES_Z80GB;
+					break;
 			}
-			else if (type == SNES_MODE21 && addon == SNES_DSP)
-				type = SNES_DSP_MODE21;
-			else
-				type = addon;
 		}
 	}
-	// ...and turn them off if we are loading from fullpath a game which requires an add-on bios
-	switch (type)
-	{
-		case SNES_DSP:
-		case SNES_DSP_2MB:
-		case SNES_DSP4:
-		case SNES_ST010:
-		case SNES_ST011:
-		case SNES_ST018:
-//		case SNES_CX4:
-			printf("This type of cart requires the dump of on-cart CPU. You need to load it from softlist!\n");
-			type = SNES_MODE20;
-			break;
-		case SNES_DSP_MODE21:
-			printf("This type of cart requires the dump of on-cart CPU. You need to load it from softlist!\n");
-			type = SNES_MODE21;
-			break;
-	}
-
-	return type;
 }
+
 /*-------------------------------------------------
  get default card software
  -------------------------------------------------*/
 
 const char * base_sns_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
-	const char *slot_string = "lorom";
 	bool fullpath = open_image_file(options);
 
 	if (fullpath)
 	{
+		const char *slot_string = "lorom";
 		UINT32 offset = 0;
 		UINT32 len = core_fsize(m_file);
 		UINT8 *ROM = global_alloc_array(UINT8, len);
-		int type;
+		int type = 0, addon = 0;
 
 		core_fread(m_file, ROM, len);
 
 		offset = snes_skip_header(ROM, len);
-		
-		type = get_cart_type(ROM + offset, len - offset);
+
+		get_cart_type_addon(ROM + offset, len - offset, type, addon);
 		slot_string = sns_get_slot(type);
 
 		global_free(ROM);
@@ -852,7 +969,6 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 
 	return software_get_default_slot(config, options, this, "lorom");
 }
-
 
 
 /*-------------------------------------------------
@@ -919,6 +1035,17 @@ WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)
 		m_cart->chip_write(space, offset, data);
 }
 
+
+/*-------------------------------------------------
+ snes_stop_addon_cpu
+ -------------------------------------------------*/
+
+void base_sns_cart_slot_device::snes_stop_addon_cpu(const char *cputag)
+{
+	astring cpu(m_cart->device().tag(), ":", cputag);
+	if (m_cart && machine().device(cpu))
+		machine().device(cpu.cstr())->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
 
 /*-------------------------------------------------
  Internal header logging

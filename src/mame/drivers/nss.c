@@ -866,17 +866,11 @@ MACHINE_CONFIG_END
 #define NSS_BIOS \
 	ROM_REGION(0x100,           "sound_ipl", 0)     /* IPL ROM */ \
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) \
-	ROM_REGION(0x10000,           "addons", ROMREGION_ERASE00)      /* add-on chip ROMs (DSP1 will be needed if we dump the NSS version of Super Mario Kart)*/\
-	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) ) \
 	ROM_REGION(0x8000,         "bios",  0)      /* Bios CPU */ \
 	ROM_SYSTEM_BIOS( 0, "single", "Nintendo Super System (Single Cart BIOS)" ) \
 	ROMX_LOAD("nss-ic14.02", 0x00000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477), ROM_BIOS(1) )   /* bios */ \
 	ROM_SYSTEM_BIOS( 1, "multi", "Nintendo Super System (Multi Cart BIOS)" ) \
-	ROMX_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */ \
-	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF) \
-	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
-
-
+	ROMX_LOAD("nss-c.dat"  , 0x00000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2), ROM_BIOS(2) )   /* bios */
 
 
 ROM_START( nss )

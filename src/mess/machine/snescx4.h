@@ -22,3 +22,6 @@ struct CX4
 		double c4x, c4y, c4z;
 		double c4x2, c4y2, c4z2;
 };
+
+UINT8 CX4_read(UINT32 addr);
+void CX4_write(running_machine &machine, UINT32 addr, UINT8 data);
