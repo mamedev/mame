@@ -158,7 +158,7 @@ static void mlc_drawgfxzoomline(
 }
 
 
-void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect, int scanline)
 {
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
@@ -368,126 +368,120 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 		if (!ratio)
 			continue;
 
-		for (int bby=0; bby<full_sprite_screen_height>>16; bby++)
+		int bby = scanline - (full_realybase>>16);
+
+		if (bby < 0)
+			continue;
+
+		if (bby >= full_sprite_screen_height>>16)
+			continue;
+
+
+
+		
+		int srcline = ((bby<<16) / ratio);
+			
+		by = srcline >> 4;
+			
+		int y = (full_realybase>>16)+bby;
+
+		rectangle myclip;
+		myclip = user_clip;
+		myclip &= bitmap.cliprect();
+
+		if( y < myclip.min_y )
+			continue;
+
+		if( y > myclip.max_y+1 )
+			continue;
+
+		UINT32 *dest = &bitmap.pix32(y);
+
+		srcline &=0xf;
+		if( fy )
 		{
-			int srcline = ((bby<<16) / ratio);
-			
-			by = srcline >> 4;
-			
-			int y = (full_realybase>>16)+bby;
+			srcline = 15 - srcline;
+		}
 
-			rectangle myclip;
-			myclip = user_clip;
-			myclip &= bitmap.cliprect();
 
-			if( y < myclip.min_y )
-				continue;
-
-			if( y > myclip.max_y+1 )
-				continue;
-
-			UINT32 *dest = &bitmap.pix32(y);
-
-			srcline &=0xf;
-			if( fy )
+		for (bx=0; bx<w; bx++) {
+				
+			int realxbase = xbase + bx * xinc;
+			int count = 0;
+			if (fx)
 			{
-				srcline = 15 - srcline;
+				if (fy)
+					count = (h-1-by) * w + (w-1-bx);
+				else
+					count = by * w + (w-1-bx);
+			}
+			else
+			{
+				if (fy)
+					count = (h-1-by) * w + bx;
+				else
+					count = by * w + bx;
 			}
 
+			int tile=sprite + count;
+			int tile2=sprite2 + count;
 
-			for (bx=0; bx<w; bx++) {
-				
-				int realxbase = xbase + bx * xinc;
-				int count = 0;
-				if (fx)
+			if (blockIsTilemapIndex) {
+				if (useIndicesInRom)
 				{
-					if (fy)
-						count = (h-1-by) * w + (w-1-bx);
+					const UINT8* ptr=rawrom+(tile*2);
+					tile=(*ptr) + ((*(ptr+1))<<8);
+
+					if (use8bppMode) {
+						const UINT8* ptr2=rawrom+(tile2*2);
+						tile2=(*ptr2) + ((*(ptr2+1))<<8);
+					}
 					else
-						count = by * w + (w-1-bx);
+					{
+						tile2=0;
+					}
+
+					if (tileFormat)
+					{
+						colorOffset=(tile&0xf000)>>12;
+						tile=(tile&0x0fff)|hibits;
+						tile2=(tile2&0x0fff)|hibits;
+					}
+					else
+					{
+						colorOffset=0;
+						tile=(tile&0xffff)|(hibits<<2);
+						tile2=(tile2&0xffff)|(hibits<<2);
+					}
 				}
 				else
 				{
-					if (fy)
-						count = (h-1-by) * w + bx;
-					else
-						count = by * w + bx;
-				}
+					const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
+					tile=(*ptr)&0xffff;
 
-				int tile=sprite + count;
-				int tile2=sprite2 + count;
-
-				if (blockIsTilemapIndex) {
-					if (useIndicesInRom)
+					if (tileFormat)
 					{
-						const UINT8* ptr=rawrom+(tile*2);
-						tile=(*ptr) + ((*(ptr+1))<<8);
-
-						if (use8bppMode) {
-							const UINT8* ptr2=rawrom+(tile2*2);
-							tile2=(*ptr2) + ((*(ptr2+1))<<8);
-						}
-						else
-						{
-							tile2=0;
-						}
-
-						if (tileFormat)
-						{
-							colorOffset=(tile&0xf000)>>12;
-							tile=(tile&0x0fff)|hibits;
-							tile2=(tile2&0x0fff)|hibits;
-						}
-						else
-						{
-							colorOffset=0;
-							tile=(tile&0xffff)|(hibits<<2);
-							tile2=(tile2&0xffff)|(hibits<<2);
-						}
+						colorOffset=(tile&0xf000)>>12;
+						tile=(tile&0x0fff)|hibits;
 					}
 					else
 					{
-						const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
-						tile=(*ptr)&0xffff;
-
-						if (tileFormat)
-						{
-							colorOffset=(tile&0xf000)>>12;
-							tile=(tile&0x0fff)|hibits;
-						}
-						else
-						{
-							colorOffset=0;
-							tile=(tile&0xffff)|(hibits<<2);
-						}
-
-						tile2=0;
+						colorOffset=0;
+						tile=(tile&0xffff)|(hibits<<2);
 					}
+
+					tile2=0;
 				}
-
-
-
-
-				mlc_drawgfxzoomline(
-								dest,user_clip,machine().gfx[0],
-								tile,tile2,
-								color + colorOffset,fx,realxbase,
-								0,
-								use8bppMode,(xscale<<8),alpha, srcline);
-
 			}
 
-							
+			mlc_drawgfxzoomline(
+							dest,user_clip,machine().gfx[0],
+							tile,tile2,
+							color + colorOffset,fx,realxbase,
+							0,
+							use8bppMode,(xscale<<8),alpha, srcline);
 
 		}
-
-//      if (lastRasterMode!=0 && rasterDirty)
-//      {
-//          blitRaster(machine, bitmap, rasterMode);
-//          temp_bitmap->fill(0, cliprect);
-//          rasterDirty=0;
-//      }
-//      lastRasterMode=rasterMode;
 
 		if (use8bppMode)
 			offs-=8;
@@ -512,6 +506,10 @@ UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bi
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(bitmap,cliprect);
+
+	for (int i=0;i<256;i++)
+	{
+		draw_sprites(bitmap,cliprect, i);
+	}
 	return 0;
 }
