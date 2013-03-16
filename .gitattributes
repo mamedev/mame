@@ -4599,6 +4599,7 @@ src/mame/layout/crsbingo.lay svneol=native#text/plain
 src/mame/layout/crusnexo.lay svneol=native#text/plain
 src/mame/layout/darius.lay svneol=native#text/plain
 src/mame/layout/dblaxle.lay svneol=native#text/plain
+src/mame/layout/de2.lay svneol=native#text/plain
 src/mame/layout/deadeye.lay svneol=native#text/plain
 src/mame/layout/demon.lay svneol=native#text/plain
 src/mame/layout/dendego.lay svneol=native#text/plain

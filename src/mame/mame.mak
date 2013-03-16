@@ -2083,6 +2083,8 @@ $(DRIVERS)/corona.o:    $(LAYOUT)/re800.lh \
 
 $(DRIVERS)/darius.o:    $(LAYOUT)/darius.lh
 
+$(DRIVERS)/de_2.o:      $(LAYOUT)/de2.lh
+
 $(DRIVERS)/destroyr.o:  $(LAYOUT)/destroyr.lh
 
 $(DRIVERS)/dlair.o:     $(LAYOUT)/dlair.lh
