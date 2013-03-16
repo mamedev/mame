@@ -384,7 +384,7 @@ WRITE8_MEMBER( de_2_state::dig0_w )
 WRITE8_MEMBER( de_2_state::dig1_w )
 {
 	m_segment2 |= data;
-	m_segment2 |= 0x20000;
+	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
 		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
@@ -494,6 +494,7 @@ static const pia6821_interface pia30_intf =
 // 6821 PIA at 0x3400
 WRITE8_MEMBER( de_2_state::pia34_pa_w )
 {
+	// Not connected?
 	m_segment2 |= (data<<8);
 	m_segment2 |= 0x10000;
 	if ((m_segment2 & 0x70000) == 0x30000)
@@ -594,9 +595,7 @@ ROM_START(mnfb_c27)
 	ROM_LOAD("mnf-f7.256", 0x8000, 0x8000, CRC(fbc2d6f6) SHA1(33173c081de776d32e926481e94b265ec48d770b))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("mnf-f5-6.512", 0x00000, 0x10000, CRC(0c6ea963) SHA1(8c88fa588222ef8a6c872b8c5b49639b108384d4))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("mnf-f4-5.512", 0x20000, 0x10000, CRC(efca5d80) SHA1(9655c885dd64aa170205170b6a0c052bd9367379))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("mnf-f4-5.512", 0x10000, 0x10000, CRC(efca5d80) SHA1(9655c885dd64aa170205170b6a0c052bd9367379))
 ROM_END
 
 /*-------------------------------------------------------------------------------
@@ -610,9 +609,7 @@ ROM_START(poto_a32)
 	ROM_LOAD("potof7.rom", 0x8000, 0x8000, CRC(2e60b2e3) SHA1(0be89fc9b2c6548392febb35c1ace0eb912fc73f))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("potof6.rom", 0x00000, 0x10000, CRC(62b8f74b) SHA1(f82c706b88f49341bab9014bd83371259eb53b47))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("potof5.rom", 0x20000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
 ROM_END
 
 /*-----------------------------------------------------------------------------------
@@ -626,9 +623,7 @@ ROM_START(play_a24)
 	ROM_LOAD("pbsnd7.dat", 0x8000, 0x8000, CRC(c2cf2cc5) SHA1(1277704b1b38558c341b52da5e06ffa9f07942ad))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("pbsnd6.dat", 0x00000, 0x10000, CRC(c2570631) SHA1(135db5b923689884c73aa5ce48f566db7f1cf831))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("pbsnd5.dat", 0x20000, 0x10000, CRC(0fd30569) SHA1(0bf53fe4b5dffb5e15212c3371f51e98ad14e258))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("pbsnd5.dat", 0x10000, 0x10000, CRC(0fd30569) SHA1(0bf53fe4b5dffb5e15212c3371f51e98ad14e258))
 ROM_END
 
 /*------------------------------------------------------------------
@@ -642,9 +637,7 @@ ROM_START(robo_a34)
 	ROM_LOAD("robof7.rom", 0x8000, 0x8000, CRC(fa0891bd) SHA1(332d03c7802989abf717564230993b54819ebc0d))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("robof6.rom", 0x00000, 0x10000, CRC(9246e107) SHA1(e8e72c0d099b17ea9e59ea7794011bad4c072c5e))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("robof4.rom", 0x20000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
 ROM_END
 
 /*-------------------------------------------------------------------------
@@ -669,7 +662,7 @@ ROM_START(ssvc_b26)
 	ROM_LOAD("sssndf7b.rom", 0x8000, 0x8000, CRC(4bd6b16a) SHA1(b9438a16cd35820628fe6eb82287b2c39fe4b1c6))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("ssv1f6.rom", 0x00000, 0x10000, CRC(ccbc72f8) SHA1(c5c13fb8d05d7fb4005636655073d88b4d12d65e))
-	ROM_LOAD("ssv2f4.rom", 0x20000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
+	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
 ROM_END
 
 /*--------------------------------------------------------------------------
@@ -683,9 +676,7 @@ ROM_START(tmac_a24)
 	ROM_LOAD("tmachf7.rom", 0x8000, 0x8000, CRC(0f518bd4) SHA1(05e24ca0e76d576c65d9d2a01417f1ad2aa984bb))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmachf6.rom", 0x00000, 0x10000, CRC(47e61641) SHA1(93cd946ebc9f69d82512429a9ae5f2754499b00a))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("tmachf4.rom", 0x20000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("tmachf4.rom", 0x10000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
 ROM_END
 
 ROM_START(tmac_a18)
@@ -696,9 +687,7 @@ ROM_START(tmac_a18)
 	ROM_LOAD("tmachf7.rom", 0x8000, 0x8000, CRC(0f518bd4) SHA1(05e24ca0e76d576c65d9d2a01417f1ad2aa984bb))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("tmachf6.rom", 0x00000, 0x10000, CRC(47e61641) SHA1(93cd946ebc9f69d82512429a9ae5f2754499b00a))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("tmachf4.rom", 0x20000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("tmachf4.rom", 0x10000, 0x10000, CRC(51e3aade) SHA1(38fc0f3a9c727bfd07fbcb16c3ca6d0560dc65c3))
 ROM_END
 
 /*-----------------------------------------------------------------------
@@ -712,9 +701,7 @@ ROM_START(torp_e21)
 	ROM_LOAD("torpef7.rom", 0x8000, 0x8000, CRC(26f4c33e) SHA1(114f85e93e7b699c4cd6ce1298f95228d439deba))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("torpef6.rom", 0x00000, 0x10000, CRC(b214a7ea) SHA1(d972148395581844e3eaed08f755f3e2217dbbc0))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("torpef4.rom", 0x20000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("torpef4.rom", 0x10000, 0x10000, CRC(83a4e7f3) SHA1(96deac9251fe68cc0319ac009becd424c4e444c5))
 ROM_END
 
 GAME(1989,  mnfb_c27,       0,          de_2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       GAME_IS_SKELETON_MECHANICAL)

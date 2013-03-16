@@ -87,48 +87,48 @@
 		</bezel>
 
 		<!-- Player 3 Score -->
-		<bezel name="digit17" element="digit">
+		<bezel name="digit17" element="ldigit">
 			<bounds left="10" top="100" right="30" bottom="139" />
 		</bezel>
-		<bezel name="digit18" element="digit">
+		<bezel name="digit18" element="ldigit">
 			<bounds left="34" top="100" right="54" bottom="139" />
 		</bezel>
-		<bezel name="digit19" element="digit">
+		<bezel name="digit19" element="ldigit">
 			<bounds left="58" top="100" right="78" bottom="139" />
 		</bezel>
-		<bezel name="digit20" element="digit">
+		<bezel name="digit20" element="ldigit">
 			<bounds left="82" top="100" right="102" bottom="139" />
 		</bezel>
-		<bezel name="digit21" element="digit">
+		<bezel name="digit21" element="ldigit">
 			<bounds left="106" top="100" right="126" bottom="139" />
 		</bezel>
-		<bezel name="digit22" element="digit">
+		<bezel name="digit22" element="ldigit">
 			<bounds left="130" top="100" right="150" bottom="139" />
 		</bezel>
-		<bezel name="digit23" element="digit">
+		<bezel name="digit23" element="ldigit">
 			<bounds left="154" top="100" right="174" bottom="139" />
 		</bezel>
 
 		<!-- Player 4 Score -->
-		<bezel name="digit25" element="digit">
+		<bezel name="digit25" element="ldigit">
 			<bounds left="190" top="100" right="210" bottom="139" />
 		</bezel>
-		<bezel name="digit26" element="digit">
+		<bezel name="digit26" element="ldigit">
 			<bounds left="214" top="100" right="234" bottom="139" />
 		</bezel>
-		<bezel name="digit27" element="digit">
+		<bezel name="digit27" element="ldigit">
 			<bounds left="238" top="100" right="258" bottom="139" />
 		</bezel>
-		<bezel name="digit28" element="digit">
+		<bezel name="digit28" element="ldigit">
 			<bounds left="262" top="100" right="282" bottom="139" />
 		</bezel>
-		<bezel name="digit29" element="digit">
+		<bezel name="digit29" element="ldigit">
 			<bounds left="286" top="100" right="306" bottom="139" />
 		</bezel>
-		<bezel name="digit30" element="digit">
+		<bezel name="digit30" element="ldigit">
 			<bounds left="310" top="100" right="330" bottom="139" />
 		</bezel>
-		<bezel name="digit31" element="digit">
+		<bezel name="digit31" element="ldigit">
 			<bounds left="334" top="100" right="354" bottom="139" />
 		</bezel>
 
