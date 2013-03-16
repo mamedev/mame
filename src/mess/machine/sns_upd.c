@@ -12,6 +12,17 @@
 #include "emu.h"
 #include "machine/sns_upd.h"
 
+
+// helpers
+inline UINT32 get_prg(UINT8 *CPU, UINT32 addr)
+{
+	return ((CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00);
+}
+inline UINT16 get_data(UINT8 *CPU, UINT32 addr)
+{
+	return ((CPU[addr * 2] << 8) | CPU[addr * 2 + 1]);
+}
+
 //-------------------------------------------------
 //  constructor
 //-------------------------------------------------
@@ -89,13 +100,12 @@ void sns_rom_setadsp_device::device_start()
 // DSP dump contains prg at offset 0 and data at offset 0x2000
 READ32_MEMBER( sns_rom20_necdsp_device::necdsp_prg_r )
 {
-	return (m_bios[offset * 4] << 24) | (m_bios[offset * 4 + 1] << 16) |
-				(m_bios[offset * 4 + 2] << 8) | 0x00;
+	return get_prg(m_bios, offset);
 }
 
 READ16_MEMBER( sns_rom20_necdsp_device::necdsp_data_r )
 {
-	return (m_bios[0x2000 + offset * 2] << 8) | m_bios[0x2000 + offset * 2 + 1];
+	return get_data(m_bios, offset + 0x2000/2);
 }
 
 
@@ -156,13 +166,12 @@ WRITE8_MEMBER( sns_rom20_necdsp_device::chip_write )
 // DSP dump contains prg at offset 0 and data at offset 0x2000
 READ32_MEMBER( sns_rom21_necdsp_device::necdsp_prg_r )
 {
-	return (m_bios[offset * 4] << 24) | (m_bios[offset * 4 + 1] << 16) |
-	(m_bios[offset * 4 + 2] << 8) | 0x00;
+	return get_prg(m_bios, offset);
 }
 
 READ16_MEMBER( sns_rom21_necdsp_device::necdsp_data_r )
 {
-	return (m_bios[0x2000 + offset * 2] << 8) | m_bios[0x2000 + offset * 2 + 1];
+	return get_data(m_bios, offset + 0x2000/2);
 }
 
 
@@ -276,13 +285,12 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 // DSP dump contains prg at offset 0 and data at offset 0x10000
 READ32_MEMBER( sns_rom_setadsp_device::setadsp_prg_r )
 {
-	return (m_bios[offset * 4] << 24) | (m_bios[offset * 4 + 1] << 16) |
-				(m_bios[offset * 4 + 2] << 8) | 0x00;
+	return get_prg(m_bios, offset);
 }
 
 READ16_MEMBER( sns_rom_setadsp_device::setadsp_data_r )
 {
-	return (m_bios[0x10000 + offset * 2] << 8) | m_bios[0x10000 + offset * 2 + 1];
+	return get_data(m_bios, offset + 0x10000/2);
 }
 
 
