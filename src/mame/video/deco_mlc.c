@@ -80,7 +80,12 @@ static void mlc_drawgfxzoomline(
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	
+	if( usey < myclip.min_y )
+		return;
+
+	if( usey > myclip.max_y+1 )
+		return;
+
 	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
 	const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
@@ -88,7 +93,6 @@ static void mlc_drawgfxzoomline(
 	int sprite_screen_width = (scalex*16+(sx&0xffff))>>16;
 
 	sx>>=16;
-	int sy = usey;
 	if (sprite_screen_width)
 	{
 		/* compute sprite increment per screen pixel */
@@ -125,67 +129,39 @@ static void mlc_drawgfxzoomline(
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
-			int y;
 
-			/* case 1: no alpha */
+			/* no alpha */
 			if (alpha == 0xff)
 			{		
-				y = sy;
+				const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
+				const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
+				UINT32 *dest = &dest_bmp.pix32(usey);
 
-				if( y < myclip.min_y )
-					return;
+				int x, x_index = x_index_base;
 
-				if( y > myclip.max_y+1 )
-					return;
-
-
-
+				for( x=sx; x<ex; x++ )
 				{
-					const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
-					const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
-					UINT32 *dest = &dest_bmp.pix32(y);
+					int c = source1[x_index>>16];
+					if (use8bpp)
+						c=(c<<4)|source2[x_index>>16];
 
-					int x, x_index = x_index_base;
+					if( c != transparent_color ) dest[x] = pal[c];
 
-					for( x=sx; x<ex; x++ )
-					{
-						int c = source1[x_index>>16];
-						if (use8bpp)
-							c=(c<<4)|source2[x_index>>16];
-
-						if( c != transparent_color ) dest[x] = pal[c];
-
-						x_index += dx;
-					}
-				}		
+					x_index += dx;
+				}
 			}
-
-			/* case 6: alpha blended */
 			else
 			{
-				y = sy;
+				const UINT8 *source = code_base1 + (srcline) * gfx->rowbytes();
+				UINT32 *dest = &dest_bmp.pix32(usey);
 
-				if( y < myclip.min_y )
-					return;
-
-				if( y > myclip.max_y+1 )
-					return;
-
+				int x, x_index = x_index_base;
+				for( x=sx; x<ex; x++ )
 				{
-					const UINT8 *source = code_base1 + (srcline) * gfx->rowbytes();
-					UINT32 *dest = &dest_bmp.pix32(y);
-
-					int x, x_index = x_index_base;
-					for( x=sx; x<ex; x++ )
-					{
-						int c = source[x_index>>16];
-						if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], 0, alpha); //pal[c]);
-						x_index += dx;
-					}
-
-						
+					int c = source[x_index>>16];
+					if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], 0, alpha); //pal[c]);
+					x_index += dx;
 				}
-
 			}
 		}
 	}
@@ -404,7 +380,7 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 			int dy = (16<<16)/sprite_screen_height;
 
 
-
+			
 			int counter = 0;
 			for (int y=realybase;y<ey;y++)
 			{
