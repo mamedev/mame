@@ -11,10 +11,6 @@
 #include "emu.h"
 #include "includes/deco_mlc.h"
 
-//extern int mlc_raster_table[9][256];
-//extern UINT32 mlc_clipper[32];
-//static bitmap_rgb32 *temp_bitmap;
-
 /******************************************************************************/
 
 VIDEO_START_MEMBER(deco_mlc_state,mlc)
@@ -30,34 +26,6 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT32, 0x3000/4);
 }
 
-#ifdef UNUSED_FUNCTION
-void deco_mlc_state::blitRaster(bitmap_rgb32 &bitmap, int rasterMode)
-{
-	int x,y;
-	for (y=0; y<256; y++) //todo
-	{
-		UINT32* src=&temp_bitmap->pix32(y&0x1ff);
-		UINT32* dst=&bitmap.pix32(y);
-		UINT32 xptr=(m_mlc_raster_table[0][y]<<13);
-
-		if (machine().input().code_pressed(KEYCODE_X))
-			xptr=0;
-
-		for (x=0; x<320; x++)
-		{
-			if (src[x])
-				dst[x]=src[(xptr>>16)&0x1ff];
-
-			//if (machine().input().code_pressed(KEYCODE_X))
-			//  xptr+=0x10000;
-			//else if(rasterHackTest[0][y]<0)
-				xptr+=0x10000 - ((m_mlc_raster_table[2][y]&0x3ff)<<5);
-			//else
-			//  xptr+=0x10000 + (m_mlc_raster_table[0][y]<<5);
-		}
-	}
-}
-#endif
 
 static void mlc_drawgfxzoomline(
 		UINT32* dest,const rectangle &clip,gfx_element *gfx,
@@ -78,9 +46,6 @@ static void mlc_drawgfxzoomline(
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 
 
-	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
-	const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
-	const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
 
 	int sprite_screen_width = (scalex*16+(sx&0xffff))>>16;
 
@@ -121,10 +86,13 @@ static void mlc_drawgfxzoomline(
 
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
+			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
 
 			/* no alpha */
 			if (alpha == 0xff)
-			{		
+			{	
+				const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
 				const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
 				const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
 
@@ -172,12 +140,13 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 	int useIndicesInRom=0;
 	int hibits=0;
 	int tileFormat=0;
-//  int rasterMode=0;
-//  int lastRasterMode=0;
-//  int rasterDirty=0;
+	int rasterMode=0;
+
 	int clipper=0;
 	rectangle user_clip;
 	UINT32* mlc_spriteram=m_mlc_buffered_spriteram; // spriteram32
+
+	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
 	for (offs = (0x3000/4)-8; offs>=0; offs-=8)
 	{
@@ -233,7 +202,15 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		fx = mlc_spriteram[offs+1]&0x8000;
 		fy = mlc_spriteram[offs+1]&0x4000;
 		color = mlc_spriteram[offs+1]&0xff;
-//      rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+
+		// there are 3 different sets of raster values, must be a way to selects
+		// between them? furthermore avengrgs doesn't even enable this
+		// although it doesn't seem to set the scroll values very often either
+		// so the irq mechanism might be wrong
+		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+		
+
+		
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
 		indx = mlc_spriteram[offs+0]&0x3fff;
 		yscale = mlc_spriteram[offs+4]&0x3ff;
@@ -343,6 +320,26 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 		if(fx1&1) fx^=0x8000;
 		if(fy1&1) fy^=0x4000;
+
+		if (rasterMode)
+		{
+			int irq_base_reg = 6 /* 6, 9, 12 */;
+
+			int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
+			int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
+			int extra_y_scale = (m_irq_ram[irq_base_reg+2]>>16) & 0x7ff;
+			int extra_x_scale = (m_irq_ram[irq_base_reg+2]>>0) & 0x7ff;
+
+			if (extra_x_off & 0x400) extra_x_off -= 0x800;
+			if (extra_y_off & 0x400) extra_y_off -= 0x800;
+
+			x += extra_x_off;
+			y += extra_x_off;
+
+			xscale = extra_x_scale;
+			yscale = extra_y_scale;
+
+		}
 
 		int ybase=y<<16;
 		int yinc=(yscale<<8)*16;
@@ -510,6 +507,14 @@ UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bi
 	{
 		UINT32 *dest = &bitmap.pix32(i);
 
+		/*
+		printf("%d -", i);
+		for (int j=0;j<0x20;j++)
+		{
+			printf("%08x, ",m_irq_ram[j]);
+		}
+		printf("\n");
+		*/
 		draw_sprites(cliprect, i, dest);
 	}
 	return 0;

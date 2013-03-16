@@ -175,8 +175,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 {
-	int scanline=machine().primary_screen->vpos();
-	m_irq_ram[offset]=data&0xffff;
+//	int scanline=machine().primary_screen->vpos();
+	COMBINE_DATA(&m_irq_ram[offset]);
+
 
 	switch (offset*4)
 	{
@@ -187,30 +188,6 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 		m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_irq_ram[0x14/4]));
 		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], machine().primary_screen->vpos());
 		return;
-	case 0x18:
-	case 0x1c:
-	case 0x20:
-	case 0x24:
-	case 0x28:
-	case 0x2c:
-	case 0x30:
-	case 0x34:
-	case 0x38:
-		if (scanline > 255)
-			scanline = 255;
-		/* Update scanlines up to present line */
-		while (m_lastScanline[offset-6]<scanline)
-		{
-			m_mlc_raster_table[offset-6][m_lastScanline[offset-6]+1]=m_mlc_raster_table[offset-6][m_lastScanline[offset-6]];
-			m_lastScanline[offset-6]++;
-		}
-
-		if (m_lastScanline[offset-6] > scanline)
-			m_lastScanline[offset-6]=0;
-
-		/* Set current scanline value */
-		m_mlc_raster_table[offset-6][scanline]=data&0xffff;
-		break;
 
 	default:
 		break;
