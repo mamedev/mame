@@ -207,6 +207,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		// between them? furthermore avengrgs doesn't even enable this
 		// although it doesn't seem to set the scroll values very often either
 		// so the irq mechanism might be wrong
+		//
+		// actually avengrgs has our current clipper&1 set on the areas that should
+		// have the scroll effect applied to them.  all clip windows are the same
+		// so there is no reason to select a clip window other than to be using it
+		// to select a set of raster-set scroll regs?
 		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
 
 
@@ -214,6 +219,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		int unk_bit = (mlc_spriteram[offs+1]>>10)&0x2;
 		// just bail if this bit is set, although it might be clip window related and enable a clip window
 		// to hide all the sprites it covers
+		// this seem realistic because 2 of the upper 4 'clip windows' are usually set to invalid (off-screen)
+		// areas, and we currently have no bit to select them.
 		if (unk_bit) 
 			continue;
 
