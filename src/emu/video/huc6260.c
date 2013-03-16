@@ -30,9 +30,9 @@ PALETTE_INIT( huc6260 )
 
 	for ( i = 0; i < 512; i++ )
 	{
-		int r = ( ( i >> 3 ) & 7 ) << 5;
-		int g = ( ( i >> 6 ) & 7 ) << 5;
-		int b = ( ( i      ) & 7 ) << 5;
+		int r = pal3bit( ( i >> 3 ) & 7 );
+		int g = pal3bit( ( i >> 6 ) & 7 );
+		int b = pal3bit( ( i      ) & 7 );
 		int y = ( ( 66 * r + 129 * g + 25 * b + 128 ) >> 8 ) + 16;
 
 		palette_set_color_rgb( machine, i, r, g, b );
