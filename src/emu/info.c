@@ -553,51 +553,55 @@ void info_xml_creator::output_rom(device_t &device)
 						}
 				}
 
+				astring output;
+
 				// opening tag
 				if (!is_disk)
-					fprintf(m_output, "\t\t<rom");
+					output.cat("\t\t<rom");
 				else
-					fprintf(m_output, "\t\t<disk");
+					output.cat("\t\t<disk");
 
 				// add name, merge, bios, and size tags */
 				if (name != NULL && name[0] != 0)
-					fprintf(m_output, " name=\"%s\"", xml_normalize_string(name));
+					output.catprintf(" name=\"%s\"", xml_normalize_string(name));
 				if (merge_name != NULL)
-					fprintf(m_output, " merge=\"%s\"", xml_normalize_string(merge_name));
+					output.catprintf(" merge=\"%s\"", xml_normalize_string(merge_name));
 				if (bios_name[0] != 0)
-					fprintf(m_output, " bios=\"%s\"", xml_normalize_string(bios_name));
+					output.catprintf(" bios=\"%s\"", xml_normalize_string(bios_name));
 				if (!is_disk)
-					fprintf(m_output, " size=\"%d\"", rom_file_size(rom));
+					output.catprintf(" size=\"%d\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
 				if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 				{
 					// iterate over hash function types and print m_output their values
 					astring tempstr;
-					fprintf(m_output, " %s", hashes.attribute_string(tempstr));
+					output.catprintf(" %s", hashes.attribute_string(tempstr));
 				}
 				else
-					fprintf(m_output, " status=\"nodump\"");
+					output.cat(" status=\"nodump\"");
 
 				// append a region name
-				fprintf(m_output, " region=\"%s\"", ROMREGION_GETTAG(region));
+				output.catprintf(" region=\"%s\"", ROMREGION_GETTAG(region));
 
 				// for non-disk entries, print offset
 				if (!is_disk)
-					fprintf(m_output, " offset=\"%x\"", offset);
+					output.catprintf(" offset=\"%x\"", offset);
 
 				// for disk entries, add the disk index
 				else
 				{
-					fprintf(m_output, " index=\"%x\"", DISK_GETINDEX(rom));
-					fprintf(m_output, " writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
+					output.catprintf(" index=\"%x\"", DISK_GETINDEX(rom));
+					output.catprintf(" writable=\"%s\"", DISK_ISREADONLY(rom) ? "no" : "yes");
 				}
 
 				// add optional flag
 				if ((!is_disk && ROM_ISOPTIONAL(rom)) || (is_disk && DISK_ISOPTIONAL(rom)))
-					fprintf(m_output, " optional=\"yes\"");
+					output.cat(" optional=\"yes\"");
 
-				fprintf(m_output, "/>\n");
+				output.cat("/>\n");
+
+				fprintf(m_output, "%s", output.cstr());
 			}
 		}
 }
@@ -1092,20 +1096,24 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 		for (ioport_field *field = port->first_field(); field != NULL; field = field->next())
 			if (field->type() == type)
 			{
+				astring output;
+
 				astring newtag(port->tag()), oldtag(":");
 				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
 				// output the switch name information
-				fprintf(m_output, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, xml_normalize_string(field->name()), xml_normalize_string(newtag), field->mask());
+				output.catprintf("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, xml_normalize_string(field->name()), xml_normalize_string(newtag), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
 				{
-					fprintf(m_output, "\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
+					output.catprintf("\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
 
 				// terminate the switch entry
-				fprintf(m_output, "\t\t</%s>\n", outertag);
+				output.catprintf("\t\t</%s>\n", outertag);
+
+				fprintf(m_output, "%s", output.cstr());
 			}
 }
 
