@@ -12,6 +12,8 @@
 #include "sound/msm5205.h"
 #include "de2.lh"
 
+// To start Secret Service, hold I, O and Left ALT while pressing Start.
+
 // Data East CPU board is similar to Williams System 11, but without the generic audio board.
 // For now, we'll presume the timings are the same.
 
@@ -31,24 +33,22 @@ public:
 	de_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu"),
 			m_ym2151(*this, "ym2151"),
-			m_msm5205(*this, "msm5205"),
 			m_pia21(*this, "pia21"),
 			m_pia24(*this, "pia24"),
 			m_pia28(*this, "pia28"),
 			m_pia2c(*this, "pia2c"),
 			m_pia30(*this, "pia30"),
-			m_pia34(*this, "pia34")
+			m_pia34(*this, "pia34"),
+			m_audiocpu(*this, "audiocpu"),
+			m_msm5205(*this, "msm5205")
 	{ }
 
 protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<ym2151_device> m_ym2151;
-	required_device<msm5205_device> m_msm5205;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp0_w);
 	DECLARE_WRITE8_MEMBER(lamp1_w) { };
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
 	DECLARE_WRITE8_MEMBER(sol3_w);
@@ -87,6 +88,12 @@ public:
 
 	DECLARE_READ8_MEMBER(sound_latch_r);
 	DECLARE_WRITE8_MEMBER(sample_bank_w);
+
+	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm5205;
+	UINT8 m_sample_data;
+	bool m_more_data;
+	bool m_nmi_enable;
 
 private:
 	UINT32 m_segment1;
@@ -101,7 +108,6 @@ private:
 
 	UINT8 m_sample_bank;
 	UINT8 m_msm_prescaler;
-	bool m_nmi_enable;
 };
 
 static ADDRESS_MAP_START( de_2_map, AS_PROGRAM, 8, de_2_state )
@@ -193,7 +199,8 @@ static INPUT_PORTS_START( de_2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
 
 	PORT_START("INP40")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INP80")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -237,11 +244,12 @@ void de_2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 MACHINE_RESET_MEMBER(de_2_state, de_2)
 {
 	membank("sample_bank")->set_entry(0);
+	m_more_data = false;
 }
 
 DRIVER_INIT_MEMBER(de_2_state, de_2)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("sound1")->base();
 	m_irq_timer = timer_alloc(TIMER_IRQ);
 	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 	m_irq_active = false;
@@ -252,6 +260,24 @@ DRIVER_INIT_MEMBER(de_2_state, de_2)
 WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
+}
+
+//WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
+static void msm5205_irq_w(device_t* device)
+{
+	de_2_state* state = device->machine().driver_data<de_2_state>();
+	msm5205_data_w(state->m_msm5205,state->m_sample_data >> 4);
+	if(state->m_more_data)
+	{
+		if(state->m_nmi_enable)
+			state->m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // generate NMI when we need more data
+		state->m_more_data = false;
+	}
+	else
+	{
+		state->m_more_data = true;
+		state->m_sample_data <<= 4;
+	}
 }
 
 WRITE_LINE_MEMBER(de_2_state::pia_irq)
@@ -296,7 +322,6 @@ WRITE8_MEMBER( de_2_state::sound_w )
 {
 	m_sound_data = data;
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
-	popmessage("sound_w: %02x",data);
 }
 
 WRITE_LINE_MEMBER( de_2_state::pia21_ca2_w )
@@ -498,9 +523,7 @@ static const pia6821_interface pia34_intf =
 // Sound board
 WRITE8_MEMBER(de_2_state::sample_w)
 {
-	msm5205_data_w(m_msm5205,data);
-	msm5205_vclk_w(m_msm5205,1);
-	msm5205_vclk_w(m_msm5205,0);
+	m_sample_data = data;
 }
 
 READ8_MEMBER( de_2_state::sound_latch_r )
@@ -511,9 +534,10 @@ READ8_MEMBER( de_2_state::sound_latch_r )
 
 WRITE8_MEMBER( de_2_state::sample_bank_w )
 {
-	UINT8 prescale[4] = { MSM5205_S96_4B, MSM5205_S48_4B, MSM5205_S64_4B, 0 };
+	static const UINT8 prescale[4] = { MSM5205_S96_4B, MSM5205_S48_4B, MSM5205_S64_4B, 0 };
 
-	m_sample_bank = (data & 0x03) | ((data & 0x04) << 1);
+	m_sample_bank = (data & 0x07);
+	membank("sample_bank")->set_entry(m_sample_bank);
 	m_msm_prescaler = (data & 0x30) >> 4;
 	m_nmi_enable = (~data & 0x80);
 	msm5205_playmode_w(m_msm5205,prescale[m_msm_prescaler]);
@@ -522,8 +546,8 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 
 static const msm5205_interface msm5205_intf =
 {
-	0,
-	MSM5205_SEX_4B
+	msm5205_irq_w,
+	MSM5205_S96_4B
 };
 
 static MACHINE_CONFIG_START( de_2, de_2_state )
@@ -554,7 +578,7 @@ static MACHINE_CONFIG_START( de_2, de_2_state )
 	MCFG_YM2151_ADD("ym2151", 3580000)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(de_2_state, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-	MCFG_SOUND_ADD("msm5205", MSM5205, 3580000)
+	MCFG_SOUND_ADD("msm5205", MSM5205, 384000)
 	MCFG_SOUND_CONFIG(msm5205_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
 MACHINE_CONFIG_END
@@ -634,9 +658,7 @@ ROM_START(ssvc_a26)
 	ROM_LOAD("sssndf7.rom", 0x8000, 0x8000, CRC(980778d0) SHA1(7c1f14d327b6d0e6d0fef058f96bb1cb440c9330))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("ssv1f6.rom", 0x00000, 0x10000, CRC(ccbc72f8) SHA1(c5c13fb8d05d7fb4005636655073d88b4d12d65e))
-	ROM_RELOAD( 0x10000, 0x10000)
-	ROM_LOAD("ssv2f4.rom", 0x20000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
-	ROM_RELOAD( 0x30000, 0x10000)
+	ROM_LOAD("ssv2f4.rom", 0x10000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
 ROM_END
 
 ROM_START(ssvc_b26)
@@ -647,9 +669,7 @@ ROM_START(ssvc_b26)
 	ROM_LOAD("sssndf7b.rom", 0x8000, 0x8000, CRC(4bd6b16a) SHA1(b9438a16cd35820628fe6eb82287b2c39fe4b1c6))
 	ROM_REGION(0x40000, "sound1", 0)
 	ROM_LOAD("ssv1f6.rom", 0x00000, 0x10000, CRC(ccbc72f8) SHA1(c5c13fb8d05d7fb4005636655073d88b4d12d65e))
-	ROM_RELOAD( 0x10000, 0x10000)
 	ROM_LOAD("ssv2f4.rom", 0x20000, 0x10000, CRC(53832d16) SHA1(2227eb784e0221f1bf2bdf7ea48ecd122433f1ea))
-	ROM_RELOAD( 0x30000, 0x10000)
 ROM_END
 
 /*--------------------------------------------------------------------------
