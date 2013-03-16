@@ -353,135 +353,132 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 			xbase-=xoffs * (xscale<<8);
 
 
+		int full_realybase = ybase;
+		int full_sprite_screen_height = ((yscale<<8)*(h*16)+(0));
+		int full_sprite_screen_height_unscaled = ((1)*(h*16)+(0));
 
 
 
-		for (by=0; by<h; by++)
+		if (!full_sprite_screen_height_unscaled)
+			continue;
+
+
+		int ratio = full_sprite_screen_height / full_sprite_screen_height_unscaled;
+
+		if (!ratio)
+			continue;
+
+		for (int bby=0; bby<full_sprite_screen_height>>16; bby++)
 		{
-
+			int srcline = ((bby<<16) / ratio);
 			
+			by = srcline >> 4;
+			
+			int y = (full_realybase>>16)+bby;
 
-			int realybase = ybase + by * yinc;
-			int sprite_screen_height = ((yscale<<8)*16+(realybase&0xffff))>>16;
+			rectangle myclip;
+			myclip = user_clip;
+			myclip &= bitmap.cliprect();
 
-			for (int yi=0;yi<sprite_screen_height;yi++)
+			if( y < myclip.min_y )
+				continue;
+
+			if( y > myclip.max_y+1 )
+				continue;
+
+			UINT32 *dest = &bitmap.pix32(y);
+
+			srcline &=0xf;
+			if( fy )
 			{
-				int y = (realybase>>16)+yi;
-
-				rectangle myclip;
-				myclip = user_clip;
-				myclip &= bitmap.cliprect();
-
-				if( y < myclip.min_y )
-					continue;
-
-				if( y > myclip.max_y+1 )
-					continue;
-
-				UINT32 *dest = &bitmap.pix32(y);
-
-				if (!sprite_screen_height)
-					continue;
-
-				int dy = (16<<16)/sprite_screen_height;
+				srcline = 15 - srcline;
+			}
 
 
-
-				int dystuff = yi * dy;
-
-				int srcline;
-				srcline = dystuff >> 16;
-
-				if( fy )
+			for (bx=0; bx<w; bx++) {
+				
+				int realxbase = xbase + bx * xinc;
+				int count = 0;
+				if (fx)
 				{
-					srcline = (srcline &~15) | (15-(srcline&15));
+					if (fy)
+						count = (h-1-by) * w + (w-1-bx);
+					else
+						count = by * w + (w-1-bx);
+				}
+				else
+				{
+					if (fy)
+						count = (h-1-by) * w + bx;
+					else
+						count = by * w + bx;
 				}
 
+				int tile=sprite + count;
+				int tile2=sprite2 + count;
 
-				for (bx=0; bx<w; bx++) {
-				
-					int realxbase = xbase + bx * xinc;
-					int count = 0;
-					if (fx)
+				if (blockIsTilemapIndex) {
+					if (useIndicesInRom)
 					{
-						if (fy)
-							count = (h-1-by) * w + (w-1-bx);
+						const UINT8* ptr=rawrom+(tile*2);
+						tile=(*ptr) + ((*(ptr+1))<<8);
+
+						if (use8bppMode) {
+							const UINT8* ptr2=rawrom+(tile2*2);
+							tile2=(*ptr2) + ((*(ptr2+1))<<8);
+						}
 						else
-							count = by * w + (w-1-bx);
+						{
+							tile2=0;
+						}
+
+						if (tileFormat)
+						{
+							colorOffset=(tile&0xf000)>>12;
+							tile=(tile&0x0fff)|hibits;
+							tile2=(tile2&0x0fff)|hibits;
+						}
+						else
+						{
+							colorOffset=0;
+							tile=(tile&0xffff)|(hibits<<2);
+							tile2=(tile2&0xffff)|(hibits<<2);
+						}
 					}
 					else
 					{
-						if (fy)
-							count = (h-1-by) * w + bx;
-						else
-							count = by * w + bx;
-					}
+						const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
+						tile=(*ptr)&0xffff;
 
-					int tile=sprite + count;
-					int tile2=sprite2 + count;
-
-					if (blockIsTilemapIndex) {
-						if (useIndicesInRom)
+						if (tileFormat)
 						{
-							const UINT8* ptr=rawrom+(tile*2);
-							tile=(*ptr) + ((*(ptr+1))<<8);
-
-							if (use8bppMode) {
-								const UINT8* ptr2=rawrom+(tile2*2);
-								tile2=(*ptr2) + ((*(ptr2+1))<<8);
-							}
-							else
-							{
-								tile2=0;
-							}
-
-							if (tileFormat)
-							{
-								colorOffset=(tile&0xf000)>>12;
-								tile=(tile&0x0fff)|hibits;
-								tile2=(tile2&0x0fff)|hibits;
-							}
-							else
-							{
-								colorOffset=0;
-								tile=(tile&0xffff)|(hibits<<2);
-								tile2=(tile2&0xffff)|(hibits<<2);
-							}
+							colorOffset=(tile&0xf000)>>12;
+							tile=(tile&0x0fff)|hibits;
 						}
 						else
 						{
-							const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
-							tile=(*ptr)&0xffff;
-
-							if (tileFormat)
-							{
-								colorOffset=(tile&0xf000)>>12;
-								tile=(tile&0x0fff)|hibits;
-							}
-							else
-							{
-								colorOffset=0;
-								tile=(tile&0xffff)|(hibits<<2);
-							}
-
-							tile2=0;
+							colorOffset=0;
+							tile=(tile&0xffff)|(hibits<<2);
 						}
+
+						tile2=0;
 					}
-
-
-
-
-					mlc_drawgfxzoomline(
-									dest,user_clip,machine().gfx[0],
-									tile,tile2,
-									color + colorOffset,fx,realxbase,
-									0,
-									use8bppMode,(xscale<<8),alpha, srcline);
-
 				}
 
-							
+
+
+
+				mlc_drawgfxzoomline(
+								dest,user_clip,machine().gfx[0],
+								tile,tile2,
+								color + colorOffset,fx,realxbase,
+								0,
+								use8bppMode,(xscale<<8),alpha, srcline);
+
 			}
+
+							
+
 		}
 
 //      if (lastRasterMode!=0 && rasterDirty)
