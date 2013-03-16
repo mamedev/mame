@@ -65,6 +65,9 @@
     if skew existed.  SockMaster has confirmed that scanlines are in
     fact 228 clock cycles.
 
+	The PAL emulation is little more than having more scanlines; surely
+	there are details that we are missing here.
+
 **********************************************************************/
 
 
@@ -1683,7 +1686,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 262.0)
+	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
 }
 
@@ -1705,7 +1708,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 262.5)
+	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 313.0)
 {
 }
 
@@ -1727,6 +1730,6 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 262.0)
+	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 313.0)
 {
 }
