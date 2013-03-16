@@ -165,7 +165,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		            0x4000 - Y flip
 		            0x2000 - Auto-flicker (display sprite only every other frame)
 		            0x1000 - If set combine this 4bpp sprite & next one, into 8bpp sprite
-		            0x0800 - ?  (Not seen used anywhere)
+		            0x0800 - This is set ingame on Stadium Hero 96, on graphics which otherwise obscure the playfield?
 		            0x0400 - Use raster IRQ lookup table when drawing object
 		            0x0300 - Selects clipping window to use
 		            0x00ff - Colour/alpha shadow enable
@@ -208,7 +208,15 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		// although it doesn't seem to set the scroll values very often either
 		// so the irq mechanism might be wrong
 		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
+
+
 		
+		int unk_bit = (mlc_spriteram[offs+1]>>10)&0x2;
+		// just bail if this bit is set, although it might be clip window related and enable a clip window
+		// to hide all the sprites it covers
+		if (unk_bit) 
+			continue;
+
 
 		
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
@@ -323,7 +331,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 		if (rasterMode)
 		{
-			int irq_base_reg = 6 /* 6, 9, 12 */;
+			int irq_base_reg = 12 /* 6, 9, 12 */;
 
 			int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
 			int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
@@ -332,12 +340,15 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 			if (extra_x_off & 0x400) extra_x_off -= 0x800;
 			if (extra_y_off & 0x400) extra_y_off -= 0x800;
+		
+			if (extra_y_scale & 0x400) extra_y_scale -= 0x800;
+			if (extra_x_scale & 0x400) extra_x_scale -= 0x800;
 
 			x += extra_x_off;
-			y += extra_x_off;
+			y += extra_y_off;
 
-			xscale = extra_x_scale;
-			yscale = extra_y_scale;
+			xscale += extra_x_scale;
+			yscale += extra_y_scale;
 
 		}
 
@@ -382,7 +393,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			continue;
 
 
-
+	
+//		color = machine().rand();
 		
 		int srcline = ((bby<<16) / ratio);
 			
