@@ -1096,19 +1096,12 @@ void info_xml_creator::output_switches(const ioport_list &portlist, const char *
 				newtag.substr(newtag.find(oldtag.cat(root_tag)) + oldtag.len());
 
 				// output the switch name information
-				fprintf(m_output, "\t\t<%s name=\"%s\"", outertag, xml_normalize_string(field->name()));
-				fprintf(m_output, " tag=\"%s\"", xml_normalize_string(newtag));
-				fprintf(m_output, " mask=\"%u\"", field->mask());
-				fprintf(m_output, ">\n");
+				fprintf(m_output, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, xml_normalize_string(field->name()), xml_normalize_string(newtag), field->mask());
 
 				// loop over settings
 				for (ioport_setting *setting = field->first_setting(); setting != NULL; setting = setting->next())
 				{
-					fprintf(m_output, "\t\t\t<%s name=\"%s\"", innertag, xml_normalize_string(setting->name()));
-					fprintf(m_output, " value=\"%u\"", setting->value());
-					if (setting->value() == field->defvalue())
-						fprintf(m_output, " default=\"yes\"");
-					fprintf(m_output, "/>\n");
+					fprintf(m_output, "\t\t\t<%s name=\"%s\" value=\"%u\"%s/>\n", innertag, xml_normalize_string(setting->name()), setting->value(), setting->value() == field->defvalue() ? " default=\"yes\"" : "");
 				}
 
 				// terminate the switch entry
