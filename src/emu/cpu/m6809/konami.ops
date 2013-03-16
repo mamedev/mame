@@ -517,7 +517,7 @@ LSRD:
 		else
 			m_cc &= ~CC_C;
 
-		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right<INT16>(m_d.w, m_temp.b.l));
+		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right<UINT16>(m_d.w, m_temp.b.l));
 	}
 	eat(1);
 	return;
@@ -582,7 +582,7 @@ ABS8:
 ABS16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
-	m_temp.w = set_flags<UINT16>(CC_NZVC, 0, m_temp.w, ((INT8) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
+	m_temp.w = set_flags<UINT16>(CC_NZVC, 0, m_temp.w, ((INT16) m_temp.w) >= 0 ? m_temp.w : -m_temp.w);
 	@eat(1);
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
