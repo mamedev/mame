@@ -59,15 +59,15 @@ void deco_mlc_state::blitRaster(bitmap_rgb32 &bitmap, int rasterMode)
 }
 #endif
 
-static void mlc_drawgfxzoom(
+static void mlc_drawgfxzoomline(
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int flipy,int sx,int sy,
+		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int scaley,int alpha)
+		int scalex, int alpha, int usey, int srcline	)
 {
 	rectangle myclip;
 
-	if (!scalex || !scaley) return;
+	if (!scalex) return;
 
 	/*
 	scalex and scaley are 16.16 fixed point numbers
@@ -80,129 +80,112 @@ static void mlc_drawgfxzoom(
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
+	
+	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
+	const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
+
+	int sprite_screen_width = (scalex*16+(sx&0xffff))>>16;
+
+	sx>>=16;
+	int sy = usey;
+	if (sprite_screen_width)
 	{
-		if( gfx )
+		/* compute sprite increment per screen pixel */
+		int dx = (16<<16)/sprite_screen_width;
+
+		int ex = sx+sprite_screen_width;
+
+		int x_index_base;
+
+		if( flipx )
 		{
-			const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
-			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
-			const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
+			x_index_base = (sprite_screen_width-1)*dx;
+			dx = -dx;
+		}
+		else
+		{
+			x_index_base = 0;
+		}
 
-			int sprite_screen_height = (scaley*gfx->height()+(sy&0xffff))>>16;
-			int sprite_screen_width = (scalex*gfx->width()+(sx&0xffff))>>16;
 
-			sx>>=16;
-			sy>>=16;
 
-			if (sprite_screen_width && sprite_screen_height)
+		if( sx < myclip.min_x)
+		{ /* clip left */
+			int pixels = myclip.min_x-sx;
+			sx += pixels;
+			x_index_base += pixels*dx;
+		}
+		/* NS 980211 - fixed incorrect clipping */
+		if( ex > myclip.max_x+1 )
+		{ /* clip right */
+			int pixels = ex-myclip.max_x-1;
+			ex -= pixels;
+		}
+
+		if( ex>sx )
+		{ /* skip if inner loop doesn't draw anything */
+			int y;
+
+			/* case 1: no alpha */
+			if (alpha == 0xff)
+			{		
+				y = sy;
+
+				if( y < myclip.min_y )
+					return;
+
+				if( y > myclip.max_y+1 )
+					return;
+
+
+
+				{
+					const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
+					const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
+					UINT32 *dest = &dest_bmp.pix32(y);
+
+					int x, x_index = x_index_base;
+
+					for( x=sx; x<ex; x++ )
+					{
+						int c = source1[x_index>>16];
+						if (use8bpp)
+							c=(c<<4)|source2[x_index>>16];
+
+						if( c != transparent_color ) dest[x] = pal[c];
+
+						x_index += dx;
+					}
+				}		
+			}
+
+			/* case 6: alpha blended */
+			else
 			{
-				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width()<<16)/sprite_screen_width;
-				int dy = (gfx->height()<<16)/sprite_screen_height;
+				y = sy;
 
-				int ex = sx+sprite_screen_width;
-				int ey = sy+sprite_screen_height;
+				if( y < myclip.min_y )
+					return;
 
-				int x_index_base;
-				int y_index;
+				if( y > myclip.max_y+1 )
+					return;
 
-				if( flipx )
 				{
-					x_index_base = (sprite_screen_width-1)*dx;
-					dx = -dx;
-				}
-				else
-				{
-					x_index_base = 0;
-				}
+					const UINT8 *source = code_base1 + (srcline) * gfx->rowbytes();
+					UINT32 *dest = &dest_bmp.pix32(y);
 
-				if( flipy )
-				{
-					y_index = (sprite_screen_height-1)*dy;
-					dy = -dy;
-				}
-				else
-				{
-					y_index = 0;
-				}
-
-				if( sx < myclip.min_x)
-				{ /* clip left */
-					int pixels = myclip.min_x-sx;
-					sx += pixels;
-					x_index_base += pixels*dx;
-				}
-				if( sy < myclip.min_y )
-				{ /* clip top */
-					int pixels = myclip.min_y-sy;
-					sy += pixels;
-					y_index += pixels*dy;
-				}
-				/* NS 980211 - fixed incorrect clipping */
-				if( ex > myclip.max_x+1 )
-				{ /* clip right */
-					int pixels = ex-myclip.max_x-1;
-					ex -= pixels;
-				}
-				if( ey > myclip.max_y+1 )
-				{ /* clip bottom */
-					int pixels = ey-myclip.max_y-1;
-					ey -= pixels;
-				}
-
-				if( ex>sx )
-				{ /* skip if inner loop doesn't draw anything */
-					int y;
-
-					/* case 1: no alpha */
-					if (alpha == 0xff)
+					int x, x_index = x_index_base;
+					for( x=sx; x<ex; x++ )
 					{
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								const UINT8 *source1 = code_base1 + (y_index>>16) * gfx->rowbytes();
-								const UINT8 *source2 = code_base2 + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-
-								int x, x_index = x_index_base;
-
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source1[x_index>>16];
-									if (use8bpp)
-										c=(c<<4)|source2[x_index>>16];
-
-									if( c != transparent_color ) dest[x] = pal[c];
-
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
+						int c = source[x_index>>16];
+						if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], 0, alpha); //pal[c]);
+						x_index += dx;
 					}
 
-					/* case 6: alpha blended */
-					else
-					{
-						{
-							for( y=sy; y<ey; y++ )
-							{
-								const UINT8 *source = code_base1 + (y_index>>16) * gfx->rowbytes();
-								UINT32 *dest = &dest_bmp.pix32(y);
-
-								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
-								{
-									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], 0, alpha); //pal[c]);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
+						
 				}
+
 			}
 		}
 	}
@@ -218,7 +201,6 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 	int blockIsTilemapIndex=0;
 	int sprite2=0,indx2=0,use8bppMode=0;
 	int yscale,xscale;
-	int ybase,yinc;
 	int alpha;
 	int useIndicesInRom=0;
 	int hibits=0;
@@ -387,95 +369,142 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 		if(fx1&1) fx^=0x8000;
 		if(fy1&1) fy^=0x4000;
 
-		ybase=y<<16;
+		int ybase=y<<16;
+		int yinc=(yscale<<8)*16;
+
 		if (fy)
-			ybase+=(yoffs-15) * (yscale<<8);
+			ybase+=(yoffs-15) * (yscale<<8) - ((h-1)*yinc);
 		else
 			ybase-=yoffs * (yscale<<8);
 
-		yinc=(yscale<<8)*16;
+		int xbase=x<<16;
+		int xinc=(xscale<<8)*16;
+			
+		if (fx)
+			xbase+=(xoffs-15) * (xscale<<8) - ((w-1)*xinc);
+		else
+			xbase-=xoffs * (xscale<<8);
 
-		if (fy) yinc=-yinc;
+
+
+
 
 		for (by=0; by<h; by++) {
-			int xbase=x<<16;
-			int xinc=(xscale<<8)*16;
 
-			if (fx)
-				xbase+=(xoffs-15) * (xscale<<8);
-			else
-				xbase-=xoffs * (xscale<<8);
+			int realybase = ybase + by * yinc;
 
-			if (fx) xinc=-xinc;
+			//for (int y=0;
+			int sprite_screen_height = ((yscale<<8)*16+(realybase&0xffff))>>16;
+			int ey = (realybase>>16)+sprite_screen_height;
+			realybase >>= 16;
 
-			for (bx=0; bx<w; bx++) {
-				int tile=sprite;
-				int tile2=sprite2;
+			if (!sprite_screen_height)
+				continue;
 
-				if (blockIsTilemapIndex) {
-					if (useIndicesInRom)
+			int dy = (16<<16)/sprite_screen_height;
+
+
+
+			int counter = 0;
+			for (int y=realybase;y<ey;y++)
+			{
+				int dystuff = counter * dy;
+				counter++;
+
+				int y_index;
+				if( fy )
+				{
+					y_index = (sprite_screen_height-1)*dy-dystuff;
+				}
+				else
+				{
+					y_index = dystuff;
+				}
+
+				for (bx=0; bx<w; bx++) {
+				
+					int realxbase = xbase + bx * xinc;
+					int count = 0;
+					if (fx)
 					{
-						const UINT8* ptr=rawrom+(sprite*2);
-						tile=(*ptr) + ((*(ptr+1))<<8);
-
-						if (use8bppMode) {
-							const UINT8* ptr2=rawrom+(sprite2*2);
-							tile2=(*ptr2) + ((*(ptr2+1))<<8);
-						}
+						if (fy)
+							count = (h-1-by) * w + (w-1-bx);
 						else
-						{
-							tile2=0;
-						}
-
-						if (tileFormat)
-						{
-							colorOffset=(tile&0xf000)>>12;
-							tile=(tile&0x0fff)|hibits;
-							tile2=(tile2&0x0fff)|hibits;
-						}
-						else
-						{
-							colorOffset=0;
-							tile=(tile&0xffff)|(hibits<<2);
-							tile2=(tile2&0xffff)|(hibits<<2);
-						}
+							count = by * w + (w-1-bx);
 					}
 					else
 					{
-						const UINT32* ptr=m_mlc_vram + ((sprite)&0x7fff);
-						tile=(*ptr)&0xffff;
+						if (fy)
+							count = (h-1-by) * w + bx;
+						else
+							count = by * w + bx;
+					}
 
-						if (tileFormat)
+					int tile=sprite + count;
+					int tile2=sprite2 + count;
+
+					if (blockIsTilemapIndex) {
+						if (useIndicesInRom)
 						{
-							colorOffset=(tile&0xf000)>>12;
-							tile=(tile&0x0fff)|hibits;
+							const UINT8* ptr=rawrom+(tile*2);
+							tile=(*ptr) + ((*(ptr+1))<<8);
+
+							if (use8bppMode) {
+								const UINT8* ptr2=rawrom+(tile2*2);
+								tile2=(*ptr2) + ((*(ptr2+1))<<8);
+							}
+							else
+							{
+								tile2=0;
+							}
+
+							if (tileFormat)
+							{
+								colorOffset=(tile&0xf000)>>12;
+								tile=(tile&0x0fff)|hibits;
+								tile2=(tile2&0x0fff)|hibits;
+							}
+							else
+							{
+								colorOffset=0;
+								tile=(tile&0xffff)|(hibits<<2);
+								tile2=(tile2&0xffff)|(hibits<<2);
+							}
 						}
 						else
 						{
-							colorOffset=0;
-							tile=(tile&0xffff)|(hibits<<2);
-						}
+							const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
+							tile=(*ptr)&0xffff;
 
-						tile2=0;
+							if (tileFormat)
+							{
+								colorOffset=(tile&0xf000)>>12;
+								tile=(tile&0x0fff)|hibits;
+							}
+							else
+							{
+								colorOffset=0;
+								tile=(tile&0xffff)|(hibits<<2);
+							}
+
+							tile2=0;
+						}
 					}
+
+	//              if (rasterMode)
+	//                  rasterDirty=1;
+
+					mlc_drawgfxzoomline(
+									/*rasterMode ? temp_bitmap : */bitmap,user_clip,machine().gfx[0],
+									tile,tile2,
+									color + colorOffset,fx,realxbase,
+									0,
+									use8bppMode,(xscale<<8),alpha, y, y_index>>16);
+
 				}
 
-//              if (rasterMode)
-//                  rasterDirty=1;
-
-				mlc_drawgfxzoom(
-								/*rasterMode ? temp_bitmap : */bitmap,user_clip,machine().gfx[0],
-								tile,tile2,
-								color + colorOffset,fx,fy,xbase,ybase,
-								0,
-								use8bppMode,(xscale<<8),(yscale<<8),alpha);
-
-				sprite++;
-				sprite2++;
-
-				xbase+=xinc;
+							
 			}
-			ybase+=yinc;
 		}
 
 //      if (lastRasterMode!=0 && rasterDirty)
