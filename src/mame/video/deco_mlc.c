@@ -158,7 +158,7 @@ static void mlc_drawgfxzoomline(
 }
 
 
-void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect, int scanline)
+void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest)
 {
 	UINT32 *index_ptr=0;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
@@ -244,8 +244,16 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 		however there are space for 8 clipping windows, where is the high bit? (Or is it ~0x400?) */
 		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
 
-		user_clip.min_y=m_mlc_clip_ram[(clipper*4)+0];
-		user_clip.max_y=m_mlc_clip_ram[(clipper*4)+1];
+		int min_y = m_mlc_clip_ram[(clipper*4)+0];
+		int max_y = m_mlc_clip_ram[(clipper*4)+1];
+
+		if (scanline<min_y)
+			continue;
+
+		if (scanline>max_y)
+			continue;
+
+
 		user_clip.min_x=m_mlc_clip_ram[(clipper*4)+2];
 		user_clip.max_x=m_mlc_clip_ram[(clipper*4)+3];
 
@@ -383,19 +391,6 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 			
 		by = srcline >> 4;
 			
-		int y = (full_realybase>>16)+bby;
-
-		rectangle myclip;
-		myclip = user_clip;
-		myclip &= bitmap.cliprect();
-
-		if( y < myclip.min_y )
-			continue;
-
-		if( y > myclip.max_y+1 )
-			continue;
-
-		UINT32 *dest = &bitmap.pix32(y);
 
 		srcline &=0xf;
 		if( fy )
@@ -507,9 +502,15 @@ UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bi
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(machine().pens[0], cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
 
-	for (int i=0;i<256;i++)
+
+
+
+
+	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
 	{
-		draw_sprites(bitmap,cliprect, i);
+		UINT32 *dest = &bitmap.pix32(i);
+
+		draw_sprites(cliprect, i, dest);
 	}
 	return 0;
 }

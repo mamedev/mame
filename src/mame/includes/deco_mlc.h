@@ -40,6 +40,6 @@ public:
 	void screen_eof_mlc(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void blitRaster(bitmap_rgb32 &bitmap, int rasterMode);
-	void draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect, int scanline);
+	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
 	void descramble_sound(  );
 };
