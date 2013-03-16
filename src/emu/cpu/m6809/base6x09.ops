@@ -164,7 +164,7 @@ ASR16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_cc &= ~CC_NZC;
-	m_cc |= (m_temp.b.l & 1) ? CC_C : 0;
+	m_cc |= (m_temp.w & 1) ? CC_C : 0;
 	m_temp.w = set_flags<UINT16>(CC_NZ, ((INT16) m_temp.w) >> 1);
 	@eat(hd6309_native_mode() ? 0 : 1);
 	@write_operand(0, m_temp.b.h);
