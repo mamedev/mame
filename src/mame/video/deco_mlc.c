@@ -60,12 +60,11 @@ void deco_mlc_state::blitRaster(bitmap_rgb32 &bitmap, int rasterMode)
 #endif
 
 static void mlc_drawgfxzoomline(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+		UINT32* dest,const rectangle &clip,gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int usey, int srcline	)
+		int scalex, int alpha, int srcline	)
 {
-	rectangle myclip;
 
 	if (!scalex) return;
 
@@ -77,14 +76,7 @@ static void mlc_drawgfxzoomline(
 	*/
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	myclip = clip;
-	myclip &= dest_bmp.cliprect();
 
-	if( usey < myclip.min_y )
-		return;
-
-	if( usey > myclip.max_y+1 )
-		return;
 
 	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
@@ -114,16 +106,16 @@ static void mlc_drawgfxzoomline(
 
 
 
-		if( sx < myclip.min_x)
+		if( sx < clip.min_x)
 		{ /* clip left */
-			int pixels = myclip.min_x-sx;
+			int pixels = clip.min_x-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
 		/* NS 980211 - fixed incorrect clipping */
-		if( ex > myclip.max_x+1 )
+		if( ex > clip.max_x+1 )
 		{ /* clip right */
-			int pixels = ex-myclip.max_x-1;
+			int pixels = ex-clip.max_x-1;
 			ex -= pixels;
 		}
 
@@ -135,7 +127,6 @@ static void mlc_drawgfxzoomline(
 			{		
 				const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
 				const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
-				UINT32 *dest = &dest_bmp.pix32(usey);
 
 				int x, x_index = x_index_base;
 
@@ -153,7 +144,6 @@ static void mlc_drawgfxzoomline(
 			else
 			{
 				const UINT8 *source = code_base1 + (srcline) * gfx->rowbytes();
-				UINT32 *dest = &dest_bmp.pix32(usey);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -166,6 +156,7 @@ static void mlc_drawgfxzoomline(
 		}
 	}
 }
+
 
 void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
@@ -365,37 +356,47 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 
 
 
-		for (by=0; by<h; by++) {
-
-			int realybase = ybase + by * yinc;
-
-			//for (int y=0;
-			int sprite_screen_height = ((yscale<<8)*16+(realybase&0xffff))>>16;
-			int ey = (realybase>>16)+sprite_screen_height;
-			realybase >>= 16;
-
-			if (!sprite_screen_height)
-				continue;
-
-			int dy = (16<<16)/sprite_screen_height;
-
+		for (by=0; by<h; by++)
+		{
 
 			
-			int counter = 0;
-			for (int y=realybase;y<ey;y++)
-			{
-				int dystuff = counter * dy;
-				counter++;
 
-				int y_index;
+			int realybase = ybase + by * yinc;
+			int sprite_screen_height = ((yscale<<8)*16+(realybase&0xffff))>>16;
+
+			for (int yi=0;yi<sprite_screen_height;yi++)
+			{
+				int y = (realybase>>16)+yi;
+
+				rectangle myclip;
+				myclip = user_clip;
+				myclip &= bitmap.cliprect();
+
+				if( y < myclip.min_y )
+					continue;
+
+				if( y > myclip.max_y+1 )
+					continue;
+
+				UINT32 *dest = &bitmap.pix32(y);
+
+				if (!sprite_screen_height)
+					continue;
+
+				int dy = (16<<16)/sprite_screen_height;
+
+
+
+				int dystuff = yi * dy;
+
+				int srcline;
+				srcline = dystuff >> 16;
+
 				if( fy )
 				{
-					y_index = (sprite_screen_height-1)*dy-dystuff;
+					srcline = (srcline &~15) | (15-(srcline&15));
 				}
-				else
-				{
-					y_index = dystuff;
-				}
+
 
 				for (bx=0; bx<w; bx++) {
 				
@@ -467,15 +468,15 @@ void deco_mlc_state::draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprec
 						}
 					}
 
-	//              if (rasterMode)
-	//                  rasterDirty=1;
+
+
 
 					mlc_drawgfxzoomline(
-									/*rasterMode ? temp_bitmap : */bitmap,user_clip,machine().gfx[0],
+									dest,user_clip,machine().gfx[0],
 									tile,tile2,
 									color + colorOffset,fx,realxbase,
 									0,
-									use8bppMode,(xscale<<8),alpha, y, y_index>>16);
+									use8bppMode,(xscale<<8),alpha, srcline);
 
 				}
 
