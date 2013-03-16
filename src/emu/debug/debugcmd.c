@@ -2544,12 +2544,8 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 	if (!debug_command_parameter_command(machine, action = param[2]))
 		return;
 
-	/* further validation */
-	if (mame_stricmp(filename, "off") == 0)
-		filename = NULL;
-
 	/* open the file */
-	if (filename)
+	if (mame_stricmp(filename, "off") != 0)
 	{
 		mode = "w";
 
