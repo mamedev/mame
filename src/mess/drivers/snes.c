@@ -1395,9 +1395,16 @@ static SLOT_INTERFACE_START(snes_cart)
 	SLOT_INTERFACE_INTERNAL("lorom_20col",   SNS_LOROM_20COL)
 	SLOT_INTERFACE_INTERNAL("lorom_pija",    SNS_LOROM_BANANA)  // not working yet
 	SLOT_INTERFACE_INTERNAL("lorom_bugs",    SNS_LOROM_BUGSLIFE)    // not working yet
+	// legacy slots to support DSPx games from fullpath
+	SLOT_INTERFACE_INTERNAL("lorom_dsp1leg", SNS_LOROM_NECDSP1_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_dsp1bleg",SNS_LOROM_NECDSP1B_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_dsp2leg", SNS_LOROM_NECDSP2_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_dsp3leg", SNS_LOROM_NECDSP3_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_dsp4leg", SNS_LOROM_NECDSP4_LEG)
+	SLOT_INTERFACE_INTERNAL("hirom_dsp1leg", SNS_HIROM_NECDSP1_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_st10leg", SNS_LOROM_SETA10_LEG)
+	SLOT_INTERFACE_INTERNAL("lorom_st11leg", SNS_LOROM_SETA11_LEG)
 SLOT_INTERFACE_END
-
-
 
 static MACHINE_START( snes_console )
 {
@@ -1517,33 +1524,6 @@ static MACHINE_RESET( snes_console )
 	state->m_io_read = write8_delegate(FUNC(snes_console_state::snes_input_read),state);
 	state->m_oldjoy1_read = read8_delegate(FUNC(snes_console_state::snes_oldjoy1_read),state);
 	state->m_oldjoy2_read = read8_delegate(FUNC(snes_console_state::snes_oldjoy2_read),state);
-
-	// if trying to load a game requiring add-on CPU dump from fullpath,
-	// warn the user, disable the CPU in slot & switch back to base type
-	if (!state->m_cartslot->m_cart->get_addon_bios_size())
-	{
-		switch (state->m_type)
-		{
-			case SNES_DSP:
-			case SNES_DSP_2MB:
-			case SNES_DSP4:
-			case SNES_ST010:
-			case SNES_ST011:
-				mame_printf_error("This type of cart requires the dump of on-cart CPU.\nPlease either load it from softlist or use snes_add driver.\n");
-				state->m_cartslot->snes_stop_addon_cpu("dsp");
-				state->m_type = SNES_MODE20;
-				break;
-			case SNES_DSP_MODE21:
-				mame_printf_error("This type of cart requires the dump of on-cart CPU.\nPlease either load it from softlist or use snes_add driver.\n");
-				state->m_cartslot->snes_stop_addon_cpu("dsp");
-				state->m_type = SNES_MODE21;
-				break;
-			case SNES_ST018:
-			case SNES_CX4:
-				// we don't emulate the CPU for these yet...
-				break;
-		}
-	}
 }
 
 
@@ -1588,72 +1568,6 @@ static MACHINE_CONFIG_DERIVED( snespal, snes )
 MACHINE_CONFIG_END
 
 
-static MACHINE_RESET( snes_addon )
-{
-	snes_console_state *state = machine.driver_data<snes_console_state>();
-	UINT8 *ROM = state->memregion("addons")->base();
-
-	MACHINE_RESET_CALL(snes);
-
-	state->m_io_read = write8_delegate(FUNC(snes_console_state::snes_input_read),state);
-	state->m_oldjoy1_read = read8_delegate(FUNC(snes_console_state::snes_oldjoy1_read),state);
-	state->m_oldjoy2_read = read8_delegate(FUNC(snes_console_state::snes_oldjoy2_read),state);
-
-	// if trying to load a game requiring add-on CPU dump from fullpath, load
-	// such a dump from the BIOS (hacky workaround to support legacy sfc dumps)
-	switch (state->m_cartslot->get_addon())
-	{
-		case ADDON_DSP1:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x2800);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_DSP1_OFFSET, 0x2800);
-			break;
-		case ADDON_DSP1B:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x2800);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_DSP1B_OFFSET, 0x2800);
-			break;
-		case ADDON_DSP2:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x2800);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_DSP2_OFFSET, 0x2800);
-			break;
-		case ADDON_DSP3:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x2800);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_DSP3_OFFSET, 0x2800);
-			break;
-		case ADDON_DSP4:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x2800);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_DSP4_OFFSET, 0x2800);
-			break;
-		case ADDON_ST010:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x11000);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_ST10_OFFSET, 0x11000);
-			break;
-		case ADDON_ST011:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x11000);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_ST11_OFFSET, 0x11000);
-			break;
-		case ADDON_CX4:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x00c00);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_CX4_OFFSET, 0x00c00);
-			break;
-		case ADDON_ST018:
-			state->m_cartslot->m_cart->addon_bios_alloc(machine, 0x28000);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base(), ROM + SNES_ST18_OFFSET1, 0x20000);
-			memcpy(state->m_cartslot->m_cart->get_addon_bios_base() + 0x20000, ROM + SNES_ST18_OFFSET2, 0x8000);
-			break;
-		default:
-			break;
-	}
-}
-
-
-static MACHINE_CONFIG_DERIVED( snes_add, snes )
-	MCFG_MACHINE_RESET( snes_addon )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( snesp_add, snespal )
-	MCFG_MACHINE_RESET( snes_addon )
-MACHINE_CONFIG_END
-
 
 /*************************************
  *
@@ -1668,27 +1582,7 @@ ROM_START( snes )
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
 ROM_END
 
-ROM_START( snes_add )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
-
-	ROM_REGION( 0x60000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD( "dsp1.bin",       SNES_DSP1_OFFSET,  0x02800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
-	ROM_LOAD( "dsp1b.bin",      SNES_DSP1B_OFFSET, 0x02800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
-	ROM_LOAD( "dsp2.bin",       SNES_DSP2_OFFSET,  0x02800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )
-	ROM_LOAD( "dsp3.bin",       SNES_DSP3_OFFSET,  0x02800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) )
-	ROM_LOAD( "dsp4.bin",       SNES_DSP4_OFFSET,  0x02800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) )
-	ROM_LOAD( "st010.bin",      SNES_ST10_OFFSET,  0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
-	ROM_LOAD( "st011.bin",      SNES_ST11_OFFSET,  0x11000, CRC(34d2952c) SHA1(1375b8c1efc8cae4962b57dfe22f6b78e1ddacc8) )
-	ROM_LOAD( "cx4.bin",        SNES_CX4_OFFSET,   0x00c00, CRC(b6e76a6a) SHA1(a002f4efba42775a31185d443f3ed1790b0e949a) )
-	ROM_LOAD( "st018_0xf3.bin", SNES_ST18_OFFSET1, 0x20000, CRC(f73d5e10) SHA1(388e3721b94cd074d6ba0eca8616523d2118a6c3) )
-	ROM_LOAD( "st018_0xf4.bin", SNES_ST18_OFFSET2, 0x08000, CRC(b5255459) SHA1(b19c0f8f207d62fdabf4bf71442826063bccc626) )
-ROM_END
-
 #define rom_snespal rom_snes
-#define rom_snesp_add rom_snes_add
 
 /*************************************
  *
@@ -1699,7 +1593,3 @@ ROM_END
 /*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT                 INIT  COMPANY     FULLNAME                                      FLAGS */
 CONS( 1989, snes,      0,      0,     snes,      snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 CONS( 1991, snespal,   snes,   0,     snespal,   snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-
-// legacy drivers to allow loading old .sfc files of DSPx/CX4/ST0xx games without the add-on chip dump (add-on dumps directly in the BIOS)
-CONS( 1989, snes_add,  snes,   0,     snes_add,  snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/add-on CPUs)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_UNOFFICIAL)
-CONS( 1991, snesp_add, snes,   0,     snesp_add, snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/add-on CPUs)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_UNOFFICIAL)

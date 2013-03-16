@@ -21,10 +21,27 @@
     subslots (e.g. BS-X compatible ones), that need to write to subslot (NV)RAM independently
     to accesses to their own (NV)RAM.
 
-    In order to support legacy dumps of games with add-on NEC & Seta DSPs, CX4 and Seta ST018,
-    we use not only m_type to identify the correct slot device to be used (for this DSP1B, DSP2 and
-    DSP3 are the same), but also a m_addon variable that snes_add driver uses to load CPU dump from
-    the system BIOS (for this DSP1B, DSP2 and DSP3 are not the same).
+    Notes about add-on detection and handling (useful for future addition of st018, cx4, etc.)
+    ===============================================================================================
+    When loading from softlist, m_type would be enough to take care of add-on chips, because 
+    the ones needing a CPU dump have it in the zipfile. However, to support these games also
+    from fullpath, both with files having DSP data appended to the .sfc and with older dumps
+    missing DSP data, a second variable is present in the SNES slot: m_addon.
+    From fullpath, support works as follows
+    - get_default_card_software needs to decide whether to use the main devices or the legacy
+      ones containing DSP dump as device roms, so it gets m_type as the main device should be
+      used and if m_addon is ADDON_DSP* or ADDON_ST*, then it checks if the DSP data is appended
+      or if m_type has to be switched to legacy type
+    - call_load needs to detect faulty dumps too, to alloc m_addon_bios and copy the data from 
+      the correct place, so if m_addon is ADDON_DSP* or ADDON_ST* it checks whether DSP data is 
+      appended or not: if it is, this data is copied to m_addon_bios; if not, then we are in 
+      the legacy device case and data is copied from the device rom
+    After the cart has been loaded and emulation has started, only m_type is needed to later 
+    handlers installation and cart accesses
+
+    Also notice that, from softlist, DSP1, 1B, 2, 3 are treated as the same device, because they 
+	all have the same I/O and the only difference (i.e. the DSP data) comes from the zipfile itself. 
+    OTOH, to support faulty dumps missing DSP content, we need separate legacy devices...
 
 
  ***********************************************************************************************************/
@@ -265,14 +282,23 @@ static const sns_slot slot_list[] =
 	// Sufami Turbo carts
 	{ SNES_STROM,       "strom"},
 	// pirate carts
-	{ SNES_POKEMON,     "lorom_poke"},
-	{ SNES_TEKKEN2,     "lorom_tekken2"},
-	{ SNES_SOULBLAD,    "lorom_sbld"},
-	{ SNES_MCPIR1,      "lorom_mcpir1"},
-	{ SNES_MCPIR2,      "lorom_mcpir2"},
-	{ SNES_20COL,       "lorom_20col"},
-	{ SNES_BANANA,      "lorom_pija"},  // wip
-	{ SNES_BUGS,        "lorom_bugs"}  // wip
+	{ SNES_POKEMON,      "lorom_poke"},
+	{ SNES_TEKKEN2,      "lorom_tekken2"},
+	{ SNES_SOULBLAD,     "lorom_sbld"},
+	{ SNES_MCPIR1,       "lorom_mcpir1"},
+	{ SNES_MCPIR2,       "lorom_mcpir2"},
+	{ SNES_20COL,        "lorom_20col"},
+	{ SNES_BANANA,       "lorom_pija"},  // wip
+	{ SNES_BUGS,         "lorom_bugs"},  // wip
+	// legacy slots to support DSPx games from fullpath
+	{ SNES_DSP1_LEG,     "lorom_dsp1leg"},
+	{ SNES_DSP1B_LEG,    "lorom_dsp1bleg"},
+	{ SNES_DSP2_LEG,     "lorom_dsp2leg"},
+	{ SNES_DSP3_LEG,     "lorom_dsp3leg"},
+	{ SNES_DSP4_LEG,     "lorom_dsp4leg"},
+	{ SNES_DSP1_MODE21_LEG, "hirom_dsp1leg"},
+	{ SNES_ST010_LEG,     "lorom_st10leg"},
+	{ SNES_ST011_LEG,     "lorom_st11leg"}
 };
 
 static int sns_get_pcb_id(const char *slot)
@@ -643,7 +669,7 @@ bool base_sns_cart_slot_device::call_load()
 		}
 
 		if (software_entry() == NULL)
-			setup_appended_addon();
+			setup_addon_from_fullpath();
 
 		setup_nvram();
 
@@ -697,7 +723,7 @@ void base_sns_cart_slot_device::call_unload()
 }
 
 
-void base_sns_cart_slot_device::setup_appended_addon()
+void base_sns_cart_slot_device::setup_addon_from_fullpath()
 {
 	// if we already have an add-on bios or if no addon has been detected, we have nothing to do
 	if (m_cart->get_addon_bios_size() || m_addon == ADDON_NONE)
@@ -782,6 +808,53 @@ void base_sns_cart_slot_device::setup_appended_addon()
 			}
 			break;
 	}
+	
+	// otherwise, we need to use the legacy versions including DSP dump in device romset
+	if (!m_cart->get_addon_bios_size())
+	{
+		astring region(m_cart->device().tag(), ":addon");
+		UINT8 *ROM = NULL;
+		
+		switch (m_addon)
+		{
+			case ADDON_DSP1:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
+				break;
+			case ADDON_DSP1B:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
+				break;
+			case ADDON_DSP2:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
+				break;
+			case ADDON_DSP3:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
+				break;
+			case ADDON_DSP4:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x2800);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x2800);
+				break;
+			case ADDON_ST010:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x11000);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
+				break;
+			case ADDON_ST011:
+				ROM = machine().root_device().memregion(region)->base();
+				m_cart->addon_bios_alloc(machine(), 0x11000);
+				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
+				break;
+		}
+	}		
+	
 }
 
 void base_sns_cart_slot_device::setup_nvram()
@@ -959,6 +1032,44 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 		offset = snes_skip_header(ROM, len);
 
 		get_cart_type_addon(ROM + offset, len - offset, type, addon);
+		// here we're from fullpath, so check if it's a DSP game which needs legacy device (i.e. it has no appended DSP dump)
+		switch (addon)
+		{
+			case ADDON_DSP1:
+				if ((len & 0x7fff) != 0x2800 && (len & 0x7fff) != 0x2000)
+				{
+					if (type == SNES_DSP_MODE21)
+						type = SNES_DSP1_MODE21_LEG;
+					else
+						type = SNES_DSP1_LEG;					
+				}
+				break;
+			case ADDON_DSP1B:
+				if ((len & 0x7fff) != 0x2800 && (len & 0x7fff) != 0x2000)
+					type = SNES_DSP1B_LEG;
+				break;
+			case ADDON_DSP2:
+				if ((len & 0x7fff) != 0x2800 && (len & 0x7fff) != 0x2000)
+					type = SNES_DSP2_LEG;
+				break;
+			case ADDON_DSP3:
+				if ((len & 0x7fff) != 0x2800 && (len & 0x7fff) != 0x2000)
+					type = SNES_DSP3_LEG;
+				break;
+			case ADDON_DSP4:
+				if ((len & 0x7fff) != 0x2800 && (len & 0x7fff) != 0x2000)
+					type = SNES_DSP4_LEG;
+				break;
+			case ADDON_ST010:
+				if ((len & 0x3ffff) != 0x11000 && (len & 0xffff) != 0xd000)
+					type = SNES_ST010_LEG;
+				break;
+			case ADDON_ST011:
+				if ((len & 0x3ffff) != 0x11000 && (len & 0xffff) != 0xd000)
+					type = SNES_ST011_LEG;
+				break;
+		}
+
 		slot_string = sns_get_slot(type);
 
 		global_free(ROM);
@@ -1035,17 +1146,6 @@ WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)
 		m_cart->chip_write(space, offset, data);
 }
 
-
-/*-------------------------------------------------
- snes_stop_addon_cpu
- -------------------------------------------------*/
-
-void base_sns_cart_slot_device::snes_stop_addon_cpu(const char *cputag)
-{
-	astring cpu(m_cart->device().tag(), ":", cputag);
-	if (m_cart && machine().device(cpu))
-		machine().device(cpu.cstr())->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
 
 /*-------------------------------------------------
  Internal header logging

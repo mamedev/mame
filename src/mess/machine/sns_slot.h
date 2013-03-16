@@ -55,7 +55,16 @@ enum
 	SNES_MCPIR2,
 	SNES_20COL,
 	SNES_BANANA,    // wip
-	SNES_BUGS   // wip
+	SNES_BUGS,   // wip
+	// legacy types to support DSPx games from fullpath
+	SNES_DSP1_LEG,
+	SNES_DSP1B_LEG,
+	SNES_DSP2_LEG,
+	SNES_DSP3_LEG,
+	SNES_DSP4_LEG,
+	SNES_DSP1_MODE21_LEG,
+	SNES_ST010_LEG,
+	SNES_ST011_LEG
 };
 
 /* add-ons to handle legacy dumps in snes_add  */
@@ -160,7 +169,6 @@ public:
 	void get_cart_type_addon(UINT8 *ROM, UINT32 len, int &type, int &addon);
 	UINT32 snes_skip_header(UINT8 *ROM, UINT32 snes_rom_size);
 	int get_type() { return m_type; }
-	int get_addon() { return m_addon; }
 
 	void setup_nvram();
 	void internal_header_logging(UINT8 *ROM, UINT32 len);
@@ -186,12 +194,9 @@ public:
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 
-	// in order to support legacy dumps, we enable add-on CPUs even when loading from fullpath
-	// and then we stop them at MACHINE_RESET to avoid crashes
-	void snes_stop_addon_cpu(const char *cputag);
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we 
 	// check if the required data is present and update bank map accordingly
-	void setup_appended_addon();
+	void setup_addon_from_fullpath();
 
 
 // m_cart cannot be made private yet, because we need to check nvram_size from the driver...

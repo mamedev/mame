@@ -70,8 +70,6 @@ gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld
 snes      // Nintendo Super Nintendo NTSC
 snespal   // Nintendo Super Nintendo PAL
-snes_add      // Nintendo Super Nintendo NTSC w/add-on CPUs as BIOS (legacy driver to run old dumps)
-snesp_add   // Nintendo Super Nintendo PAL w/add-on CPUs as BIOS (legacy driver to run old dumps)
 n64       // Nintendo N64
 n64dd     // Nintendo N64 (64DD Attachment)
 pokemini  // Nintendo Pokemon Mini

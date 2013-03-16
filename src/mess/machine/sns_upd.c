@@ -22,8 +22,20 @@ const device_type SNS_LOROM_SETA10 = &device_creator<sns_rom_seta10dsp_device>;
 const device_type SNS_LOROM_SETA11 = &device_creator<sns_rom_seta11dsp_device>;
 
 
+sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom_device(mconfig, type, name, tag, owner, clock),
+						m_upd7725(*this, "dsp")
+{
+}
+
 sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom_device(mconfig, SNS_LOROM_NECDSP, "SNES Cart (LoROM) + NEC DSP", tag, owner, clock),
+						m_upd7725(*this, "dsp")
+{
+}
+
+sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom21_device(mconfig, type, name, tag, owner, clock),
 						m_upd7725(*this, "dsp")
 {
 }
@@ -326,3 +338,176 @@ machine_config_constructor sns_rom_seta11dsp_device::device_mconfig_additions() 
 {
 	return MACHINE_CONFIG_NAME( snes_st011 );
 }
+
+
+
+
+// Legacy versions including DSP dump roms, in order to support faulty dumps missing DSP data...
+
+const device_type SNS_LOROM_NECDSP1_LEG = &device_creator<sns_rom20_necdsp1_legacy_device>;
+const device_type SNS_LOROM_NECDSP1B_LEG = &device_creator<sns_rom20_necdsp1b_legacy_device>;
+const device_type SNS_LOROM_NECDSP2_LEG = &device_creator<sns_rom20_necdsp2_legacy_device>;
+const device_type SNS_LOROM_NECDSP3_LEG = &device_creator<sns_rom20_necdsp3_legacy_device>;
+const device_type SNS_LOROM_NECDSP4_LEG = &device_creator<sns_rom20_necdsp4_legacy_device>;
+const device_type SNS_HIROM_NECDSP1_LEG = &device_creator<sns_rom21_necdsp1_legacy_device>;
+const device_type SNS_LOROM_SETA10_LEG = &device_creator<sns_rom_seta10dsp_legacy_device>;
+const device_type SNS_LOROM_SETA11_LEG = &device_creator<sns_rom_seta11dsp_legacy_device>;
+
+
+sns_rom20_necdsp1_legacy_device::sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP1_LEG, "SNES Cart (LoROM) + NEC DSP1 Legacy", tag, owner, clock)
+{
+}
+
+sns_rom20_necdsp1b_legacy_device::sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP1B_LEG, "SNES Cart (LoROM) + NEC DSP1B Legacy", tag, owner, clock)
+{
+}
+
+sns_rom20_necdsp2_legacy_device::sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP2_LEG, "SNES Cart (LoROM) + NEC DSP2 Legacy", tag, owner, clock)
+{
+}
+
+sns_rom20_necdsp3_legacy_device::sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP3_LEG, "SNES Cart (LoROM) + NEC DSP3 Legacy", tag, owner, clock)
+{
+}
+
+sns_rom20_necdsp4_legacy_device::sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom20_necdsp_device(mconfig, SNS_LOROM_NECDSP4_LEG, "SNES Cart (LoROM) + NEC DSP4 Legacy", tag, owner, clock)
+{
+}
+
+sns_rom21_necdsp1_legacy_device::sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom21_necdsp_device(mconfig, SNS_HIROM_NECDSP1_LEG, "SNES Cart (HiROM) + NEC DSP1 Legacy", tag, owner, clock)
+{
+}
+
+sns_rom_seta10dsp_legacy_device::sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA10_LEG, "SNES Cart (LoROM) + Seta ST010 DSP Legacy", tag, owner, clock)
+{
+}
+
+sns_rom_seta11dsp_legacy_device::sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: sns_rom_setadsp_device(mconfig, SNS_LOROM_SETA11_LEG, "SNES Cart (LoROM) + Seta ST011 DSP Legacy", tag, owner, clock)
+{
+}
+
+
+machine_config_constructor sns_rom20_necdsp1_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
+}
+
+machine_config_constructor sns_rom20_necdsp1b_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
+}
+
+machine_config_constructor sns_rom20_necdsp2_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
+}
+
+machine_config_constructor sns_rom20_necdsp3_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
+}
+
+machine_config_constructor sns_rom20_necdsp4_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_lorom );
+}
+
+machine_config_constructor sns_rom21_necdsp1_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_dsp_hirom );
+}
+
+machine_config_constructor sns_rom_seta10dsp_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_st010 );
+}
+
+machine_config_constructor sns_rom_seta11dsp_legacy_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( snes_st011 );
+}
+
+
+ROM_START( snes_dsp1 )
+	ROM_REGION(0x2800, "addon", 0)
+	ROM_LOAD( "dsp1.bin",       0,  0x02800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
+ROM_END
+
+ROM_START( snes_dsp1b )
+	ROM_REGION(0x2800, "addon", 0)
+	ROM_LOAD( "dsp1b.bin",      0,  0x02800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
+ROM_END
+
+ROM_START( snes_dsp2 )
+	ROM_REGION(0x2800, "addon", 0)
+	ROM_LOAD( "dsp2.bin",       0,  0x02800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )
+ROM_END
+
+ROM_START( snes_dsp3 )
+	ROM_REGION(0x2800, "addon", 0)
+	ROM_LOAD( "dsp3.bin",       0,  0x02800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) )
+ROM_END
+
+ROM_START( snes_dsp4 )
+	ROM_REGION(0x2800, "addon", 0)
+	ROM_LOAD( "dsp4.bin",       0,  0x02800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) )
+ROM_END
+
+ROM_START( snes_st010 )
+	ROM_REGION(0x11000, "addon", 0)
+	ROM_LOAD( "st010.bin",      0,  0x11000, CRC(aa11ee2d) SHA1(cc1984e989cb94e3dcbb5f99e085b5414e18a017) )
+ROM_END
+
+ROM_START( snes_st011 )
+	ROM_REGION(0x11000, "addon", 0)
+	ROM_LOAD( "st011.bin",      0,  0x11000, CRC(34d2952c) SHA1(1375b8c1efc8cae4962b57dfe22f6b78e1ddacc8) )
+ROM_END
+
+const rom_entry *sns_rom20_necdsp1_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp1 );
+}
+
+const rom_entry *sns_rom20_necdsp1b_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp1b );
+}
+
+const rom_entry *sns_rom20_necdsp2_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp2 );
+}
+
+const rom_entry *sns_rom20_necdsp3_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp3 );
+}
+
+const rom_entry *sns_rom20_necdsp4_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp4 );
+}
+
+const rom_entry *sns_rom21_necdsp1_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_dsp1 );
+}
+
+const rom_entry *sns_rom_seta10dsp_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_st010 );
+}
+
+const rom_entry *sns_rom_seta11dsp_legacy_device::device_rom_region() const
+{
+	return ROM_NAME( snes_st011 );
+}
+
