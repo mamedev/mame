@@ -45,6 +45,7 @@
 #include <commctrl.h>
 #include <mmsystem.h>
 #include <tchar.h>
+#include <io.h>
 
 // standard C headers
 #include <ctype.h>
@@ -454,6 +455,12 @@ const options_entry windows_options::s_option_entries[] =
 
 int main(int argc, char *argv[])
 {
+	// use small output buffers on non-TTYs (i.e. pipes)
+	if (!isatty(fileno(stdout)))
+		setvbuf(stdout, (char *) NULL, _IOFBF, 64);
+	if (!isatty(fileno(stderr)))
+		setvbuf(stderr, (char *) NULL, _IOFBF, 64);
+
 	// initialize common controls
 	InitCommonControls();
 
