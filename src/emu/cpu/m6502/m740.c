@@ -63,6 +63,8 @@ void m740_device::device_reset()
 	inst_substate = 0;
 	nmi_state = false;
 	irq_state = false;
+	m_irq_multiplex = 0;
+	m_irq_vector = 0xfffc;
 	apu_irq_state = false;
 	irq_taken = false;
 	v_state = false;
@@ -86,7 +88,70 @@ UINT8 m740_device::do_seb(UINT8 in, UINT8 bit)
 // doesn't affect the flags
 UINT8 m740_device::do_rrf(UINT8 in)
 {
-	return ((in&0xf)<<4) | ((in&0xf0)>>4);
+      return ((in&0xf)<<4) | ((in&0xf0)>>4);
+}
+
+void m740_device::execute_set_input(int inputnum, int state)
+{
+	switch(inputnum) 
+	{
+		case M740_INT0_LINE:
+		case M740_INT1_LINE:
+		case M740_INT2_LINE:
+		case M740_INT3_LINE:
+		case M740_INT4_LINE:
+		case M740_INT5_LINE:
+		case M740_INT6_LINE:
+		case M740_INT7_LINE:
+		case M740_INT8_LINE:
+		case M740_INT9_LINE:
+		case M740_INT10_LINE:
+		case M740_INT11_LINE:
+		case M740_INT12_LINE:
+		case M740_INT13_LINE:
+		case M740_INT14_LINE:	// 37450 has 15 IRQ lines, no other known variant has that many
+			set_irq_line(inputnum - M740_INT0_LINE, state);
+			break; 
+
+		case V_LINE:
+			if(!v_state && state == ASSERT_LINE)
+			{
+				P |= F_V;
+			}
+			v_state = state == ASSERT_LINE;
+			break;
+	}
+}
+
+void m740_device::set_irq_line(int line, int state)
+{
+	assert(line > 0);
+	assert(line <= M740_MAX_INT_LINE);
+
+	if (state == ASSERT_LINE)
+	{
+		m_irq_multiplex  |= (1<<line);
+	}
+	else
+	{
+		m_irq_multiplex &= ~(1<<line);
+	}
+
+	irq_state = (m_irq_multiplex != 0);
+
+	if (irq_state)
+	{
+		for (int i = 0; i < M740_MAX_INT_LINE; i++)
+		{
+			if (m_irq_multiplex & (1 << i))
+			{
+				m_irq_vector = 0xfffc - (UINT16)(2 * i);
+				break;
+			}
+		}
+	}
+
+//	printf("M740 single IRQ state is %d (MPX %08x, vector %x)\n", irq_state, m_irq_multiplex, m_irq_vector);
 }
 
 #include "cpu/m6502/m740.inc"

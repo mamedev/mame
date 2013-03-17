@@ -44,16 +44,38 @@
 
 class m740_device : public m6502_device {
 public:
-	m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+		enum
+		{
+			M740_INT0_LINE = INPUT_LINE_IRQ0,	// (fffc)
+			M740_INT1_LINE,	 // (fffa)
+			M740_INT2_LINE,	 // (fff8)
+			M740_INT3_LINE,	 // (fff6)
+			M740_INT4_LINE,	 // (fff4)
+			M740_INT5_LINE,	 // (fff2)
+			M740_INT6_LINE,	 // (fff0)
+			M740_INT7_LINE,	 // (ffee)
+			M740_INT8_LINE,	 // (ffec)
+			M740_INT9_LINE,	 // (ffea)
+			M740_INT10_LINE, // (ffe8)
+			M740_INT11_LINE, // (ffe6)
+			M740_INT12_LINE, // (ffe4)
+			M740_INT13_LINE, // (ffe2)
+			M740_INT14_LINE, // (ffe0)
+			M740_MAX_INT_LINE = M740_INT14_LINE,
+			M740_SET_OVERFLOW = m6502_device::V_LINE,
+		};
 
-	virtual void device_reset();
+		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	static const disasm_entry disasm_entries[0x100];
+      virtual void device_reset();
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	virtual void do_exec_full();
-	virtual void do_exec_partial();
+      static const disasm_entry disasm_entries[0x100];
+
+      virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+      virtual void do_exec_full();
+      virtual void do_exec_partial();
+      virtual void execute_set_input(int inputnum, int state);
 
 protected:
 #define O(o) void o ## _full(); void o ## _partial()
@@ -63,6 +85,7 @@ protected:
 	UINT8 do_rrf(UINT8 in);
 
 	// m740 opcodes
+	O(brk740_imp);
 	O(clt_imp);
 	O(set_imp);
 	O(ldm_imz);
@@ -74,14 +97,14 @@ protected:
 	O(bbs_bzr); O(bbs_acc);
 	O(rrf_zpg);
 	O(bra_rel);
+	O(jmp_zpi);
 
 #undef O
-};
 
-enum {
-	M740_IRQ_LINE = m6502_device::IRQ_LINE,
-	M740_NMI_LINE = m6502_device::NMI_LINE,
-	M740_SET_OVERFLOW = m6502_device::V_LINE,
+	UINT32 m_irq_multiplex;
+	UINT16 m_irq_vector;
+
+	void set_irq_line(int line, int state);
 };
 
 extern const device_type M740;

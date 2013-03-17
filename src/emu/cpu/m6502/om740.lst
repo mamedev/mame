@@ -102,8 +102,45 @@ bra_rel
 	PC += INT8(TMP);
 	prefetch();
 
+jmp_zpi
+	TMP2 = read_pc();
+	TMP = read(TMP2 & 0xff);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	PC = TMP;
+	prefetch();
+
 reset740
 	PC = read_direct(0xfffe);
 	PC = set_h(PC, read_direct(0xffff));
 	prefetch();
 	inst_state = -1;
+
+brk740_imp
+	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
+	if(irq_taken) {
+		read_pc_noinc();
+	} else {
+		read_pc();
+	}
+	write(SP, PC >> 8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, irq_taken ? P & ~F_B : P);
+	dec_SP();
+	if(nmi_state) {
+		PC = read_direct(0xfffa);
+		PC = set_h(PC, read_direct(0xfffb));
+		nmi_state = false;
+		standard_irq_callback(NMI_LINE);
+	} else {
+		PC = read_direct(m_irq_vector);
+		PC = set_h(PC, read_direct(m_irq_vector+1));
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE);
+	}
+	irq_taken = false;
+	P |= F_I; // Do *not* move after the prefetch
+	prefetch();
+	inst_state = -1;
+
