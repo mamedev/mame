@@ -517,7 +517,7 @@ LSRD:
 		else
 			m_cc &= ~CC_C;
 
-		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right<UINT16>(m_d.w, m_temp.b.l));
+		m_d.w = set_flags<UINT16>(CC_NZ, safe_shift_right_unsigned<UINT16>(m_d.w, m_temp.b.l));
 	}
 	eat(1);
 	return;

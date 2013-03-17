@@ -249,6 +249,22 @@ template<class T> T konami_cpu_device::safe_shift_right(T value, UINT32 shift)
 
 
 //-------------------------------------------------
+//  safe_shift_right_unsigned
+//-------------------------------------------------
+
+template<class T> T konami_cpu_device::safe_shift_right_unsigned(T value, UINT32 shift)
+{
+	T result;
+
+	if (shift < (sizeof(T) * 8))
+		result = value >> shift;
+	else
+		result = 0;
+
+	return result;
+}
+
+//-------------------------------------------------
 //  safe_shift_left
 //-------------------------------------------------
 

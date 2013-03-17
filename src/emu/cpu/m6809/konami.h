@@ -67,6 +67,7 @@ private:
 
 	// miscellaneous
 	template<class T> T safe_shift_right(T value, UINT32 shift);
+	template<class T> T safe_shift_right_unsigned(T value, UINT32 shift);
 	template<class T> T safe_shift_left(T value, UINT32 shift);
 	void set_lines(UINT8 data);
 	void execute_one();
