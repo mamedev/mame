@@ -387,7 +387,7 @@ WRITE8_MEMBER( de_2_state::dig1_w )
 	m_segment2 |= 0x30000;
 	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 11, 15, 12, 10, 8, 14, 13, 9, 7, 6, 5, 4, 3, 2, 1, 0));
 		m_segment2 |= 0x40000;
 	}
 }
