@@ -84,7 +84,7 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS	1
+#define LOG_INTERRUPTS	0
 
 // turn off 'unreferenced label' errors
 #ifdef __GNUC__
