@@ -76,11 +76,11 @@ USE_DISPATCH_GL = 1
 # (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
 NO_USE_XINPUT = 1
 
-# uncomment to try the experimental new Qt debugger
-#USE_QTDEBUG = 1
+# uncomment to disable the Qt debugger and fall back to a system default
+# NO_USE_QTDEBUG = 1
 
 # uncomment to disable MIDI
-#NO_USE_MIDI = 1
+# NO_USE_MIDI = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -237,10 +237,12 @@ SYNC_IMPLEMENTATION = ntc
 NO_X11 = 1
 NO_USE_XINPUT = 1
 NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
 LIBS += -lnetwork -lbsd
 endif
 
 ifeq ($(TARGETOS),macosx)
+NO_USE_QTDEBUG = 1
 BASE_TARGETOS = unix
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
 
@@ -248,7 +250,7 @@ ifndef NO_USE_MIDI
 LIBS += -framework CoreAudio -framework CoreMIDI
 endif
 
-ifndef USE_QTDEBUG
+ifdef NO_USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
 endif
 
@@ -298,11 +300,11 @@ SDL_NETWORK = pcap
 
 # do we have GTK ?
 ifndef GTK_INSTALL_ROOT
-ifndef USE_QTDEBUG
+ifdef NO_USE_QTDEBUG
 NO_DEBUGGER = 1
 endif
 else
-ifndef USE_QTDEBUG
+ifdef NO_USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
 	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
@@ -320,7 +322,7 @@ DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
 LDFLAGS += -municode
 
 # Qt
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
 LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4 -lcomdlg32 -loleaut32 -limm32 -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -lshell32 -lkernel32
@@ -328,7 +330,7 @@ endif
 endif
 
 ifeq ($(TARGETOS),macosx)
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 MOC = @moc
 
 QT_INSTALL_LIBS = $(shell qmake -query QT_INSTALL_LIBS)
@@ -345,6 +347,7 @@ NO_DEBUGGER = 1
 NO_X11 = 1
 NO_USE_XINPUT = 1
 NO_USE_MIDI = 1
+NO_USE_QTDEBUG = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
 endif
@@ -487,7 +490,7 @@ else   # ifeq ($(TARGETOS),macosx)
 
 DEFS += -DSDLMAME_UNIX
 
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 MOCTST = $(shell which moc-qt4 2>/dev/null)
 ifeq '$(MOCTST)' ''
 MOCTST = $(shell which moc 2>/dev/null)
@@ -601,7 +604,7 @@ ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	LDFLAGS += -static-libstdc++
 endif
 
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 MOC = @moc
 endif
 
@@ -625,7 +628,7 @@ endif # OS2
 # Debugging
 #-------------------------------------------------
 
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 $(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
 	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
 
@@ -689,7 +692,7 @@ DEFS += -DSDLMAME_X11
 LIBS += -lX11 -lXinerama
 
 # The newer debugger uses QT
-ifdef USE_QTDEBUG
+ifndef NO_USE_QTDEBUG
 INCPATH += `pkg-config QtGui --cflags`
 LIBS += `pkg-config QtGui --libs`
 else
