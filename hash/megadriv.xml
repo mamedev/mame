@@ -24,7 +24,6 @@
     GO NET                  JAPAN
     INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
     JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
-    MARBLE MADNESS              JAPAN
     NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
     NFL PRO FOOTBALL '94            JAPAN
     OSAKA BANK MY LINE              JAPAN
@@ -97,9 +96,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="f-22_intercept_f-202-4.u1" size="524288" crc="649771f8" sha1="6daeca39841f06549373f3a4fd746f3e1c95c328" offset="000000" />
-				<rom name="f-22_intercept_f-202-1.u2" size="131072" crc="d3d7cbb8" sha1="72e56f858bfe88c2529939304ba49eee3fe14353" offset="0x080000" loadflag="load16_byte" />
+			<dataarea name="rom" size="1048576">
+				<rom name="f-22 intercept f-202-4.u1" size="524288" crc="649771f8" sha1="6daeca39841f06549373f3a4fd746f3e1c95c328" offset="000000" />
+				<rom name="f-22 intercept f-202-1.u2" size="131072" crc="d3d7cbb8" sha1="72e56f858bfe88c2529939304ba49eee3fe14353" offset="0x080000" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 <!--
@@ -123,8 +122,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1996</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="fifa_97_b1" size="2097152" crc="2bedb061" sha1="9337ad0318061e70e235a5bfba4504c738d7870c" offset="000000" />
+			<dataarea name="rom" size="2097152">
+				<rom name="fifa 97 b1.u1" size="2097152" crc="2bedb061" sha1="9337ad0318061e70e235a5bfba4504c738d7870c" offset="000000" />
 			</dataarea>
 		</part>
 <!--
@@ -144,8 +143,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1992</year>
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="mpr-15312a" size="524288" crc="66635364" sha1="6e7a3ad1d6f55aed082ed4ea22e222282cfcb704" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-15312a t02.ic1" size="524288" crc="66635364" sha1="6e7a3ad1d6f55aed082ed4ea22e222282cfcb704" offset="000000" />
 			</dataarea>
 		</part>
 <!--
@@ -163,8 +162,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="james_pond_u1_jam03" size="524288" crc="d0e7b466" sha1="b4e1c945c3ccea2e76b296d6694c0931a1ec1310" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="james pond u1 jam03.u1" size="524288" crc="d0e7b466" sha1="b4e1c945c3ccea2e76b296d6694c0931a1ec1310" offset="000000" />
 			</dataarea>
 		</part>
 <!--
@@ -183,14 +182,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="pond_ii_robocod_ro_b02" size="524288" crc="c32b5d66" sha1="20e70c2a8236915a6e4746b6ad1b603563aecf48" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="pond ii robocod rob02.u1" size="524288" crc="c32b5d66" sha1="20e70c2a8236915a6e4746b6ad1b603563aecf48" offset="000000" />
 			</dataarea>
 		</part>
 <!--
     Rom Labeled
 
-    Pond II: Robocod RO B02
+    Pond II: Robocod ROB02
     (c)Electronic Arts 1991
     All Rights Reserved
 -->
@@ -203,8 +202,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV G" />
-			<dataarea name="rom" size="4194304">
-				<rom name="lotus_turbo_lot03.u1" size="1048576" crc="b83ccb7a" sha1="922c29fd0195e3e0f72f6fc803d3d5c7299d9f0d" offset="000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="lotus turbo lot03.u1" size="1048576" crc="b83ccb7a" sha1="922c29fd0195e3e0f72f6fc803d3d5c7299d9f0d" offset="000000" />
 			</dataarea>
 		</part>
 <!--
@@ -223,8 +222,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" size="4194304">
-				<rom name="nhl94_hl9402" size="1048576" crc="acecd225" sha1="5a11c7e3c925a6e256d2000b292ad7aa530bda0f" offset="000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="nhl94 hl9402.u1" size="1048576" crc="acecd225" sha1="5a11c7e3c925a6e256d2000b292ad7aa530bda0f" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -246,8 +245,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" size="4194304">
-				<rom name="pga_tour_golf_pgt04" size="1048576" crc="8d980bb4" sha1="89b50dae5c88f633458a6faeb4ee288fcc94c1b1" offset="000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="pga tour golf pgt04.u1" size="1048576" crc="8d980bb4" sha1="89b50dae5c88f633458a6faeb4ee288fcc94c1b1" offset="000000" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -269,8 +268,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="es133-1_rise_of_the_robots.u1" size="2097152" crc="ed583ef7" sha1="b9f43d5bf31819a1d76c1495e81cfa1d38bcde1c" offset="000000" />
-				<rom name="es133-2_rise_of_the_robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="0x200000" />
+				<rom name="es133-1 rise of the robots.u1" size="2097152" crc="ed583ef7" sha1="b9f43d5bf31819a1d76c1495e81cfa1d38bcde1c" offset="000000" />
+				<rom name="es133-2 rise of the robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="0x200000" />
 			</dataarea>
 		</part>
 <!--
@@ -298,7 +297,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19920804"/>
 		<info name="alt_title" value="スプラッターハウスPART2"/>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="1048576">
 				<rom name="sh2j" size="1048576" crc="adbd991b" sha1="1a0032faec53f8cf21d3178939bbc5b2f844782a" offset="000000" />
 			</dataarea>
 		</part>
@@ -310,9 +309,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="zetsg_lo_7500-00034a.u2" size="1048576" crc="b9c2d518" sha1="e5e7c36746233f441af5e03d0e2b63c6d916df24" offset="000000" loadflag="load16_byte"/>
-				<rom name="zetsg_hi_7500-00033a.u1" size="1048576" crc="af362b8c" sha1="2e5c1e4809d763513fa5bb8dc72c97a873fc732b" offset="000001" loadflag="load16_byte"/>
+			<dataarea name="rom" size="2097152">
+				<rom name="zetsg lo 7500-00034a.u2" size="1048576" crc="b9c2d518" sha1="e5e7c36746233f441af5e03d0e2b63c6d916df24" offset="000000" loadflag="load16_byte"/>
+				<rom name="zetsg hi 7500-00033a.u1" size="1048576" crc="af362b8c" sha1="2e5c1e4809d763513fa5bb8dc72c97a873fc732b" offset="000001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 <!--
@@ -330,6 +329,61 @@ better to use names related to the actual pcb, possibly even reverting to use th
 -->
 	</software>
 
+<!-- Only Europe is confirmed -->
+	<software name="688atsub">
+		<description>688 Attack Sub (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-13956-F" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-13956-f.ic1" size="1048576" crc="f2c58bf7" sha1="6795b9fc9a21167d94a0b4c9c38d4e11214e1ea7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaahhrm">
+		<description>AAAHH!!! Real Monsters (Euro)</description>
+		<year>1995</year>
+		<publisher>Viacom New Media</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-18558-U" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-18558-u.ic1" size="2097152" crc="7ad115ff" sha1="9f6361fecbeee1c703b5c988d10a5cb09751ad2a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="aburner2">
+		<description>After Burner II (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13261-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13261-h.ic1" size="524288" crc="ccafe00e" sha1="523e4abdf19794a167a347b7eeca79907416e084" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="addfam">
+		<description>The Addams Family (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Flying Edge</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="ic1" value="MPR-16147-F" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16147-f.ic1" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advbatr">
 		<description>The Adventures of Batman &amp; Robin (Euro)</description>
 		<year>1995</year>
@@ -338,7 +392,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-6329A" />
 			<feature name="ic1" value="MPR-18019-U" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-18019.ic1" size="2097152" crc="355e8c39" sha1="c08c48236c38263df8ea38a5820d16644bddb1a2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18019-u.ic1" size="2097152" crc="355e8c39" sha1="c08c48236c38263df8ea38a5820d16644bddb1a2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aero">
+		<description>Aero the Acro-Bat (Euro)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="ic1" value="MPR-16603-MX" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16603-mx.ic1" size="1048576" crc="1a3eaf57" sha1="0a4c99a31e507bcee5b955e4bf3773f4ded827b6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -351,7 +418,21 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-17434-U" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17434.ic1" size="1048576" crc="24f1a3bb" sha1="e60eec1d39b32ce5cc2125cffd3016b4070a65c3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17434-u.ic1" size="1048576" crc="24f1a3bb" sha1="e60eec1d39b32ce5cc2125cffd3016b4070a65c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdin">
+		<description>Disney's Aladdin (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<!-- Also exists on a 171-6330A with two roms, MPR-15959 and MPR15960 -->
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-15939-H" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-15939-h.ic1" size="2097152" crc="d1845e8f" sha1="42debba01ba3555f61d1e9b445542a05d01451dd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -364,7 +445,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12608A-S" />
 			<dataarea name="rom" size="262144">
-				<rom name="mpr-12608a.ic1" size="262144" crc="778a0f00" sha1="b7e96b33ab1715fe265ed0de81a26dde969698d5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12608a-s.ic1" size="262144" crc="778a0f00" sha1="b7e96b33ab1715fe265ed0de81a26dde969698d5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -377,7 +458,21 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-14680-F" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14680.ic1" size="1048576" crc="28165bd1" sha1="c8a3667631fdbd4d0073e42ada9f7199d09c0cfa" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14680-f.ic1" size="1048576" crc="28165bd1" sha1="c8a3667631fdbd4d0073e42ada9f7199d09c0cfa" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="altbeast">
+		<description>Altered Beast (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12538F" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12538f.ic1" size="524288" crc="154d59bb" sha1="38945360d824d2fb9535b4fd7f25b9aa9b32f019" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -390,7 +485,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-15488-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-15488.ic1" size="524288" crc="224256c7" sha1="70fa6185a4ebbbc9a6b2c7428c489ba5303859b0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15488-f.ic1" size="524288" crc="224256c7" sha1="70fa6185a4ebbbc9a6b2c7428c489ba5303859b0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -403,7 +498,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-15498-H" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15498.ic1" size="1048576" crc="e9742041" sha1="9d98d6817b3e3651837bb2692f7a2a60a608c055" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15498-h.ic1" size="1048576" crc="e9742041" sha1="9d98d6817b3e3651837bb2692f7a2a60a608c055" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -417,7 +512,38 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-18815-SM" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-18815.ic1" size="524288" crc="8aed2090" sha1="ec29aec7848dbcea6678adb4b31deba0a6ecf1e2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18815-sm.ic1" size="524288" crc="8aed2090" sha1="ec29aec7848dbcea6678adb4b31deba0a6ecf1e2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="ariel">
+		<description>Disney's Ariel the Little Mermaid (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-15153 W98" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-15153 w98.ic1" size="524288" crc="58e297df" sha1="201105569535b7c8f11bd97b93cbee884c7845c4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Only Europe is confirmed -->
+	<software name="arrow">
+		<description>Arrow Flash (World)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4039 (JPN)"/>
+		<info name="release" value="19901020 (JPN)"/>
+		<info name="alt_title" value="アローフラッシュ"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13396-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13396-h.ic1" size="524288" crc="d49f8444" sha1="5d2ca55704b7fe8d83fa7564fb1efc62834d3148" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -434,7 +560,48 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5927" />
 			<feature name="ic1" value="MPR-14384-T" />
 			<dataarea name="rom" size="131072">
-				<rom name="mpr-14384.ic1" size="131072" crc="f1b72cdd" sha1="2c57e38592a206a1847e9e202341595832798587" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14384-t.ic1" size="131072" crc="f1b72cdd" sha1="2c57e38592a206a1847e9e202341595832798587" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astergre">
+		<description>Astérix and the Great Rescue (Euro)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6330A" />
+			<feature name="ic1" value="MPR-15961-F" />
+			<feature name="ic2" value="MPR-15962-F" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-15961-f.ic1" size="1048576" crc="5e84f375" sha1="74201ead2acbecb0b6213ace53a1106900c9f459" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15962-f.ic2" size="1048576" crc="714ac01d" sha1="25468d71702d8fe22af2dc7b9217ae8f304b3606" offset="0x100000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asterpg">
+		<description>Astérix and the Power of the Gods (Euro)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-17719-H" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-17719-h.ic1" size="2097152" crc="4ff1d83f" sha1="189c1e7dd280d0d621eb9e895831fb8109e3e3ab" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atomrun">
+		<description>Atomic Runner (Euro)</description>
+		<year>1992</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="ic1" value="MPR-15286-H" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-15286-h.ic1" size="1048576" crc="b3c05418" sha1="ab84274bc98a1f8f808bee3f41645884c95cc840" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +618,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14125A-SM" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14125a.ic1" size="524288" crc="4052e845" sha1="731cdf182fe647e4977477ba4dd2e2b46b9b878a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14125a-sm.ic1" size="524288" crc="4052e845" sha1="731cdf182fe647e4977477ba4dd2e2b46b9b878a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -468,7 +635,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14125 W35" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14125.ic1" size="524288" crc="bff227c6" sha1="3d74dbc81f3472a5bde45bf265e636a72a314667" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14125 w35.ic1" size="524288" crc="bff227c6" sha1="3d74dbc81f3472a5bde45bf265e636a72a314667" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +648,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14561-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14561.ic1" size="524288" crc="61c60c35" sha1="c7279c6d45e6533f9de14f65098c289b7534beb3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14561-t.ic1" size="524288" crc="61c60c35" sha1="c7279c6d45e6533f9de14f65098c289b7534beb3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -494,7 +661,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-14770A-H" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14770a.ic1" size="1048576" crc="250111df" sha1="0e33965994a6f53aca93c3cb164726b913789fc1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14770a-h.ic1" size="1048576" crc="250111df" sha1="0e33965994a6f53aca93c3cb164726b913789fc1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -513,7 +680,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic4" value="D74HC74C" />
 			<feature name="ic5" value="D74HC32C" />
 			<dataarea name="rom" size="131072">
-				<rom name="mpr-12750a.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12750a-t.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -529,8 +696,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic2" value="MPR-12606A W57" />
 			<feature name="ic3" value="HD74HC139P" />
 			<dataarea name="rom" size="655360">
-				<rom name="mpr-12605a.ic1" size="131072" crc="d367c3cc" sha1="4c2c8fcf0219c6129650cf59a47d8edeb844e2df" offset="000000" />
-				<rom name="mpr-12606a.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="0x020000" />
+				<rom name="mpr-12605a t04.ic1" size="131072" crc="d367c3cc" sha1="4c2c8fcf0219c6129650cf59a47d8edeb844e2df" offset="000000" />
+				<rom name="mpr-12606a w57.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="0x020000" />
 			</dataarea>
 		</part>
 	</software>
@@ -546,8 +713,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic2" value="MPR-12606 R32" />
 			<feature name="ic3" value="74HC139AP" />
 			<dataarea name="rom" size="655360">
-				<rom name="mpr-12605.ic1" size="131072" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="000000" />
-				<rom name="mpr-12606.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="0x020000" />
+				<rom name="mpr-12605 t02.ic1" size="131072" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="000000" />
+				<rom name="mpr-12606 r32.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="0x020000" />
 			</dataarea>
 		</part>
 	</software>
@@ -565,7 +732,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic4" value="74HC74N" />
 			<feature name="ic5" value="AT24C01" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16211.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16211-sm.ic1" size="2097152" crc="9778c181" sha1="db28d70f9b744004cadd06eb77d6223534f59215" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -592,7 +759,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14996-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14996.ic1" size="524288" crc="aa0d4387" sha1="c3794ef25d53cb7811dd0df73ba6fadd4cecb116" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14996-t.ic1" size="524288" crc="aa0d4387" sha1="c3794ef25d53cb7811dd0df73ba6fadd4cecb116" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -604,9 +771,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="ic1" value="MPR-14356-F" />
+			<feature name="u1" value="MPR-14356-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14356.ic1" size="1048576" crc="f2363a4a" sha1="3925623fafb79a7e8467e9b6fe70361c147cbfd3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14356-f.u1" size="1048576" crc="f2363a4a" sha1="3925623fafb79a7e8467e9b6fe70361c147cbfd3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -650,7 +817,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-17108-F" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17108.ic1" size="1048576" crc="54ab3beb" sha1="01f76e2f719bdae5f21ff0e5a1ac1262c2def279" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17108-f.ic1" size="1048576" crc="54ab3beb" sha1="01f76e2f719bdae5f21ff0e5a1ac1262c2def279" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -663,7 +830,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-7147A" />
 			<feature name="ic1" value="MPR-18871-MX" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18871.ic1" size="3145728" crc="fe3e7e4f" sha1="cca818d624e95c2d07cfc1b22c44eb53e4bdcd02" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18871-mx.ic1" size="3145728" crc="fe3e7e4f" sha1="cca818d624e95c2d07cfc1b22c44eb53e4bdcd02" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -722,8 +889,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic4" value="067" />
 			<feature name="ic5" value="PC74HC139P" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-12851a.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
-				<rom name="mpr-12852a.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="0x080000" />
+				<rom name="mpr-12851a s40.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
+				<rom name="mpr-12852a-s.ic2" size="524288" crc="e304231a" sha1="4ab8a0b63816f9bdc76ae36962f1e8c7228f5473" offset="0x080000" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -742,7 +909,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic3" value="SN74HC00N" />
 			<feature name="ic4" value="BA6162" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16933.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16933-h.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -757,7 +924,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-17019A-F" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-17019a.ic1" size="1048576" crc="88b30eff" sha1="0da7e621e05dc9160122d728e1fca645ff11e670" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17019a-f.ic1" size="1048576" crc="88b30eff" sha1="0da7e621e05dc9160122d728e1fca645ff11e670" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -774,7 +941,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic3" value="M74HC00B1" />
 			<feature name="ic4" value="BA6162" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-17512.ic1" size="2097152" crc="9ed4c323" sha1="95ae529cecb7dbca281df25c3c4e7cb8f48d936c" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17512-u.ic1" size="2097152" crc="9ed4c323" sha1="95ae529cecb7dbca281df25c3c4e7cb8f48d936c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -825,7 +992,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic5" value="M74HC00B1" />
 			<feature name="ic6" value="M74HC00B1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16342.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16342-s.ic1" size="2097152" crc="6a632503" sha1="2ff45bb056ede0f745e52f8d02c54b4ca724ca4c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="fram" size="1024">
 			</dataarea>
@@ -860,8 +1027,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic2" value="MPR-18204-MX" />
 			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18203.ic1" size="2097152" crc="fe61c79e" sha1="08a92494e23bd53248aa4031233e151394f044f5" offset="000000" />
-				<rom name="mpr-18204.ic2" size="1048576" crc="21d42146" sha1="d72820d829c72d524bf77ff9a75151f15db5345d" offset="0x200000" />
+				<rom name="mpr-18203-mx.ic1" size="2097152" crc="fe61c79e" sha1="08a92494e23bd53248aa4031233e151394f044f5" offset="000000" />
+				<rom name="mpr-18204-mx.ic2" size="1048576" crc="21d42146" sha1="d72820d829c72d524bf77ff9a75151f15db5345d" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -874,7 +1041,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-16077 W08" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16077.ic1" size="1048576" crc="aea0786d" sha1="f61a568314133b60de82ac162b5b52473adc9e1c" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16077 w08.ic1" size="1048576" crc="aea0786d" sha1="f61a568314133b60de82ac162b5b52473adc9e1c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -888,7 +1055,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" /> <!-- Also exist on a 171-6242A -->
 			<feature name="ic1" value="MPR-12355-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12355.ic1" size="524288" crc="e5c9cbb0" sha1="db4285e4ffb69aa9f1ca68c4103fbfd0843f7b86" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12355-h.ic1" size="524288" crc="e5c9cbb0" sha1="db4285e4ffb69aa9f1ca68c4103fbfd0843f7b86" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -905,8 +1072,8 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic2" value="MPR-17720-SM" />
 			<feature name="ic3" value="GH76C8BALK-15" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-17720.ic1" size="2097152" crc="5385f970" sha1="30d80bfdbfa4758d1ad5aaad12899cf3e6dd1b63" offset="000000" />
-				<rom name="mpr-17721.ic2" size="1048576" crc="158fa2aa" sha1="f9c7aaf77e5cfe5b8bcce4e0021b7f413636b9ee" offset="0x200000" />
+				<rom name="mpr-17720-sm.ic1" size="2097152" crc="5385f970" sha1="30d80bfdbfa4758d1ad5aaad12899cf3e6dd1b63" offset="000000" />
+				<rom name="mpr-17721-sm.ic2" size="1048576" crc="158fa2aa" sha1="f9c7aaf77e5cfe5b8bcce4e0021b7f413636b9ee" offset="0x200000" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -922,7 +1089,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13250A-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-13250a.ic1" size="524288" crc="be91b28a" sha1="1e49a449367f0ec7ba0331b7b0d074f796e48d58" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13250a-f.ic1" size="524288" crc="be91b28a" sha1="1e49a449367f0ec7ba0331b7b0d074f796e48d58" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -936,21 +1103,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-15040-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-15040.ic1" size="524288" crc="f22412b6" sha1="0459f7c61f152fa0afa98d96ef9fbe4964641f34" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Only Europe is confirmed -->
-	<software name="addfam">
-		<description>The Addams Family (Euro, USA)</description>
-		<year>1994</year>
-		<publisher>Flying Edge</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978B" />
-			<feature name="ic1" value="MPR-16147-F" />
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16147.ic1" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15040-s.ic1" size="524288" crc="f22412b6" sha1="0459f7c61f152fa0afa98d96ef9fbe4964641f34" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1019,7 +1172,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-16269-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16259.ic1" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16259-s.ic1" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1033,7 +1186,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13192A S69" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-13192a.ic1" size="524288" crc="e72f8a36" sha1="5cb96061bd2b00c82f8d6b46ab9802e2b1820c86" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13192a s69.ic1" size="524288" crc="e72f8a36" sha1="5cb96061bd2b00c82f8d6b46ab9802e2b1820c86" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1051,7 +1204,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic1" value="MPR-14860-T" />
 			<feature name="slot" value="rom_eeprom" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14860.ic1" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14860-t.ic1" size="524288" crc="4fef37c8" sha1="eb4aca22f8b5837a0a0b10491c46714948b09844" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1065,7 +1218,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-15225-T" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15225.ic1" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15225-t.ic1" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1082,7 +1235,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-14248B-F" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14248b.ic1" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14248b-f.ic1" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1093,7 +1246,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="PWA P100001 REV F" />
+			<feature name="pcb" value="PWA P10001 REV F" />
 			<feature name="u1" value="MUTANT LEAGUE MLF03" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mlf03.u1" size="1048576" crc="dce29c9d" sha1="6f8638a1c56229ddcb71c9da9f652b49c2978f44" offset="000000" loadflag="load16_word_swap" />
@@ -1110,7 +1263,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-16065-H" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16065.ic1" size="1048576" crc="b5804771" sha1="fc63d2a2a723f60f2141bc50bd94acef74ba9ab3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16065-h.ic1" size="1048576" crc="b5804771" sha1="fc63d2a2a723f60f2141bc50bd94acef74ba9ab3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1124,7 +1277,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-15709-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15709.ic1" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15709-s.ic1" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1141,7 +1294,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12807 T05" />
 			<dataarea name="rom" size="262144">
-				<rom name="mpr-12807.ic1" size="262144" crc="724d6965" sha1="05efc300b3f68496200cb73a2a462a97f930a011" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12807 t05.ic1" size="262144" crc="724d6965" sha1="05efc300b3f68496200cb73a2a462a97f930a011" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1167,7 +1320,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-6329A" />
 			<feature name="ic1" value="MPR-18887-U" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-18887.ic1" size="2097152" crc="cec0a0bb" sha1="ee079f3cbb168bab62d5f0643709d840a9b5d2d5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18887-u.ic1" size="2097152" crc="cec0a0bb" sha1="ee079f3cbb168bab62d5f0643709d840a9b5d2d5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1181,7 +1334,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-14557 W29" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14557.ic1" size="1048576" crc="ce36e6cc" sha1="28b904000b2863b6760531807760b571f1a5fc1d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14557 w29.ic1" size="1048576" crc="ce36e6cc" sha1="28b904000b2863b6760531807760b571f1a5fc1d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1206,7 +1359,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978B" />
 			<feature name="ic1" value="MPR-15798 T57" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15798.ic1" size="1048576" crc="0b6d3eb5" sha1="23579c8f7e2396080b478b113aff36d2382395a3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15798 t57.ic1" size="1048576" crc="0b6d3eb5" sha1="23579c8f7e2396080b478b113aff36d2382395a3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1219,7 +1372,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12559 T87" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12559.ic1" size="524288" crc="9b1561b3" sha1="b81e7ebc4ceb6c1ae2975d27e0a78ba1e8546b5f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12559 t87.ic1" size="524288" crc="9b1561b3" sha1="b81e7ebc4ceb6c1ae2975d27e0a78ba1e8546b5f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1241,9 +1394,9 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="alt_title" value="アイラブ ドナルドダック グルジア王の秘宝"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6206A" />
-			<feature name="ic1" value="MPR-14371-F" />
+			<feature name="ic1" value="MPR-14371-F, MPR-14371-H" />
 			<dataarea name="rom" size="1310720">
-				<rom name="mpr-14371.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14371-f.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
 				<rom size="262144" offset="0x100000" loadflag="continue" />
 			</dataarea>
 		</part>
@@ -1258,7 +1411,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12929 S19" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12929.ic1" size="524288" crc="a605b65b" sha1="8f7262102c2b2334f0bc88ee6fd6b08797919176" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12929 s19.ic1" size="524288" crc="a605b65b" sha1="8f7262102c2b2334f0bc88ee6fd6b08797919176" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1276,7 +1429,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="ic3" value="HD74HC00P" />
 			<feature name="ic4" value="BA6162" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-15976.ic1" size="2097152" crc="5de7d917" sha1="86db4b22b54e8583e35717927ad66b7535bf33b4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15976-s.ic1" size="2097152" crc="5de7d917" sha1="86db4b22b54e8583e35717927ad66b7535bf33b4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -1291,7 +1444,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13913-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-13913.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13913-f.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1320,7 +1473,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978B" />
 			<feature name="ic1" value="MPR-14998 T02" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14998.ic1" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14998 t02.ic1" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1336,7 +1489,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12354 W54" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12354.bin" size="524288" crc="b13087ee" sha1="21810b4a309a5b9a70965dd440e9aeed0b6ca4c5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12354 w54.bin" size="524288" crc="b13087ee" sha1="21810b4a309a5b9a70965dd440e9aeed0b6ca4c5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1353,7 +1506,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="u3" value="GD74LS138" />
 			<feature name="u4" value="1026B" />
 			<dataarea name="rom" size="2097152">
-				<rom name="fifa95b1.bin" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fifa95b1.u1" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -1382,7 +1535,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-15320 T15" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15320.ic1" size="1048576" crc="1de28bb1" sha1="6421c26000bec21d0c808252c5d9ce75b75cb8a4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15320 t15.ic1" size="1048576" crc="1de28bb1" sha1="6421c26000bec21d0c808252c5d9ce75b75cb8a4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1396,7 +1549,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14118A-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14118a.ic1" size="524288" crc="cee98813" sha1="9a6e4ca71546e798e1c98e78c4ab72aba46374c5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14118a-f.ic1" size="524288" crc="cee98813" sha1="9a6e4ca71546e798e1c98e78c4ab72aba46374c5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1409,7 +1562,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="ic1" value="MPR-15008-F" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15008.ic1" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15008-f.ic1" size="1048576" crc="af9f275d" sha1="2b30982d04628edc620d8d99f7dceb4ed87b41e3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1553,17 +1706,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="688atsub">
-		<description>688 Attack Sub (Euro, USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-13956.bin" size="1048576" crc="f2c58bf7" sha1="6795b9fc9a21167d94a0b4c9c38d4e11214e1ea7" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aresshmd">
 		<description>A Ressha de Ikou MD - Take the "A" Train (Jpn)</description>
 		<year>1992</year>
@@ -1591,17 +1733,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="aa harimanada (jpn).bin" size="2097152" crc="065f6021" sha1="fcc4b27aaaea0439fb256f40fb79c823d90a9d88" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aaahhrm">
-		<description>AAAHH!!! Real Monsters (Euro)</description>
-		<year>1995</year>
-		<publisher>Viacom New Media</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="aaahh!!! real monsters (euro).bin" size="2097152" crc="7ad115ff" sha1="9f6361fecbeee1c703b5c988d10a5cb09751ad2a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1865,17 +1996,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aero">
-		<description>Aero the Acro-Bat (Euro)</description>
-		<year>1993</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-16603.bin" size="1048576" crc="1a3eaf57" sha1="0a4c99a31e507bcee5b955e4bf3773f4ded827b6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aerop" cloneof="aero">
 		<description>Aero the Acro-Bat (Prototype)</description>
 		<year>1993</year>
@@ -1971,17 +2091,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="aburner2">
-		<description>After Burner II (Euro, USA)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13261.bin" size="524288" crc="ccafe00e" sha1="523e4abdf19794a167a347b7eeca79907416e084" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="aburner2j" cloneof="aburner2">
 		<description>After Burner II (Jpn)</description>
 		<year>1990</year>
@@ -2040,19 +2149,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19900309"/>
 		<info name="alt_title" value="エアダイバー"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12893 R98" />
 			<dataarea name="rom" size="524288">
-				<rom name="air diver (jpn).bin" size="524288" crc="9e2d5b91" sha1="540460e95f6a82256ca2a16f347a7b6524f3053f" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="aladdin">
-		<description>Disney's Aladdin (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-15939.bin" size="2097152" crc="d1845e8f" sha1="42debba01ba3555f61d1e9b445542a05d01451dd" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12893 r98.ic1" size="524288" crc="9e2d5b91" sha1="540460e95f6a82256ca2a16f347a7b6524f3053f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2065,8 +2165,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19931112"/>
 		<info name="alt_title" value="アラジン"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-16069-S" />
 			<dataarea name="rom" size="2097152">
-				<rom name="aladdin (jpn).bin" size="2097152" crc="fb5aacf0" sha1="43753dafd0b816c39aca87fc0788e598fb4bb4f3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16069-s.ic1" size="2097152" crc="fb5aacf0" sha1="43753dafd0b816c39aca87fc0788e598fb4bb4f3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2206,8 +2308,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19910628 (JPN)"/>
 		<info name="alt_title" value="エイリアン ストーム"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13941-SM" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-13941.bin" size="524288" crc="f5ac8de5" sha1="e4f8774c5f96db76a781c31476d06203ec16811a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13941-sm.ic1" size="524288" crc="f5ac8de5" sha1="e4f8774c5f96db76a781c31476d06203ec16811a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2233,17 +2337,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="alisia dragoon (usa).bin" size="1048576" crc="d28d5c40" sha1="69bf7a9ebcb851e0d571f93b26d785ca87621b01" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="altbeast">
-		<description>Altered Beast (Euro, USA)</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-12538.bin" size="524288" crc="154d59bb" sha1="38945360d824d2fb9535b4fd7f25b9aa9b32f019" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2409,17 +2502,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="ariel">
-		<description>Disney's Ariel the Little Mermaid (Euro, USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-15153.bin" size="524288" crc="58e297df" sha1="201105569535b7c8f11bd97b93cbee884c7845c4" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="arnoldp">
 		<description>Arnold Palmer Tournament Golf (Euro, USA)</description>
 		<year>1989</year>
@@ -2441,20 +2523,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="naomichi ozaki no super masters (jpn).bin" size="524288" crc="088ba825" sha1="662a87d679066aad0638b2ffb01c807d9f376121" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="arrow">
-		<description>Arrow Flash (World)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4039 (JPN)"/>
-		<info name="release" value="19901020 (JPN)"/>
-		<info name="alt_title" value="アローフラッシュ"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13396.bin" size="524288" crc="d49f8444" sha1="5d2ca55704b7fe8d83fa7564fb1efc62834d3148" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2520,17 +2588,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="astergre">
-		<description>Astérix and the Great Rescue (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-15961+mpr-15962.bin" size="2097152" crc="4735fee6" sha1="e6353362ba261f1f8efb31e624250e74e1ca0da1" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="astergreu" cloneof="astergre">
 		<description>Astérix and the Great Rescue (USA)</description>
 		<year>1994</year>
@@ -2538,17 +2595,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="asterix and the great rescue (usa).bin" size="2097152" crc="7f112cd8" sha1="6d73f37fa31dbcc6a8e9e1590f552e084346088c" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="asterpg">
-		<description>Astérix and the Power of the Gods (Euro)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="mpr-17719.bin" size="2097152" crc="4ff1d83f" sha1="189c1e7dd280d0d621eb9e895831fb8109e3e3ab" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2585,17 +2631,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13483.bin" size="524288" crc="e833067e" sha1="9bed099693c27a6575b394bdd150efb7cc53c5c6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="atomrun">
-		<description>Atomic Runner (Euro)</description>
-		<year>1992</year>
-		<publisher>Data East</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15286.bin" size="1048576" crc="b3c05418" sha1="ab84274bc98a1f8f808bee3f41645884c95cc840" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2843,8 +2878,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-14861 W45" />
+			<feature name="ic2" value="MB8464A" />
+			<feature name="ic3" value="IL7-1026B" />
+			<feature name="ic4" value="HD74HC00P" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14861.bin" size="1048576" crc="60af0f76" sha1="373fb1744170a114ef99802db987bc9aae009032" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14861 w45.ic1" size="1048576" crc="60af0f76" sha1="373fb1744170a114ef99802db987bc9aae009032" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -3765,6 +3806,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<!-- also found in a diff pcb with two separate ROMs bloc-u1_blo03+bloc-u2_blo03 -->
 	<software name="blockout">
 		<description>Blockout (World)</description>
 		<year>1991</year>
@@ -3773,8 +3815,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19911101"/>
 		<info name="alt_title" value="ブロックアウト"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5927" />
+			<feature name="u1" value="MPR-14247-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
-				<rom name="bloc-u1_blo03+bloc-u2_blo03.bin,mpr-14247.bin" size="131072" crc="5e2966f1" sha1="f6620d3b712f3bd333d0bb355c08cf992af6e12d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14247-t.u1" size="131072" crc="5e2966f1" sha1="f6620d3b712f3bd333d0bb355c08cf992af6e12d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4319,6 +4363,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="burnforcj" cloneof="burnforc">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Burning Force (Jpn)</description>
 		<year>1990</year>
 		<publisher>Namcot</publisher>
@@ -4327,7 +4372,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="alt_title" value="バーニングフォース"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="burning force (jpn).bin" size="524288" crc="0c1deb47" sha1="8849253262f545fbaf6140bfa5ca67a3caac9a80" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mbu mb98570-001.bin" size="524288" crc="0c1deb47" sha1="8849253262f545fbaf6140bfa5ca67a3caac9a80" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4498,8 +4543,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19901121"/>
 		<info name="alt_title" value="アイラブミッキーマウス ふしぎのお城大冒険"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13498-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-13498.bin" size="524288" crc="ce8333c6" sha1="0679162757f375751a677fd05195c9248abc84f0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13498-h.ic1" size="524288" crc="ce8333c6" sha1="0679162757f375751a677fd05195c9248abc84f0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -5324,8 +5371,15 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19900630 (JPN)"/>
 		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-13193-T" />
+			<feature name="ic2" value="(unpopulated)" />
+			<feature name="ic3" value="(unpopulated)" />
+			<feature name="ic4" value="(unpopulated)" />
+			<feature name="ic5" value="(unpopulated)" />
 			<dataarea name="rom" size="131072">
-				<rom name="mpr-13193.bin" size="131072" crc="03163d7a" sha1="b262a4c2738a499f070777dbe05e2629d211a107" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13193-t.ic1" size="131072" crc="03163d7a" sha1="b262a4c2738a499f070777dbe05e2629d211a107" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -5689,8 +5743,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13578 S85" />
 			<dataarea name="rom" size="524288">
-				<rom name="crack down (euro, jpn).bin" size="524288" crc="538aaa5d" sha1="1082c89920699dbc6f6672c9b0519b3d0f626ba5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13578 s85.ic1" size="524288" crc="538aaa5d" sha1="1082c89920699dbc6f6672c9b0519b3d0f626ba5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6686,8 +6743,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19900519"/>
 		<info name="alt_title" value="DJボーイ"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13117-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="dj boy (jpn).bin" size="524288" crc="202abaa8" sha1="c66b2e00b8a9172a76f5e699730c7d88740b5dd7" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13117-h.ic1" size="524288" crc="202abaa8" sha1="c66b2e00b8a9172a76f5e699730c7d88740b5dd7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8198,8 +8257,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19911122"/>
 		<info name="alt_title" value="ファンタジア ミッキーマウス・マジック"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-14028A-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-14028a.bin" size="524288" crc="fc43df2d" sha1="e3ba172d93505f8e0c1763b600f68af11b68f261" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14028a-h.ic1" size="524288" crc="fc43df2d" sha1="e3ba172d93505f8e0c1763b600f68af11b68f261" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8246,8 +8307,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="alt_title" value="ファステスト・ワン"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="171-5919" />
+			<feature name="ic1" value="MPR-13938-SY" />
+			<feature name="ic2" value="KM6264BLS-10L" />
+			<feature name="ic3" value="147-1026B" />
+			<feature name="ic4" value="HD74HC00P" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="524288">
-				<rom name="fastest 1 (jpn).bin" size="524288" crc="bb43f0de" sha1="837a19b4b821076f1cd01d53d90b4553a0252340" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13938-sy.ic1" size="524288" crc="bb43f0de" sha1="837a19b4b821076f1cd01d53d90b4553a0252340" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -8933,8 +9000,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19910103 (JPN)"/>
 		<info name="alt_title" value="ゲイングランド"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13642 S87" />
 			<dataarea name="rom" size="524288">
-				<rom name="gain ground (world).bin" size="524288" crc="8641a2ab" sha1="a5017e44b5f470e0499f4a9b494385c567632864" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13642 s87.ic1" size="524288" crc="8641a2ab" sha1="a5017e44b5f470e0499f4a9b494385c567632864" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9189,8 +9259,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19900630 (JPN)"/>
 		<info name="alt_title" value="ゴーストバスターズ"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13191 S48" />
 			<dataarea name="rom" size="524288">
-				<rom name="ghostbusters (world).bin" size="524288" crc="00419da3" sha1="2a1589781fc4aca2c1ba97ec9ecf1acf563b7bfb" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13191 s48.ic1" size="524288" crc="00419da3" sha1="2a1589781fc4aca2c1ba97ec9ecf1acf563b7bfb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9306,15 +9379,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="goldnaxe">
-		<description>Golden Axe (World, v1.1)</description>
+		<description>Golden Axe (World, Rev. A)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4018 (JPN)"/>
 		<info name="release" value="19891223"/>
 		<info name="alt_title" value="ゴールデンアックス"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12806A S33" />
 			<dataarea name="rom" size="524288">
-				<rom name="golden axe (world) (v1.1).bin" size="524288" crc="665d7df9" sha1="2ce17105ca916fbbe3ac9ae3a2086e66b07996dd" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12806a s33.ic1" size="524288" crc="665d7df9" sha1="2ce17105ca916fbbe3ac9ae3a2086e66b07996dd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9838,8 +9913,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19900928"/>
 		<info name="alt_title" value="ヘルファイアー"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13251-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="hellfire (jpn).bin" size="524288" crc="8e5e13ba" sha1="17bbf3da65757cad3c7ff82c094e54cc68fd2f73" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13251-h.ic1" size="524288" crc="8e5e13ba" sha1="17bbf3da65757cad3c7ff82c094e54cc68fd2f73" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10370,25 +10447,29 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="jlps">
-		<description>J. League Pro Striker '93 (Jpn, v1.3)</description>
+		<description>J. League Pro Striker '93 (Jpn, Rev. A)</description>	<!-- binary v1.3 -->
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
 		<info name="release" value="19930618"/>
 		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-15554A W13" />
+			<feature name="ic2" value="FM1208S-250PC" />
+			<feature name="ic3" value="HD74HC00P" />
 			<feature name="slot" value="rom_sram" />
 			<dataarea name="rom" size="1048576">
-				<rom name="j. league pro striker (jpn) (v1.3).bin" size="1048576" crc="2d5b7a11" sha1="1e437182fab2980156b101a53623c3c2f27c3a6c" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15554a w13.ic1" size="1048576" crc="2d5b7a11" sha1="1e437182fab2980156b101a53623c3c2f27c3a6c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
-			<!-- Correct? size taken from the header -->
+			<!-- Correct? size taken from the header. on the PCB there seems to be no battery... -->
 			<dataarea name="sram" size="1024">
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="jlpsa" cloneof="jlps">
-		<description>J. League Pro Striker '93 (Jpn, v1.0)</description>
+		<description>J. League Pro Striker '93 (Jpn)</description>	<!-- binary v1.0 -->
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
@@ -10965,8 +11046,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19930827"/>
 		<info name="alt_title" value="ジュラシック・パーク"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-15767 W36" />
 			<dataarea name="rom" size="2097152">
-				<rom name="jurassic park (jpn).bin" size="2097152" crc="ec8e5783" sha1="d5d0e2ed4c00435ec4a343583bb399b07927de21" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15767 w36.ic1" size="2097152" crc="ec8e5783" sha1="d5d0e2ed4c00435ec4a343583bb399b07927de21" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11253,8 +11336,10 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="release" value="19931126"/>
 		<info name="alt_title" value="キング・オブ・ザ・モンスターズ"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="u1" value="MPR-15677-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="king of the monsters (jpn).bin" size="1048576" crc="3af7e74e" sha1="119557b565e1246ce68c2e6bc18074ae9b69874d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15677-t.u1" size="1048576" crc="3af7e74e" sha1="119557b565e1246ce68c2e6bc18074ae9b69874d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -12293,6 +12378,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="marblej">
+		<description>Marble Madness (Japan)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<info name="serial" value="T-48113"/>
+		<info name="release" value="19930813"/>
+		<info name="alt_title" value="マーブル マッドネス"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="marble madness (japan).bin" size="524288" crc="775bc464" sha1="ca343f3e4f945b6f58b08e276dff505ea1ace179" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="andretti">
 		<description>Mario Andretti Racing (Euro, USA)</description>
 		<year>1994</year>
@@ -12795,6 +12894,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="megapanl">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>MegaPanel (Jpn)</description>
 		<year>1990</year>
 		<publisher>Namcot</publisher>
@@ -12803,7 +12903,7 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<info name="alt_title" value="メガパネル"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="megapanel (jpn).bin" size="262144" crc="6240f579" sha1="1822905930f5f3627e9f9109760205e617295fda" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog4511-mmg 90436.bin" size="262144" crc="6240f579" sha1="1822905930f5f3627e9f9109760205e617295fda" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -13682,7 +13782,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="ふしぎの海のナディア"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="namcot_mfn_mb838200-20.bin" size="1048576" crc="4762062a" sha1="bbcd26d5d1f1422051467aacaa835e1f38383f64" offset="000000" loadflag="load16_word_swap" />
+				<rom name="namcot mfn mb838200-20.bin" size="1048576" crc="4762062a" sha1="bbcd26d5d1f1422051467aacaa835e1f38383f64" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -14395,8 +14495,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19930402"/>
 		<info name="alt_title" value="NBAプロバスケットボール ブルズ VS レイカーズ"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA P10001 REV G" />
+			<feature name="u1" value="EM20012" />
 			<dataarea name="rom" size="1048576">
-				<rom name="nba pro basketball - bulls vs lakers (jpn).bin" size="1048576" crc="4416ce39" sha1="003b01282aff14ccea9390551aba5ac4a9e53825" offset="000000" loadflag="load16_word_swap" />
+				<rom name="em20012.u1" size="1048576" crc="4416ce39" sha1="003b01282aff14ccea9390551aba5ac4a9e53825" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15402,15 +15504,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="olympgldj" cloneof="olympgld">
-		<description>Olympic Gold (Jpn, Kor)</description>
+		<description>Olympic Gold (Jpn, Kor, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4081"/>
 		<info name="release" value="19920724"/>
 		<info name="alt_title" value="オリンピックゴールド"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-149858A-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="olympic gold (jpn, kor).bin" size="524288" crc="e9c925b8" sha1="ce640bb979fcb285729b58de4da421c5493ef5e2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-149858a-t.ic1" size="524288" crc="e9c925b8" sha1="ce640bb979fcb285729b58de4da421c5493ef5e2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15669,8 +15774,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19910809"/>
 		<info name="alt_title" value="アウト ラン"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-14171 W30" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="outrun (jpn).bin" size="1048576" crc="ee7d9f4a" sha1="a94c96ffb53080b2c098be86e715f1dc727be07d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14171 w30.u1" size="1048576" crc="ee7d9f4a" sha1="a94c96ffb53080b2c098be86e715f1dc727be07d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16502,8 +16609,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19900720"/>
 		<info name="alt_title" value="フェリオス"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="Namcot" />
+			<feature name="ic1" value="NAMCOT MPS" />
 			<dataarea name="rom" size="524288">
-				<rom name="phelios (jpn).bin" size="524288" crc="94596174" sha1="9834c9963debebb6ee80ffac4191ff260b85e511" offset="000000" loadflag="load16_word_swap" />
+				<rom name="namcot mps.ic1" size="524288" crc="94596174" sha1="9834c9963debebb6ee80ffac4191ff260b85e511" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19898,8 +20007,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19921121 (JPN)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-15000A W99" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15000a.bin" size="1048576" crc="7b905383" sha1="8bca5dcef1af3e00098666fd892dc1c2a76333f9" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15000a w99.u1" size="1048576" crc="7b905383" sha1="8bca5dcef1af3e00098666fd892dc1c2a76333f9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21422,7 +21534,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="pcb" value="171-5919" />
 			<feature name="ic1" value="MPR-12477A-H" />
 			<feature name="ic2" value="MB8464A" />
-			<feature name="ic3" value="? 1471026B" />
+			<feature name="ic3" value="147-1026B" />
 			<feature name="ic4" value="PC74HC00P" />
 			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="524288">
@@ -21595,8 +21707,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19890422"/>
 		<info name="alt_title" value="スーパーリーグ"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5702" />
+			<feature name="u1" value="MPR-12406 T25" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="MPR-12407 T26" />	<!-- location not really marked on PCB, using u2 for consistency -->
 			<dataarea name="rom" size="524288">
-				<rom name="super league (jpn).bin" size="524288" crc="ea13cb1d" sha1="9e975ba4c396617ff9535d51d0929f6d592478fc" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12406 t25.u1" size="262144" crc="60f51c6d" sha1="c99c028e7ad5712ab433a5b3a3627cbf23cc54e9" offset="000000" loadflag="load16_byte"/>
+				<rom name="mpr-12407 t26.u2" size="262144" crc="52a72d6d" sha1="b08bf6d9a9ca5ca093b8a74e0806e53f7af29228" offset="000001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21703,8 +21819,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19900302"/>
 		<info name="alt_title" value="スーパーリアル バスケットボール"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12904F" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12904.bin" size="524288" crc="4346e11a" sha1="c86725780027ef9783cb7884c8770cc030b0cd0d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12904f.ic1" size="524288" crc="4346e11a" sha1="c86725780027ef9783cb7884c8770cc030b0cd0d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21791,6 +21910,24 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-11996.bin" size="524288" crc="8bd77836" sha1="f40bef7a5a2e414d87335e3e56a2c34fb4f83fca" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stbladj1" cloneof="stblad">
+		<description>Super Thunder Blade (Jpn, Alt PCB)</description>
+		<year>1988</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4003"/>
+		<info name="release" value="19881029"/>
+		<info name="alt_title" value="スーパーサンダーブレード"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5702" />
+			<feature name="u1" value="MPR-12005 T12" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="MPR-12006 T13" />	<!-- location not really marked on PCB, using u2 for consistency -->
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12006 t13.u2" size="262144" crc="655fa4e4" sha1="2e7574a9d0da0282cbaa7845930a0dae58c98d21" offset="000000" loadflag="load16_byte"/>
+				<rom name="mpr-12005 t12.u1" size="262144" crc="0a08d32d" sha1="99d0b833fbb636a4e67244439ce83872c600d753" offset="000001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22163,8 +22300,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19891209 (JPN)"/>
 		<info name="alt_title" value="タツジン"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12752 R87" />
 			<dataarea name="rom" size="524288">
-				<rom name="truxton -- tatsujin (world).bin" size="524288" crc="5bd0882d" sha1="90039844478e7cb99951fdff1979c3bda04d080a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12752 r87.ic1" size="524288" crc="5bd0882d" sha1="90039844478e7cb99951fdff1979c3bda04d080a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -22920,8 +23059,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19920313 (JPN)"/>
 		<info name="alt_title" value="トージャム&amp;アール"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-14236A-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14236a.bin" size="1048576" crc="7a588f4b" sha1="85e8d0a4fac591b25b77c35680ac4175976f251b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14236a-h.u1" size="1048576" crc="7a588f4b" sha1="85e8d0a4fac591b25b77c35680ac4175976f251b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24899,8 +25041,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19890729 (JPN)"/>
 		<info name="alt_title" value="ワールドカップサッカー"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-12589 W89" />
 			<dataarea name="rom" size="262144">
-				<rom name="world cup soccer -- world championship soccer (usa, jpn).bin" size="262144" crc="b01c3d70" sha1="39bbab6430aad3fa9bf024c4b42387ba4ba3e488" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12589 w89.ic1" size="262144" crc="b01c3d70" sha1="39bbab6430aad3fa9bf024c4b42387ba4ba3e488" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -26358,8 +26503,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19910531"/>
 		<info name="alt_title" value="ゼロウイング"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-13904-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="zero wing (jpn).bin" size="1048576" crc="7e203d2b" sha1="fad499e21ac55a3b8513110dc1f6e3f6cdeca8dd" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13904-h.u1" size="1048576" crc="7e203d2b" sha1="fad499e21ac55a3b8513110dc1f6e3f6cdeca8dd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
