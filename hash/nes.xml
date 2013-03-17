@@ -12281,7 +12281,7 @@
 		</part>
 	</software>
 
-	<software name="flipull">
+	<software name="flipull1" cloneof="flipull">
 		<description>Flipull - An Exciting Cube Game (Jpn)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -40340,7 +40340,7 @@
 		</part>
 	</software>
 
-	<software name="zoidschu">
+	<software name="zoidschu1" cloneof="zoidschu">
 		<description>Zoids - Chuuou Tairiku no Tatakai (Jpn)</description>
 		<year>1987</year>
 		<publisher>Toemiland</publisher>
@@ -42792,6 +42792,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="flipull">
+		<description>Flipull - An Exciting Cube Game (Jpn, v1.1)</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="TFC-FP-3900 (29)"/>
+		<info name="release" value="19891215"/>
+		<info name="alt_title" value="フリップル"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TAITO-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="chr" size="32768">
+				<rom name="flipull - an exciting cube game (japan) (ver1.1).chr" size="32768" crc="e90ed472" sha1="60ec7aefa78f1ba24540de76e11e1e2da610f8b7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="flipull - an exciting cube game (japan) (ver1.1).prg" size="32768" crc="3de19b75" sha1="5724f859e8f8500fcd7b9d040af8011ae6227439" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flyhero">
 		<description>Flying Hero (Jpn)</description>
 		<year>1989</year>
@@ -43795,6 +43814,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="kingneptp" cloneof="kingnept">
+		<description>King Neptune's Adventure (USA, Prototype)</description>
+		<year>1990</year>
+		<publisher>Color Dreams</publisher>
+		<info name="serial" value="CDR-KE-81016"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="COLORDREAMS-74*377" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="65536">
+				<rom name="king neptune's adventure (prototype).chr" size="65536" crc="9f4e36b6" sha1="cd3bc935a398d59f72b6a68c96cc09a4a75639b8" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="king neptune's adventure (prototype).prg" size="65536" crc="4a0721f0" sha1="bbb72cd7fadc1f68006836ec5b6c2d827b1d7503" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingeyc" cloneof="kingey">
 		<description>The King of Kings - The Early Years (USA, v1.1)</description>
 		<year>1991</year>
@@ -43899,8 +43935,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="juranger">
-		<description>Kyouryuu Sentai Juuranger (Jpn)</description>
+	<software name="zyurangr">
+		<description>Kyouryuu Sentai Zyuranger (Jpn)</description>
 		<year>1992</year>
 		<publisher>Angel</publisher>
 		<info name="serial" value="ANG-JF"/>
@@ -44398,7 +44434,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="miniputt">
-		<description>Mini Putt (Jpn, Bad Dump)</description>
+		<description>Mini Putt (Jpn)</description>
 		<year>1991</year>
 		<publisher>A-Wave</publisher>
 		<info name="serial" value="WAV-Q6 (11)"/>
@@ -44407,10 +44443,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="mini putt (japan) [b].chr" size="131072" crc="63a420f3" sha1="1fea96f96c00ade85e9d120f5f795cb256a93e71" offset="00000" status="baddump" />
+				<rom name="mini putt (japan).chr" size="131072" crc="2922fbc4" sha1="2442be2aa68f12e5b68ed9ed27903fbc4277a22c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="mini putt (japan) [b].prg" size="131072" crc="06e97649" sha1="2e37e0bf702d1c0f2a8bfabc2360e28955b7f750" offset="00000" status="baddump" />
+				<rom name="mini putt (japan).prg" size="131072" crc="06e97649" sha1="2e37e0bf702d1c0f2a8bfabc2360e28955b7f750" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46099,7 +46135,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="supermog">
-		<description>Super Mogura Tataki!! - Pokkun Mogurar (Jpn, Bad Dump)</description>
+		<description>Super Mogura Tataki!! - Pokkun Mogurar (Jpn)</description>
 		<year>1989</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X1"/>
@@ -46108,11 +46144,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
-			<dataarea name="prg" size="32768">
-				<rom name="super mogura tataki!! - pokkun mogurar (japan) [b].prg" size="32768" crc="3993b4eb" sha1="5a96941f06a86730c59e1f8c5b563d4ea63c1aa2" offset="00000" status="baddump" />
-			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="super mogura tataki!! - pokkun mogurar (japan) [b].chr" size="32768" crc="909883f5" sha1="21b93dce366ce5568bc79bbb781d98f857b927d7" offset="00000" status="baddump" />
+				<rom name="super mogura tataki!! - pokkun mogurar (japan).chr" size="32768" crc="909883f5" sha1="21b93dce366ce5568bc79bbb781d98f857b927d7" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="super mogura tataki!! - pokkun mogurar (japan).prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46803,7 +46839,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="untouchj" cloneof="untouch">
-		<description>The Untouchables (Jpn, Bad Dump)</description>
+		<description>The Untouchables (Jpn)</description>
 		<year>1991</year>
 		<publisher>Altron</publisher>
 		<info name="serial" value="ALT-U6"/>
@@ -46812,10 +46848,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<dataarea name="chr" size="131072">
-				<rom name="untouchables, the (japan) [b].chr" size="131072" crc="449f94a5" sha1="bd2e33ad995fb01d05aee16460fa29585dd7b8d5" offset="00000" status="baddump" />
+				<rom name="untouchables, the (japan).chr" size="131072" crc="f52ec2ad" sha1="9e179507ac878e7362ccd03d369488105b8c1f40" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="untouchables, the (japan) [b].prg" size="131072" crc="e6d73266" sha1="1e3e80abf9969fc0c732b073312b66284e75fbe6" offset="00000" status="baddump" />
+				<rom name="untouchables, the (japan).prg" size="131072" crc="903e36ad" sha1="42e5b6bad7c433c95ffef94a144b6a4ed4f47ab1" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -47054,6 +47090,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="zenbei!! pro basket (japan).prg" size="131072" crc="e5d49424" sha1="e1da11b6d0cc2abaf4aa62db0409a4eb3b4176d6" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoidschu">
+		<description>Zoids - Chuuou Tairiku no Tatakai (Jpn, Rev. A)</description>
+		<year>1987</year>
+		<publisher>Toemiland</publisher>
+		<info name="serial" value="TFS-ZD"/>
+		<info name="release" value="19870905"/>
+		<info name="alt_title" value="ゾイド 中央大陸の戦い"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="tfs-zd-0 prg" size="131072" crc="e0b6b7bb" sha1="22bab863746f0903ac3b8187ffed288ff7ceeae3" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -62411,6 +62466,57 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
+	<software name="subor11">
+		<description>Subor v1.1 (Chi)</description>
+		<year>19??</year>
+		<publisher>Subor</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="262144">
+				<rom name="[subor] subor v1.1 (c).prg" size="262144" crc="e4460df2" sha1="7f9630b456941a18e2f9586863f9cbc6da4f6aef" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cksjdnj">
+		<description>Cang Ku Shi Jia Dong Nao Jin (Chi)</description>
+		<year>19??</year>
+		<publisher>Subor</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="262144">
+				<rom name="[subor] cang ku shi jia dong nao jin (c).prg" size="262144" crc="f9bc83b9" sha1="33733d4f6cbd9cd1aeaf82362c9e379505871987" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zhengfu">
+		<description>Zheng Fu Tai Yang Xi Xiao Guan Jia (Chi)</description>
+		<year>19??</year>
+		<publisher>Subor</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TXC-MXMDHTWO" />
+			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="sub_keyboard" />
+			<dataarea name="prg" size="524288">
+				<rom name="[subor] zheng fu tai yang xi xiao guan jia (c).prg" size="524288" crc="36a8fdf6" sha1="a9c32c189dedf6585fe3b9850c7c9407fc9164bc" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Carts by Subor are manufactured in China, but for Russian market -->
 
 	<software name="subor">
@@ -65183,6 +65289,36 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super mario world 9 (adventure island hack) [p1].prg" size="131072" crc="1c1bf48c" sha1="e369c7fa3792c5e3ace5ae73382b0f1b99b01d8d" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heromali" cloneof="lilninjb">
+		<description>Hero Mali Brothers (Little Ninja Brothers pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="super mali hero legends (unl)[!].chr" size="131072" crc="68a91ed3" sha1="5ca1f9894c2e12adb9f21d056ca58375a67a2b71" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="super mali hero legends (unl)[!].prg" size="131072" crc="bd0d1cf3" sha1="1c6cf2afca01322a819737e93954fd381b3d0917" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smsplash" cloneof="kerosplb">
+		<description>Super Mali Bros Splash Bomb (Keroppi to Keroriinu no Splash Bomb! pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" />	<!-- Unif board UNL-MALISB -->
+			<dataarea name="chr" size="32768">
+				<rom name="super mali splash bomb (unl)[u][!].chr" size="32768" crc="0e89e16f" sha1="af54d4d261dd8700f23fdca001719c11eb525736" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="super mali splash bomb (unl)[u][!].prg" size="131072" crc="058fbed7" sha1="5208137ba627b447e83526e72e6777dafb7ed8bb" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
