@@ -1236,10 +1236,10 @@ ROM_START( subroc3d )
 ROM_END
 
 
-ROM_START( buckrog )
+ROM_START( buckrog ) /* CPU BOARD Sega ID#  834-5158-01, ROM BOARD Sega ID# 834-5152-01 */
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "epr-5265.cpu-ic3", 0x0000, 0x4000, CRC(f0055e97) SHA1(f6ee2afd6fef710949087d1cb04cbc242d1fa9f5) ) /* encrypted */
-	ROM_LOAD( "epr-5266.cpu-ic4", 0x4000, 0x4000, CRC(7d084c39) SHA1(ef2c0a2a59e14d9e196fd3837139fc5acf0f63be) ) /* encrypted */
+	ROM_LOAD( "epr-5265.cpu-ic3", 0x0000, 0x4000, CRC(f0055e97) SHA1(f6ee2afd6fef710949087d1cb04cbc242d1fa9f5) ) /* encrypted Z80 code, SEGA 315-5014 CPU */
+	ROM_LOAD( "epr-5266.cpu-ic4", 0x4000, 0x4000, CRC(7d084c39) SHA1(ef2c0a2a59e14d9e196fd3837139fc5acf0f63be) ) /* encrypted Z80 code, SEGA 315-5014 CPU */
 
 	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
@@ -1270,7 +1270,7 @@ ROM_START( buckrog )
 	ROM_LOAD( "pr-5196.cpu-ic10", 0x0100, 0x0200, CRC(04204bcf) SHA1(5636eb184463ac58fcfd20012d13d14fb0769124) )  /* sprite Y scaling */
 	ROM_LOAD( "pr-5197.cpu-ic78", 0x0300, 0x0200, CRC(a42674af) SHA1(db3590dd0d0f8a85d4ba32ac4ee33f2f4ee4c348) )  /* video timing */
 	ROM_LOAD( "pr-5198.cpu-ic93", 0x0500, 0x0200, CRC(32e74bc8) SHA1(dd2c812efd7b8f6b31a45e698d6453ea6bec132e) )  /* char color table */
-	ROM_LOAD( "pr-5199.cpu-ic95", 0x0700, 0x0400, CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) )  /* sprite color table */
+	ROM_LOAD( "pr-5233.cpu-ic95", 0x0700, 0x0400, CRC(1cd08c4e) SHA1(fb3081548f157d705211a5f07261cf4ad1ebb453) )  /* sprite color table */
 ROM_END
 
 
@@ -1313,8 +1313,8 @@ ROM_END
 
 ROM_START( buckrogn2 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "epr-5204", 0x0000, 0x4000, CRC(c2d43741) SHA1(ad435278de101b32e931a2a1a6cdba9be7b7da73) )
-	ROM_LOAD( "epr-5205", 0x4000, 0x4000, CRC(648f3546) SHA1(2eefdab44aea5fe6fa8e302032c725615b9fdb8a) )
+	ROM_LOAD( "epr-5204.cpu-ic3", 0x0000, 0x4000, CRC(c2d43741) SHA1(ad435278de101b32e931a2a1a6cdba9be7b7da73) )
+	ROM_LOAD( "epr-5205.cpu-ic4", 0x4000, 0x4000, CRC(648f3546) SHA1(2eefdab44aea5fe6fa8e302032c725615b9fdb8a) )
 
 	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
@@ -1345,11 +1345,11 @@ ROM_START( buckrogn2 )
 	ROM_LOAD( "pr-5196.cpu-ic10", 0x0100, 0x0200, CRC(04204bcf) SHA1(5636eb184463ac58fcfd20012d13d14fb0769124) )  /* sprite Y scaling */
 	ROM_LOAD( "pr-5197.cpu-ic78", 0x0300, 0x0200, CRC(a42674af) SHA1(db3590dd0d0f8a85d4ba32ac4ee33f2f4ee4c348) )  /* video timing */
 	ROM_LOAD( "pr-5198.cpu-ic93", 0x0500, 0x0200, CRC(32e74bc8) SHA1(dd2c812efd7b8f6b31a45e698d6453ea6bec132e) )  /* char color table */
-	ROM_LOAD( "pr-5233",          0x0700, 0x0400, CRC(1cd08c4e) SHA1(fb3081548f157d705211a5f07261cf4ad1ebb453) )  /* sprite color table */
+	ROM_LOAD( "pr-5233.cpu-ic95", 0x0700, 0x0400, CRC(1cd08c4e) SHA1(fb3081548f157d705211a5f07261cf4ad1ebb453) )  /* sprite color table */
 ROM_END
 
 /*
-Buck Rogers Zoom 909 (early version of Buck Rogers Planet of Zoom)
+Zoom 909 (alternate title for Buck Rogers Planet of Zoom for a different region?)
 Sega, 1982
 
 PCB Layouts
@@ -1484,8 +1484,8 @@ Notes:
 
 ROM_START( zoom909 )
 	ROM_REGION( 0xc000, "maincpu", 0 )
-	ROM_LOAD( "epr-5217b.cpu-ic3",  0x0000, 0x4000, CRC(1b56e7dd) SHA1(ccf638c318ebce754ac9628271d2064e05ced35c) )  /* encrypted */
-	ROM_LOAD( "epr-5218b.cpu-ic4",  0x4000, 0x4000, CRC(77dfd911) SHA1(cc1d4aac863b2d6b52eff7de2b8233be21aac3c9) )  /* encrypted */
+	ROM_LOAD( "epr-5217b.cpu-ic3",  0x0000, 0x4000, CRC(1b56e7dd) SHA1(ccf638c318ebce754ac9628271d2064e05ced35c) )  /* encrypted Z80 code, SEGA 315-5014 CPU  */
+	ROM_LOAD( "epr-5218b.cpu-ic4",  0x4000, 0x4000, CRC(77dfd911) SHA1(cc1d4aac863b2d6b52eff7de2b8233be21aac3c9) )  /* encrypted Z80 code, SEGA 315-5014 CPU  */
 
 	ROM_REGION( 0x2000, "subcpu", 0 )
 	ROM_LOAD( "epr-5200.cpu-ic66",  0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
@@ -1516,7 +1516,7 @@ ROM_START( zoom909 )
 	ROM_LOAD( "pr-5196.cpu-ic10", 0x0100, 0x0200, CRC(04204bcf) SHA1(5636eb184463ac58fcfd20012d13d14fb0769124) )  /* sprite Y scaling */
 	ROM_LOAD( "pr-5197.cpu-ic78", 0x0300, 0x0200, CRC(a42674af) SHA1(db3590dd0d0f8a85d4ba32ac4ee33f2f4ee4c348) )  /* video timing */
 	ROM_LOAD( "pr-5198.cpu-ic93", 0x0500, 0x0200, CRC(32e74bc8) SHA1(dd2c812efd7b8f6b31a45e698d6453ea6bec132e) )  /* char color table */
-	ROM_LOAD( "pr-5199.cpu-ic95", 0x0700, 0x0400, BAD_DUMP CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) )  /* sprite color table */
+	ROM_LOAD( "pr-5199.cpu-ic95", 0x0700, 0x0400, CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) )  /* sprite color table */
 ROM_END
 
 
@@ -1654,11 +1654,11 @@ DRIVER_INIT_MEMBER(turbo_state,buckrog_enc)
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,    turbo, driver_device,    0,           ROT270,             "Sega", "Turbo", GAME_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboa,   turbo,   turbo,    turbo, turbo_state,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 1)", GAME_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,   turbo,   turbo,    turbo, turbo_state,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 2)", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbo,    0,       turbo,    turbo,    driver_device, 0,           ROT270,             "Sega", "Turbo", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turboa,   turbo,   turbo,    turbo,    turbo_state,   turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 1)", GAME_IMPERFECT_SOUND , layout_turbo )
+GAMEL( 1981, turbob,   turbo,   turbo,    turbo,    turbo_state,   turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 2)", GAME_IMPERFECT_SOUND , layout_turbo )
 GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, driver_device, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", GAME_IMPERFECT_SOUND , layout_subroc3d )
-GAMEL( 1982, buckrog,  0,       buckrog,  buckrog, turbo_state,  buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", GAME_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog, turbo_state,  buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS, layout_buckrog ) // bad PROM
-GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog, driver_device,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 1)", GAME_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn2,buckrog, buckrog,  buckrog, driver_device,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 2)", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrog,  0,       buckrog,  buckrog,  turbo_state,   buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  driver_device, 0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 1)", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn2,buckrog, buckrog,  buckrog,  driver_device, 0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 2)", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog,  turbo_state,   buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_SOUND, layout_buckrog )

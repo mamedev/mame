@@ -103,32 +103,32 @@
   List of encrypted games currently known:
 
  CPU Part #         Game                   Comments
-  ???-????      Buck Rogers            unencrypted version available
-  315-5010      Pengo                  unencrypted version available
-  315-5013      Super Zaxxon           used Zaxxon for known plaintext attack
+  315-5010      Pengo                   unencrypted version available
+  315-5013      Super Zaxxon            used Zaxxon for known plaintext attack
+  315-5014      Buck Rogers / Zoom 909  unencrypted version available
   315-5015      Super Locomotive
   315-5018      Yamato
-  ???-????      Top Roller             same key as Yamato
+  ???-????      Top Roller              same key as Yamato
   315-5028      Sindbad Mystery
-  315-5030      Up'n Down &            unencrypted version available
+  315-5030      Up'n Down &             unencrypted version available
   ???-???? M120 Razzmatazz
-  315-5033      Regulus                unencrypted version available
+  315-5033      Regulus                 unencrypted version available
   315-5041 M140 Mister Viking
-  315-5048      SWAT                   used Bull Fight for k.p.a.
+  315-5048      SWAT                    used Bull Fight for k.p.a.
   315-5051      Flicky &
                 Ninja Princess (bootleg)
   315-5061      Future Spy
-  315-5064      Water Match            used Mister Viking for k.p.a.
+  315-5064      Water Match             used Mister Viking for k.p.a.
   315-5065      Bull Fight
-  315-5069      Star Force             game by Tehkan; same key as Super Locomotive
-  ???-????      Pinball Action         game by Tehkan; also has a simple bitswap on top
+  315-5069      Star Force              game by Tehkan; same key as Super Locomotive
+  ???-????      Pinball Action          game by Tehkan; also has a simple bitswap on top
   ???-????      Spatter
-  315-5084      Jongkyo                TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
+  315-5084      Jongkyo                 TABLE INCOMPLETE game by Kiwako; also has a simple bitswap on top
   315-5093      Pitfall II
-  315-5098      Ninja Princess         unencrypted version available; same key as Up'n Down
-  315-5102      Sega Ninja             unencrypted version available
-  315-5110      I'm Sorry              used My Hero for k.p.a.
-  315-5114      ?? pcb 834-5492        same key as Regulus
+  315-5098      Ninja Princess          unencrypted version available; same key as Up'n Down
+  315-5102      Sega Ninja              unencrypted version available
+  315-5110      I'm Sorry               used My Hero for k.p.a.
+  315-5114      ?? pcb 834-5492         same key as Regulus
   315-5115      TeddyBoy Blues
   315-5132      My Hero
   315-5135      Heavy Metal &
