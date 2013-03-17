@@ -368,16 +368,18 @@ INDEXED:
 
 		case 0x24: case 0x34: case 0x54: case 0x64: case 0x74:
 			// postbyte offset
+			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.l = read_opcode_arg();
-			m_temp.w = ireg() + (INT8) m_temp.b.l;
+			m_temp.w = m_ea.w + (INT8) m_temp.b.l;
 			eat(1);
 			break;
 
 		case 0x25: case 0x35: case 0x55: case 0x65: case 0x75:
 			// postword offset
+			m_ea.w = ireg();	// need to do this now because ireg() might be PC
 			@m_temp.b.h = read_opcode_arg();
 			@m_temp.b.l = read_opcode_arg();
-			m_temp.w = ireg() + (INT16) m_temp.w;
+			m_temp.w = m_ea.w + (INT16) m_temp.w;
 			eat(2);
 			break;
 
