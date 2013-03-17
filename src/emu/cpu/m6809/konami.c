@@ -197,7 +197,7 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register konami_cpu_device::read_exg
 	exgtfr_register result;
 	result.word_value = 0x00FF;
 
-	switch(reg & 0x0F)
+	switch(reg & 0x07)
 	{
 		case  0: result.word_value = m_d.b.h;	break;	// A
 		case  1: result.word_value = m_d.b.l;	break;	// B
@@ -217,7 +217,7 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register konami_cpu_device::read_exg
 
 ATTR_FORCE_INLINE void konami_cpu_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
 {
-	switch(reg & 0x0F)
+	switch(reg & 0x07)
 	{
 		case  0: m_d.b.h = value.byte_value;	break;	// A
 		case  1: m_d.b.l = value.byte_value;	break;	// B

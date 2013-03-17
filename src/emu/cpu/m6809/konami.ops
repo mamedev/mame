@@ -431,10 +431,10 @@ EXG:
 	{
 		// konami's EXG instruction differs enough from 6809 to fork the code
 		UINT8 param = read_opcode_arg();
-		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
-		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
-		write_exgtfr_register(param >> 4, reg2);
-		write_exgtfr_register(param >> 0, reg1);
+		exgtfr_register reg1 = read_exgtfr_register(param >> 0);
+		exgtfr_register reg2 = read_exgtfr_register(param >> 4);
+		write_exgtfr_register(param >> 0, reg2);
+		write_exgtfr_register(param >> 4, reg1);
 	}
 	eat(hd6309_native_mode() ? 3 : 6);
 	return;
@@ -444,7 +444,7 @@ TFR:
 		// konami's TFR instruction differs enough from 6809 to fork the code
 		UINT8 param = read_opcode_arg();
 		exgtfr_register reg = read_exgtfr_register(param >> 0);
-		write_exgtfr_register((param >> 4) & 0x07, reg);
+		write_exgtfr_register(param >> 4, reg);
 	}
 	eat(hd6309_native_mode() ? 2 : 4);
 	return;
