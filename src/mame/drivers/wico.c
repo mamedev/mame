@@ -375,20 +375,19 @@ WRITE8_MEMBER( wico_state::wdogcl_w )
 TIMER_DEVICE_CALLBACK_MEMBER( wico_state::irq_housekeeping )
 {
 	if (m_zcen)
-		generic_pulse_irq_line(m_hcpu, M6809_IRQ_LINE,1);
+		m_hcpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( wico_state::firq_housekeeping )
 {
 	if (m_gten)
-		generic_pulse_irq_line(m_hcpu, M6809_FIRQ_LINE,1);
+		m_hcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 
 	// Gen. timer irq of command CPU kicks in every 4 interrupts of this timer
 	m_firqtimer++;
 	if (m_firqtimer > 3) // divided by 4 by U2 74LS393.
 	{
-		//m_cpu2->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		generic_pulse_irq_line(m_ccpu, M6809_IRQ_LINE,1);
+		m_ccpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 		m_firqtimer = 0;
 	}
 }
