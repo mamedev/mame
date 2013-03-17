@@ -36,9 +36,8 @@ known issues:
 
     Valkyrie No Densetsu
     - gives ADSMISS error on startup
-       Writes 0x0010 -> [0x10fbfc], 0x0000 -> [0x10fbfe], 0x0000 -> [0x10fc00], 0x1234 -> [0x10fc02] at PC=0x3d208, then does some writes to video related
-       devices then it tries to check if [0x10fbfc] is equal to 0x1234 (at PC=0x3d8f8), fails in any case if not.
-       Worth mentioning is that 0x3d202 contains a check with work RAM address 0x10fe5c. If zero the program flow writes 0x1234 on [0x10fbfc] instead.
+       Does a checksum on area 0x181000 - 0x183fff, in 0x20 bytes block chunks. Game doesn't init it properly so you'd have to go into service menu and do
+       an "all data clear" or play once to get rid of the message.
 
     Bubble Trouble (Golly Ghost II)
     - no artwork
