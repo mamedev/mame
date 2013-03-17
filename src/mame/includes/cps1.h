@@ -256,6 +256,7 @@ public:
 	DECLARE_MACHINE_START(cawingbl);
 	DECLARE_MACHINE_START(knightsb);
 	DECLARE_MACHINE_START(sf2mdt);
+	DECLARE_MACHINE_START(sgyxz);
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
