@@ -336,28 +336,56 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		if(fx1&1) fx^=0x8000;
 		if(fy1&1) fy^=0x4000;
 
+		int extra_x_scale = 0x100;
+
+		// I think we need some hardware tests..
+		//  see notes about how this can't be our enable register (avengrgs doesn't touch it
+		//  and relies on something else, probably just the bits we use to select the window)
+		//  (although as previously noted, it isn't writing valid per-scanline values either)
 		if (rasterMode)
 		{
-			int irq_base_reg = 12 /* 6, 9, 12 */;
+				// use of these is a bit weird.
+				// -ZZZ -xxx   ---- -yyy   -XXX -zzz
 
-			int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
-			int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
-			int extra_y_scale = (m_irq_ram[irq_base_reg+2]>>16) & 0x7ff;
-			int extra_x_scale = (m_irq_ram[irq_base_reg+2]>>0) & 0x7ff;
+				// xxx = x offset?
+				// yyy = y offset?
+				// zzz = xzoom (confirmed? stadium hero)
+				//  0x100 = no zoom
+				//
+				// XXX = duplicate bits of xxx?
+				// ZZZ = (sometimes) duplicate bits of zzz
 
-			if (extra_x_off & 0x400) extra_x_off -= 0x800;
-			if (extra_y_off & 0x400) extra_y_off -= 0x800;
+			if ((clipper==0x0) || (clipper==0x2))
+			{
+			
+				int irq_base_reg; /* 6, 9, 12  are possible */
+				if (clipper== 0) irq_base_reg = 6;  	// OK upper screen.. left?
+				else if (clipper== 2) irq_base_reg = 9; // OK upper screen.. main / center
+				else irq_base_reg = 12;
+
+				int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
+				int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
+				extra_x_scale = (m_irq_ram[irq_base_reg+2]>>0) & 0x3ff;
+
+				if (extra_x_off & 0x400) { extra_x_off = (-extra_x_off & 0x3ff); } else { extra_x_off = (extra_x_off & 0x3ff); }
+				if (extra_y_off & 0x400) { extra_x_off = (-extra_y_off & 0x3ff); } else { extra_y_off = (extra_y_off & 0x3ff); }
 		
-			if (extra_y_scale & 0x400) extra_y_scale -= 0x800;
-			if (extra_x_scale & 0x400) extra_x_scale -= 0x800;
 
-			x += extra_x_off;
-			y += extra_y_off;
-
-			xscale += extra_x_scale;
-			yscale += extra_y_scale;
+				x += extra_x_off;
+				y += extra_y_off;
+			}
+			else if (clipper==0x1)
+			{
+				// right? 
+			}
+			else if (clipper==0x3)
+			{
+				// bottom?
+			}
 
 		}
+
+		xscale *= extra_x_scale;
 
 		int ybase=y<<16;
 		int yinc=(yscale<<8)*16;
@@ -368,12 +396,12 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			ybase-=yoffs * (yscale<<8);
 
 		int xbase=x<<16;
-		int xinc=(xscale<<8)*16;
+		int xinc=(xscale)*16;
 			
 		if (fx)
-			xbase+=(xoffs-15) * (xscale<<8) - ((w-1)*xinc);
+			xbase+=(xoffs-15) * (xscale) - ((w-1)*xinc);
 		else
-			xbase-=xoffs * (xscale<<8);
+			xbase-=xoffs * (xscale);
 
 
 		int full_realybase = ybase;
@@ -490,7 +518,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
 							0,
-							use8bppMode,(xscale<<8),alpha, srcline);
+							use8bppMode,(xscale),alpha, srcline);
 
 		}
 

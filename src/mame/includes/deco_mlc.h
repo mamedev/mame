@@ -16,7 +16,9 @@ public:
 	required_shared_ptr<UINT32> m_mlc_vram;
 	timer_device *m_raster_irq_timer;
 	int m_mainCpuIsArm;
-	int m_mlc_raster_table[9][256];
+	UINT32 m_mlc_raster_table_1[4*256];
+	UINT32 m_mlc_raster_table_2[4*256];
+	UINT32 m_mlc_raster_table_3[4*256];
 	UINT32 m_vbl_i;
 	int m_lastScanline[9];
 	UINT32 m_colour_mask;
@@ -30,6 +32,7 @@ public:
 	DECLARE_READ32_MEMBER(mlc_spriteram_r);
 	DECLARE_READ32_MEMBER(mlc_vram_r);
 	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
+	DECLARE_WRITE32_MEMBER(stadhr96_prot_146_w);
 	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
 	DECLARE_WRITE32_MEMBER(avengrs_eprom_w);
 	DECLARE_DRIVER_INIT(mlc);

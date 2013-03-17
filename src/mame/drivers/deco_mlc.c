@@ -206,6 +206,7 @@ READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 	return m_mlc_vram[offset]&0xffff;
 }
 
+// there is more to this, it controls the runner on the attract screen before the title should appear at least
 READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 {
 	/*
@@ -217,7 +218,6 @@ READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 	*/
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", space.device().safe_pc(), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -228,7 +228,14 @@ READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 	if (offset==0x304)
 		return 0x0001 << 16; // Unknown, is either 0,1,2,3
 
+	printf("%08x:  Read prot %08x\n", space.device().safe_pc(), offset);
+
 	return 0;
+}
+
+WRITE32_MEMBER(deco_mlc_state::stadhr96_prot_146_w)
+{
+	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
 }
 
 /******************************************************************************/
@@ -250,8 +257,7 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
-	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
-//  AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_w) AM_SHARE("prot32ram")
+	AM_RANGE(0x070f000, 0x070ffff) AM_READWRITE(stadhr96_prot_146_r, stadhr96_prot_146_w) AM_MIRROR(0xff000000)
 ADDRESS_MAP_END
 
 /******************************************************************************/
