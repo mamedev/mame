@@ -39,7 +39,7 @@ public:
 	{
 		int code  = m_ram.target()[((tile_index / 80) * 128) + (tile_index % 80) + 0x800];
 
-		SET_TILE_INFO_MEMBER(0, code, 0, 0);
+		SET_TILE_INFO_MEMBER(0, code & 0x7f, ( code & 0x80 ) >> 7, 0);
 	}
 
 	virtual void machine_start()
@@ -354,6 +354,9 @@ void clcd_state::palette_init()
 {
 	palette_set_color(machine(), 0, MAKE_RGB(32,240,32));
 	palette_set_color(machine(), 1, MAKE_RGB(32,32,32));
+
+	palette_set_color(machine(), 2, MAKE_RGB(32,32,32));
+	palette_set_color(machine(), 3, MAKE_RGB(32,240,32));
 }
 
 static const via6522_interface via0_intf =
@@ -396,16 +399,16 @@ static const via6522_interface via1_intf =
 static const gfx_layout charset_8x8 =
 {
 	6,8,
-	256,
+	128,
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5},
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	6*8
 };
 
 static GFXDECODE_START( clcd )
-	GFXDECODE_ENTRY( "charrom", 0, charset_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x7700, charset_8x8, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( clcd, clcd_state )
@@ -426,16 +429,12 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_LENGTH(4)
 	MCFG_GFXDECODE(clcd)
 MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( clcd )
-
-	ROM_REGION( 0x1000, "charrom", 0 )
-	ROM_LOAD( "charrom",            0x00800, 0x0800, BAD_DUMP CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa))
-	ROM_CONTINUE( 0x00000, 0x0800 )
 
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "kizapr.u102",        0x00000, 0x8000, CRC(59103d52) SHA1(e49c20b237a78b54c2cb26b133d5903bb60bd8ef))
