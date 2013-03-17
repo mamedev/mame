@@ -181,7 +181,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 UINT8 fp200_state::read_lcd_attr(UINT16 X, UINT16 Y)
 {
 	UINT16 base_offs;
-	UINT8 res;
+	UINT8 res = 0;
 
 	for(int yi=0;yi<8;yi++)
 	{
@@ -199,7 +199,7 @@ UINT8 fp200_state::read_lcd_attr(UINT16 X, UINT16 Y)
 UINT8 fp200_state::read_lcd_vram(UINT16 X, UINT16 Y)
 {
 	UINT16 base_offs;
-	UINT8 res;
+	UINT8 res = 0;
 
 	for(int yi=0;yi<8;yi++)
 	{
