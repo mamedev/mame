@@ -345,7 +345,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		if (rasterMode)
 		{
 				// use of these is a bit weird.
-				// -ZZZ -xxx   ---- -yyy   -XXX -zzz
+				// -ZZZ -YYY   ---- -xxx   -yyy -zzz
 
 				// xxx = x offset?
 				// yyy = y offset?
@@ -367,8 +367,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 				int extra_x_off = m_irq_ram[irq_base_reg+1] & 0x7ff;
 				extra_x_scale = (m_irq_ram[irq_base_reg+2]>>0) & 0x3ff;
 
-				if (extra_x_off & 0x400) { extra_x_off = (-extra_x_off & 0x3ff); } else { extra_x_off = (extra_x_off & 0x3ff); }
-				if (extra_y_off & 0x400) { extra_x_off = (-extra_y_off & 0x3ff); } else { extra_y_off = (extra_y_off & 0x3ff); }
+				if (extra_x_off & 0x400) { extra_x_off -= 0x800; }
+				if (extra_y_off & 0x400) { extra_y_off -= 0x800; }
 		
 
 				x += extra_x_off;
