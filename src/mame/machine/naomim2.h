@@ -3,16 +3,16 @@
 
 #include "naomibd.h"
 
-#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _eeprom_tag, _maincpu_tag, _irq_cb) \
+#define MCFG_NAOMI_M2_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _maincpu_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M2_BOARD, _eeprom_tag, _maincpu_tag, _irq_cb) \
-	naomi_m2_board::static_set_tags(*device);
+	naomi_m2_board::static_set_tags(*device, _key_tag);
 
 class naomi_m2_board : public naomi_board
 {
 public:
 	naomi_m2_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_tags(device_t &device);
+	static void static_set_tags(device_t &device, const char *_key_tag);
 
 protected:
 	virtual void device_start();
@@ -29,6 +29,7 @@ private:
 		FLAG_COMPRESSED = 0x10000, FLAG_LINE_SIZE_512 = 0x20000
 	};
 
+	const char *key_tag;
 	UINT32 key;
 
 	UINT8 *ram, *buffer, *line_buffer, *line_buffer_prev;

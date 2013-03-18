@@ -3,16 +3,16 @@
 
 #include "naomibd.h"
 
-#define MCFG_NAOMI_M4_BOARD_ADD(_tag, _eeprom_tag, _maincpu_tag, _irq_cb) \
+#define MCFG_NAOMI_M4_BOARD_ADD(_tag, _key_tag, _eeprom_tag, _maincpu_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_M4_BOARD, _eeprom_tag, _maincpu_tag, _irq_cb) \
-	naomi_m4_board::static_set_tags(*device);
+	naomi_m4_board::static_set_tags(*device, _key_tag);
 
 class naomi_m4_board : public naomi_board
 {
 public:
 	naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_tags(device_t &device);
+	static void static_set_tags(device_t &device, const char *_key_tag);
 
 protected:
 	virtual void device_start();
@@ -27,6 +27,7 @@ private:
 
 	static const UINT8 k_sboxes[4][16];
 
+	const char *key_tag;
 	UINT16 key, iv;
 	UINT16 *one_round;
 

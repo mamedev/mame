@@ -22,9 +22,6 @@
 
 const device_type NAOMI_M4_BOARD = &device_creator<naomi_m4_board>;
 
-
-
-
 const UINT8 naomi_m4_board::k_sboxes[4][16] = {
 	{13,14,1,11,7,9,10,0,15,6,4,5,8,2,12,3},
 	{12,3,14,6,7,15,2,13,1,4,11,0,9,10,8,5},
@@ -35,20 +32,28 @@ const UINT8 naomi_m4_board::k_sboxes[4][16] = {
 naomi_m4_board::naomi_m4_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: naomi_board(mconfig, NAOMI_M4_BOARD, "NAOMI-M1-BOARD", tag, owner, clock)
 {
+	key_tag = 0;
 }
 
-void naomi_m4_board::static_set_tags(device_t &device)
+void naomi_m4_board::static_set_tags(device_t &device, const char *_key_tag)
 {
+	naomi_m4_board &dev = downcast<naomi_m4_board &>(device);
+	dev.key_tag = _key_tag;
 }
 
 void naomi_m4_board::device_start()
 {
 	naomi_board::device_start();
 
+#if USE_NAOMICRYPT
 	UINT32 tempkey = get_naomi_key(machine()); 
 	iv = (tempkey >> 16) &0xffff;
 	key = tempkey & 0xffff;
-
+#else
+	const UINT8 *key_data = memregion(key_tag)->base();
+	key = (key_data[2] << 8) | key_data[3];
+	iv = (key_data[0] << 8) | key_data[1];
+#endif
 	buffer = auto_alloc_array(machine(), UINT8, BUFFER_SIZE);
 	enc_init();
 
