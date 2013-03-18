@@ -173,9 +173,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		            0x4000 - Y flip
 		            0x2000 - Auto-flicker (display sprite only every other frame)
 		            0x1000 - If set combine this 4bpp sprite & next one, into 8bpp sprite
-		            0x0800 - This is set ingame on Stadium Hero 96, on graphics which otherwise obscure the playfield?
-		            0x0400 - Use raster IRQ lookup table when drawing object
-		            0x0300 - Selects clipping window to use - and upper bits of raster select (stadhr96)
+		            0x0800 - upper clip bit (stadhr96 view of bases)
+		            0x0400 - Use raster IRQ lookup table when drawing object - or not? (OK for stadhr96, NOT enabled for avengrgs)
+		            0x0300 - lower clipping window to use (swapped) - and upper bits of raster select (stadhr96)
 					0x0080 - seems to be both the lower bit of the raster select (stadhr96) AND the upper bit of colour / alpha (avngrgs?) - might depend on other bits?
 		            0x007f - Colour/alpha shadow enable
 		    Word 2: 0x07ff - Y position
@@ -227,18 +227,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		rasterMode = (mlc_spriteram[offs+1]>>10)&0x1;
 
 
-		
-		int unk_bit = (mlc_spriteram[offs+1]>>10)&0x2;
-		// just bail if this bit is set, although it might be clip window related and enable a clip window
-		// to hide all the sprites it covers
-		// this seem realistic because 2 of the upper 4 'clip windows' are usually set to invalid (off-screen)
-		// areas, and we currently have no bit to select them.
-		if (unk_bit) 
-			continue;
 
 
 		
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
+
 		indx = mlc_spriteram[offs+0]&0x3fff;
 		yscale = mlc_spriteram[offs+4]&0x3ff;
 		xscale = mlc_spriteram[offs+5]&0x3ff;
@@ -247,6 +240,16 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		/* Clip windows - this mapping seems odd, but is correct for Skull Fang and StadHr96,
 		however there are space for 8 clipping windows, where is the high bit? (Or is it ~0x400?) */
 		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
+
+
+		
+		int upperclip = (mlc_spriteram[offs+1]>>10)&0x2;
+		// this is used on some ingame gfx in stadhr96
+		// to clip the images of your guys on the bases
+		if (upperclip) 
+			clipper |= 0x4;
+
+
 
 		int min_y = m_mlc_clip_ram[(clipper*4)+0];
 		int max_y = m_mlc_clip_ram[(clipper*4)+1];
