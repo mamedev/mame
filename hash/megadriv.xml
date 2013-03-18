@@ -207,7 +207,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 	<software name="robocod">
-		<!-- James Pond 2 - Robocod (Euro, USA), Cart manufactured by Electronic Arts, (c)1991 on board -->
 		<description>James Pond II - Codename RoboCod (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -228,12 +227,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 	<software name="lotust">
-		<!-- Lotus Turbo Challenge (Euro, USA), Cart manufactured by Electronic Arts, (c)1992 on board -->
 		<description>Lotus Turbo Challenge (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="PWA P10001 REV G" />
+			<feature name="pcb" value="PWA P10001 REV G,PWA P10001 REV F" />
+			<feature name="u1" value="LOTUS TURBO LOT03" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lotus turbo lot03.u1" size="1048576" crc="b83ccb7a" sha1="922c29fd0195e3e0f72f6fc803d3d5c7299d9f0d" offset="000000" />
 			</dataarea>
@@ -248,7 +247,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 	<software name="nhl94">
-		<!-- NHL '94 (Euro, USA), Cart manufactured by Electronics Art, Includes ROM, RAM, battery etc. -->
 		<description>NHL '94 (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
@@ -277,12 +275,17 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 	<software name="pga2a" cloneof="pga2">
-		<!-- PGA Tour Golf II (Euro, USA), Cart manufactured by Electronics Art, (c)1992 on board, Includes ROM, RAM, battery etc. -->
 		<description>PGA Tour Golf II (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="PWA P10002 REV G?" />
+			<feature name="u1" value="PGA TOUR GOLF PGT04" />
+			<feature name="u2" value="MB8464A" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="2K5-1026B" />
+			<feature name="(batt)" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pga tour golf pgt04.u1" size="1048576" crc="8d980bb4" sha1="89b50dae5c88f633458a6faeb4ee288fcc94c1b1" offset="000000" />
 			</dataarea>
@@ -307,6 +310,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="pcb" value="670121 REV 3" />
 			<feature name="u1" value="ACCLAIM ES133-1 RISE OF THE ROBOTS 9447 D" />
 			<feature name="u2" value="ACCLAIM ES133-2 RISE OF THE ROBOTS 9447 D" />
+			<feature name="u3" value="DV74ALS139N" />
 			<dataarea name="rom" size="4194304">
 				<rom name="es133-1 rise of the robots.u1" size="2097152" crc="ed583ef7" sha1="b9f43d5bf31819a1d76c1495e81cfa1d38bcde1c" offset="000000" />
 				<rom name="es133-2 rise of the robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="0x200000" />
@@ -468,11 +472,26 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Also exists on a 171-6330A with two roms, MPR-15959 and MPR15960 -->
 			<feature name="pcb" value="171-6329A" />
 			<feature name="ic1" value="MPR-15939-H, MPR-15939-T" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-15939-h.ic1" size="2097152" crc="d1845e8f" sha1="42debba01ba3555f61d1e9b445542a05d01451dd" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdina" cloneof="aladdin">
+		<description>Disney's Aladdin (Euro, Alt PCB)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6330A" />
+			<feature name="ic1" value="MPR-15959 T66" />
+			<feature name="ic2" value="MPR-15960 T67" />
+			<feature name="ic3" value="HD74HC00P" />
+			<dataarea name="rom" size="2097152">
+				<rom name="mpr-15959 t66.ic1" size="1048576" crc="32324c70" sha1="dccbb7006ac7dccb454389b2a9e18cd17cd22abb" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15960 t67.ic2" size="1048576" crc="004025f3" sha1="88eab5db861b87d4c28b1c0e308faca23aa77d9c" offset="0x100000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7571,8 +7590,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-17118-H" />
+			<feature name="ic2" value="MPR-17119-SM" />
+			<feature name="ic3" value="SN74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="earthworm jim (euro).bin" size="3145728" crc="1c07b337" sha1="d5dc11009e3a5cc2381dd2a75cb81ce2e7428342" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17118-h.ic1" size="2097152" crc="bb3aa04e" sha1="5686b89a7c89e5aee1a84c2022bad3506d9eef08" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17119-sm.ic2" size="1048576" crc="69853962" sha1="3f60a9bcee219d98204eee33b4608e62ab96df7d" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8106,8 +8130,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-16212-SM" />
+			<feature name="ic2" value="MPR-16213-SM" />
+			<feature name="ic3" value="SN74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-16212+mpr-16213.bin" size="3145728" crc="b9512f5e" sha1="578475a736bef8c76ba158110cebadf495c2f252" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16212-sm.ic1" size="2097152" crc="9b662efc" sha1="e7591f30b1016c4ceaa22e649933162e0e5c4ccd" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16213-sm.ic2" size="1048576" crc="81bbdd0e" sha1="f8755e397f64f04ce6b58e1f009e2b5a3aac9e10" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9931,8 +9960,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5979-A" />
+			<feature name="ic1" value="MPR-16246-F" />
+			<feature name="ic2" value="MPR-16247-F" />
+			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="1048576">
-				<rom name="gunship (euro).bin" size="1048576" crc="da1440c9" sha1="3820eac00b888b17c02f271fab5fd08af99d5ef9" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16246-f.ic1" size="524288" crc="3e6c1909" sha1="4ae43ac70d7fa0f1f5890a0f0fb50378405e24c2" offset="0x00000" loadflag="load16_word_swap" />
+				<rom name="mpr-16247-f.ic2" size="524288" crc="ff782463" sha1="61fca7c621ec38cf2858fe46d27412cc43b7ac18" offset="0x80000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -14312,7 +14346,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p22" cloneof="nbaact95" supported="no">
+	<software name="nbaact95p22" cloneof="nbaact95">
 		<description>NBA Action '95 (Prototype, 19941209)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -14382,7 +14416,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="nbaact95p17" cloneof="nbaact95" supported="no">
+	<software name="nbaact95p17" cloneof="nbaact95">
 		<description>NBA Action '95 (Prototype, 19941230)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -18289,8 +18323,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="670121 REV 3" />
+			<feature name="u1" value="REVOLUTION X U1" />
+			<feature name="u2" value="REVOLUTION X U2" />
+			<feature name="u3" value="GD74LS139" />
 			<dataarea name="rom" size="4194304">
-				<rom name="revolution x (euro, usa).bin" size="4194304" crc="5fb0c5d4" sha1="e1c8011ff878c7d99236ddd4008dd284e1c28333" offset="000000" loadflag="load16_word_swap" />
+				<rom name="revolution x u1.u1" size="2097152" crc="786248a7" sha1="4923973b65537b3737986a58bf4fac973ac54f37" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="revolution x u2.u2" size="2097152" crc="3f04f118" sha1="58b06c1ed0268274d28b73109b22b7263d6a7b22" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19475,8 +19514,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="PWA PN10017 REV A" />
+			<feature name="u1" value="U1 SHAQ FU SFB2" />
+			<feature name="u2" value="U2 SHAQ FU SFB2" />
+			<feature name="u3" value="GD74LS138" />
 			<dataarea name="rom" size="3145728">
-				<rom name="sfb2_u1+sfb2_u2.bin" size="3145728" crc="499955f2" sha1="1ad8cd54f8fe474da01d1baba98491411c4cedaf" offset="000000" loadflag="load16_word_swap" />
+				<rom name="u1 shaq fu sfb2.u1" size="2097152" crc="1bf9e4f9" sha1="7edaaedd67a112d1d2b77f8a9f486b984537ca13" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="u2 shaq fu sfb2.u2" size="1048576" crc="41054fb3" sha1="c7205485f189742a7efcd4ba7b80b64a8e4735e4" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21283,7 +21327,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128 REV 1" />
-			<feature name="u1" value="STARGATE TM 1994 ACCLAIM ENTERTAINMENT S517 9507" />
+			<feature name="u1" value="STARGATE TM" />
 			<dataarea name="rom" size="2097152">
 				<rom name="stargate tm.u1" size="2097152" crc="e587069e" sha1="d0843442059c89b11db02615670632fda2b2ee85" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24686,6 +24730,22 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="vf2a" cloneof="vf2">
+		<description>Virtua Fighter 2 - Genesis (Euro, USA, Alt PCB)</description>
+		<year>1997</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-19107-MX" />
+			<feature name="ic2" value="MPR-19108-MX" />
+			<feature name="ic3" value="SN74HC00N" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-19107-mx.ic1" size="2097152" crc="1645fd9f" sha1="10571f7171e2b9e48178a8031d9654ee8883717b" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19108-mx.ic2" size="2097152" crc="03ca9dc2" sha1="aed36c31c5f33e49e2909d83a3649e66c7932b40" offset="0x200000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vf2k" cloneof="vf2">
 		<description>Virtua Fighter 2 - Genesis (Kor)</description>
 		<year>1997</year>
@@ -25189,8 +25249,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5979-A" />
+			<feature name="ic1" value="MPR-15966-F" />
+			<feature name="ic2" value="MPR-15967-F" />
+			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="1048576">
-				<rom name="wimbledon championship tennis (euro).bin" size="1048576" crc="b791a435" sha1="6b7d8aa9d4b9d10c26dc079ab78e11766982cef2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15966-f.ic1" size="524288" crc="1e8402e0" sha1="4d965220ad62d301c385a5a1fc2ea123bd12b868" offset="0x00000" loadflag="load16_word_swap" />
+				<rom name="mpr-15967-f.ic2" size="524288" crc="8e0f76f6" sha1="66d48c603b7f8957372fce6ae1ceec92bf56be54" offset="0x80000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -26047,7 +26112,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95" supported="no">
+	<software name="wsb95">
 		<description>World Series Baseball '95 (USA)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26061,7 +26126,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p23" cloneof="wsb95" supported="no">
+	<software name="wsb95p23" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19941208)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -26083,7 +26148,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p21" cloneof="wsb95" supported="no">
+	<software name="wsb95p21" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19941228-SB)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -26097,7 +26162,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p09" cloneof="wsb95" supported="no">
+	<software name="wsb95p09" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950202)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26111,7 +26176,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p08" cloneof="wsb95" supported="no">
+	<software name="wsb95p08" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950203)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26125,7 +26190,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p07" cloneof="wsb95" supported="no">
+	<software name="wsb95p07" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950207)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26139,7 +26204,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p06" cloneof="wsb95" supported="no">
+	<software name="wsb95p06" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950209-B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26153,7 +26218,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p05" cloneof="wsb95" supported="no">
+	<software name="wsb95p05" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950209)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26167,7 +26232,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p04" cloneof="wsb95" supported="no">
+	<software name="wsb95p04" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950211)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26181,7 +26246,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p03" cloneof="wsb95" supported="no">
+	<software name="wsb95p03" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950212)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26195,7 +26260,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p02" cloneof="wsb95" supported="no">
+	<software name="wsb95p02" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950213)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26209,7 +26274,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p01" cloneof="wsb95" supported="no">
+	<software name="wsb95p01" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950214)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26223,7 +26288,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p20" cloneof="wsb95" supported="no">
+	<software name="wsb95p20" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950101-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26237,7 +26302,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p19" cloneof="wsb95" supported="no">
+	<software name="wsb95p19" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950103-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26251,7 +26316,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p18" cloneof="wsb95" supported="no">
+	<software name="wsb95p18" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950105)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26265,7 +26330,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p17" cloneof="wsb95" supported="no">
+	<software name="wsb95p17" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950109-TST)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26279,7 +26344,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p16" cloneof="wsb95" supported="no">
+	<software name="wsb95p16" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950110)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26304,7 +26369,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p14" cloneof="wsb95" supported="no">
+	<software name="wsb95p14" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950116)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26329,7 +26394,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p12" cloneof="wsb95" supported="no">
+	<software name="wsb95p12" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950120)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26343,7 +26408,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p11" cloneof="wsb95" supported="no">
+	<software name="wsb95p11" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950125)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26357,7 +26422,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb95p10" cloneof="wsb95" supported="no">
+	<software name="wsb95p10" cloneof="wsb95">
 		<description>World Series Baseball '95 (USA, Prototype, 19950130)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -26371,7 +26436,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb96" supported="no">
+	<software name="wsb96">
 		<description>World Series Baseball '96 (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -26385,7 +26450,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="wsb98" supported="no">
+	<software name="wsb98">
 		<description>World Series Baseball '98 (USA)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -26645,10 +26710,25 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="WWFロイヤルランブル"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="670116 REV 2" />
+			<feature name="ic1" value="WWFRR-GEN LO VER 1.00" />
+			<feature name="ic2" value="WWFRR-GEN HI VER 1.00" />
 			<dataarea name="rom" size="2097152">
-				<rom name="wwf royal rumble (world).bin" size="2097152" crc="b69dc53e" sha1="34e85015b8681ce15ad4777a60c81297ccf718b1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="wwfrr-gen lo ver 1.00.ic1" size="1048576" crc="0b424112" sha1="c0b6cd9b285807d946c47eb6254b21d18b93b024" offset="000000" loadflag="load16_byte"/>
+				<rom name="wwfrr-gen hi ver 1.00.ic2" size="1048576" crc="d227a6e1" sha1="1e6a2be80f7f85ed35345f64bfc183afd05d12a7" offset="000001" loadflag="load16_byte"/>
 			</dataarea>
 		</part>
+<!--
+    Roms Labeled
+
+    WWFRR-GEN HI 
+    ACCLAIM (C) 1993
+    VER 1.00
+
+    WWFRR-GEN LO
+    ACCLAIM (C) 1993
+    VER 1.00
+-->
 	</software>
 
 	<software name="wwfsup">
