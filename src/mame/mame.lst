@@ -11064,6 +11064,10 @@ crzmon_9        // (c) 2003
 //crzmon_10     // (c) 2003
 //crzmon_11     // (c) 2003
 //crzmon_12     // (c) 2003
+crzmon13        // (c) 2003
+//crzmon_14     // (c) 2003
+crzmon_15       // (c) 2003
+crzmon_16       // (c) 2003
 
 // Fruit Cocktail
 //fcockt        // (c) 2003
@@ -11092,6 +11096,7 @@ lhaunt_7        // (c) 2003
 lhaunt_8        // (c) 2003
 //lhaunt_9      // (c) 2003
 lhaunt_10       // (c) 2003
+lhaunt_11       // (c) 2003
 
 // Rollfruit
 //rollfr        // (c) 2003
@@ -11129,6 +11134,10 @@ resdnt_2        // (c) 2004
 resdnt_3        // (c) 2004
 //resdnt_4      // (c) 2004
 //resdnt_5      // (c) 2004
+resdnt_6        // (c) 2004
+//resdnt_7      // (c) 2004
+resdnt_8        // (c) 2004
+resdnt_9        // (c) 2004
 
 // Island
 island          // (c) 2005
@@ -11169,6 +11178,10 @@ gnome_5         // (c) 2007
 //gnome_6       // (c) 2007
 gnome_7         // (c) 2007
 //gnome_8       // (c) 2007
+gnome_9         // (c) 2007
+gnome_10        // (c) 2007
+gnome_11        // (c) 2007
+gnome_12        // (c) 2007
 
 // Sweet Life 2
 sweetl2         // (c) 2007
@@ -11184,6 +11197,11 @@ fcockt2_4       // (c) 2008
 fcockt2_5       // (c) 2008
 fcockt2_6       // (c) 2008
 fcockt2_7       // (c) 2008
+
+// Crazy Monkey 2
+crzmon2		// (c) 2010
+crzmon2_2	// (c) 2010
+crzmon2_3	// (c) 2010
 
 
 // Igrosoft bootleg sets
