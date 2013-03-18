@@ -1868,7 +1868,7 @@ ROM_END
 
 ROM_START( phrcrazeb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "5281-40_u5-3a.u5", 0x00000, 0x8000, CRC(d04c7657) SHA1(0b59fbf553eb5b68544ee2f94cf8106ab30ff1ed) ) /* 6221-40 U4-3A 100086 */
+	ROM_LOAD( "5281-40_u5-3a.u5", 0x00000, 0x8000, CRC(d04c7657) SHA1(0b59fbf553eb5b68544ee2f94cf8106ab30ff1ed) ) /* 6221-40 U5-3A 100086 */
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "phrz_u37.u37", 0x00000, 0x8000, CRC(237e221a) SHA1(7aa69375c2b9a9e73e0e4ed207bf595368b2deb2) ) /* 1st & 2nd half identical, but correct and verified */
