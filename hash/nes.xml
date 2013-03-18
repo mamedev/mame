@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="nes" description="Nintendo Entertainment System cartridges">
 
@@ -47105,7 +47105,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="tfs-zd-0 prg" size="131072" crc="e0b6b7bb" sha1="22bab863746f0903ac3b8187ffed288ff7ceeae3" offset="00000" status="baddump" />
+				<rom name="zoids - chuuou tairiku no tatakai (jpn, rev. a).prg" size="131072" crc="e0b6b7bb" sha1="22bab863746f0903ac3b8187ffed288ff7ceeae3" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -65313,7 +65313,7 @@ resulting in tons of glitches? -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" />	<!-- Unif board UNL-MALISB -->
+			<feature name="pcb" value="UNKNOWN" />  <!-- Unif board UNL-MALISB -->
 			<dataarea name="chr" size="32768">
 				<rom name="super mali splash bomb (unl)[u][!].chr" size="32768" crc="0e89e16f" sha1="af54d4d261dd8700f23fdca001719c11eb525736" offset="00000" status="baddump" />
 			</dataarea>
