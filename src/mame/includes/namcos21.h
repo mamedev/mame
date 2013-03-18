@@ -146,6 +146,7 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+
 	DECLARE_DRIVER_INIT(driveyes);
 	DECLARE_DRIVER_INIT(winrun);
 	DECLARE_DRIVER_INIT(starblad);
