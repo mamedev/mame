@@ -8916,7 +8916,7 @@
 		<description>Dr. Mario (Euro)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-VU (NOE/SCN/ESP)"/>
+		<info name="serial" value="NES-VU-(NOE/SCN/ESP)"/>
 		<info name="release" value="19910627"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SEROM" />
@@ -8926,6 +8926,53 @@
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="nes-vu-0 chr" size="32768" crc="064d4ab3" sha1="bcdc34435bf631422ea2701f00744a3606c6dce8" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drmariop" cloneof="drmario">
+		<description>Dr. Mario (Prototype)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SIEPROM" />
+			<feature name="mmc1_type" value="MMC1B1-H" />
+			<dataarea name="prg" size="32768">
+				<rom name="dr mario prg" size="32768" crc="71a3069b" sha1="ab623f914a544db5db7110d6810a08130d685a2a" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="dr mario chr" size="32768" crc="cd4c755d" sha1="2c23062169a34f4741e671385f41f4d66f7e2b8b" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virus" cloneof="drmario">
+		<description>Virus (Prototype, 19900202)</description>
+		<year>1990</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SIEPROM" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="32768">
+				<rom name="virus 2-2-90 prg 5039" size="32768" crc="14f7b86c" sha1="73c5f8c574e46eafe8e177b633118de1bc552b12" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="virus 2-2-90 chr 6581" size="16384" crc="d06589fe" sha1="954007d3f38b2135dac2a2fe655f01142c012325" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virus1" cloneof="drmario">
+		<description>Virus (Prototype, 1989xxxx)</description>
+		<year>1989</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="prg" size="32768">
+				<rom name="virus 4 08a8" size="32768" crc="beba9ac6" sha1="891e252b6aa17cc16b2cb05737149fb1bb592e96" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="0.chr" size="8192" crc="1d904031" sha1="1e39566299bc2bab2257b52459f71f94394f9f22" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27970,7 +28017,7 @@
 	</software>
 
 	<software name="racermt2" supported="no">
-		<description>RacerMate Challenge 2 (USA, Rev. 9.03.128)</description>
+		<description>RacerMate Challenge 2 (USA, v9.03.128)</description>
 		<year>1996</year>
 		<publisher>RacerMate</publisher>
 		<info name="serial" value="UNL-RCMII"/>
@@ -27981,6 +28028,42 @@
 			<feature name="peripheral" value="racermate" />
 			<dataarea name="prg" size="65536">
 				<rom name="v903_128" size="65536" crc="f6a9cb75" sha1="ef355fd0f299622675a716b782f68521eb3defa7" offset="00000" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram2" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racermt2a" cloneof="racermt2" supported="no">
+		<description>RacerMate Challenge 2 (USA, v6.02.002)</description>
+		<year>1995</year>
+		<publisher>RacerMate</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-RACERMATE" />
+			<dataarea name="prg" size="65536">
+				<rom name="n602-2" size="65536" crc="3e59e951" sha1="b66382b1ee59a531cd15318aea5d4b965975e13a" offset="00000" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram2" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racermt2b" cloneof="racermt2" supported="no">
+		<description>RacerMate Challenge 2 (USA, v3.11.088)</description>
+		<year>1996</year>
+		<publisher>RacerMate</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-RACERMATE" />
+			<dataarea name="prg" size="65536">
+				<rom name="n311088" size="65536" crc="74920c13" sha1="7bfc9dde8e97f171263eb0c9c84c83705459432c" offset="00000" />
 			</dataarea>
 			<!-- 32k VRAM on cartridge -->
 			<dataarea name="vram" size="32768">
@@ -45316,42 +45399,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="r.c. pro-am (europe) (rev a).prg" size="32768" crc="2dbddd11" sha1="b619ecf43277af93b5a6c0d62fe6d956cb5a7548" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racermt2b" cloneof="racermt2" supported="no">
-		<description>Racermate Challenge 2 (USA, v3.11.088)</description>
-		<year>1995</year>
-		<publisher>RacerMate</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-RACERMATE" />
-			<dataarea name="prg" size="65536">
-				<rom name="racermate challenge ii (usa) (v3.11.088) (unl).prg" size="65536" crc="74920c13" sha1="7bfc9dde8e97f171263eb0c9c84c83705459432c" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 32k VRAM on cartridge -->
-			<dataarea name="vram" size="32768">
-			</dataarea>
-			<!-- 32k VRAM on cartridge -->
-			<dataarea name="vram2" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="racermt2a" cloneof="racermt2" supported="no">
-		<description>Racermate Challenge 2 (USA, v6.02.002)</description>
-		<year>1995</year>
-		<publisher>RacerMate</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNL-RACERMATE" />
-			<dataarea name="prg" size="65536">
-				<rom name="racermate challenge ii (usa) (v6.02.002) (unl).prg" size="65536" crc="3e59e951" sha1="b66382b1ee59a531cd15318aea5d4b965975e13a" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 32k VRAM on cartridge -->
-			<dataarea name="vram" size="32768">
-			</dataarea>
-			<!-- 32k VRAM on cartridge -->
-			<dataarea name="vram2" size="32768">
 			</dataarea>
 		</part>
 	</software>
