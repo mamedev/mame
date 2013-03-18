@@ -23,6 +23,9 @@ const device_type MD_STD_ROM = &device_creator<md_std_rom_device>;
 const device_type MD_ROM_SRAM = &device_creator<md_rom_sram_device>;
 const device_type MD_ROM_FRAM = &device_creator<md_rom_fram_device>;
 
+// BASE CARTS + BANKSWITCH AT RESET
+const device_type MD_ROM_CM2IN1 = &device_creator<md_rom_cm2in1_device>;
+
 // BASE CARTS + PROTECTION / BANKSWITCH
 const device_type MD_ROM_SSF2 = &device_creator<md_rom_ssf2_device>;
 const device_type MD_ROM_BUGSLIFE = &device_creator<md_rom_bugslife_device>;
@@ -77,6 +80,11 @@ md_rom_fram_device::md_rom_fram_device(const machine_config &mconfig, const char
 
 md_rom_ssf2_device::md_rom_ssf2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SSF2, "MD Super SF2", tag, owner, clock)
+{
+}
+
+md_rom_cm2in1_device::md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_CM2IN1, "MD Codemasters 2in1", tag, owner, clock)
 {
 }
 
@@ -227,6 +235,18 @@ void md_rom_ssf2_device::device_reset()
 		m_bank[i] = i;
 	m_lastoff = -1;
 	m_lastdata = -1;
+}
+
+void md_rom_cm2in1_device::device_start()
+{
+	m_base = -1;
+	save_item(NAME(m_base));
+}
+
+void md_rom_cm2in1_device::device_reset()
+{
+	m_base++;
+	m_base &= 1;
 }
 
 void md_rom_mcpirate_device::device_start()
@@ -484,6 +504,21 @@ WRITE16_MEMBER(md_rom_ssf2_device::write_a13)
 		}
 	}
 }
+
+/*-------------------------------------------------
+ CODEMASTERS 2 IN 1 (RESET BASED)
+ -------------------------------------------------*/
+
+#define MD_ADDR_CM2IN1(a) (m_base == 0 ? ((a << 1) & 0x1fffff)/2 : (((a << 1) & 0x7ffff) + 0x200000)/2)
+
+READ16_MEMBER(md_rom_cm2in1_device::read)
+{
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR_CM2IN1(offset)];
+	else
+		return 0xffff;
+}
+
 
 /*-------------------------------------------------
  PIRATE MULTICARTS

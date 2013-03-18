@@ -83,6 +83,27 @@ private:
 	int m_lastoff, m_lastdata;
 };
 
+// ======================> md_rom_cm2in1_device
+
+class md_rom_cm2in1_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete() { m_shortname = "md_rom_cm2in1"; }
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+	
+private:
+	int m_base;
+};
+
+
 // ======================> md_rom_mcpirate_device
 
 class md_rom_mcpirate_device : public md_std_rom_device
@@ -559,6 +580,7 @@ private:
 extern const device_type MD_STD_ROM;
 extern const device_type MD_ROM_SRAM;
 extern const device_type MD_ROM_FRAM;
+extern const device_type MD_ROM_CM2IN1;
 extern const device_type MD_ROM_BUGSLIFE;
 extern const device_type MD_ROM_CHINF3;
 extern const device_type MD_ROM_ELFWOR;

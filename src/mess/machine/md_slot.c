@@ -253,6 +253,7 @@ static const md_slot slot_list[] =
 	{ PSOLAR, "rom_stm95"},
 
 	{ SSF2, "rom_ssf2" },
+	{ CM_2IN1, "rom_cm2in1" },
 	{ RADICA, "rom_radica" },
 //  { GAME_KANDUME, "rom_gkand" },  // what's needed by this?
 
