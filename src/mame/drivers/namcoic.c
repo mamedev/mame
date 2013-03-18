@@ -193,14 +193,14 @@ SetTilemapControl( int offset, UINT16 newword )
 	}
 } /* SetTilemapControl */
 
-WRITE16_HANDLER( namcos2_state::namco_tilemapcontrol16_w )
+WRITE16_MEMBER( namcos2_state::namco_tilemapcontrol16_w )
 {
 	UINT16 newword = mTilemapInfo.control[offset];
 	COMBINE_DATA( &newword );
 	SetTilemapControl( offset, newword );
 }
 
-READ16_HANDLER( namcos2_state::namco_tilemapcontrol16_r )
+READ16_MEMBER( namcos2_state::namco_tilemapcontrol16_r )
 {
 	return mTilemapInfo.control[offset];
 }
