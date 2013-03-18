@@ -88,8 +88,10 @@
         it is barely used by the game (only checked at startup).  See decoprot.c
 
     Driver todo:
-        stadhr96 seems to require raster IRQ video update support.
+        stadhr96 - protection? issues (or 156 co-processor? or timing?)
+		avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
+		hoops** - crash entering test mode (regression from 0.113 era?)
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
@@ -115,17 +117,69 @@ READ32_MEMBER(deco_mlc_state::test2_r)
 	return machine().rand(); //0xffffffff;
 }
 
-READ32_MEMBER(deco_mlc_state::test3_r)
+READ32_MEMBER(deco_mlc_state::mlc_440000_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_440004_r)
+{
+	return 0xffffffff;
+}
+
+
+READ32_MEMBER(deco_mlc_state::mlc_440008_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 {
 /*
     test3 7 - vbl loop on 0x10 0000 at end of IRQ
-
+	avengrgs tests other bits too
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
 //  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
+//	return 0x00100000;
 	return 0xffffffff;
 }
+
+WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
+{
+
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_200070_r)
+{
+	m_vbl_i ^=0xffffffff;
+//logerror("vbl r %08x\n", space.device().safe_pc());
+	// Todo: Vblank probably in $10
+	return m_vbl_i;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_200000_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_200004_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_20007c_r)
+{
+	return 0xffffffff;
+}
+
+READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
+{
+//  logerror("read scanline counter (%d)\n", machine().primary_screen->vpos());
+	return machine().primary_screen->vpos();
+}
+
 
 WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 {
@@ -153,19 +207,6 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
-READ32_MEMBER(deco_mlc_state::decomlc_vbl_r)
-{
-	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", space.device().safe_pc());
-	// Todo: Vblank probably in $10
-	return m_vbl_i;
-}
-
-READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
-{
-//  logerror("read scanline counter (%d)\n", machine().primary_screen->vpos());
-	return machine().primary_screen->vpos();
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
@@ -271,18 +312,21 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
-	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200004, 0x0200007) AM_READ(mlc_200004_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200070, 0x0200073) AM_READ(mlc_200070_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x020007c, 0x020007f) AM_READ(mlc_20007c_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( mlc_spriteram_r, mlc_spriteram_w ) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("mlc_vram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440000, 0x0440003) AM_READ(mlc_440000_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440004, 0x0440007) AM_READ(mlc_440004_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440008, 0x044000b) AM_READ(mlc_440008_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x044001c, 0x044001f) AM_READWRITE(mlc_44001c_r, mlc_44001c_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
 	AM_RANGE(0x070f000, 0x070ffff) AM_READWRITE(stadhr96_prot_146_r, stadhr96_prot_146_w) AM_MIRROR(0xff000000)

@@ -21,7 +21,7 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 		m_colour_mask=0x3f;
 	else
 		m_colour_mask=0x1f;
-
+	
 //  temp_bitmap = auto_bitmap_rgb32_alloc( machine(), 512, 512 );
 	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
 	m_mlc_spriteram_spare = auto_alloc_array(machine(), UINT16, 0x3000/2);
