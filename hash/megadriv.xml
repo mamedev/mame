@@ -83,7 +83,37 @@ NOTE
 
 -->
 
+<!--
 
+Info on Sega chip labels (from Sunbeam / Digital Corruption)
+
+  Sega used for chip labels/imprints a coding as follows:
+
+    MPR-13192A-F
+
+    MPR - Abbreviation for "Mask-Programmed ROM"
+    13192 - Serial Number
+    A - Revision (optional)
+    F - Manufacturer
+
+  The serial number is permanently assigned to its content and kept on a reproduction run as well. In case of software updates the optional revision
+  letter is appended. Some chips have been produced by different manufacturer.
+
+  Manufacturer Codes:
+  S**  - NEC
+  T**  - NEC
+  W**  - NEC
+  F    - Fujitsu
+  H    - Hitachi
+  M    - Matsushita
+  MX   - Macronix
+  S    - Sharp
+  SM   - Samsung
+  SY   - ?
+  T    - Toshiba
+  U    - UMC
+
+-->
 
 <softwarelist name="megadriv" description="Sega MegaDrive/Genesis cartridges">
 
@@ -183,7 +213,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="??" />
-			<feature name="u1" value="Pond II:Robocod ROB02" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="Pond II:Robocod ROB02" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="pond ii robocod rob02.u1" size="524288" crc="c32b5d66" sha1="20e70c2a8236915a6e4746b6ad1b603563aecf48" offset="000000" />
 			</dataarea>
@@ -346,7 +376,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-13956-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13956-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13956-f.u1" size="1048576" crc="f2c58bf7" sha1="6795b9fc9a21167d94a0b4c9c38d4e11214e1ea7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -387,7 +417,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-16147-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16147-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16147-f.u1" size="1048576" crc="71f58614" sha1="1cd7ac493a448c7486eefde2300240c3675986a9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -413,7 +443,7 @@ NOTE
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16603-MX" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16603-MX" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16603-mx.u1" size="1048576" crc="1a3eaf57" sha1="0a4c99a31e507bcee5b955e4bf3773f4ded827b6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -466,7 +496,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14680-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14680-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14680-f.u1" size="1048576" crc="28165bd1" sha1="c8a3667631fdbd4d0073e42ada9f7199d09c0cfa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -506,7 +536,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15498-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15498-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15498-h.u1" size="1048576" crc="e9742041" sha1="9d98d6817b3e3651837bb2692f7a2a60a608c055" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -568,7 +598,7 @@ NOTE
 		<info name="alt_title" value="アートアライブ"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-14384-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14384-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-14384-t.u1" size="131072" crc="f1b72cdd" sha1="2c57e38592a206a1847e9e202341595832798587" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -609,7 +639,7 @@ NOTE
 		<publisher>Data East</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15286-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15286-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15286-h.u1" size="1048576" crc="b3c05418" sha1="ab84274bc98a1f8f808bee3f41645884c95cc840" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -669,7 +699,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14770A-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14770A-H" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14770a-h.u1" size="1048576" crc="250111df" sha1="0e33965994a6f53aca93c3cb164726b913789fc1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -781,7 +811,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14356-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14356-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14356-f.u1" size="1048576" crc="f2363a4a" sha1="3925623fafb79a7e8467e9b6fe70361c147cbfd3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -825,7 +855,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17108-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17108-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17108-f.u1" size="1048576" crc="54ab3beb" sha1="01f76e2f719bdae5f21ff0e5a1ac1262c2def279" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -932,7 +962,7 @@ NOTE
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17019A-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17019A-F" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17019a-f.u1" size="1048576" crc="88b30eff" sha1="0da7e621e05dc9160122d728e1fca645ff11e670" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1049,7 +1079,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA,171-5978B" />
-			<feature name="u1" value="MPR-16077 W08, MPR-16077-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16077 W08, MPR-16077-F" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16077 w08.u1" size="1048576" crc="aea0786d" sha1="f61a568314133b60de82ac162b5b52473adc9e1c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1180,7 +1210,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16269-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16269-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16259-s.u1" size="1048576" crc="1f6e574a" sha1="ca0115dd843e072815c4be86a7a491b26e3c4762" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1230,7 +1260,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15225-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15225-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15225-t.u1" size="1048576" crc="33b1979f" sha1="20b282ff8220291d98853888cfe504692c04e654" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1247,7 +1277,7 @@ NOTE
 		<info name="alt_title" value="ギャラクシーフォースII"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14248B-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14248B-F" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14248b-f.u1" size="1048576" crc="d15f5c3c" sha1="db1615fc239cb0ed9fdc792217964c33e1e700fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1275,7 +1305,7 @@ NOTE
 		<publisher>TecMagik</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16065-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16065-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16065-h.u1" size="1048576" crc="b5804771" sha1="fc63d2a2a723f60f2141bc50bd94acef74ba9ab3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1289,7 +1319,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15709-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15709-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15709-s.u1" size="1048576" crc="4a4414ea" sha1="978dabcc7d098edebc9d3f2fef04f27fd6aeab19" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1346,7 +1376,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14557 W29,MPR-14557-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14557 W29,MPR-14557-T" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14557 w29.u1" size="1048576" crc="ce36e6cc" sha1="28b904000b2863b6760531807760b571f1a5fc1d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1371,7 +1401,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15798 T57" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15798 T57" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15798 t57.u1" size="1048576" crc="0b6d3eb5" sha1="23579c8f7e2396080b478b113aff36d2382395a3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1485,7 +1515,7 @@ NOTE
 		<info name="alt_title" value="バットマン・リターンズ"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-14998 T02" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14998 T02" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14998 t02.u1" size="1048576" crc="4a3225c0" sha1="b173d388485461b9f8b27d299a014d226aef7aa1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1548,7 +1578,7 @@ NOTE
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15320 T15" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15320 T15" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15320 t15.u1" size="1048576" crc="1de28bb1" sha1="6421c26000bec21d0c808252c5d9ce75b75cb8a4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -2431,7 +2461,7 @@ NOTE
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536" />
-			<feature name="u1" value="FX014A1" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FX014A1" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="fx014a1.u1" size="1048576" crc="92b6f255" sha1="c474d13afb04bfdb291cfabe43ffc0931be42dbc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -2455,7 +2485,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15497-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15497-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15497-f.u1" size="1048576" crc="2da36e01" sha1="f00f96fb1b346d5b13c6bc8bc586477fed743800" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -2490,7 +2520,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="??" />
-			<feature name="u1" value="AQUATIC AQUA01" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="AQUATIC AQUA01" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="aquatic aqua01.u1" size="524288" crc="400f4ba7" sha1="3bbd0853099f655cd33b52d32811f8ccb64b0418" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3779,7 +3809,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15204 W97" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15204 W97" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15204 w97.u1" size="1048576" crc="95b0ea2b" sha1="dca9d505302ce9ff1f98c4da95505139c7d3cafc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3866,7 +3896,7 @@ NOTE
 		<info name="alt_title" value="ブロックアウト"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-14247-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14247-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-14247-t.u1" size="131072" crc="5e2966f1" sha1="f6620d3b712f3bd333d0bb355c08cf992af6e12d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4052,7 +4082,7 @@ NOTE
 		<info name="alt_title" value="Disney's Bonkers (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17070-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17070-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17070-t.u1" size="1048576" crc="d1e66017" sha1="938642252fdb1c5aedc785bce2ba383fc683c917" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4360,7 +4390,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC40X1 REV A" />
-			<feature name="u1" value="Budokan U1 S0015" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="Budokan U1 S0015" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="budokan u1 s0015.u1" size="524288" crc="97add5bd" sha1="004f3d6f333795315a072f3f0661ce4e5e91a4ae" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4490,7 +4520,7 @@ NOTE
 		<info name="alt_title" value="Caliber.50 (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14337-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14337-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14337-h.u1" size="1048576" crc="44f4fa05" sha1="a68f3b9350a3a05850c17d157b56de88556cd26a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4527,7 +4557,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15499" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15499" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15499.u1" size="1048576" crc="43225612" sha1="66ec647175251d8c109c6c21440d415e13e14001" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4629,7 +4659,7 @@ NOTE
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="MPR-16378-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16378-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16378-f.u1" size="1048576" crc="4dd4e4a5" sha1="61aabb1053f090fb6c13968c86170357c5df4eba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4689,7 +4719,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15274-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15274-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15274-f.u1" size="1048576" crc="046a48de" sha1="7eae088f0b15e4bcd9a6a38849df5a20446be548" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4895,7 +4925,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15310-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15310-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15310-f.u1" size="1048576" crc="813a7d62" sha1="3cbeb068751c39790116aa8f422dd6f333be42e0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4933,7 +4963,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-14833 W48" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14833 W48" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14833 w48.u1" size="1048576" crc="7cd40bea" sha1="832a18eb028630e31b5bacd05f9694f4a827268b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4946,7 +4976,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14772 W44" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14772 W44" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14772 w44.u1" size="1048576" crc="f8ac454a" sha1="f6177b4c9ac48325c53fa26531cdd9bbc673dda3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4959,7 +4989,7 @@ NOTE
 		<publisher>Core Design</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15715 T58" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15715 T58" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15715 t58.u1" size="1048576" crc="1ade9488" sha1="f57ed0e6201b706abd5e837d9043723a1b3b4de5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5450,7 +5480,7 @@ NOTE
 		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-13286-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13286-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-13286-t.u1" size="131072" crc="d783c244" sha1="17ae2595e4d3fb705c9f8f66d5938deca3f95c4e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5748,7 +5778,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15477 T34" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15477 T34" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15477 t34.u1" size="1048576" crc="5f09fa41" sha1="b6dc5d4c29b2161f7252828cf267117e726d8e82" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5775,7 +5805,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15476 W09" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15476 W09" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15476 w09.u1" size="1048576" crc="f024c1a1" sha1="9a214e0eab58ddb8e9d752e41fce2ce08e6c39a7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5799,7 +5829,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15065-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15065-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15065-sm.u1" size="1048576" crc="a80d18aa" sha1="520e01abe76120dbd680b9fc34eb1303c780b069" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -6841,7 +6871,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-19075-U" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-19075-U" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-19075-u.u1" size="1048576" crc="adfde883" sha1="991e22d7f258cba94306d16d5dd37172a34da9d3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7030,7 +7060,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15321A-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15321A-F" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15321a-f.u1" size="1048576" crc="b36ab75c" sha1="663dfeebd21409942bcc446633b9b9f0dd238aa8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7054,7 +7084,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16172-MX" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16172-MX" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16172-mx.u1" size="1048576" crc="70680706" sha1="8cdaca024585aab557e9a09732a298e5112ee15b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7289,7 +7319,7 @@ NOTE
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16838-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16838-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16838-f.u1" size="1048576" crc="39790728" sha1="55996cd262df518e92271bceee4d2a657cd7e02c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7482,7 +7512,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="?? (Electronic Arts 1991)" />
-			<feature name="u1" value="EA HOCKEY U1 EAJ01" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="EA HOCKEY U1 EAJ01" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="ea hockey u1 eaj01.u1" size="524288" crc="9bfc279c" sha1="118419e596bf07047a18d1828290019fbc4afc45" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7586,7 +7616,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15265-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15265-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15265-sm.u1" size="1048576" crc="45547390" sha1="2cad130f3118c189d39fd1d46c5c31a5060ce894" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7809,7 +7839,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15046-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15046-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15046-f.u1" size="1048576" crc="e5517b77" sha1="00109e6de5b823525b3ba519222fecc4e229f6d1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8277,7 +8307,7 @@ NOTE
 		<publisher>Microprose</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15756-MX" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15756-MX" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15756-mx.u1" size="1048576" crc="e98ee370" sha1="190508c5fe65c47f289d85768f7d79b1a235f3d5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8290,7 +8320,7 @@ NOTE
 		<publisher>Microprose</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15919-MX" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15919-MX" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15919-mx.u1" size="1048576" crc="412c4d60" sha1="d5f0d3d3b9cb7557d85bd54465072555f60c25a1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8577,7 +8607,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-13705-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13705-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-13705-t.u1" size="131072" crc="5f0bd984" sha1="c136cb3fae1914a8fe079eb28c4533af5d8774e2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -8980,7 +9010,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-13839-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13839-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-13839-t.u1" size="131072" crc="4291c8ab" sha1="83d8bbf0a9b38c42a0bf492d105cc3abe9644a96" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -9155,7 +9185,7 @@ NOTE
 		<info name="alt_title" value="ジー・ロック"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15326-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15326-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15326-f.u1" size="1048576" crc="f2af886e" sha1="81bb08c4080ca9a8af65597d1c7b11ce902c8d9e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -9427,7 +9457,7 @@ NOTE
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15390 T24" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15390 T24" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15390 t24.u1" size="1048576" crc="bd556381" sha1="c93298ee3ad6164ce497bd49d0ab6638854acb79" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -9514,7 +9544,7 @@ NOTE
 		<info name="alt_title" value="Global Gladiators (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15237-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15237-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15237-f.u1" size="1048576" crc="5c218c6a" sha1="daf1ded2439c626c0fd227550be6563cd1b09612" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -9949,7 +9979,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15813 T59" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15813 T59" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15813 t59.u1" size="1048576" crc="b813cf0d" sha1="7721e302555f16e3242ad4a47ed87a1de1882122" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10067,7 +10097,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV J" />
-			<feature name="u1" value="HAUNTING HNTB07" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="HAUNTING HNTB07" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="haunting hntb07.u1" size="2097152" crc="c9fc876d" sha1="d6227ef00fdded9184676edf5dd2f6cae9b244a5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10228,7 +10258,7 @@ NOTE
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15773-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15773-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15773-t.u1" size="1048576" crc="a154433a" sha1="da5da918e92211d9a4108c2b39b29b8583242cbb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10321,7 +10351,7 @@ NOTE
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="FX009A1" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FX009A1" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="fx009a1.u1" size="2097152" crc="f27c576a" sha1="91560ddf53f50bb5b9f4b48be906ce27e9c05742" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10455,7 +10485,7 @@ NOTE
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15207-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15207-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15207-s.u1" size="1048576" crc="eb8f4374" sha1="70b5b4bc3f6d7ee7fbc77489bcfa4a96a831b88d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10688,7 +10718,7 @@ NOTE
 	</software>
 
 	<software name="jlps">
-		<description>J. League Pro Striker '93 (Jpn, Rev. A)</description>	<!-- binary v1.3 -->
+		<description>J. League Pro Striker '93 (Jpn, Rev. A)</description>  <!-- binary v1.3 -->
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
@@ -10710,7 +10740,7 @@ NOTE
 	</software>
 
 	<software name="jlpsa" cloneof="jlps">
-		<description>J. League Pro Striker '93 (Jpn)</description>	<!-- binary v1.0 -->
+		<description>J. League Pro Striker '93 (Jpn)</description>  <!-- binary v1.0 -->
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5526"/>
@@ -10866,7 +10896,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV J" />
-			<feature name="u1" value="JPOND3 JP3B36 9343" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="JPOND3 JP3B36 9343" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="jpond3 jp3b36.u1" size="2097152" crc="26f64b2a" sha1="df7fca887e7988e24ab2d08b015c6db2902fe571" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11067,7 +11097,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="?? (Electronic Arts 1991)" />
-			<feature name="u1" value="Madden II MII05" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="Madden II MII05" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="madden ii mii05.u1" size="524288" crc="046e3945" sha1="1a4c1dcc2de5018142a770f753ff42667b83e5be" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11146,7 +11176,7 @@ NOTE
 		<info name="alt_title" value="Jordan Vs Bird (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWB SC42X1 REV B" />
-			<feature name="u1" value="Jord vs Bird JOR05 7051" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="Jord vs Bird JOR05 7051" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="jord vs bird jor05 7051.u1" size="524288" crc="22d77e6d" sha1="977430962510867b16c113cff1436cb75c0485ac" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11262,7 +11292,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV J" />
-			<feature name="u1" value="JSTRIKE JSB06" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="JSTRIKE JSB06" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="jstrike jsb06.u1" size="2097152" crc="a5d29735" sha1="7a7568e39341b1bb218280ee05c2b37c273317b5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11526,7 +11556,7 @@ NOTE
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17359-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17359-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17359-f.u1" size="1048576" crc="bc37401a" sha1="e449cfd4f9d59cf28b4842d465022a399964d0d6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11587,7 +11617,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15556-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15556-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15556-sm.u1" size="1048576" crc="7a94fd49" sha1="46dc75f1e4d79fd159fcb4a256881375b63d9a2b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11600,7 +11630,7 @@ NOTE
 		<publisher>Takara</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="SA-8" />
-			<feature name="u1" value="MPR-15485 T33" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15485 T33" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15485 t33.u1" size="1048576" crc="f390d406" sha1="b88555b50b12f7d9470e5a9870882ca38100342c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11616,7 +11646,7 @@ NOTE
 		<info name="alt_title" value="キング・オブ・ザ・モンスターズ"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15677-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15677-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15677-t.u1" size="1048576" crc="3af7e74e" sha1="119557b565e1246ce68c2e6bc18074ae9b69874d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12001,7 +12031,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15233-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15233-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15233-f.u1" size="1048576" crc="6a1a4579" sha1="f4b86031e348edb4dcffaf969998f368955828ce" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12091,7 +12121,7 @@ NOTE
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="FV008A1" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FV008A1" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="fv008a1.u1" size="2097152" crc="51d9a84a" sha1="309b41c6d4159f4f07fe9a76aca4fc4ddf45de63" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12126,7 +12156,7 @@ NOTE
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="??" />
-			<feature name="u1" value="LHX ATTACK CH LHX04" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="LHX ATTACK CH LHX04" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="lhx attack ch lhx04.u1" size="1048576" crc="70c3428d" sha1="f23c6d0bc6daae11a3398d73961f621e508c9229" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12863,7 +12893,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15661-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15661-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15661-s.u1" size="1048576" crc="4b07a105" sha1="40e48ce531ed013d5a4a6f689e70781df3e0095c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12913,7 +12943,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15803 W48" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15803 W48" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15803 w48.u1" size="1048576" crc="6ab6a8da" sha1="f6178018102df3c92d05a48ff5949db9416acd5c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -12996,7 +13026,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15009 W50" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15009 W50" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15009 w50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13131,7 +13161,7 @@ NOTE
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17346-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17346-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17346-f.u1" size="1048576" crc="b1d15d0f" sha1="00ad2cf231bedbd373253b169e170e8b0db4c86a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13144,7 +13174,7 @@ NOTE
 		<publisher>Data East</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16388-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16388-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16388-h.u1" size="1048576" crc="fe898cc9" sha1="180285dbfc1613489f1c20e9fd6c2b154dec7fe2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13168,7 +13198,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15230-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15230-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15230-h.u1" size="1048576" crc="2148d56d" sha1="e861551edabe55181ed1b7260169e953af903b5e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13181,7 +13211,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15330-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15330-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15330-h.u1" size="1048576" crc="3b3231ed" sha1="1fcfc9ee3bffc25388735782b0cdb829a7e40507" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13208,7 +13238,7 @@ NOTE
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15284-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15284-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15284-f.u1" size="1048576" crc="a744921e" sha1="99ae974fccebfbf6f5a4738e953ad55181144a99" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13247,7 +13277,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15075-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15075-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15075-f.u1" size="1048576" crc="936b85f7" sha1="2357ed0b9da25e36f6a937c99ebc32729b8c10d2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13274,7 +13304,7 @@ NOTE
 		<info name="alt_title" value="戦場の狼II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14242-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14242-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14242-h.u1" size="1048576" crc="16113a72" sha1="ab633913147325190ef13bd10f3ef5b06d3a9e28" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13460,7 +13490,7 @@ NOTE
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR 13895 W36" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR 13895 W36" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr 13895 w36.u1" size="1048576" crc="187c6af6" sha1="6cdd9083e2ff72cfb0099fd57a7f9eade9a74dda" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13500,7 +13530,7 @@ NOTE
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15659 T47" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15659 T47" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15659 t47.u1" size="1048576" crc="70b0a5d7" sha1="5a2e7f8c752dfd8b301d2c044619c003a15894aa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13917,7 +13947,7 @@ NOTE
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17314-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17314-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17314-t.u1" size="1048576" crc="0786ea0b" sha1="318ff3a44554b75260d5b9b9e7b81a3cfd07581a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13953,7 +13983,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Tengen ~ Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-14178-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14178-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-14178-t.u1" size="131072" crc="af041be6" sha1="29fff97e19a00904846ad99baf6b9037b28df15f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -13988,7 +14018,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6278A" />
-			<feature name="u1" value="MPR-15323-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15323-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15323-f.u1" size="1048576" crc="b638b6a3" sha1="caad1bc67fd3d7f7add0a230def4a0d5a7f196ef" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -16128,7 +16158,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16214 R04" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16214 R04" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16214 r04.u1" size="1048576" crc="41ac8003" sha1="4bb7cfc41ea7eaaed79ec402ec0d551c1e5c5bb6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -16174,7 +16204,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14171A W01" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14171A W01" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14171a w01.u1" size="1048576" crc="fdd9a8d2" sha1="95d2055ffd679ab19f0d4ca0af62a0d565bc258e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -16190,7 +16220,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="アウト ラン"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14171 W30" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14171 W30" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14171 w30.u1" size="1048576" crc="ee7d9f4a" sha1="a94c96ffb53080b2c098be86e715f1dc727be07d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -16203,7 +16233,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15482-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15482-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15482-sm.u1" size="1048576" crc="5cb3536a" sha1="f1a26bd827e9a674cf1dde74dc2c36f61c827c76" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17147,7 +17177,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="ピットファイター"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14320A-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14320A-F" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14320a-f.u1" size="1048576" crc="d48a8b02" sha1="8cd0ffaf3c29b3aa1f9068cd89cb64f492066d74" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17303,7 +17333,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17421-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17421-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17421-t.u1" size="1048576" crc="8c00ad61" sha1="6ffaaac637fb41a2f94912c382385a9cb17639a9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17442,7 +17472,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Domark</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-16445 W86" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16445 W86" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16445 w86.u1" size="1048576" crc="61de6fe0" sha1="6e645b791e6e2b84a206dca6cf47e8f955e60a72" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17524,7 +17554,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536" />
-			<feature name="u1" value="FX010A1" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FX010A1" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="fx010a1.u1" size="2097152" crc="bc597d48" sha1="69d905751ffa6a921586767263e45ddeb73333c2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17576,7 +17606,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15678-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15678-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15678-f.u1" size="1048576" crc="5d5c9ade" sha1="89a347f35c4d0d364c284f2f32f708d0378b8735" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -17955,7 +17985,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="雷電伝説"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14030 W14" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14030 W14" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14030 w14.u1" size="1048576" crc="f839a811" sha1="9d4011d650179c62acdba0ed58143aa77b97d0e9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -18048,7 +18078,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15759 T54" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15759 T54" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15759 t54.u1" size="1048576" crc="55915915" sha1="2611c818ecb53edc7d561fce1a349acad6abff4a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -18141,7 +18171,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="The Ren &amp; Stimpy Show Presents Stimpy's Invention (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16251 W85" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16251 W85" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16251 w85.u1" size="1048576" crc="c276c220" sha1="34d520d8a835e386c26793f216b1dc8f78d8f67a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -18717,7 +18747,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="FX004" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FX004" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="fx004.u1" size="1048576" crc="8eedfd51" sha1="cb741f868b0eba17819a27e37cda96f33674c342" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -19278,7 +19308,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="??" />
-			<feature name="u1" value="SHADOW SHA01" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="SHADOW SHA01" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="shadow sha01.u1" size="1048576" crc="bd385c27" sha1="2f6f5165d3aa40213c8020149d5e4b29f86dfba8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -19637,7 +19667,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15674-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15674-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15674-f.u1" size="1048576" crc="5381506f" sha1="1e07d7998e3048fcfba4238ae96496460e91b3a5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -19858,7 +19888,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15762 T53" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15762 T53" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15762 t53.u1" size="1048576" crc="24d7507c" sha1="fb95b7fdf12dcf62883dabf65d2bf8ffa83786fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -20524,7 +20554,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15000A W99" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15000A W99" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15000a w99.u1" size="1048576" crc="7b905383" sha1="8bca5dcef1af3e00098666fd892dc1c2a76333f9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -20955,7 +20985,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-18010-U" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-18010-U" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18010-u.u1" size="1048576" crc="6634b130" sha1="5f18db9c85df4eaf4647a0519c9dc966aee583fa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21552,7 +21582,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17987-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17987-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17987-f.u1" size="1048576" crc="1a58d5fe" sha1="95aa250ea47d14d60da9f0fed5b1aad1ff2c1862" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21842,7 +21872,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-13487-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13487-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13487-h.u1" size="1048576" crc="b9d099a4" sha1="26fe42d13a01c8789bbad722ebac05b8a829eb37" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21869,7 +21899,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15470-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15470-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15470-h.u1" size="1048576" crc="e85e5270" sha1="c048bf092745654bb60a437ef1543abfd407093c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22016,7 +22046,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353585" />
-			<feature name="u1" value="FV002A1 056194" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FV002A1 056194" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="fv002a1 056194.u1" size="524288" crc="ac30c297" sha1="b40ea5b00f477d7b7448447f15b4c571f5e8ff0d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22029,7 +22059,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV J" />
-			<feature name="u1" value="SUPER 2020 SUPER02" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="SUPER 2020 SUPER02" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="super 2020 super02.u1" size="2097152" crc="c17acee5" sha1="a6ea6dcc33d60cf4d3be75b1cc867699811f8b3a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22276,8 +22306,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="スーパーリーグ"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5702" />
-			<feature name="u1" value="MPR-12406 T25" />	<!-- location not really marked on PCB, using u1 for consistency -->
-			<feature name="u2" value="MPR-12407 T26" />	<!-- location not really marked on PCB, using u2 for consistency -->
+			<feature name="u1" value="MPR-12406 T25" /> <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="MPR-12407 T26" /> <!-- location not really marked on PCB, using u2 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12406 t25.u1" size="262144" crc="60f51c6d" sha1="c99c028e7ad5712ab433a5b3a3627cbf23cc54e9" offset="000000" loadflag="load16_byte"/>
 				<rom name="mpr-12407 t26.u2" size="262144" crc="52a72d6d" sha1="b08bf6d9a9ca5ca093b8a74e0806e53f7af29228" offset="000001" loadflag="load16_byte"/>
@@ -22495,8 +22525,8 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="スーパーサンダーブレード"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5702" />
-			<feature name="u1" value="MPR-12005 T12" />	<!-- location not really marked on PCB, using u1 for consistency -->
-			<feature name="u2" value="MPR-12006 T13" />	<!-- location not really marked on PCB, using u2 for consistency -->
+			<feature name="u1" value="MPR-12005 T12" /> <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="MPR-12006 T13" /> <!-- location not really marked on PCB, using u2 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12006 t13.u2" size="262144" crc="655fa4e4" sha1="2e7574a9d0da0282cbaa7845930a0dae58c98d21" offset="000000" loadflag="load16_byte"/>
 				<rom name="mpr-12005 t12.u1" size="262144" crc="0a08d32d" sha1="99d0b833fbb636a4e67244439ce83872c600d753" offset="000001" loadflag="load16_byte"/>
@@ -22547,7 +22577,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="Superman - The Man of Steel (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15327-T" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15327-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15327-t.u1" size="1048576" crc="7db434ba" sha1="c956730af44b737ee3d0c1e83c147f32e3504383" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22714,7 +22744,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H" />
-			<feature name="u1" value="SYNDICATE SYNDB14" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="SYNDICATE SYNDB14" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="syndicate syndb14.u1" size="2097152" crc="95bbf87b" sha1="87442ecc50df508d54d241cbd468b41c926b974d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22939,7 +22969,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H" />
-			<feature name="u1" value="TECHNOCLASH TECHNOCL02" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="TECHNOCLASH TECHNOCL02" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="technoclash technocl02.u1" size="1048576" crc="4e65e483" sha1="686afbd7130fe8487d9126e690bf53800ae953ba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23172,7 +23202,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="MPR-15289" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15289" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15289.u1" size="1048576" crc="966d5286" sha1="ed6c32cae0813cbcf590fad715fa045fbeab6d78" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23210,7 +23240,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="MPR-16017-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16017-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16017-sm.u1" size="2097152" crc="3cd2b7e6" sha1="6a6c4ae9d944ad1d459d46ae40d3af09e60b5d7d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23237,7 +23267,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536" />
-			<feature name="u1" value="MPR-16018-U" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16018-U" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16018-u.u1" size="2097152" crc="95b5484d" sha1="1a27be1e7f8f47eb539b874eaa48586fe2dab9c0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23303,7 +23333,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14925 W47" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14925 W47" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14925 w47.u1" size="1048576" crc="15f4d302" sha1="c8ee275f2e30aaf6ad713c6cd915a4ede65328e0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23316,7 +23346,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14828-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14828-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14828-f.u1" size="1048576" crc="31a629be" sha1="2a1894e7f40b9001961f7bf1c70672351aa525f9" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23351,7 +23381,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="PWA P10001 REV H" />
-			<feature name="u1" value="TPB10 THEME PARK" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="TPB10 THEME PARK" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
 				<rom name="tpb10 theme park.u1" size="2097152" crc="289da2c5" sha1="03c6504b5d797f10c7c361735d801902e4b00981" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23417,7 +23447,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Technosoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15209-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15209-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15209-sm.u1" size="1048576" crc="e7e3c05b" sha1="ecbc2bfc4f3d8bbd46b398274ed2f5cc3db68454" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23445,7 +23475,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="Lightening Force - Quest for the Darkstar (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15210-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15210-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15210-s.u1" size="1048576" crc="c8f8c0e0" sha1="ab5bd9ddbfc07d860f44b9c72d098aef2581d1d8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23552,7 +23582,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="MPR-17066-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17066-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17066-f.u1" size="1048576" crc="1227b2b2" sha1="2672018d9e005a9a3b5006fa8f61e08f2d1909aa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23576,7 +23606,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353536" />
-			<feature name="u1" value="MPR-15406" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15406" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15406.u1" size="524288" crc="d10fba51" sha1="9e63b150cc2ec0ef141e68ffda862aa8db604441" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23600,7 +23630,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="MPR-15405" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15405" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15405.u1" size="524288" crc="a26d3ae0" sha1="d8d159c7c5a365242f989cc3aad2352fb27e3af3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23670,7 +23700,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14236A-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14236A-H" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14236a-h.u1" size="1048576" crc="7a588f4b" sha1="85e8d0a4fac591b25b77c35680ac4175976f251b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -23686,7 +23716,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="トージャム&amp;アール"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14236-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14236-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14236-f.ic1" size="1048576" crc="d1b36786" sha1="7f82d8b57fff88bdca5d8aff85b01e231dc1239a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24163,7 +24193,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Data East</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15319-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15319-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15319-f.u1" size="1048576" crc="b6d90a10" sha1="babf6ec6dac62e7563c4fe9cb278179dc4343ea4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24176,7 +24206,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Data East</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14559 W23" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14559 W23" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14559 w23.u1" size="1048576" crc="721b5744" sha1="e8c2faa0de6d370a889426b38538e75c264c4456" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24203,7 +24233,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15652-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15652-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15652-s.u1" size="1048576" crc="ee988bd9" sha1="556a79febff1fe4beb41e4e8a2629ff02b20c38f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24263,7 +24293,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15819-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15819-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15819-s.u1" size="1048576" crc="83db6e58" sha1="91781d0561f84de0d304221bbc26f4035f62010f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -25276,7 +25306,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15968-S" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15968-S" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15968-s.u1" size="1048576" crc="f09353b4" sha1="2e7a1724a72e89a3f9a66720d9a7c6f293263798" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -25391,7 +25421,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-16930-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16930-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16930-f.u1" size="1048576" crc="6065774d" sha1="5f5a31a3e8e3b56aa0a3acdb8049246160679a8f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -25973,7 +26003,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B" />
-			<feature name="u1" value="MPR-15271-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15271-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15271-f.u1" size="1048576" crc="121c6a49" sha1="4b7aa8de517516edd9ee5288124f77238fc9ba6b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -26662,7 +26692,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-15505-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15505-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15505-sm.u1" size="1048576" crc="0b78ca97" sha1="111d696b317ad5b57bc66e037a935d3f123d41c2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -27028,7 +27058,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Empire Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-17424-F" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-17424-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-17424-f.u1" size="1048576" crc="204f97d8" sha1="9f235fd4ac2612fb398ecbe423f40c901be8f564" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -27175,7 +27205,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-14463-SM" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-14463-SM" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-14463-sm.u1" size="1048576" crc="89b744a3" sha1="98335b97c5e21f7f8c5436427621836660b91075" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -27191,7 +27221,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="ゼロウイング"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
-			<feature name="u1" value="MPR-13904-H" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-13904-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-13904-h.u1" size="1048576" crc="7e203d2b" sha1="fad499e21ac55a3b8513110dc1f6e3f6cdeca8dd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -27226,7 +27256,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="353490" />
-			<feature name="u1" value="FX005" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="FX005" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="fx005.u1" size="1048576" crc="179a1aa2" sha1="f0b447196d648b282050a52bdfdd9bf0d8f3d57e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
