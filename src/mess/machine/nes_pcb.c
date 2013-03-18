@@ -196,6 +196,7 @@ static const nes_pcb pcb_list[] =
 	{ "NES-SH1ROM",       STD_SXROM },
 	{ "NES-SHROM",        STD_SXROM },
 	{ "NES-SIROM",        STD_SXROM },
+	{ "NES-SIEPROM",      STD_SXROM },
 	{ "NES-SJROM",        STD_SXROM },
 	{ "NES-SKROM",        STD_SXROM },
 	{ "NES-SKEPROM",      STD_SXROM },
@@ -206,6 +207,7 @@ static const nes_pcb pcb_list[] =
 	{ "NES-SLRROM",       STD_SXROM },
 	{ "NES-SMROM",        STD_SXROM },
 	{ "NES-SNROM",        STD_SXROM },
+	{ "NES-SNWEPROM",     STD_SXROM },
 	{ "NES-SUROM",        STD_SXROM },
 	{ "NES-SXROM",        STD_SXROM },
 	{ "NES-WH",           STD_SXROM },
@@ -617,6 +619,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-BB",              UNSUPPORTED_BOARD }, //  used by a few FDS conversions
 	{ "UNL-LH32",            UNSUPPORTED_BOARD }, //  used by Monty no Doki Doki Daidassou FDS conversion
 	{ "UNL-CITYFIGHT",       UNSUPPORTED_BOARD }, //  used by City Fighter IV
+	{ "UNL-MALISB",          UNSUPPORTED_BOARD }, //  used by Super Mali Splash Bomb
 	{ "BMC-G-146",           UNSUPPORTED_BOARD }, // multigame mapper
 	{ "BMC-11160",           UNSUPPORTED_BOARD }, // multigame mapper
 // are there dumps of games with these boards?

@@ -65320,7 +65320,7 @@ resulting in tons of glitches? -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" />  <!-- Unif board UNL-MALISB -->
+			<feature name="pcb" value="UNL-MALISB" />
 			<dataarea name="chr" size="32768">
 				<rom name="super mali splash bomb (unl)[u][!].chr" size="32768" crc="0e89e16f" sha1="af54d4d261dd8700f23fdca001719c11eb525736" offset="00000" status="baddump" />
 			</dataarea>
