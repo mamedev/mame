@@ -56,22 +56,22 @@ sns_rom_pokemon_device::sns_rom_pokemon_device(const machine_config &mconfig, co
 }
 
 sns_rom_tekken2_device::sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_TEKKEN2, "SNES Pirate Carts with Protection", tag, owner, clock)
+					: sns_rom_device(mconfig, SNS_LOROM_TEKKEN2, "SNES Tekken 2", tag, owner, clock)
 {
 }
 
 sns_rom_soulblad_device::sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_SOULBLAD, "SNES Pirate Carts with Protection", tag, owner, clock)
+					: sns_rom_device(mconfig, SNS_LOROM_SOULBLAD, "SNES Soul Blade", tag, owner, clock)
 {
 }
 
 sns_rom_banana_device::sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_BANANA, "SNES Pirate Carts with Protection", tag, owner, clock)
+					: sns_rom_device(mconfig, SNS_LOROM_BANANA, "SNES Banana de Pijamas", tag, owner, clock)
 {
 }
 
 sns_rom_bugs_device::sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: sns_rom_device(mconfig, SNS_LOROM_BUGSLIFE, "SNES Pirate Carts with Protection", tag, owner, clock)
+					: sns_rom_device(mconfig, SNS_LOROM_BUGSLIFE, "SNES A Bug's Life", tag, owner, clock)
 {
 }
 
