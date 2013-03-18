@@ -248,6 +248,7 @@ public:
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);
 	DECLARE_DRIVER_INIT(cawingbl);
+	DECLARE_DRIVER_INIT(knightsb);
 	DECLARE_DRIVER_INIT(sf2mdt);
 	DECLARE_DRIVER_INIT(sf2mdta);
 	DECLARE_MACHINE_START(fcrash);

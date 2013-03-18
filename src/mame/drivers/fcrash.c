@@ -168,16 +168,16 @@ WRITE16_MEMBER(cps_state::kodb_layer_w)
 WRITE16_MEMBER(cps_state::knightsb_layer_w)
 {
 	if (offset == 0x05)
-		m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
+		m_cps_a_regs[0x14 / 2] = data; /* scroll 3x */
 	else
 	if (offset == 0x04)
 		m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
 	else
 	if (offset == 0x03)
-		m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+		m_cps_a_regs[0x10 / 2] = data; /* scroll 2x */
 	else
 	if (offset == 0x01)
-		m_cps_a_regs[0x0c / 2] = data + 0xffc2; /* scroll 1x */
+		m_cps_a_regs[0x0c / 2] = data; /* scroll 1x */
 	else
 	if (offset == 0x02)
 	{
@@ -189,7 +189,26 @@ WRITE16_MEMBER(cps_state::knightsb_layer_w)
 		m_cps_a_regs[0x0e / 2] = data; /* scroll 1y - fixes scroll of high scores */
 	else
 	if (offset == 0x06)
+	{
+		switch (data)
+		{
+		case 0x0000:
+		case 0x001f:
+		case 0x00ff:
+			data = 0x12f2;
+			break;
+		case 0x2000:
+			data = 0x06f2;
+			break;
+		case 0xa000:
+			data = 0x24d0;
+			break;
+		default:
+			printf ("Unknown control word = %X\n",data);
+			data = 0x12c0;
+		}
 		m_cps_b_regs[m_layer_enable_reg / 2] = data;
+	}
 	else
 	if (offset == 0x10)
 		m_cps_b_regs[m_layer_mask_reg[1] / 2] = data;
@@ -466,16 +485,16 @@ static ADDRESS_MAP_START( knightsb_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN1")            /* Player input ports */
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN2")//(cps1_in2_r)            /* Player 3 controls */
+	AM_RANGE(0x800004, 0x800005) AM_WRITENOP // writes 0000 here
 	AM_RANGE(0x800006, 0x800007) AM_WRITE(fcrash_soundlatch_w)    /* Sound command */
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)            /* System input ports / Dip Switches */
 	AM_RANGE(0x800030, 0x800037) AM_WRITENOP //AM_WRITE(cps1_coinctrl_w) only writes bit 15
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")  /* CPS-A custom */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")    /* CPS-B custom */
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
-	AM_RANGE(0x880000, 0x880001) AM_WRITENOP //?
+	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_SHARE("cps_a_regs")  /* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_SHARE("cps_b_regs")  /* CPS-B custom */
+	AM_RANGE(0x800180, 0x800181) AM_WRITENOP //AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
+	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // unknown
 	AM_RANGE(0x900000, 0x93ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
 	AM_RANGE(0x980000, 0x98002f) AM_WRITE(knightsb_layer_w)
-	AM_RANGE(0x991000, 0x993fff) AM_WRITENOP // could be bootleg_sprite_ram
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -543,6 +562,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( knightsb_z80map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0xcffe, 0xcfff) AM_WRITENOP // writes lots of data
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("2151", ym2151_device, read, write)
 	AM_RANGE(0xdc00, 0xdc00) AM_READ(soundlatch_byte_r)
@@ -1161,16 +1181,16 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
-	m_layer_enable_reg = 0x20;
+	m_layer_enable_reg = 0x30;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;
 	m_layer_mask_reg[2] = 0x2c;
 	m_layer_mask_reg[3] = 0x2e;
-	m_layer_scroll1x_offset = 0;
-	m_layer_scroll2x_offset = 0;
-	m_layer_scroll3x_offset = 0;
+	m_layer_scroll1x_offset = 0x3e; //text
+	m_layer_scroll2x_offset = 0x3c; //bricks around scores
+	m_layer_scroll3x_offset = 0x40; //hill with sword going in
 	m_sprite_base = 0x1000;
-	m_sprite_list_end_marker = 0xffff;
+	m_sprite_list_end_marker = 0x8000;
 	m_sprite_x_offset = 0;
 }
 
@@ -1343,7 +1363,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_cps1)
+	MCFG_SCREEN_UPDATE_DRIVER(cps_state, screen_update_fcrash)
 	MCFG_SCREEN_VBLANK_DRIVER(cps_state, screen_eof_cps1)
 
 	MCFG_GFXDECODE(cps1)
@@ -1777,19 +1797,7 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 		rom[i + 6] = tmp;
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c018, 0x70c01f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x708000, 0x708fff, write16_delegate(FUNC(cps_state::sf2mdt_layer_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c000, 0x70c001, "IN1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c008, 0x70c009, "IN2");
-
-	/* bootleg sprite ram */
-	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen  */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x70c106, 0x70c107, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
-
-	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x800030, 0x800031); /* coin lockout doesn't work (unmap it) */
-
-	DRIVER_INIT_CALL(cps1);
+	DRIVER_INIT_CALL(sf2mdta);
 }
 
 DRIVER_INIT_MEMBER(cps_state, sf2mdta)
@@ -1811,10 +1819,18 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 	DRIVER_INIT_CALL(cps1);
 }
 
+DRIVER_INIT_MEMBER(cps_state, knightsb)
+{
+	/* bootleg sprite ram */
+	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x990000, 0x993fff);
+
+	DRIVER_INIT_CALL(cps1);
+}
+
 
 GAME( 1990, fcrash,    ffight,  fcrash,    fcrash,   cps_state, cps1,     ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", GAME_SUPPORTS_SAVE )
 GAME( 1991, kodb,      kod,     kodb,      kodb,     cps_state, kodb,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 910731  "ETC"
-GAME( 1991, knightsb,  knights, knightsb,  knights,  cps_state, cps1,     ROT0,   "bootleg", "Knights of the Round (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )    // 911127 - based on World version
+GAME( 1991, knightsb,  knights, knightsb,  knights,  cps_state, knightsb, ROT0,   "bootleg", "Knights of the Round (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )    // 911127 - based on World version
 GAME( 1990, cawingbl,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cawingb2,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2mdt,    sf2ce,   sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
