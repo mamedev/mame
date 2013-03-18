@@ -260,7 +260,7 @@ READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
 	if (offset==0x7a4)
-		return 0x0002 << 16;
+		return 0x0001 << 16; // "2" makes OUT count to add by 2.
 	if (offset==0x53c)
 		return 0x0008 << 16;
 	if (offset==0x304)
@@ -276,7 +276,7 @@ WRITE32_MEMBER(deco_mlc_state::stadhr96_prot_146_w)
 	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
 }
 
-READ32_MEMBER( deco_mlc_state::mlc_spriteram_r ) 
+READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 {
 	UINT32 retdata = 0;
 
@@ -284,7 +284,7 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 	{
 		retdata |= 0xffff0000;
 	}
-	
+
 	if (mem_mask & 0x0000ffff)
 	{
 		retdata |= m_mlc_spriteram[offset];
@@ -294,11 +294,11 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 }
 
 
-WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w ) 
+WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 {
 	if (mem_mask & 0xffff0000)
 	{
-		
+
 	}
 
 	if (mem_mask & 0x0000ffff)
