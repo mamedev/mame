@@ -837,8 +837,13 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-193050"/>
 		<info name="alt_title" value="ガブッチョつりがっこう やったね!ぼくはつりめいじん"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7630B" />
+			<feature name="ic1" value="MPR-20458 J53" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74ASJ" />
+			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="1048576">
-				<rom name="gabucho tsuri gakkou yatta ne! boku hatsuri meijn (japan).bin" size="1048576" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-20458 j53.ic1" size="1048576" crc="33a61b64" sha1="9f0a87a6baf060323b1f7b08fa905ce76cf5c1c9" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1676,6 +1681,12 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6007"/>
 		<info name="alt_title" value="ミーミとタータのワイワイおえかきどうぶつえん"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6588B" />
+			<feature name="ic1" value="OPR-16285" />
+			<feature name="ic2" value="KM62256BLG" />
+			<feature name="ic3" value="337-26B" />
+			<feature name="ic4" value="HC00" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="524288">
 				<rom name="opr-16285.ic1" size="524288" crc="070cb5d6" sha1="b056919eed642d3838c4d9cd71750bce9bf3a999" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1856,8 +1867,13 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="200008xx"/>
 		<info name="alt_title" value="おしゃれピコ すてきにへんしん! るなちゃんのおしゃれヘアサロン"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0025-RV" />
+			<feature name="ic2" value="HC32" />
+			<feature name="ic3" value="HC74" />
+			<feature name="ic4" value="HC125" />
 			<dataarea name="rom" size="2097152">
-				<rom name="oshare pico suteki ni henshin! naruchan no oshare hair salon (japan).bin" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
+				<rom name="9k0-0025-rv.ic1" size="2097152" crc="376cfa05" sha1="ff7b03a62620ea668ab41fe731af07b78db984fc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2270,8 +2286,11 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="200210xx"/>
 		<info name="alt_title" value="しまじろうと ゆめのくにへ だいぼうけん!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="??" />
+			<feature name="u1" value="EPOXY BLOCK U1" />
+			<feature name="u2" value="74HC00D" />
 			<dataarea name="rom" size="4194304">
-				<rom name="shimajirou to yume no kunihe daibouken! (japan).bin" size="4194304" crc="00239298" sha1="606f6794cc18120684eff36f06e29a3d2f373b93" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.u1" size="4194304" crc="00239298" sha1="606f6794cc18120684eff36f06e29a3d2f373b93" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
