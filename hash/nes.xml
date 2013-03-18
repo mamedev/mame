@@ -5676,7 +5676,7 @@
 		<description>Castlevania II - Simon's Quest (Euro)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
-		<info name="serial" value="NES-QU-EEC"/>
+		<info name="serial" value="NES-QU-(EEC/FRG)"/>
 		<info name="release" value="19900427"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
@@ -11920,6 +11920,23 @@
 		</part>
 	</software>
 
+	<software name="ffant2">
+		<description>Final Fantasy II (USA, Prototype)</description>
+		<year>1991</year>
+		<publisher>Square</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-SNWEPROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="262144">
+				<rom name="ff2 nes for ces v12.5.ic1" size="131072" crc="bdf606c3" sha1="49b6504afd4c54ac91b330e16b00bf1ae18f32f0" offset="0x00000" />
+				<rom name="ff2 nes for ces v12.5.ic2" size="131072" crc="f12c6cbb" sha1="4c12ae11228245ddf95023ed80a02243b160bd4c" offset="0x20000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ffant2j" cloneof="ffant2">
 		<description>Final Fantasy II (Jpn)</description>
 		<year>1988</year>
@@ -12281,6 +12298,25 @@
 		</part>
 	</software>
 
+	<software name="flipull">
+		<description>Flipull - An Exciting Cube Game (Jpn, v1.1)</description>
+		<year>1989</year>
+		<publisher>Taito</publisher>
+		<info name="serial" value="TFC-FP-3900 (29)"/>
+		<info name="release" value="19891215"/>
+		<info name="alt_title" value="フリップル"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="TAITO-CNROM" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="c14-02 w31" size="32768" crc="3de19b75" sha1="5724f859e8f8500fcd7b9d040af8011ae6227439" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="c14-01 w30" size="32768" crc="e90ed472" sha1="60ec7aefa78f1ba24540de76e11e1e2da610f8b7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flipull1" cloneof="flipull">
 		<description>Flipull - An Exciting Cube Game (Jpn)</description>
 		<year>1989</year>
@@ -12295,7 +12331,7 @@
 				<rom name="c14-02" size="32768" crc="5bd69e1d" sha1="ccf4ff1725ee08b83e6a71cb42f7fb8403b1d4c4" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="c14-01" size="32768" crc="e90ed472" sha1="60ec7aefa78f1ba24540de76e11e1e2da610f8b7" offset="00000" />
+				<rom name="c14-01 w30" size="32768" crc="e90ed472" sha1="60ec7aefa78f1ba24540de76e11e1e2da610f8b7" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15727,7 +15763,7 @@
 		<description>Hook (Euro)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
-		<info name="serial" value="NES-7Q-(NOE/UKV)"/>
+		<info name="serial" value="NES-7Q-(NOE/UKV/ESP)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
@@ -16099,6 +16135,23 @@
 			</dataarea>
 			<dataarea name="chr" size="8192">
 				<rom name="0.chr" size="8192" crc="a0ac7cfc" sha1="18825d6cc757a5e75aded9cedd531cd8e331e407" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyperolg" cloneof="hyperol">
+		<description>Hyper Olympic (Jpn, Gentaiban!)</description>
+		<year>1985</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="KON-RC800LE"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="KONAMI-74*139/74" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000"  />
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="800jxc" size="16384" crc="ffc4eede" sha1="de7044078b3a11dac6dccfb43da8e50c5c880149" offset="00000"  />
 			</dataarea>
 		</part>
 	</software>
@@ -23113,6 +23166,25 @@
 		</part>
 	</software>
 
+	<software name="miniputt">
+		<description>Mini Putt (Jpn)</description>
+		<year>1991</year>
+		<publisher>A-Wave</publisher>
+		<info name="serial" value="WAV-Q6 (11)"/>
+		<info name="release" value="19910215"/>
+		<info name="alt_title" value="ミニパット"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="131072">
+				<rom name="wav-q6-0 prg" size="131072" crc="06e97649" sha1="2e37e0bf702d1c0f2a8bfabc2360e28955b7f750" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="wav-q6-0 chr" size="131072" crc="2922fbc4" sha1="2442be2aa68f12e5b68ed9ed27903fbc4277a22c" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minnatab" supported="no">
 		<description>Minna no Taabou no Nakayoshi Daisakusen (Jpn)</description>
 		<year>1991</year>
@@ -26018,6 +26090,25 @@
 		</part>
 	</software>
 
+	<software name="pachikn5">
+		<description>Pachio-kun Jr. (Jpn)</description>
+		<year>1993</year>
+		<publisher>Coconuts Japan</publisher>
+		<info name="serial" value="CDS-PE"/>
+		<info name="release" value="19930611"/>
+		<info name="alt_title" value="パチ夫くん5 Jrの挑戦 ~ Pachio-kun 5 - Jr. no Chousen (Box)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-TKROM" />
+			<feature name="mmc3_type" value="MMC3C" />
+			<dataarea name="prg" size="262144">
+				<rom name="cds-pe-0 prg" size="262144" crc="9525fa38" sha1="20b5b83fac09a42bbc7e2b5f3deb9835fa14b650" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="cds-pe-0 chr" size="131072" crc="45fd2145" sha1="a1fbb3f96e68ab4d98f2737d63204aee91612ccb" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="palamedsj" cloneof="palameds">
 		<description>Palamedes (Jpn)</description>
 		<year>1990</year>
@@ -28480,7 +28571,7 @@
 		<description>Road Fighter (Euro)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
-		<info name="serial" value="NES-39 (NOE/SCN/AUS)"/>
+		<info name="serial" value="NES-39 (NOE/SCN/AUS/ESP)"/>
 		<info name="release" value="19920618"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-128" />
@@ -29481,7 +29572,7 @@
 		<description>Rygar (Euro)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
-		<info name="serial" value="NES-RY (EEC/ESP)"/>
+		<info name="serial" value="NES-RY-(EEC/ESP/FRG)"/>
 		<info name="release" value="19900330"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-UNROM" />
@@ -34000,6 +34091,25 @@
 		</part>
 	</software>
 
+	<software name="supermog">
+		<description>Super Mogura Tataki!! Pokkun Moguraa (Jpn)</description>
+		<year>1989</year>
+		<publisher>IGS</publisher>
+		<info name="serial" value="IGS-X1"/>
+		<info name="release" value="19891208"/>
+		<info name="alt_title" value="ぽっくんモグラー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-CNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="0.prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="0.chr" size="32768" crc="909883f5" sha1="21b93dce366ce5568bc79bbb781d98f857b927d7" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smomo">
 		<description>Super Momotarou Dentetsu (Jpn)</description>
 		<year>1992</year>
@@ -34372,6 +34482,22 @@
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-sn-0 chr" size="131072" crc="561471b6" sha1="fb7218ba40ff8d6dec1582fea83202240465b91c" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermnp">
+		<description>Superman (USA, Sunsoft Prototype)</description>
+		<year>19??</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TKEPROM" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="131072">
+				<rom name="superman nes 2-6 prg" size="131072" crc="ef9d9c0c" sha1="e0b639fd91c736863eace7782cc9b0bc47427a34" offset="00000" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="superman nes 2-6 chr" size="131072" crc="7a00d195" sha1="c3f9bbd119d9440405107db7a40847d43632771b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -35469,7 +35595,7 @@
 		<description>Tecmo World Wrestling (Euro)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
-		<info name="serial" value="NES-PZ (EEC/SCN/ESP)"/>
+		<info name="serial" value="NES-PZ-(EEC/SCN/ESP/FRG)"/>
 		<info name="release" value="19901123"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SLROM" /> <!-- also found with NES-SLRROM pcb -->
@@ -37971,6 +38097,25 @@
 		</part>
 	</software>
 
+	<software name="untouchj" cloneof="untouch">
+		<description>The Untouchables (Jpn)</description>
+		<year>1991</year>
+		<publisher>Altron</publisher>
+		<info name="serial" value="ALT-U6"/>
+		<info name="release" value="19911220"/>
+		<info name="alt_title" value="アンタッチャブル"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-SLROM" />
+			<feature name="mmc1_type" value="MMC1B3" />
+			<dataarea name="prg" size="131072">
+				<rom name="alt-u6-0 prg" size="131072" crc="903e36ad" sha1="42e5b6bad7c433c95ffef94a144b6a4ed4f47ab1" offset="00000"  />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="alt-u6-0 chr" size="131072" crc="f52ec2ad" sha1="9e179507ac878e7362ccd03d369488105b8c1f40" offset="00000"  />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="urbnchmp">
 		<description>Urban Champion (World)</description>
 		<year>1984</year>
@@ -40204,7 +40349,7 @@
 		<description>Zelda II - The Adventure of Link (Euro, Rev. B)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NES-AL (EEC/NOE)"/>
+		<info name="serial" value="NES-AL (EEC/NOE/ESP)"/>
 		<info name="release" value="19880926"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-SKROM" />
@@ -40336,6 +40481,25 @@
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoidschu">
+		<description>Zoids - Chuuou Tairiku no Tatakai (Jpn, Rev. A)</description>
+		<year>1987</year>
+		<publisher>Toemiland</publisher>
+		<info name="serial" value="TFS-ZD"/>
+		<info name="release" value="19870905"/>
+		<info name="alt_title" value="ゾイド 中央大陸の戦い"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HVC-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="tfs-zd-1 prg" size="131072" crc="e0b6b7bb" sha1="22bab863746f0903ac3b8187ffed288ff7ceeae3" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -42759,21 +42923,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ffant2">
-		<description>Final Fantasy II (USA, Prototype)</description>
-		<year>1991</year>
-		<publisher>Square</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="prg" size="262144">
-				<rom name="final fantasy ii (usa) (proto).prg" size="262144" crc="93a2eefb" sha1="dc358d47102a7c4e2ace49121b9df3e4c771081a" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="flintj" cloneof="flint">
 		<description>The Flintstones - The Rescue of Dino &amp; Hoppy (Jpn)</description>
 		<year>1992</year>
@@ -42788,25 +42937,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="flintstones, the - the rescue of dino &amp; hoppy (japan).prg" size="131072" crc="547e6cc1" sha1="0609d3fa46bde957636afe28645422a52231f676" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flipull">
-		<description>Flipull - An Exciting Cube Game (Jpn, v1.1)</description>
-		<year>1989</year>
-		<publisher>Taito</publisher>
-		<info name="serial" value="TFC-FP-3900 (29)"/>
-		<info name="release" value="19891215"/>
-		<info name="alt_title" value="フリップル"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="TAITO-CNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="flipull - an exciting cube game (japan) (ver1.1).chr" size="32768" crc="e90ed472" sha1="60ec7aefa78f1ba24540de76e11e1e2da610f8b7" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="flipull - an exciting cube game (japan) (ver1.1).prg" size="32768" crc="3de19b75" sha1="5724f859e8f8500fcd7b9d040af8011ae6227439" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -43325,22 +43455,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="hyaku no sekai no monogatari - the tales on a watery wilderness (japan).prg" size="131072" crc="60d88631" sha1="9873d846631998475fc5b55b54d142789c5a123d" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hyperolg" cloneof="hyperol">
-		<description>Hyper Olympic (Jpn, Genteiban!)</description>
-		<year>1985</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="KONAMI-74*139/74" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="16384">
-				<rom name="hyper olympic (japan) (genteiban!).chr" size="16384" crc="ffc4eede" sha1="de7044078b3a11dac6dccfb43da8e50c5c880149" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="hyper olympic (japan) (genteiban!).prg" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -44433,24 +44547,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="miniputt">
-		<description>Mini Putt (Jpn)</description>
-		<year>1991</year>
-		<publisher>A-Wave</publisher>
-		<info name="serial" value="WAV-Q6 (11)"/>
-		<info name="release" value="19910215"/>
-		<info name="alt_title" value="ミニパット"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="mini putt (japan).chr" size="131072" crc="2922fbc4" sha1="2442be2aa68f12e5b68ed9ed27903fbc4277a22c" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="mini putt (japan).prg" size="131072" crc="06e97649" sha1="2e37e0bf702d1c0f2a8bfabc2360e28955b7f750" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="miraclepg" cloneof="miraclep" supported="no">
 		<description>The Miracle Piano Teaching System (Ger)</description>
 		<year>1991</year>
@@ -45005,24 +45101,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="32768">
 				<rom name="pac-man (europe).prg" size="16384" crc="6fa1193b" sha1="8fef2bdce0c0be2ece67b26587aa22097ba3c9cf" offset="00000" status="baddump" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pachikn5">
-		<description>Pachio-kun 5 - Pachio-kun Jr. (Jpn)</description>
-		<year>1993</year>
-		<publisher>Coconuts Japan</publisher>
-		<info name="serial" value="CDS-PE"/>
-		<info name="release" value="19930611"/>
-		<info name="alt_title" value="パチ夫くん5 Jrの挑戦"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="pachio-kun 5 (japan).chr" size="131072" crc="45fd2145" sha1="a1fbb3f96e68ab4d98f2737d63204aee91612ccb" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="262144">
-				<rom name="pachio-kun 5 (japan).prg" size="262144" crc="9525fa38" sha1="20b5b83fac09a42bbc7e2b5f3deb9835fa14b650" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46134,25 +46212,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="supermog">
-		<description>Super Mogura Tataki!! - Pokkun Mogurar (Jpn)</description>
-		<year>1989</year>
-		<publisher>IGS</publisher>
-		<info name="serial" value="IGS-X1"/>
-		<info name="release" value="19891208"/>
-		<info name="alt_title" value="ぽっくんモグラー"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
-			<feature name="mirroring" value="horizontal" />
-			<dataarea name="chr" size="32768">
-				<rom name="super mogura tataki!! - pokkun mogurar (japan).chr" size="32768" crc="909883f5" sha1="21b93dce366ce5568bc79bbb781d98f857b927d7" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="super mogura tataki!! - pokkun mogurar (japan).prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="spinbp" cloneof="spinb">
 		<description>Super Pinball (Jpn, Prototype)</description>
 		<year>1988</year>
@@ -46230,21 +46289,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supermnp">
-		<description>Superman (USA, Sunsoft Prototype)</description>
-		<year>19??</year>
-		<publisher>Sunsoft</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-TLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="superman (sunsoft) (usa) (proto).chr" size="131072" crc="7a00d195" sha1="c3f9bbd119d9440405107db7a40847d43632771b" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="superman (sunsoft) (usa) (proto).prg" size="131072" crc="ef9d9c0c" sha1="e0b639fd91c736863eace7782cc9b0bc47427a34" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -46838,24 +46882,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="untouchj" cloneof="untouch">
-		<description>The Untouchables (Jpn)</description>
-		<year>1991</year>
-		<publisher>Altron</publisher>
-		<info name="serial" value="ALT-U6"/>
-		<info name="release" value="19911220"/>
-		<info name="alt_title" value="アンタッチャブル"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-SLROM" />
-			<dataarea name="chr" size="131072">
-				<rom name="untouchables, the (japan).chr" size="131072" crc="f52ec2ad" sha1="9e179507ac878e7362ccd03d369488105b8c1f40" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="untouchables, the (japan).prg" size="131072" crc="903e36ad" sha1="42e5b6bad7c433c95ffef94a144b6a4ed4f47ab1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="uruseiyap" cloneof="uruseiya">
 		<description>Urusei Yatsura - Lum no Wedding Bell (Jpn, Prototype)</description>
 		<year>1986</year>
@@ -47090,25 +47116,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="zenbei!! pro basket (japan).prg" size="131072" crc="e5d49424" sha1="e1da11b6d0cc2abaf4aa62db0409a4eb3b4176d6" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoidschu">
-		<description>Zoids - Chuuou Tairiku no Tatakai (Jpn, Rev. A)</description>
-		<year>1987</year>
-		<publisher>Toemiland</publisher>
-		<info name="serial" value="TFS-ZD"/>
-		<info name="release" value="19870905"/>
-		<info name="alt_title" value="ゾイド 中央大陸の戦い"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="HVC-UNROM" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="zoids - chuuou tairiku no tatakai (jpn, rev. a).prg" size="131072" crc="e0b6b7bb" sha1="22bab863746f0903ac3b8187ffed288ff7ceeae3" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
