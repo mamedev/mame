@@ -196,10 +196,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 //  logerror("irqw %04x %04x (%d)\n", offset * 4, data&0xffff, scanline);
 }
 
-READ32_MEMBER(deco_mlc_state::mlc_spriteram_r)
-{
-	return m_spriteram[offset]&0xffff;
-}
+
 
 READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 {
@@ -238,6 +235,37 @@ WRITE32_MEMBER(deco_mlc_state::stadhr96_prot_146_w)
 	printf("%08x:  Write prot %04x %08x\n", space.device().safe_pc(), offset, data);
 }
 
+READ32_MEMBER( deco_mlc_state::mlc_spriteram_r ) 
+{
+	UINT32 retdata = 0;
+
+	if (mem_mask & 0xffff0000)
+	{
+		retdata |= 0xffff0000;
+	}
+	
+	if (mem_mask & 0x0000ffff)
+	{
+		retdata |= m_mlc_spriteram[offset];
+	}
+
+	return retdata;
+}
+
+
+WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w ) 
+{
+	if (mem_mask & 0xffff0000)
+	{
+		
+	}
+
+	if (mem_mask & 0x0000ffff)
+	{
+		data &=0x0000ffff;
+		COMBINE_DATA(&m_mlc_spriteram[offset]);
+	}
+}
 /******************************************************************************/
 
 static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
@@ -249,8 +277,8 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_SHARE("spriteram") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_SHARE("mlc_vram") AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( mlc_spriteram_r, mlc_spriteram_w ) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("mlc_vram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r) AM_MIRROR(0xff000000)

@@ -23,7 +23,15 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 		m_colour_mask=0x1f;
 
 //  temp_bitmap = auto_bitmap_rgb32_alloc( machine(), 512, 512 );
-	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT32, 0x3000/4);
+	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
+	m_mlc_spriteram_spare = auto_alloc_array(machine(), UINT16, 0x3000/2);
+	m_mlc_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
+
+
+	save_pointer(NAME(m_mlc_spriteram), 0x3000/2);
+	save_pointer(NAME(m_mlc_spriteram_spare), 0x3000/2);
+	save_pointer(NAME(m_mlc_buffered_spriteram), 0x3000/2);
+
 }
 
 
@@ -144,7 +152,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 	int clipper=0;
 	rectangle user_clip;
-	UINT32* mlc_spriteram=m_mlc_buffered_spriteram; // spriteram32
+	UINT16* mlc_spriteram=m_mlc_buffered_spriteram; // spriteram32
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
@@ -167,8 +175,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		            0x1000 - If set combine this 4bpp sprite & next one, into 8bpp sprite
 		            0x0800 - This is set ingame on Stadium Hero 96, on graphics which otherwise obscure the playfield?
 		            0x0400 - Use raster IRQ lookup table when drawing object
-		            0x0300 - Selects clipping window to use
-		            0x00ff - Colour/alpha shadow enable
+		            0x0300 - Selects clipping window to use - and upper bits of raster select (stadhr96)
+					0x0080 - seems to be both the lower bit of the raster select (stadhr96) AND the upper bit of colour / alpha (avngrgs?) - might depend on other bits?
+		            0x007f - Colour/alpha shadow enable
 		    Word 2: 0x07ff - Y position
 		    Word 3: 0x07ff - X position
 		    Word 4: 0x03ff - X scale
@@ -202,6 +211,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		fx = mlc_spriteram[offs+1]&0x8000;
 		fy = mlc_spriteram[offs+1]&0x4000;
 		color = mlc_spriteram[offs+1]&0xff;
+
+		int raster_select = (mlc_spriteram[offs+1]&0x0180)>>7;
+
 
 		// there are 3 different sets of raster values, must be a way to selects
 		// between them? furthermore avengrgs doesn't even enable this
@@ -289,8 +301,8 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			yoffs=index_ptr8[0]&0xff;
 			xoffs=index_ptr8[2]&0xff;
 
-			fy1=(index_ptr8[1]&0xf0)>>4;
-			fx1=(index_ptr8[3]&0xf0)>>4;
+			fy1=(index_ptr8[1]&0x10)>>4;
+			fx1=(index_ptr8[3]&0x10)>>4;
 
 			tileFormat=index_ptr8[4]&0x80;
 
@@ -329,12 +341,12 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			yoffs=index_ptr[0]&0xff;
 			xoffs=index_ptr[1]&0xff;
 
-			fy1=(index_ptr[0]&0xf000)>>12;
-			fx1=(index_ptr[1]&0xf000)>>12;
+			fy1=(index_ptr[0]&0x1000)>>12;
+			fx1=(index_ptr[1]&0x1000)>>12;
 		}
 
-		if(fx1&1) fx^=0x8000;
-		if(fy1&1) fy^=0x4000;
+		if(fx1) fx^=0x8000;
+		if(fy1) fy^=0x4000;
 
 		int extra_x_scale = 0x100;
 
@@ -344,23 +356,23 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		//  (although as previously noted, it isn't writing valid per-scanline values either)
 		if (rasterMode)
 		{
-				// use of these is a bit weird.
-				// -ZZZ -YYY   ---- -xxx   -yyy -zzz
+				// use of these is a bit weird.  (it's probably just 16-bit .. like spriteram so the upper dupes are ignored?)
+				// -ZZZ -yyy   ---- -xxx   -YYY -zzz
 
 				// xxx = x offset?
 				// yyy = y offset?
 				// zzz = xzoom (confirmed? stadium hero)
 				//  0x100 = no zoom
 				//
-				// XXX = duplicate bits of xxx?
+				// YYY = duplicate bits of yyy?
 				// ZZZ = (sometimes) duplicate bits of zzz
 
-			if ((clipper==0x0) || (clipper==0x2))
+			if (raster_select==1 || raster_select==2 || raster_select==3)
 			{
 			
 				int irq_base_reg; /* 6, 9, 12  are possible */
-				if (clipper== 0) irq_base_reg = 6;  	// OK upper screen.. left?
-				else if (clipper== 2) irq_base_reg = 9; // OK upper screen.. main / center
+				if (raster_select== 1) irq_base_reg = 6;  	// OK upper screen.. left?
+				else if (raster_select== 2) irq_base_reg = 9; // OK upper screen.. main / center
 				else irq_base_reg = 12;
 
 				int extra_y_off = m_irq_ram[irq_base_reg+0] & 0x7ff;
@@ -374,13 +386,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 				x += extra_x_off;
 				y += extra_y_off;
 			}
-			else if (clipper==0x1)
+			else if (raster_select==0x0)
 			{
-				// right? 
-			}
-			else if (clipper==0x3)
-			{
-				// bottom?
+				// possibly disabled?
 			}
 
 		}
@@ -537,7 +545,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 		lookup table.  Without buffering incorrect one frame glitches are seen
 		in several places, especially in Hoops.
 		*/
-		memcpy(m_mlc_buffered_spriteram, m_spriteram, 0x3000);
+		memcpy(m_mlc_buffered_spriteram, m_mlc_spriteram, 0x3000/2);
 	}
 }
 
