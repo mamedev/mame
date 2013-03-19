@@ -1219,6 +1219,27 @@ ROM_START( pc_drmro )   /* Dr Mario */
 	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1b26e58c) SHA1(bd2d81d3cc54966ef154b3487d43ecbc316d6d22) )
 ROM_END
 
+ROM_START( pc_virus )   /* Virus */
+	BIOS_CPU
+	ROM_LOAD( "u2",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
+	BIOS_GFX
+
+	ROM_REGION( 0x30000, "cart", 0 )
+	ROM_LOAD( "virus 3-12-90.u4",  0x10000, 0x08000, CRC(a5239a77) SHA1(f1e79906bcbee4e0c62036d6ba95385b95daa53f) )    /* banked */
+	ROM_RELOAD(         0x18000, 0x08000 )
+	ROM_RELOAD(         0x20000, 0x08000 )
+	ROM_RELOAD(         0x28000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
+	ROM_LOAD( "virus 3-12-90.u1",  0x00000, 0x08000, CRC(d233c2ae) SHA1(0de301894edfc50b26b6e4cf3697a15065035c5e) )
+	ROM_RELOAD(         0x08000, 0x08000 )
+	ROM_RELOAD(         0x10000, 0x08000 )
+	ROM_RELOAD(         0x18000, 0x08000 )
+
+	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
+	ROM_LOAD( "security.u6", 0x00000, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+ROM_END
+
 ROM_START( pc_ftqst )   /* Fester's Quest */
 	BIOS_CPU
 	ROM_LOAD( "eq-u2",   0x0c000, 0x2000, CRC(85326040) SHA1(866bd15e77d911147b191c13d062cef7ae4dcf62) ) /* extra bios code for this game */
@@ -1610,6 +1631,21 @@ GAME( 1986, playch10, 0, playch10, playch10, playch10_state, playch10, ROT0, "Ni
 
 /******************************************************************************/
 
+
+DRIVER_INIT_MEMBER(playch10_state,virus)
+{
+	UINT8 *ROM = memregion("rp5h01")->base();
+	UINT32 len = memregion("rp5h01")->bytes();
+	for (int i = 0; i < len; i++)
+	{
+		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i] ^= 0xff;
+	}
+
+	/* common init */
+	DRIVER_INIT_CALL(pcfboard);
+}
+
 /*     YEAR  NAME      PARENT    BIOS      MACHINE   INPUT     INIT      MONITOR  */
 
 /* Standard Games */
@@ -1662,6 +1698,7 @@ GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, pcfboard, RO
 GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
 GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS)
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
+GAME( 1990, pc_virus, playch10, playch10, playch10, playch10_state, virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )
 
