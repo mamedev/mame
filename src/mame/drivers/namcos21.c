@@ -1949,8 +1949,59 @@ ROM_END
 
 ROM_START( starblad )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
-	ROM_LOAD16_BYTE( "st1-mp-u.bin", 0x000000, 0x80000, CRC(483a311c) SHA1(dd9416b8d4b0f8b361630e312eac71c113064eae) )
-	ROM_LOAD16_BYTE( "st1-mp-l.bin", 0x000001, 0x80000, CRC(0a4dd661) SHA1(fc2b71a255a8613693c4d1c79ddd57a6d396165a) )
+	ROM_LOAD16_BYTE( "st2_mpu.mpru", 0x000000, 0x80000, CRC(35bc9e4a) SHA1(03401fb846c1b2aee775071a554654e49fe5c47c) )
+	ROM_LOAD16_BYTE( "st2_mpl.mprl", 0x000001, 0x80000, CRC(193e641b) SHA1(fed803167c5b0bba5b8381c26c909b7380d57efd) )
+
+	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
+	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
+	ROM_LOAD16_BYTE( "st1-sp-l.bin", 0x000001, 0x40000, CRC(acbe39c7) SHA1(ca48b7ea619b1caaf590eed33001826ce7ef36d8) )
+
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound */
+	ROM_LOAD( "st1-snd0.bin", 0x00c000, 0x004000, CRC(c0e934a3) SHA1(678ed6705c6f494d7ecb801a4ef1b123b80979a5) )
+	ROM_CONTINUE(             0x010000, 0x01c000 )
+	ROM_RELOAD(               0x010000, 0x020000 )
+
+	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
+	ROM_LOAD( "sys2mcpu.bin", 0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
+	ROM_LOAD( "sys2c65c.bin", 0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x20000, "dspmaster", 0 ) /* Master DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+	ROM_REGION( 0x20000, "dspslave", 0 ) /* Slave DSP */
+	ROM_LOAD( "c67.bin", 0, 0x2000, CRC(6bd8988e) SHA1(c9ec18d5f88d53976b94444eedc64d5568155958) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "st1-obj0.bin", 0x000000, 0x80000, CRC(5d42c71e) SHA1(f1aa2bb31bbbcdcac8e94334b1c78238cac1a0e7) )
+	ROM_LOAD( "st1-obj1.bin", 0x080000, 0x80000, CRC(c98011ad) SHA1(bc34c21428e0ef5887051c0eb0fdef5397823a82) )
+	ROM_LOAD( "st1-obj2.bin", 0x100000, 0x80000, CRC(6cf5b608) SHA1(c8537fbe97677c4c8a365b1cf86c4645db7a7d6b) )
+	ROM_LOAD( "st1-obj3.bin", 0x180000, 0x80000, CRC(cdc195bb) SHA1(91443917a6982c286b6f15381d441d061aefb138) )
+
+	ROM_REGION16_BE( 0x40000, "user1", 0 )
+	ROM_LOAD16_BYTE( "st1-data-u.bin", 0x000000, 0x20000, CRC(2433e911) SHA1(95f5f00d3bacda4996e055a443311fb9f9a5fe2f) )
+	ROM_LOAD16_BYTE( "st1-data-l.bin", 0x000001, 0x20000, CRC(4a2cc252) SHA1(d9da9992bac878f8a1f5e84cc3c6d457b4705e8f) )
+
+	ROM_REGION32_BE( 0x400000, "user2", ROMREGION_ERASE ) /* 24bit signed point data */
+	ROM_LOAD32_BYTE( "st1-pt0-h.bin", 0x000001, 0x80000, CRC(84eb355f) SHA1(89a248b8be2e0afcee29ba4c4c9cca65d5fb246a) )
+	ROM_LOAD32_BYTE( "st1-pt0-u.bin", 0x000002, 0x80000, CRC(1956cd0a) SHA1(7d21b3a59f742694de472c545a1f30c3d92e3390) )
+	ROM_LOAD32_BYTE( "st1-pt0-l.bin", 0x000003, 0x80000, CRC(ff577049) SHA1(1e1595174094e88d5788753d05ce296c1f7eca75) )
+	ROM_LOAD32_BYTE( "st1-pt1-h.bin", 0x200001, 0x80000, CRC(96b1bd7d) SHA1(55da7896dda2aa4c35501a55c8605a065b02aa17) )
+	ROM_LOAD32_BYTE( "st1-pt1-u.bin", 0x200002, 0x80000, CRC(ecf21047) SHA1(ddb13f5a2e7d192f0662fa420b49f89e1e991e66) )
+	ROM_LOAD32_BYTE( "st1-pt1-l.bin", 0x200003, 0x80000, CRC(01cb0407) SHA1(4b58860bbc353de8b4b8e83d12b919d9386846e8) )
+
+	ROM_REGION( 0x200000, "c140", 0 ) /* sound samples */
+	ROM_LOAD("st1-voi0.bin", 0x000000, 0x80000,CRC(5b3d43a9) SHA1(cdc04f19dc91dca9fa88ba0c2fca72aa195a3694) )
+	ROM_LOAD("st1-voi1.bin", 0x080000, 0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
+	ROM_LOAD("st1-voi2.bin", 0x100000, 0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
+	ROM_LOAD("st1-voi3.bin", 0x180000, 0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
+
+	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
+	// starblad needs default NVRAM to be all 0
+ROM_END
+
+ROM_START( starbladj )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */
+	ROM_LOAD16_BYTE( "st1_mpu.mpru", 0x000000, 0x80000, CRC(483a311c) SHA1(dd9416b8d4b0f8b361630e312eac71c113064eae) )
+	ROM_LOAD16_BYTE( "st1_mpl.mprl", 0x000001, 0x80000, CRC(0a4dd661) SHA1(fc2b71a255a8613693c4d1c79ddd57a6d396165a) )
 
 	ROM_REGION( 0x080000, "slave", 0 ) /* Slave */
 	ROM_LOAD16_BYTE( "st1-sp-u.bin", 0x000000, 0x40000, CRC(9f9a55db) SHA1(72bf5d6908cc57cc490fa2292b4993d796b2974d) )
@@ -2481,14 +2532,15 @@ static INPUT_PORTS_START( aircomb )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-/*    YEAR, NAME,     PARENT,  MACHINE,  INPUT,      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
-GAME( 1988, winrun,   0,       winrun,   winrun, namcos21_state,     winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp, 0,       winrun,   winrungp, namcos21_state,   winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91, 0,       winrun,   winrungp, namcos21_state,   winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, driveyes, 0,       driveyes, winrungp, namcos21_state,   driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, solvalou, 0,       namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
-GAME( 1991, starblad, 0,       namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircomb,  0,       namcos21, aircomb, namcos21_state,    aircomb,  ROT0,    "Namco", "Air Combat (US)",                       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1992, aircombj, aircomb, namcos21, aircomb, namcos21_state,    aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,  0,       namcos21, cybsled, namcos21_state,    cybsled,  ROT0,    "Namco", "Cyber Sled (US)",                       GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsledj, cybsled, namcos21, cybsled, namcos21_state,    cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
+/*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,                      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
+GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes,  0,        driveyes, winrungp,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (US)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    GAME_IMPERFECT_GRAPHICS )
