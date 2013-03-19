@@ -10412,7 +10412,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="hyper dunk - the playoff edition (jpn) (beta).in" size="2097152" crc="db124bbb" sha1="87a2d58614fab2799e2a4456a08436fc7acc745b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="hyper dunk - the playoff edition (jpn) (beta).bin" size="2097152" crc="db124bbb" sha1="87a2d58614fab2799e2a4456a08436fc7acc745b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
