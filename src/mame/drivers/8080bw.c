@@ -3465,10 +3465,10 @@ ROM_END
 
 ROM_START( invrvngea ) // Space Invaders hw + sound daughterboard
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h.ic36",      0x0000, 0x0800, CRC(0914b279) SHA1(91e465f56ed0dc8c68e109e33ec9d2bda2616a21) )
-	ROM_LOAD( "g.ic35",      0x0800, 0x0800, CRC(84d9497c) SHA1(fb1b5fc49365fbf89e5418789e64efd186cdeecf) )
-	ROM_LOAD( "f.ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
-	ROM_LOAD( "e.ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
+	ROM_LOAD( "h(__invrvngea).ic36",      0x0000, 0x0800, CRC(0914b279) SHA1(91e465f56ed0dc8c68e109e33ec9d2bda2616a21) )
+	ROM_LOAD( "g(__invrvngea).ic35",      0x0800, 0x0800, CRC(84d9497c) SHA1(fb1b5fc49365fbf89e5418789e64efd186cdeecf) )
+	ROM_LOAD( "f(__invrvngea).ic34",      0x1000, 0x0800, CRC(78d34d97) SHA1(a50c19df12e75c644b014d74a463094e249db207) )
+	ROM_LOAD( "e(__invrvngea).ic33",      0x1800, 0x0800, CRC(30c71887) SHA1(17c9e905eb327435d52b6d51842f7f42a5e6ab7d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
 	ROM_LOAD( "snd.2c",      0xf000, 0x0800, CRC(135f3b16) SHA1(d472a6ca32c4a16cc1faf09f4a4876d75cd4ba24) )
@@ -3510,17 +3510,17 @@ ROM_END
 
 ROM_START( invrvngegw ) // single PCB
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ir.5m",       0x0000, 0x0800, CRC(4fe35d1f) SHA1(469d563f88229cf163f8b21dce9e68f75d3d214e) )
-	ROM_LOAD( "ir.5n",       0x0800, 0x0800, CRC(92d0442c) SHA1(1d104fbb225ce1a3a72e47af396a641030d990c2) )
-	ROM_LOAD( "ir.5p",       0x1000, 0x0800, CRC(18d2372d) SHA1(d19b7bd315226ef0a565b296964b221fa4714413) )
-	ROM_LOAD( "ir.5r",       0x1800, 0x0800, CRC(657ddf27) SHA1(957c6bbdb2133d4697d3302b2358979d1451b6d5) )
+	ROM_LOAD( "ir(__invrvngegw).5m",       0x0000, 0x0800, CRC(4fe35d1f) SHA1(469d563f88229cf163f8b21dce9e68f75d3d214e) )
+	ROM_LOAD( "ir(__invrvngegw).5n",       0x0800, 0x0800, CRC(92d0442c) SHA1(1d104fbb225ce1a3a72e47af396a641030d990c2) )
+	ROM_LOAD( "ir(__invrvngegw).5p",       0x1000, 0x0800, CRC(18d2372d) SHA1(d19b7bd315226ef0a565b296964b221fa4714413) )
+	ROM_LOAD( "ir(__invrvngegw).5r",       0x1800, 0x0800, CRC(657ddf27) SHA1(957c6bbdb2133d4697d3302b2358979d1451b6d5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // encrypted
-	ROM_LOAD( "ir.1t",       0xf000, 0x0800, CRC(64e9e81e) SHA1(3390f8bab219cf134b33ae21c473da0873e01929) ) // bad?
+	ROM_LOAD( "ir(__invrvngegw).1t",       0xf000, 0x0800, CRC(64e9e81e) SHA1(3390f8bab219cf134b33ae21c473da0873e01929) ) // bad?
 	ROM_LOAD( "ir.1u",       0xf800, 0x0800, CRC(152fc85e) SHA1(df207d6e690287a56e4e330deaa5ee40a179f1fc) )
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "ir.3r",       0x0000, 0x0800, CRC(6ce639bf) SHA1(73752f5886dcf8729d9853ddc258770f5c724ca3) )
+	ROM_LOAD( "ir(__invrvngegw).3r",       0x0000, 0x0800, CRC(6ce639bf) SHA1(73752f5886dcf8729d9853ddc258770f5c724ca3) )
 ROM_END
 
 
@@ -4027,11 +4027,11 @@ ROM_END
 
 ROM_START( schasera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rt13.bin",     0x0000, 0x0800, CRC(7b0bfeed) SHA1(832fe90430653d03cd0e7ea1b046524a2ca292ea) )
-	ROM_LOAD( "rt15.bin",     0x0800, 0x0800, CRC(825fc8ac) SHA1(176ff0f4d0cd55be30efb184bd5bef62b92d0333) )
-	ROM_LOAD( "rt17.bin",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
-	ROM_LOAD( "rt19.bin",     0x1800, 0x0800, CRC(c0adab87) SHA1(4bb8e4ccfb5eaa052584555bfa03fecf19ab8a29) )
-	ROM_LOAD( "rt21.bin",     0x4000, 0x0800, CRC(a3b31070) SHA1(af0108e1446a2be66cfc00d0b837fa91ab882441) )
+	ROM_LOAD( "rt13(__schasera).bin",     0x0000, 0x0800, CRC(7b0bfeed) SHA1(832fe90430653d03cd0e7ea1b046524a2ca292ea) )
+	ROM_LOAD( "rt15(__schasera).bin",     0x0800, 0x0800, CRC(825fc8ac) SHA1(176ff0f4d0cd55be30efb184bd5bef62b92d0333) )
+	ROM_LOAD( "rt17(__schasera).bin",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
+	ROM_LOAD( "rt19(__schasera).bin",     0x1800, 0x0800, CRC(c0adab87) SHA1(4bb8e4ccfb5eaa052584555bfa03fecf19ab8a29) )
+	ROM_LOAD( "rt21(__schasera).bin",     0x4000, 0x0800, CRC(a3b31070) SHA1(af0108e1446a2be66cfc00d0b837fa91ab882441) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* background color map */
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
