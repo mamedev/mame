@@ -28,6 +28,13 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 }
 
 
+DebuggerView::~DebuggerView()
+{
+    if (m_machine && m_view)
+        m_machine->debug_view().free_view(*m_view);
+}
+
+
 void DebuggerView::paintEvent(QPaintEvent* event)
 {
 	// Tell the MAME debug view how much real estate is available

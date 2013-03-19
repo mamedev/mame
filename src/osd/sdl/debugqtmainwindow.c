@@ -5,7 +5,7 @@
 
 
 MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, parent),
+	WindowQt(machine, NULL),
 	m_historyIndex(0),
 	m_inputHistory()
 {

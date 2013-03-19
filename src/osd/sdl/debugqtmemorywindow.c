@@ -6,7 +6,7 @@
 
 
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, parent)
+	WindowQt(machine, NULL)
 {
 	setWindowTitle("Debug: Memory View");
 
@@ -41,6 +41,8 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	// Populate the combo box
 	populateComboBox();
 
+	// Set to the current CPU's memory view
+    setToCurrentCpu();
 
 	// Layout
 	QHBoxLayout* subLayout = new QHBoxLayout(topSubFrame);
@@ -212,9 +214,13 @@ void MemoryWindow::populateComboBox()
 	{
 		m_memoryComboBox->addItem(source->name());
 	}
+}
 
-	// TODO: Set to the proper memory view
-	//const debug_view_source *source = mem->views[0]->view->source_list().match_device(curcpu);
-	//gtk_combo_box_set_active(zone_w, mem->views[0]->view->source_list().index(*source));
-	//mem->views[0]->view->set_source(*source);
+
+void MemoryWindow::setToCurrentCpu()
+{
+	device_t* curCpu = debug_cpu_get_visible_cpu(*m_machine);
+	const debug_view_source *source = m_memTable->view()->source_list().match_device(curCpu);
+    const int listIndex = m_memTable->view()->source_list().index(*source);
+    m_memoryComboBox->setCurrentIndex(listIndex);
 }

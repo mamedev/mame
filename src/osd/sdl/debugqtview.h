@@ -14,7 +14,7 @@ public:
 	DebuggerView(const debug_view_type& type,
 					running_machine* machine,
 					QWidget* parent=NULL);
-	virtual ~DebuggerView() {}
+	virtual ~DebuggerView();
 
 	void paintEvent(QPaintEvent* event);
 

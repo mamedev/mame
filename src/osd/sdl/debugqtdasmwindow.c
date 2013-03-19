@@ -6,7 +6,7 @@
 
 
 DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, parent)
+	WindowQt(machine, NULL)
 {
 	setWindowTitle("Debug: Disassembly View");
 

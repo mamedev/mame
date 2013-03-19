@@ -6,7 +6,7 @@
 
 
 LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, parent)
+	WindowQt(machine, NULL)
 {
 	setWindowTitle("Debug: Machine Log");
 

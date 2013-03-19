@@ -12,11 +12,16 @@ bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;
 
 
+// Since all debug windows are intended to be top-level, this inherited
+// constructor is always called with a NULL parent.  The passed-in parent widget,
+// however, is often used to place each child window & the code to do this can
+// be found in most of the inherited classes.
+
 WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	QMainWindow(parent),
 	m_machine(machine)
 {
-	//setAttribute(Qt::WA_DeleteOnClose, true);
+	setAttribute(Qt::WA_DeleteOnClose, true);
 
 	// The Debug menu bar
 	QAction* debugActOpenMemory = new QAction("New &Memory Window", this);
