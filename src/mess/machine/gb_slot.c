@@ -425,7 +425,7 @@ bool megaduck_cart_slot_device::call_load()
 
 
 /*-------------------------------------------------
- call_unloadload
+ call_unload
  -------------------------------------------------*/
 
 void base_gb_cart_slot_device::call_unload()

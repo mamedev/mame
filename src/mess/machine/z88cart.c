@@ -162,7 +162,7 @@ bool z88cart_slot_device::call_load()
 
 
 /*-------------------------------------------------
-    call_unloadload
+    call_unload
 -------------------------------------------------*/
 
 void z88cart_slot_device::call_unload()

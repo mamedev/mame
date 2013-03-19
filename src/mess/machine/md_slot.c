@@ -532,7 +532,7 @@ int base_md_cart_slot_device::load_nonlist()
 }
 
 /*-------------------------------------------------
- call_unloadload
+ call_unload
  -------------------------------------------------*/
 
 void base_md_cart_slot_device::call_unload()
