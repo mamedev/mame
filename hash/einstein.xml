@@ -1226,71 +1226,71 @@ Xtal Systems (Xtal Research)
 	<!-- Star Trek is a Basic Game and it needs to be started with tatung-xtaldos 1.31-->
 <!--
 
-	<software name="msprnt">
-		<description>100 Metres Sprint &amp; Karate</description>
-		<year>19??</year>
-		<publisher>Mario Castro</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="msprnt.dsk" size="215296" crc="e19fddea" sha1="92e7f6cf7465ca99d3fea300c14a98fffe825087" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="msprnt">
+        <description>100 Metres Sprint &amp; Karate</description>
+        <year>19??</year>
+        <publisher>Mario Castro</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="msprnt.dsk" size="215296" crc="e19fddea" sha1="92e7f6cf7465ca99d3fea300c14a98fffe825087" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="conan">
-		<description>Conan &amp; Boxing</description>
-		<year>19??</year>
-		<publisher>Mario Castro</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="conan.dsk" size="215296" crc="841c2f87" sha1="ef27be711470e8f1899002a7d2c135365433a7a1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="conan">
+        <description>Conan &amp; Boxing</description>
+        <year>19??</year>
+        <publisher>Mario Castro</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="conan.dsk" size="215296" crc="841c2f87" sha1="ef27be711470e8f1899002a7d2c135365433a7a1" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="lotto">
-		<description>Lottery</description>
-		<year>2005</year>
-		<publisher>Mario Castro</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="lotto.dsk" size="215296" crc="356cbdbb" sha1="dc832b72dda5d3997b22f48f26619eecd809b007" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="lotto">
+        <description>Lottery</description>
+        <year>2005</year>
+        <publisher>Mario Castro</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="lotto.dsk" size="215296" crc="356cbdbb" sha1="dc832b72dda5d3997b22f48f26619eecd809b007" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="skijump">
-		<description>Ski-Jump &amp; Nubble Trubble</description>
-		<year>19??</year>
-		<publisher>Mario Castro</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="skijump.dsk" size="215296" crc="589a78d2" sha1="e474ef511c440c8c61b8fa4cfd551cfa60e27f51" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="skijump">
+        <description>Ski-Jump &amp; Nubble Trubble</description>
+        <year>19??</year>
+        <publisher>Mario Castro</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="skijump.dsk" size="215296" crc="589a78d2" sha1="e474ef511c440c8c61b8fa4cfd551cfa60e27f51" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="startrek">
-		<description>Star Trek</description>
-		<year>19??</year>
-		<publisher>Mario Castro</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="startrek.dsk" size="215296" crc="525d1dd2" sha1="0f438ac14b52ff5a5071106b148c81293ba747d7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="startrek">
+        <description>Star Trek</description>
+        <year>19??</year>
+        <publisher>Mario Castro</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="startrek.dsk" size="215296" crc="525d1dd2" sha1="0f438ac14b52ff5a5071106b148c81293ba747d7" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="sword">
-		<description>Sword Feud</description>
-		<year>198?</year>
-		<publisher>A.C.E. Software</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="215296">
-				<rom name="sword.dsk" size="215296" crc="b871d8f0" sha1="410710023db949bd37d6af41b844650dcfb6cefa" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="sword">
+        <description>Sword Feud</description>
+        <year>198?</year>
+        <publisher>A.C.E. Software</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="215296">
+                <rom name="sword.dsk" size="215296" crc="b871d8f0" sha1="410710023db949bd37d6af41b844650dcfb6cefa" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
 -->
 

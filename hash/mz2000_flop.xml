@@ -2,11 +2,11 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Usage instructions: if the game/program does not autoboot, ype DIR to list the disk content
-	and look for CMD or COM files.
-	To run CMD files (which are TF-FOS programs, type RUN "XXX", with XXX being the name of the
-	CMD file (e.g. RUN "SPACE MOUSE").
-	To run COM files (which are CP/M programs) simply type the name of the COM file.
+  Usage instructions: if the game/program does not autoboot, ype DIR to list the disk content
+  and look for CMD or COM files.
+  To run CMD files (which are TF-FOS programs, type RUN "XXX", with XXX being the name of the
+  CMD file (e.g. RUN "SPACE MOUSE").
+  To run COM files (which are CP/M programs) simply type the name of the COM file.
 -->
 
 
@@ -36,13 +36,13 @@
 <!--
 
 2011/10/25-2011/12/08 Rel.1.1  for MZ-2500 Extended Keys and 2DD,
-								Change Drive Assignment for 2DD,
-								Change the Utility Command Name:
-									- SYSINIT -> SETUP
-									- DISKCOPY -> COPYDISK
-									- SYSGEN -> COPYSYS
-								Bug fixes, etc.
-	-->
+                               Change Drive Assignment for 2DD,
+                               Change the Utility Command Name:
+                                   - SYSINIT -> SETUP
+                                   - DISKCOPY -> COPYDISK
+                                   - SYSGEN -> COPYSYS
+                               Bug fixes, etc.
+ -->
 	<software name="cpm22a" cloneof="cpm22">
 		<description>CP/M 2.2 (Release 1.1)</description>
 		<year>2011?</year>

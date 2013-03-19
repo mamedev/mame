@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- to boot disks type 'BOOT' and press return
-	alternatively press numpad 9 which seems to do the same thing
+  alternatively press numpad 9 which seems to do the same thing
 -->
 
 <softwarelist name="samcoupe_flop" description="Sam Coupe Floppy Disks">

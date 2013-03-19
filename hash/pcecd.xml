@@ -4,29 +4,29 @@
 
 <!-- The JPN CHDs have all been converted from the 'PD PC-Engine V2' collection, dated 2007
 
-	Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
-	perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
-	are considered replaceable.
+    Apparently many of these have extra data tracks appended on the end, so shouldn't be considered
+    perfect 1:1 dumps.  Therefore, assuming better reads are made (maybe some already exist), these
+    are considered replaceable.
 
-	Missing CDs (to be confirmed):
-		- Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
-		- Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
-		- Kabuki Ittou Ryoudan                                                Hudson         HCD5070     02/24/95
-		- Super CD-ROM2 Taiken Soft-shuu                                      Hudson         HCD1027     12/13/91
-		- Tengai Makyou Kabuki Den Demo                                       Shogakukan     HCD3053     06/11/93
+    Missing CDs (to be confirmed):
+       - Akiyama Jin no Suugaku Mystery - Hihou Indo no Honoo wo Shishu Seyo NHK            NHCD4001    12/10/94
+       - Gakuraito TDF 2                                                     Pack-In-Video  PVCD-0002   01/25/91
+       - Kabuki Ittou Ryoudan                                                Hudson         HCD5070     02/24/95
+       - Super CD-ROM2 Taiken Soft-shuu                                      Hudson         HCD1027     12/13/91
+       - Tengai Makyou Kabuki Den Demo                                       Shogakukan     HCD3053     06/11/93
 
-	There appear to exist also a prototype of PC Cocoron, still undumped
+    There appear to exist also a prototype of PC Cocoron, still undumped
 
-	The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
-	currently known for Turbo Duo CDs, and therefore are included until better reads are available.
+    The USA CHDs are converted from the "Retro ISO Gaming Guild" (RIGG) which is the most complete and accurate
+    currently known for Turbo Duo CDs, and therefore are included until better reads are available.
 
 
-	NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
-	handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
-	2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
-	'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
-	various PC software and/or emulators handle them?  There are multiple second audio offset issues with
-	several games in MESS/MAME which could be related.
+    NOTE: there appears to be a problem with the either the 'REDUMP.ORG' images, or the emulation / cuesheet
+    handling.  The REDUMP.ORG images appear to have each data track as 2 seconds longer causing an additional
+    2 second offset in the cuesheet for each data track, furthermore they refuse to boot simply throwing a
+    'read error' in MESS/MAME.  Is this some kind of protection on the original discs, or just errors in the way
+    various PC software and/or emulators handle them?  There are multiple second audio offset issues with
+    several games in MESS/MAME which could be related.
 
 -->
 
@@ -2627,17 +2627,17 @@
 	<!-- This is exactly the same as xanadu ?!-->
 	<!--
 	<software name="xanadus" cloneof="xanadu">
-		<description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(Jpn)</description>
-		<year>1994</year>
-		<publisher>NEC Home Electronics</publisher>
-		<info name="serial" value="HE4002"/>
-		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
-		<part name="cdrom" interface="pce_cdrom">
-			<diskarea name="cdrom">
-				<disk name="kaze no densetsu xanadu - sample disc (scd)(jpn)" sha1="9a53a3d1458f1532ea508e43318e9c2b4aa110ad"/>
-			</diskarea>
-		</part>
+	    <description>Kaze no Densetsu Xanadu - Sample Disc (SCD)(Jpn)</description>
+	    <year>1994</year>
+	    <publisher>NEC Home Electronics</publisher>
+	    <info name="serial" value="HE4002"/>
+	    <info name="usage" value="CD-Rom System Card required" />
+	    <sharedfeat name="requirement" value="scdsys"/>
+	    <part name="cdrom" interface="pce_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="kaze no densetsu xanadu - sample disc (scd)(jpn)" sha1="9a53a3d1458f1532ea508e43318e9c2b4aa110ad"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -2883,19 +2883,19 @@
 	<!-- This is exactly the same as lastarma ?!-->
 	<!--
 	<software name="lastarmg1" cloneof="lastarmg">
-		<description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(Jpn)</description>
-		<year>1990</year>
-		<publisher>Brain Gray</publisher>
-		<info name="serial" value="BRCD0001"/>
-		<info name="release" value="19900831"/>
-		<info name="alt_title" value="ラストハルマゲドン"/>
-		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
-		<part name="cdrom" interface="pce_cdrom">
-			<diskarea name="cdrom">
-				<disk name="last armageddon {brcd0001-6-0625-r3d} (cd)(jpn)" sha1="e9070ea3fcc0f2d9574e4051f6ce6c82b14634c6"/>
-			</diskarea>
-		</part>
+	    <description>Last Armageddon {BRCD0001-6-0625-R3D} (CD)(Jpn)</description>
+	    <year>1990</year>
+	    <publisher>Brain Gray</publisher>
+	    <info name="serial" value="BRCD0001"/>
+	    <info name="release" value="19900831"/>
+	    <info name="alt_title" value="ラストハルマゲドン"/>
+	    <info name="usage" value="CD-Rom System Card required" />
+	    <sharedfeat name="requirement" value="cdsys"/>
+	    <part name="cdrom" interface="pce_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="last armageddon {brcd0001-6-0625-r3d} (cd)(jpn)" sha1="e9070ea3fcc0f2d9574e4051f6ce6c82b14634c6"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -2984,14 +2984,14 @@
 	<software name="lodosst" cloneof="lodoss">
 	<description>Lodoss Tousenki - Record of Lodoss War Taikenban (CD)(Jpn)</description>
 	<year>1992</year>
-		<publisher>Hudson</publisher>
-		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="cdsys"/>
-		<part name="cdrom" interface="pce_cdrom">
-			<diskarea name="cdrom">
-				<disk name="lodoss tousenki - record of lodoss war taikenban (cd)(jpn)" sha1="145e81409cecbaff6f1030b99a260d6de4107742"/>
-			</diskarea>
-		</part>
+	    <publisher>Hudson</publisher>
+	    <info name="usage" value="CD-Rom System Card required" />
+	    <sharedfeat name="requirement" value="cdsys"/>
+	    <part name="cdrom" interface="pce_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="lodoss tousenki - record of lodoss war taikenban (cd)(jpn)" sha1="145e81409cecbaff6f1030b99a260d6de4107742"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -6270,19 +6270,19 @@
 	<!-- This is exactly the same as tokimeki ?!-->
 	<!--
 	<software name="tokimekia" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(Jpn)</description>
-		<year>1994</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="KMCD4007"/>
-		<info name="release" value="19940527"/>
-		<info name="alt_title" value="ときめきメモリアル"/>
-		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
-		<part name="cdrom" interface="pce_cdrom">
-			<diskarea name="cdrom">
-				<disk name="tokimeki memorial {hrkm70414-1fabt} [imperfect] (scd)(jpn)" sha1="dd72050d2ca53c213305338e24bd6ccbce7e20f5"/>
-			</diskarea>
-		</part>
+	    <description>Tokimeki Memorial {HRKM70414-1FABT} [Imperfect] (SCD)(Jpn)</description>
+	    <year>1994</year>
+	    <publisher>Konami</publisher>
+	    <info name="serial" value="KMCD4007"/>
+	    <info name="release" value="19940527"/>
+	    <info name="alt_title" value="ときめきメモリアル"/>
+	    <info name="usage" value="CD-Rom System Card required" />
+	    <sharedfeat name="requirement" value="scdsys"/>
+	    <part name="cdrom" interface="pce_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="tokimeki memorial {hrkm70414-1fabt} [imperfect] (scd)(jpn)" sha1="dd72050d2ca53c213305338e24bd6ccbce7e20f5"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 
@@ -6321,19 +6321,19 @@
 	<!-- This is exactly the same as tokimekic ?!-->
 	<!--
 	<software name="tokimekid" cloneof="tokimeki">
-		<description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(Jpn)</description>
-		<year>1994</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="KMCD4007"/>
-		<info name="release" value="19940527"/>
-		<info name="alt_title" value="ときめきメモリアル"/>
-		<info name="usage" value="CD-Rom System Card required" />
-		<sharedfeat name="requirement" value="scdsys"/>
-		<part name="cdrom" interface="pce_cdrom">
-			<diskarea name="cdrom">
-				<disk name="tokimeki memorial {hrkm71014-3fabt} (scd)(jpn)" sha1="3c6c9cf7134a20c36c19dfcb6b10c32d4a0595f7"/>
-			</diskarea>
-		</part>
+	    <description>Tokimeki Memorial {HRKM71014-3FABT} (SCD)(Jpn)</description>
+	    <year>1994</year>
+	    <publisher>Konami</publisher>
+	    <info name="serial" value="KMCD4007"/>
+	    <info name="release" value="19940527"/>
+	    <info name="alt_title" value="ときめきメモリアル"/>
+	    <info name="usage" value="CD-Rom System Card required" />
+	    <sharedfeat name="requirement" value="scdsys"/>
+	    <part name="cdrom" interface="pce_cdrom">
+	        <diskarea name="cdrom">
+	            <disk name="tokimeki memorial {hrkm71014-3fabt} (scd)(jpn)" sha1="3c6c9cf7134a20c36c19dfcb6b10c32d4a0595f7"/>
+	        </diskarea>
+	    </part>
 	</software>
 	-->
 

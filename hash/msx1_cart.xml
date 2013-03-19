@@ -874,7 +874,7 @@ crc: 71e94fce  -> lh532163 + lh2309hb + lh2309hb (512k)
 crc: 827919e4  -> lh532163 + lh2309hb + ??? (512k)
 with ??? = lh2309hb with 0x15 bytes modified at 0x1c2ee...
 kept for now until finding out what those bytes affect...
-	-->
+ -->
 	<software name="rtype">
 		<description>R-Type (Jpn)</description>
 		<year>1988</year>
@@ -986,19 +986,19 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 <!--
-	<software name="slaydckl">
-		<description>Super Laydock (The Links Network Version) (Jpn)</description>
-		<year>1987</year>
-		<publisher>T&amp;E Soft</publisher>
-		<info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TA6228" />
-			<feature name="mapper" value="M60002-0125SP" />
-			<dataarea name="rom" size="262144">
-				<rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="slaydckl">
+        <description>Super Laydock (The Links Network Version) (Jpn)</description>
+        <year>1987</year>
+        <publisher>T&amp;E Soft</publisher>
+        <info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TA6228" />
+            <feature name="mapper" value="M60002-0125SP" />
+            <dataarea name="rom" size="262144">
+                <rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="spierrot">
@@ -1017,36 +1017,36 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 <!--
-	<software name="synthsau">
-		<description>Synth Saurus (Jpn)</description>
-		<year></year>
-		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-1M-008S" />
-			<feature name="mapper" value="LZ93A13" />
-			<dataarea name="rom" size="131072">
-				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="synthsau">
+        <description>Synth Saurus (Jpn)</description>
+        <year></year>
+        <publisher>Bit²</publisher>
+        <info name="alt_title" value="シンセサウルス" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TAS-1M-008S" />
+            <feature name="mapper" value="LZ93A13" />
+            <dataarea name="rom" size="131072">
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="synthsaua">
-		<description>Synth Saurus (Alt) (Jpn)</description>
-		<year></year>
-		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-2M008-E2M" />
-			<feature name="mapper" value="LZ93A13" />
-			<dataarea name="rom" size="262144">
-				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
-				<rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="synthsaua">
+        <description>Synth Saurus (Alt) (Jpn)</description>
+        <year></year>
+        <publisher>Bit²</publisher>
+        <info name="alt_title" value="シンセサウルス" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TAS-2M008-E2M" />
+            <feature name="mapper" value="LZ93A13" />
+            <dataarea name="rom" size="262144">
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+                <rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<!-- Glitches in msx driver, works fine in some Japanese machines, like cf1200 -->
@@ -11842,7 +11842,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 <!-- mmm... this is interesting: Hi-Com released this as L3W for MSX, then re-release it as Super Columns for the SMS...
-		is this the same (working on both) or is it a later backport to MSX?? -->
+     is this the same (working on both) or is it a later backport to MSX?? -->
 	<software name="supercol">
 		<description>Super Columns (Kor)</description>
 		<year>1990</year>

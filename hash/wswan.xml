@@ -1410,14 +1410,14 @@
 
 	<!-- is this an overdump?!?
 	<software name="taikyigo">
-		<description>Taikyoku Igo - Heisei Kiin</description>
-		<year>2000</year>
-		<publisher>Kaga Tech</publisher>
-		<part name="cart" interface="wswan_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="swj-kgt004.bin" size="1048576" crc="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Taikyoku Igo - Heisei Kiin</description>
+	    <year>2000</year>
+	    <publisher>Kaga Tech</publisher>
+	    <part name="cart" interface="wswan_cart">
+	        <dataarea name="rom" size="1048576">
+	            <rom name="swj-kgt004.bin" size="1048576" crc="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="tanjodeb">
@@ -1540,14 +1540,14 @@
 
 	<!-- is this an overdump?!?
 	<software name="trumpcl2">
-		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
-		<year>2000</year>
-		<publisher>Bottom Up</publisher>
-		<part name="cart" interface="wswan_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="swj-btm002.bin" size="1048576" crc="64aaf392" sha1="b25ff8fc79168e439ba913a2cea6195094be9ac2" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
+	    <year>2000</year>
+	    <publisher>Bottom Up</publisher>
+	    <part name="cart" interface="wswan_cart">
+	        <dataarea name="rom" size="1048576">
+	            <rom name="swj-btm002.bin" size="1048576" crc="64aaf392" sha1="b25ff8fc79168e439ba913a2cea6195094be9ac2" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="trumpcol">

@@ -42,17 +42,17 @@ Winter Games - NTSC only          CX7831
 Impossible Mission                CX7832
 Lode Runner                       CX7833 (Not Released)
 RealSports Baseball - NTSC only   CX7834
-									CX7835
+                                  CX7835
 Crack'ed                          CX7836
 Dark Chambers                     CX7837
 Commando                          CX7838
-									CX7839
-									CX7840
-									CX7841
-									CX7842
-									CX7843
+                                  CX7839
+                                  CX7840
+                                  CX7841
+                                  CX7842
+                                  CX7843
 Crossbow                          CX7844
-									CX7845
+                                  CX7845
 Ace of Aces                       CX7846
 Mean 18 Golf                      CX7847
 Donkey Kong                       CX7848
@@ -60,41 +60,41 @@ Donkey Kong Junior                CX7849
 Mario Bros.                       CX7850
 Fight Night                       CX7851
 Motor Psycho                      CX7852
-									CX7853
+                                  CX7853
 Fatal Run                         CX7854
 Alien Brigade                     CX7855
 Tower Toppler                     CX7856
 Jinks                             CX7857
 Xenophobe                         CX7858
 Barnyard Blaster                  CX7859
-									CX7860
-									CX7861
+                                  CX7860
+                                  CX7861
 Ikari Warriors                    CX7862
 Mat Mania Challenge               CX7863
 White Water Madness               CX7864 (Not Released)
-									CX7865
-									CX7866
-									CX7867
+                                  CX7865
+                                  CX7866
+                                  CX7867
 Planet Smashers                   CX7868
 Sentinel                          CX7869 (PAL Limited QTY, NTSC Prototype)
 Ninja Golf                        CX7870
-									CX7871
-									CX7872
-									CX7873
+                                  CX7871
+                                  CX7872
+                                  CX7873
 Electrocop                        CX7874
 Meltdown                          CX7875
-									CX7876
-									CX7877
-									CX7878
+                                  CX7876
+                                  CX7877
+                                  CX7878
 Scrapyard Dog                     CX7879
 Basketbrawl                       CX7880
-									CX7881
-									CX7882
-									CX7883
-									CX7884
-									CX7885
-									CX7886
-									CX7887
+                                  CX7881
+                                  CX7882
+                                  CX7883
+                                  CX7884
+                                  CX7885
+                                  CX7886
+                                  CX7887
 Klax                              CX7888 (Prototype)
 Midnight Mutants                  CX7889
 Missing in Action - NTSC only     CX7890 (Prototype)
@@ -270,7 +270,7 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	</software>
 
 <!-- 3-D Asteroids Rev A, Prototype.  Functionally, the same game, just unencrypted.  Only observed difference is a section of text in the
-		rom states: "IF YOU CAN READ THIS YOU'RE TOO CLOSE. GCC(C) 1984".  Release version only has the text: "TOO CLOSE. GCC(C) 1984"
+     rom states: "IF YOU CAN READ THIS YOU'RE TOO CLOSE. GCC(C) 1984".  Release version only has the text: "TOO CLOSE. GCC(C) 1984"
 -->
 	<software name="asteroid">
 		<description>Asteroids (NTSC)</description>
@@ -345,10 +345,10 @@ type of rom dumps.  Effort will be made at a later date to split them and docume
 	<software name="barnblstu" cloneof="barnblst">
 		<description>Barnyard Blaster (NTSC)</description>
 		<!-- Final Release Proto - C300051-059A (Matches NTSC)
-						10/5/88 (#1/U3 27256 SUM16=9676)
-								(#2/U2 27256 SUM16=0C34)
-								(#3/U5 27256 SUM16=9172)
-								(#4/U4 27256 SUM16=6075) -->
+		             10/5/88 (#1/U3 27256 SUM16=9676)
+		                     (#2/U2 27256 SUM16=0C34)
+		                     (#3/U5 27256 SUM16=9172)
+		                     (#4/U4 27256 SUM16=6075) -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7859"/>
@@ -1455,8 +1455,8 @@ almost nothing like the prototype.
 	<software name="mpsychou" cloneof="mpsycho">
 		<description>Motor Psycho (NTSC)</description>
 		<!-- Final Release Proto - C300051-052A (Matches NTSC)
-						4/17/90 (#1 27512 SUM16=4EB8)
-								(#2 27512 SUM16=64B3) -->
+		             4/17/90 (#1 27512 SUM16=4EB8)
+		                     (#2 27512 SUM16=64B3) -->
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7852"/>

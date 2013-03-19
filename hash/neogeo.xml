@@ -3,31 +3,31 @@
 
 <!-- The list contains both MVS and AES cartridges.
 
-		For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
-		depends upon the bios used.
+     For the majority of official titles the actual ROM data contained in the cartridges is compatible across systems, the actual codepath taken
+     depends upon the bios used.
 
-		The only real difference with the cartridges is the physical form of the cartridges which allowed a delayed release of the game for AES
-		systems at a higher cost.  Due to this many adapters are available which plug into an AES unit allowing you to plug any standard MVS cart
-		into the system.  Reverse adapters exist, although were less common because there was no reason to use them.  All MVS carts can be used
-		with AES systems so there is no reason to have separate lists especially when in the majority of cases the data is identical.
+     The only real difference with the cartridges is the physical form of the cartridges which allowed a delayed release of the game for AES
+     systems at a higher cost.  Due to this many adapters are available which plug into an AES unit allowing you to plug any standard MVS cart
+     into the system.  Reverse adapters exist, although were less common because there was no reason to use them.  All MVS carts can be used
+     with AES systems so there is no reason to have separate lists especially when in the majority of cases the data is identical.
 
-		The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
-		of the game code with additional bugfixes etc. when compared to the primary MVS release.
+     The primary MVS / AES releases are marked in the list for documentation purposes, typically the first AES release is just a later revision
+     of the game code with additional bugfixes etc. when compared to the primary MVS release.
 
-		Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
-			tagged with compatibility tags.
+     Todo: games which are actually incompatible between systems (the first release of kof2001, and many of the bootlegs / hacks) should be
+           tagged with compatibility tags.
 
 -->
 
 <softwarelist name="neogeo" description="SNK Neo-Geo cartridges">
 
 <!--***************************************
-	ID-0001
-	. NGM-001
-	NEO-MVS PROG-NAM / NEO-MVS CHA-32
-	. NGH-001
-	NEO-AEG PROG-NAM / NEO-AEG CHA-32
-	***************************************-->
+   ID-0001
+   . NGM-001
+   NEO-MVS PROG-NAM / NEO-MVS CHA-32
+   . NGH-001
+   NEO-AEG PROG-NAM / NEO-AEG CHA-32
+  ***************************************-->
 
 	<software name="nam1975">
 		<!-- MVS AND AES VERSION -->
@@ -68,11 +68,11 @@
 	</software>
 
 <!--***************************************
-	ID-0002
-	. NGM-002
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-002
-	NEO-AEG PROG-4A / NEO-AEG CHA-32
+ ID-0002
+ . NGM-002
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-002
+ NEO-AEG PROG-4A / NEO-AEG CHA-32
 ***************************************-->
 
 
@@ -151,11 +151,11 @@
 	</software>
 
 <!--***************************************
-	ID-0003
-	. NGM-003
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-003
-	NEO-AEG PROG-4B / NEO-AEG CHA-32
+ ID-0003
+ . NGM-003
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-003
+ NEO-AEG PROG-4B / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="tpgolf">
@@ -201,11 +201,11 @@
 	</software>
 
 <!--***************************************
-	ID-0004
-	. NGM-004
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-004
-	NEO-AEG PROG B  / NEO-AEG CHA-32
+ ID-0004
+ . NGM-004
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-004
+ NEO-AEG PROG B  / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="mahretsu">
@@ -244,11 +244,11 @@
 	</software>
 
 <!--***************************************
-	ID-0005
-	. NGM-005
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-005
-	NEO-AEG PROG-4B / NEO-AEG CHA-32
+ ID-0005
+ . NGM-005
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-005
+ NEO-AEG PROG-4B / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="maglord">
@@ -322,11 +322,11 @@
 	</software>
 
 <!--***************************************
-	ID-0006
-	. NGM-006
-	NEO-MVS PROG-HERO / NEO-MVS CHA-32
-	. NGH-006
-	NEO-AEG PROG-HERO / NEO-AEG CHA-32
+ ID-0006
+ . NGM-006
+ NEO-MVS PROG-HERO / NEO-MVS CHA-32
+ . NGH-006
+ NEO-AEG PROG-HERO / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="ridhero">
@@ -410,11 +410,11 @@
 	</software>
 
 <!--***************************************
-	ID-0007
-	. NGM-007
-	NEO-MVS PROG42G / NEO-MVS CHA42G
-	. NGH-007
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0007
+ . NGM-007
+ NEO-MVS PROG42G / NEO-MVS CHA42G
+ . NGH-007
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="alpham2">
@@ -488,16 +488,16 @@
 	</software>
 
 <!--***************************************
-	ID-0008
-	Sunshine (prototype) 1990 SNK
+ ID-0008
+ Sunshine (prototype) 1990 SNK
 ***************************************-->
 
 <!--***************************************
-	ID-0009
-	. NGM-009
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-009
-	NEO-AEG PROG-4A / NEO-AEG CHA-32
+ ID-0009
+ . NGM-009
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-009
+ NEO-AEG PROG-4A / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="ncombat">
@@ -573,10 +573,10 @@
 	</software>
 
 <!--***************************************
-	ID-0010
-	. NGM-010
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-010
+ ID-0010
+ . NGM-010
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-010
 ***************************************-->
 
 	<software name="cyberlip">
@@ -616,11 +616,11 @@
 	</software>
 
 <!--***************************************
-	ID-0011
-	. NGM-011
-	NEO-MVS PROG-8MB / NEO-MVS CHA-8M
-	. NGH-011
-	NEO-AEG PROG-8MB / NEO-AEG CHA-8M
+ ID-0011
+ . NGM-011
+ NEO-MVS PROG-8MB / NEO-MVS CHA-8M
+ . NGH-011
+ NEO-AEG PROG-8MB / NEO-AEG CHA-8M
 ***************************************-->
 
 	<software name="superspy">
@@ -658,21 +658,21 @@
 	</software>
 
 <!--***************************************
-	ID-0012
-	unknown
+ ID-0012
+ unknown
 ***************************************-->
 
 <!--***************************************
-	ID-0013
-	unknown
+ ID-0013
+ unknown
 ***************************************-->
 
 <!--***************************************
-	ID-0014
-	. NGM-014
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-014
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0014
+ . NGM-014
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-014
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="mutnat">
@@ -706,17 +706,17 @@
 	</software>
 
 <!--***************************************
-	ID-0015
-	unknown
+ ID-0015
+ unknown
 ***************************************-->
 
 <!--***************************************
-	ID-0016
-	. NGM-016
-	NEO-MVS PROG42G   / NEO-MVS CHA42G
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-016
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0016
+ . NGM-016
+ NEO-MVS PROG42G   / NEO-MVS CHA42G
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-016
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="kotm">
@@ -782,11 +782,11 @@
 	</software>
 
 <!--***************************************
-	ID-0017
-	. NGM-017
-	NEO-MVS PROG42G / NEO-MVS CHA42G
-	. NGH-017
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0017
+ . NGM-017
+ NEO-MVS PROG42G / NEO-MVS CHA42G
+ . NGH-017
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="sengoku">
@@ -852,13 +852,13 @@
 	</software>
 
 <!--***************************************
-	ID-0018
-	. NGM-018
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	also found on (seen several times; CHA and PROG board are 'manually patched up' with wires and resistors)
-	NEO-MVS PROG42G / NEO-MVS CHA42G
-	. NGH-018
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0018
+ . NGM-018
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ also found on (seen several times; CHA and PROG board are 'manually patched up' with wires and resistors)
+ NEO-MVS PROG42G / NEO-MVS CHA42G
+ . NGH-018
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="burningf">
@@ -961,11 +961,11 @@
 	</software>
 
 <!--***************************************
-	ID-0019
-	. NGM-019
-	NEO-MVS PROG-HERO / NEO-MVS CHA-32
-	. NGH-019
-	NEO-AEG PROG-HERO / NEO-AEG CHA-32
+ ID-0019
+ . NGM-019
+ NEO-MVS PROG-HERO / NEO-MVS CHA-32
+ . NGH-019
+ NEO-AEG PROG-HERO / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="lbowling">
@@ -1004,11 +1004,11 @@
 	</software>
 
 <!--***************************************
-	ID-0020
-	. NGM-020
-	NEO-MVS PROG8M42 / NEO-MVS CHA-8M
-	. NGH-020
-	NEO-AEG PROG8M42 / NEO-AEG CHA-8M
+ ID-0020
+ . NGM-020
+ NEO-MVS PROG8M42 / NEO-MVS CHA-8M
+ . NGH-020
+ NEO-AEG PROG8M42 / NEO-AEG CHA-8M
 ***************************************-->
 
 	<software name="gpilots">
@@ -1080,11 +1080,11 @@
 	</software>
 
 <!--***************************************
-	ID-0021
-	. NGM-021
-	NEO-MVS PROG-EP / NEO-MVS CHA-32
-	. NGH-021
-	NEO-AEG PROG B  / NEO-AEG CHA-32
+ ID-0021
+ . NGM-021
+ NEO-MVS PROG-EP / NEO-MVS CHA-32
+ . NGH-021
+ NEO-AEG PROG B  / NEO-AEG CHA-32
 ***************************************-->
 
 	<software name="joyjoy">
@@ -1118,11 +1118,11 @@
 	</software>
 
 <!--***************************************
-	ID-0022
-	. ALM-001
-	NEO-MVS PROG8M42  / NEO-MVS CHA-8M
-	. ALH-001
-	NEO-AEG PROG 8M42 / NEO-AEG CHA-8M
+ ID-0022
+ . ALM-001
+ NEO-MVS PROG8M42  / NEO-MVS CHA-8M
+ . ALH-001
+ NEO-AEG PROG 8M42 / NEO-AEG CHA-8M
 ***************************************-->
 
 	<software name="bjourney">
@@ -1156,11 +1156,11 @@
 	</software>
 
 <!--***************************************
-	ID-0023
-	. NGM-023
-	NEO-MVS PROG42G / NEO-MVS CHA42G
-	. NGH-023
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0023
+ . NGM-023
+ NEO-MVS PROG42G / NEO-MVS CHA42G
+ . NGH-023
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="quizdais">
@@ -1218,10 +1218,10 @@
 	</software>
 
 <!--***************************************
-	ID-0024
-	. NGM-024
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-024
+ ID-0024
+ . NGM-024
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-024
 ***************************************-->
 
 	<software name="lresort">
@@ -1254,11 +1254,11 @@
 	</software>
 
 <!--***************************************
-	ID-0025
-	. NGM-025
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-025
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0025
+ . NGM-025
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-025
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="eightman">
@@ -1292,16 +1292,16 @@
 	</software>
 
 <!--***************************************
-	ID-0026
-	Fun Fun Brothers (prototype) 1991 Alpha
+ ID-0026
+ Fun Fun Brothers (prototype) 1991 Alpha
 ***************************************-->
 
 <!--***************************************
-	ID-0027
-	. MOM-001
-	NEO-MVS PROG-8MB / NEO-MVS CHA-8M
-	. MOH-001
-	NEO-AEG PROG-8MB / NEO-AEG CHA-8M
+ ID-0027
+ . MOM-001
+ NEO-MVS PROG-8MB / NEO-MVS CHA-8M
+ . MOH-001
+ NEO-AEG PROG-8MB / NEO-AEG CHA-8M
 ***************************************-->
 
 	<software name="minasan">
@@ -1337,15 +1337,15 @@
 	</software>
 
 <!--***************************************
-	ID-0028
-	Dunk Star (prototype) Sammy
+ ID-0028
+ Dunk Star (prototype) Sammy
 ***************************************-->
 
 <!--***************************************
-	ID-0029
-	. ??M-029
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. ??H-029
+ ID-0029
+ . ??M-029
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . ??H-029
 ***************************************-->
 
 	<software name="legendos">
@@ -1377,11 +1377,11 @@
 	</software>
 
 <!--***************************************
-	ID-0030
-	. NGM-030
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-030
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0030
+ . NGM-030
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-030
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="2020bb">
@@ -1475,11 +1475,11 @@
 	</software>
 
 <!--***************************************
-	ID-0031
-	. NGM-031
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-031
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0031
+ . NGM-031
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-031
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="socbrawl">
@@ -1543,11 +1543,11 @@
 	</software>
 
 <!--***************************************
-	ID-0032
-	. NGM-032
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-032
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0032
+ . NGM-032
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-032
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="roboarmy">
@@ -1581,11 +1581,11 @@
 
 
 <!--***************************************
-	ID-0033
-	. NGM-033
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-033
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0033
+ . NGM-033
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-033
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="fatfury1">
@@ -1622,11 +1622,11 @@
 	</software>
 
 <!--***************************************
-	ID-0034
-	. NGM-034
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-034
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0034
+ . NGM-034
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-034
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="fbfrenzy">
@@ -1660,16 +1660,16 @@
 	</software>
 
 <!--***************************************
-	ID-0035
-	Mystic Wand (prototype) 1991 Alpha
+ ID-0035
+ Mystic Wand (prototype) 1991 Alpha
 ***************************************-->
 
 <!--***************************************
-	ID-0036
-	. MOM-002
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. MOH-002
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0036
+ . MOM-002
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . MOH-002
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="bakatono">
@@ -1703,11 +1703,11 @@
 	</software>
 
 <!--***************************************
-	ID-0037
-	. ALM-002
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. ALH-002
-	NEO-AEG PROG42G / NEO-AEG CHA42G
+ ID-0037
+ . ALM-002
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . ALH-002
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ***************************************-->
 
 	<software name="crsword">
@@ -1740,11 +1740,11 @@
 	</software>
 
 <!--***************************************
-	ID-0038
-	. ALM-003
-	NEO-MVS PROG42G-COM / NEO-MVS CHA42G-1
-	. ALH-003
-	NEO-AEG PROG42G-COM / NEO-AEG CHA42G-1
+ ID-0038
+ . ALM-003
+ NEO-MVS PROG42G-COM / NEO-MVS CHA42G-1
+ . ALH-003
+ NEO-AEG PROG42G-COM / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="trally">
@@ -1783,11 +1783,11 @@
 	</software>
 
 <!--***************************************
-	ID-0039
-	. NGM-039
-	NEO-MVS PROG16 / NEO-MVS CHA42G-1
-	. NGH-039
-	NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ ID-0039
+ . NGM-039
+ NEO-MVS PROG16 / NEO-MVS CHA42G-1
+ . NGH-039
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="kotm2">
@@ -1866,10 +1866,10 @@
 	</software>
 
 <!--***************************************
-	ID-0040
-	. NGM-040
-	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
-	. NGH-040
+ ID-0040
+ . NGM-040
+ NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
+ . NGH-040
 ***************************************-->
 
 	<software name="sengoku2">
@@ -1904,10 +1904,10 @@
 	</software>
 
 <!--***************************************
-	ID-0041
-	. NGM-041
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-041
+ ID-0041
+ . NGM-041
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-041
 ***************************************-->
 
 	<software name="bstars2">
@@ -1941,11 +1941,11 @@
 	</software>
 
 <!--***************************************
-	ID-0042
-	. NGM-042
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. NGH-042
-	NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
+ ID-0042
+ . NGM-042
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . NGH-042
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="quizdai2">
@@ -1979,11 +1979,11 @@
 	</software>
 
 <!--***************************************
-	ID-0043
-	. NGM-043
-	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
-	. NGH-043
-	NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ ID-0043
+ . NGM-043
+ NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
+ . NGH-043
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="3countb">
@@ -2022,11 +2022,11 @@
 	</software>
 
 <!--***************************************
-	ID-0044
-	. NGM-044
-	NEO-MVS PROG16 / NEO-MVS CHA42G-1
-	. NGH-044
-	NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ ID-0044
+ . NGM-044
+ NEO-MVS PROG16 / NEO-MVS CHA42G-1
+ . NGH-044
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="aof">
@@ -2064,11 +2064,11 @@
 	</software>
 
 <!--***************************************
-	ID-0045
-	. NGM-045
-	NEO-MVS PROGGSC / NEO-MVS CHA 42G-3
-	. NGH-045
-	NEO-AEG PROGGS / NEO-AEG CHA42G-4
+ ID-0045
+ . NGM-045
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3
+ . NGH-045
+ NEO-AEG PROGGS / NEO-AEG CHA42G-4
 ***************************************-->
 
 	<software name="samsho">
@@ -2138,11 +2138,11 @@
 	</software>
 
 <!--***************************************
-	ID-0046
-	. NGM-046
-	NEO-MVS PROGTOP / NEO-MVS CHA256B
-	. NGH-046
-	NEO-AEG PROGTOP / NEO-AEG CHA256[B]
+ ID-0046
+ . NGM-046
+ NEO-MVS PROGTOP / NEO-MVS CHA256B
+ . NGH-046
+ NEO-AEG PROGTOP / NEO-AEG CHA256[B]
 ***************************************-->
 
 	<software name="tophuntr">
@@ -2220,11 +2220,11 @@
 	</software>
 
 <!--***************************************
-	ID-0047
-	. NGM-047
-	NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
-	. NGH-047
-	NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
+ ID-0047
+ . NGM-047
+ NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
+ . NGH-047
+ NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
 ***************************************-->
 
 	<software name="fatfury2">
@@ -2264,9 +2264,9 @@
 	</software>
 
 <!--***************************************
-	ID-0048
-	. ??M-048
-	NEO-MVS PROGGSC / NEO-MVS CHA256
+ ID-0048
+ . ??M-048
+ NEO-MVS PROGGSC / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="janshin">
@@ -2297,11 +2297,11 @@
 	</software>
 
 <!--***************************************
-	ID-0049
-	. NGM-049
-	NEO-MVS PROG16 / NEO-MVS CHA42G-1
-	. NGH-049
-	NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ ID-0049
+ . NGM-049
+ NEO-MVS PROG16 / NEO-MVS CHA42G-1
+ . NGH-049
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="androdun">
@@ -2333,10 +2333,10 @@
 	</software>
 
 <!--***************************************
-	ID-0050
-	. ALM-004
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. ALH-004
+ ID-0050
+ . ALM-004
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . ALH-004
 ***************************************-->
 
 	<software name="ncommand">
@@ -2369,10 +2369,10 @@
 	</software>
 
 <!--***************************************
-	ID-0051
-	. AIM-051
-	NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
-	. AIH-051
+ ID-0051
+ . AIM-051
+ NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
+ . AIH-051
 ***************************************-->
 
 	<software name="viewpoin">
@@ -2406,10 +2406,10 @@
 	</software>
 
 <!--***************************************
-	ID-0052
-	. NGM-052
-	NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA 42G-2
-	. NGH-052
+ ID-0052
+ . NGM-052
+ NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA 42G-2
+ . NGH-052
 ***************************************-->
 
 	<software name="ssideki">
@@ -2442,11 +2442,11 @@
 	</software>
 
 <!--***************************************
-	ID-0053
-	. ALM-005
-	NEO-MVS PROG16 / NEO-MVS CHA42G-1
-	. ALH-005
-	NEO-AEG PROG16 / NEO-AEG CHA42G-1
+ ID-0053
+ . ALM-005
+ NEO-MVS PROG16 / NEO-MVS CHA42G-1
+ . ALH-005
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ***************************************-->
 
 	<software name="wh1">
@@ -2550,16 +2550,16 @@
 	</software>
 
 <!--***************************************
-	ID-0054
-	Crossed Swords 2 (CD only? not confirmed, MVS might exist)
+ ID-0054
+ Crossed Swords 2 (CD only? not confirmed, MVS might exist)
 ***************************************-->
 
 <!--***************************************
-	ID-0055
-	. NGM-055
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. NGH-055
-	NEO-AEG PROGRK / NEO-AEG CHA256
+ ID-0055
+ . NGM-055
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . NGH-055
+ NEO-AEG PROGRK / NEO-AEG CHA256
 ***************************************-->
 
 	<software name="kof94">
@@ -2599,11 +2599,11 @@
 	</software>
 
 <!--***************************************
-	ID-0056
-	. NGM-056
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. NGH-056
-	NEO-AEG PROGRKB / NEO-AEG CHA256[B]
+ ID-0056
+ . NGM-056
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . NGH-056
+ NEO-AEG PROGRKB / NEO-AEG CHA256[B]
 ***************************************-->
 
 	<software name="aof2">
@@ -2681,11 +2681,11 @@
 	</software>
 
 <!--***************************************
-	ID-0057
-	. ALM-006
-	NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
-	. ALH-006
-	NEO-AEG PROG4096 B / NEO-AEG CHA42G-3
+ ID-0057
+ . ALM-006
+ NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
+ . ALH-006
+ NEO-AEG PROG4096 B / NEO-AEG CHA42G-3
 ***************************************-->
 
 	<software name="wh2">
@@ -2722,11 +2722,11 @@
 	</software>
 
 <!--***************************************
-	ID-0058
-	. NGM-058
-	NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
-	. NGH-058
-	NEO-AEG PROGGS / NEO-AEG CHA42G-4
+ ID-0058
+ . NGM-058
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
+ . NGH-058
+ NEO-AEG PROGGS / NEO-AEG CHA42G-4
 ***************************************-->
 
 	<software name="fatfursp">
@@ -2801,10 +2801,10 @@
 	</software>
 
 <!--***************************************
-	ID-0059
-	. NGM-059
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. NGH-059
+ ID-0059
+ . NGM-059
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . NGH-059
 ***************************************-->
 
 	<software name="savagere">
@@ -2843,9 +2843,9 @@
 	</software>
 
 <!--***************************************
-	ID-0060
-	. ??M-060
-	NEO-MVS PROGGSC / NEO-MVS CHA256B
+ ID-0060
+ . ??M-060
+ NEO-MVS PROGGSC / NEO-MVS CHA256B
 ***************************************-->
 
 	<software name="fightfev">
@@ -2912,11 +2912,11 @@
 	</software>
 
 <!--***************************************
-	ID-0061
-	. NGM-061
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. NGH-061
-	NEO-AEG PROGRKB / NEO-AEG CHA256[B]
+ ID-0061
+ . NGM-061
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . NGH-061
+ NEO-AEG PROGRKB / NEO-AEG CHA256[B]
 ***************************************-->
 
 	<software name="ssideki2">
@@ -2951,10 +2951,10 @@
 	</software>
 
 <!--***************************************
-	ID-0062
-	. DEM-001
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. DEH-001
+ ID-0062
+ . DEM-001
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . DEH-001
 ***************************************-->
 
 	<software name="spinmast">
@@ -2991,11 +2991,11 @@
 	</software>
 
 <!--***************************************
-	ID-0063
-	. NGM-063
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. NGH-063
-	NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
+ ID-0063
+ . NGM-063
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . NGH-063
+ NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ***************************************-->
 
 	<software name="samsho2">
@@ -3078,11 +3078,11 @@
 	</software>
 
 <!--***************************************
-	ID-0064
-	. ADM-007
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. ADH-007
-	NEO-AEG PROGRK / NEO-AEG CHA256
+ ID-0064
+ . ADM-007
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . ADH-007
+ NEO-AEG PROGRK / NEO-AEG CHA256
 ***************************************-->
 
 	<software name="wh2j">
@@ -3121,10 +3121,10 @@
 	</software>
 
 <!--***************************************
-	ID-0065
-	. DEM-002
-	NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
-	. DEH-002
+ ID-0065
+ . DEM-002
+ NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
+ . DEH-002
 ***************************************-->
 
 	<software name="wjammers">
@@ -3159,10 +3159,10 @@
 	</software>
 
 <!--***************************************
-	ID-0066
-	. DEM-003
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. DEH-003
+ ID-0066
+ . DEM-003
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . DEH-003
 ***************************************-->
 
 	<software name="karnovr">
@@ -3196,9 +3196,9 @@
 	</software>
 
 <!--***************************************
-	ID-0067
-	. ??M-067
-	NEO-MVS PROG16 / NEO-MVS CHA256B
+ ID-0067
+ . ??M-067
+ NEO-MVS PROG16 / NEO-MVS CHA256B
 ***************************************-->
 
 	<software name="gururin">
@@ -3229,9 +3229,9 @@
 	</software>
 
 <!--***************************************
-	ID-0068
-	. NGM-068
-	NEO-MVS PROGTOP / NEO-MVS CHA256
+ ID-0068
+ . NGM-068
+ NEO-MVS PROGTOP / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="pspikes2">
@@ -3268,11 +3268,11 @@
 	</software>
 
 <!--***************************************
-	ID-0069
-	. NGM-069
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0069
+ . NGM-069
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 . NGH-069
-	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ***************************************-->
 
 	<software name="fatfury3">
@@ -3310,9 +3310,9 @@
 	</software>
 
 <!--***************************************
-	ID-0070
-	. ??M-070
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0070
+ . ??M-070
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="zupapa">
@@ -3348,28 +3348,28 @@
 	</software>
 
 <!--***************************************
-	ID-0071
-	Bang Bang Busters (prototype) 1994 Visco
-	Released in 2010 for MVS and AES (Releaser claims that it is officially licensed by VISCO)
+ ID-0071
+ Bang Bang Busters (prototype) 1994 Visco
+ Released in 2010 for MVS and AES (Releaser claims that it is officially licensed by VISCO)
 
-	Reported UNIVERSE BIOS CRC32:
-	ROM     EC861CAF
-	BANK 0  NOT USED
-	BANK 1  NOT USED
-	BANK 2  NOT USED
-	BANK 3  NOT USED
-	***************************************-->
-
-<!--***************************************
-	ID-0072
-	Last Odyssey Pinball Fantasia (prototype) 1995 Monolith
-	A video of this was on youtube in 2010/2011.
-	***************************************-->
+ Reported UNIVERSE BIOS CRC32:
+  ROM     EC861CAF
+  BANK 0  NOT USED
+  BANK 1  NOT USED
+  BANK 2  NOT USED
+  BANK 3  NOT USED
+ ***************************************-->
 
 <!--***************************************
-	ID-0073
-	. ??M-073
-	NEO-MVS PROGTOP / NEO-MVS CHA256
+ ID-0072
+ Last Odyssey Pinball Fantasia (prototype) 1995 Monolith
+ A video of this was on youtube in 2010/2011.
+ ***************************************-->
+
+<!--***************************************
+ ID-0073
+ . ??M-073
+ NEO-MVS PROGTOP / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="panicbom">
@@ -3401,11 +3401,11 @@
 	</software>
 
 <!--***************************************
-	ID-0074
-	. ADM-008
-	NEO-MVS PROGTOP / NEO-MVS CHA256B
-	. ADH-008
-	NEO-AEG PROGRK / NEO-AEG CHA256
+ ID-0074
+ . ADM-008
+ NEO-MVS PROGTOP / NEO-MVS CHA256B
+ . ADH-008
+ NEO-AEG PROGRK / NEO-AEG CHA256
 ***************************************-->
 
 	<software name="aodk">
@@ -3444,10 +3444,10 @@
 	</software>
 
 <!--***************************************
-	ID-0075
-	. NGM-075
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. NGH-075
+ ID-0075
+ . NGM-075
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . NGH-075
 ***************************************-->
 
 	<software name="sonicwi2">
@@ -3481,9 +3481,9 @@
 	</software>
 
 <!--***************************************
-	ID-0076
-	. ??M-076
-	NEO-MVS PROGGSC / NEO-MVS CHA256
+ ID-0076
+ . ??M-076
+ NEO-MVS PROGGSC / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="zedblade">
@@ -3518,15 +3518,15 @@
 	</software>
 
 <!--***************************************
-	ID-0077
-	The Warlocks of the Fates (prototype) 1995 Astec
+ ID-0077
+ The Warlocks of the Fates (prototype) 1995 Astec
 ***************************************-->
 
 <!--***************************************
-	ID-0078
-	. NGM-078
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. NGH-078
+ ID-0078
+ . NGM-078
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . NGH-078
 ***************************************-->
 
 	<software name="galaxyfg">
@@ -3565,11 +3565,11 @@
 	</software>
 
 <!--***************************************
-	ID-0079
-	. DEM-004
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. DEH-004
-	NEO-AEG PROGRK  / NEO-AEG CHA256
+ ID-0079
+ . DEM-004
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . DEH-004
+ NEO-AEG PROGRK  / NEO-AEG CHA256
 ***************************************-->
 
 	<software name="strhoop">
@@ -3604,11 +3604,11 @@
 	</software>
 
 <!--***************************************
-	ID-0080
-	. SAM-080
-	NEO-MVS PROGGSC / NEO-MVS CHA256
-	. SAH-080
-	NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
+ ID-0080
+ . SAM-080
+ NEO-MVS PROGGSC / NEO-MVS CHA256
+ . SAH-080
+ NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ***************************************-->
 
 	<software name="quizkof">
@@ -3676,11 +3676,11 @@
 	</software>
 
 <!--***************************************
-	ID-0081
-	. NGM-081
-	NEO-MVS PROGTOP / NEO-MVS CHA42G-3B
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. NGH-081
+ ID-0081
+ . NGM-081
+ NEO-MVS PROGTOP / NEO-MVS CHA42G-3B
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . NGH-081
 ***************************************-->
 
 	<software name="ssideki3">
@@ -3717,12 +3717,12 @@
 	</software>
 
 <!--***************************************
-	ID-0082
-	. NGM-082
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	NEO-MVS PROGTOP / NEO-MVS CHA 42G-3
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-082
+ ID-0082
+ . NGM-082
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ NEO-MVS PROGTOP / NEO-MVS CHA 42G-3
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-082
 ***************************************-->
 
 	<software name="doubledr">
@@ -3760,9 +3760,9 @@
 	</software>
 
 <!--***************************************
-	ID-0083
-	. NGM-083
-	NEO-MVS PROGTOP / NEO-MVS CHA256
+ ID-0083
+ . NGM-083
+ NEO-MVS PROGTOP / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="pbobblen">
@@ -3802,12 +3802,12 @@
 	</software>
 
 <!--***************************************
-	ID-0084
-	. NGM-084
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	NEO-MVS PROGSM / NEO-MVS CHA256
-	. NGH-084
-	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
+ ID-0084
+ . NGM-084
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGSM / NEO-MVS CHA256
+ . NGH-084
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ***************************************-->
 
 	<software name="kof95">
@@ -3888,14 +3888,14 @@
 	</software>
 
 <!--***************************************
-	ID-0085
-	Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only)
+ ID-0085
+ Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only)
 ***************************************-->
 
 <!--***************************************
-	ID-0086
-	. ??M-086
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ ID-0086
+ . ??M-086
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
 ***************************************-->
 
 	<software name="tws96">
@@ -3929,11 +3929,11 @@
 	</software>
 
 <!--***************************************
-	ID-0087
-	. NGM-087
-	NEO-MVS PROGSS3 / NEO-MVS CHA256
-	. NGH-087
-	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
+ ID-0087
+ . NGM-087
+ NEO-MVS PROGSS3 / NEO-MVS CHA256
+ . NGH-087
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ***************************************-->
 
 	<software name="samsho3">
@@ -4046,10 +4046,10 @@
 	</software>
 
 <!--***************************************
-	ID-0088
-	. NGM-088
-	NEO-MVS PROGBK1 / NEO-MVS CHA42-3B
-	. NGH-088
+ ID-0088
+ . NGM-088
+ NEO-MVS PROGBK1 / NEO-MVS CHA42-3B
+ . NGH-088
 ***************************************-->
 
 	<software name="stakwin">
@@ -4082,10 +4082,10 @@
 	</software>
 
 <!--***************************************
-	ID-0089
-	. NGM-089
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-089
+ ID-0089
+ . NGM-089
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-089
 ***************************************-->
 
 	<software name="pulstar">
@@ -4123,10 +4123,10 @@
 	</software>
 
 <!--***************************************
-	ID-0090
-	. ADM-009
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. ADH-009
+ ID-0090
+ . ADM-009
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . ADH-009
 ***************************************-->
 
 	<software name="whp">
@@ -4167,15 +4167,15 @@
 	</software>
 
 <!--***************************************
-	ID-0091
-	unknown
+ ID-0091
+ unknown
 ***************************************-->
 
 <!--***************************************
-	ID-0092
-	. NGM-092
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-092
+ ID-0092
+ . NGM-092
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-092
 ***************************************-->
 
 	<software name="kabukikl">
@@ -4211,9 +4211,9 @@
 	</software>
 
 <!--***************************************
-	ID-0093
-	. ??M-093
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0093
+ . ??M-093
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="neobombe">
@@ -4247,10 +4247,10 @@
 	</software>
 
 <!--***************************************
-	ID-0094
-	. NGM-094
-	NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
-	. NGH-094
+ ID-0094
+ . NGM-094
+ NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
+ . NGH-094
 ***************************************-->
 
 	<software name="gowcaizr">
@@ -4289,11 +4289,11 @@
 	</software>
 
 <!--***************************************
-	ID-0095
-	. NGM-095
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-095
-	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
+ ID-0095
+ . NGM-095
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-095
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ***************************************-->
 
 	<software name="rbff1">
@@ -4374,10 +4374,10 @@
 	</software>
 
 <!--***************************************
-	ID-0096
-	. NGM-096
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-096
+ ID-0096
+ . NGM-096
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-096
 ***************************************-->
 
 	<software name="aof3">
@@ -4452,10 +4452,10 @@
 	</software>
 
 <!--***************************************
-	ID-0097
-	. NGM-097
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-097
+ ID-0097
+ . NGM-097
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-097
 ***************************************-->
 
 	<software name="sonicwi3">
@@ -4489,13 +4489,13 @@
 	</software>
 
 <!--***************************************
-	ID-0098
-	Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist)
+ ID-0098
+ Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist)
 ***************************************-->
 
 <!--***************************************
-	ID-0099
-	Neo Pool Masters
+ ID-0099
+ Neo Pool Masters
 ***************************************-->
 
 
@@ -4517,10 +4517,10 @@
 
 
 <!--***************************************
-	ID-0200
-	. NGM-200
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. NGH-200
+ ID-0200
+ . NGM-200
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . NGH-200
 ***************************************-->
 
 	<software name="turfmast">
@@ -4554,10 +4554,10 @@
 	</software>
 
 <!--***************************************
-	ID-0201
-	. NGM-201
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-201
+ ID-0201
+ . NGM-201
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-201
 ***************************************-->
 
 	<software name="mslug">
@@ -4591,9 +4591,9 @@
 	</software>
 
 <!--***************************************
-	ID-0202
-	. ??M-202
-	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
+ ID-0202
+ . ??M-202
+ NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
 ***************************************-->
 
 	<software name="puzzledp">
@@ -4624,10 +4624,10 @@
 	</software>
 
 <!--***************************************
-	ID-0203
-	. ADM-010
-	NEO-MVS PROGTOP / NEO-MVS CHA42G-3B
-	. ADH-010
+ ID-0203
+ . ADM-010
+ NEO-MVS PROGTOP / NEO-MVS CHA42G-3B
+ . ADH-010
 ***************************************-->
 
 	<software name="mosyougi">
@@ -4657,20 +4657,20 @@
 	</software>
 
 <!--***************************************
-	ID-0204
-	QP (prototype)
+ ID-0204
+ QP (prototype)
 ***************************************-->
 
 <!--***************************************
-	ID-0205
-	Neo-Geo CD Special (CD only)
+ ID-0205
+ Neo-Geo CD Special (CD only)
 ***************************************-->
 
 <!--***************************************
-	ID-0206
-	. ??M-206
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. ??H-206
+ ID-0206
+ . ??M-206
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . ??H-206
 ***************************************-->
 
 	<software name="marukodq">
@@ -4703,9 +4703,9 @@
 	</software>
 
 <!--***************************************
-	ID-0207
-	. ??M-207
-	NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
+ ID-0207
+ . ??M-207
+ NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
 ***************************************-->
 
 	<software name="neomrdo">
@@ -4736,9 +4736,9 @@
 	</software>
 
 <!--***************************************
-	ID-0208
-	. ??M-208
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ ID-0208
+ . ??M-208
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
 ***************************************-->
 
 	<software name="sdodgeb">
@@ -4772,9 +4772,9 @@
 	</software>
 
 <!--***************************************
-	ID-0209
-	. ??M-209
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0209
+ . ??M-209
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="goalx3">
@@ -4808,20 +4808,20 @@
 	</software>
 
 <!--***************************************
-	ID-0210
-	Karate Ninja Sho (prototype) 1995 Yumekobo
+ ID-0210
+ Karate Ninja Sho (prototype) 1995 Yumekobo
 ***************************************-->
 
 <!--***************************************
-	ID-0211
-	Oshidashi Zintrick (CD only? not confirmed, MVS might exist) 1996 SNK/ADK
+ ID-0211
+ Oshidashi Zintrick (CD only? not confirmed, MVS might exist) 1996 SNK/ADK
 ***************************************-->
 
 <!--***************************************
-	ID-0212
-	. ADM-011
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. ADH-011
+ ID-0212
+ . ADM-011
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . ADH-011
 ***************************************-->
 
 	<software name="overtop">
@@ -4856,9 +4856,9 @@
 	</software>
 
 <!--***************************************
-	ID-0213
-	. ??M-213
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ ID-0213
+ . ??M-213
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
 ***************************************-->
 
 	<software name="neodrift">
@@ -4891,10 +4891,10 @@
 	</software>
 
 <!--***************************************
-	ID-0214
-	. NGM-214
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-214
+ ID-0214
+ . NGM-214
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-214
 ***************************************-->
 
 	<software name="kof96">
@@ -4969,10 +4969,10 @@
 	</software>
 
 <!--***************************************
-	ID-0215
-	. NGM-215
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-215
+ ID-0215
+ . NGM-215
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-215
 ***************************************-->
 
 	<software name="ssideki4">
@@ -5008,10 +5008,10 @@
 	</software>
 
 <!--***************************************
-	ID-0216
-	. ??M-216
-	NEO-MVS PROGTOP / NEO-MVS CHA256
-	. ??H-216
+ ID-0216
+ . ??M-216
+ NEO-MVS PROGTOP / NEO-MVS CHA256
+ . ??H-216
 ***************************************-->
 
 	<software name="kizuna">
@@ -5053,10 +5053,10 @@
 	</software>
 
 <!--***************************************
-	ID-0217
-	. ADM-012
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. ADH-012
+ ID-0217
+ . ADM-012
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . ADH-012
 ***************************************-->
 
 	<software name="ninjamas">
@@ -5094,10 +5094,10 @@
 	</software>
 
 <!--***************************************
-	ID-0218
-	. NGM-218
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-218
+ ID-0218
+ . NGM-218
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-218
 ***************************************-->
 
 	<software name="ragnagrd">
@@ -5135,9 +5135,9 @@
 	</software>
 
 <!--***************************************
-	ID-0219
-	. NGM-219
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0219
+ . NGM-219
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="pgoal">
@@ -5171,8 +5171,8 @@
 	</software>
 
 <!--***************************************
-	ID-0220
-	Choutetsu Brikin'ger - Iron clad (prototype) 1996 Saurus
+ ID-0220
+ Choutetsu Brikin'ger - Iron clad (prototype) 1996 Saurus
 ***************************************-->
 
 	<software name="ironclad">
@@ -5236,10 +5236,10 @@
 	</software>
 
 <!--***************************************
-	ID-0221
-	. NGM-221
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. NGH-221
+ ID-0221
+ . NGM-221
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . NGH-221
 ***************************************-->
 
 	<software name="magdrop2">
@@ -5269,11 +5269,11 @@
 	</software>
 
 <!--***************************************
-	ID-0222
-	. NGM-222
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. NGH-222
-	NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
+ ID-0222
+ . NGM-222
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . NGH-222
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ***************************************-->
 
 	<software name="samsho4">
@@ -5349,10 +5349,10 @@
 	</software>
 
 <!--***************************************
-	ID-0223
-	. NGM-223
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. NGH-223
+ ID-0223
+ . NGM-223
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . NGH-223
 ***************************************-->
 
 	<software name="rbffspec">
@@ -5428,10 +5428,10 @@
 	</software>
 
 <!--***************************************
-	ID-0224
-	. ADM-013
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. ADH-013
+ ID-0224
+ . ADM-013
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . ADH-013
 ***************************************-->
 
 	<software name="twinspri">
@@ -5465,10 +5465,10 @@
 	</software>
 
 <!--***************************************
-	ID-0225
-	. SUM-225
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. SUH-225
+ ID-0225
+ . SUM-225
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . SUH-225
 ***************************************-->
 
 	<software name="wakuwak7">
@@ -5504,15 +5504,15 @@
 	</software>
 
 <!--***************************************
-	ID-0226
-	Pair Pair Wars (prototype) 1996 Sunsoft?
+ ID-0226
+ Pair Pair Wars (prototype) 1996 Sunsoft?
 ***************************************-->
 
 <!--***************************************
-	ID-0227
-	. NGM-227
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-227
+ ID-0227
+ . NGM-227
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-227
 ***************************************-->
 
 	<software name="stakwin2">
@@ -5546,8 +5546,8 @@
 	</software>
 
 <!--***************************************
-	ID-0228
-	Ghostlop (prototype) 1996 Data East Corp.
+ ID-0228
+ Ghostlop (prototype) 1996 Data East Corp.
 ***************************************-->
 
 	<software name="ghostlop">
@@ -5578,8 +5578,8 @@
 	</software>
 
 <!--***************************************
-	ID-0229
-	King of Fighters '96 CD Collection (CD only)
+ ID-0229
+ King of Fighters '96 CD Collection (CD only)
 ***************************************-->
 
 
@@ -5587,10 +5587,10 @@
 
 
 <!--***************************************
-	ID-0230
-	. NGM-2300
-	NEO-MVS PROGBK1 / NEO-MVS CHA256B
-	. NGH-2300
+ ID-0230
+ . NGM-2300
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
+ . NGH-2300
 ***************************************-->
 
 	<software name="breakers">
@@ -5624,9 +5624,9 @@
 	</software>
 
 <!--***************************************
-	ID-0231
-	. ??M-2310
-	NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
+ ID-0231
+ . ??M-2310
+ NEO-MVS PROGBK1 / NEO-MVS CHA42G-3B
 ***************************************-->
 
 	<software name="miexchng">
@@ -5659,11 +5659,11 @@
 	</software>
 
 <!--***************************************
-	ID-0232
-	. NGM-2320
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2320
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0232
+ . NGM-2320
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2320
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="kof97">
@@ -5769,10 +5769,10 @@
 	</software>
 
 <!--***************************************
-	ID-0233
-	. NGM-2330
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	. NGH-2330
+ ID-0233
+ . NGM-2330
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ . NGH-2330
 ***************************************-->
 
 	<software name="magdrop3">
@@ -5805,11 +5805,11 @@
 	</software>
 
 <!--***************************************
-	ID-0234
-	. NGM-2340
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2340
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0234
+ . NGM-2340
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2340
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="lastblad">
@@ -5918,9 +5918,9 @@
 	</software>
 
 <!--***************************************
-	ID-0235
-	. ??M-2350
-	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
+ ID-0235
+ . ??M-2350
+ NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
 ***************************************-->
 
 	<software name="puzzldpr">
@@ -5951,17 +5951,17 @@
 	</software>
 
 <!--***************************************
-	ID-0236
-	. ??M-2360
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ ID-0236
+ . ??M-2360
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
 ***************************************-->
 
 	<!-- Irritating Maze requires a Custom BIOS and is still loaded in neodrvr.c -->
 
 <!--***************************************
-	ID-0237
-	. ??M-2370
-	NEO-MVS PROG 4096 / NEO-MVS CHA42G-3B
+ ID-0237
+ . ??M-2370
+ NEO-MVS PROG 4096 / NEO-MVS CHA42G-3B
 ***************************************-->
 
 	<software name="popbounc">
@@ -5992,9 +5992,9 @@
 	</software>
 
 <!--***************************************
-	ID-0238
-	. ??M-2380
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0238
+ . ??M-2380
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="shocktro">
@@ -6068,10 +6068,10 @@
 	</software>
 
 <!--***************************************
-	ID-0239
-	. NGM-2390
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2390
+ ID-0239
+ . NGM-2390
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2390
 ***************************************-->
 
 	<software name="blazstar">
@@ -6109,11 +6109,11 @@
 	</software>
 
 <!--***************************************
-	ID-0240
-	. NGM-2400
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2400
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0240
+ . NGM-2400
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2400
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="rbff2">
@@ -6222,11 +6222,11 @@
 	</software>
 
 <!--***************************************
-	ID-0241
-	. NGM-2410
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2410
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0241
+ . NGM-2410
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2410
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="mslug2">
@@ -6260,12 +6260,12 @@
 	</software>
 
 <!--***************************************
-	ID-0242
-	. NGM-2420
-	NEO-MVS PROGSF1 (protected board) / NEO-MVS CHA512Y
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2420
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0242
+ . NGM-2420
+ NEO-MVS PROGSF1 (protected board) / NEO-MVS CHA512Y
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2420
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="kof98">
@@ -6425,11 +6425,11 @@
 	</software>
 
 <!--***************************************
-	ID-0243
-	. NGM-2430
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2430
-	NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
+ ID-0243
+ . NGM-2430
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2430
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="lastbld2">
@@ -6469,10 +6469,10 @@
 	</software>
 
 <!--***************************************
-	ID-0244
-	. ??M-2440
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. ??H-2440
+ ID-0244
+ . ??M-2440
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . ??H-2440
 ***************************************-->
 
 	<software name="neocup98">
@@ -6504,9 +6504,9 @@
 	</software>
 
 <!--***************************************
-	ID-0245
-	. ??M-2450
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ ID-0245
+ . ??M-2450
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
 ***************************************-->
 
 	<software name="breakrev">
@@ -6544,10 +6544,10 @@
 	</software>
 
 <!--***************************************
-	ID-0246
-	. NGM-2460
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
-	. NGH-2460
+ ID-0246
+ . NGM-2460
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ . NGH-2460
 ***************************************-->
 
 	<software name="shocktr2">
@@ -6584,9 +6584,9 @@
 	</software>
 
 <!--***************************************
-	ID-0247
-	. ??M-2470
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0247
+ . ??M-2470
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="flipshot">
@@ -6617,9 +6617,9 @@
 	</software>
 
 <!--***************************************
-	ID-0248
-	. ??M-2480
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
+ ID-0248
+ . ??M-2480
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
 ***************************************-->
 
 	<software name="pbobbl2n">
@@ -6653,10 +6653,10 @@
 	</software>
 
 <!--***************************************
-	ID-0249
-	. ??M-2490
-	NEO-MVS PROGBK1 / NEO-MVS CHA256
-	NEO-MVS PROGBK1 / NEO-MVS CHA512Y
+ ID-0249
+ . ??M-2490
+ NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA512Y
 ***************************************-->
 
 	<software name="ctomaday">
@@ -6689,11 +6689,11 @@
 	</software>
 
 <!--***************************************
-	ID-0250
-	. NGM-2500
-	NEO-MVS PROGEOP / NEO-MVS CHA512Y
-	. NGH-2500
-	NEO-AEG PROGEOP (1999.4.2) / NEO-AEG CHA512Y
+ ID-0250
+ . NGM-2500
+ NEO-MVS PROGEOP / NEO-MVS CHA512Y
+ . NGH-2500
+ NEO-AEG PROGEOP (1999.4.2) / NEO-AEG CHA512Y
 ***************************************-->
 
 	<software name="mslugx">
@@ -6731,14 +6731,14 @@
 	</software>
 
 <!--***************************************
-	ID-0251
-	. NGM-2510
-	SMA protected version found on:
-	NEO-MVS PROGLBA (NEO-SMA) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	Non SMA protected version found on:
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	. NGH-2510
-	NEO-AEG PROGLBA / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ ID-0251
+ . NGM-2510
+ SMA protected version found on:
+ NEO-MVS PROGLBA (NEO-SMA) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ Non SMA protected version found on:
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ . NGH-2510
+ NEO-AEG PROGLBA / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="kof99">
@@ -6951,9 +6951,9 @@
 	</software>
 
 <!--***************************************
-	ID-0252
-	. ??M-2520
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0252
+ . ??M-2520
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="ganryu">
@@ -6989,11 +6989,11 @@
 	</software>
 
 <!--***************************************
-	ID-0253
-	. NGM-2530
-	NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	. NGH-2530
-	NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ ID-0253
+ . NGM-2530
+ NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ . NGH-2530
+ NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="garou">
@@ -7120,9 +7120,9 @@
 	</software>
 
 <!--***************************************
-	ID-0254
-	. ??M-2540
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0254
+ . ??M-2540
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="s1945p">
@@ -7166,9 +7166,9 @@
 	</software>
 
 <!--***************************************
-	ID-0255
-	. ??M-2550
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0255
+ . ??M-2550
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="preisle2">
@@ -7209,13 +7209,13 @@
 	</software>
 
 <!--***************************************
-	ID-0256
-	. NGM-2560
-	SMA protected version found on:
-	NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	Non SMA protected version found on:
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	. NGH-2560
+ ID-0256
+ . NGM-2560
+ SMA protected version found on:
+ NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ Non SMA protected version found on:
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ . NGH-2560
 ***************************************-->
 
 	<software name="mslug3">
@@ -7305,14 +7305,14 @@
 	</software>
 
 <!--***************************************
-	ID-0257
-	. NGM-2570
-	SMA protected version found on:
-	NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
-	Non SMA protected version found on:
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
-	. NGH-2570
-	NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ ID-0257
+ . NGM-2570
+ SMA protected version found on:
+ NEO-MVS PROGLBA (NEO-SMA)(LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ Non SMA protected version found on:
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ . NGH-2570
+ NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="kof2000">
@@ -7398,14 +7398,14 @@
 	</software>
 
 <!--***************************************
-	ID-0258
-	SNK vs. Capcom?
+ ID-0258
+ SNK vs. Capcom?
 ***************************************-->
 
 <!--***************************************
-	ID-0259
-	. ??M-2590
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0259
+ . ??M-2590
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="bangbead">
@@ -7443,9 +7443,9 @@
 
 
 <!--***************************************
-	ID-0260
-	. ??M-2600
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ ID-0260
+ . ??M-2600
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
 ***************************************-->
 
 	<software name="nitd">
@@ -7480,10 +7480,10 @@
 	</software>
 
 <!--***************************************
-	ID-0261
-	. NGM-2610
-	NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
-	. NGH-2610
+ ID-0261
+ . NGM-2610
+ NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
+ . NGH-2610
 ***************************************-->
 
 	<software name="sengoku3">
@@ -7522,12 +7522,12 @@
 	</software>
 
 <!--***************************************
-	ID-0262
-	. NGM-262?
-	MVS PROGBK2 REV1.0 (NEO-PCM2 SNK)/ MVS CHAFIO REV1.0 (NEO-CMC 7050)
-	. NGH-2621
-	NEO-AEG PROGBK1F / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
-	- Distribution by BrezzaSoft
+ ID-0262
+ . NGM-262?
+ MVS PROGBK2 REV1.0 (NEO-PCM2 SNK)/ MVS CHAFIO REV1.0 (NEO-CMC 7050)
+ . NGH-2621
+ NEO-AEG PROGBK1F / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+  - Distribution by BrezzaSoft
 ***************************************-->
 
 	<software name="kof2001">
@@ -7616,11 +7616,11 @@
 	</software>
 
 <!--***************************************
-	ID-0263
-	. NGM-2630
-	NEO-MVS PROGBK2 (NEO-PCM2 SNK)/ NEO-MVS CHAFIO (NEO-CMC 7050)
-	. NGH-2630
-	NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ ID-0263
+ . NGM-2630
+ NEO-MVS PROGBK2 (NEO-PCM2 SNK)/ NEO-MVS CHAFIO (NEO-CMC 7050)
+ . NGH-2630
+ NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="mslug4">
@@ -7705,12 +7705,12 @@
 	</software>
 
 <!--***************************************
-	ID-0264
-	. NGM-264?
-	NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
-	. NGH-2641
-	NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
-	- Distribution by BrezzaSoft
+ ID-0264
+ . NGM-264?
+ NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ . NGH-2641
+ NEO-AEG PROGBK2 (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+  - Distribution by BrezzaSoft
 ***************************************-->
 
 	<software name="rotd">
@@ -7754,11 +7754,11 @@
 	</software>
 
 <!--***************************************
-	ID-0265
-	. NGM-2650
-	NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
-	. NGH-2650
-	NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ ID-0265
+ . NGM-2650
+ NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ . NGH-2650
+ NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="kof2002">
@@ -7803,11 +7803,11 @@
 	</software>
 
 <!--***************************************
-	ID-0266
-	. NGM-2660
-	NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
-	. NGH-2660
-	NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ ID-0266
+ . NGM-2660
+ NEO-MVS PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ . NGH-2660
+ NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="matrim">
@@ -7852,9 +7852,9 @@
 	</software>
 
 <!--***************************************
-	ID-0267
-	. ??M-2670
-	NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ ID-0267
+ . ??M-2670
+ NEO-MVS PROGBK2 (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="pnyaa">
@@ -7891,10 +7891,10 @@
 	</software>
 
 <!--***************************************
-	ID-0268
-	. NGM-2680
-	NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
-	. NGH-2680
+ ID-0268
+ . NGM-2680
+ NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ . NGH-2680
 ***************************************-->
 
 	<software name="mslug5">
@@ -7980,11 +7980,11 @@
 	</software>
 
 <!--***************************************
-	ID-0269
-	. NGM-2690
-	NEO-MVS PROGBK3R (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
-	. NGH-2690
-	NEO-AEG PROGBK3R (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ ID-0269
+ . NGM-2690
+ NEO-MVS PROGBK3R (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ . NGH-2690
+ NEO-AEG PROGBK3R (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="svc">
@@ -8029,11 +8029,11 @@
 	</software>
 
 <!--***************************************
-	ID-0270
-	. NGM-2700
-	NEO-MVS PROGBK2R (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
-	. NGH-2700
-	NEO-AEG PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ ID-0270
+ . NGM-2700
+ NEO-MVS PROGBK2R (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ . NGH-2700
+ NEO-AEG PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="samsho5">
@@ -8120,11 +8120,11 @@
 	</software>
 
 <!--***************************************
-	ID-0271
-	. NGM-2710
-	NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
-	. NGH-2710
-	NEO-AEG PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ ID-0271
+ . NGM-2710
+ NEO-MVS PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ . NGH-2710
+ NEO-AEG PROGBK3S (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ***************************************-->
 
 	<software name="kof2003">
@@ -8213,10 +8213,10 @@
 	</software>
 
 <!--***************************************
-	ID-0272
-	. NGM-2720
-	NEO-MVS PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
-	. NGH-2720
+ ID-0272
+ . NGM-2720
+ NEO-MVS PROGBK2S (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ . NGH-2720
 ***************************************-->
 
 	<software name="samsh5sp">
@@ -8351,17 +8351,17 @@
 
 
 <!--***************************************
-	B-J-02
-	. ???-????
-	MVS PROGV (2000.11.17) / NEO-MVS CHAFIO (1999.6.14)
+ B-J-02
+ . ???-????
+ MVS PROGV (2000.11.17) / NEO-MVS CHAFIO (1999.6.14)
 ***************************************-->
 
 	<!-- jockeygp requires very specific hardware and is loaded in neodrvr.c -->
 
 <!--***************************************
-	B-V-01
-	. ???-????
-	MVS PROGV (2000.11.17) / MVS CHAV (2000.10.26)
+ B-V-01
+ . ???-????
+ MVS PROGV (2000.11.17) / MVS CHAV (2000.10.26)
 ***************************************-->
 
 	<!-- vliner requires very specific hardware and is loaded in neodrvr.c -->
@@ -8371,33 +8371,33 @@
 
 
 <!--***************************************
-	ID-2680
-	. MV-0 ????
-	NEO-MVH MVOBR 2003.8.4
+ ID-2680
+ . MV-0 ????
+ NEO-MVH MVOBR 2003.8.4
 ***************************************-->
 
 	<!-- ms5pcb is not an MVS cart and is loaded in neodrvr.c -->
 
 <!--***************************************
-	ID-2690
-	. MV-0 ????
-	NEO-MVH MVO 2003.6.5
+ ID-2690
+ . MV-0 ????
+ NEO-MVH MVO 2003.6.5
 ***************************************-->
 
 	<!-- svcpcb is not an MVS cart and is loaded in neodrvr.c -->
 
 <!--***************************************
-	ID-2690
-	. MV-0 ????
-	NEO-MVH MVOB 2003.7.9
+ ID-2690
+ . MV-0 ????
+ NEO-MVH MVOB 2003.7.9
 ***************************************-->
 
 	<!-- svcpcba is not an MVS cart and is loaded in neodrvr.c -->
 
 <!--***************************************
-	ID-2710
-	. MV-0 ????
-	NEO-MVH MVOC 2003.11.3
+ ID-2710
+ . MV-0 ????
+ NEO-MVH MVOC 2003.11.3
 ***************************************-->
 
 	<!-- kof2003pcb is not an MVS cart and is loaded in neodrvr.c -->

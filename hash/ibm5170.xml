@@ -3,8 +3,8 @@
 <!--
 Missing files come here
 
-	IPF Dumps Missing
-	Rick Dangerous (SPS 3042)
+    IPF Dumps Missing
+    Rick Dangerous (SPS 3042)
 
 -->
 <softwarelist name="ibm5170" description="IBM PC/AT disk images">
@@ -932,18 +932,18 @@ Missing files come here
 	</software>
 
 <!--
-	This is not a real dump, it was constructed using WinImage for use with MESS
-	Also circulating with CRC fb591430
-	<software name="ptombs">
-		<description>Pharaoh's Tomb (Shareware)</description>
-		<year>1994</year>
-		<publisher>Apogee</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    This is not a real dump, it was constructed using WinImage for use with MESS
+    Also circulating with CRC fb591430
+    <software name="ptombs">
+        <description>Pharaoh's Tomb (Shareware)</description>
+        <year>1994</year>
+        <publisher>Apogee</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="raptor12">
@@ -1224,7 +1224,7 @@ Missing files come here
 
 	<!-- PC Gamer Germany -->
 	<!-- October 1992 undumped
-		<info name="Contents" value="Soul Magican / Atom Demo" />-->
+	    <info name="Contents" value="Soul Magican / Atom Demo" />-->
 
 	<software name="pcga9211">
 		<description>PC Games Coverdisk (November 1992) (German)</description>
@@ -1239,7 +1239,7 @@ Missing files come here
 	</software>
 
 	<!-- December 1992 undumped
-		<info name="Contents" value="Ween the Prophecy Demo" />-->
+	    <info name="Contents" value="Ween the Prophecy Demo" />-->
 
 	<software name="pcga9301">
 		<description>PC Games Coverdisk (January 1993) (German)</description>
@@ -1266,13 +1266,13 @@ Missing files come here
 	</software>
 
 	<!-- March 1993 undumped
-		<info name="Contents" value="Ween the Prophecy Demo" />-->
+	    <info name="Contents" value="Ween the Prophecy Demo" />-->
 
 	<!-- April 1993 undumped
-		<info name="Contents" value="Zool Demo" />-->
+	    <info name="Contents" value="Zool Demo" />-->
 
 	<!-- May 1993 undumped
-		<info name="Contents" value="Tornado Demo" />-->
+	    <info name="Contents" value="Tornado Demo" />-->
 
 	<software name="pcga9306">
 		<description>PC Games Coverdisk (June 1993) (German)</description>
@@ -1311,7 +1311,7 @@ Missing files come here
 	</software>
 
 	<!-- September 1993 undumped
-		<info name="Contents" value="Ambush at Sorinor Demo" />-->
+	    <info name="Contents" value="Ambush at Sorinor Demo" />-->
 
 	<software name="pcga9310">
 		<description>PC Games Coverdisk (October 1993) (German)</description>
@@ -1326,13 +1326,13 @@ Missing files come here
 	</software>
 
 	<!-- November 1993 undumped
-		<info name="Contents" value="Energie Manager Demo" />-->
+	    <info name="Contents" value="Energie Manager Demo" />-->
 
 	<!-- December 1993 undumped
-		<info name="Contents" value="Micro Machines Demo" />-->
+	    <info name="Contents" value="Micro Machines Demo" />-->
 
 	<!-- January 1994 undumped
-		<info name="Contents" value="Android Demo" />-->
+	    <info name="Contents" value="Android Demo" />-->
 
 	<software name="pcga9402">
 		<description>PC Games Coverdisk (February 1994) (German)</description>
@@ -1347,7 +1347,7 @@ Missing files come here
 	</software>
 
 	<!-- March 1994 undumped
-		<info name="Contents" value="Pinball Fantasies Demo" />-->
+	    <info name="Contents" value="Pinball Fantasies Demo" />-->
 
 	<software name="pcga9404">
 		<description>PC Games Coverdisk (April 1994) (German)</description>
@@ -1386,22 +1386,22 @@ Missing files come here
 	</software>
 
 	<!-- July 1994 undumped
-		<info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
+	    <info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
 
 	<!-- August 1994 undumped
-		<info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
+	    <info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
 
 	<!-- September 1994 undumped
-		<info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
+	    <info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
 
 	<!-- October 1994 undumped
-		<info name="Contents" value="Cool Spot / Cheat It Demo" />-->
+	    <info name="Contents" value="Cool Spot / Cheat It Demo" />-->
 
 	<!-- November 1994 undumped
-		<info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
+	    <info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
 
 	<!-- December 1994 undumped
-		<info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
+	    <info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
 
 	<software name="pcga9501">
 		<description>PC Games Coverdisk (January 1995) (German)</description>

@@ -3,68 +3,68 @@
 <softwarelist name="pc88va" description="NEC PC-88VA disk images">
 
 <!-- Possibly Undumped PC88VA games:
-	[some of these might have been discs compatible with both PC88VA and PC98,
-	or compatible with both PC88VA and PC8801, so they could be in other collections]
-	* Flight in Hawaii ~ フライトインハワイ, released 1986-09 by Carry Soft
-	* Coach ~ 名監督, by JDS
-	* Coach 2 ~ 名監督, by JDS
-	* DIRES - giger loop, by BothTec
-	* Taiheiyou no Arashi ~ 太平洋の嵐, by GAM
-	* Tanoshī tsumego daiikkan ~ 楽しい詰碁第一巻, by GAM
-	* Igo-mei-kyoku Shuu '87 ~ 囲碁名局集'87, by GAM
-	* Death Bringer ~ デス・ブリンガー, by Telenet Japan
-	* Arantia (Atlantia?) VA Special ~ アランティアVAスペシャル, by Victor Music Industry
-	* Go Kichi-kun 2 ~ 碁キチくん2, by GAM
-	* Ultima V ~ ウルティマⅤ, by Pony Canyon
-	* The Bard's Tale ~ ザ バーズテイル, by Pony Canyon
-	* The Bard's Tale 2 ~ ザ・バーズテイル2, by Pony Canyon
-	* Battle ~ バトル, by GAM
-	* Advanced Dungeons & Dragons: Hillsfar ~ AD&D ヒルズファー, by Pony Canyon
-	* Balance of Power ~ バランスオブパワー, by ASCII
-	* First Queen ~ ファーストクイーン, by Kure Software
-	* Ishin no Arashi ~ 維新の嵐, by Koei
-	* Teitoku no Ketsudan ~ 提督の決断, by Koei
-	* Nobunaga no Yabou - Sengoku Gunyou Den ~ 信長の野望・戦国群雄伝, by Koei
-	* Suikoden ~ 水滸伝, by Koei
-	* Kawaiso Monogatari ~ かわいそう物語, by System Software
-	* Fantasy III ~ ファンタジーⅢ, by Starcraft
-	* Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
-	* Tetris ~ テトリス, by BPS
-	* Art of War ~ アートオブウォー, by Broderbund Japan
-	* Eiyuu Napoleon ~ 英雄ナポレオン, by Pony Canyon
-	* Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
-	* Heroes of the Lance ~ ヒーローオブランス, by Pony Canyon
-	* Lightning Bacchus? ~ ライトニングバッカス, by NCS
+    [some of these might have been discs compatible with both PC88VA and PC98,
+    or compatible with both PC88VA and PC8801, so they could be in other collections]
+    * Flight in Hawaii ~ フライトインハワイ, released 1986-09 by Carry Soft
+    * Coach ~ 名監督, by JDS
+    * Coach 2 ~ 名監督, by JDS
+    * DIRES - giger loop, by BothTec
+    * Taiheiyou no Arashi ~ 太平洋の嵐, by GAM
+    * Tanoshī tsumego daiikkan ~ 楽しい詰碁第一巻, by GAM
+    * Igo-mei-kyoku Shuu '87 ~ 囲碁名局集'87, by GAM
+    * Death Bringer ~ デス・ブリンガー, by Telenet Japan
+    * Arantia (Atlantia?) VA Special ~ アランティアVAスペシャル, by Victor Music Industry
+    * Go Kichi-kun 2 ~ 碁キチくん2, by GAM
+    * Ultima V ~ ウルティマⅤ, by Pony Canyon
+    * The Bard's Tale ~ ザ バーズテイル, by Pony Canyon
+    * The Bard's Tale 2 ~ ザ・バーズテイル2, by Pony Canyon
+    * Battle ~ バトル, by GAM
+    * Advanced Dungeons & Dragons: Hillsfar ~ AD&D ヒルズファー, by Pony Canyon
+    * Balance of Power ~ バランスオブパワー, by ASCII
+    * First Queen ~ ファーストクイーン, by Kure Software
+    * Ishin no Arashi ~ 維新の嵐, by Koei
+    * Teitoku no Ketsudan ~ 提督の決断, by Koei
+    * Nobunaga no Yabou - Sengoku Gunyou Den ~ 信長の野望・戦国群雄伝, by Koei
+    * Suikoden ~ 水滸伝, by Koei
+    * Kawaiso Monogatari ~ かわいそう物語, by System Software
+    * Fantasy III ~ ファンタジーⅢ, by Starcraft
+    * Lodoss Shima Senki ~ ロードス島戦記, by Humming Bird Soft
+    * Tetris ~ テトリス, by BPS
+    * Art of War ~ アートオブウォー, by Broderbund Japan
+    * Eiyuu Napoleon ~ 英雄ナポレオン, by Pony Canyon
+    * Ultima I-IV ~ ウルティマI～IV, by Pony Canyon
+    * Heroes of the Lance ~ ヒーローオブランス, by Pony Canyon
+    * Lightning Bacchus? ~ ライトニングバッカス, by NCS
 
 PC88VA doujin games (mostly undumped)
 
-	* 最終平気UPOプレリリース (by UPYOLIC SOFT, 1992)  [DUMPED!]
-	* AIR HUNTER 2 (by H-VA, 1992)
-	* Speedy Drug!! (by H-VA, 1993)
-	* 65536ショクカミシバイVA (by KAFCOBA-東京, 1993)
-	* E square (by SIGNAL, 1993)
-	* ネコメーカー (by LOKAPALA, 1994)
-	* ハティの森で (by LOKAPALA, 1994)
-	* 3D MAZE (by W341連合, 1994)
-	* ハティの空で (by LOKAPALA, 1994)  [DUMPED!]
-	* ネコメーカーおかわり (by LOKAPALA, 1994)
-	* ハティの峰で (by LOKAPALA, 1995)
-	* Star Dust Magic (by Wing software, 1995)
-	* DRAGON BALL Z キャラクター事典 (by Fredia, 1995)
-	* ハティの館で (by LOKAPALA, 1995)
-	* Flame Symbol 2 (by Wing software/Morning Bread, 1995)
-	* Boomering (by Fredia, 1996)  [DUMPED!]
-	* ばる〜んぶ れ〜か〜 (by Fredia, 1996)  [DUMPED!]
-	* 翼君の宝箱9 (by Wing software, 1996)
-	* 冒険島漫遊記 (by Wing softwre/Morning Bread, 1997)
-	* 翼くんのたからばこ拾 (by Wing software, 1997)
-	* Frediaがらくた箱 (by Fredia, 1997)
-	* 翼君の宝箱12 (by Wing software, 1998)
-	* Tear Drops (by Fredia, 1998)
-	* 翼君の宝箱13 (by Wing software, 1998)
-	* 翼君の宝箱14 (by Wing software, 1999)
-	* くるッ★彡 (by Cenkeil, 1999)
-	* Frail Rulers (by Fredia, 1999)
+    * 最終平気UPOプレリリース (by UPYOLIC SOFT, 1992)  [DUMPED!]
+    * AIR HUNTER 2 (by H-VA, 1992)
+    * Speedy Drug!! (by H-VA, 1993)
+    * 65536ショクカミシバイVA (by KAFCOBA-東京, 1993)
+    * E square (by SIGNAL, 1993)
+    * ネコメーカー (by LOKAPALA, 1994)
+    * ハティの森で (by LOKAPALA, 1994)
+    * 3D MAZE (by W341連合, 1994)
+    * ハティの空で (by LOKAPALA, 1994)  [DUMPED!]
+    * ネコメーカーおかわり (by LOKAPALA, 1994)
+    * ハティの峰で (by LOKAPALA, 1995)
+    * Star Dust Magic (by Wing software, 1995)
+    * DRAGON BALL Z キャラクター事典 (by Fredia, 1995)
+    * ハティの館で (by LOKAPALA, 1995)
+    * Flame Symbol 2 (by Wing software/Morning Bread, 1995)
+    * Boomering (by Fredia, 1996)  [DUMPED!]
+    * ばる〜んぶ れ〜か〜 (by Fredia, 1996)  [DUMPED!]
+    * 翼君の宝箱9 (by Wing software, 1996)
+    * 冒険島漫遊記 (by Wing softwre/Morning Bread, 1997)
+    * 翼くんのたからばこ拾 (by Wing software, 1997)
+    * Frediaがらくた箱 (by Fredia, 1997)
+    * 翼君の宝箱12 (by Wing software, 1998)
+    * Tear Drops (by Fredia, 1998)
+    * 翼君の宝箱13 (by Wing software, 1998)
+    * 翼君の宝箱14 (by Wing software, 1999)
+    * くるッ★彡 (by Cenkeil, 1999)
+    * Frail Rulers (by Fredia, 1999)
 -->
 
 

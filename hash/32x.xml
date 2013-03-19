@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-	Notes on GameId:
-	- first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
-		a -5x appended to the end, depending on the country/language (generic English titles have a -50)
+    Notes on GameId:
+    - first Id is the Japanese one, second Id is the USA one. European Ids are the same as USA with
+      a -5x appended to the end, depending on the country/language (generic English titles have a -50)
 
 
-	Undumped:
-		- Motherbase (Euro)
+    Undumped:
+     - Motherbase (Euro)
 
-	Known undumped prototypes:
-		- Spot Goes to Hollywood
+    Known undumped prototypes:
+     - Spot Goes to Hollywood
 
 -->
 <softwarelist name="32x" description="Sega 32X cartridges">
@@ -2505,302 +2505,302 @@
 	</software>
 
 <!--
-	<software name="32xbab" supported="no">
-		<description>32X Babe Picture by Fonzie(PD) [a1]</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="32x babe picture by fonzie(pd) [a1].bin" size="85888" crc="7c0587f6" sha1="524093f7c93f07ec117f2a6c6a61e4da93ea1549" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="32xbab" supported="no">
+        <description>32X Babe Picture by Fonzie(PD) [a1]</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="32x babe picture by fonzie(pd) [a1].bin" size="85888" crc="7c0587f6" sha1="524093f7c93f07ec117f2a6c6a61e4da93ea1549" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="32xba1" cloneof="32xbab" supported="no">
-		<description>32X Babe Picture by Fonzie(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="32x babe picture by fonzie(pd).bin" size="85888" crc="816b0cb4" sha1="dc16d3170d5809b57192e03864b7136935eada64" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="32xba1" cloneof="32xbab" supported="no">
+        <description>32X Babe Picture by Fonzie(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="32x babe picture by fonzie(pd).bin" size="85888" crc="816b0cb4" sha1="dc16d3170d5809b57192e03864b7136935eada64" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="32xqin" supported="no">
-		<description>32X Qinter Demo by Fonzie(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="32x qinter demo by fonzie(pd).bin" size="381220" crc="93d4b0a3" sha1="128bd0b6e048c749da1a2f4c3abd6a867539a293" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="32xqin" supported="no">
+        <description>32X Qinter Demo by Fonzie(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="32x qinter demo by fonzie(pd).bin" size="381220" crc="93d4b0a3" sha1="128bd0b6e048c749da1a2f4c3abd6a867539a293" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="32xsam" supported="no">
-		<description>32X Sample Program - PWM Sound Demo (USA) (SDK Build)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="32x sample program - pwm sound demo (usa) (sdk build).bin" size="524288" crc="542ad12e" sha1="b2b7938d5c9a207efecf9f5054308f5772c8c25f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="32xsam" supported="no">
+        <description>32X Sample Program - PWM Sound Demo (USA) (SDK Build)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="32x sample program - pwm sound demo (usa) (sdk build).bin" size="524288" crc="542ad12e" sha1="b2b7938d5c9a207efecf9f5054308f5772c8c25f" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="backan" supported="no">
-		<description>Back and Forth Rotating XOR Palette by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="back and forth rotating xor palette by devster(pd).bin" size="4696" crc="4e7ac3d4" sha1="87f999f629feb873f8916483ab76152a88a9af53" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="backan" supported="no">
+        <description>Back and Forth Rotating XOR Palette by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="back and forth rotating xor palette by devster(pd).bin" size="4696" crc="4e7ac3d4" sha1="87f999f629feb873f8916483ab76152a88a9af53" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="backwa" supported="no">
-		<description>Backward Rotating XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="backward rotating xor palette demo by devster(pd).bin" size="4648" crc="d4ae89da" sha1="58b0e798329df3591a08c21492a8967ad20736c6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="backwa" supported="no">
+        <description>Backward Rotating XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="backward rotating xor palette demo by devster(pd).bin" size="4648" crc="d4ae89da" sha1="58b0e798329df3591a08c21492a8967ad20736c6" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="devste" supported="no">
-		<description>DevSter Owns! Text Demo(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="devster owns! text demo(pd).bin" size="4196" crc="03f9f674" sha1="96b92cca59a0e9005dc958d96207cf71a91cf0b9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="devste" supported="no">
+        <description>DevSter Owns! Text Demo(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="devster owns! text demo(pd).bin" size="4196" crc="03f9f674" sha1="96b92cca59a0e9005dc958d96207cf71a91cf0b9" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="greenr" supported="no">
-		<description>Green Rotating No Stretching XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="green rotating no stretching xor palette demo by devster(pd).bin" size="76376" crc="84251f0a" sha1="4582aa4309baffe80a087efe50be4644e7d3b64d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="greenr" supported="no">
+        <description>Green Rotating No Stretching XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="green rotating no stretching xor palette demo by devster(pd).bin" size="76376" crc="84251f0a" sha1="4582aa4309baffe80a087efe50be4644e7d3b64d" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="green1" cloneof="greenr" supported="no">
-		<description>Green Rotating XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="green rotating xor palette demo by devster(pd).bin" size="4696" crc="e075ece6" sha1="3c211234782c9e97e76f2dba587e879272b123af" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="green1" cloneof="greenr" supported="no">
+        <description>Green Rotating XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="green rotating xor palette demo by devster(pd).bin" size="4696" crc="e075ece6" sha1="3c211234782c9e97e76f2dba587e879272b123af" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotchi" supported="no">
-		<description>Hot Chick by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick by devster(pd).bin" size="74588" crc="da9c93c9" sha1="a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotchi" supported="no">
+        <description>Hot Chick by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick by devster(pd).bin" size="74588" crc="da9c93c9" sha1="a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch1" cloneof="hotchi" supported="no">
-		<description>Hot Chick Drawn Without the SH2s for Emulators by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick drawn without the sh2s for emulators by devster(pd).bin" size="77788" crc="d581910d" sha1="7d488bfd1bbd399d305da1b6cbf87edc882f3ed0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch1" cloneof="hotchi" supported="no">
+        <description>Hot Chick Drawn Without the SH2s for Emulators by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick drawn without the sh2s for emulators by devster(pd).bin" size="77788" crc="d581910d" sha1="7d488bfd1bbd399d305da1b6cbf87edc882f3ed0" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch2" cloneof="hotchi" supported="no">
-		<description>Hot Chick Drawn Without the SH2s for Hardware by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick drawn without the sh2s for hardware by devster(pd).bin" size="77884" crc="02d37b32" sha1="c490a19423c609ca3e9f89b21801de2307e4f87a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch2" cloneof="hotchi" supported="no">
+        <description>Hot Chick Drawn Without the SH2s for Hardware by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick drawn without the sh2s for hardware by devster(pd).bin" size="77884" crc="02d37b32" sha1="c490a19423c609ca3e9f89b21801de2307e4f87a" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch3" cloneof="hotchi" supported="no">
-		<description>Hot Chick in High Quality 15BPP by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick in high quality 15bpp by devster(pd).bin" size="148836" crc="938f4e1d" sha1="ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch3" cloneof="hotchi" supported="no">
+        <description>Hot Chick in High Quality 15BPP by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick in high quality 15bpp by devster(pd).bin" size="148836" crc="938f4e1d" sha1="ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch4" cloneof="hotchi" supported="no">
-		<description>Hot Chick in VDP Mode 2 by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick in vdp mode 2 by devster(pd).bin" size="77144" crc="cbf2f87e" sha1="376e67044c08373e49fd79892392a6a3a20059ef" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch4" cloneof="hotchi" supported="no">
+        <description>Hot Chick in VDP Mode 2 by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick in vdp mode 2 by devster(pd).bin" size="77144" crc="cbf2f87e" sha1="376e67044c08373e49fd79892392a6a3a20059ef" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch5" cloneof="hotchi" supported="no">
-		<description>Hot Chick in VDP Mode 3 by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick in vdp mode 3 by devster(pd).bin" size="77144" crc="f2758266" sha1="bc16856dbcd88a2ad742ed636b35f405da8e9af2" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch5" cloneof="hotchi" supported="no">
+        <description>Hot Chick in VDP Mode 3 by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick in vdp mode 3 by devster(pd).bin" size="77144" crc="f2758266" sha1="bc16856dbcd88a2ad742ed636b35f405da8e9af2" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch6" cloneof="hotchi" supported="no">
-		<description>Hot Chick Spinning Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick spinning demo by devster(pd).bin" size="76840" crc="73b25607" sha1="86cf6c88ccedefeb0b691c3f9aab5b624c0120d5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch6" cloneof="hotchi" supported="no">
+        <description>Hot Chick Spinning Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick spinning demo by devster(pd).bin" size="76840" crc="73b25607" sha1="86cf6c88ccedefeb0b691c3f9aab5b624c0120d5" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch7" cloneof="hotchi" supported="no">
-		<description>Hot Chick Spinning Slower Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick spinning slower demo by devster(pd).bin" size="76840" crc="3d1d1191" sha1="221a74408653e18cef8ce2f9b4d33ed93e4218b7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch7" cloneof="hotchi" supported="no">
+        <description>Hot Chick Spinning Slower Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick spinning slower demo by devster(pd).bin" size="76840" crc="3d1d1191" sha1="221a74408653e18cef8ce2f9b4d33ed93e4218b7" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch8" cloneof="hotchi" supported="no">
-		<description>Hot Chick with Genesis VDP Overlay by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick with genesis vdp overlay by devster(pd).bin" size="77144" crc="817b7656" sha1="99ee4fded53e4856a633676b0c6f83081186492c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch8" cloneof="hotchi" supported="no">
+        <description>Hot Chick with Genesis VDP Overlay by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick with genesis vdp overlay by devster(pd).bin" size="77144" crc="817b7656" sha1="99ee4fded53e4856a633676b0c6f83081186492c" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="hotch9" cloneof="hotchi" supported="no">
-		<description>Hot Chick Zoom Shot by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="hot chick zoom shot by devster(pd).bin" size="78384" crc="e6dd4f0c" sha1="a7e3eb018063cd9470f25ca74dad6603b913e0c7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="hotch9" cloneof="hotchi" supported="no">
+        <description>Hot Chick Zoom Shot by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="hot chick zoom shot by devster(pd).bin" size="78384" crc="e6dd4f0c" sha1="a7e3eb018063cd9470f25ca74dad6603b913e0c7" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="optimi" supported="no">
-		<description>Optimized Rotating XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="optimized rotating xor palette demo by devster(pd).bin" size="4664" crc="941351aa" sha1="f42d0f5126f17641e59fcb4c18f2cc8d4488a27c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="optimi" supported="no">
+        <description>Optimized Rotating XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="optimized rotating xor palette demo by devster(pd).bin" size="4664" crc="941351aa" sha1="f42d0f5126f17641e59fcb4c18f2cc8d4488a27c" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="rotati" supported="no">
-		<description>Rotating No Background Fill XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="rotating no background fill xor palette demo by devster(pd).bin" size="4600" crc="7fce8c27" sha1="a6a0a26f7e0244265948b3360f0a8c37d56846bc" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="rotati" supported="no">
+        <description>Rotating No Background Fill XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="rotating no background fill xor palette demo by devster(pd).bin" size="4600" crc="7fce8c27" sha1="a6a0a26f7e0244265948b3360f0a8c37d56846bc" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="rotat1" cloneof="rotati" supported="no">
-		<description>Rotating Pixel Skipping XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="rotating pixel skipping xor palette demo by devster(pd).bin" size="4648" crc="1b394d4f" sha1="11b9912776e5331c9ffa93d45ca8f91586173b0b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="rotat1" cloneof="rotati" supported="no">
+        <description>Rotating Pixel Skipping XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="rotating pixel skipping xor palette demo by devster(pd).bin" size="4648" crc="1b394d4f" sha1="11b9912776e5331c9ffa93d45ca8f91586173b0b" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="rotat2" cloneof="rotati" supported="no">
-		<description>Rotating XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="rotating xor palette demo by devster(pd).bin" size="5688" crc="98c25033" sha1="8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="rotat2" cloneof="rotati" supported="no">
+        <description>Rotating XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="rotating xor palette demo by devster(pd).bin" size="5688" crc="98c25033" sha1="8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="superx" supported="no">
-		<description>Super-X Raycasting Engine Test 1 by Fonzie(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="super-x raycasting engine test 1 by fonzie(pd).bin" size="17128" crc="3316c17b" sha1="cb5d98ec0998c718f0778cc131ebbbbfc72edca7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="superx" supported="no">
+        <description>Super-X Raycasting Engine Test 1 by Fonzie(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="super-x raycasting engine test 1 by fonzie(pd).bin" size="17128" crc="3316c17b" sha1="cb5d98ec0998c718f0778cc131ebbbbfc72edca7" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="super1" cloneof="superx" supported="no">
-		<description>Super-X Raycasting Engine Test 2 by Fonzie(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="super-x raycasting engine test 2 by fonzie(pd).bin" size="23208" crc="19f8fa8f" sha1="dec8238b0d5c95bb4c742d5a57ac23d42dd25047" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="super1" cloneof="superx" supported="no">
+        <description>Super-X Raycasting Engine Test 2 by Fonzie(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="super-x raycasting engine test 2 by fonzie(pd).bin" size="23208" crc="19f8fa8f" sha1="dec8238b0d5c95bb4c742d5a57ac23d42dd25047" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="switch" supported="no">
-		<description>Switching CRAM Palettes by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="switching cram palettes by devster(pd).bin" size="2252" crc="007cd5f2" sha1="b28cfbd400e70acf0bee3ba9ee1793f195cfbdd6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="switch" supported="no">
+        <description>Switching CRAM Palettes by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="switching cram palettes by devster(pd).bin" size="2252" crc="007cd5f2" sha1="b28cfbd400e70acf0bee3ba9ee1793f195cfbdd6" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="xorpal" supported="no">
-		<description>XOR Palette Demo by DevSter(PD)</description>
-		<year>199?</year>
-		<publisher>Homebrew</publisher>
-		<part name="cart" interface="_32x_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="xor palette demo by devster(pd).bin" size="3400" crc="c6428bb2" sha1="75fd855f3a70e411ad28a483a3f5fb4da1ebf4b6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="xorpal" supported="no">
+        <description>XOR Palette Demo by DevSter(PD)</description>
+        <year>199?</year>
+        <publisher>Homebrew</publisher>
+        <part name="cart" interface="_32x_cart">
+            <dataarea name="rom" size="4194304">
+                <rom name="xor palette demo by devster(pd).bin" size="3400" crc="c6428bb2" sha1="75fd855f3a70e411ad28a483a3f5fb4da1ebf4b6" offset="000000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 </softwarelist>

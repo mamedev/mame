@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 Titles, publishers and release dates taken from:
-	- X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
+  - X1 Soft Database ( http://www2s.biglobe.ne.jp/~ITTO/x1/softdb.html )
 but the website only covers post 1985 titles...
 
 Games I haven't managed to start (possibly due to my mistakes):
@@ -409,9 +409,9 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 <!-- The following version consists of d88 disks which only differ in the header, but contains the exact same data
-	<rom name="crimsonp.d88" size="348848" crc="bb46dc55" sha1="1cfebfe7b80e4818ca815ee9aa9df337d6bb900b" offset="0" />
-	<rom name="crimsons.d88" size="348848" crc="d3cd8490" sha1="24054ba0c57b14cdaf1fa2fd4c5c8d1d874198d8" offset="0" />
-	<rom name="crimsonu.d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
+    <rom name="crimsonp.d88" size="348848" crc="bb46dc55" sha1="1cfebfe7b80e4818ca815ee9aa9df337d6bb900b" offset="0" />
+    <rom name="crimsons.d88" size="348848" crc="d3cd8490" sha1="24054ba0c57b14cdaf1fa2fd4c5c8d1d874198d8" offset="0" />
+    <rom name="crimsonu.d88" size="348848" crc="3eeaae89" sha1="460e405c18beac1593ee851d86a2d1dfe4315b34" offset="0" />
 -->
 	<software name="crimson">
 		<description>Crimson</description>
@@ -3163,7 +3163,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 <!-- There exists an alt checksum for the first disk (due to differences only in the d88 header, but exact same data)
-	<rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
+    <rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
 -->
 	<software name="wibarm">
 		<description>Wibarm</description>
@@ -3184,8 +3184,8 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 <!-- The following version consists of d88 disks which only differ in the header, but contains the exact same data
-	<rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
-	<rom name="zzz-unk-wib_usr.d88" size="414992" crc="61bd9a53" sha1="a0e65a7fd206e71e3025dcb1bcd63947914f33f0" offset="0" />
+    <rom name="zzz-unk-wib_sys.d88" size="414992" crc="9670c2c2" sha1="49d4539a8eaa81818da1f192cd6bc56dc779291f" offset="0" />
+    <rom name="zzz-unk-wib_usr.d88" size="414992" crc="61bd9a53" sha1="a0e65a7fd206e71e3025dcb1bcd63947914f33f0" offset="0" />
 -->
 	<software name="wibarma" cloneof="wibarm">
 		<description>Wibarm (Alt)</description>
@@ -5617,13 +5617,13 @@ systems, for the moment they stay here!
 
 	<software name="game6">
 <!-- From GAME6.txt:
-	ウォーロイド(ASCII)
-	テニス(任天堂のあれ)
-	マイナー2049(COMPTIQ)
-	ドアドア(ENIX)
-	デーモンクリスタル(電波新聞)
-	コスモ・トラベラー(APOLO TECHNICA)
-	ボンバーマンはないです(^^；
+    ウォーロイド(ASCII)
+    テニス(任天堂のあれ)
+    マイナー2049(COMPTIQ)
+    ドアドア(ENIX)
+    デーモンクリスタル(電波新聞)
+    コスモ・トラベラー(APOLO TECHNICA)
+    ボンバーマンはないです(^^；
 [i.e. Bomberman is not included even if listed in the menu (probably it did
 not fit the disk)]
 -->
@@ -5663,7 +5663,7 @@ not fit the disk)]
 8. ちゃっくんぽっぷ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-	起動してください。
+ 起動してください。
 -->
 		<description>Game 02</description>
 		<year>19??</year>
@@ -5683,7 +5683,7 @@ not fit the disk)]
 8. Building Hopper
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-	起動してください。
+ 起動してください。
 -->
 		<description>Game 03</description>
 		<year>19??</year>
@@ -5723,7 +5723,7 @@ not fit the disk)]
 5. Mr.Pac!
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-	起動してください。
+ 起動してください。
 -->
 		<description>Game 05</description>
 		<year>19??</year>
@@ -5931,7 +5931,7 @@ not fit the disk)]
 6. スターライトアドベンチャーⅡ
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-	起動してください。
+ 起動してください。
 -->
 		<description>Game 16</description>
 		<year>19??</year>
@@ -5952,7 +5952,7 @@ not fit the disk)]
 7. キャノンボール
 
 ＊ゲームを起動するには「Sys」とついている方を選んで
-	起動してください。
+ 起動してください。
 -->
 		<description>Game 17</description>
 		<year>19??</year>
@@ -6006,7 +6006,7 @@ MB-GAME Disk Utility No.2
 
 	<software name="game20">
 <!--
-	From GAME1-25_List.txt:
+ From GAME1-25_List.txt:
 1. ハイドライド
 2. チョップリフター
 3. ファンタジアン
@@ -6172,13 +6172,13 @@ From GAME1-25_List.txt:
 
 	<software name="gamee">
 <!-- From GAME_E.txt:
-	1. ASTEROID CHALLENGER
-	2. Super Billiards          (HAL研)
-	3. NUTS & MILK              (HUDSON)
-	4. HARVEST                  (Micronet)
-	5. ドクロンの館             (ENIX)
-	6. THEえんま大王            (HUDSON)
-	7. MINER 2049er             (COMPTIQ)
+   1. ASTEROID CHALLENGER
+   2. Super Billiards          (HAL研)
+   3. NUTS & MILK              (HUDSON)
+   4. HARVEST                  (Micronet)
+   5. ドクロンの館             (ENIX)
+   6. THEえんま大王            (HUDSON)
+   7. MINER 2049er             (COMPTIQ)
 -->
 		<description>Game E</description>
 		<year>19??</year>
@@ -6276,10 +6276,10 @@ HP Osho
 
 	<software name="gamepk2">
 <!-- From GAMEPK2.txt:
-	1. UOOTOY
-	2. ZEPLIS ][
-	3. 妖魔仕事人 魔童
-	4. STAR BEE
+  1. UOOTOY
+  2. ZEPLIS ][
+  3. 妖魔仕事人 魔童
+  4. STAR BEE
 -->
 		<description>GAMEPK2</description>
 		<year>19??</year>

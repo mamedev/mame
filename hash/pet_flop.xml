@@ -35,16 +35,16 @@
 		<!--
 		VisiCalc(R)                                                 PET 2001, CBM 2001
 		Program Diskette                                              and CBM 8032 32K
-										[VisiCorp logo]                for 2040 and 4040
+		                              [VisiCorp logo]                for 2040 and 4040
 		One of the VisiTM programs                                     Diskette Drives
 		from VisiCorp                                           by Software Arts, Inc.
 
-										VisiCorpTM
-									PERSONAL SOFTWARETM
+		                                VisiCorpTM
+		                            PERSONAL SOFTWARETM
 
 		Program Copyright (C) 1979, 1981
 		Software Arts, Inc. All Rights Reserved
-																			20910-5511
+		                                                                    20910-5511
 		-->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

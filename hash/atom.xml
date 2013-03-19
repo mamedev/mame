@@ -2,10 +2,10 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
-	Missing:
+  Missing:
 
-	- econet
-	- axr2 (APP Laboratories)
+  - econet
+  - axr2 (APP Laboratories)
 
 -->
 <softwarelist name="atom" description="Acorn Atom expansion ROMs">

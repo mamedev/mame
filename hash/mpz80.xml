@@ -13,7 +13,7 @@
 
 		@ 1979 Digital Research  @ 1979 Morrow Designs
 
-													#509
+		                                          #509
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="324473">
@@ -33,7 +33,7 @@
 		Decision 1 as console                          Vers 5.21
 		Serial port 3 with CTS protocall as LST:        © 1979
 		@ 1979 Digital Research   @ 1979 Morrow Designs Microsoft
-													#805
+		                                           #805
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="498497">
@@ -53,7 +53,7 @@
 		Multio console
 		Serial port 3 with CTS protocal as LST:
 		@ 1979 Digital Research   @ 1979 Morrow Designs
-													#817
+		                                           #817
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="515868">
@@ -121,7 +121,7 @@
 		Movcpm; AB: HDDMA M5, BC: DJDMA 8, DE: DJDMA 5, GH: DJ/B
 		Multio 9600 console; Multio 1200 serial LST:
 		@ 1979 Digital Research   @ 1979 Morrow Designs
-													#908
+		                                           #908
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="590692">
@@ -141,8 +141,8 @@
 		Movcpm; AB: HDDMA M5, BC: DJDMA 8, DE: DJDMA 5, GH: DJ/B
 		Multio 9600 console; Multio 1200 serial LST: MICROSOFT BASIC
 		@ 1979 Digital Research   @ 1979 Morrow DesignsVers 5.21
-													#909 © 1979
-														Microsoft
+		                                           #909 © 1979
+		                                               Microsoft
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="558903">
@@ -184,7 +184,7 @@
 		Movcpm; ABC: HDC3 M20, DE: DJDMA 8, FG: DJDMA 5
 		Multio 9600 console; Multio 1200 serial LST:
 		@ 1979 Digital Research   @ 1979 Morrow Designs
-													#911
+		                                           #911
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="567059">
@@ -206,7 +206,7 @@
 		MOVCPM16; ABCD: HDDMA (2)M16, EF: DJDMA 8, GH: DJDMA
 		DJDMA serial console; Blank list
 		(c) 1980 Digital Research, (c) 1982 Morrow Designs
-													#921
+		                                           #921
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="497589">
@@ -228,7 +228,7 @@
 		MOVCPM16; ABCD: HDDMA (2)M16, EF: DJDMA 8, GH: DJDMA
 		Multio (9600) as console, Multio (1200) as list
 		(c) 1980 Digital Research, (c) 1982 Morrow Designs
-													#922
+		                                           #922
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="541604">
@@ -274,7 +274,7 @@
 
 
 		(c) 1980 Digital Research, (c) 1982 Morrow Designs
-													#926
+		                                           #926
 		-->
 		<part name="flop" interface="floppy_8">
 			<dataarea name="flop" size="460614">
@@ -360,7 +360,7 @@
 		<!--
 		INSTALL PACKAGE for the HDDMA                   #941-8
 		PRL files supplied: M5, (4)M5, M10, (4)M10,
-							M16, (4)M16
+		                    M16, (4)M16
 
 
 		(c) 1982 Morrow Designs
@@ -380,7 +380,7 @@
 		<!--
 		INSTALL PACKAGE for the HDCA                 #942
 		PRL files supplied: HDCAM10F, HDCAM10M, HDCAM20,
-							HDCAM26
+		                    HDCAM26
 
 
 		(c) 1982 Morrow Designs
@@ -423,7 +423,7 @@
 		____ NOT A BOOT DISKETTE ____        1 of 2
 
 		CP/M (c) '76, '77, '78, '79, '80
-			Digital Research
+		   Digital Research
 		(c) 1982 Morrow Designs
 		-->
 		<part name="flop1" interface="floppy_8">
@@ -438,7 +438,7 @@
 
 		MBASIC Rev 5.21 (c) 1979 Microsoft, Inc.
 		CP/M (c) '76, '77, '78, '79, '80
-			Digital Research
+		   Digital Research
 		(c) 1982 Morrow Designs
 		-->
 		<part name="flop2" interface="floppy_8">

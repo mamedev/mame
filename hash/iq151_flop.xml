@@ -4,10 +4,10 @@
 <softwarelist name="iq151_flop" description="IQ-151 disk images">
 	<software name="mikros">
 	<!--
-		How to load MIKROS:
-		- Use the modified CP/M Monitor (-bios 2)
-		- execute GFFF8 into the monitor
-		- Select the drive where the disk is mounted (0 or 1)
+	    How to load MIKROS:
+	    - Use the modified CP/M Monitor (-bios 2)
+	    - execute GFFF8 into the monitor
+	    - Select the drive where the disk is mounted (0 or 1)
 	-->
 		<description>MIKROS v2.2</description>
 		<year>198?</year>

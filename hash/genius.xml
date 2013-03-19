@@ -96,7 +96,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 <!-- Second chunk of dumps, compatible with: Genius Leader series (actual compatible models as listed on the box are documented below) -->
 
 <!-- According to the boxart, this is compatible with: Leader 2000/2000 Classic/2000 Plus/2000 Compact/4000 Quadro/4004 Quadro L/3000 S/6000 SL
-		A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
+     A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
 	<software name="snws">
 		<description>Super Naturwissenschaften</description>
 		<year>200?</year>
@@ -111,7 +111,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 	</software>
 
 <!-- According to the boxart, this is compatible with: Leader 2000/2000 Classic/2000 Plus/2000 Compact/4000 Quadro/4004 Quadro L/3000 S/6000 SL
-		A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
+     A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
 	<software name="englishaa" cloneof="englisha">
 		<description>Englisch für Anfänger (Genius Leader)</description>
 		<year>200?</year>
@@ -126,7 +126,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 	</software>
 
 <!-- According to the boxart, this is compatible with: Leader 2000/2000 Classic/2000 Plus/2000 Compact/4000 Quadro/4004 Quadro L/3000 S/6000 SL
-		A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
+     A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
 	<software name="schrkursa" cloneof="schrkurs">
 		<description>Schreibmaschinenkurs (Genius Leader)</description>
 		<year>200?</year>
@@ -141,7 +141,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 	</software>
 
 <!-- According to the boxart, this is compatible with: Leader 2000/2000 Classic/2000 Plus/2000 Compact/4000 Quadro/4004 Quadro L/3000 S/6000 SL
-		A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
+     A (later) sticker says compatibility extends to all Leader 2000 - 7007 SL -->
 	<software name="englishf">
 		<description>Englisch für Fortgeschrittene</description>
 		<year>200?</year>
@@ -156,7 +156,7 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 	</software>
 
 <!-- According to the boxart, this is compatible with: Leader 2000/2000 Classic/2000 Plus/2000 Compact/4000 Quadro/4004 Quadro L/3000 S/6000 SL
-		A (later) sticker says compatibility extends to 7007 SL -->
+     A (later) sticker says compatibility extends to 7007 SL -->
 	<software name="franzosia">
 		<description>Französisch für Anfänger</description>
 		<year>200?</year>
