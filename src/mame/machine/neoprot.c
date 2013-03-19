@@ -23,7 +23,7 @@
 /************************ Fatal Fury 2 *************************/
 
 READ16_MEMBER( neogeo_state::fatfury2_protection_16_r )
-{	
+{
 	UINT16 res = m_fatfury2_prot_data >> 24;
 
 	switch (offset)
@@ -93,7 +93,7 @@ WRITE16_MEMBER( neogeo_state::fatfury2_protection_16_w )
 
 
 void neogeo_state::fatfury2_install_protection()
-{	
+{
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x200000, 0x2fffff, read16_delegate(FUNC(neogeo_state::fatfury2_protection_16_r),this), write16_delegate(FUNC(neogeo_state::fatfury2_protection_16_w),this));

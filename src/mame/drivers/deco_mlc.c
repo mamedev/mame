@@ -89,9 +89,9 @@
 
     Driver todo:
         stadhr96 - protection? issues (or 156 co-processor? or timing?)
-		avengrgs - doesn't generate enough line interrupts?
+        avengrgs - doesn't generate enough line interrupts?
         ddream95 seems to have a dual screen mode(??)
-		hoops** - crash entering test mode (regression from 0.113 era?)
+        hoops** - crash entering test mode (regression from 0.113 era?)
 
     Driver by Bryan McPhail, bmcphail@tendril.co.uk, thank you to Avedis and The Guru.
 
@@ -137,12 +137,12 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 {
 /*
     test3 7 - vbl loop on 0x10 0000 at end of IRQ
-	avengrgs tests other bits too
+    avengrgs tests other bits too
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
 //  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
-//	return 0x00100000;
+//  return 0x00100000;
 	return 0xffffffff;
 }
 
@@ -216,7 +216,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 {
-//	int scanline=machine().primary_screen->vpos();
+//  int scanline=machine().primary_screen->vpos();
 	COMBINE_DATA(&m_irq_ram[offset]);
 
 

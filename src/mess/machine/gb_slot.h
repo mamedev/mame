@@ -147,7 +147,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
-	
+
 protected:
 	// Donkey Kong Land 2 + 3 store SGB border tiles differently... this will be hopefully be removed when SGB is properly emulated!
 	int m_sgb_hack;

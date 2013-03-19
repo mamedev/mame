@@ -1171,7 +1171,7 @@ static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrit
 
 	UML_LABEL(block, label++);              // label:
 
-#if 0	// DO NOT ENABLE - SEVERE AARON DAMAGE
+#if 0   // DO NOT ENABLE - SEVERE AARON DAMAGE
 	for (int ramnum = 0; ramnum < SH2_MAX_FASTRAM; ramnum++)
 	{
 		if (sh2->fastram[ramnum].base != NULL && (!iswrite || !sh2->fastram[ramnum].readonly))
@@ -2020,24 +2020,24 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 			int skip = compiler->labelnum+1;
 			compiler->labelnum += 3;
 
-			UML_MOV(block, I0, mem(&sh2->sleep_mode));							// mov i0, sleep_mode
-			UML_CMP(block, I0, 0x2);											// cmp i0, #2
-			UML_JMPc(block, COND_E, skip+1);	  			 			  		// beq skip + 1
+			UML_MOV(block, I0, mem(&sh2->sleep_mode));                          // mov i0, sleep_mode
+			UML_CMP(block, I0, 0x2);                                            // cmp i0, #2
+			UML_JMPc(block, COND_E, skip+1);                                    // beq skip + 1
 			// sleep mode != 2
-			UML_CMP(block, I0, 0x0);											// cmp i0, #0
-			UML_JMPc(block, COND_NE, skip);										// bne skip
-			UML_MOV(block, mem(&sh2->sleep_mode), 0x1);							// mov sleep_mode, #1
+			UML_CMP(block, I0, 0x0);                                            // cmp i0, #0
+			UML_JMPc(block, COND_NE, skip);                                     // bne skip
+			UML_MOV(block, mem(&sh2->sleep_mode), 0x1);                         // mov sleep_mode, #1
 
-			UML_LABEL(block, skip);												// skip:
-			generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);		// repeat this insn
-			UML_JMP(block, skip+2);										  		// jmp skip+2
+			UML_LABEL(block, skip);                                             // skip:
+			generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);       // repeat this insn
+			UML_JMP(block, skip+2);                                             // jmp skip+2
 
-			UML_LABEL(block, skip+1);									  		// skip + 1:
+			UML_LABEL(block, skip+1);                                           // skip + 1:
 			// sleep_mode == 2
-			UML_MOV(block, mem(&sh2->sleep_mode), 0x0);							// sleep_mode = 0
-			generate_update_cycles(sh2, block, compiler, desc->pc+2, TRUE);		// go to next insn
+			UML_MOV(block, mem(&sh2->sleep_mode), 0x0);                         // sleep_mode = 0
+			generate_update_cycles(sh2, block, compiler, desc->pc+2, TRUE);     // go to next insn
 
-			UML_LABEL(block, skip+2);	  				  				  		// skip + 2:
+			UML_LABEL(block, skip+2);                                           // skip + 2:
 		}
 		return TRUE;
 

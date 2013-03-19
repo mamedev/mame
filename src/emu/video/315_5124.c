@@ -335,7 +335,7 @@ void sega315_5124_device::process_line_timer()
 
 	/* Activate flags that were pending until the end of previous line. */
 	check_pending_flags(m_screen->width());
-	
+
 	/* Check if we're on the last line of a frame */
 	if (vpos == vpos_limit - 1)
 	{
@@ -542,7 +542,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 
 	check_pending_flags(m_screen->hpos());
 	temp = m_status;
-	
+
 	if ( !space.debugger_access() )
 	{
 		/* Clear pending write flag */
@@ -636,7 +636,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 				set_display_settings();
 
 			if ( ( reg_num == 0 && (m_status & STATUS_HINT) ) ||
-			     ( reg_num == 1 && (m_status & STATUS_VINT) ) )
+					( reg_num == 1 && (m_status & STATUS_VINT) ) )
 			{
 				// For HINT disabling through register 00:
 				// "Line IRQ VCount" test, of Flubba's VDPTest ROM, disables HINT to wait
@@ -650,7 +650,7 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 				// The following bit of code takes care of that.
 				//
 				if ( ( (m_status & STATUS_HINT) && !(m_reg[0x00] & 0x10) ) ||
-				     ( (m_status & STATUS_VINT) && !(m_reg[0x01] & 0x20) ) )
+						( (m_status & STATUS_VINT) && !(m_reg[0x01] & 0x20) ) )
 				{
 					if (m_irq_state == 1)
 					{

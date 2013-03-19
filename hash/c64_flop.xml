@@ -906,7 +906,7 @@
 		<publisher>Passport Designs</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<sharedfeat name="requirement" value="c64_cart:midipp"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="midi8+.g64" size="333744" crc="294921f7" sha1="376f7b91feb7709f9169aa1a9f297d3678e2d97a" offset="0" />
@@ -919,7 +919,7 @@
 		<year>198?</year>
 		<publisher>Dr T</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="caged artist_1.g64" size="333744" crc="a2e05594" sha1="4950d59682683af49098e7665f81341e4c7843d1" offset="0" />
@@ -932,7 +932,7 @@
 		<year>1988</year>
 		<publisher>Leaping Lizards</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="lexedit.g64" size="333744" crc="b6468192" sha1="15ef75d08111fb1a992f866313b346186f0a77cb" offset="0" />
@@ -945,7 +945,7 @@
 		<year>198?</year>
 		<publisher>The Music Software Exchange</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="midu.d64" size="174848" crc="4f4d3f29" sha1="e5c1bf26cca0e0dd65c8908f4554722d1d2d492c" offset="0" />
@@ -958,7 +958,7 @@
 		<year>198?</year>
 		<publisher>Oberheim</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="patobmtrx.d64" size="174848" crc="7243d5fc" sha1="4cdd27ef400e0b3f62299206e18ba0c8f0bd72be" offset="0" />
@@ -971,7 +971,7 @@
 		<year>1984</year>
 		<publisher>Sonus</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="sonusseq.g64" size="333744" crc="4b2d949a" sha1="824c0058c567e25fb4bc19b1f7a75352c4e19459" offset="0" />
@@ -986,21 +986,21 @@
 		<year>1997</year>
 		<publisher>Wolfgang Lorenz</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="174848">
 				<rom name="tsuit215-1.d64" size="174848" crc="CF1070B7" sha1="E7D31E4F55B771AA9595B27D294C72BC205E8770" offset="0" />
 			</dataarea>
 		</part>
-	
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="174848">
 				<rom name="tsuit215-2.d64" size="174848" crc="12430B99" sha1="A9522A3971D7E331412DFAD52C297881AE4CEA3C" offset="0" />
 			</dataarea>
 		</part>
-	
+
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="174848">
@@ -1016,14 +1016,14 @@
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="174848">
 				<rom name="2nd1.d64" size="174848" crc="1dded14f" sha1="73d0d46fa4adf85a0bd7f55583f06d41b76c8e82" offset="0" />
 			</dataarea>
 		</part>
-	
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="174848">

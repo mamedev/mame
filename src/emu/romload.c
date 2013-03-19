@@ -1324,7 +1324,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	romdata->romstotal = 0;
 	romdata->romstotalsize = 0;
 	romdata->romsloadedsize = 0;
-	
+
 	if (software_get_support(device->machine().options(), swlist, swname) == SOFTWARE_SUPPORTED_PARTIAL)
 	{
 		romdata->errorstring.catprintf("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist);
@@ -1377,14 +1377,14 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		else
 			fill_random(romdata->machine(), romdata->region->base(), romdata->region->bytes());
 #endif
-		
+
 		/* update total number of roms */
 		for (const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 		{
 			romdata->romstotal++;
 			romdata->romstotalsize += rom_file_size(rom);
 		}
-		
+
 		/* now process the entries in the region */
 		if (ROMREGION_ISROMDATA(region))
 			process_rom_entries(romdata, locationtag, region, region + 1, device, TRUE);
@@ -1393,7 +1393,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	}
 
 	/* now go back and post-process all the regions */
-	for (region = start_region; region != NULL; region = rom_next_region(region)) 
+	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
 		device->subtag(regiontag, ROMREGION_GETTAG(region));
 		region_post_process(romdata, regiontag.cstr(), ROMREGION_ISINVERTED(region));

@@ -144,7 +144,7 @@ public:
 	ioport_port       *m_io_zapper2_y;
 	ioport_port       *m_io_paddle;
 
-	optional_device<nes_cart_slot_device> m_cartslot;	//mandatory
+	optional_device<nes_cart_slot_device> m_cartslot;   //mandatory
 
 private:
 	/* devices */

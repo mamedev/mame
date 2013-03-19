@@ -37,7 +37,7 @@ protected:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	
+
 private:
 	void handle_hold(void);
 	void set_all_geometries(floppy_type_t type);

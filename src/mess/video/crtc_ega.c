@@ -739,9 +739,9 @@ void crtc_ega_device::device_reset()
 	m_vert_blank_start = 0;
 	m_line_counter = 0;
 	m_raster_counter = 0;
-	m_horiz_pix_total = 0; 
+	m_horiz_pix_total = 0;
 	m_vert_pix_total = 0;
-	m_max_visible_x = 0; 
+	m_max_visible_x = 0;
 	m_max_visible_y = 0;
 	m_hsync_on_pos = 0;
 	m_vsync_on_pos = 0;

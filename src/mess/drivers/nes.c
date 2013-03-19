@@ -568,7 +568,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )
 	MCFG_DEVICE_REMOVE( "nes_slot" )
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL)	// here we need a non-mandatory cart...
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL) // here we need a non-mandatory cart...
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)

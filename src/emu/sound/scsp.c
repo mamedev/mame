@@ -1066,17 +1066,17 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 			004A88: 3540 009E                  move.w  D0, ($9e,A2)
 			004A8C: 4E75                       rts
 
-				004C9A: 48E7 4000                  movem.l D1, -(A7)
-				004C9E: 3010                       move.w  (A0), D0 ;reads from 0x100ee0/ee2
-				004CA0: 4A40                       tst.w   D0
-				004CA2: 6A00 0004                  bpl     $4ca8
-				004CA6: 4440                       neg.w   D0
-				004CA8: 3211                       move.w  (A1), D1
-				004CAA: D041                       add.w   D1, D0
-				004CAC: E248                       lsr.w   #1, D0
-				004CAE: 3280                       move.w  D0, (A1) ;writes to RAM buffer 0x790/0x792
-				004CB0: 4CDF 0002                  movem.l (A7)+, D1
-				004CB4: 4E75                       rts
+			    004C9A: 48E7 4000                  movem.l D1, -(A7)
+			    004C9E: 3010                       move.w  (A0), D0 ;reads from 0x100ee0/ee2
+			    004CA0: 4A40                       tst.w   D0
+			    004CA2: 6A00 0004                  bpl     $4ca8
+			    004CA6: 4440                       neg.w   D0
+			    004CA8: 3211                       move.w  (A1), D1
+			    004CAA: D041                       add.w   D1, D0
+			    004CAC: E248                       lsr.w   #1, D0
+			    004CAE: 3280                       move.w  D0, (A1) ;writes to RAM buffer 0x790/0x792
+			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
+			    004CB4: 4E75                       rts
 			*/
 			logerror("SCSP: Reading from unmapped register %08x\n",addr);
 			if(addr == 0xee0)

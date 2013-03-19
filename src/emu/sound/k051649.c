@@ -43,14 +43,14 @@ const device_type K051649 = &device_creator<k051649_device>;
 
 k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_mclock(0),
-      m_rate(0),
-	  m_mixer_table(NULL),
-	  m_mixer_lookup(NULL),
-	  m_mixer_buffer(NULL),
-	  m_test(0)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_mclock(0),
+		m_rate(0),
+		m_mixer_table(NULL),
+		m_mixer_lookup(NULL),
+		m_mixer_buffer(NULL),
+		m_test(0)
 {
 }
 
@@ -61,15 +61,15 @@ k051649_device::k051649_device(const machine_config &mconfig, const char *tag, d
 
 void k051649_device::device_start()
 {
-	// get stream channels 
+	// get stream channels
 	m_rate = clock()/16;
 	m_stream = stream_alloc(0, 1, m_rate);
 	m_mclock = clock();
 
-	// allocate a buffer to mix into - 1 second's worth should be more than enough 
+	// allocate a buffer to mix into - 1 second's worth should be more than enough
 	m_mixer_buffer = auto_alloc_array(machine(), short, 2 * m_rate);
 
-	// build the mixer table 
+	// build the mixer table
 	make_mixer_table(5);
 }
 
@@ -83,9 +83,9 @@ void k051649_device::device_reset()
 	k051649_sound_channel *voice = m_channel_list;
 	int i;
 
-	// reset all the voices 
+	// reset all the voices
 	for (i = 0; i < 5; i++)
-    {
+	{
 		voice[i].frequency = 0;
 		voice[i].volume = 0xf;
 		voice[i].counter = 0;
@@ -108,12 +108,12 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	short *mix;
 	int i,j;
 
-	// zap the contents of the mixer buffer 
+	// zap the contents of the mixer buffer
 	memset(m_mixer_buffer, 0, samples * sizeof(short));
 
 	for (j = 0; j < 5; j++)
-    {
-		// channel is halted for freq < 9 
+	{
+		// channel is halted for freq < 9
 		if (voice[j].frequency > 8)
 		{
 			const signed char *w = voice[j].waveram;
@@ -123,7 +123,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			mix = m_mixer_buffer;
 
-			// add our contribution 
+			// add our contribution
 			for (i = 0; i < samples; i++)
 			{
 				int offs;
@@ -133,12 +133,12 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				*mix++ += (w[offs] * v)>>3;
 			}
 
-			// update the counter for this voice 
+			// update the counter for this voice
 			voice[j].counter = c;
 		}
 	}
 
-	// mix it down 
+	// mix it down
 	mix = m_mixer_buffer;
 	for (i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
@@ -150,7 +150,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 {
-	// waveram is read-only? 
+	// waveram is read-only?
 	if (m_test & 0x40 || (m_test & 0x80 && offset >= 0x60))
 		return;
 
@@ -158,7 +158,7 @@ WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 
 	if (offset >= 0x60)
 	{
-		// channel 5 shares waveram with channel 4 
+		// channel 5 shares waveram with channel 4
 		m_channel_list[3].waveram[offset&0x1f]=data;
 		m_channel_list[4].waveram[offset&0x1f]=data;
 	}
@@ -169,7 +169,7 @@ WRITE8_MEMBER( k051649_device::k051649_waveform_w )
 
 READ8_MEMBER ( k051649_device::k051649_waveform_r )
 {
-	// test-register bits 6/7 expose the internal counter 
+	// test-register bits 6/7 expose the internal counter
 	if (m_test & 0xc0)
 	{
 		m_stream->update();
@@ -185,7 +185,7 @@ READ8_MEMBER ( k051649_device::k051649_waveform_r )
 
 WRITE8_MEMBER( k051649_device::k052539_waveform_w )
 {
-	// waveram is read-only? 
+	// waveram is read-only?
 	if (m_test & 0x40)
 		return;
 
@@ -196,7 +196,7 @@ WRITE8_MEMBER( k051649_device::k052539_waveform_w )
 
 READ8_MEMBER ( k051649_device::k052539_waveform_r )
 {
-	// test-register bit 6 exposes the internal counter 
+	// test-register bit 6 exposes the internal counter
 	if (m_test & 0x40)
 	{
 		m_stream->update();
@@ -220,13 +220,13 @@ WRITE8_MEMBER( k051649_device::k051649_frequency_w )
 
 	m_stream->update();
 
-	// test-register bit 5 resets the internal counter 
+	// test-register bit 5 resets the internal counter
 	if (m_test & 0x20)
 		m_channel_list[offset].counter = ~0;
 	else if (m_channel_list[offset].frequency < 9)
 		m_channel_list[offset].counter |= ((1 << FREQ_BITS) - 1);
 
-	// update frequency 
+	// update frequency
 	if (freq_hi)
 		m_channel_list[offset].frequency = (m_channel_list[offset].frequency & 0x0ff) | (data << 8 & 0xf00);
 	else
@@ -240,7 +240,7 @@ WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 	m_stream->update();
 
 	for (i = 0; i < 5; i++)
-    {
+	{
 		m_channel_list[i].key=data&1;
 		data >>= 1;
 	}
@@ -255,7 +255,7 @@ WRITE8_MEMBER( k051649_device::k051649_test_w )
 
 READ8_MEMBER ( k051649_device::k051649_test_r )
 {
-	// reading the test register sets it to $ff! 
+	// reading the test register sets it to $ff!
 	k051649_test_w(space, offset, 0xff);
 	return 0xff;
 }
@@ -269,13 +269,13 @@ void k051649_device::make_mixer_table(int voices)
 {
 	int i;
 
-	// allocate memory 
+	// allocate memory
 	m_mixer_table = auto_alloc_array(machine(), INT16, 512 * voices);
 
-	// find the middle of the table 
+	// find the middle of the table
 	m_mixer_lookup = m_mixer_table + (256 * voices);
 
-	// fill in the table - 16 bit case 
+	// fill in the table - 16 bit case
 	for (i = 0; i < (voices * 256); i++)
 	{
 		int val = i * DEF_GAIN * 16 / voices;
@@ -284,5 +284,3 @@ void k051649_device::make_mixer_table(int voices)
 		m_mixer_lookup[-i] = -val;
 	}
 }
-
-

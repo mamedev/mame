@@ -259,8 +259,8 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 //-------------------------------------------------
 
 void tandy2k_keyboard_device::device_config_complete()
-{ 
-	m_shortname = "tandy2kb"; 
+{
+	m_shortname = "tandy2kb";
 
 	// inherit a copy of the static data
 	const tandy2k_keyboard_interface *intf = reinterpret_cast<const tandy2k_keyboard_interface *>(static_config());

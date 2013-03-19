@@ -65,10 +65,10 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_rom(NULL),
-	  m_rom_length(0),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_rom(NULL),
+		m_rom_length(0),
+		m_stream(NULL)
 {
 	memset(m_env_ar_table, 0, sizeof(double)*0x9f);
 	memset(m_env_dr_table, 0, sizeof(double)*0x9f);

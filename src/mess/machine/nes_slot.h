@@ -153,7 +153,7 @@ public:
 
 	//private:
 
-	device_nes_cart_interface*		m_cart;
+	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
 };
@@ -197,12 +197,12 @@ public:
 	virtual void device_config_complete() { m_shortname = "nes_rom"; }
 
 	// nescart_interface overrides
-//	virtual DECLARE_READ8_MEMBER(read_l);
-//	virtual DECLARE_READ8_MEMBER(read_m);
-//	virtual DECLARE_READ8_MEMBER(read_h);
-//	virtual DECLARE_WRITE8_MEMBER(write_l);
-//	virtual DECLARE_WRITE8_MEMBER(write_m);
-//	virtual DECLARE_WRITE8_MEMBER(write_h);
+//  virtual DECLARE_READ8_MEMBER(read_l);
+//  virtual DECLARE_READ8_MEMBER(read_m);
+//  virtual DECLARE_READ8_MEMBER(read_h);
+//  virtual DECLARE_WRITE8_MEMBER(write_l);
+//  virtual DECLARE_WRITE8_MEMBER(write_m);
+//  virtual DECLARE_WRITE8_MEMBER(write_h);
 };
 
 // device type definition

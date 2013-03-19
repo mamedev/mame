@@ -497,7 +497,7 @@ void lc89510_temp_device::CDC_Reset(void)
 	LC8951RegistersW[REG_W_WAL] = wa & 0xff; LC8951RegistersW[REG_W_WAH] = (wa >> 8) &0xff;
 	LC8951RegistersR[REG_R_HEAD0] = 0x01;
 	LC8951RegistersR[REG_R_STAT3] = 0x80;
-	
+
 	LC8951UpdateHeader();
 }
 

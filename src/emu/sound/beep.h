@@ -27,9 +27,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    void set_state(int on);
-    void set_frequency(int frequency);
-    void set_volume(int volume);
+	void set_state(int on);
+	void set_frequency(int frequency);
+	void set_volume(int volume);
 
 private:
 	sound_stream *m_stream;   /* stream number */

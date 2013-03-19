@@ -392,7 +392,7 @@ bool base_gb_cart_slot_device::call_load()
 		if (strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
 			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
 			m_sgb_hack = 1;
-		
+
 		return IMAGE_INIT_PASS;
 	}
 
@@ -545,8 +545,8 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		}
 		if (count == 4876)
 		{
-//			printf("Niutoude!\n");
-//			type = GB_MBC_NIUTOUDE;
+//          printf("Niutoude!\n");
+//          type = GB_MBC_NIUTOUDE;
 		}
 		if (count == 4138 || count == 4125)
 		{
@@ -556,7 +556,7 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			type = GB_MBC_SINTAX;
 		}
 	}
-	
+
 	/* Check if we're dealing with the multigame variant of the MBC1 mapper */
 	if (type == GB_MBC_MBC1)
 	{

@@ -24,8 +24,8 @@
 #define M6520_2_TAG     "b8"
 #define MC6845_TAG      "ub13"
 #define SCREEN_TAG      "screen"
-#define PLA1_TAG		"ue6"
-#define PLA2_TAG		"ue5"
+#define PLA1_TAG        "ue6"
+#define PLA2_TAG        "ue5"
 
 class pet_state : public driver_device
 {

@@ -442,17 +442,17 @@ void sns_rom_sdd1_device::device_reset()
 {
 	m_sdd1_enable = 0x00;
 	m_xfer_enable = 0x00;
-	
+
 	m_mmc[0] = 0 << 20;
 	m_mmc[1] = 1 << 20;
 	m_mmc[2] = 2 << 20;
 	m_mmc[3] = 3 << 20;
-	
+
 	for(int i = 0; i < 8; i++)
 	{
 		m_dma[i].addr = 0;
 		m_dma[i].size = 0;
-	}	
+	}
 }
 
 /*-------------------------------------------------
@@ -604,4 +604,3 @@ WRITE8_MEMBER( sns_rom_sdd1_device::write_ram )
 {
 	m_nvram[offset & 0x1fff] = data;
 }
-

@@ -11,16 +11,16 @@
 
 // Interrupt control bits (interpolated from C68 program; need 7450 Group manual badly)
 
-#define IRQ1_INT1		(0x04)
-#define IRQ1_INT2		(0x08)	// guess, not used in C68
-#define IRQ1_INT3		(0x10)  // guess, not used in C68
+#define IRQ1_INT1       (0x04)
+#define IRQ1_INT2       (0x08)  // guess, not used in C68
+#define IRQ1_INT3       (0x10)  // guess, not used in C68
 
-#define IRQ2_SERIALRX	(0x08)
-#define IRQ2_SERIALTX	(0x10)
-#define IRQ2_ADC		(0x20)
+#define IRQ2_SERIALRX   (0x08)
+#define IRQ2_SERIALTX   (0x10)
+#define IRQ2_ADC        (0x20)
 
-#define ADCTRL_CH_MASK	(0x07)	// AD ctrl reg. channel mask
-#define ADCTRL_COMPLETE	(0x08)	// AD ctrl "start"/"complete" bit
+#define ADCTRL_CH_MASK  (0x07)  // AD ctrl reg. channel mask
+#define ADCTRL_COMPLETE (0x08)  // AD ctrl "start"/"complete" bit
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -75,7 +75,7 @@ void m3745x_device::device_start()
 	write_p3.resolve_safe();
 	write_p4.resolve_safe();
 	write_p5.resolve_safe();
-    write_p6.resolve_safe();
+	write_p6.resolve_safe();
 	read_ad_0.resolve_safe(0);
 	read_ad_1.resolve_safe(0);
 	read_ad_2.resolve_safe(0);
@@ -109,7 +109,7 @@ void m3745x_device::device_reset()
 {
 	m740_device::device_reset();
 
-	SP = 0x01ff;	// we have the "traditional" stack in page 1, not 0 like some M740 derivatives
+	SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
@@ -179,7 +179,7 @@ void m3745x_device::execute_set_input(int inputnum, int state)
 			}
 			break;
 
-		case M3745X_SET_OVERFLOW:	// the base 740 class can handle this
+		case M3745X_SET_OVERFLOW:   // the base 740 class can handle this
 			m740_device::execute_set_input(M740_SET_OVERFLOW, state);
 			break;
 	}
@@ -190,7 +190,7 @@ void m3745x_device::execute_set_input(int inputnum, int state)
 void m3745x_device::recalc_irqs()
 {
 	UINT16 all_ints = 0;
-	int static const irq_lines[16] = 
+	int static const irq_lines[16] =
 	{
 		-1, -1, -1, M740_INT11_LINE, M740_INT12_LINE, M740_INT13_LINE, -1, -1,
 		-1, -1, M740_INT2_LINE, M740_INT3_LINE, M740_INT4_LINE, -1, -1, -1
@@ -199,7 +199,7 @@ void m3745x_device::recalc_irqs()
 	all_ints = (m_intreq1 & m_intctrl1) << 8;
 	all_ints |= (m_intreq2 & m_intctrl2);
 
-//	printf("recalc_irqs: last_all_ints = %04x last_ints = %04x (req1 %02x ctrl1 %02x req2 %02x ctrl2 %02x)\n", all_ints, m_last_all_ints, m_intreq1, m_intctrl1, m_intreq2, m_intctrl2);
+//  printf("recalc_irqs: last_all_ints = %04x last_ints = %04x (req1 %02x ctrl1 %02x req2 %02x ctrl2 %02x)\n", all_ints, m_last_all_ints, m_intreq1, m_intctrl1, m_intreq2, m_intctrl2);
 
 	// check all 16 IRQ bits for changes
 	for (int i = 0; i < 16; i++)
@@ -210,19 +210,19 @@ void m3745x_device::recalc_irqs()
 			// and wasn't last time
 			if (!(m_last_all_ints & (1 << i)))
 			{
-//				printf("    asserting irq %d (%d)\n", i, irq_lines[i]);
+//              printf("    asserting irq %d (%d)\n", i, irq_lines[i]);
 				if (irq_lines[i] != -1)
 				{
 					m740_device::execute_set_input(irq_lines[i], ASSERT_LINE);
 				}
 			}
 		}
-		else	// bit is clear now
+		else    // bit is clear now
 		{
 			// ...and wasn't clear last time
 			if (m_last_all_ints & (1 << i))
 			{
-//				printf("    clearing irq %d (%d)\n", i, irq_lines[i]);
+//              printf("    clearing irq %d (%d)\n", i, irq_lines[i]);
 				if (irq_lines[i] != -1)
 				{
 					m740_device::execute_set_input(irq_lines[i], CLEAR_LINE);
@@ -258,103 +258,103 @@ void m3745x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 UINT8 m3745x_device::read_port(UINT8 offset)
 {
-   UINT8 incoming = 0;
+	UINT8 incoming = 0;
 
-   switch (offset)
-   {
-	   case 0:
-		   incoming = read_p3();
-		   break;
+	switch (offset)
+	{
+		case 0:
+			incoming = read_p3();
+			break;
 
-	   case 1:
-		   incoming = read_p4();
-		   break;
+		case 1:
+			incoming = read_p4();
+			break;
 
-	   case 2:
-		   incoming = read_p5();
-		   break;
+		case 2:
+			incoming = read_p5();
+			break;
 
-	   case 3:
-		   incoming = read_p6();
-		   break;
-   }
+		case 3:
+			incoming = read_p6();
+			break;
+	}
 
-   // apply data direction registers
-   incoming &= (m_ddrs[offset] ^ 0xff);
-   // OR in ddr-masked version of port writes
-   incoming |= (m_ports[offset] & m_ddrs[offset]);
+	// apply data direction registers
+	incoming &= (m_ddrs[offset] ^ 0xff);
+	// OR in ddr-masked version of port writes
+	incoming |= (m_ports[offset] & m_ddrs[offset]);
 
-   return incoming;
+	return incoming;
 }
 
 READ8_MEMBER(m3745x_device::ports_r)
 {
-   switch (offset)
-   {
-      case 0:
-		  return read_port(0);
+	switch (offset)
+	{
+		case 0:
+			return read_port(0);
 
-      case 1:
-		  return m_ddrs[0];
+		case 1:
+			return m_ddrs[0];
 
-      case 2:
-		  return read_port(1);
+		case 2:
+			return read_port(1);
 
-      case 4:
-		  return read_port(2);
+		case 4:
+			return read_port(2);
 
-      case 5:
-		  return m_ddrs[2];
+		case 5:
+			return m_ddrs[2];
 
-      case 6:
-		  return read_port(3);
+		case 6:
+			return read_port(3);
 
-      case 7:
-		  return m_ddrs[3];
-   }
+		case 7:
+			return m_ddrs[3];
+	}
 
-   return 0xff;
+	return 0xff;
 }
 
 WRITE8_MEMBER(m3745x_device::ports_w)
 {
-   switch (offset)
-   {
-      case 0:	// p3
-		  send_port(space, 0, data & m_ddrs[0]);
-		  m_ports[0] = data;
-		  break;
+	switch (offset)
+	{
+		case 0: // p3
+			send_port(space, 0, data & m_ddrs[0]);
+			m_ports[0] = data;
+			break;
 
-      case 1: // p3 ddr
-		  send_port(space, 0, m_ports[0] & data);
-		  m_ddrs[0] = data;
-		  break;
+		case 1: // p3 ddr
+			send_port(space, 0, m_ports[0] & data);
+			m_ddrs[0] = data;
+			break;
 
-      case 2:	// p4
-		  send_port(space, 1, data & m_ddrs[1]);
-		  m_ports[1] = data;
-		  break;
+		case 2: // p4
+			send_port(space, 1, data & m_ddrs[1]);
+			m_ports[1] = data;
+			break;
 
-      case 4:	// p5
-		  send_port(space, 2, data & m_ddrs[2]);
-		  m_ports[2] = data;
-		  break;
+		case 4: // p5
+			send_port(space, 2, data & m_ddrs[2]);
+			m_ports[2] = data;
+			break;
 
-      case 5: // p5 ddr
-		  send_port(space, 2, m_ports[2] & data);
-		  m_ddrs[2] = data;
-		  break;
+		case 5: // p5 ddr
+			send_port(space, 2, m_ports[2] & data);
+			m_ddrs[2] = data;
+			break;
 
-      case 6:	// p6
-		  send_port(space, 3, data & m_ddrs[3]);
-		  m_ports[3] = data;
-		  break;
+		case 6: // p6
+			send_port(space, 3, data & m_ddrs[3]);
+			m_ports[3] = data;
+			break;
 
-      case 7: // p6 ddr
-		  send_port(space, 3, m_ports[3] & data);
-		  m_ddrs[3] = data;
-		  break;
-   }
+		case 7: // p6 ddr
+			send_port(space, 3, m_ports[3] & data);
+			m_ddrs[3] = data;
+			break;
+	}
 }
 
 READ8_MEMBER(m3745x_device::intregs_r)
@@ -495,4 +495,3 @@ m37450_device::m37450_device(const machine_config &mconfig, device_type type, co
 	m3745x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map))
 {
 }
-

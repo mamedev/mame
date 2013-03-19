@@ -52,7 +52,7 @@ static READ32_HANDLER( decathlt_prot_r )
 				if (fake0) retvalue = fake0[(((0x20080/4)+decathlt_lastcount))];
 				decathlt_lastcount++;
 				return retvalue;
-			
+
 			case 0x00a9f3a:
 				if (fake0) retvalue = fake0[(((0x00000/4)+decathlt_lastcount))];
 				decathlt_lastcount++;
@@ -70,7 +70,7 @@ static READ32_HANDLER( decathlt_prot_r )
 
 			case 0x033f16c:
 			case 0x038929c:
-			
+
 
 
 			case 0x00de05a:
@@ -99,7 +99,7 @@ static READ32_HANDLER( decathlt_prot_r )
 				return retvalue;
 		}
 
-		
+
 	}
 	else
 	{
@@ -250,4 +250,3 @@ void install_decathlt_protection(running_machine &machine)
 	/* It accesses the device at this address too, with different tables, for the game textures, should it just act like a mirror, or a secondary device? */
 	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x27FFFF0, 0x27FFFFF, FUNC(decathlt_prot_r), FUNC(decathlt_prot2_w));
 }
-

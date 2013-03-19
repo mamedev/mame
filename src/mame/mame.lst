@@ -217,7 +217,7 @@ sstarcrs        // Taito (Brazil)
 mooncmw         // bootleg
 mooncrsb        // bootleg
 mooncrs2        // bootleg
-starfgmc		// bootleg
+starfgmc        // bootleg
 spcdrag         // bootleg
 stera           // bootleg
 spcdraga        // bootleg
@@ -4005,7 +4005,7 @@ headon1         // 163-167/192-193 (c) Gremlin
 headonb         // bootleg, headonb.c
 headons         // Sidam bootleg
 headonsa        // Sidam bootleg
-headonmz		// bootleg
+headonmz        // bootleg
 supcrash        // bootleg
 hocrash         // bootleg
 headon2         // ???-??? (c) 1979 Sega
@@ -5016,8 +5016,8 @@ sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A)
 confmiss        // 2000.11 Confidential Mission         // First GD-ROM game?
 				// 2000.11 Ninja Assault (NJA1 Ver. A)
 				// 2000.11 Ninja Assault (NJA2 Ver. A)
-ninjaslt		// 2000.11 Ninja Assault (NJA3 Ver. A)
-ninjaslt4		// 2000.11 Ninja Assault (NJA4 Ver. A)
+ninjaslt        // 2000.11 Ninja Assault (NJA3 Ver. A)
+ninjaslt4       // 2000.11 Ninja Assault (NJA4 Ver. A)
 				// 2000.11 Shakatto Tambourine
 wwfroyal        // 2000.11 WWF Royal Rumble
 pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
@@ -5070,7 +5070,7 @@ ggxx            // 2002.05 Guilty Gear XX
 mok             // 2002.05 The Maze of the Kings
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
 mazan           // 2002.07 Mazan : Flash of the Blade (MAZ2 Ver. A)
-                // 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
+				// 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
@@ -5732,7 +5732,7 @@ candance        // MCF (c) 1996 Mitchell
 sotsugyo        //     (c) 1995 Mitchell (Atlus license)
 sshangha        //     (c) 1992 Hot-B
 sshanghab       // bootleg
-dreambal		// MM
+dreambal        // MM
 
 // Data East MLC Games
 hoops96         // MCE (c) 1996 Data East Corporation
@@ -8053,7 +8053,7 @@ cupsocs         // (c) 1992 Seibu
 cupsocs2        // (c) 1992 Seibu
 cupsocsb        // bootleg
 cupsocsb2       // bootleg
-cupsocsb3		// bootleg
+cupsocsb3       // bootleg
 olysoc92        // (c) 1992 Seibu
 olysoc92a       // (c) 1992 Seibu
 goal92          // bootleg
@@ -8696,7 +8696,7 @@ goindolk        // (c) 1987 Sun a Electronics
 homo            // bootleg
 rranger         // (c) 1988 SunA + Sharp Image license
 sranger         // (c) 1988
-srangero		// (c) 1988
+srangero        // (c) 1988
 srangerb        // bootleg
 srangern        // (c) 1988 SunA (NOVA License)
 srangerw        // (c) 1988 SunA (WDK License)
@@ -8890,7 +8890,7 @@ magicbuba       // (c) Yun Sung
 shocking        // (c) 1997 Yun Sung
 shockingk       // (c) 1997 Yun Sung
 bombkick        // (c) 1998 Yun Sung
-bombkicka		// (c) 1998 Yun Sung
+bombkicka       // (c) 1998 Yun Sung
 nmg5            // (c) 1998 Yun Sung
 nmg5e           // (c) 1998 Yun Sung
 searchey        // (c) 1999 Yun Sung
@@ -9429,7 +9429,7 @@ toursol1        // (c) 1995 Dynamo
 dynamski        // (c) 1984 Taiyo
 chinhero        // (c) 1984 Taiyo
 chinhero2       // (c) 1984 Taiyo
-chinhero3		// (c) 1984 Taiyo
+chinhero3       // (c) 1984 Taiyo
 chinherot       // (c) 1984 Taiyo
 shangkid        // (c) 1985 Taiyo + Data East license
 hiryuken        // (c) 1985 Taito
@@ -10489,8 +10489,8 @@ galgame         // (c) 1971 Computer Recreations, Inc
 ichiban         // (c) 199? Excel
 3x3puzzl        // (c) 199? Ace
 3x3puzzla       // (c) 199? Ace
-gambl186		// unknown
-gambl186a		// unknown
+gambl186        // unknown
+gambl186a       // unknown
 
 
 // InterFlip / Recreativos Franco
@@ -11200,9 +11200,9 @@ fcockt2_6       // (c) 2008
 fcockt2_7       // (c) 2008
 
 // Crazy Monkey 2
-crzmon2		// (c) 2010
-crzmon2_2	// (c) 2010
-crzmon2_3	// (c) 2010
+crzmon2     // (c) 2010
+crzmon2_2   // (c) 2010
+crzmon2_3   // (c) 2010
 
 
 // Igrosoft bootleg sets

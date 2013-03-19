@@ -23,19 +23,19 @@
 
 struct saa1099_channel
 {
-    saa1099_channel() :
-	  frequency(0),
-	  freq_enable(0),
-	  noise_enable(0),
-	  octave(0),
-	  counter(0.0),
-	  freq(0.0),
-	  level(0)
-    {
-        memset(amplitude, 0, sizeof(int)*2);
-        memset(envelope, 0, sizeof(int)*2);
-    }
-    
+	saa1099_channel() :
+		frequency(0),
+		freq_enable(0),
+		noise_enable(0),
+		octave(0),
+		counter(0.0),
+		freq(0.0),
+		level(0)
+	{
+		memset(amplitude, 0, sizeof(int)*2);
+		memset(envelope, 0, sizeof(int)*2);
+	}
+
 	int frequency;          /* frequency (0x00..0xff) */
 	int freq_enable;        /* frequency enable */
 	int noise_enable;       /* noise enable */
@@ -51,11 +51,11 @@ struct saa1099_channel
 
 struct saa1099_noise
 {
-    saa1099_noise() : 
-      counter(0.0),
-      freq(0.0),
-      level(0) {}
-    
+	saa1099_noise() :
+		counter(0.0),
+		freq(0.0),
+		level(0) {}
+
 	/* vars to simulate the noise generator output */
 	double counter;
 	double freq;
@@ -66,7 +66,7 @@ struct saa1099_noise
 // ======================> saa1099_device
 
 class saa1099_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -80,27 +80,27 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( saa1099_control_w );
-    DECLARE_WRITE8_MEMBER( saa1099_data_w );
+	DECLARE_WRITE8_MEMBER( saa1099_control_w );
+	DECLARE_WRITE8_MEMBER( saa1099_data_w );
 
 private:
-    void saa1099_envelope(int ch);
+	void saa1099_envelope(int ch);
 
 private:
-    sound_stream *m_stream;          /* our stream */
-    int m_noise_params[2];            /* noise generators parameters */
-    int m_env_enable[2];              /* envelope generators enable */
-    int m_env_reverse_right[2];       /* envelope reversed for right channel */
-    int m_env_mode[2];                /* envelope generators mode */
-    int m_env_bits[2];                /* non zero = 3 bits resolution */
-    int m_env_clock[2];               /* envelope clock mode (non-zero external) */
-    int m_env_step[2];                /* current envelope step */
-    int m_all_ch_enable;              /* all channels enable */
-    int m_sync_state;                 /* sync all channels */
-    int m_selected_reg;               /* selected register */
-    saa1099_channel m_channels[6];    /* channels */
-    saa1099_noise m_noise[2];         /* noise generators */
-    double m_sample_rate;
+	sound_stream *m_stream;          /* our stream */
+	int m_noise_params[2];            /* noise generators parameters */
+	int m_env_enable[2];              /* envelope generators enable */
+	int m_env_reverse_right[2];       /* envelope reversed for right channel */
+	int m_env_mode[2];                /* envelope generators mode */
+	int m_env_bits[2];                /* non zero = 3 bits resolution */
+	int m_env_clock[2];               /* envelope clock mode (non-zero external) */
+	int m_env_step[2];                /* current envelope step */
+	int m_all_ch_enable;              /* all channels enable */
+	int m_sync_state;                 /* sync all channels */
+	int m_selected_reg;               /* selected register */
+	saa1099_channel m_channels[6];    /* channels */
+	saa1099_noise m_noise[2];         /* noise generators */
+	double m_sample_rate;
 };
 
 extern const device_type SAA1099;

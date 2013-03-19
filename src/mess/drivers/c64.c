@@ -1034,7 +1034,7 @@ void c64_state::machine_reset()
 	m_sid->reset();
 	m_cia1->reset();
 	m_cia2->reset();
-	
+
 	m_iec->reset();
 	m_exp->reset();
 	m_user->reset();

@@ -79,5 +79,5 @@ public:
 	void psikyosh_postlineblend( bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri );
 	void psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 			UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
-			int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z);	
+			int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z);
 };

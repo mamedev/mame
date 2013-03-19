@@ -112,7 +112,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 
 MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 {
-//	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+//  address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	address_space &audio_space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	mFinalLapProtCount = 0;
@@ -818,4 +818,3 @@ READ8_MEMBER( namcos2_shared_state::namcos2_mcu_port_d_r )
 	/* Return the result */
 	return data;
 }
-

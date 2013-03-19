@@ -30,16 +30,16 @@ class sns_rom_obc1_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_obc1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_obc1"; }
-	
+
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
-	
+
 	int m_address;
 	int m_offset;
 	int m_shift;
@@ -74,12 +74,12 @@ class sns_rom_tekken2_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_tekken2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_tekken2"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
 	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
@@ -98,10 +98,10 @@ class sns_rom_soulblad_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_soulblad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "sns_rom_soulblad"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
 };
@@ -113,12 +113,12 @@ class sns_rom_mcpirate1_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_mcpirate1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_mcpirate1"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -133,12 +133,12 @@ class sns_rom_mcpirate2_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_mcpirate2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_mcpirate2"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -153,11 +153,11 @@ class sns_rom_20col_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_20col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_20col"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -172,12 +172,12 @@ class sns_rom_banana_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_banana_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
-//	virtual void device_start();
-//	virtual void device_reset();
+//  virtual void device_start();
+//  virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_banana"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
 	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device
@@ -191,12 +191,12 @@ class sns_rom_bugs_device : public sns_rom_device
 public:
 	// construction/destruction
 	sns_rom_bugs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sns_rom_bugslife"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);    // protection device
 	virtual DECLARE_WRITE8_MEMBER(chip_write);  // protection device

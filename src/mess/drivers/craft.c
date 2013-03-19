@@ -76,9 +76,9 @@ public:
 	DECLARE_DRIVER_INIT(craft);
 	virtual void machine_reset();
 	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-#if ENABLE_VERBOSE_LOG	
+#if ENABLE_VERBOSE_LOG
 	inline void verboselog(int n_level, const char *s_fmt, ...);
-#endif	
+#endif
 };
 
 void craft_state::machine_start()

@@ -45,18 +45,18 @@ public:
 
 struct timer8253chan
 {
-    timer8253chan() :
-	  count(0),
-	  cnval(0),
-	  bcdMode(0),
-	  cntMode(0),
-	  valMode(0),
-	  gate(0),
-	  output(0),
-	  loadCnt(0),
-	  enable(0)
-    {}
-            
+	timer8253chan() :
+		count(0),
+		cnval(0),
+		bcdMode(0),
+		cntMode(0),
+		valMode(0),
+		gate(0),
+		output(0),
+		loadCnt(0),
+		enable(0)
+	{}
+
 	UINT16 count;
 	UINT16 cnval;
 	UINT8 bcdMode;
@@ -70,7 +70,7 @@ struct timer8253chan
 
 struct timer8253struct
 {
-    struct timer8253chan channel[3];
+	struct timer8253chan channel[3];
 };
 
 
@@ -91,16 +91,16 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );
-    DECLARE_WRITE8_MEMBER( tiamc1_timer1_w );
-    DECLARE_WRITE8_MEMBER( tiamc1_timer1_gate_w );
+	DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );
+	DECLARE_WRITE8_MEMBER( tiamc1_timer1_w );
+	DECLARE_WRITE8_MEMBER( tiamc1_timer1_gate_w );
 
 private:
-    void timer8253_reset(struct timer8253struct *t);
-    void timer8253_tick(struct timer8253struct *t,int chn);
-    void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val);
-    char timer8253_get_output(struct timer8253struct *t, int chn);
-    void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate);
+	void timer8253_reset(struct timer8253struct *t);
+	void timer8253_tick(struct timer8253struct *t,int chn);
+	void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val);
+	char timer8253_get_output(struct timer8253struct *t, int chn);
+	void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate);
 
 private:
 	sound_stream *m_channel;

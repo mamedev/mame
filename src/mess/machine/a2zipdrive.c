@@ -1,20 +1,20 @@
 /*********************************************************************
- 
-	a2zipdrive.c
+
+    a2zipdrive.c
 
     ZIP Technologies ZipDrive IDE card
- 
+
     NOTE: No known dump exists of the formatter utility and the
     format of the custom partition record (block 0) that the card
     expects has not yet been determined, so this is largely untested
     and will work only with a drive dump from real h/w.
- 
+
     PLEASE use it only on a backup copy of said dump and contact MESSdev
     if you have one!
- 
+
     Partition block format:
     +0000: ASCII "Zip Technologies"
- 
+
 *********************************************************************/
 
 #include "a2zipdrive.h"
@@ -119,9 +119,9 @@ UINT8 a2bus_zipdrivebase_device::read_c0nx(address_space &space, UINT8 offset)
 		case 7:
 			return ide_controller_r(m_ide, 0x1f0+offset, 1);
 
-		case 8:	// data port
+		case 8: // data port
 			m_lastdata = ide_controller_r(m_ide, 0x1f0, 2);
-//			printf("%04x @ IDE data\n", m_lastdata);
+//          printf("%04x @ IDE data\n", m_lastdata);
 			return m_lastdata&0xff;
 
 		case 9:
@@ -144,7 +144,7 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, UINT8 offset, U
 {
 	switch (offset)
 	{
-		case 0:   
+		case 0:
 		case 1:
 		case 2:
 		case 3:
@@ -152,17 +152,17 @@ void a2bus_zipdrivebase_device::write_c0nx(address_space &space, UINT8 offset, U
 		case 5:
 		case 6:
 		case 7:
-//			printf("%02x to IDE controller @ %x\n", data, offset);
+//          printf("%02x to IDE controller @ %x\n", data, offset);
 			ide_controller_w(m_ide, 0x1f0+offset, 1, data);
 			break;
 
 		case 8:
-//			printf("%02x to IDE data lo\n", data);
+//          printf("%02x to IDE data lo\n", data);
 			m_lastdata = data;
 			break;
 
 		case 9:
-//			printf("%02x to IDE data hi\n", data);
+//          printf("%02x to IDE data hi\n", data);
 			m_lastdata &= 0x00ff;
 			m_lastdata |= (data << 8);
 			ide_controller_w(m_ide, 0x1f0, 2, m_lastdata);
@@ -196,4 +196,3 @@ UINT8 a2bus_zipdrivebase_device::read_c800(address_space &space, UINT16 offset)
 
 	return m_rom[offset+0x1800];
 }
-

@@ -139,8 +139,8 @@ void nscsi_harddisk_device::scsi_command()
 			strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
 			strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
 			strcpy((char *)&scsi_cmdbuf[31], "1.00");
-			scsi_cmdbuf[36] = 0x00;	// # of extents high
-			scsi_cmdbuf[37] = 0x08;	// # of extents low
+			scsi_cmdbuf[36] = 0x00; // # of extents high
+			scsi_cmdbuf[37] = 0x08; // # of extents low
 			scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
 			scsi_cmdbuf[39] = 0x99; // commands 0,3,4,7
 			scsi_cmdbuf[40] = 0xa0; // commands 8, a
@@ -156,7 +156,7 @@ void nscsi_harddisk_device::scsi_command()
 			scsi_cmdbuf[50] = 0xa0; // commands 8, a
 			scsi_cmdbuf[51] = 0x00;
 			scsi_cmdbuf[52] = 0x00;
-			scsi_cmdbuf[53] = 0xff;	// end of list
+			scsi_cmdbuf[53] = 0xff; // end of list
 			if(size > 54)
 				size = 54;
 			scsi_data_in(0, size);

@@ -142,7 +142,7 @@ private:
 	enum { BUS_BUSY, BUS_FREE_WAIT, BUS_FREE };
 
 	enum {
-		ST_RST			  = 0x80,
+		ST_RST            = 0x80,
 		ST_BSY            = 0x40,
 		ST_REQ            = 0x20,
 		ST_MSG            = 0x10,
@@ -151,7 +151,7 @@ private:
 		ST_SEL            = 0x02,
 		ST_DBP            = 0x01,
 
-		BAS_ENDOFDMA	  = 0x80,
+		BAS_ENDOFDMA      = 0x80,
 		BAS_DMAREQUEST    = 0x40,
 		BAS_PARITYERROR   = 0x20,
 		BAS_IRQACTIVE     = 0x10,
@@ -160,25 +160,25 @@ private:
 		BAS_ATN           = 0x02,
 		BAS_ACK           = 0x01,
 
-		IC_RST			  = 0x80,
-		IC_ARBITRATION	  = 0x40,
-		IC_ARBLOST		  = 0x20,
-		IC_ACK			  = 0x10,
-		IC_BSY			  = 0x08,
-		IC_SEL			  = 0x04,
-		IC_ATN			  = 0x02,
-		IC_DBUS			  = 0x01,
-		IC_PHASEMASK	  = 0x9e,
-		IC_WRITEMASK	  = 0x9f,
+		IC_RST            = 0x80,
+		IC_ARBITRATION    = 0x40,
+		IC_ARBLOST        = 0x20,
+		IC_ACK            = 0x10,
+		IC_BSY            = 0x08,
+		IC_SEL            = 0x04,
+		IC_ATN            = 0x02,
+		IC_DBUS           = 0x01,
+		IC_PHASEMASK      = 0x9e,
+		IC_WRITEMASK      = 0x9f,
 
-		MODE_BLOCKDMA	  = 0x80,
-		MODE_TARGET		  = 0x40,
-		MODE_PARITYCHK	  = 0x20,
-		MODE_PARITYIRQ	  = 0x10,
-		MODE_EOPIRQ		  = 0x08,
-		MODE_BSYIRQ		  = 0x04,
-		MODE_DMA		  = 0x02,
-		MODE_ARBITRATE	  = 0x01,
+		MODE_BLOCKDMA     = 0x80,
+		MODE_TARGET       = 0x40,
+		MODE_PARITYCHK    = 0x20,
+		MODE_PARITYIRQ    = 0x10,
+		MODE_EOPIRQ       = 0x08,
+		MODE_BSYIRQ       = 0x04,
+		MODE_DMA          = 0x02,
+		MODE_ARBITRATE    = 0x01,
 	};
 
 	enum { DMA_NONE, DMA_IN, DMA_OUT };

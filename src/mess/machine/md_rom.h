@@ -90,15 +90,15 @@ class md_rom_cm2in1_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_cm2in1"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
-	
+
 private:
 	int m_base;
 };
@@ -287,10 +287,10 @@ class md_rom_pokea_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "md_rom_pokea"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
 };
@@ -419,16 +419,16 @@ class md_rom_smw64_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_smw64"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
-	
+
 private:
 	UINT32 m_latch0, m_latch1;
 	UINT16 m_reg[6];
@@ -537,12 +537,12 @@ class md_rom_beggarp_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_beggarp"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
@@ -559,17 +559,17 @@ class md_rom_wukong_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "md_rom_wukong"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
-	
+
 private:
 	UINT8 m_mode;
 };

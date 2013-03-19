@@ -326,8 +326,8 @@ void ob68k1a_state::machine_reset()
 
 	// initialize COM8116
 	com8116_w(program, 0, 0xee);
-//	m_dbrg->stt_w(program, 0, 0x01);
-//	m_dbrg->str_w(program, 0, 0x01);
+//  m_dbrg->stt_w(program, 0, 0x01);
+//  m_dbrg->str_w(program, 0, 0x01);
 
 	// set reset vector
 	void *ram = program.get_write_ptr(0);

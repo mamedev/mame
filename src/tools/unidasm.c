@@ -328,7 +328,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "spc700",     _8bit,  0, CPU_DISASSEMBLE_NAME(spc700) },
 	{ "ssem",       _32le,  0, CPU_DISASSEMBLE_NAME(ssem) },
 	{ "ssp1601",    _16be, -1, CPU_DISASSEMBLE_NAME(ssp1601) },
-//	{ "superfx",    _8bit,  0, CPU_DISASSEMBLE_NAME(superfx) },
+//  { "superfx",    _8bit,  0, CPU_DISASSEMBLE_NAME(superfx) },
 	{ "t11",        _16le,  0, CPU_DISASSEMBLE_NAME(t11) },
 //  { "t90",        _8bit,  0, CPU_DISASSEMBLE_NAME(t90) },
 	{ "tlcs900",    _8bit,  0, CPU_DISASSEMBLE_NAME(tlcs900) },

@@ -21,7 +21,7 @@
     History:
 
 March 2013 NPW:
-	Rewrite of 6809/6309/Konami CPU; attempted to make cycle exact.
+    Rewrite of 6809/6309/Konami CPU; attempted to make cycle exact.
 
 991026 HJB:
     Fixed missing calls to cpu_changepc() for the TFR and EXG ocpodes.
@@ -84,7 +84,7 @@ March 2013 NPW:
 //  PARAMETERS
 //**************************************************************************
 
-#define LOG_INTERRUPTS	0
+#define LOG_INTERRUPTS  0
 
 // turn off 'unreferenced label' errors
 #ifdef __GNUC__
@@ -150,18 +150,18 @@ void m6809_base_device::device_start()
 	// register our state for the debugger
 	astring tempstr;
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE",	m_ppc.w).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc.w).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
-	state_add(M6809_PC,        "PC",    	m_pc.w).mask(0xffff);
-	state_add(M6809_S,         "S",        	m_s.w).mask(0xffff);
+	state_add(M6809_PC,        "PC",        m_pc.w).mask(0xffff);
+	state_add(M6809_S,         "S",         m_s.w).mask(0xffff);
 	state_add(M6809_CC,        "CC",        m_cc).mask(0xff);
-	state_add(M6809_U,         "U",        	m_u.w).mask(0xffff);
-	state_add(M6809_A,         "A",        	m_d.b.h).mask(0xff);
-	state_add(M6809_B,         "B",        	m_d.b.l).mask(0xff);
-	state_add(M6809_X,         "X",        	m_x.w).mask(0xffff);
-	state_add(M6809_Y,         "Y",        	m_y.w).mask(0xffff);
+	state_add(M6809_U,         "U",         m_u.w).mask(0xffff);
+	state_add(M6809_A,         "A",         m_d.b.h).mask(0xff);
+	state_add(M6809_B,         "B",         m_d.b.l).mask(0xff);
+	state_add(M6809_X,         "X",         m_x.w).mask(0xffff);
+	state_add(M6809_Y,         "Y",         m_y.w).mask(0xffff);
 	state_add(M6809_DP,        "DP",        m_dp).mask(0xff);
-	
+
 	// initialize variables
 	m_cc = 0;
 	m_pc.w = 0;
@@ -215,10 +215,10 @@ void m6809_base_device::device_reset()
 	m_irq_line = false;
 	m_lds_encountered = false;
 
-	m_dp = 0x00;		// reset direct page register
+	m_dp = 0x00;        // reset direct page register
 
-	m_cc |= CC_I;		// IRQ disabled
-	m_cc |= CC_F;		// FIRQ disabled
+	m_cc |= CC_I;       // IRQ disabled
+	m_cc |= CC_F;       // FIRQ disabled
 
 	m_pc.b.h = m_program->read_byte(VECTOR_RESET_FFFE + 0);
 	m_pc.b.l = m_program->read_byte(VECTOR_RESET_FFFE + 1);
@@ -462,10 +462,10 @@ const char *m6809_base_device::inputnum_string(int inputnum)
 {
 	switch(inputnum)
 	{
-		case INPUT_LINE_NMI:	return "NMI";
-		case M6809_FIRQ_LINE:	return "FIRQ";
-		case M6809_IRQ_LINE:	return "IRQ";
-		default:				return "???";
+		case INPUT_LINE_NMI:    return "NMI";
+		case M6809_FIRQ_LINE:   return "FIRQ";
+		case M6809_IRQ_LINE:    return "IRQ";
+		default:                return "???";
 	}
 }
 
@@ -482,16 +482,16 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register m6809_base_device::read_exg
 
 	switch(reg & 0x0F)
 	{
-		case  0: result.word_value = m_d.w;		break;	// D
-		case  1: result.word_value = m_x.w;		break;	// X
-		case  2: result.word_value = m_y.w;		break;	// Y
-		case  3: result.word_value = m_u.w;		break;	// U
-		case  4: result.word_value = m_s.w;		break;	// S
-		case  5: result.word_value = m_pc.w;	break;	// PC
-		case  8: result.byte_value = m_d.b.h;	break;	// A
-		case  9: result.byte_value = m_d.b.l;	break;	// B
-		case 10: result.byte_value = m_cc;		break;	// CC
-		case 11: result.byte_value = m_dp;		break;	// DP
+		case  0: result.word_value = m_d.w;     break;  // D
+		case  1: result.word_value = m_x.w;     break;  // X
+		case  2: result.word_value = m_y.w;     break;  // Y
+		case  3: result.word_value = m_u.w;     break;  // U
+		case  4: result.word_value = m_s.w;     break;  // S
+		case  5: result.word_value = m_pc.w;    break;  // PC
+		case  8: result.byte_value = m_d.b.h;   break;  // A
+		case  9: result.byte_value = m_d.b.l;   break;  // B
+		case 10: result.byte_value = m_cc;      break;  // CC
+		case 11: result.byte_value = m_dp;      break;  // DP
 	}
 	return result;
 }
@@ -505,23 +505,23 @@ ATTR_FORCE_INLINE void m6809_base_device::write_exgtfr_register(UINT8 reg, m6809
 {
 	switch(reg & 0x0F)
 	{
-		case  0: m_d.w   = value.word_value;	break;	// D
-		case  1: m_x.w   = value.word_value;	break;	// X
-		case  2: m_y.w   = value.word_value;	break;	// Y
-		case  3: m_u.w   = value.word_value;	break;	// U
-		case  4: m_s.w   = value.word_value;	break;	// S
-		case  5: m_pc.w  = value.word_value;	break;	// PC
-		case  8: m_d.b.h = value.byte_value;	break;	// A
-		case  9: m_d.b.l = value.byte_value;	break;	// B
-		case 10: m_cc    = value.byte_value;	break;	// CC
-		case 11: m_dp    = value.byte_value;	break;	// DP
+		case  0: m_d.w   = value.word_value;    break;  // D
+		case  1: m_x.w   = value.word_value;    break;  // X
+		case  2: m_y.w   = value.word_value;    break;  // Y
+		case  3: m_u.w   = value.word_value;    break;  // U
+		case  4: m_s.w   = value.word_value;    break;  // S
+		case  5: m_pc.w  = value.word_value;    break;  // PC
+		case  8: m_d.b.h = value.byte_value;    break;  // A
+		case  9: m_d.b.l = value.byte_value;    break;  // B
+		case 10: m_cc    = value.byte_value;    break;  // CC
+		case 11: m_dp    = value.byte_value;    break;  // DP
 	}
 }
 
 
 //-------------------------------------------------
 //  log_illegal - used to log hits to illegal
-//	instructions (except for HD6309 which traps)
+//  instructions (except for HD6309 which traps)
 //-------------------------------------------------
 
 void m6809_base_device::log_illegal()

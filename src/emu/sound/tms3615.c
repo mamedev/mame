@@ -21,16 +21,16 @@ const device_type TMS3615 = &device_creator<tms3615_device>;
 
 tms3615_device::tms3615_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS3615, "TMS3615", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_channel(0),
-	  m_samplerate(0),
-	  m_basefreq(0),
-	  m_output8(0),
-	  m_output16(0),
-	  m_enable(0)
+		device_sound_interface(mconfig, *this),
+		m_channel(0),
+		m_samplerate(0),
+		m_basefreq(0),
+		m_output8(0),
+		m_output16(0),
+		m_enable(0)
 {
-    memset(m_counter8, 0, TMS3615_TONES);
-    memset(m_counter16, 0, TMS3615_TONES);
+	memset(m_counter8, 0, TMS3615_TONES);
+	memset(m_counter16, 0, TMS3615_TONES);
 }
 
 
@@ -105,5 +105,3 @@ void tms3615_device::enable_w(int enable)
 {
 	m_enable = enable;
 }
-
-

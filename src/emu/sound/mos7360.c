@@ -410,7 +410,7 @@ void mos7360_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_timer3_active = 1;
 		set_interrupt(0x40);
 		break;
-	
+
 	case TIMER_LINE:
 		raster_interrupt_gen();
 		break;

@@ -46,7 +46,7 @@ void naomi_m4_board::device_start()
 	naomi_board::device_start();
 
 #if USE_NAOMICRYPT
-	UINT32 tempkey = get_naomi_key(machine()); 
+	UINT32 tempkey = get_naomi_key(machine());
 	iv = (tempkey >> 16) &0xffff;
 	key = tempkey & 0xffff;
 #else

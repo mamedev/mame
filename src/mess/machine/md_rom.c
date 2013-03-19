@@ -764,7 +764,7 @@ WRITE16_MEMBER(md_rom_lion3_device::write)
 {
 	if (offset >= 0x600000/2 && offset < 0x700000/2)
 	{
-//		printf("protection write, offset %d data %d\n", offset & 0x7, data);
+//      printf("protection write, offset %d data %d\n", offset & 0x7, data);
 		switch (offset & 0x7)
 		{
 			case 0x0:
@@ -802,7 +802,7 @@ WRITE16_MEMBER(md_rom_lion3_device::write)
 						| (BIT(m_reg[0], 0) << 7);
 				break;
 		}
-		
+
 	}
 	if (offset >= 0x700000/2)
 		m_bank = data & 0xff;
@@ -974,7 +974,7 @@ READ16_MEMBER(md_rom_smw64_device::read)
 {
 	// 0x000000-0x0fffff: lower 512KB ROM (up to 0x07ffff) + mirror
 	// 0x600000-0x6fffff: internal hardware (up to 0x67ffff) + mirror
-	// Namely, 
+	// Namely,
 	//  * 60xxx = bank1 of the upper 512KB ROM
 	//  * 61xxx = bank2 of the upper 512KB ROM
 	//  * 62xxx = alternate 4KB chunks of 0x0000 ~ 0xffff
@@ -1004,30 +1004,30 @@ READ16_MEMBER(md_rom_smw64_device::read)
 			case 0x0:
 			case 0x2:
 			case 0x4:
-				return m_reg[offset/2];	// DATA1, DATA2, DATA3
+				return m_reg[offset/2]; // DATA1, DATA2, DATA3
 			case 0x1:
 			case 0x3:
 			case 0x5:
-				return m_reg[offset/2] + 1;	// DATA1+1, DATA2+1, DATA3+1
+				return m_reg[offset/2] + 1; // DATA1+1, DATA2+1, DATA3+1
 			case 0x6:
-				return m_reg[2] + 2;	// DATA3+2
+				return m_reg[2] + 2;    // DATA3+2
 			case 0x7:
-				return m_reg[2] + 3;	// DATA3+3
+				return m_reg[2] + 3;    // DATA3+3
 		}
 	}
 	if ((offset >= 0x670000/2) && (offset < 0x680000/2))
 	{
 		UINT16 data = (m_ctrl[1] & 0x80) ? ((m_ctrl[2] & 0x40) ? (m_reg[4] & m_reg[5]) : (m_reg[4] ^ 0xff)) : 0x0000;
-		if (offset & 0x1)	// odd offset, return lower 7 bits of the above
+		if (offset & 0x1)   // odd offset, return lower 7 bits of the above
 			return data & 0x7f;
-		else	// even offset, return whole data above, but also update the regs if CTRL3 has 0x80 set
+		else    // even offset, return whole data above, but also update the regs if CTRL3 has 0x80 set
 		{
-			if (m_ctrl[2] & 0x80)	// update regs if CTRL3 has bit7 set
+			if (m_ctrl[2] & 0x80)   // update regs if CTRL3 has bit7 set
 			{
 				if (m_ctrl[2] & 0x20)
-					m_reg[2] = (m_reg[5] << 2) & 0xfc;	// DATA3
+					m_reg[2] = (m_reg[5] << 2) & 0xfc;  // DATA3
 				else
-					m_reg[0] = ((m_reg[4] << 1) ^ m_reg[3]) & 0xfe;	// DATA1
+					m_reg[0] = ((m_reg[4] << 1) ^ m_reg[3]) & 0xfe; // DATA1
 			}
 			return data;
 		}
@@ -1038,7 +1038,7 @@ READ16_MEMBER(md_rom_smw64_device::read)
 WRITE16_MEMBER(md_rom_smw64_device::write)
 {
 	// 0x600000-0x6fffff: internal hardware (up to 0x67ffff) + mirror
-	// Namely, 
+	// Namely,
 	//  * 62xxx/63xxx = unknown/unmapped
 	//  * 65xxx/66xxx = unknown/unmapped
 	//  * remaining ranges = CTRL/DATA
@@ -1047,35 +1047,35 @@ WRITE16_MEMBER(md_rom_smw64_device::write)
 		if (offset & 1)
 		{
 			if ((m_ctrl[0] & 7) == 0)
-				m_reg[0] = ((m_reg[0] ^ m_reg[3]) ^ data) & 0xfe;	// DATA1
+				m_reg[0] = ((m_reg[0] ^ m_reg[3]) ^ data) & 0xfe;   // DATA1
 			if ((m_ctrl[0] & 7) == 1)
-				m_reg[1] = data & 0xfe;	// DATA2
+				m_reg[1] = data & 0xfe; // DATA2
 			if ((m_ctrl[0] & 7) == 7)
-				m_latch1 = 8 + ((data & 0x1c) >> 2);	// ROM BANKSWITCH $61
-			m_reg[3] = data;	// DATA4
+				m_latch1 = 8 + ((data & 0x1c) >> 2);    // ROM BANKSWITCH $61
+			m_reg[3] = data;    // DATA4
 		}
 		else
-			m_ctrl[0] = data;	// CTRL1
+			m_ctrl[0] = data;   // CTRL1
 	}
 	if ((offset >= 0x610000/2) && (offset < 0x620000/2))
 	{
 		if (offset & 1)
-			m_ctrl[1] = data;	// CTRL2
+			m_ctrl[1] = data;   // CTRL2
 	}
 	if ((offset >= 0x640000/2) && (offset < 0x650000/2))
 	{
 		if (offset & 1)
-			m_reg[5] = data;	// DATA6
+			m_reg[5] = data;    // DATA6
 		else
-			m_reg[4] = data;	// DATA5
+			m_reg[4] = data;    // DATA5
 	}
 	if ((offset >= 0x670000/2) && (offset < 0x680000/2))
 	{
 		if (!(offset & 1))
 		{
-			m_ctrl[2] = data;	// CTRL3
+			m_ctrl[2] = data;   // CTRL3
 			if (m_ctrl[1] & 0x80)
-				m_latch0 = 8 + ((data & 0x1c) >> 2);	// ROM BANKSWITCH $60
+				m_latch0 = 8 + ((data & 0x1c) >> 2);    // ROM BANKSWITCH $60
 		}
 	}
 }
@@ -1174,12 +1174,12 @@ READ16_MEMBER(md_rom_radica_device::read_a13)
 
 /*-------------------------------------------------
  BEGGAR PRINCE
- This game uses cart which is the same as SEGA_SRAM 
+ This game uses cart which is the same as SEGA_SRAM
  + bankswitch mechanism for first 256KB of the image:
  depending on bit7 of the value written at 0xe00/2,
- accesses to 0x00000-0x3ffff go to the first 256KB 
+ accesses to 0x00000-0x3ffff go to the first 256KB
  of ROM, or to the second to last 256KB chunk (usually
- mapped to 0x380000-0x3bffff). SRAM is mapped at 
+ mapped to 0x380000-0x3bffff). SRAM is mapped at
  the end of ROM.
  -------------------------------------------------*/
 
@@ -1199,7 +1199,7 @@ READ16_MEMBER(md_rom_beggarp_device::read)
 WRITE16_MEMBER(md_rom_beggarp_device::write)
 {
 	if (offset >= 0x0e00/2 && offset < 0x0f00/2)
-		m_mode = BIT(data, 7);	
+		m_mode = BIT(data, 7);
 
 	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly)
 		m_nvram[offset & 0x3fff] = data;
@@ -1212,7 +1212,7 @@ WRITE16_MEMBER(md_rom_beggarp_device::write_a13)
 		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
 		m_nvram_active = BIT(data, 0);
 		m_nvram_readonly = BIT(data, 1);
-		
+
 		// since a lot of generic carts ends up here if loaded from fullpath
 		// we turn on nvram (with m_nvram_handlers_installed) only if they toggle it on by writing here!
 		if (m_nvram_active)
@@ -1221,11 +1221,11 @@ WRITE16_MEMBER(md_rom_beggarp_device::write_a13)
 }
 
 /*-------------------------------------------------
- LEGEND OF WUKONG 
- This game uses cart which is the same as SEGA_SRAM 
+ LEGEND OF WUKONG
+ This game uses cart which is the same as SEGA_SRAM
  + bankswitch mechanism for last 128KB of the image:
  first 2MB of ROM is loaded in 0-0x200000 and
- mirrored in 0x200000-0x400000, but depending on 
+ mirrored in 0x200000-0x400000, but depending on
  bit7 of the value written at 0xe00/2 accesses to
  0x200000-0x21ffff go either to the "physical" address
  (i.e. last 128K of ROM) or to the "memory" address
@@ -1238,7 +1238,7 @@ READ16_MEMBER(md_rom_wukong_device::read)
 		return m_nvram[offset - m_nvram_start/2];
 
 	// here can access both last 128K of the ROM and the first 128K, depending of bit7 of m_mode
-	if (offset >= 0x200000/2 && offset < 0x220000/2)	
+	if (offset >= 0x200000/2 && offset < 0x220000/2)
 		return !m_mode ? m_rom[offset] : m_rom[offset & 0xffff];
 	else if (offset < 0x400000/2)
 		return m_rom[offset & 0xfffff];
@@ -1248,7 +1248,7 @@ READ16_MEMBER(md_rom_wukong_device::read)
 
 WRITE16_MEMBER(md_rom_wukong_device::write)
 {
-	if (offset < 0x100000/2)	// it actually writes to 0xe00/2
+	if (offset < 0x100000/2)    // it actually writes to 0xe00/2
 		m_mode = BIT(data, 7);
 
 	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly)
@@ -1262,11 +1262,10 @@ WRITE16_MEMBER(md_rom_wukong_device::write_a13)
 		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
 		m_nvram_active = BIT(data, 0);
 		m_nvram_readonly = BIT(data, 1);
-		
+
 		// since a lot of generic carts ends up here if loaded from fullpath
 		// we turn on nvram (with m_nvram_handlers_installed) only if they toggle it on by writing here!
 		if (m_nvram_active)
 			m_nvram_handlers_installed = 1;
 	}
 }
-

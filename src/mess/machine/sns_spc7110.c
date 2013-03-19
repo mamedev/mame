@@ -61,7 +61,7 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r480a = 0x00;
 	m_r480b = 0x00;
 	m_r480c = 0x00;
-	
+
 	m_r4811 = 0x00;
 	m_r4812 = 0x00;
 	m_r4813 = 0x00;
@@ -70,11 +70,11 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r4816 = 0x00;
 	m_r4817 = 0x00;
 	m_r4818 = 0x00;
-	
+
 	m_r481x = 0x00;
 	m_r4814_latch = 0;
 	m_r4815_latch = 0;
-	
+
 	m_r4820 = 0x00;
 	m_r4821 = 0x00;
 	m_r4822 = 0x00;
@@ -91,7 +91,7 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r482d = 0x00;
 	m_r482e = 0x00;
 	m_r482f = 0x00;
-	
+
 	m_r4830 = 0x00;
 	m_r4831 = 0;
 	m_dx_offset = spc7110_datarom_addr(0 * 0x100000, 0x200000); // we would need the rom length here...
@@ -100,7 +100,7 @@ void sns_rom_spc7110_device::spc7110_start()
 	m_r4833 = 2;
 	m_fx_offset = spc7110_datarom_addr(2 * 0x100000, 0x200000); // we would need the rom length here...
 	m_r4834 = 0x00;
-	
+
 	m_r4840 = 0x00;
 	m_r4841 = 0x00;
 	m_r4842 = 0x00;
@@ -167,19 +167,19 @@ void sns_rom_spc7110_device::device_start()
 void sns_rom_spc7110rtc_device::device_start()
 {
 	spc7110_start();
-	
+
 	// RTC
 	m_rtc_state = RTCS_Inactive;
 	m_rtc_mode  = RTCM_Linear;
 	m_rtc_index = 0;
 	m_rtc_offset = 0;
-	
+
 // at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
 //  spc7110_update_time(0);
 
 	// set basetime for RTC
 	machine().current_datetime(m_rtc_basetime);
-	
+
 	save_item(NAME(m_rtc_state));
 	save_item(NAME(m_rtc_mode));
 	save_item(NAME(m_rtc_index));
@@ -936,7 +936,7 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 	system_time curtime;
 	machine().current_datetime(curtime);
 	INT64 diff = curtime.time - m_rtc_basetime.time - offset;
-//	printf("diff %llx\n", diff);
+//  printf("diff %llx\n", diff);
 	bool update = TRUE;
 
 	// TEST: can we go beyond 24hrs of rounding?!? I doubt it will ever go beyond 3600, but I could be wrong...
@@ -984,37 +984,37 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 
 			UINT8 days = spc7110_months[month % 12];
 			// check for feb 29th
-			if (days == 28) 
+			if (days == 28)
 			{
 				bool leap = FALSE;
-				if ((year % 4) == 0) 
+				if ((year % 4) == 0)
 				{
 					if(year % 100 || !(year % 400))
 						leap = TRUE;
 				}
-				if (leap) 
+				if (leap)
 					days++;
 			}
 
 			// are we below end of month?
-			if (day < days) 
+			if (day < days)
 				continue;
 			// otherwise we have to increase month!
 			day = 0;
 			month++;
 
 			// are we below end of year?
-			if (month < 12) 
+			if (month < 12)
 				continue;
 			// otherwise we have to increase year!
 			month = 0;
 			year++;
 		}
-		
+
 		day++;
 		month++;
 		year %= 100;
-		
+
 		m_rtc_ram[0] = second % 10;
 		m_rtc_ram[1] = second / 10;
 		m_rtc_ram[2] = minute % 10;
@@ -1608,14 +1608,14 @@ READ8_MEMBER(sns_rom_spc7110_device::read_l)
 {
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
-	
+
 	return 0xff;
 }
 
 READ8_MEMBER(sns_rom_spc7110_device::read_h)
 {
 	UINT16 address = offset & 0xfffff;
-	
+
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
 	else
@@ -1634,7 +1634,7 @@ READ8_MEMBER(sns_rom_spc7110_device::read_h)
 				break;
 		}
 	}
-	
+
 	return 0xff;
 }
 
@@ -1648,4 +1648,3 @@ WRITE8_MEMBER( sns_rom_spc7110_device::write_ram )
 {
 	m_ram[offset & 0x1fff] = data;
 }
-

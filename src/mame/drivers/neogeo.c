@@ -1322,7 +1322,7 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		}
 		else
 			machine().memory().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
-		ym->reset();	// and this makes the new pointers take effect
+		ym->reset();    // and this makes the new pointers take effect
 		size = image.get_software_region_length("sprites");
 		machine().memory().region_free(":sprites");
 		machine().memory().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);

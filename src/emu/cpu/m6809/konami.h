@@ -2,7 +2,7 @@
 
     konami.h
 
-	Portable Konami CPU emulator
+    Portable Konami CPU emulator
 
 **********************************************************************/
 

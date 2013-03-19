@@ -141,7 +141,7 @@ public:
 	void korosuke_rom_decode();
 	void eyes_decode(UINT8 *data);
 	void mspacman_install_patches(UINT8 *ROM);
-	
+
 	// theglopb.c
 	void theglobp_decrypt_rom_8();
 	void theglobp_decrypt_rom_9();
@@ -158,7 +158,7 @@ public:
 	// jumpshot.c
 	UINT8 jumpshot_decrypt(int addr, UINT8 e);
 	void jumpshot_decode();
-	
+
 	// acitya.c
 	void acitya_decrypt_rom_8();
 	void acitya_decrypt_rom_9();
@@ -166,5 +166,5 @@ public:
 	void acitya_decrypt_rom_B();
 	DECLARE_READ8_MEMBER(acitya_decrypt_rom);
 	DECLARE_MACHINE_START(acitya);
-	DECLARE_MACHINE_RESET(acitya);	
+	DECLARE_MACHINE_RESET(acitya);
 };

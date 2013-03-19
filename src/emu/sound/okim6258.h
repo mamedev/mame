@@ -54,18 +54,18 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_READ8_MEMBER( okim6258_status_r );
-    DECLARE_WRITE8_MEMBER( okim6258_data_w );
-    DECLARE_WRITE8_MEMBER( okim6258_ctrl_w );
+	DECLARE_READ8_MEMBER( okim6258_status_r );
+	DECLARE_WRITE8_MEMBER( okim6258_data_w );
+	DECLARE_WRITE8_MEMBER( okim6258_ctrl_w );
 
 public:
-    void set_divider(int val);
-    void set_clock(int val);
-    int get_vclk();
+	void set_divider(int val);
+	void set_clock(int val);
+	int get_vclk();
 
 private:
-    void okim6258_state_save_register();
-    INT16 clock_adpcm(UINT8 nibble);
+	void okim6258_state_save_register();
+	INT16 clock_adpcm(UINT8 nibble);
 
 private:
 	UINT8  m_status;

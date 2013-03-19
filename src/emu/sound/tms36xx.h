@@ -36,7 +36,7 @@ struct tms36xx_interface
 // ======================> tms36xx_device
 
 class tms36xx_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -50,18 +50,18 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    // MM6221AA interface functions
-    void mm6221aa_tune_w(int tune);
+	// MM6221AA interface functions
+	void mm6221aa_tune_w(int tune);
 
-    // TMS3615/17 interface functions
-    void tms36xx_note_w(int octave, int note);
+	// TMS3615/17 interface functions
+	void tms36xx_note_w(int octave, int note);
 
-    // TMS3617 interface functions
-    void tms3617_enable_w(int enable);
+	// TMS3617 interface functions
+	void tms3617_enable_w(int enable);
 
 private:
-    void tms36xx_reset_counters();
-    void tms3617_enable(int enable);
+	void tms36xx_reset_counters();
+	void tms3617_enable(int enable);
 
 private:
 	char *m_subtype;      // subtype name MM6221AA, TMS3615 or TMS3617

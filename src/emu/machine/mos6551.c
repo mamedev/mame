@@ -242,7 +242,7 @@ void mos6551_device::update_serial()
 		m_connection_state &= ~SERIAL_STATE_RTS;
 	else
 		m_connection_state |= SERIAL_STATE_RTS;
-	
+
 	m_write_rts((m_connection_state & SERIAL_STATE_RTS) ? 0 : 1);
 
 	serial_connection_out();
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( mos6551_device::rxc_w )
 
 WRITE_LINE_MEMBER( mos6551_device::cts_w )
 {
-	m_cts = state;	
+	m_cts = state;
 }
 
 

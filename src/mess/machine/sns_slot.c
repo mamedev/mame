@@ -23,7 +23,7 @@
 
     Notes about add-on detection and handling (useful for future addition of st018, cx4, etc.)
     ===============================================================================================
-    When loading from softlist, m_type would be enough to take care of add-on chips, because 
+    When loading from softlist, m_type would be enough to take care of add-on chips, because
     the ones needing a CPU dump have it in the zipfile. However, to support these games also
     from fullpath, both with files having DSP data appended to the .sfc and with older dumps
     missing DSP data, a second variable is present in the SNES slot: m_addon.
@@ -32,15 +32,15 @@
       ones containing DSP dump as device roms, so it gets m_type as the main device should be
       used and if m_addon is ADDON_DSP* or ADDON_ST*, then it checks if the DSP data is appended
       or if m_type has to be switched to legacy type
-    - call_load needs to detect faulty dumps too, to alloc m_addon_bios and copy the data from 
-      the correct place, so if m_addon is ADDON_DSP* or ADDON_ST* it checks whether DSP data is 
-      appended or not: if it is, this data is copied to m_addon_bios; if not, then we are in 
+    - call_load needs to detect faulty dumps too, to alloc m_addon_bios and copy the data from
+      the correct place, so if m_addon is ADDON_DSP* or ADDON_ST* it checks whether DSP data is
+      appended or not: if it is, this data is copied to m_addon_bios; if not, then we are in
       the legacy device case and data is copied from the device rom
-    After the cart has been loaded and emulation has started, only m_type is needed to later 
+    After the cart has been loaded and emulation has started, only m_type is needed to later
     handlers installation and cart accesses
 
-    Also notice that, from softlist, DSP1, 1B, 2, 3 are treated as the same device, because they 
-	all have the same I/O and the only difference (i.e. the DSP data) comes from the zipfile itself. 
+    Also notice that, from softlist, DSP1, 1B, 2, 3 are treated as the same device, because they
+    all have the same I/O and the only difference (i.e. the DSP data) comes from the zipfile itself.
     OTOH, to support faulty dumps missing DSP content, we need separate legacy devices...
 
 
@@ -808,13 +808,13 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 			}
 			break;
 	}
-	
+
 	// otherwise, we need to use the legacy versions including DSP dump in device romset
 	if (!m_cart->get_addon_bios_size())
 	{
 		astring region(m_cart->device().tag(), ":addon");
 		UINT8 *ROM = NULL;
-		
+
 		switch (m_addon)
 		{
 			case ADDON_DSP1:
@@ -853,8 +853,8 @@ void base_sns_cart_slot_device::setup_addon_from_fullpath()
 				memcpy(m_cart->get_addon_bios_base(), ROM, 0x11000);
 				break;
 		}
-	}		
-	
+	}
+
 }
 
 void base_sns_cart_slot_device::setup_nvram()
@@ -1041,7 +1041,7 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 					if (type == SNES_DSP_MODE21)
 						type = SNES_DSP1_MODE21_LEG;
 					else
-						type = SNES_DSP1_LEG;					
+						type = SNES_DSP1_LEG;
 				}
 				break;
 			case ADDON_DSP1B:

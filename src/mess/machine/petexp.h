@@ -72,7 +72,7 @@ public:
 	UINT8 dma_bd_r(offs_t offset);
 	void dma_bd_w(offs_t offset, UINT8 data);
 	int phi2();
-	
+
 	enum
 	{
 		SEL_NONE = -1,

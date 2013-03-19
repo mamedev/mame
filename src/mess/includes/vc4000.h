@@ -160,13 +160,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    void soundport_w(int mode, int data);
+	void soundport_w(int mode, int data);
 
 private:
 	sound_stream *m_channel;
 	UINT8 m_reg[1];
 	int m_size;
-    int m_pos;
+	int m_pos;
 	unsigned m_level;
 };
 

@@ -334,7 +334,7 @@ protected:
 	void set_output_data( UINT8 data );
 	TIMER_CALLBACK_MEMBER( ms5pcb_bios_timer_callback );
 	TIMER_CALLBACK_MEMBER( svcpcb_bios_timer_callback );
-	
+
 	// protections implementation
 	DECLARE_READ16_MEMBER( sbp_lowerrom_r );
 	DECLARE_WRITE16_MEMBER( sbp_lowerrom_w );

@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(fastfred_state,fastfred)
  *************************************/
 
 WRITE8_MEMBER(fastfred_state::fastfred_videoram_w )
-{	
+{
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }

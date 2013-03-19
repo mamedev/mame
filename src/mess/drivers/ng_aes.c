@@ -1692,21 +1692,21 @@ ROM_START( aes )
 	ROM_SYSTEM_BIOS( 2, "uni-bios23",   "Universe Bios (Ver. 2.3)" )
 	ROMX_LOAD( "uni-bios_2_3.rom",  0x00000, 0x020000, CRC(27664eb5) SHA1(5b02900a3ccf3df168bdcfc98458136fd2b92ac0), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3) ) /* Universe Bios v2.3 (hack) */
 	ROM_SYSTEM_BIOS( 3, "uni-bios30",   "Universe Bios (Ver. 3.0)" )
-	ROMX_LOAD("uni-bios-30.rom", 0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4))	/* Universe Bios v3.0 */
+	ROMX_LOAD("uni-bios-30.rom", 0x00000, 0x020000, CRC(a97c89a9) SHA1(97a5eff3b119062f10e31ad6f04fe4b90d366e7f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(4))    /* Universe Bios v3.0 */
 	ROM_SYSTEM_BIOS( 4, "uni-bios10",   "Universe Bios (Ver. 1.0)" )
-	ROMX_LOAD("uni-bios-10.rom", 0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5))	/* Universe Bios v1.0 */
+	ROMX_LOAD("uni-bios-10.rom", 0x00000, 0x020000, CRC(0ce453a0) SHA1(3b4c0cd26c176fc6b26c3a2f95143dd478f6abf9), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(5))    /* Universe Bios v1.0 */
 	ROM_SYSTEM_BIOS( 5, "uni-bios11",   "Universe Bios (Ver. 1.1)" )
-	ROMX_LOAD("uni-bios-11.rom", 0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6))	/* Universe Bios v1.1 */
+	ROMX_LOAD("uni-bios-11.rom", 0x00000, 0x020000, CRC(5dda0d84) SHA1(4153d533c02926a2577e49c32657214781ff29b7), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(6))    /* Universe Bios v1.1 */
 	ROM_SYSTEM_BIOS( 6, "uni-bios12",   "Universe Bios (Ver. 1.2)" )
-	ROMX_LOAD("uni-bios-12.rom", 0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(7))	/* Universe Bios v1.2 */
+	ROMX_LOAD("uni-bios-12.rom", 0x00000, 0x020000, CRC(4fa698e9) SHA1(682e13ec1c42beaa2d04473967840c88fd52c75a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(7))    /* Universe Bios v1.2 */
 	ROM_SYSTEM_BIOS( 7, "uni-bios13",   "Universe Bios (Ver. 1.3)" )
-	ROMX_LOAD("uni-bios-13.rom", 0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(8))	/* Universe Bios v1.3 */
+	ROMX_LOAD("uni-bios-13.rom", 0x00000, 0x020000, CRC(b24b44a0) SHA1(eca8851d30557b97c309a0d9f4a9d20e5b14af4e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(8))    /* Universe Bios v1.3 */
 	ROM_SYSTEM_BIOS( 8, "uni-bios20",   "Universe Bios (Ver. 2.0)" )
-	ROMX_LOAD("uni-bios-20.rom", 0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(9))	/* Universe Bios v2.0 */
+	ROMX_LOAD("uni-bios-20.rom", 0x00000, 0x020000, CRC(0c12c2ad) SHA1(37bcd4d30f3892078b46841d895a6eff16dc921e), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(9))    /* Universe Bios v2.0 */
 	ROM_SYSTEM_BIOS( 9, "uni-bios21",   "Universe Bios (Ver. 2.1)" )
-	ROMX_LOAD("uni-bios-21.rom", 0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(10))	/* Universe Bios v2.1 */
+	ROMX_LOAD("uni-bios-21.rom", 0x00000, 0x020000, CRC(8dabf76b) SHA1(c23732c4491d966cf0373c65c83c7a4e88f0082c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(10))   /* Universe Bios v2.1 */
 	ROM_SYSTEM_BIOS( 10, "uni-bios22",   "Universe Bios (Ver. 2.2)" )
-	ROMX_LOAD("uni-bios-22.rom", 0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(11))	/* Universe Bios v2.2 */
+	ROMX_LOAD("uni-bios-22.rom", 0x00000, 0x020000, CRC(2d50996a) SHA1(5241a4fb0c63b1a23fd1da8efa9c9a9bd3b4279c), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(11))   /* Universe Bios v2.2 */
 
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 

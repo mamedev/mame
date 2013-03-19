@@ -1,7 +1,7 @@
 /*
  todo: bank handlers etc. should be installed on a per-game basis
        to make it clearer why all the sets with hacked bank
-	   setup existed in the wild
+       setup existed in the wild
 */
 
 /*
@@ -2004,7 +2004,7 @@ ROM_END
 ROM_START( lhaunt_11 ) // 100331 entertainment
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "lh_x_100331.rom", 0x00000, 0x40000, CRC(992c4f25) SHA1(23618fb387e24fae26c7cd184bc61be61c11ad62) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "luckyhaunter_ent.001", 0x000000, 0x80000, CRC(f4d3eb09) SHA1(ac6796250a60cf926087671e9fac3980a136d86e) )
 	ROM_LOAD( "luckyhaunter_ent.002", 0x100000, 0x80000, CRC(a2a88abc) SHA1(d417ab939faab373fc50abec5dc6edc160f0fdfb) )
@@ -3106,7 +3106,7 @@ ROM_END
 ROM_START( gnome_12 ) // 100326 Russia
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "gn_100326.rom", 0x00000, 0x40000, CRC(78585923) SHA1(c3fadbb9e1de317ec5be78c102dd90a64b85e816) )
-	
+
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "gnome.001", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
 	ROM_LOAD( "gnome.002", 0x100000, 0x80000, CRC(f6e5e6f0) SHA1(9751e8df87f14a252595547d24b8dd865ee4f08d) )
@@ -3370,7 +3370,7 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 //GAME( 2003, crzmon_11,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (081113 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2003, crzmon_12,   crzmon_parent,   multfish, multfish, multfish_state, crzmonent,ROT0, "Igrosoft", "Crazy Monkey (090711 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 	GAME( 2003, crzmon13,   0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100311 World)", GAME_SUPPORTS_SAVE ) /* World */
-//	GAME( 2003, crzmon_14,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//  GAME( 2003, crzmon_14,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 	GAME( 2003, crzmon_15,   crzmon_parent,   multfish, multfish, multfish_state, crzmonent,ROT0, "Igrosoft", "Crazy Monkey (100311 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 	GAME( 2003, crzmon_16,   crzmon_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Crazy Monkey (100312 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 
@@ -3440,7 +3440,7 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 //GAME( 2004, resdnt_4,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (090129 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 //GAME( 2004, resdnt_5,    resdnt_parent,   multfish, multfish, multfish_state, resdntent,ROT0, "Igrosoft", "Resident (090722 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 	GAME( 2004, resdnt_6,    0,               multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (100311 World)", GAME_SUPPORTS_SAVE ) /* World */
-//	GAME( 2004, resdnt_7,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
+//  GAME( 2004, resdnt_7,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (100311 Lottery)", GAME_SUPPORTS_SAVE ) /* Lottery */
 	GAME( 2004, resdnt_8,    resdnt_parent,   multfish, multfish, multfish_state, resdntent,ROT0, "Igrosoft", "Resident (100311 Entertainment)", GAME_SUPPORTS_SAVE ) /* Entertainment */
 	GAME( 2004, resdnt_9,    resdnt_parent,   multfish, multfish, driver_device,  0,        ROT0, "Igrosoft", "Resident (100316 Russia)", GAME_SUPPORTS_SAVE ) /* Russia */
 

@@ -163,12 +163,12 @@ void nes_cart_slot_device::device_start()
 void nes_cart_slot_device::device_config_complete()
 {
 	// inherit a copy of the static data
-//	const nes_cart_interface *intf = reinterpret_cast<const nes_cart_interface *>(static_config());
-//	if (intf != NULL)
-//	{
-//		*static_cast<nes_cart_interface *>(this) = *intf;
-//	}
-	
+//  const nes_cart_interface *intf = reinterpret_cast<const nes_cart_interface *>(static_config());
+//  if (intf != NULL)
+//  {
+//      *static_cast<nes_cart_interface *>(this) = *intf;
+//  }
+
 	// set brief and instance name
 	update_names();
 }
@@ -214,18 +214,18 @@ static const struct nes_cart_lines nes_cart_lines_table[] =
 static int nes_cart_get_line( const char *feature )
 {
 	const struct nes_cart_lines *nes_line = &nes_cart_lines_table[0];
-	
+
 	if (feature == NULL)
 		return 128;
-	
+
 	while (nes_line->tag)
 	{
 		if (strcmp(nes_line->tag, feature) == 0)
 			break;
-		
+
 		nes_line++;
 	}
-	
+
 	return nes_line->line;
 }
 
@@ -237,51 +237,51 @@ bool nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_ram_size = 0, mapper_bram_size = 0;	// helper for regions to alloc at the end
+		UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_ram_size = 0, mapper_bram_size = 0; // helper for regions to alloc at the end
 
 		if (software_entry() == NULL)
 		{
 			const char *mapinfo = NULL;
 			int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 			char magic[4];
-			
+
 			/* Check first 4 bytes of the image to decide if it is UNIF or iNES */
 			/* Unfortunately, many .unf files have been released as .nes, so we cannot rely on extensions only */
 			memset(magic, '\0', sizeof(magic));
 			fread(magic, 4);
-			
+
 			if ((magic[0] == 'N') && (magic[1] == 'E') && (magic[2] == 'S'))    /* If header starts with 'NES' it is iNES */
 			{
 				UINT32 prg_size, vrom_size;
 				UINT8 header[0x10];
 				UINT8 mapper, local_options;
 				bool ines20 = FALSE, has_trainer = FALSE, prg16k;
-				
+
 				// check if the image is recognized by nes.hsi
 				mapinfo = hashfile_extrainfo(*this);
-				
+
 				// image_extrainfo() resets the file position back to start.
 				fseek(0, SEEK_SET);
 				// read out the header
 				fread(&header, 0x10);
-				
+
 				// SETUP step 1: getting PRG, VROM, VRAM sizes
 				prg16k = (header[4] == 1);
 				prg_size = prg16k ? 2 * 0x4000 : header[4] * 0x4000;
 				vrom_size = header[5] * 0x2000;
 				vram_size = 0x4000;
-				
+
 				// SETUP step 2: getting PCB and other settings
 				mapper = (header[6] & 0xf0) >> 4;
 				local_options = header[6] & 0x0f;
-				
+
 				switch (header[7] & 0xc)
 				{
 					case 0x4:
 					case 0xc:
 						// probably the header got corrupted: don't trust upper bits for mapper
 						break;
-						
+
 					case 0x8:   // it's iNES 2.0 format
 						ines20 = TRUE;
 					case 0x0:
@@ -289,7 +289,7 @@ bool nes_cart_slot_device::call_load()
 						mapper |= header[7] & 0xf0;
 						break;
 				}
-				
+
 				// use info from nes.hsi if available!
 				if (mapinfo)
 				{
@@ -313,7 +313,7 @@ bool nes_cart_slot_device::call_load()
 				{
 					logerror("NES: No extrainfo found\n");
 				}
-				
+
 				// use extended iNES2.0 info if available!
 				if (ines20)
 				{
@@ -322,7 +322,7 @@ bool nes_cart_slot_device::call_load()
 					prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
 					vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
 				}
-				
+
 				// SETUP step 3: storing the info needed for emulation
 				m_pcb_id = nes_get_mmc_id(machine(), mapper);
 				m_cart->set_mirroring(BIT(local_options, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
@@ -330,7 +330,7 @@ bool nes_cart_slot_device::call_load()
 					battery_size = NES_BATTERY_SIZE; // with original iNES format we can only support 8K WRAM battery
 				has_trainer = BIT(local_options, 2) ? TRUE : FALSE;
 				m_cart->set_four_screen_vram(BIT(local_options, 3));
-				
+
 				if (ines20)
 				{
 					// PRGRAM/BWRAM (not fully supported, also due to lack of 2.0 files)
@@ -353,7 +353,7 @@ bool nes_cart_slot_device::call_load()
 					// so its size has been added recently to the iNES format spec, but almost no image uses it
 					prgram_size = header[8] ? header[8] * 0x2000 : 0x2000;
 				}
-				
+
 				// a few mappers correspond to multiple PCBs, so we need a few additional checks and tweaks
 				switch (m_pcb_id)
 				{
@@ -485,7 +485,7 @@ bool nes_cart_slot_device::call_load()
 						break;
 						//FIXME: we also have to fix Action 52 PRG loading somewhere...
 				}
-				
+
 				// SETUP step 4: logging what we have found
 				if (!ines20)
 				{
@@ -516,17 +516,17 @@ bool nes_cart_slot_device::call_load()
 					logerror("-- CHR WRAM: %d\n", (header[11] & 0xf0) >> 4);
 					logerror("-- TV System: %s\n", (header[12] & 2) ? "Both NTSC and PAL" : (header[12] & 1) ? "PAL" : "NTSC");
 				}
-				
+
 				// SETUP step 5: allocate pointers for PRG/VROM
 				if (prg_size)
 					m_cart->prg_alloc(machine(), prg_size);
 				if (vrom_size)
 					m_cart->vrom_alloc(machine(), vrom_size);
-				
+
 				if (has_trainer)
 					fread(&m_cart->m_prgram[0x1000], 0x200);
-				
-				
+
+
 				// SETUP step 6: at last load the data!
 				// Read in the program chunks
 				if (prg16k)
@@ -540,7 +540,7 @@ bool nes_cart_slot_device::call_load()
 				{
 					FILE *prgout;
 					char outname[255];
-					
+
 					sprintf(outname, "%s.prg", filename());
 					prgout = fopen(outname, "wb");
 					if (prgout)
@@ -548,21 +548,21 @@ bool nes_cart_slot_device::call_load()
 						fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
 						mame_printf_error("Created PRG chunk\n");
 					}
-					
+
 					fclose(prgout);
 				}
 #endif
-				
+
 				// Read in any chr chunks
 				if (m_cart->get_vrom_size())
 					fread(m_cart->get_vrom_base(), m_cart->get_vrom_size());
-				
+
 #if SPLIT_CHR
 				if (state->m_chr_chunks > 0)
 				{
 					FILE *chrout;
 					char outname[255];
-					
+
 					sprintf(outname, "%s.chr", filename());
 					chrout= fopen(outname, "wb");
 					if (chrout)
@@ -584,29 +584,29 @@ bool nes_cart_slot_device::call_load()
 				char magic2[4];
 				char unif_mapr[32]; // here we should store MAPR chunks
 				bool mapr_chunk_found = FALSE, small_prg = FALSE;
-				
+
 				// allocate space to temporarily store PRG & CHR banks
 				UINT8 *temp_prg = auto_alloc_array(machine(), UINT8, 256 * 0x4000);
 				UINT8 *temp_chr = auto_alloc_array(machine(), UINT8, 256 * 0x2000);
 				UINT8 temp_byte = 0;
-				
+
 				fread(&buffer, 4);
 				unif_ver = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 				logerror("Loaded game in UNIF format, version %d\n", unif_ver);
-				
+
 				if (size <= 0x20)
 				{
 					logerror("%s only contains the UNIF header and no data.\n", filename());
 					return IMAGE_INIT_FAIL;
 				}
-				
+
 				do
 				{
 					fseek(read_length, SEEK_SET);
-					
+
 					memset(magic2, '\0', sizeof(magic2));
 					fread(&magic2, 4);
-					
+
 					/* We first run through the whole image to find a [MAPR] chunk. This is needed
 					 because, unfortunately, the MAPR chunk is not always the first chunk (see
 					 Super 24-in-1). When such a chunk is found, we set mapr_chunk_found=1 and
@@ -619,11 +619,11 @@ bool nes_cart_slot_device::call_load()
 							logerror("[MAPR] chunk found: ");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							if (chunk_length <= 0x20)
 								fread(&unif_mapr, chunk_length);
 							logerror("%s\n", unif_mapr);
-							
+
 							/* now that we found the MAPR chunk, we can go back to load other chunks */
 							fseek(0x20, SEEK_SET);
 							read_length = 0x20;
@@ -633,7 +633,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("Skip this chunk. We need a [MAPR] chunk before anything else.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 					}
@@ -647,7 +647,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[MAPR] chunk found (in the 2nd run). Already loaded.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'R') && (magic2[1] == 'E') && (magic2[2] == 'A') && (magic2[3] == 'D'))
@@ -655,7 +655,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[READ] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'N') && (magic2[1] == 'A') && (magic2[2] == 'M') && (magic2[3] == 'E'))
@@ -663,7 +663,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[NAME] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'W') && (magic2[1] == 'R') && (magic2[2] == 'T') && (magic2[3] == 'R'))
@@ -671,7 +671,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[WRTR] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'T') && (magic2[1] == 'V') && (magic2[2] == 'C') && (magic2[3] == 'I'))
@@ -679,10 +679,10 @@ bool nes_cart_slot_device::call_load()
 							logerror("[TVCI] chunk found.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							fread(&temp_byte, 1);
 							logerror("Television Standard : %s\n", (temp_byte == 0) ? "NTSC" : (temp_byte == 1) ? "PAL" : "Does not matter");
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'T') && (magic2[1] == 'V') && (magic2[2] == 'S') && (magic2[3] == 'C')) // is this the same as TVCI??
@@ -690,7 +690,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[TVSC] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'D') && (magic2[1] == 'I') && (magic2[2] == 'N') && (magic2[3] == 'F'))
@@ -698,7 +698,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[DINF] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'C') && (magic2[1] == 'T') && (magic2[2] == 'R') && (magic2[3] == 'L'))
@@ -706,7 +706,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[CTRL] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'B') && (magic2[1] == 'A') && (magic2[2] == 'T') && (magic2[3] == 'R'))
@@ -714,7 +714,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[BATR] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'V') && (magic2[1] == 'R') && (magic2[2] == 'O') && (magic2[3] == 'R'))
@@ -722,7 +722,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[VROR] chunk found. No support yet.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'M') && (magic2[1] == 'I') && (magic2[2] == 'R') && (magic2[3] == 'R'))
@@ -730,9 +730,9 @@ bool nes_cart_slot_device::call_load()
 							logerror("[MIRR] chunk found.\n");
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							fread(&mirror, 1);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'P') && (magic2[1] == 'C') && (magic2[2] == 'K'))
@@ -740,7 +740,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[PCK%c] chunk found. No support yet.\n", magic2[3]);
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'C') && (magic2[1] == 'C') && (magic2[2] == 'K'))
@@ -748,7 +748,7 @@ bool nes_cart_slot_device::call_load()
 							logerror("[CCK%c] chunk found. No support yet.\n", magic2[3]);
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-							
+
 							read_length += (chunk_length + 8);
 						}
 						else if ((magic2[0] == 'P') && (magic2[1] == 'R') && (magic2[2] == 'G'))
@@ -757,7 +757,7 @@ bool nes_cart_slot_device::call_load()
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 							prg_size += chunk_length;
-							
+
 							if (chunk_length / 0x4000)
 								logerror("It consists of %d 16K-blocks.\n", chunk_length / 0x4000);
 							else
@@ -765,10 +765,10 @@ bool nes_cart_slot_device::call_load()
 								small_prg = TRUE;
 								logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
 							}
-							
+
 							/* Read in the program chunks */
 							fread(&temp_prg[prg_start], chunk_length);
-							
+
 							prg_start += chunk_length;
 							read_length += (chunk_length + 8);
 						}
@@ -778,12 +778,12 @@ bool nes_cart_slot_device::call_load()
 							fread(&buffer, 4);
 							chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 							vrom_size += chunk_length;
-							
+
 							logerror("It consists of %d 8K-blocks.\n", chunk_length / 0x2000);
-							
+
 							/* Read in the vrom chunks */
 							fread(&temp_chr[chr_start], chunk_length);
-							
+
 							chr_start += chunk_length;
 							read_length += (chunk_length + 8);
 						}
@@ -794,32 +794,32 @@ bool nes_cart_slot_device::call_load()
 						}
 					}
 				} while (size > read_length);
-				
+
 				if (!mapr_chunk_found)
 				{
 					auto_free(machine(), temp_prg);
 					auto_free(machine(), temp_chr);
 					fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted\n");
 				}
-				
+
 				if (!prg_start)
 				{
 					auto_free(machine(), temp_prg);
 					auto_free(machine(), temp_chr);
 					fatalerror("No PRG found. Please report the problem at MESS Board.\n");
 				}
-				
+
 				// SETUP step 2: getting PCB and other settings
 				int pcb_id = 0, battery = 0, prgram = 0, vram_chunks = 0;
 				unif_mapr_setup(unif_mapr, &pcb_id, &battery, &prgram, &vram_chunks);
-				
+
 				// SETUP step 3: storing the info needed for emulation
 				m_pcb_id = pcb_id;
 				if (battery)
 					battery_size = NES_BATTERY_SIZE; // we should allow for smaller battery!
 				prgram_size = prgram * 0x2000;
 				vram_size = vram_chunks * 0x2000;
-				
+
 				m_cart->set_four_screen_vram(0);
 				switch (mirror)
 				{
@@ -849,13 +849,13 @@ bool nes_cart_slot_device::call_load()
 						m_cart->set_mirroring(PPU_MIRROR_HORZ);
 						break;
 				}
-				
+
 				// SETUP step 4: logging what we have found
 				logerror("-- Board %s\n", unif_mapr);
 				logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
 				logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
 				logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
-				
+
 				// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
 				if (prg_size == 0x4000)
 				{
@@ -868,10 +868,10 @@ bool nes_cart_slot_device::call_load()
 					m_cart->prg_alloc(machine(), prg_size);
 					memcpy(m_cart->get_prg_base(), temp_prg, prg_size);
 				}
-				
+
 				if (small_prg)  // This is not supported yet, so warn users about this
 					mame_printf_error("Loaded UNIF file with non-16k PRG chunk. This is not supported in MESS yet.");
-				
+
 				if (vrom_size)
 				{
 					m_cart->vrom_alloc(machine(), vrom_size);
@@ -882,7 +882,7 @@ bool nes_cart_slot_device::call_load()
 				{
 					FILE *prgout;
 					char outname[255];
-					
+
 					sprintf(outname, "%s.prg", filename());
 					prgout = fopen(outname, "wb");
 					if (prgout)
@@ -890,17 +890,17 @@ bool nes_cart_slot_device::call_load()
 						fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
 						mame_printf_error("Created PRG chunk\n");
 					}
-					
+
 					fclose(prgout);
 				}
 #endif
-				
+
 #if SPLIT_CHR
 				if (state->m_chr_chunks > 0)
 				{
 					FILE *chrout;
 					char outname[255];
-					
+
 					sprintf(outname, "%s.chr", filename());
 					chrout= fopen(outname, "wb");
 					if (chrout)
@@ -929,47 +929,47 @@ bool nes_cart_slot_device::call_load()
 			UINT32 vrom_size = get_software_region_length("chr");
 			UINT32 vram_size = get_software_region_length("vram");
 			vram_size += get_software_region_length("vram2");
-			
+
 			// validate the xml fields
 			if (!prg_size)
 				fatalerror("No PRG entry for this software! Please check if the xml list got corrupted\n");
 			if (prg_size < 0x8000)
 				fatalerror("PRG entry is too small! Please check if the xml list got corrupted\n");
-			
+
 			// SETUP step 2: getting PCB and other settings
 			if (get_feature("pcb"))
 				m_pcb_id = nes_get_pcb_id(machine(), get_feature("pcb"));
 			else
 				m_pcb_id = NO_BOARD;
-			
+
 			// SETUP step 3: storing the info needed for emulation
 			if (m_pcb_id == STD_TVROM || m_pcb_id == STD_DRROM || m_pcb_id == IREM_LROG017)
 				m_cart->set_four_screen_vram(1);
 			else
 				m_cart->set_four_screen_vram(0);
-			
+
 			if (get_software_region("bwram") != NULL)
 				battery_size = get_software_region_length("bwram");
-			
+
 			if (m_pcb_id == BANDAI_LZ93EX)
 			{
 				// allocate the 24C01 or 24C02 EEPROM
 				battery_size += 0x2000;
 			}
-			
+
 			if (m_pcb_id == BANDAI_DATACH)
 			{
 				// allocate the 24C01 and 24C02 EEPROM
 				battery_size += 0x4000;
 			}
-			
+
 			if (get_software_region("wram") != NULL)
 				prgram_size = get_software_region_length("wram");
 			if (get_software_region("mapper_ram") != NULL)
 				mapper_ram_size = get_software_region_length("mapper_ram");
 			if (get_software_region("mapper_bram") != NULL)
 				mapper_bram_size = get_software_region_length("mapper_bram");
-			
+
 			if (get_feature("mirroring"))
 			{
 				const char *mirroring = get_feature("mirroring");
@@ -984,7 +984,7 @@ bool nes_cart_slot_device::call_load()
 			}
 			else
 				m_cart->set_mirroring(PPU_MIRROR_NONE);
-			
+
 			/* Check for pins in specific boards which require them */
 			if (m_pcb_id == STD_CNROM)
 			{
@@ -999,13 +999,13 @@ bool nes_cart_slot_device::call_load()
 					m_ce_state |= !strcmp(get_feature("chr-pin27"), "CE") ? 0x02 : 0;
 				}
 			}
-			
+
 			if (m_pcb_id == TAITO_X1_005 && get_feature("x1-pin17") != NULL && get_feature("x1-pin31") != NULL)
 			{
 				if (!strcmp(get_feature("x1-pin17"), "CIRAM A10") && !strcmp(get_feature("x1-pin31"), "NC"))
 					m_pcb_id = TAITO_X1_005_A;
 			}
-			
+
 			if (m_pcb_id == KONAMI_VRC2)
 			{
 				m_vrc_ls_prg_a = nes_cart_get_line(get_feature("vrc2-pin3"));
@@ -1013,34 +1013,34 @@ bool nes_cart_slot_device::call_load()
 				m_vrc_ls_chr = (nes_cart_get_line(get_feature("vrc2-pin21")) != 10) ? 1 : 0;
 //          mame_printf_error("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->m_vrc_ls_prg_a, state->m_vrc_ls_prg_b, state->m_vrc_ls_chr ? "NC" : "A10");
 			}
-			
+
 			if (m_pcb_id == KONAMI_VRC4)
 			{
 				m_vrc_ls_prg_a = nes_cart_get_line(get_feature("vrc4-pin3"));
 				m_vrc_ls_prg_b = nes_cart_get_line(get_feature("vrc4-pin4"));
 //          mame_printf_error("VRC-4, pin3: A%d, pin4: A%d\n", state->m_vrc_ls_prg_a, state->m_vrc_ls_prg_b);
 			}
-			
+
 			if (m_pcb_id == KONAMI_VRC6)
 			{
 				m_vrc_ls_prg_a = nes_cart_get_line(get_feature("vrc6-pin9"));
 				m_vrc_ls_prg_b = nes_cart_get_line(get_feature("vrc6-pin10"));
 //          mame_printf_error("VRC-6, pin9: A%d, pin10: A%d\n", state->m_vrc_ls_prg_a, state->m_vrc_ls_prg_b);
 			}
-			
+
 			/* Check for other misc board variants */
 			if (m_pcb_id == STD_SOROM)
 			{
 				if (get_feature("mmc1_type") != NULL && !strcmp(get_feature("mmc1_type"), "MMC1A"))
 					m_pcb_id = STD_SOROM_A;    // in MMC1-A PRG RAM is always enabled
 			}
-			
+
 			if (m_pcb_id == STD_SXROM)
 			{
 				if (get_feature("mmc1_type") != NULL && !strcmp(get_feature("mmc1_type"), "MMC1A"))
 					m_pcb_id = STD_SXROM_A;    // in MMC1-A PRG RAM is always enabled
 			}
-			
+
 			if (m_pcb_id == STD_NXROM || m_pcb_id == SUNSOFT_DCS)
 			{
 				if (get_software_region("minicart") != NULL)    // check for dual minicart
@@ -1049,7 +1049,7 @@ bool nes_cart_slot_device::call_load()
 					// we shall load somewhere the minicart, but we still do not support this
 				}
 			}
-			
+
 			// SETUP step 4: logging what we have found
 			logerror("Loaded game from softlist:\n");
 			logerror("-- PCB: %s", get_feature("pcb"));
@@ -1060,7 +1060,7 @@ bool nes_cart_slot_device::call_load()
 			logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
 			logerror("-- PRG NVWRAM: %d\n", m_cart->get_battery_size());
 			logerror("-- PRG WRAM: %d\n",  m_cart->get_prgram_size());
-			
+
 			// SETUP steps 5/6: allocate pointers for PRG/VROM and load the data!
 			m_cart->prg_alloc(machine(), prg_size);
 			memcpy(m_cart->get_prg_base(), get_software_region("prg"), prg_size);
@@ -1070,7 +1070,7 @@ bool nes_cart_slot_device::call_load()
 				memcpy(m_cart->get_vrom_base(), get_software_region("chr"), vrom_size);
 			}
 		}
-	
+
 		// Allocate the remaining pointer, when needed
 		if (vram_size)
 			m_cart->vram_alloc(machine(), vram_size);
@@ -1078,7 +1078,7 @@ bool nes_cart_slot_device::call_load()
 			m_cart->prgram_alloc(machine(), prgram_size);
 		if (mapper_ram_size)
 			m_cart->mapper_ram_alloc(machine(), mapper_ram_size);
-		
+
 		// Attempt to load a battery file for this ROM
 		// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
 		if (battery_size || mapper_bram_size)
@@ -1096,12 +1096,12 @@ bool nes_cart_slot_device::call_load()
 				m_cart->mapper_bram_alloc(machine(), mapper_bram_size);
 				memcpy(m_cart->get_mapper_bram_base(), temp_nvram + battery_size, mapper_bram_size);
 			}
-			
+
 			if (temp_nvram)
 				auto_free(machine(), temp_nvram);
 		}
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -1122,7 +1122,7 @@ void nes_cart_slot_device::call_unload()
 				memcpy(temp_nvram, m_cart->get_battery_base(), m_cart->get_battery_size());
 			if (m_cart->get_mapper_bram_size())
 				memcpy(temp_nvram + m_cart->get_battery_size(), m_cart->get_mapper_bram_base(), m_cart->get_mapper_bram_size());
-			
+
 			battery_save(temp_nvram, tot_size);
 			if (temp_nvram)
 				auto_free(machine(), temp_nvram);
@@ -1230,4 +1230,3 @@ nes_rom_device::nes_rom_device(const machine_config &mconfig, device_type type, 
 void nes_rom_device::device_start()
 {
 }
-

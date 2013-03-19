@@ -480,7 +480,7 @@ void c1551_device::device_reset()
 	m_maincpu->reset();
 
 	m_tpi0->reset();
-	
+
 	m_exp->reset();
 
 	// initialize gate array

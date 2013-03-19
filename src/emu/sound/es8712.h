@@ -23,7 +23,7 @@
 // ======================> es8712_device
 
 class es8712_device : public device_t,
-					  public device_sound_interface
+						public device_sound_interface
 {
 public:
 	es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -38,17 +38,17 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( es8712_w );
+	DECLARE_WRITE8_MEMBER( es8712_w );
 
 public:
-    void play();
-    void set_bank_base(int base);
-    void set_frequency(int frequency);
+	void play();
+	void set_bank_base(int base);
+	void set_frequency(int frequency);
 
 private:
-    void compute_tables();
-    void generate_adpcm(stream_sample_t *buffer, int samples);
-    void es8712_state_save_register();
+	void compute_tables();
+	void generate_adpcm(stream_sample_t *buffer, int samples);
+	void es8712_state_save_register();
 
 private:
 	UINT8 m_playing;          /* 1 if we're actively playing */

@@ -323,23 +323,23 @@ const device_type TMS36XX = &device_creator<tms36xx_device>;
 
 tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_subtype(NULL),
-	  m_channel(NULL),
-	  m_samplerate(0),
-	  m_basefreq(0),
-	  m_octave(0),
-	  m_speed(0),
-	  m_tune_counter(0),
-	  m_note_counter(0),
-	  m_voices(0),
-	  m_shift(0),
-	  m_output(0),
-	  m_enable(0),
-	  m_tune_num(0),
-	  m_tune_ofs(0),
-	  m_tune_max(0),
-	  m_intf(NULL)
+		device_sound_interface(mconfig, *this),
+		m_subtype(NULL),
+		m_channel(NULL),
+		m_samplerate(0),
+		m_basefreq(0),
+		m_octave(0),
+		m_speed(0),
+		m_tune_counter(0),
+		m_note_counter(0),
+		m_voices(0),
+		m_shift(0),
+		m_output(0),
+		m_enable(0),
+		m_tune_num(0),
+		m_tune_ofs(0),
+		m_tune_max(0),
+		m_intf(NULL)
 {
 	memset(m_vol, 0, sizeof(int)*12);
 	memset(m_vol_counter, 0, sizeof(int)*12);
@@ -491,7 +491,7 @@ void tms36xx_device::tms36xx_note_w(int octave, int note)
 //-------------------------------------------------
 //  TMS3617 interface functions
 //-------------------------------------------------
-      
+
 void tms36xx_device::tms3617_enable_w(int enable)
 {
 	tms3617_enable(enable);

@@ -29,7 +29,7 @@ class channelf_state : public driver_device
 public:
 	channelf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_custom(*this,"custom")	{ }
+			m_custom(*this,"custom")    { }
 
 	DECLARE_READ8_MEMBER(channelf_port_0_r);
 	DECLARE_READ8_MEMBER(channelf_port_1_r);

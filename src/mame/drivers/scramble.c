@@ -1161,7 +1161,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( harem ) /* Switch 8 doesn't appear to mapped (just like Scorpion) */
 	PORT_START("IN0")   // $6100 - PPI0 Port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Up in Cocktail - Not Used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Up in Cocktail - Not Used */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1176,15 +1176,15 @@ static INPUT_PORTS_START( harem ) /* Switch 8 doesn't appear to mapped (just lik
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Infinite ) )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Button2 in Cocktail - Not Used */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Button1 in Cocktail - Not Used */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Right in Cocktail - Not Used */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Left in Cocktail - Not Used */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Button2 in Cocktail - Not Used */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Button1 in Cocktail - Not Used */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Right in Cocktail - Not Used */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Left in Cocktail - Not Used */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")   // $6102 - PPI0 Port C
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* Same hardware as Scorpion: P2 Down in Cocktail */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* Same hardware as Scorpion: P2 Down in Cocktail */
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )

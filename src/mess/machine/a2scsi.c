@@ -34,7 +34,7 @@
 const device_type A2BUS_SCSI = &device_creator<a2bus_scsi_device>;
 
 #define SCSI_ROM_REGION  "scsi_rom"
-#define SCSI_BUS_TAG	 "scsibus"
+#define SCSI_BUS_TAG     "scsibus"
 #define SCSI_5380_TAG    "scsibus:7:ncr5380"
 
 static const ncr5380n_interface ncr5380_interface =
@@ -157,20 +157,20 @@ UINT8 a2bus_scsi_device::read_c0nx(address_space &space, UINT8 offset)
 		case 5:
 		case 6:
 		case 7:
-//			printf("Read 5380 @ %x\n", offset);
+//          printf("Read 5380 @ %x\n", offset);
 			return m_ncr5380->read(space, offset);
 			break;
 
-		case 8:		// read and DACK
+		case 8:     // read and DACK
 			return m_ncr5380->dma_r();
 
 		case 9:     // our SCSI ID (normally 0x80 = 7)
 			return (1<<7);
 
-		case 0xa:	// RAM/ROM bank
+		case 0xa:   // RAM/ROM bank
 			return m_bank;
 
-		case 0xe:	// DRQ status in bit 7
+		case 0xe:   // DRQ status in bit 7
 			return m_drq;
 
 		default:
@@ -198,11 +198,11 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 		case 5:
 		case 6:
 		case 7:
-//			printf("%02x to 5380 reg %x\n", data, offset);
+//          printf("%02x to 5380 reg %x\n", data, offset);
 			m_ncr5380->write(space, offset, data);
 			break;
 
-		case 8:	// write and DACK
+		case 8: // write and DACK
 			m_ncr5380->dma_w(data);
 			break;
 
@@ -224,23 +224,23 @@ void a2bus_scsi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 			m_rambank = ((data>>4) & 0x7) * 0x400;
 			m_rombank = (data & 0xf) * 0x400;
 			m_bank = data;
-//			printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
-			m_816block = false;	// does this reset block mode?
+//          printf("RAM bank to %x, ROM bank to %x\n", m_rambank, m_rombank);
+			m_816block = false; // does this reset block mode?
 			break;
 
-		case 0xb:	// reset 5380
-//			printf("Resetting SCSI: %02x at %x\n", data, space.device().safe_pc());
+		case 0xb:   // reset 5380
+//          printf("Resetting SCSI: %02x at %x\n", data, space.device().safe_pc());
 			m_ncr5380->reset();
 			m_816block = false;
 			break;
 
-		case 0xc:	// set IIgs block mode DMA
+		case 0xc:   // set IIgs block mode DMA
 			printf("%02x to block-mode DMA mode\n", data);
 			m_816block = true;
 			break;
 
-		case 0xd:	// set Mac-style pseudo-DMA
-//			printf("%02x to pseudo-DMA mode\n", data);
+		case 0xd:   // set Mac-style pseudo-DMA
+//          printf("%02x to pseudo-DMA mode\n", data);
 			m_816block = false;
 			break;
 
@@ -263,7 +263,7 @@ UINT8 a2bus_scsi_device::read_cnxx(address_space &space, UINT8 offset)
 void a2bus_scsi_device::write_cnxx(address_space &space, UINT8 offset, UINT8 data)
 {
 	// there are writes to cn0A, possibly misguided C0nA (bank select?) writes?
-//	printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
+//  printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
 }
 
 /*-------------------------------------------------
@@ -276,7 +276,7 @@ UINT8 a2bus_scsi_device::read_c800(address_space &space, UINT16 offset)
 	// bankswitched ROM at cc00-cfff
 	if (offset < 0x400)
 	{
-//		printf("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
+//      printf("Read RAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		if (m_816block)
 		{
 			return m_ncr5380->dma_r();
@@ -297,7 +297,7 @@ void a2bus_scsi_device::write_c800(address_space &space, UINT16 offset, UINT8 da
 {
 	if (offset < 0x400)
 	{
-//		printf("%02x to RAM at %x\n", data, offset+m_rambank);
+//      printf("%02x to RAM at %x\n", data, offset+m_rambank);
 		if (m_816block)
 		{
 			m_ncr5380->dma_w(data);

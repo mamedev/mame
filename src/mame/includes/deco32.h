@@ -153,4 +153,3 @@ public:
 	void screen_eof_dragngun(screen_device &screen, bool state);
 	void dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata);
 };
-

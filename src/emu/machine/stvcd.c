@@ -721,10 +721,10 @@ void saturn_state::cd_exec_command( void )
 
 				CDROM_LOG(("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2))
 
-				if (cr1 & 1)	// set true condition
+				if (cr1 & 1)    // set true condition
 					filters[fnum].condtrue = (cr2>>8)&0xff;
 
-				if (cr1 & 2)	// set false condition
+				if (cr1 & 2)    // set false condition
 					filters[fnum].condfalse = cr2&0xff;
 
 				hirqreg |= (CMOK|ESEL);

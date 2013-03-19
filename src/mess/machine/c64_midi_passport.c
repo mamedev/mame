@@ -15,8 +15,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MC6840_TAG		"mc6840"
-#define MC6850_TAG		"mc6850"
+#define MC6840_TAG      "mc6840"
+#define MC6850_TAG      "mc6850"
 
 
 
@@ -71,7 +71,7 @@ WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::tx_out )
 static ACIA6850_INTERFACE( acia_intf )
 {
 	500000,
-	0,  		// rx clock (we manually clock rx)
+	0,          // rx clock (we manually clock rx)
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, rx_in),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_passport_midi_cartridge_device, tx_out),
 	DEVCB_NULL,
@@ -92,8 +92,8 @@ SLOT_INTERFACE_END
 WRITE_LINE_MEMBER( c64_passport_midi_cartridge_device::midi_rx_w )
 {
 	m_rx_state = state;
-	
-	for (int i = 0; i < 16; i++)	// divider is set to 16
+
+	for (int i = 0; i < 16; i++)    // divider is set to 16
 	{
 		m_acia->rx_clock_in();
 	}
@@ -115,7 +115,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 
@@ -246,7 +246,7 @@ void c64_passport_midi_cartridge_device::c64_cd_w(address_space &space, offs_t o
 		case 0x30:
 			// Drum sync SET
 			break;
-			
+
 		case 0x38:
 			// Drum sync CLEAR
 			break;

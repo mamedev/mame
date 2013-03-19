@@ -64,7 +64,7 @@ void sns_rom_bsx_device::device_start()
 	m_cart_regs[7] = 0x80;
 	m_cart_regs[8] = 0x80;
 	access_update();
-	
+
 	save_item(NAME(m_cart_regs));
 	save_item(NAME(access_00_1f));
 	save_item(NAME(access_80_9f));
@@ -77,7 +77,7 @@ void sns_rom_bsx_device::device_start()
 }
 
 void sns_rom_bsx_device::device_reset()
-{	
+{
 	memset(m_pram, 0xff, sizeof(m_pram));
 }
 
@@ -104,7 +104,7 @@ void sns_rom_bsmempak_device::device_reset()
 	m_command = 0;
 	m_write_old = 0;
 	m_write_new = 0;
-	
+
 	m_flash_enable = 0;
 	m_read_enable = 0;
 	m_write_enable = 0;

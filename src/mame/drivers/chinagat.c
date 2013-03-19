@@ -156,7 +156,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
 }
 
 WRITE8_MEMBER(chinagat_state::chinagat_interrupt_w )
-{	
+{
 	switch (offset)
 	{
 		case 0: /* 3e00 - SND irq */

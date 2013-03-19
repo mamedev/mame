@@ -4,12 +4,12 @@
 
 <!--
 
-  General usage: if not bootable disk, check content with VL, then launch the .cmd files
+	General usage: if not bootable disk, check content with VL, then launch the .cmd files
 
-  NOTE: I think disks prompting "Invalid" message in the terminal (after Bootstrap)
-  are non-bootable disks and just need PCOS to be read. However, I haven't found how
-  to properly access volume 1 ("VL 1: " gives error)
-  OTOH, I have no idea how to boot the disks with sits on PCOS prompt...
+	NOTE: I think disks prompting "Invalid" message in the terminal (after Bootstrap)
+	are non-bootable disks and just need PCOS to be read. However, I haven't found how
+	to properly access volume 1 ("VL 1: " gives error)
+	OTOH, I have no idea how to boot the disks with sits on PCOS prompt...
 
 -->
 

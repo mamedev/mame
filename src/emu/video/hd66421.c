@@ -251,6 +251,6 @@ UINT32 hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 		rectangle rect(0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1);
 		bitmap.fill(get_white_pen(machine()), rect);
 	}
-	
+
 	return 0;
 }

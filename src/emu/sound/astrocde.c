@@ -57,18 +57,18 @@ const device_type ASTROCADE = &device_creator<astrocade_device>;
 
 astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_master_count(0),
-	  m_vibrato_clock(0),
-	  m_noise_clock(0),
-	  m_noise_state(0),
-	  m_a_count(0),
-	  m_a_state(0),
-	  m_b_count(0),
-	  m_b_state(0),
-	  m_c_count(0),
-	  m_c_state(0)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_master_count(0),
+		m_vibrato_clock(0),
+		m_noise_clock(0),
+		m_noise_state(0),
+		m_a_count(0),
+		m_a_state(0),
+		m_b_count(0),
+		m_b_state(0),
+		m_c_count(0),
+		m_c_state(0)
 {
 	memset(m_reg, 0, sizeof(UINT8)*8);
 	memset(m_bitswap, 0, sizeof(UINT8)*256);
@@ -281,4 +281,3 @@ WRITE8_MEMBER( astrocade_device::astrocade_sound_w )
 	/* stash the new register value */
 	m_reg[offset & 7] = data;
 }
-

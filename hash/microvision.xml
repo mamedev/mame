@@ -14,37 +14,37 @@ The "rc" feature is used to indicate the source of the clock signal
 -->
 
 <!--
-    <software name="alienrdr">
-        <description>Alien Raiders</description>
-        <year>1981</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="alienrdr">
+		<description>Alien Raiders</description>
+		<year>1981</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="yes" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="m34009-n1" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="yes" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="m34009-n1" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 <!--
-    <software name="Baseball">
-        <description>Baseball</description>
-        <year>1980</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="Baseball">
+		<description>Baseball</description>
+		<year>1980</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="yes" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="mp3479-n1nll_4063" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="yes" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="mp3479-n1nll_4063" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 	<software name="blckbstr">
@@ -63,20 +63,20 @@ The "rc" feature is used to indicate the source of the clock signal
 	</software>
 
 <!--
-    <software name="bowling">
-        <description>Bowling</description>
-        <year>1979</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="bowling">
+		<description>Bowling</description>
+		<year>1979</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <!- - also seen with 4952 REV-A - ->
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="no" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="mp3475nll_4972" size="2048" crc="" sha1="" offset="0" />
+		<part name="cart" interface="microvision_cart">
+			<!- - also seen with 4952 REV-A - ->
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="mp3475nll_4972" size="2048" crc="" sha1="" offset="0" />
 
-    </software>
+	</software>
 -->
 
 	<software name="connect4">
@@ -95,20 +95,20 @@ The "rc" feature is used to indicate the source of the clock signal
 	</software>
 
 <!--
-    <software name="cosmichu">
-        <description>Cosmic hunter</description>
-        <year>1981</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="cosmichu">
+		<description>Cosmic hunter</description>
+		<year>1981</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="no" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="m34017-n1" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="m34017-n1" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 	<software name="mindbstr">
@@ -142,54 +142,54 @@ The "rc" feature is used to indicate the source of the clock signal
 	</software>
 
 <!--
-    <software name="pinball">
-        <description>Pinball</description>
-        <year>1980</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="pinball">
+		<description>Pinball</description>
+		<year>1980</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="yes" />
-            <feature name="rc" value="100pf/21.0K" />
-            <dataarea name="rom" size="2048">
-                <rom name="mp3455nll_4974" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="yes" />
+			<feature name="rc" value="100pf/21.0K" />
+			<dataarea name="rom" size="2048">
+				<rom name="mp3455nll_4974" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 <!--
-    <software name="seaduel">
-        <description>Sea Duel</description>
-        <year>1980</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="seaduel">
+		<description>Sea Duel</description>
+		<year>1980</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="4952-79 REV-B" />
-            <feature name="paddle" value="no" />
-            <feature name="rc" value="100pf/39.4K" />
-            <dataarea name="rom" size="2048">
-                <rom name="mp3496-n1_4064" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="4952-79 REV-B" />
+			<feature name="paddle" value="no" />
+			<feature name="rc" value="100pf/39.4K" />
+			<dataarea name="rom" size="2048">
+				<rom name="mp3496-n1_4064" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 <!--
-    <software name="sprblock">
-        <description>Super Blockbuster</description>
-        <year>1982</year>
-        <publisher>Milton Bradley</publisher>
+	<software name="sprblock">
+		<description>Super Blockbuster</description>
+		<year>1982</year>
+		<publisher>Milton Bradley</publisher>
 
-        <part name="cart" interface="microvision_cart">
-            <feature name="pcb" value="7924952D02" />
-            <feature name="paddle" value="yes" />
-            <feature name="rc" value="100pf/23.2K" />
-            <dataarea name="rom" size="2048">
-                <rom name="m34047-n2ll_4241" size="2048" crc="" sha1="" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="cart" interface="microvision_cart">
+			<feature name="pcb" value="7924952D02" />
+			<feature name="paddle" value="yes" />
+			<feature name="rc" value="100pf/23.2K" />
+			<dataarea name="rom" size="2048">
+				<rom name="m34047-n2ll_4241" size="2048" crc="" sha1="" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 -->
 
 	<software name="vegasslt">

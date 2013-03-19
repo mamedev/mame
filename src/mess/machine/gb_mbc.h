@@ -17,10 +17,10 @@ public:
 	virtual void device_start() { shared_start(); };
 	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_mbc_base"; }
-	
+
 	void shared_start();
 	void shared_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -191,13 +191,13 @@ class gb_rom_sintax_device : public gb_rom_mbc_device
 public:
 	// construction/destruction
 	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_sintax"; }
 	void set_xor_for_bank(UINT8 bank);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -215,12 +215,12 @@ class gb_rom_chongwu_device : public gb_rom_mbc5_device
 public:
 	// construction/destruction
 	gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "gb_rom_chongwu"; }
-	
+
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	UINT8 m_protection_checked;
 };
@@ -232,12 +232,12 @@ class gb_rom_digimon_device : public gb_rom_mbc5_device
 public:
 	// construction/destruction
 	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() { shared_start(); };
 	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_digimon"; }
-	
+
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -250,12 +250,12 @@ class gb_rom_rockman8_device : public gb_rom_mbc_device
 public:
 	// construction/destruction
 	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() { shared_start(); };
 	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_rockman8"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -270,12 +270,12 @@ class gb_rom_sm3sp_device : public gb_rom_mbc_device
 public:
 	// construction/destruction
 	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start() { shared_start(); };
 	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom_sm3sp"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);

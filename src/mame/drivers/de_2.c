@@ -308,9 +308,9 @@ INPUT_CHANGED_MEMBER( de_2_state::audio_nmi )
 {
 	// Not on DECO board?
 	// Diagnostic button sends a pulse to NMI pin
-//	if (newval==CLEAR_LINE)
-//		if(m_audiocpu)
-//			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+//  if (newval==CLEAR_LINE)
+//      if(m_audiocpu)
+//          m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 // 6821 PIA at 0x2000

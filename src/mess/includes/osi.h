@@ -93,7 +93,7 @@ class c1p_state : public sb2m600_state
 public:
 	c1p_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sb2m600_state(mconfig, type, tag),
-		  m_beep(*this, BEEPER_TAG)
+			m_beep(*this, BEEPER_TAG)
 	{ }
 
 	required_device<beep_device> m_beep;

@@ -2,12 +2,12 @@
 
 /*
 
-80186xl20	Xtal 40Mhz
+80186xl20   Xtal 40Mhz
 At89c52 (not dumped) with external 32K ram?? Xtal 11.xxx18Mhz
 Cirrus Logic CL-GD5428-80QC-A video chip with 416c256 ram near it Xtal 14.x818 Mhaz
 
 U9-U10 programm rom common to both pcb
-u11-u12 Program rom/GFX 
+u11-u12 Program rom/GFX
 U13-U14 256Kramx8 (32Kbyte x16)
 
 U23 Nec D71055C

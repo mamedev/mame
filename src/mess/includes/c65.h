@@ -103,7 +103,7 @@ public:
 	UINT8 *m_io_ram_w_ptr;
 	UINT8 *m_io_ram_r_ptr;
 	c64_cart_t m_cart;
-	int m_nmilevel;	int m_charset_select;
+	int m_nmilevel; int m_charset_select;
 	int m_c64mode;
 	UINT8 m_6511_port;
 	UINT8 m_keyline;

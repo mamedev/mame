@@ -152,4 +152,3 @@ WRITE8_MEMBER( sns_rom_superfx_device::write_ram )
 	if (superfx_access_ram(m_superfx))
 		sfx_ram[offset & 0xfffff] = data;
 }
-

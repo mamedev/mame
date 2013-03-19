@@ -6,28 +6,28 @@
 <!-- Note, the majority of this has been converted from the 'CPC Power Collection' -->
 
 <!-- Some tapes seem to be split by side of cassette, others by game block (especially on Multload games and compilations) These are tagged as "Version Split"
-       I'm not sure what the preference is as far as MESS is concerend, but there isn't a 100% overlap so they can't just be removed
+		I'm not sure what the preference is as far as MESS is concerend, but there isn't a 100% overlap so they can't just be removed
 
-       Most of these will need sorting into a proper order too, often the first part listed isn't actually the first part of the game at the moment!
+		Most of these will need sorting into a proper order too, often the first part listed isn't actually the first part of the game at the moment!
 -->
 
 <!-- Some games have known mastering errors which results in them failing at certain points, these can be documented in the future -->
 
 <!-- I believe most of the dumps are good, but many fail in MESS due to inadequate emulation, some of the protection routines are quite fussy, this is worse
-       for disk images (see cpc_disks.xml) -->
+		for disk images (see cpc_disks.xml) -->
 
 <!-- I believe all the Cassette images here are original, so some require the manuals for additional copy protection -->
 
 <!-- Many of the audio companion tapes, which are often important to the game, or provide music when absent in the game have been dumped as MP3, this is not
-       ideal, they should be redumped in a lossless, non-patent encumbered format, for now I've left them here, but something should be done. -->
+		ideal, they should be redumped in a lossless, non-patent encumbered format, for now I've left them here, but something should be done. -->
 
 <!-- Loading Instructions:
 
-       If the system has a disk drive (which the 464 does by default in MESS) you must type |tape (| is on the { key)
-      Type run" and press return.  (on a real system you can use CTRL + Enter on the numpad)
+		If the system has a disk drive (which the 464 does by default in MESS) you must type |tape (| is on the { key)
+		Type run" and press return.  (on a real system you can use CTRL + Enter on the numpad)
 
-      To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning
-      Scroll Lock back on when you're finished.
+		To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning
+		Scroll Lock back on when you're finished.
 -->
 
 
@@ -35,9 +35,9 @@
 <!-- List Revision History -->
 
 <!--
-       27/11/11 : Preliminary list, automatically generated with minor cleanups. A _LOT_ of the cloning will be wrong as it's just auto generated. Names need a lot of cleaning up
-                          Included were Games, Compilations, Educational, Utilities
-                         NOT included (yet) Type-ins, Scene Demos
+		27/11/11 : Preliminary list, automatically generated with minor cleanups. A _LOT_ of the cloning will be wrong as it's just auto generated. Names need a lot of cleaning up
+							Included were Games, Compilations, Educational, Utilities
+							NOT included (yet) Type-ins, Scene Demos
 -->
 
 

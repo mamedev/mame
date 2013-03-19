@@ -1,15 +1,15 @@
 /***************************************************************************
 
-	FP-200 (c) 1982 Casio
+    FP-200 (c) 1982 Casio
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- What's the LCDC type? Custom?
-	- Why RAM isn't recognized? Perhaps RAM is back-upped and needs default
-	  data?
-	- Unless I've missed something in the schems, this one shouldn't have any
-	  sound capability.
+    TODO:
+    - What's the LCDC type? Custom?
+    - Why RAM isn't recognized? Perhaps RAM is back-upped and needs default
+      data?
+    - Unless I've missed something in the schems, this one shouldn't have any
+      sound capability.
 
 ***************************************************************************/
 
@@ -129,11 +129,11 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			/*
 			else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-				UINT8 vram,pix;
+			    UINT8 vram,pix;
 
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = (vram) >> (7-(yoffs & 7)) & 1;
-				bitmap.pix16(y,x) = pix;
+			    vram = m_lcd.vram[x/8+yoffs*20];
+			    pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix16(y,x) = pix;
 			}*/
 		}
 	}
@@ -159,11 +159,11 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 			}
 			/*else if(m_lcd.attr[x/8+yoffs*20] == 0x40)
 			{
-				UINT8 vram,pix;
+			    UINT8 vram,pix;
 
-				vram = m_lcd.vram[x/8+yoffs*20];
-				pix = (vram) >> (7-(yoffs & 7)) & 1;
-				bitmap.pix16(y,x) = pix;
+			    vram = m_lcd.vram[x/8+yoffs*20];
+			    pix = (vram) >> (7-(yoffs & 7)) & 1;
+			    bitmap.pix16(y,x) = pix;
 			}*/
 		}
 	}
@@ -175,7 +175,7 @@ UINT32 fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, 
 /*
 [1] DDDD DDDD vram data/attr (left half)
 [2] DDDD DDDD vram data/attr (right half)
-[8]	SSSS --YY Status code (1=vram type/0xb=attr type) / upper part of Y address
+[8] SSSS --YY Status code (1=vram type/0xb=attr type) / upper part of Y address
 [9] YYYY XXXX lower part of Y address / X address
 */
 UINT8 fp200_state::read_lcd_attr(UINT16 X, UINT16 Y)
@@ -262,7 +262,7 @@ void fp200_state::write_lcd_attr(UINT16 X, UINT16 Y,UINT8 data)
 			return;
 
 		//if(data != 0x60)
-		//	printf("%d %d %02x\n",X,Y,data);
+		//  printf("%d %d %02x\n",X,Y,data);
 
 		m_lcd.attr[base_offs] = data;
 	}
@@ -316,9 +316,9 @@ WRITE8_MEMBER(fp200_state::fp200_lcd_w)
 READ8_MEMBER(fp200_state::fp200_keyb_r)
 {
 	const char *const keynames[16] = { "KEY0", "KEY1", "KEY2", "KEY3",
-									   "KEY4", "KEY5", "KEY6", "KEY7",
-									   "KEY8", "KEY9", "UNUSED", "UNUSED",
-									   "UNUSED", "UNUSED", "UNUSED", "UNUSED"};
+										"KEY4", "KEY5", "KEY6", "KEY7",
+										"KEY8", "KEY9", "UNUSED", "UNUSED",
+										"UNUSED", "UNUSED", "UNUSED", "UNUSED"};
 	UINT8 res;
 
 	if(offset == 0)
@@ -452,7 +452,7 @@ static INPUT_PORTS_START( fp200 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("; / +") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 
 	PORT_START("KEY4")
-//	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) //PORT_TOGGLE PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
+//  PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) //PORT_TOGGLE PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INS / DEL") PORT_CODE(KEYCODE_INSERT) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("HOME / CLS") PORT_CODE(KEYCODE_HOME) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF0 / PF5") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, fp200_state,keyb_irq, 0)

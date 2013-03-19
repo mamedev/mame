@@ -103,8 +103,8 @@ struct jaguar_cpu_state
 	address_space *program;
 	direct_read_data *direct;
 
-	UINT32		internal_ram_start;
-	UINT32		internal_ram_end;
+	UINT32      internal_ram_start;
+	UINT32      internal_ram_end;
 };
 
 

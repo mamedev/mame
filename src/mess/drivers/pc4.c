@@ -192,7 +192,7 @@ void pc4_state::machine_start()
 	m_blink_timer = timer_alloc(BLINKING_TIMER);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
 
-    for (int i=0; i<8; i++)
+	for (int i=0; i<8; i++)
 	{
 		io_port[i] = ioport(bitnames[i]);
 	}

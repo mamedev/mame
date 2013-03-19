@@ -33,10 +33,10 @@ struct crt_interface
 
 struct crt_point
 {
-    crt_point() :
-      intensity(0),
-      next(0) {}
-    
+	crt_point() :
+		intensity(0),
+		next(0) {}
+
 	int intensity;      /* current intensity of the pixel */
 						/* a node is not in the list when (intensity == -1) */
 	int next;           /* index of next pixel in list */
@@ -55,23 +55,23 @@ protected:
 	virtual void device_start();
 
 public:
-    void plot(int x, int y);
-    void eof();
-    void update(bitmap_ind16 &bitmap);
+	void plot(int x, int y);
+	void eof();
+	void update(bitmap_ind16 &bitmap);
 
 private:
 	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
 	int *m_list_head;  /* head of the list of lit pixels (index in the array) */
-					   /* keep a separate list for each display line (makes the video code slightly faster) */
+						/* keep a separate list for each display line (makes the video code slightly faster) */
 
 	int m_decay_counter;  /* incremented each frame (tells for how many frames the CRT has decayed between two screen refresh) */
 
 	/* CRT window */
 	int m_num_intensity_levels;
 	int m_window_offset_x;
-    int m_window_offset_y;
+	int m_window_offset_y;
 	int m_window_width;
-    int m_window_height;
+	int m_window_height;
 };
 
 extern const device_type CRT;

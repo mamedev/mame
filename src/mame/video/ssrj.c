@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
 TODO: This table is nowhere near as accurate. If you bother, here's how colors should be:
 -"START" sign is red with dark blue background.
 -Sidewalk is yellow-ish.
--first opponents have swapped colors (blue/yellow ìnstead of yellow/blue)
+-first opponents have swapped colors (blue/yellow ?nstead of yellow/blue)
 -after the first stage, houses have red/white colors.
 */
 

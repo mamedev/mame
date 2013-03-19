@@ -46,8 +46,8 @@ public:
 		tilemap_t *             tmap;
 		UINT8                   page;
 		UINT8                   bank;
-	};	
-	
+	};
+
 	UINT8 m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
 	UINT8 m_sound_irq_control[4];

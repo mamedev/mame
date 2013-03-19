@@ -312,7 +312,7 @@ OutTrigger                                      840-0017C  22163   19 (64Mb)   ?
 Power Stone                                     841-0001C  21597    8 (64Mb)   present  315-6213  317-5046-COM   joystick + 3 buttons
 Power Stone 2                                   841-0008C  23127    9 (64Mb)   present  315-6213  317-5054-COM   joystick + 3 buttons
 Puyo Puyo Da!                                   841-0006C  22206   20 (64Mb)   ?        ?         ?
-Ring Out 4x4									840-0004C  21779   10 (64Mb)   ?	    ?         ?
+Ring Out 4x4                                    840-0004C  21779   10 (64Mb)   ?        ?         ?
 Samba de Amigo (prototype)                      840-0020C  proto   16 (64Mb)   ?        315-6213  317-0270-COM   will boot but requires special controller to play it
 Samba de Amigo (Rev B)                          840-0020C  22966B  16 (64Mb)   ?        315-6213  317-0270-COM   will boot but requires special controller to play it
 Sega Marine Fishing                             840-0027C  22221   10 (64Mb)   ?        315-6213  not present    ROM 3&4 not present. Requires special I/O board and fishing controller
@@ -427,7 +427,7 @@ Alien Front (Rev T)                             840-0048C  23586T   5 (128Mb)  3
 Capcom Vs. SNK Millennium Fight 2000 (Rev A)    841-0011C  23511A   7 (128Mb)  315-6219   present   317-5059-COM  (000804)
 Capcom Vs. SNK Millennium Fight 2000 (Rev C)    841-0011C  23511C   7 (128Mb)  315-6319   present   317-5059-COM  (000904)
 Club Kart: European Session (Rev D)             840-0062C  21473D  11 (128Mb)  315-6319A  present   317-0313-COM
-Crackin' DJ						                840-0043C  23450D  10 (128Mb)  315-6319   present   ?
+Crackin' DJ                                     840-0043C  23450D  10 (128Mb)  315-6319   present   ?
 Derby Owners Club II (Rev B)                    840-0083C  22306B  11 (128Mb)  315-6319A  present   not present
 Derby Owners Club World Edition (Rev C)         840-0088C  22336C   7 (128Mb)  315-6319A  present   not present
 Derby Owners Club World Edition (Rev D)         840-0088C  22336D   7 (128Mb)  315-6319A  present   not present   2 MaskROM are different from Rev C

@@ -246,24 +246,24 @@ INPUT_PORTS_END
 const UINT8 odyssey2_colors[] =
 {
 	/* Background,Grid Dim */
- 0x00,0x00,0x00,   /* Black */                                         // i r g b
- 0x1A,0x37,0xBE,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
- 0x00,0x6D,0x07,   /* Green          - Calibrated To Real VideoPac */  // i r G b	
- 0x2A,0xAA,0xBE,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
- 0x79,0x00,0x00,   /* Red            - Calibrated To Real VideoPac */  // i R g b
- 0x94,0x30,0x9F,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
- 0x77,0x67,0x0B,   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
- 0xCE,0xCE,0xCE,   /* Lt Grey */                                       // i R G B
+	0x00,0x00,0x00,   /* Black */                                         // i r g b
+	0x1A,0x37,0xBE,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
+	0x00,0x6D,0x07,   /* Green          - Calibrated To Real VideoPac */  // i r G b
+	0x2A,0xAA,0xBE,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
+	0x79,0x00,0x00,   /* Red            - Calibrated To Real VideoPac */  // i R g b
+	0x94,0x30,0x9F,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	0x77,0x67,0x0B,   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
+	0xCE,0xCE,0xCE,   /* Lt Grey */                                       // i R G B
 
 	/* Background,Grid Bright */
- 0x67,0x67,0x67,   /* Grey           - Calibrated To Real VideoPac */  // I R g B
- 0x5C,0x80,0xF6,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
- 0x56,0xC4,0x69,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B  
- 0x77,0xE6,0xEB,   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
- 0xC7,0x51,0x51,   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b 
- 0xDC,0x84,0xE8,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
- 0xC6,0xB8,0x6A,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
- 0xFF,0xFF,0xFF,   /* White */                                         // I R G B
+	0x67,0x67,0x67,   /* Grey           - Calibrated To Real VideoPac */  // I R g B
+	0x5C,0x80,0xF6,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g B
+	0x56,0xC4,0x69,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
+	0x77,0xE6,0xEB,   /* Lt Blue-Green  - Calibrated To Real VideoPac */  // I R g b
+	0xC7,0x51,0x51,   /* Lt Red         - Calibrated To Real VideoPac */  // I R g b
+	0xDC,0x84,0xE8,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	0xC6,0xB8,0x6A,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
+	0xFF,0xFF,0xFF,   /* White */                                         // I R G B
 };
 
 
@@ -280,23 +280,23 @@ void g7400_state::palette_init()
 {
 	const UINT8 g7400_colors[] =
 	{
- 0x00,0x00,0x00, // Black
- 0x1A,0x37,0xBE, // Blue
- 0x00,0x6D,0x07, // Green
- 0x2A,0xAA,0xBE, // Blue-Green
- 0x79,0x00,0x00, // Red
- 0x94,0x30,0x9F, // Violet
- 0x77,0x67,0x0B, // Khaki
- 0xCE,0xCE,0xCE, // Lt Grey
+	0x00,0x00,0x00, // Black
+	0x1A,0x37,0xBE, // Blue
+	0x00,0x6D,0x07, // Green
+	0x2A,0xAA,0xBE, // Blue-Green
+	0x79,0x00,0x00, // Red
+	0x94,0x30,0x9F, // Violet
+	0x77,0x67,0x0B, // Khaki
+	0xCE,0xCE,0xCE, // Lt Grey
 
- 0x67,0x67,0x67, // Grey
- 0x5C,0x80,0xF6, // Lt Blue
- 0x56,0xC4,0x69, // Lt Green
- 0x77,0xE6,0xEB, // Lt Blue-Green
- 0xC7,0x51,0x51, // Lt Red
- 0xDC,0x84,0xE8, // Lt Violet
- 0xC6,0xB8,0x6A, // Lt Yellow
- 0xff,0xff,0xff  // White
+	0x67,0x67,0x67, // Grey
+	0x5C,0x80,0xF6, // Lt Blue
+	0x56,0xC4,0x69, // Lt Green
+	0x77,0xE6,0xEB, // Lt Blue-Green
+	0xC7,0x51,0x51, // Lt Red
+	0xDC,0x84,0xE8, // Lt Violet
+	0xC6,0xB8,0x6A, // Lt Yellow
+	0xff,0xff,0xff  // White
 
 	};
 
@@ -976,4 +976,3 @@ COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odys
 COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", GAME_IMPERFECT_GRAPHICS )
 COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", GAME_IMPERFECT_GRAPHICS )
 COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, odyssey2_state, odyssey2, "Maganvox", "Odyssey 3 Command Center (prototype)", GAME_IMPERFECT_GRAPHICS )
-

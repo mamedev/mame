@@ -2577,7 +2577,7 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 	gfxdata = m_vdp2.gfx_decode + code * 0x20;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
-	   stv2_current_tilemap.window_control.enabled[1])
+		stv2_current_tilemap.window_control.enabled[1])
 		popmessage("Window Enabled for RGB555 Zoom");
 
 	if (!scalex || !scaley) return;
@@ -2804,8 +2804,8 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 	sprite_screen_width = sprite_screen_height = 8;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
-	   stv2_current_tilemap.window_control.enabled[1])
-	   popmessage("Window Enabled for RGB555 tiles");
+		stv2_current_tilemap.window_control.enabled[1])
+		popmessage("Window Enabled for RGB555 tiles");
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
@@ -2918,8 +2918,8 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 	sprite_screen_width = sprite_screen_height = 8;
 
 	if(stv2_current_tilemap.window_control.enabled[0] ||
-	   stv2_current_tilemap.window_control.enabled[1])
-	   popmessage("Window Enabled for RGB888 tiles");
+		stv2_current_tilemap.window_control.enabled[1])
+		popmessage("Window Enabled for RGB888 tiles");
 
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
@@ -3053,7 +3053,7 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 
 	/* clip top */
 	if (sy < clip.min_y)
-	{ 	int pixels = clip.min_y-sy;
+	{   int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
@@ -3130,7 +3130,7 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 
 	/* clip top */
 	if (sy < clip.min_y)
-	{ 	int pixels = clip.min_y-sy;
+	{   int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
@@ -3492,7 +3492,7 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 		{
 		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
-		//	case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
+		//  case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
@@ -4474,8 +4474,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
 		/* Decathlete 0x088 */
 		/* Sexy Parodius 0x2300 */
-//		if(STV_VDP2_WCTLD & 0x2000)
-//			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
+//      if(STV_VDP2_WCTLD & 0x2000)
+//          popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		/* Layer Section */
@@ -4963,10 +4963,10 @@ void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.window_control.logic = STV_VDP2_N0LOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_N0W0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_N0W1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N0SWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N0SWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_N0W0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_N0W1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N0SWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N0SWA;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N0LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N0MZE;
@@ -5063,10 +5063,10 @@ void saturn_state::stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.window_control.logic = STV_VDP2_N1LOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_N1W0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_N1W1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N1SWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N1SWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_N1W0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_N1W1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N1SWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N1SWA;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N1LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N1MZE;
@@ -5164,10 +5164,10 @@ void saturn_state::stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.window_control.logic = STV_VDP2_N2LOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_N2W0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_N2W1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N2SWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N2SWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_N2W0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_N2W1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N2SWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N2SWA;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N2LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N2MZE;
@@ -5267,10 +5267,10 @@ void saturn_state::stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.window_control.logic = STV_VDP2_N3LOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_N3W0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_N3W1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N3SWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N3SWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_N3W0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_N3W1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_N3SWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_N3SWA;
 
 	stv2_current_tilemap.line_screen_enabled = STV_VDP2_N3LCEN;
 	stv2_current_tilemap.mosaic_screen_enabled = STV_VDP2_N3MZE;
@@ -5419,8 +5419,8 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 
 		colour_calculation_enabled = stv2_current_tilemap.colour_calculation_enabled;
 		stv2_current_tilemap.colour_calculation_enabled = 0;
-//		window_control = stv2_current_tilemap.window_control;
-//		stv2_current_tilemap.window_control = 0;
+//      window_control = stv2_current_tilemap.window_control;
+//      stv2_current_tilemap.window_control = 0;
 		fade_control = stv2_current_tilemap.fade_control;
 		stv2_current_tilemap.fade_control = 0;
 		g_profiler.start(PROFILER_USER1);
@@ -5528,10 +5528,10 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	stv2_current_tilemap.window_control.logic = STV_VDP2_R0LOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_R0W0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_R0W1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_R0W0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_R0W1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_R0SWA;
 
 	stv2_current_tilemap.scrollx = 0;
 	stv2_current_tilemap.scrolly = 0;
@@ -6325,7 +6325,7 @@ int saturn_state::stv_vdp2_window_process(int x,int y)
 	int w0_pix, w1_pix;
 
 	if (stv2_current_tilemap.window_control.enabled[0] == 0 &&
-	    stv2_current_tilemap.window_control.enabled[1] == 0)
+		stv2_current_tilemap.window_control.enabled[1] == 0)
 		return 1;
 
 	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
@@ -6479,12 +6479,12 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	stv2_current_tilemap.window_control.logic = STV_VDP2_SPLOG;
 	stv2_current_tilemap.window_control.enabled[0] = STV_VDP2_SPW0E;
 	stv2_current_tilemap.window_control.enabled[1] = STV_VDP2_SPW1E;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_SPSWE;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_SPSWE;
 	stv2_current_tilemap.window_control.area[0] = STV_VDP2_SPW0A;
 	stv2_current_tilemap.window_control.area[1] = STV_VDP2_SPW1A;
-//	stv2_current_tilemap.window_control.? = STV_VDP2_SPSWA;
+//  stv2_current_tilemap.window_control.? = STV_VDP2_SPSWA;
 
-//	stv_vdp2_apply_window_on_layer(mycliprect);
+//  stv_vdp2_apply_window_on_layer(mycliprect);
 
 	if (interlace_framebuffer == 0 && double_x == 0 )
 	{

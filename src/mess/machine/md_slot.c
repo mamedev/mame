@@ -640,7 +640,7 @@ void base_md_cart_slot_device::setup_nvram()
 		case BEGGARP:
 			m_cart->m_nvram_start = 0x400000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
-			m_cart->nvram_alloc(machine(), 0x8000);	// 32K mirrored
+			m_cart->nvram_alloc(machine(), 0x8000); // 32K mirrored
 			m_cart->m_nvram_active = 1;
 			break;
 		case WUKONG:

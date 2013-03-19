@@ -364,19 +364,19 @@ READ8_MEMBER( cbm2_state::ext_read )
 
 	if (!casseg1)
 	{
-	    data = m_ram->pointer()[offset & 0xffff];
+		data = m_ram->pointer()[offset & 0xffff];
 	}
 	if (!casseg2)
 	{
-	    data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
+		data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
 	}
 	if (!casseg3 && (m_ram->size() > 0x20000))
 	{
-	    data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
+		data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
 	}
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
-	    data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
+		data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
 	}
 
 	return data;
@@ -402,19 +402,19 @@ WRITE8_MEMBER( cbm2_state::ext_write )
 
 	if (!casseg1)
 	{
-	    m_ram->pointer()[offset & 0xffff] = data;
+		m_ram->pointer()[offset & 0xffff] = data;
 	}
 	if (!casseg2)
 	{
-	    m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
+		m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
 	}
 	if (!casseg3 && (m_ram->size() > 0x20000))
 	{
-	    m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
+		m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
 	}
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
-	    m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
+		m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
 	}
 #endif
 
@@ -1755,8 +1755,8 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 
 	    bit     description
 
-	    0       
-	    1 		_BUSY2
+	    0
+	    1       _BUSY2
 	    2
 	    3
 	    4
@@ -1862,8 +1862,8 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 
 	    bit     description
 
-	    0       
-	    1 		_BUSY2
+	    0
+	    1       _BUSY2
 	    2
 	    3
 	    4

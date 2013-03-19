@@ -309,17 +309,17 @@ WRITE8_MEMBER( sns_rom_pokemon_device::chip_write )
 }
 
 
-// Tekken 2: It accesses the protection in a very strange way, always reading/writing the same data $f0 times, 
-// because each access must be repeated a couple of times to be registered (typically around 7-30 times) 
+// Tekken 2: It accesses the protection in a very strange way, always reading/writing the same data $f0 times,
+// because each access must be repeated a couple of times to be registered (typically around 7-30 times)
 // They probably used a microcontroller here.
-// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) adress lines 
+// The protection itself is accessed in banks $80-$bf. Accessing (read/write, doesn't matter) adress lines
 // A8,A9,A10 in these banks in a certain sequence makes the mc return a 4bit value. [d4s]
 // Details on a possible algorythm behind the sequence of accesses were provided by nocash. Thanks!
 void sns_rom_tekken2_device::update_prot(UINT32 offset)
 {
 	// accesses to [80-bf][8000-87ff] ranges update the protection value
 	offset &= 0x7ff;
-	
+
 	switch (offset & 0x700)
 	{
 		case 0x000:
@@ -328,22 +328,22 @@ void sns_rom_tekken2_device::update_prot(UINT32 offset)
 		case 0x100:
 			// used for read access
 			break;
-		case 0x200:	// BIT 0
+		case 0x200: // BIT 0
 			m_prot |= 1;
 			break;
-		case 0x300:	// BIT 1
+		case 0x300: // BIT 1
 			m_prot |= 2;
 			break;
-		case 0x400:	// BIT 2
+		case 0x400: // BIT 2
 			m_prot |= 4;
 			break;
-		case 0x500:	// BIT 3
+		case 0x500: // BIT 3
 			m_prot |= 8;
 			break;
-		case 0x600:	// DIRECTION
+		case 0x600: // DIRECTION
 			m_prot |= 0x10;
 			break;
-		case 0x700:	// FUNCTION
+		case 0x700: // FUNCTION
 			m_prot |= 0x20;
 			break;
 	}
@@ -355,18 +355,18 @@ READ8_MEMBER( sns_rom_tekken2_device::chip_read )
 
 	if ((offset & 0x700) == 0x100)
 	{
-		if (BIT(m_prot, 5))		// FUNCTION = 1 means Shift
+		if (BIT(m_prot, 5))     // FUNCTION = 1 means Shift
 		{
-			if (BIT(m_prot, 4)) 	// DIRECTION = 1 means Right
+			if (BIT(m_prot, 4))     // DIRECTION = 1 means Right
 				return (m_prot & 0x0f) >> 1;
-			else					// DIRECTION = 0 means Left
+			else                    // DIRECTION = 0 means Left
 				return (m_prot & 0x0f) << 1;
 		}
-		else						// FUNCTION = 0 means Add/Sub
+		else                        // FUNCTION = 0 means Add/Sub
 		{
-			if (BIT(m_prot, 4)) 	// DIRECTION = 1 means Minus
+			if (BIT(m_prot, 4))     // DIRECTION = 1 means Minus
 				return (m_prot & 0x0f) - 1;
-			else					// DIRECTION = 0 means Plus
+			else                    // DIRECTION = 0 means Plus
 				return (m_prot & 0x0f) + 1;
 		}
 	}
@@ -380,7 +380,7 @@ WRITE8_MEMBER( sns_rom_tekken2_device::chip_write )
 }
 
 
-// Soul Blade: Adresses $xxx0-$xxx3 in banks $80-$bf always read $55, $0f, $aa, $f0. 
+// Soul Blade: Adresses $xxx0-$xxx3 in banks $80-$bf always read $55, $0f, $aa, $f0.
 // Banks $c0-$ff return open bus.
 READ8_MEMBER( sns_rom_soulblad_device::chip_read )
 {
@@ -407,7 +407,7 @@ READ8_MEMBER( sns_rom_soulblad_device::chip_read )
 
 // Multicart pirate banking emulation
 // LoROM games, writes to [ff][ff00-ffff] control bankswitch
-// The actual banks depends on the last 8bits of the address accessed. 
+// The actual banks depends on the last 8bits of the address accessed.
 
 // Type 1: bits0-4 of the address are used as base bank (256KB chunks)
 READ8_MEMBER(sns_rom_mcpirate1_device::read_l)
@@ -424,7 +424,7 @@ READ8_MEMBER(sns_rom_mcpirate1_device::read_h)
 WRITE8_MEMBER( sns_rom_mcpirate1_device::chip_write )
 {
 	m_base_bank = offset & 0x1f;
-//	printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
+//  printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
 }
 
 // Type 2: bits0-3 & bit5 of the address are used as base bank (256KB chunks)
@@ -442,7 +442,7 @@ READ8_MEMBER(sns_rom_mcpirate2_device::read_h)
 WRITE8_MEMBER( sns_rom_mcpirate2_device::chip_write )
 {
 	m_base_bank = (offset & 0x0f) | ((offset & 0x20) >> 1);
-//	printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
+//  printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
 }
 
 // Korean 20 in 1 collection with NES games
@@ -488,7 +488,7 @@ WRITE8_MEMBER( sns_rom_20col_device::chip_write )
 	// [19] mario bros - 9b
 	// [20] popeye - 9c
 	m_base_bank = data & 0xdf;
-//	printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
+//  printf("offset %X data %X bank %X\n", offset, data, m_base_bank);
 }
 
 
@@ -502,7 +502,7 @@ READ8_MEMBER( sns_rom_banana_device::chip_read )
 
 WRITE8_MEMBER( sns_rom_banana_device::chip_write )
 {
-//	printf("write addr %X data %X\n", offset, data);
+//  printf("write addr %X data %X\n", offset, data);
 	m_latch[0xf] = data;
 }
 
@@ -515,5 +515,3 @@ WRITE8_MEMBER( sns_rom_bugs_device::chip_write )
 {
 	m_latch[offset & 0xff] = data;
 }
-
-

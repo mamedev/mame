@@ -2,8 +2,8 @@
 
     m6809inl.h
 
-	Portable 6809 emulator - Inline functions for the purposes of
-	optimization
+    Portable 6809 emulator - Inline functions for the purposes of
+    optimization
 
 **********************************************************************/
 
@@ -67,11 +67,11 @@ inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand()
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_EA:			return read_memory(m_ea.w);
-		case ADDRESSING_MODE_IMMEDIATE:		return read_opcode_arg();
-		case ADDRESSING_MODE_REGISTER_A:	return m_d.b.h;
-		case ADDRESSING_MODE_REGISTER_B:	return m_d.b.l;
-		default:							fatalerror("Unexpected");	return 0x00;
+		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w);
+		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
+		case ADDRESSING_MODE_REGISTER_A:    return m_d.b.h;
+		case ADDRESSING_MODE_REGISTER_B:    return m_d.b.l;
+		default:                            fatalerror("Unexpected");   return 0x00;
 	}
 }
 
@@ -84,9 +84,9 @@ inline ATTR_FORCE_INLINE UINT8 m6809_base_device::read_operand(int ordinal)
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_EA:			return read_memory(m_ea.w + ordinal);
-		case ADDRESSING_MODE_IMMEDIATE:		return read_opcode_arg();
-		default:							fatalerror("Unexpected");	return 0x00;
+		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w + ordinal);
+		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
+		default:                            fatalerror("Unexpected");   return 0x00;
 	}
 }
 
@@ -99,11 +99,11 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(UINT8 data)
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_IMMEDIATE:		/* do nothing */				break;
-		case ADDRESSING_MODE_EA:			write_memory(m_ea.w, data);		break;
-		case ADDRESSING_MODE_REGISTER_A:	m_d.b.h = data;					break;
-		case ADDRESSING_MODE_REGISTER_B:	m_d.b.l = data;					break;
-		default:							fatalerror("Unexpected");		break;
+		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                break;
+		case ADDRESSING_MODE_EA:            write_memory(m_ea.w, data);     break;
+		case ADDRESSING_MODE_REGISTER_A:    m_d.b.h = data;                 break;
+		case ADDRESSING_MODE_REGISTER_B:    m_d.b.l = data;                 break;
+		default:                            fatalerror("Unexpected");       break;
 	}
 }
 
@@ -116,9 +116,9 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, UINT
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_IMMEDIATE:		/* do nothing */				break;
-		case ADDRESSING_MODE_EA:			write_memory(m_ea.w + ordinal, data);	break;
-		default:							fatalerror("Unexpected");		break;
+		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                break;
+		case ADDRESSING_MODE_EA:            write_memory(m_ea.w + ordinal, data);   break;
+		default:                            fatalerror("Unexpected");       break;
 	}
 }
 
@@ -129,10 +129,10 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_operand(int ordinal, UINT
 
 inline ATTR_FORCE_INLINE bool m6809_base_device::match_target_bytes(UINT16 address, const UINT8 *bytes, int length)
 {
-	UINT8 *start_raw		= (UINT8 *) m_direct->read_raw_ptr(address);
-	UINT8 *start_decrypted	= (UINT8 *) m_direct->read_decrypted_ptr(address);
-	UINT8 *end_raw			= (UINT8 *) m_direct->read_raw_ptr(address + length - 1);
-	UINT8 *end_decrypted	= (UINT8 *) m_direct->read_decrypted_ptr(address + length - 1);
+	UINT8 *start_raw        = (UINT8 *) m_direct->read_raw_ptr(address);
+	UINT8 *start_decrypted  = (UINT8 *) m_direct->read_decrypted_ptr(address);
+	UINT8 *end_raw          = (UINT8 *) m_direct->read_raw_ptr(address + length - 1);
+	UINT8 *end_decrypted    = (UINT8 *) m_direct->read_decrypted_ptr(address + length - 1);
 
 	return (start_raw != NULL)
 		&& (end_raw != NULL)
@@ -145,7 +145,7 @@ inline ATTR_FORCE_INLINE bool m6809_base_device::match_target_bytes(UINT16 addre
 
 //-------------------------------------------------
 //  burn_any_delay_loops - optimization for delay
-//	loops
+//  loops
 //-------------------------------------------------
 
 inline ATTR_FORCE_INLINE void m6809_base_device::burn_any_delay_loops()
@@ -176,15 +176,15 @@ inline ATTR_FORCE_INLINE void m6809_base_device::daa()
 	UINT8 lsn = m_d.b.h & 0x0F;
 
 	// compute the carry
-	if (lsn > 0x09 || m_cc & CC_H)	cf |= 0x06;
-	if (msn > 0x80 && lsn > 0x09 )	cf |= 0x60;
-	if (msn > 0x90 || m_cc & CC_C)	cf |= 0x60;
+	if (lsn > 0x09 || m_cc & CC_H)  cf |= 0x06;
+	if (msn > 0x80 && lsn > 0x09 )  cf |= 0x60;
+	if (msn > 0x90 || m_cc & CC_C)  cf |= 0x60;
 
 	// calculate the result
 	t = m_d.b.h + cf;
 
 	m_cc &= ~CC_V;
-	if (t & 0x0100)		// keep carry from previous operation
+	if (t & 0x0100)     // keep carry from previous operation
 		m_cc |= CC_C;
 
 	// and put it back into A
@@ -220,10 +220,10 @@ inline ATTR_FORCE_INLINE UINT16 &m6809_base_device::ireg()
 {
 	switch(m_opcode & 0x60)
 	{
-		case 0x00:	return m_x.w;
-		case 0x20:	return m_y.w;
-		case 0x40:	return m_u.w;
-		case 0x60:	return m_s.w;
+		case 0x00:  return m_x.w;
+		case 0x20:  return m_y.w;
+		case 0x40:  return m_u.w;
+		case 0x60:  return m_s.w;
 		default:
 			fatalerror("Unexpected");
 			return m_x.w;
@@ -276,7 +276,7 @@ inline void m6809_base_device::eat_remaining()
 	UINT16 real_pc = m_pc.w;
 
 	eat(m_icount);
-	
+
 	m_pc.w = m_ppc.w;
 	debugger_instruction_hook(this, m_pc.w);
 	m_pc.w = real_pc;
@@ -333,10 +333,10 @@ inline UINT16 m6809_base_device::check_pending_interrupt()
 	switch(result)
 	{
 		case VECTOR_FIRQ:
-			standard_irq_callback(M6809_FIRQ_LINE);	
+			standard_irq_callback(M6809_FIRQ_LINE);
 			break;
 		case VECTOR_IRQ:
-			standard_irq_callback(M6809_IRQ_LINE);	
+			standard_irq_callback(M6809_IRQ_LINE);
 			break;
 	}
 

@@ -2,7 +2,7 @@
 
   Besta-88 and Besta-90 engineering workstations.
 
-	Derived (OEMd?) from Force Computers' SYS68K series.
+    Derived (OEMd?) from Force Computers' SYS68K series.
 
 ****************************************************************************/
 
@@ -56,14 +56,14 @@ READ8_MEMBER( besta_state::mpcc_reg_r )
 	UINT8 ret;
 
 	if (!(offset == 0 && !m_mpcc_regs[0])) {
-	DBG_LOG(1,"mpcc_reg_r",("(%d) = %02X at %s\n", offset, 
+	DBG_LOG(1,"mpcc_reg_r",("(%d) = %02X at %s\n", offset,
 		(offset > 31 ? -1 : m_mpcc_regs[offset]), machine.describe_context()));
 	}
 
 	switch (offset) {
-		case 0:	/* r_stat aka ... */
+		case 0: /* r_stat aka ... */
 			return (m_term_data) ? 0x80 : 0;
-		case 2:	/* r_data aka ... */
+		case 2: /* r_data aka ... */
 			ret = m_term_data;
 			m_term_data = 0;
 			return ret;
@@ -96,18 +96,18 @@ WRITE8_MEMBER( besta_state::kbd_put )
 #endif
 
 static ADDRESS_MAP_START(besta_mem, AS_PROGRAM, 32, besta_state)
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram")		// local bus DRAM, 4MB
-//	AM_RANGE(0x08010000, 0x08011fff) AM_RAM							// unknown -- accessed by cp31dssp
-	AM_RANGE(0xff000000, 0xff00ffff) AM_ROM AM_REGION("user1",0)	// actual mapping is up to 0xff03ffff
-	AM_RANGE(0xff040000, 0xff07ffff) AM_RAM							// onboard SRAM
-//	68561 MPCC (console)
-//	AM_RANGE(0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_t, reg_r, reg_w, 0xffffffff)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("p_ram")       // local bus DRAM, 4MB
+//  AM_RANGE(0x08010000, 0x08011fff) AM_RAM                         // unknown -- accessed by cp31dssp
+	AM_RANGE(0xff000000, 0xff00ffff) AM_ROM AM_REGION("user1",0)    // actual mapping is up to 0xff03ffff
+	AM_RANGE(0xff040000, 0xff07ffff) AM_RAM                         // onboard SRAM
+//  68561 MPCC (console)
+//  AM_RANGE(0xff800000, 0xff80001f) AM_DEVREADWRITE8("mpcc", mpcc68561_t, reg_r, reg_w, 0xffffffff)
 	AM_RANGE(0xff800000, 0xff80001f) AM_READWRITE8(mpcc_reg_r, mpcc_reg_w, 0xffffffff)
-//	AM_RANGE(0xff800200, 0xff800xxx) // 68230 PIT2
-//	AM_RANGE(0xff800400, 0xff800xxx) // ??? -- shows up in cp31dssp log
-//	AM_RANGE(0xff800800, 0xff800xxx) // BIM
-//	AM_RANGE(0xff800a00, 0xff800xxx) // 62421 RTC
-//	AM_RANGE(0xff800c00, 0xff800xxx) // 68230 PIT
+//  AM_RANGE(0xff800200, 0xff800xxx) // 68230 PIT2
+//  AM_RANGE(0xff800400, 0xff800xxx) // ??? -- shows up in cp31dssp log
+//  AM_RANGE(0xff800800, 0xff800xxx) // BIM
+//  AM_RANGE(0xff800a00, 0xff800xxx) // 62421 RTC
+//  AM_RANGE(0xff800c00, 0xff800xxx) // 68230 PIT
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -119,9 +119,9 @@ void besta_state::machine_reset()
 {
 	UINT8* user1 = memregion("user1")->base();
 
-	memcpy((UINT8*)m_p_ram.target(),user1,0x10000);	// not really what happens but...
-	memset(m_mpcc_regs, sizeof(m_mpcc_regs), 0);	// should initialize to defined values
-	m_mpcc_regs[8] = 0x80;				// always ready to transmit
+	memcpy((UINT8*)m_p_ram.target(),user1,0x10000); // not really what happens but...
+	memset(m_mpcc_regs, sizeof(m_mpcc_regs), 0);    // should initialize to defined values
+	m_mpcc_regs[8] = 0x80;              // always ready to transmit
 
 	machine().device("maincpu")->reset();
 }
@@ -139,7 +139,7 @@ static MACHINE_CONFIG_START( besta, besta_state )
 	MCFG_CPU_PROGRAM_MAP(besta_mem)
 
 #if 0
-	MCFG_MPCC68561_ADD("mpcc", XTAL_25MHz, line_cb_t());	// confirm internal oscillator frequency
+	MCFG_MPCC68561_ADD("mpcc", XTAL_25MHz, line_cb_t());    // confirm internal oscillator frequency
 #endif
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
@@ -147,7 +147,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 
 ROM_START( besta88 )
-    ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x10000, "user1", ROMREGION_ERASEFF )
 
 	ROM_SYSTEM_BIOS(0, "cp31dbg", "CP31 Debug")
 	ROMX_LOAD( "cp31dbgboot.27c512",  0x0000, 0x10000, CRC(9bf057de) SHA1(b13cb16042e4c6ca63ae26058a78259c0849d0b6), ROM_BIOS(1))

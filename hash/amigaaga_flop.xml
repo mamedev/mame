@@ -2,10 +2,10 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- General purpose software list for Amiga software with a MINIMUM requirement of the AGA chipset (A1200 / A4000)
-     some AGA software exists instead in other lists if it is backwards compatible with older hardware
+		some AGA software exists instead in other lists if it is backwards compatible with older hardware
 
-    the software listed here is not designed for use on systems without the AGA chipset and
-    will not function.
+	the software listed here is not designed for use on systems without the AGA chipset and
+	will not function.
 -->
 
 
@@ -4415,50 +4415,50 @@
 		</part>
 	</software>
 <!--
-    <software name="blasmund" supported="partial">
-        <description>Blasmundfeelings</description>
-        <year>19??</year>
-        <publisher>Secretly</publisher>
+	<software name="blasmund" supported="partial">
+		<description>Blasmundfeelings</description>
+		<year>19??</year>
+		<publisher>Secretly</publisher>
 
-        <part name="flop1" interface="floppy_3_5">
-            <feature name="part_id" value="Disk 1" />
-            <dataarea name="flop" size="901120">
-                <rom name="blasmundfeelings (19xx)(secretly)(aga).adf" size="901120" crc="44fb33ed" sha1="3d14f2d5022364604bd6f4df971edda65d0bdde8" offset="0"/>
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="901120">
+				<rom name="blasmundfeelings (19xx)(secretly)(aga).adf" size="901120" crc="44fb33ed" sha1="3d14f2d5022364604bd6f4df971edda65d0bdde8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="bodyshp1" supported="partial">
-        <description>Body Shop I</description>
-        <year>19??</year>
-        <publisher>NFA</publisher>
+	<software name="bodyshp1" supported="partial">
+		<description>Body Shop I</description>
+		<year>19??</year>
+		<publisher>NFA</publisher>
 
-        <part name="flop1" interface="floppy_3_5">
-            <feature name="part_id" value="Disk 1" />
-            <dataarea name="flop" size="901120">
-                <rom name="body shop i (19xx)(nfa)(aga).adf" size="901120" crc="22a34f5b" sha1="9fde035951f8f72522ad16b15b79a39b1f7bdd0a" offset="0"/>
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="901120">
+				<rom name="body shop i (19xx)(nfa)(aga).adf" size="901120" crc="22a34f5b" sha1="9fde035951f8f72522ad16b15b79a39b1f7bdd0a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 
-    <software name="bodyshp4" supported="partial">
-        <description>Body Shop IV</description>
-        <year>19??</year>
-        <publisher>NFA</publisher>
+	<software name="bodyshp4" supported="partial">
+		<description>Body Shop IV</description>
+		<year>19??</year>
+		<publisher>NFA</publisher>
 
-        <part name="flop1" interface="floppy_3_5">
-            <feature name="part_id" value="Disk 1" />
-            <dataarea name="flop" size="901120">
-                <rom name="body shop iv (19xx)(nfa)(aga) (disk 1).adf" size="901120" crc="7062fb91" sha1="b4e4f2c69d7b6bae461e178a9b049759a4b2d588" offset="0"/>
-            </dataarea>
-        </part>
-        <part name="flop2" interface="floppy_3_5">
-            <feature name="part_id" value="Disk 2" />
-            <dataarea name="flop" size="901120">
-                <rom name="body shop iv (19xx)(nfa)(aga) (disk 2).adf" size="901120" crc="2e809f98" sha1="c0fbfeee45682bb84ef05408d11bf0c402dacf51" offset="0"/>
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="901120">
+				<rom name="body shop iv (19xx)(nfa)(aga) (disk 1).adf" size="901120" crc="7062fb91" sha1="b4e4f2c69d7b6bae461e178a9b049759a4b2d588" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="901120">
+				<rom name="body shop iv (19xx)(nfa)(aga) (disk 2).adf" size="901120" crc="2e809f98" sha1="c0fbfeee45682bb84ef05408d11bf0c402dacf51" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
 -->
 </softwarelist>
 

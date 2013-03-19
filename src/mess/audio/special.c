@@ -24,10 +24,10 @@ const device_type SPECIMX = &device_creator<specimx_sound_device>;
 
 specimx_sound_device::specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SPECIMX, "Specialist MX Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_mixer_channel(NULL)
+		device_sound_interface(mconfig, *this),
+		m_mixer_channel(NULL)
 {
-    memset(m_specimx_input, 0, sizeof(int)*3);
+	memset(m_specimx_input, 0, sizeof(int)*3);
 }
 
 
@@ -79,10 +79,8 @@ void specimx_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 void specimx_sound_device::set_input(int index, int state)
 {
 	if (m_mixer_channel!=NULL)
-    {
+	{
 		m_mixer_channel->update();
 	}
 	m_specimx_input[index] = state;
 }
-
-

@@ -185,8 +185,8 @@ protected:
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_colorram_space_config;
 
-	devcb2_read8	m_read_potx;
-	devcb2_read8	m_read_poty;
+	devcb2_read8    m_read_potx;
+	devcb2_read8    m_read_poty;
 
 	const char *m_screen_tag;
 	screen_device *m_screen;

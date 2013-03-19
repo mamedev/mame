@@ -22,8 +22,8 @@ const device_type SVISION = &device_creator<svision_sound_device>;
 
 svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SVISION, "Super Vision Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_mixer_channel(NULL)
+		device_sound_interface(mconfig, *this),
+		m_mixer_channel(NULL)
 {
 }
 
@@ -263,4 +263,3 @@ void svision_sound_device::soundport_w(int which, int offset, int data)
 			break;
 	}
 }
-

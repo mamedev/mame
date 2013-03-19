@@ -7,7 +7,7 @@ public:
 		m_irq_ram(*this, "irq_ram"),
 		m_mlc_clip_ram(*this, "mlc_clip_ram"),
 		m_mlc_vram(*this, "mlc_vram")
-	
+
 	{ }
 
 	required_shared_ptr<UINT32> m_mlc_ram;
@@ -48,7 +48,7 @@ public:
 	DECLARE_READ32_MEMBER(mlc_spriteram_r);
 	DECLARE_WRITE32_MEMBER(mlc_spriteram_w);
 
-	
+
 
 	DECLARE_DRIVER_INIT(mlc);
 	DECLARE_DRIVER_INIT(avengrgs);

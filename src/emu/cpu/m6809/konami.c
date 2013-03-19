@@ -2,7 +2,7 @@
 
     konami.c
 
-	Portable Konami cpu emulator
+    Portable Konami cpu emulator
 
     Copyright Nicola Salmoria and the MAME Team
 
@@ -27,19 +27,19 @@
     History:
 
 March 2013 NPW:
-	Rewrite of 6809/6309/Konami CPU; overall core is now unified and
-	supports mid-instruction timings.
+    Rewrite of 6809/6309/Konami CPU; overall core is now unified and
+    supports mid-instruction timings.
 
-	Some of the instruction timings have changed with the new core; the
-	old core had some nonsensical timings.  For example (from scontra):
-		
-		819A    3A 07 1F 8C        STA $1f8C
+    Some of the instruction timings have changed with the new core; the
+    old core had some nonsensical timings.  For example (from scontra):
 
-	Under the old core, this took four clock cycles, which is dubious
-	because this instruction would have to do four opcode reads and one
-	write.  OGalibert says that the current timings are just a guess and
-	nobody has done precise readings, so I'm replacing the old guesses
-	with new guesses.
+        819A    3A 07 1F 8C        STA $1f8C
+
+    Under the old core, this took four clock cycles, which is dubious
+    because this instruction would have to do four opcode reads and one
+    write.  OGalibert says that the current timings are just a guess and
+    nobody has done precise readings, so I'm replacing the old guesses
+    with new guesses.
 
 991022 HJB:
     Tried to improve speed: Using bit7 of cycles1 as flag for multi
@@ -133,10 +133,10 @@ inline ATTR_FORCE_INLINE UINT8 konami_cpu_device::read_operand(int ordinal)
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_EA:			return read_memory(m_ea.w + ordinal);
-		case ADDRESSING_MODE_IMMEDIATE:		return read_opcode_arg();
-		case ADDRESSING_MODE_REGISTER_D:	return (ordinal & 1) ? m_d.b.l : m_d.b.h;
-		default:							fatalerror("Unexpected");	return 0x00;
+		case ADDRESSING_MODE_EA:            return read_memory(m_ea.w + ordinal);
+		case ADDRESSING_MODE_IMMEDIATE:     return read_opcode_arg();
+		case ADDRESSING_MODE_REGISTER_D:    return (ordinal & 1) ? m_d.b.l : m_d.b.h;
+		default:                            fatalerror("Unexpected");   return 0x00;
 	}
 }
 
@@ -160,10 +160,10 @@ ATTR_FORCE_INLINE void konami_cpu_device::write_operand(int ordinal, UINT8 data)
 {
 	switch(m_addressing_mode)
 	{
-		case ADDRESSING_MODE_IMMEDIATE:		/* do nothing */								break;
-		case ADDRESSING_MODE_EA:			write_memory(m_ea.w + ordinal, data);			break;
-		case ADDRESSING_MODE_REGISTER_D:	*((ordinal & 1) ? &m_d.b.l : &m_d.b.h) = data;	break;
-		default:							fatalerror("Unexpected");						break;
+		case ADDRESSING_MODE_IMMEDIATE:     /* do nothing */                                break;
+		case ADDRESSING_MODE_EA:            write_memory(m_ea.w + ordinal, data);           break;
+		case ADDRESSING_MODE_REGISTER_D:    *((ordinal & 1) ? &m_d.b.l : &m_d.b.h) = data;  break;
+		default:                            fatalerror("Unexpected");                       break;
 	}
 }
 
@@ -176,11 +176,11 @@ ATTR_FORCE_INLINE UINT16 &konami_cpu_device::ireg()
 {
 	switch(m_opcode & 0x70)
 	{
-		case 0x20:	return m_x.w;
-		case 0x30:	return m_y.w;
-		case 0x50:	return m_u.w;
-		case 0x60:	return m_s.w;
-		case 0x70:	return m_pc.w;
+		case 0x20:  return m_x.w;
+		case 0x30:  return m_y.w;
+		case 0x50:  return m_u.w;
+		case 0x60:  return m_s.w;
+		case 0x70:  return m_pc.w;
 		default:
 			fatalerror("Should not get here");
 			return m_x.w;
@@ -199,12 +199,12 @@ ATTR_FORCE_INLINE m6809_base_device::exgtfr_register konami_cpu_device::read_exg
 
 	switch(reg & 0x07)
 	{
-		case  0: result.word_value = m_d.b.h;	break;	// A
-		case  1: result.word_value = m_d.b.l;	break;	// B
-		case  2: result.word_value = m_x.w;		break;	// X
-		case  3: result.word_value = m_y.w;		break;	// Y
-		case  4: result.word_value = m_s.w;		break;	// S
-		case  5: result.word_value = m_u.w;		break;	// U
+		case  0: result.word_value = m_d.b.h;   break;  // A
+		case  1: result.word_value = m_d.b.l;   break;  // B
+		case  2: result.word_value = m_x.w;     break;  // X
+		case  3: result.word_value = m_y.w;     break;  // Y
+		case  4: result.word_value = m_s.w;     break;  // S
+		case  5: result.word_value = m_u.w;     break;  // U
 	}
 	result.byte_value = (UINT8) result.word_value;
 	return result;
@@ -219,12 +219,12 @@ ATTR_FORCE_INLINE void konami_cpu_device::write_exgtfr_register(UINT8 reg, m6809
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_d.b.h = value.byte_value;	break;	// A
-		case  1: m_d.b.l = value.byte_value;	break;	// B
-		case  2: m_x.w   = value.word_value;	break;	// X
-		case  3: m_y.w   = value.word_value;	break;	// Y
-		case  4: m_s.w   = value.word_value;	break;	// S
-		case  5: m_u.w   = value.word_value;	break;	// U
+		case  0: m_d.b.h = value.byte_value;    break;  // A
+		case  1: m_d.b.l = value.byte_value;    break;  // B
+		case  2: m_x.w   = value.word_value;    break;  // X
+		case  3: m_y.w   = value.word_value;    break;  // Y
+		case  4: m_s.w   = value.word_value;    break;  // S
+		case  5: m_u.w   = value.word_value;    break;  // U
 	}
 }
 

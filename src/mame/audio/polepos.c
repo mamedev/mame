@@ -51,12 +51,12 @@ const device_type POLEPOS = &device_creator<polepos_sound_device>;
 
 polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, POLEPOS, "Pole Position Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_current_position(0),
-	  m_sample_msb(0),
-	  m_sample_lsb(0),
-	  m_sample_enable(0),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_current_position(0),
+		m_sample_msb(0),
+		m_sample_lsb(0),
+		m_sample_enable(0),
+		m_stream(NULL)
 {
 }
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_msb_w )
 static const discrete_dac_r1_ladder polepos_54xx_dac =
 {
 	4,               /* number of DAC bits */
-					 /* 54XX_0   54XX_1  54XX_2 */
+						/* 54XX_0   54XX_1  54XX_2 */
 	{ RES_K(47),     /* R124,    R136,   R152 */
 		RES_K(22),   /* R120,    R132,   R142 */
 		RES_K(10),   /* R119,    R131,   R138 */
@@ -357,5 +357,3 @@ DISCRETE_SOUND_START(polepos)
 	DISCRETE_OUTPUT(POLEPOS_CHANL3_SND, 32767/2)
 	DISCRETE_OUTPUT(POLEPOS_CHANL4_SND, 32767/2)
 DISCRETE_SOUND_END
-
-

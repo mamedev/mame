@@ -21,7 +21,7 @@ public:
 		m_spriteram(*this, "spriteram"){ }
 
 	typedef void (wc90_state::*draw_sprites_func)(bitmap_ind16 &, const rectangle &, int, int, int, int, int );
-	
+
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_txvideoram;

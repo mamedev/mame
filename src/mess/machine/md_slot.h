@@ -162,11 +162,11 @@ public:
 
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-	
+
 	int load_list();
 	int load_nonlist();
 	int get_cart_type(UINT8 *ROM, UINT32 len);
-	
+
 	void setup_custom_mappers();
 	void setup_nvram();
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
@@ -182,7 +182,7 @@ public:
 
 // TODO: this only needs to be public because megasvp copies rom into memory region, so we need to rework that code...
 //private:
-	
+
 	int m_type;
 	device_md_cart_interface*       m_cart;
 	bool                            m_must_be_loaded;

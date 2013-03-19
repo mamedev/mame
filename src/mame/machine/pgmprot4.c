@@ -330,7 +330,7 @@ void pgm_022_025_state::IGS022_handle_command()
 WRITE16_MEMBER(pgm_022_025_state::killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
-//  return 0;	
+//  return 0;
 	offset &= 0xf;
 
 	if (offset == 0)
@@ -518,7 +518,7 @@ WRITE16_MEMBER(pgm_022_025_state::drgw3_igs025_prot_w )
 
 READ16_MEMBER(pgm_022_025_state::drgw3_igs025_prot_r )
 {
-//  mame_printf_debug("killbld prot w\n");	
+//  mame_printf_debug("killbld prot w\n");
 	UINT16 res ;
 
 	offset&=0xf;

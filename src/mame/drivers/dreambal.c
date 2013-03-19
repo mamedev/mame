@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x140000, 0x1403ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w) 
+	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 
 	AM_RANGE(0x160088, 0x160089) AM_READ_PORT("INP")
 	AM_RANGE(0x160292, 0x160293) AM_READ_PORT("SYS")
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 	AM_RANGE(0x162000, 0x162001) AM_WRITENOP // writes 0003 on startup
 	AM_RANGE(0x163000, 0x163001) AM_WRITENOP // something on bit 1
 	AM_RANGE(0x164000, 0x164001) AM_WRITENOP // something on bit 1
-	
+
 	AM_RANGE(0x165000, 0x165001) AM_WRITE( dreambal_eeprom_w ) // EEP Write?
 
 	AM_RANGE(0x16c002, 0x16c00d) AM_WRITENOP // writes 0000 to 0005 on startup
@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 9830400/8, OKIM6295_PIN7_HIGH)
-	                          
+
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

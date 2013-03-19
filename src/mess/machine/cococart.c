@@ -50,7 +50,7 @@ void cococart_slot_device::device_start()
 {
 	for(int i=0; i<TIMER_POOL; i++ )
 	{
-		m_cart_line.timer[i]	= timer_alloc(TIMER_CART);
+		m_cart_line.timer[i]    = timer_alloc(TIMER_CART);
 		m_nmi_line.timer[i]     = timer_alloc(TIMER_NMI);
 		m_halt_line.timer[i]    = timer_alloc(TIMER_HALT);
 	}
@@ -294,7 +294,7 @@ void cococart_slot_device::cart_set_line(cococart_line line, cococart_line_value
 			break;
 
 		case COCOCART_LINE_SOUND_ENABLE:
-			// do nothing for now 
+			// do nothing for now
 			break;
 	}
 }

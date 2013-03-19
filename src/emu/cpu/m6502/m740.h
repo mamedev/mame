@@ -46,16 +46,16 @@ class m740_device : public m6502_device {
 public:
 		enum
 		{
-			M740_INT0_LINE = INPUT_LINE_IRQ0,	// (fffc)
-			M740_INT1_LINE,	 // (fffa)
-			M740_INT2_LINE,	 // (fff8)
-			M740_INT3_LINE,	 // (fff6)
-			M740_INT4_LINE,	 // (fff4)
-			M740_INT5_LINE,	 // (fff2)
-			M740_INT6_LINE,	 // (fff0)
-			M740_INT7_LINE,	 // (ffee)
-			M740_INT8_LINE,	 // (ffec)
-			M740_INT9_LINE,	 // (ffea)
+			M740_INT0_LINE = INPUT_LINE_IRQ0,   // (fffc)
+			M740_INT1_LINE,  // (fffa)
+			M740_INT2_LINE,  // (fff8)
+			M740_INT3_LINE,  // (fff6)
+			M740_INT4_LINE,  // (fff4)
+			M740_INT5_LINE,  // (fff2)
+			M740_INT6_LINE,  // (fff0)
+			M740_INT7_LINE,  // (ffee)
+			M740_INT8_LINE,  // (ffec)
+			M740_INT9_LINE,  // (ffea)
 			M740_INT10_LINE, // (ffe8)
 			M740_INT11_LINE, // (ffe6)
 			M740_INT12_LINE, // (ffe4)
@@ -68,14 +68,14 @@ public:
 		m740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 		m740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-      virtual void device_reset();
+		virtual void device_reset();
 
-      static const disasm_entry disasm_entries[0x100];
+		static const disasm_entry disasm_entries[0x100];
 
-      virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-      virtual void do_exec_full();
-      virtual void do_exec_partial();
-      virtual void execute_set_input(int inputnum, int state);
+		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+		virtual void do_exec_full();
+		virtual void do_exec_partial();
+		virtual void execute_set_input(int inputnum, int state);
 
 protected:
 #define O(o) void o ## _full(); void o ## _partial()

@@ -366,4 +366,3 @@ void namcos2_adjust_posirq_timer( running_machine &machine, int scanline );
 /**************************************************************/
 /* Sound CPU support handlers - 6809                          */
 /**************************************************************/
-

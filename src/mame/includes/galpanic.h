@@ -33,5 +33,5 @@ public:
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	/*----------- defined in video/galpanic.c -----------*/
 	DECLARE_WRITE16_MEMBER( galpanic_bgvideoram_w );
-	DECLARE_WRITE16_MEMBER( galpanic_paletteram_w );	
+	DECLARE_WRITE16_MEMBER( galpanic_paletteram_w );
 };

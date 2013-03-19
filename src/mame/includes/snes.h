@@ -363,15 +363,15 @@
 #define DSP_FIR_C7      0x7F
 
 
-#define SNES_CPU_REG(a) m_cpu_regs[a - 0x4200]	// regs 0x4200-0x421f
-#define SNES_CPU_REG_STATE(a) state->m_cpu_regs[a - 0x4200]	// regs 0x4200-0x421f
+#define SNES_CPU_REG(a) m_cpu_regs[a - 0x4200]  // regs 0x4200-0x421f
+#define SNES_CPU_REG_STATE(a) state->m_cpu_regs[a - 0x4200] // regs 0x4200-0x421f
 
 /* (PPU) Video related */
 
 struct SNES_SCANLINE
 {
 	int enable, clip;
-	
+
 	UINT16 buffer[SNES_SCR_WIDTH];
 	UINT8  priority[SNES_SCR_WIDTH];
 	UINT8  layer[SNES_SCR_WIDTH];
@@ -384,7 +384,7 @@ public:
 	UINT8 m_regs[0x40];
 
 	SNES_SCANLINE m_scanlines[2];
-	
+
 	struct
 	{
 		/* clipmasks */
@@ -393,23 +393,23 @@ public:
 		UINT8 wlog_mask;
 		/* color math enabled */
 		UINT8 color_math;
-		
+
 		UINT8 charmap;
 		UINT8 tilemap;
 		UINT8 tilemap_size;
-		
+
 		UINT8 tile_size;
 		UINT8 mosaic_enabled;   // actually used only for layers 0->3!
-		
+
 		UINT8 main_window_enabled;
 		UINT8 sub_window_enabled;
 		UINT8 main_bg_enabled;
 		UINT8 sub_bg_enabled;
-		
+
 		UINT16 hoffs;
 		UINT16 voffs;
 	} m_layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
-	
+
 	struct
 	{
 		UINT8 address_low;
@@ -427,7 +427,7 @@ public:
 		UINT8 flip;
 		UINT16 write_latch;
 	} m_oam;
-	
+
 	struct
 	{
 		UINT16 latch_horz;
@@ -437,7 +437,7 @@ public:
 		UINT8 last_visible_line;
 		UINT8 interlace_count;
 	} m_beam;
-	
+
 	struct
 	{
 		UINT8 repeat;
@@ -453,7 +453,7 @@ public:
 		UINT16 ver_offset;
 		UINT8 extbg;
 	} m_mode7;
-	
+
 	UINT8 m_mosaic_size;
 	UINT8 m_clip_to_black;
 	UINT8 m_prevent_color_math;
@@ -461,13 +461,13 @@ public:
 	UINT8 m_bg3_priority_bit;
 	UINT8 m_direct_color;
 	UINT8 m_ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
-								 'previous' scroll value */
+                                 'previous' scroll value */
 	UINT8 m_mode7_last_scroll;    /* as per Anomie's doc mode 7 scroll regs use a different value, shared with mode 7 matrix! */
-	
+
 	UINT8 m_ppu1_open_bus, m_ppu2_open_bus;
 	UINT8 m_ppu1_version, m_ppu2_version;
 	UINT8 m_window1_left, m_window1_right, m_window2_left, m_window2_right;
-	
+
 	UINT16 m_mosaic_table[16][4096];
 	UINT8 m_clipmasks[6][SNES_SCR_WIDTH];
 	UINT8 m_update_windows;
@@ -494,7 +494,7 @@ public:
 	UINT16                m_vram_fgr_shift;
 	UINT16                m_vram_read_buffer;
 	UINT16                m_vmadd;
-	
+
 	inline UINT16 get_bgcolor(UINT8 direct_colors, UINT16 palette, UINT8 color);
 	inline void set_scanline_pixel(int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend);
 	inline void draw_bgtile_lores(UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority);
@@ -531,7 +531,7 @@ public:
 	void ppu_start(running_machine &machine);
 	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
 	void write(address_space &space, UINT32 offset, UINT8 data);
-	
+
 	DECLARE_READ8_MEMBER( oam_read );
 	DECLARE_WRITE8_MEMBER( oam_write );
 	DECLARE_READ8_MEMBER( cgram_read );
@@ -676,15 +676,15 @@ public:
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
 	inline UINT8 snes_rom_access(UINT32 offset);
-	
+
 	void snes_init_ram();
-	
+
 	DECLARE_WRITE8_MEMBER(nss_io_read);
 	DECLARE_READ8_MEMBER(nss_oldjoy1_read);
 	DECLARE_READ8_MEMBER(nss_oldjoy2_read);
 
 	DECLARE_READ8_MEMBER(snes_r_io);
-	DECLARE_WRITE8_MEMBER(snes_w_io);	
+	DECLARE_WRITE8_MEMBER(snes_w_io);
 	DECLARE_READ8_MEMBER(snes_io_dma_r);
 	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
 	DECLARE_READ8_MEMBER(snes_r_bank1);
@@ -701,7 +701,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
-	virtual void video_start();	
+	virtual void video_start();
 };
 
 /* Special chips, checked at init and used in memory handlers */

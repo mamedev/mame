@@ -147,4 +147,3 @@ public:
 	void init_skns();
 	void set_drc_pcflush(UINT32 addr);
 };
-

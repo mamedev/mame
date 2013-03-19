@@ -119,7 +119,7 @@ public:
 	UINT32 screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
-	
+
 	// from pgmprot5.c
 	int protection_address;
 
@@ -127,12 +127,12 @@ public:
 	UINT8 dw2_asic_z;
 	UINT8 dw2_asic_y;
 	UINT16 dw2_asic_hold;
-	
+
 	DECLARE_READ16_MEMBER( dw2_d80000_r );
 	DECLARE_WRITE16_MEMBER( dw2_d80000_w );
 	DECLARE_WRITE16_MEMBER(dw2_unk_w);
 	void pgm_dw2_decrypt();
-	void drgwld2_common_init();	
+	void drgwld2_common_init();
 	inline void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat);
 	inline void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
 	inline void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
@@ -169,7 +169,7 @@ public:
 	void asic3_compute_hold();
 	DECLARE_READ16_MEMBER( pgm_asic3_r );
 	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
-	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );	
+	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );
 };
 
 
@@ -235,7 +235,7 @@ public:
 	DECLARE_DRIVER_INIT(kovboot);
 	DECLARE_DRIVER_INIT(oldsplus);
 	DECLARE_MACHINE_START(pgm_arm_type1);
-	
+
 	DECLARE_READ32_MEMBER( pgm_arm7_type1_protlatch_r );
 	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_protlatch_w );
 	DECLARE_READ16_MEMBER( pgm_arm7_type1_68k_protlatch_r );
@@ -263,7 +263,7 @@ public:
 	void command_handler_oldsplus(int pc);
 	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_sim_w );
 	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_protram_r );
-	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );	
+	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );
 };
 
 /* for machine/pgmprot2.c type games */
@@ -366,9 +366,9 @@ public:
 	int           m_kb_ptr;
 	int           m_kb_region_sequence_position;
 	UINT32        m_kb_regs[0x10];
-	int 		  reg;
-	int 		  ptr;
-	UINT8 		  dw3_swap;
+	int           reg;
+	int           ptr;
+	UINT8         dw3_swap;
 	required_shared_ptr<UINT16> m_sharedprotram;
 
 	DECLARE_DRIVER_INIT(killbld);
@@ -404,7 +404,7 @@ public:
 
 	DECLARE_DRIVER_INIT(olds);
 	DECLARE_MACHINE_RESET(olds);
-	
+
 	UINT32 olds_prot_addr( UINT16 addr );
 	UINT32 olds_read_reg( UINT16 addr );
 	void olds_write_reg( UINT16 addr, UINT32 val );

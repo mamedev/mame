@@ -29,7 +29,7 @@ public:
 	DECLARE_READ8_MEMBER( es5503_sample_r );
 	DECLARE_WRITE16_MEMBER( output_w );
 	DECLARE_READ16_MEMBER( coin_chip_r );
-	DECLARE_WRITE16_MEMBER( coin_chip_w );	
+	DECLARE_WRITE16_MEMBER( coin_chip_w );
 };
 
 /*************************************

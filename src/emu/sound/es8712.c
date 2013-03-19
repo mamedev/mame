@@ -39,19 +39,19 @@ const device_type ES8712 = &device_creator<es8712_device>;
 
 es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_playing(0),
-	  m_base_offset(0),
-	  m_sample(0),
-	  m_count(0),
-	  m_signal(0),
-	  m_step(0),
-	  m_start(0),
-	  m_end(0),
-	  m_repeat(0),
-	  m_bank_offset(0),
-	  m_region_base(NULL),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_playing(0),
+		m_base_offset(0),
+		m_sample(0),
+		m_count(0),
+		m_signal(0),
+		m_step(0),
+		m_start(0),
+		m_end(0),
+		m_repeat(0),
+		m_bank_offset(0),
+		m_region_base(NULL),
+		m_stream(NULL)
 {
 }
 

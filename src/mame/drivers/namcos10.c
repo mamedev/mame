@@ -422,7 +422,7 @@ READ32_MEMBER(namcos10_state::nand_status_r )
 WRITE32_MEMBER(namcos10_state::nand_address1_w )
 {
 	logerror("nand_a1_w %08x (%08x)\n", data, space.device().safe_pc());
-	//	nand_address = ( nand_address & 0x00ffffff ) | ( ( data & 0xff ) << 24 );
+	//  nand_address = ( nand_address & 0x00ffffff ) | ( ( data & 0xff ) << 24 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address2_w )
@@ -459,7 +459,7 @@ READ32_MEMBER(namcos10_state::nand_data_r )
 {
 	UINT32 data = nand_read2( nand_address * 2 );
 
-	//	logerror("read %08x = %04x\n", nand_address*2, data);
+	//  logerror("read %08x = %04x\n", nand_address*2, data);
 
 /*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;

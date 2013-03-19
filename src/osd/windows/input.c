@@ -1603,16 +1603,16 @@ static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID r
 	{
 		FPTR offset = (FPTR)(&((DIJOYSTATE2 *)NULL)->rgbButtons[butnum]);
 		char *name = dinput_device_item_name(devinfo, offset, default_button_name(butnum), NULL);
-		
+
 		input_item_id itemid;
-		
+
 		if (butnum < INPUT_MAX_BUTTONS)
 			itemid = (input_item_id) (ITEM_ID_BUTTON1 + butnum);
 		else if (butnum < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
 			itemid = (input_item_id) (ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + butnum);
 		else
 			itemid = ITEM_ID_OTHER_SWITCH;
-	
+
 		devinfo->device->add_item(name, itemid, generic_button_get_state, &devinfo->joystick.state.rgbButtons[butnum]);
 		osd_free(name);
 	}

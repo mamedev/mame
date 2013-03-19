@@ -311,8 +311,8 @@ private:
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
 	attotime                m_endexectime;              // ending time of the current execution
-	UINT64					m_total_cycles;				// current total cycles
-	UINT64					m_last_total_cycles;		// last total cycles
+	UINT64                  m_total_cycles;             // current total cycles
+	UINT64                  m_last_total_cycles;        // last total cycles
 
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs

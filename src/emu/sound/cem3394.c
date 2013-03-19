@@ -94,7 +94,7 @@
 #define WAVE_SAWTOOTH       2
 #define WAVE_PULSE          4
 
-// keep lots of fractional bits 
+// keep lots of fractional bits
 #define FRACTION_BITS       28
 #define FRACTION_ONE        (1 << FRACTION_BITS)
 #define FRACTION_ONE_D      ((double)(1 << FRACTION_BITS))
@@ -115,26 +115,26 @@ const device_type CEM3394 = &device_creator<cem3394_device>;
 
 cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, CEM3394, "CEM3394", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_external(NULL),
-	  m_stream(NULL),
-	  m_vco_zero_freq(0.0),
-	  m_filter_zero_freq(0.0),
-	  m_wave_select(0),
-	  m_volume(0),
-	  m_mixer_internal(0),
-	  m_mixer_external(0),
-	  m_position(0),
-	  m_step(0),
-	  m_filter_position(0),
-	  m_filter_step(0),
-	  m_modulation_depth(0),
-	  m_last_ext(0),
-	  m_pulse_width(0),
-	  m_inv_sample_rate(0.0),
-	  m_sample_rate(0),
-	  m_mixer_buffer(NULL),
-	  m_external_buffer(NULL)
+		device_sound_interface(mconfig, *this),
+		m_external(NULL),
+		m_stream(NULL),
+		m_vco_zero_freq(0.0),
+		m_filter_zero_freq(0.0),
+		m_wave_select(0),
+		m_volume(0),
+		m_mixer_internal(0),
+		m_mixer_external(0),
+		m_position(0),
+		m_step(0),
+		m_filter_position(0),
+		m_filter_step(0),
+		m_modulation_depth(0),
+		m_last_ext(0),
+		m_pulse_width(0),
+		m_inv_sample_rate(0.0),
+		m_sample_rate(0),
+		m_mixer_buffer(NULL),
+		m_external_buffer(NULL)
 {
 	memset(m_values, 0, 8*sizeof(double));
 }

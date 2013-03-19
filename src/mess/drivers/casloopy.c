@@ -13,13 +13,13 @@
       the idea is to understand the HW enough to extract the SH-1 internal BIOS
       data via a trojan;
 
-	ASM notes:
-	- first vector is almost certainly VBR value.
-	- [VBR + 0x2c] irq for i/o?
-	- [VBR + 0x140] points to an internal BIOS routine, at 0x6238
-	  (Nigaoe Artist has a direct 0x648c instead)
-	- 0x0604 is probably a BRA -2 / NOP (some games puts that as a null irq vector)
-	- Nigaoe Artist jumps to 0x668 at some point.
+    ASM notes:
+    - first vector is almost certainly VBR value.
+    - [VBR + 0x2c] irq for i/o?
+    - [VBR + 0x140] points to an internal BIOS routine, at 0x6238
+      (Nigaoe Artist has a direct 0x648c instead)
+    - 0x0604 is probably a BRA -2 / NOP (some games puts that as a null irq vector)
+    - Nigaoe Artist jumps to 0x668 at some point.
 
 
 ===============================================================================
@@ -379,7 +379,7 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 		sh7021_regs[0x7e/2]&=0xfffe;
 	}
 
-//	printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
+//  printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
 }
 
 READ8_MEMBER(casloopy_state::casloopy_bitmap_r)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(casloopy_vregs_r,casloopy_vregs_w,0xffffffff)
 	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
 	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff)
-//	AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
+//  AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0)
 	AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 	AM_RANGE(0x09000000, 0x0907ffff) AM_RAM AM_SHARE("wram")
@@ -482,10 +482,10 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(8000000, 444, 0, 256, 263, 0, 224)
 
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//	MCFG_SCREEN_SIZE(444, 263)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+//  MCFG_SCREEN_SIZE(444, 263)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
 	MCFG_PALETTE_LENGTH(512)

@@ -179,7 +179,7 @@ better; in reality, it's big advantage was it made far fewer stupid
 stress-placement mistakes because
 it did a much better job of understanding prefixes and suffixes.
 
-Dave Conroy 
+Dave Conroy
 */
 /*
 There are 3 things on the pins. Serial I/O. The telephone line. Power.
@@ -202,7 +202,7 @@ and use the telephone pins as a transformer-coupled audio output. This
 is what we
 used to do in the lab all the time.
 
-dgc (dg(no!spam)cx@mac.com) 
+dgc (dg(no!spam)cx@mac.com)
 */
 
 // USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
@@ -792,9 +792,9 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 	// also it doesn't work well, the setup menu is badly corrupt
 	/*device_t *duart = machine().device("duart68681");
 	if (machine.input().code_pressed(KEYCODE_F1))
-		duart68681_rx_break(duart, 1, 1);
+	    duart68681_rx_break(duart, 1, 1);
 	else
-		duart68681_rx_break(duart, 1, 0);*/
+	    duart68681_rx_break(duart, 1, 0);*/
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
@@ -886,7 +886,7 @@ ROM_START( dectalk )
 	ROM_LOAD16_BYTE("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
 
 	/* the undumped 1.8 or 2.0 (beta?) version likely has roms:
-	23-091e5.e22, 23-092e5.e21, 23-093e5.e20, 23-094e5.e19, 
+	23-091e5.e22, 23-092e5.e21, 23-093e5.e20, 23-094e5.e19,
 	23-099e5.e8, 23-100e5.e7, 23-101e5.e6, 23-102e5.e5
 	and shares the 23-103e5 thru 106e5, and 095e5 thru 098e5 roms with
 	the 2.0 version above

@@ -440,7 +440,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_byte){
 	{
 		SLOG1(("dma read byte at offset %x+%03x = %02x", page_offset, offset, data));
 	}
-//	logerror(" %02x", data);
+//  logerror(" %02x", data);
 	return data;
 }
 
@@ -460,7 +460,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 	{
 		SLOG1(("dma write byte at offset %x+%03x = %02x", page_offset, offset , data));
 	}
-//	logerror(" %02x", data);
+//  logerror(" %02x", data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_read_word){

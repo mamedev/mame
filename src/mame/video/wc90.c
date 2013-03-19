@@ -157,12 +157,12 @@ static const char p64x64[4][16] = {
 	{ 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
 };
 
-void wc90_state::draw_sprite_16x16(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags ) 
+void wc90_state::draw_sprite_16x16(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags )
 {
 	WC90_DRAW_SPRITE( code, sx, sy );
 }
 
-void wc90_state::draw_sprite_16x32(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags ) 
+void wc90_state::draw_sprite_16x32(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags )
 {
 	if ( bank & 2 ) {
 		WC90_DRAW_SPRITE( code+1, sx, sy+16 );
@@ -173,7 +173,7 @@ void wc90_state::draw_sprite_16x32(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-void wc90_state::draw_sprite_16x64(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags ) 
+void wc90_state::draw_sprite_16x64(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags )
 {
 	if ( bank & 2 ) {
 		WC90_DRAW_SPRITE( code+3, sx, sy+48 );
@@ -199,7 +199,7 @@ void wc90_state::draw_sprite_32x16(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-void wc90_state::draw_sprite_32x32(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags ) 
+void wc90_state::draw_sprite_32x32(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags )
 {
 	const char *p = p32x32[ bank&3 ];
 
@@ -223,7 +223,7 @@ void wc90_state::draw_sprite_32x64(bitmap_ind16 &bitmap, const rectangle &clipre
 	WC90_DRAW_SPRITE( code+p[7], sx+16, sy+48 );
 }
 
-void wc90_state::draw_sprite_64x16(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags ) 
+void wc90_state::draw_sprite_64x16(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags )
 {
 	if ( bank & 1 ) {
 		WC90_DRAW_SPRITE( code+3, sx+48, sy );

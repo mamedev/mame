@@ -565,7 +565,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)
 {
-    device->machine().driver_data<thomson_state>()->thomson_index_callback(device, state);
+	device->machine().driver_data<thomson_state>()->thomson_index_callback(device, state);
 }
 
 

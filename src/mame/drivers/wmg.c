@@ -28,17 +28,17 @@ There are 3 boards - the CPU board, the Sound board, and the Widget board.
 - The Sound board only has the new sound ROM. The sounds are selected via the bank number from C400.
 
 - The Widget board has the joysticks and buttons connected to it. These are steered to the correct
-	inputs by a custom-programmed large square XC9572 84-pin chip. This is also controlled by
-	the bank number from C400. 
+    inputs by a custom-programmed large square XC9572 84-pin chip. This is also controlled by
+    the bank number from C400.
 
 - The CPU board has 3 components:
 -- A DS1225AD 8k x 8 NVRAM. Like the other chips, it is banked, giving each game its own save area.
 -- The new cpu ROM, containing code for the 6 games and the menu. Splat and Defender are slightly
-	modified to work properly on the Robotron hardware. Splat is converted from SC2 to SC1; while
-	Defender has the I/O devices remapped to suit the hardware.
+    modified to work properly on the Robotron hardware. Splat is converted from SC2 to SC1; while
+    Defender has the I/O devices remapped to suit the hardware.
 -- A square custom-programmed 44-pin chip (number rubbed off), which performs all the bank-switching,
-	the special changes for Defender, the lock feature, and the sound cpu reset. It is not known
-	which square chip detects and acts on the P1+P2 reset.
+    the special changes for Defender, the lock feature, and the sound cpu reset. It is not known
+    which square chip detects and acts on the P1+P2 reset.
 
 
 Setting it up:
@@ -136,13 +136,13 @@ WRITE8_MEMBER( wmg_state::wmg_rombank_w )
 
 	data &= 7;
 
-	if ((!data) || (!m_wmg_bank))	// we must be going to/from the menu
+	if ((!data) || (!m_wmg_bank))   // we must be going to/from the menu
 	{
 		m_wmg_bank = data;
 		wmg_def_rombank_w( space1, 0, 0);
-		memcpy( &RAM[0x10000], &RAM[(data << 16) + 0x20000], 0x9000 );		/* Gfx etc */
-		membank("bank5")->set_entry(data);		/* Code */
-		membank("bank6")->set_entry(data);		/* Sound */
+		memcpy( &RAM[0x10000], &RAM[(data << 16) + 0x20000], 0x9000 );      /* Gfx etc */
+		membank("bank5")->set_entry(data);      /* Code */
+		membank("bank6")->set_entry(data);      /* Sound */
 	}
 }
 
@@ -187,7 +187,7 @@ WRITE8_MEMBER( wmg_state::wmg_def_rombank_w )
 {
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	data &= 15;
-	if ((m_wmg_def_bank != data) && (m_wmg_bank == 5) && (data)) 
+	if ((m_wmg_def_bank != data) && (m_wmg_bank == 5) && (data))
 	{
 		m_wmg_def_bank = data;
 
@@ -268,14 +268,14 @@ static const pia6821_interface wmg_muxed_pia_0_intf =
 READ8_MEMBER( wmg_state::wmg_pia_0_r )
 {
 /* if player presses P1 and P2 in a game, return to the menu.
-	Since there is no code in rom to handle this, it must be a hardware feature
-	which probably just resets the cpu. */
+    Since there is no code in rom to handle this, it must be a hardware feature
+    which probably just resets the cpu. */
 
 	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	pia6821_device *pia_0 = space1.machine().device<pia6821_device>("pia_0");
 	UINT8 data = pia_0->read(space1, offset);
 
-	if ((m_wmg_bank) && (!offset) && ((data & 0x30) == 0x30))	// P1 and P2 pressed
+	if ((m_wmg_bank) && (!offset) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{
 		wmg_rombank_w( space1, 0, 0);
 		m_maincpu->reset();
@@ -298,8 +298,8 @@ static ADDRESS_MAP_START( wmg_cpu1, AS_PROGRAM, 8, wmg_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wmg_cpu2, AS_PROGRAM, 8, wmg_state )
-	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
+	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
+	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 /* These next 2 are actually banked in CPU 1, but its not something Mame can handle very well. Placed here instead. */
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
@@ -507,10 +507,10 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 	UINT8 *ROM = memregion("soundcpu")->base();
-	membank("bank5")->configure_entries(0, 8, &RAM[0x2d000], 0x10000);	/* Code */
-	membank("bank6")->configure_entries(0, 8, &ROM[0x10000], 0x1000);	/* Sound */
-	membank("bank7")->configure_entries(1, 4, &RAM[0x78000], 0x1000);	/* Defender roms */
-//	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
+	membank("bank5")->configure_entries(0, 8, &RAM[0x2d000], 0x10000);  /* Code */
+	membank("bank6")->configure_entries(0, 8, &ROM[0x10000], 0x1000);   /* Sound */
+	membank("bank7")->configure_entries(1, 4, &RAM[0x78000], 0x1000);   /* Defender roms */
+//  CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 	m_blitter_config = WILLIAMS_BLITTER_SC01;
 	m_blitter_clip_address = 0xc000;
 }

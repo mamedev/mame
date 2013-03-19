@@ -2,82 +2,82 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
-    This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
-    Some games benefit from, or require RAM expansions, this will also be marked later.
+	This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
+	Some games benefit from, or require RAM expansions, this will also be marked later.
 
-    Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
+	Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
 -->
 <!--
-    Most images for the initial import are from SPS / CAPS collections
+	Most images for the initial import are from SPS / CAPS collections
 
-    todo (SPS):
-    - fill in year / manufacturer details, the SPS official dat lacks this
-    - see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
-    that the images from which the SHA1s were generated haven't been faked.
-    - ensure discs are in a sensible order for multi-disk games (and data disks?)
-    - check / add any missing parent/clone relationships
-    - find out why we have duplicates of some releases with different IPF files (typically the _0 ones)
-      (the ones not in the SPS database have been marked as bad?)
-    - move AGA only discs to the AGA list
-    - add any other imagess which can be found
-    - test compatibility with emulation, note which games require manuals for operation (either protection or important game notes)
-    - document hardware configurations needed for 'fussy' games, and which ones differ in operation depending on HW config
-    - choose more appropriate short names
+	todo (SPS):
+	- fill in year / manufacturer details, the SPS official dat lacks this
+	- see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
+	that the images from which the SHA1s were generated haven't been faked.
+	- ensure discs are in a sensible order for multi-disk games (and data disks?)
+	- check / add any missing parent/clone relationships
+	- find out why we have duplicates of some releases with different IPF files (typically the _0 ones)
+		(the ones not in the SPS database have been marked as bad?)
+	- move AGA only discs to the AGA list
+	- add any other imagess which can be found
+	- test compatibility with emulation, note which games require manuals for operation (either protection or important game notes)
+	- document hardware configurations needed for 'fussy' games, and which ones differ in operation depending on HW config
+	- choose more appropriate short names
 
-    todo (General):
-    - add the various cracked dumps after verifying them
-    - add Public Domain titles, Demos etc. (maybe in separate lists)
-    - add Utilities (separate lists?)
-    - add list to document various Amiga viruses (maybe, if I'm feeling perverted)
+	todo (General):
+	- add the various cracked dumps after verifying them
+	- add Public Domain titles, Demos etc. (maybe in separate lists)
+	- add Utilities (separate lists?)
+	- add list to document various Amiga viruses (maybe, if I'm feeling perverted)
 
 -->
 
 <!-- Virus Warning
 
-    The following original discs were mastered with viruses on them
-    ref: http://eab.abime.net/showthread.php?t=65171
+	The following original discs were mastered with viruses on them
+	ref: http://eab.abime.net/showthread.php?t=65171
 
-    0011 - Espionage - The Computer Game
-    Espionage.ipf  -  NorthStar 2 Bootblock
+	0011 - Espionage - The Computer Game
+	Espionage.ipf  -  NorthStar 2 Bootblock
 
-    0206 - Backgammon
-    Backgammon.ipf - SCA Bootblock
+	0206 - Backgammon
+	Backgammon.ipf - SCA Bootblock
 
-    0712 - The President is Missing
-    PresidentIsMissing,The.ipf - Byte Warrior (DASA) Bootblock
+	0712 - The President is Missing
+	PresidentIsMissing,The.ipf - Byte Warrior (DASA) Bootblock
 
-    1246 - Chase H.Q. II: Special Criminal Investigation
-    ChaseHQII-SpecialCriminalInvestigation_Disk2.ipf - Lamer Exterminator Bootblock
+	1246 - Chase H.Q. II: Special Criminal Investigation
+	ChaseHQII-SpecialCriminalInvestigation_Disk2.ipf - Lamer Exterminator Bootblock
 
-    1255 - Ooze - Als die Geister mürbe wurden
-    Ooze.ipf - PvL Virus Protector v5.0 Bootblock
+	1255 - Ooze - Als die Geister mürbe wurden
+	Ooze.ipf - PvL Virus Protector v5.0 Bootblock
 
-    1304 - Beam
-    Beam.ipf - NorthStar 2 Bootblock
+	1304 - Beam
+	Beam.ipf - NorthStar 2 Bootblock
 
-    1589 - Legend of Faerghail
-    LegendOfFaerghail_Disk3.ipf - Byte Bandit Bootblock
+	1589 - Legend of Faerghail
+	LegendOfFaerghail_Disk3.ipf - Byte Bandit Bootblock
 
-    1612 - StarRay
-    StarRay_BootDisk.ipf - SCA Bootblock
+	1612 - StarRay
+	StarRay_BootDisk.ipf - SCA Bootblock
 
-    2669 - The Shortgrey
-    Shortgrey,The_Disquette0.ipf (and 1,2,4) - SADDAM disk-validator
+	2669 - The Shortgrey
+	Shortgrey,The_Disquette0.ipf (and 1,2,4) - SADDAM disk-validator
 
-    2768 - Zombi
-    Zombi.ipf - Lamer Exterminator Bootblock
+	2768 - Zombi
+	Zombi.ipf - Lamer Exterminator Bootblock
 
-    The following original discs are virus damaged, but still work
+	The following original discs are virus damaged, but still work
 
-    2159 - Astatin
-    Astatin.ipf - Sector 1086 is destroyed by The Lamer Exterminator virus (No file damage)
+	2159 - Astatin
+	Astatin.ipf - Sector 1086 is destroyed by The Lamer Exterminator virus (No file damage)
 
-    2804 - Chariots of Wrath
-    ChariotsOfWrath.ipf - Sector 1369 is destroyed by The Lamer Exterminator virus (No file damage)
+	2804 - Chariots of Wrath
+	ChariotsOfWrath.ipf - Sector 1369 is destroyed by The Lamer Exterminator virus (No file damage)
 
-    These viruses can be dangerous even to an emulated machine as they will still transfer between
-    any non-write protected discs you insert as long as they're memory resident.
- -->
+	These viruses can be dangerous even to an emulated machine as they will still transfer between
+	any non-write protected discs you insert as long as they're memory resident.
+	-->
 
 <softwarelist name="amigaocs_flop" description="Amiga OCS disk images">
 	<!-- these are not listed in SPS? -->

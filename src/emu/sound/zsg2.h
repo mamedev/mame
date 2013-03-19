@@ -30,11 +30,11 @@ struct zsg2_interface
 // 16 registers per channel, 48 channels
 struct zchan
 {
-    zchan()
-    {
-        memset(v, 0, sizeof(UINT16)*16);
-    }
-    
+	zchan()
+	{
+		memset(v, 0, sizeof(UINT16)*16);
+	}
+
 	UINT16 v[16];
 };
 
@@ -56,22 +56,22 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_READ16_MEMBER( zsg2_r );
-    DECLARE_WRITE16_MEMBER( zsg2_w );
+	DECLARE_READ16_MEMBER( zsg2_r );
+	DECLARE_WRITE16_MEMBER( zsg2_w );
 
 public:
-    void chan_w(int chan, int reg, UINT16 data);
-    UINT16 chan_r(int chan, int reg);
-    void check_channel(int chan);
-    void keyon(int chan);
-    void control_w(int reg, UINT16 data);
-    UINT16 control_r(int reg);
+	void chan_w(int chan, int reg, UINT16 data);
+	UINT16 chan_r(int chan, int reg);
+	void check_channel(int chan);
+	void keyon(int chan);
+	void control_w(int reg, UINT16 data);
+	UINT16 control_r(int reg);
 
 private:
 	zchan m_zc[48];
 	UINT16 m_act[3];
 	UINT16 m_alow;
-    UINT16 m_ahigh;
+	UINT16 m_ahigh;
 	UINT8 *m_bank_samples;
 
 	int m_sample_rate;

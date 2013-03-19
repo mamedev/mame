@@ -148,7 +148,7 @@ and the size of it
 
 fad      size     file name   date
 000000aa 00003000  2000/2/8
-000000aa 00003000  2000/2/8
+000000aa 00003000 ? 2000/2/8
 000000b0 00076080 0;1 2000/2/8
 0001799e 014b2000 ALY.RED;1 1999/11/9
 00002350 00001900 ALYHRAM.BIN;1 2000/2/8
@@ -404,7 +404,7 @@ fad      size     file name   date
 UINT32 rsgun_prot_read_callback( address_space &space, int protaddr, UINT32 key )
 {
 	int tempctrl = protaddr - 0x0201000; // technically it doesn't seem to care, but...
-			
+
 	switch(key)
 	{
 		case 0x77770000:
@@ -418,7 +418,7 @@ UINT32 rsgun_prot_read_callback( address_space &space, int protaddr, UINT32 key 
 				val &= 0x0f0f0f0f;
 			else
 				val &= 0xf0f0f0f0;
-					
+
 			return val;
 		}
 	}
@@ -466,13 +466,13 @@ UINT32 sss_prot_read_callback( address_space &space, int protaddr, UINT32 key )
 	UINT32 res;
 
 	/*
-		MAIN : 2c5b0000  DATA : 000000a6 014c0000
-		MAIN : 47f10000  DATA : 0f9800a6 014c1f30
-		MAIN : fcda0000  DATA : 1d4800a6 014c3a90
-		MAIN : b5e60000  DATA : 29e300a6 014c53c6
-		MAIN : 392c0000  DATA : 38e900a6 014c71d2
-		MAIN : 77c30000  DATA : 462500a6 014c8c4a
-		MAIN : 8a620000  DATA : 555c00a6 014caab8
+	    MAIN : 2c5b0000  DATA : 000000a6 014c0000
+	    MAIN : 47f10000  DATA : 0f9800a6 014c1f30
+	    MAIN : fcda0000  DATA : 1d4800a6 014c3a90
+	    MAIN : b5e60000  DATA : 29e300a6 014c53c6
+	    MAIN : 392c0000  DATA : 38e900a6 014c71d2
+	    MAIN : 77c30000  DATA : 462500a6 014c8c4a
+	    MAIN : 8a620000  DATA : 555c00a6 014caab8
 	*/
 
 	// I have a feeling rather than the offsets being scrambled they were lazy
@@ -597,7 +597,7 @@ static READ32_HANDLER( common_prot_r )
 			#endif
 			UINT32 realret = space.read_dword(0x2000000+ctrl_index);
 			UINT32 retdata = prot_readback(space, ctrl_index, m_abus_protkey);
-	
+
 			logerror("A-Bus control protection read at %06x with data = %08x Returning = %08x Would otherwise return = %08x\n",space.device().safe_pc(),m_abus_protkey, retdata, realret);
 
 			ctrl_index += 4;
@@ -620,7 +620,7 @@ static WRITE32_HANDLER ( common_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
 	//printf("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
-	
+
 	if (offset == 0)
 	{
 		COMBINE_DATA(&m_abus_protenable);
@@ -637,7 +637,7 @@ static WRITE32_HANDLER ( common_prot_w )
 		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
 		a_bus_vector<<= 1;
 		//printf("MAIN : %08x  DATA : %08x %08x\n",m_abus_protkey,m_abus_prot_addr,a_bus_vector);
-		
+
 		// if you look at the first transfer in ffreveng this is clearly a ROM address from a table |  MAIN : 10d70000  DATA : 0b780013 002616f0
 		// (opr21872.7, offset 0x616f0, which happens to be 0x2616f0 in the ROM region "game0")
 		// the values sent by the CPU are plucked from a table above where the data is, located at 0x60000
@@ -666,7 +666,7 @@ void install_sss_protection(running_machine &machine)
 void install_astrass_protection(running_machine &machine)
 {
 	install_common_protection(machine);
-	prot_readback = astrass_prot_read_callback;	
+	prot_readback = astrass_prot_read_callback;
 }
 
 void install_ffreveng_protection(running_machine &machine)

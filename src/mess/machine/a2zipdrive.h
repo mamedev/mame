@@ -3,9 +3,9 @@
     a2zipdrive.h
 
     ZIP Technologies ZipDrive IDE card
- 
+
     See important NOTE at the top of a2zipdrive.c!
- 
+
 *********************************************************************/
 
 #ifndef __A2BUS_ZIPDRIVE__

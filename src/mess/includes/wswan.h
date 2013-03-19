@@ -191,15 +191,15 @@ void wswan_refresh_scanline( running_machine &machine );
 
 struct CHAN
 {
-    CHAN() :
-	  freq(0),
-	  period(0),
-	  pos(0),
-	  vol_left(0),
-	  vol_right(0),
-	  on(0),
-	  signal(0) { }
-            
+	CHAN() :
+		freq(0),
+		period(0),
+		pos(0),
+		vol_left(0),
+		vol_right(0),
+		on(0),
+		signal(0) { }
+
 	UINT16  freq;           /* frequency */
 	UINT32  period;         /* period */
 	UINT32  pos;            /* position */
@@ -227,10 +227,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( wswan_sound_port_w );
+	DECLARE_WRITE8_MEMBER( wswan_sound_port_w );
 
 private:
-    void wswan_ch_set_freq( CHAN *ch, UINT16 freq );
+	void wswan_ch_set_freq( CHAN *ch, UINT16 freq );
 
 private:
 	sound_stream *m_channel;

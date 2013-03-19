@@ -509,7 +509,7 @@ public:
 	void update_sio_irqs();
 	inline void _add_dynamic_address(offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname);
 	inline void _add_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname);
-	
+
 	void init_common(int ioasic, int serialnum);
 };
 

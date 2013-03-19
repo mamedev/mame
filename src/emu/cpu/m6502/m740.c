@@ -88,12 +88,12 @@ UINT8 m740_device::do_seb(UINT8 in, UINT8 bit)
 // doesn't affect the flags
 UINT8 m740_device::do_rrf(UINT8 in)
 {
-      return ((in&0xf)<<4) | ((in&0xf0)>>4);
+		return ((in&0xf)<<4) | ((in&0xf0)>>4);
 }
 
 void m740_device::execute_set_input(int inputnum, int state)
 {
-	switch(inputnum) 
+	switch(inputnum)
 	{
 		case M740_INT0_LINE:
 		case M740_INT1_LINE:
@@ -109,9 +109,9 @@ void m740_device::execute_set_input(int inputnum, int state)
 		case M740_INT11_LINE:
 		case M740_INT12_LINE:
 		case M740_INT13_LINE:
-		case M740_INT14_LINE:	// 37450 has 15 IRQ lines, no other known variant has that many
+		case M740_INT14_LINE:   // 37450 has 15 IRQ lines, no other known variant has that many
 			set_irq_line(inputnum - M740_INT0_LINE, state);
-			break; 
+			break;
 
 		case V_LINE:
 			if(!v_state && state == ASSERT_LINE)
@@ -151,7 +151,7 @@ void m740_device::set_irq_line(int line, int state)
 		}
 	}
 
-//	printf("M740 single IRQ state is %d (MPX %08x, vector %x)\n", irq_state, m_irq_multiplex, m_irq_vector);
+//  printf("M740 single IRQ state is %d (MPX %08x, vector %x)\n", irq_state, m_irq_multiplex, m_irq_vector);
 }
 
 #include "cpu/m6502/m740.inc"

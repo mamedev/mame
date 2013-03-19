@@ -563,4 +563,3 @@ void a2bus_echoplus_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 			break;
 	}
 }
-

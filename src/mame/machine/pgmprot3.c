@@ -43,7 +43,7 @@
 WRITE32_MEMBER(pgm_arm_type3_state::svg_arm7_ram_sel_w )
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
-	machine().scheduler().synchronize(); // force resync	
+	machine().scheduler().synchronize(); // force resync
 	m_svg_ram_sel = data & 1;
 }
 
@@ -248,7 +248,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,killbldp)
 }
 
 READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
-{	
+{
 	int pc = space.device().safe_pc();
 	if (pc == 0x8000fea) space.device().execute().eat_cycles(500);
 //  else printf("dmn_speedup_r %08x\n", pc);
@@ -256,7 +256,7 @@ READ32_MEMBER(pgm_arm_type3_state::dmnfrnt_speedup_r )
 }
 
 READ16_MEMBER(pgm_arm_type3_state::dmnfrnt_main_speedup_r )
-{	
+{
 	UINT16 data = m_mainram[0xa03c/2];
 	int pc = space.device().safe_pc();
 	if (pc == 0x10193a) space.device().execute().spin_until_interrupt();

@@ -30,13 +30,13 @@ const device_type TC0140SYT = &device_creator<tc0140syt_device>;
 
 tc0140syt_device::tc0140syt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TC0140SYT, "Taito TC0140SYT", tag, owner, clock),
-	  m_mainmode(0),
-	  m_submode(0),
-	  m_status(0),
-	  m_nmi_enabled(0),
-	  m_nmi_req(0),
-	  m_mastercpu(NULL),
-	  m_slavecpu(NULL)
+		m_mainmode(0),
+		m_submode(0),
+		m_status(0),
+		m_nmi_enabled(0),
+		m_nmi_req(0),
+		m_mastercpu(NULL),
+		m_slavecpu(NULL)
 {
 	memset(m_slavedata, 0, sizeof(UINT8)*4);
 	memset(m_masterdata, 0, sizeof(UINT8)*4);
@@ -307,5 +307,3 @@ READ8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_r )
 
 	return res;
 }
-
-

@@ -86,14 +86,14 @@ INLINE int limit(INT32 in)
 
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C140, "C140", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_sample_rate(0),
-	  m_stream(NULL),
-	  m_banking_type(0),
-	  m_mixer_buffer_left(NULL),
-	  m_mixer_buffer_right(NULL),
-	  m_baserate(0),
-	  m_pRom(NULL)
+		device_sound_interface(mconfig, *this),
+		m_sample_rate(0),
+		m_stream(NULL),
+		m_banking_type(0),
+		m_mixer_buffer_left(NULL),
+		m_mixer_buffer_right(NULL),
+		m_baserate(0),
+		m_pRom(NULL)
 {
 	memset(m_REG, 0, sizeof(UINT8)*0x200);
 	memset(m_pcmtbl, 0, sizeof(INT16)*8);

@@ -25,25 +25,25 @@ const device_type WSWAN = &device_creator<wswan_sound_device>;
 
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WSWAN, "WonderSwan Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_channel(NULL),
-	  m_sweep_step(0),
-	  m_sweep_time(0),
-	  m_sweep_count(0),
-	  m_noise_type(0),
-	  m_noise_reset(0),
-	  m_noise_enable(0),
-	  m_sample_address(0),
-	  m_audio2_voice(0),
-	  m_audio3_sweep(0),
-	  m_audio4_noise(0),
-	  m_mono(0),
-	  m_voice_data(0),
-	  m_output_volume(0),
-	  m_external_stereo(0),
-	  m_external_speaker(0),
-	  m_noise_shift(0),
-	  m_master_volume(0)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_sweep_step(0),
+		m_sweep_time(0),
+		m_sweep_count(0),
+		m_noise_type(0),
+		m_noise_reset(0),
+		m_noise_enable(0),
+		m_sample_address(0),
+		m_audio2_voice(0),
+		m_audio3_sweep(0),
+		m_audio4_noise(0),
+		m_mono(0),
+		m_voice_data(0),
+		m_output_volume(0),
+		m_external_stereo(0),
+		m_external_speaker(0),
+		m_noise_shift(0),
+		m_master_volume(0)
 {
 }
 
@@ -246,5 +246,3 @@ WRITE8_MEMBER( wswan_sound_device::wswan_sound_port_w )
 		break;
 	}
 }
-
-

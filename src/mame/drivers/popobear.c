@@ -7,10 +7,10 @@
     TODO:
     - auto-animation speed is erratic (way too fast);
     - BGM seems quite off, YM2413 core bug?
-	- IRQ generation;
+    - IRQ generation;
       - all possible related to some timers?
- 
-    
+
+
     - I/Os;
     - Port 0x620000 is quite a mystery, some silly protection?
 
@@ -251,7 +251,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 	---- ---- ---- --x- NOT set on the enemy character / characters in your line
 	---- ---- ---- ---x set on opposite to above?
 	*/
-	
+
 	for (int drawpri = 0xf;drawpri>=0x0;drawpri--)
 	{
 		/* 0x106 = 8 x 8 */
@@ -262,9 +262,9 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 			int x = vram[i+0x7f800+4]|(vram[i+0x7f800+5]<<8);
 			int spr_num = vram[i+0x7f800+6]|(vram[i+0x7f800+7]<<8);
 			int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
-		
+
 			int pri = (param & 0x0f00)>>8;
-		
+
 			// we do this because it's sprite<->sprite priority,
 			if (pri!=drawpri)
 				continue;
@@ -281,7 +281,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 			if (param&0xf000) color_bank = (machine().rand() & 0x3);
 
-		
+
 
 			int add_it = 0;
 
@@ -297,12 +297,12 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 				//color_bank = (machine().rand() & 0x3);
 				add_it = color_bank*0x40;
 				break;
-				
+
 				case 0x2: // characters in intro, main player, powerups, timer, large dancing chars between levels (0x3f?)
 				//color_bank = (machine().rand() & 0x3);
 				add_it = color_bank*0x40;
 				break;
-				
+
 				case 0x3: // letters on GAME OVER need this..
 				add_it = color_bank*0x40;
 				add_it += 0x20;
@@ -359,7 +359,7 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 	//popmessage("%04x",m_vregs[0/2]);
 	UINT16* vreg = m_vregs;
 
-//	popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
+//  popmessage("%04x %04x %04x %04x %04x %04x %04x - %04x - %04x %04x",vreg[0x00],vreg[0x01],vreg[0x02],vreg[0x03],vreg[0x04],vreg[0x05],vreg[0x06], vreg[0x0b],vreg[0x0e],vreg[0x0f]);
 
 	// vreg[0x00] also looks like it could be some enable registers
 	// 0x82ff - BMC logo

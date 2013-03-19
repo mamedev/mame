@@ -400,7 +400,7 @@ void threecom3c505_device::data_buffer_fifo::reset()
 	m_count = 0;
 }
 
-int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[],	const int length)
+int threecom3c505_device::data_buffer_fifo::put(const UINT8 data[], const int length)
 {
 	UINT16 next_index = (m_put_index + 1) % m_size;
 
@@ -659,11 +659,11 @@ void threecom3c505_device::do_receive_command()
 			// preset receive response PCB
 			memcpy(&m_response, &m_rcv_response, sizeof(m_rcv_response));
 
-//			m_response.command = CMD_RECEIVE_PACKET_COMPLETE; // 0x38
-//			m_response.length = 16;
-//			m_response.data.rcv_resp.buf_ofs = htole16(0);
-//			m_response.data.rcv_resp.buf_seg = htole16(0);
-//			m_response.data.rcv_resp.buf_len = htole16(buf_len);
+//          m_response.command = CMD_RECEIVE_PACKET_COMPLETE; // 0x38
+//          m_response.length = 16;
+//          m_response.data.rcv_resp.buf_ofs = htole16(0);
+//          m_response.data.rcv_resp.buf_seg = htole16(0);
+//          m_response.data.rcv_resp.buf_len = htole16(buf_len);
 
 			// htole16 and friends are not portable beyond Linux.  It's named differently on *BSD and differently again on OS X.  Avoid!
 			m_response.data.rcv_resp.pkt_len = uint16_to_le(m_rx_data_buffer.get_length());
@@ -1129,7 +1129,7 @@ UINT8 threecom3c505_device::read_command_port()
 			case CMD_TRANSMIT_PACKET_18_COMPLETE:
 				m_netstat.tot_xmit++;
 
-				if (!send(m_tx_data_buffer.get_data(), 	m_tx_data_buffer.get_length()))
+				if (!send(m_tx_data_buffer.get_data(),  m_tx_data_buffer.get_length()))
 				{
 					// FIXME: failed to send the Ethernet packet
 					LOG(("read_command_port(): !!! failed to send Ethernet packet"));
@@ -1216,7 +1216,7 @@ void threecom3c505_device::write_data_port(UINT8 data)
 		}
 	}
 	else if (m_command_buffer[0] == CMD_TRANSMIT_PACKET || //
-			m_command_buffer[0]	== CMD_TRANSMIT_PACKET_18)
+			m_command_buffer[0] == CMD_TRANSMIT_PACKET_18)
 	{
 		if (!m_tx_data_buffer.append(data))
 		{

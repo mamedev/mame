@@ -3,11 +3,11 @@
     ncr5380n.c
 
     Implementation of the NCR 5380, aka the Zilog Z5380
- 
+
     TODO:
     - IRQs (Apple doesn't use 'em)
     - Target mode
- 
+
 *********************************************************************/
 
 #include "emu.h"
@@ -93,7 +93,7 @@ void ncr5380n_device::device_config_complete()
 void ncr5380n_device::reset_soft()
 {
 	state = IDLE;
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);	// clear any signals we're driving
+	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL); // clear any signals we're driving
 	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
 	status = 0;
 	drq = false;
@@ -113,13 +113,13 @@ void ncr5380n_device::scsi_ctrl_changed()
 {
 	UINT32 ctrl = scsi_bus->ctrl_r();
 
-//	printf("scsi_ctrl_changed: lines now %x\n", ctrl);
+//  printf("scsi_ctrl_changed: lines now %x\n", ctrl);
 
-/*	if ((ctrl & (S_PHASE_MASK|S_SEL|S_BSY)) != last_phase)
-	{
-		printf("phase now %d, SEL %x BSY %x\n", ctrl & S_PHASE_MASK, ctrl & S_SEL, ctrl & S_BSY);
-		last_phase = (S_PHASE_MASK|S_SEL|S_BSY);
-	}*/
+/*  if ((ctrl & (S_PHASE_MASK|S_SEL|S_BSY)) != last_phase)
+    {
+        printf("phase now %d, SEL %x BSY %x\n", ctrl & S_PHASE_MASK, ctrl & S_SEL, ctrl & S_BSY);
+        last_phase = (S_PHASE_MASK|S_SEL|S_BSY);
+    }*/
 
 	// recalculate phase match
 	m_busstatus &= ~BAS_PHASEMATCH;
@@ -133,7 +133,7 @@ void ncr5380n_device::scsi_ctrl_changed()
 		// if BSY drops or the phase goes mismatch, that terminates the DMA
 		if ((!(ctrl & S_BSY)) || !(m_busstatus & BAS_PHASEMATCH))
 		{
-//			printf("BSY dropped or phase mismatch during DMA, ending DMA\n");
+//          printf("BSY dropped or phase mismatch during DMA, ending DMA\n");
 			m_mode &= ~MODE_DMA;
 			m_busstatus |= BAS_ENDOFDMA;
 			drq_clear();
@@ -178,7 +178,7 @@ void ncr5380n_device::step(bool timeout)
 
 		int win;
 		for(win=7; win>=0 && !(data & (1<<win)); win--);
-//		printf("data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
+//      printf("data %02x win %02x scsi_id %02x\n", data, win, scsi_id);
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
@@ -270,21 +270,21 @@ void ncr5380n_device::recv_byte()
 void ncr5380n_device::function_bus_complete()
 {
 	state = IDLE;
-//	istatus |= I_FUNCTION|I_BUS;
+//  istatus |= I_FUNCTION|I_BUS;
 	check_irq();
 }
 
 void ncr5380n_device::function_complete()
 {
 	state = IDLE;
-//	istatus |= I_FUNCTION;
+//  istatus |= I_FUNCTION;
 	check_irq();
 }
 
 void ncr5380n_device::bus_complete()
 {
 	state = IDLE;
-//	istatus |= I_BUS;
+//  istatus |= I_BUS;
 	check_irq();
 }
 
@@ -327,7 +327,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 	// asserting to drive the data bus?
 	if ((data & IC_DBUS) && !(m_icommand & IC_DBUS))
 	{
-//		printf("%s: driving data bus with %02x\n", tag(), m_outdata);
+//      printf("%s: driving data bus with %02x\n", tag(), m_outdata);
 		scsi_bus->data_w(scsi_refid, m_outdata);
 		delay(2);
 	}
@@ -345,7 +345,7 @@ WRITE8_MEMBER(ncr5380n_device::icmd_w)
 			(data & IC_SEL ? S_SEL : 0) |
 			(data & IC_ATN ? S_ATN : 0);
 
-//		printf("%s: changing control lines %04x\n", tag(), newdata);
+//      printf("%s: changing control lines %04x\n", tag(), newdata);
 		scsi_bus->ctrl_w(scsi_refid, newdata, S_RST|S_ACK|S_BSY|S_SEL|S_ATN);
 	}
 
@@ -360,22 +360,22 @@ READ8_MEMBER(ncr5380n_device::mode_r)
 
 WRITE8_MEMBER(ncr5380n_device::mode_w)
 {
-//	printf("%s: mode_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  printf("%s: mode_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	// arbitration bit being set?
 	if ((data & MODE_ARBITRATE) && !(m_mode & MODE_ARBITRATE))
 	{
-		// if SEL is selected and the assert SEL bit in the initiator 
+		// if SEL is selected and the assert SEL bit in the initiator
 		// command register is clear, fail
 		if ((scsi_bus->ctrl_r() & S_SEL) && !(m_icommand & IC_SEL))
 		{
-//			printf("arbitration lost, ctrl = %x, m_icommand&IC_SEL = %x\n", scsi_bus->ctrl_r(), m_icommand & IC_SEL);
+//          printf("arbitration lost, ctrl = %x, m_icommand&IC_SEL = %x\n", scsi_bus->ctrl_r(), m_icommand & IC_SEL);
 			m_icommand &= ~IC_ARBITRATION;
 			m_icommand |= IC_ARBLOST;
 		}
 		else
 		{
 			seq = 0;
-//			state = DISC_SEL_ARBITRATION;
+//          state = DISC_SEL_ARBITRATION;
 			arbitrate();
 		}
 	}
@@ -385,13 +385,13 @@ WRITE8_MEMBER(ncr5380n_device::mode_w)
 
 READ8_MEMBER(ncr5380n_device::command_r)
 {
-//	logerror("%s: command_r %02x (%08x)\n", tag(), m_tcommand, space.device().safe_pc());
+//  logerror("%s: command_r %02x (%08x)\n", tag(), m_tcommand, space.device().safe_pc());
 	return m_tcommand;
 }
 
 WRITE8_MEMBER(ncr5380n_device::command_w)
 {
-//	printf("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+//  printf("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	m_tcommand = data;
 
 	// recalculate phase match
@@ -425,7 +425,7 @@ void ncr5380n_device::check_irq()
 READ8_MEMBER(ncr5380n_device::status_r)
 {
 	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT8 res = status | 
+	UINT8 res = status |
 		(ctrl & S_RST ? ST_RST : 0) |
 		(ctrl & S_BSY ? ST_BSY : 0) |
 		(ctrl & S_REQ ? ST_REQ : 0) |
@@ -434,7 +434,7 @@ READ8_MEMBER(ncr5380n_device::status_r)
 		(ctrl & S_INP ? ST_IO  : 0) |
 		(ctrl & S_SEL ? ST_SEL : 0);
 
-//	printf("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  printf("%s: status_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
 	return res;
 }
 
@@ -449,7 +449,7 @@ READ8_MEMBER(ncr5380n_device::busandstatus_r)
 		(ctrl & S_ATN ? BAS_ATN : 0) |
 		(ctrl & S_ACK ? BAS_ACK : 0);
 
-//	printf("%s: busandstatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
+//  printf("%s: busandstatus_r %02x (%08x)\n", tag(), res, space.device().safe_pc());
 
 	return res;
 }
@@ -477,7 +477,7 @@ READ8_MEMBER(ncr5380n_device::resetparityirq_r)
 
 WRITE8_MEMBER(ncr5380n_device::startdmainitrx_w)
 {
-//	printf("%02x to start dma initiator Rx\n", data);
+//  printf("%02x to start dma initiator Rx\n", data);
 	recv_byte();
 }
 
@@ -509,7 +509,7 @@ UINT8 ncr5380n_device::dma_r()
 
 void ncr5380n_device::drq_set()
 {
-	if(!drq) 
+	if(!drq)
 	{
 		drq = true;
 		m_busstatus |= BAS_DMAREQUEST;
@@ -520,7 +520,7 @@ void ncr5380n_device::drq_set()
 
 void ncr5380n_device::drq_clear()
 {
-	if(drq) 
+	if(drq)
 	{
 		drq = false;
 		m_busstatus &= ~BAS_DMAREQUEST;
@@ -598,4 +598,3 @@ WRITE8_MEMBER(ncr5380n_device::write)
 			break;
 	}
 }
-

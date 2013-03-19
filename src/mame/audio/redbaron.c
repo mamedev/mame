@@ -35,23 +35,23 @@ const device_type REDBARON = &device_creator<redbaron_sound_device>;
 
 redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, REDBARON, "Red Baron Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_vol_lookup(NULL),
-	  m_channel(NULL),
-	  m_latch(0),
-	  m_poly_counter(0),
-	  m_poly_shift(0),
-	  m_filter_counter(0),
-	  m_crash_amp(0),
-	  m_shot_amp(0),
-	  m_shot_amp_counter(0),
-	  m_squeal_amp(0),
-	  m_squeal_amp_counter(0),
-	  m_squeal_off_counter(0),
-	  m_squeal_on_counter(0),
-	  m_squeal_out(0)
+		device_sound_interface(mconfig, *this),
+		m_vol_lookup(NULL),
+		m_channel(NULL),
+		m_latch(0),
+		m_poly_counter(0),
+		m_poly_shift(0),
+		m_filter_counter(0),
+		m_crash_amp(0),
+		m_shot_amp(0),
+		m_shot_amp_counter(0),
+		m_squeal_amp(0),
+		m_squeal_amp_counter(0),
+		m_squeal_off_counter(0),
+		m_squeal_on_counter(0),
+		m_squeal_out(0)
 {
-	  memset(m_vol_crash, 0, sizeof(INT16)*16);
+		memset(m_vol_crash, 0, sizeof(INT16)*16);
 }
 
 

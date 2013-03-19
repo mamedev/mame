@@ -181,7 +181,7 @@ void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UIN
 		case pet_expansion_slot_device::SELE:
 			if (!BIT(m_ctrl, 6) || !BIT(offset, 11))
 			{
-				write_ram(offset, data);	
+				write_ram(offset, data);
 				sel = pet_expansion_slot_device::SEL_NONE;
 			}
 			break;

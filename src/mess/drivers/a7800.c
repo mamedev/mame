@@ -33,7 +33,7 @@
                Colorburst/Hue = 180 degrees
 
     2013/02/27 Robert Tuccitto  Palette rebuild due to misaligned
-	       data references.  Corrected PAL color sequence order.
+           data references.  Corrected PAL color sequence order.
 
 ***************************************************************************/
 

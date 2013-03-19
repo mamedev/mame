@@ -26,7 +26,7 @@ const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
 
 #define SSC_ROM_REGION  "ssc_rom"
 #define SSC_ACIA_TAG    "ssc_acia"
-#define SSC_RS232_TAG	"ssc_rs232"
+#define SSC_RS232_TAG   "ssc_rs232"
 
 static SLOT_INTERFACE_START( rs232_devices )
 	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)

@@ -160,14 +160,14 @@ const unif *nes_unif_lookup( const char *board )
 
 void unif_mapr_setup( const char *board, int *pcb_id, int *battery, int *prgram, int *vram_chunks )
 {
-	const unif *unif_board = nes_unif_lookup(board);		
+	const unif *unif_board = nes_unif_lookup(board);
 	if (unif_board == NULL)
 		fatalerror("Unknown UNIF board %s.\n", board);
-	
+
 	*pcb_id = unif_board->board_idx;
-	*battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
-	*prgram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
-	
+	*battery = unif_board->nvwram;  // we should implement battery banks based on the size of this...
+	*prgram = unif_board->wram; // we should implement WRAM banks based on the size of this...
+
 	if (unif_board->chrram <= CHRRAM_8)
 		*vram_chunks = 1;
 	else if (unif_board->chrram == CHRRAM_16)

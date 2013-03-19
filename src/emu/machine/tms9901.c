@@ -510,7 +510,7 @@ void tms9901_device::device_reset(void)
 	field_interrupts();
 
 	m_clock_mode = false;
-	
+
 	m_clock_register = 0;
 	timer_reload();
 }
@@ -537,7 +537,7 @@ void tms9901_device::device_start(void)
 	}
 
 	m_interrupt.resolve(intf->interrupt_callback, *this);
-	
+
 	m_clock_register = 0;
 }
 

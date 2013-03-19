@@ -19,8 +19,8 @@
 #define MC6850_0_TAG    "u34"
 #define MC6850_1_TAG    "u26"
 #define COM8116_TAG     "u56"
-#define RS232_A_TAG		"rs232a"
-#define RS232_B_TAG		"rs232b"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
 
 class ob68k1a_state : public driver_device
 {

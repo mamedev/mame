@@ -21,7 +21,7 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 		m_colour_mask=0x3f;
 	else
 		m_colour_mask=0x1f;
-	
+
 //  temp_bitmap = auto_bitmap_rgb32_alloc( machine(), 512, 512 );
 	m_mlc_buffered_spriteram = auto_alloc_array(machine(), UINT16, 0x3000/2);
 	m_mlc_spriteram_spare = auto_alloc_array(machine(), UINT16, 0x3000/2);
@@ -39,7 +39,7 @@ static void mlc_drawgfxzoomline(
 		UINT32* dest,const rectangle &clip,gfx_element *gfx,
 		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int sx,
 		int transparent_color,int use8bpp,
-		int scalex, int alpha, int srcline	)
+		int scalex, int alpha, int srcline  )
 {
 
 	if (!scalex) return;
@@ -99,7 +99,7 @@ static void mlc_drawgfxzoomline(
 
 			/* no alpha */
 			if (alpha == 0xff)
-			{	
+			{
 				const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
 				const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
 				const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
@@ -176,7 +176,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		            0x0800 - upper clip bit (stadhr96 view of bases)
 		            0x0400 - Use raster IRQ lookup table when drawing object - or not? (OK for stadhr96, NOT enabled for avengrgs)
 		            0x0300 - lower clipping window to use (swapped) - and upper bits of raster select (stadhr96)
-					0x0080 - seems to be both the lower bit of the raster select (stadhr96) AND the upper bit of colour / alpha (avngrgs?) - might depend on other bits?
+		            0x0080 - seems to be both the lower bit of the raster select (stadhr96) AND the upper bit of colour / alpha (avngrgs?) - might depend on other bits?
 		            0x007f - Colour/alpha shadow enable
 		    Word 2: 0x07ff - Y position
 		    Word 3: 0x07ff - X position
@@ -229,7 +229,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 
 
-		
+
 		clipper = (mlc_spriteram[offs+1]>>8)&0x3;
 
 		indx = mlc_spriteram[offs+0]&0x3fff;
@@ -242,11 +242,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 		clipper=((clipper&2)>>1)|((clipper&1)<<1); // Swap low two bits
 
 
-		
+
 		int upperclip = (mlc_spriteram[offs+1]>>10)&0x2;
 		// this is used on some ingame gfx in stadhr96
 		// to clip the images of your guys on the bases
-		if (upperclip) 
+		if (upperclip)
 			clipper |= 0x4;
 
 
@@ -372,9 +372,9 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 			if (raster_select==1 || raster_select==2 || raster_select==3)
 			{
-			
+
 				int irq_base_reg; /* 6, 9, 12  are possible */
-				if (raster_select== 1) irq_base_reg = 6;  	// OK upper screen.. left?
+				if (raster_select== 1) irq_base_reg = 6;    // OK upper screen.. left?
 				else if (raster_select== 2) irq_base_reg = 9; // OK upper screen.. main / center
 				else irq_base_reg = 12;
 
@@ -384,7 +384,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 				if (extra_x_off & 0x400) { extra_x_off -= 0x800; }
 				if (extra_y_off & 0x400) { extra_y_off -= 0x800; }
-		
+
 
 				x += extra_x_off;
 				y += extra_y_off;
@@ -408,7 +408,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 		int xbase=x<<16;
 		int xinc=(xscale)*16;
-			
+
 		if (fx)
 			xbase+=(xoffs-15) * (xscale) - ((w-1)*xinc);
 		else
@@ -439,13 +439,13 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			continue;
 
 
-	
-//		color = machine().rand();
-		
+
+//      color = machine().rand();
+
 		int srcline = ((bby<<16) / ratio);
-			
+
 		by = srcline >> 4;
-			
+
 
 		srcline &=0xf;
 		if( fy )
@@ -455,7 +455,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 
 		for (bx=0; bx<w; bx++) {
-				
+
 			int realxbase = xbase + bx * xinc;
 			int count = 0;
 			if (fx)
@@ -569,7 +569,7 @@ UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bi
 		printf("%d -", i);
 		for (int j=0;j<0x20;j++)
 		{
-			printf("%08x, ",m_irq_ram[j]);
+		    printf("%08x, ",m_irq_ram[j]);
 		}
 		printf("\n");
 		*/

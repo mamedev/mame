@@ -22,12 +22,12 @@ class studio2_state : public driver_device
 public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, CDP1802_TAG),
-		  m_speaker(*this, BEEPER_TAG),
-		  m_vdc(*this, CDP1861_TAG),
-		  m_clear(*this, "CLEAR"),
-		  m_a(*this, "A"),
-		  m_b(*this, "B")
+			m_maincpu(*this, CDP1802_TAG),
+			m_speaker(*this, BEEPER_TAG),
+			m_vdc(*this, CDP1861_TAG),
+			m_clear(*this, "CLEAR"),
+			m_a(*this, "A"),
+			m_b(*this, "B")
 	{ }
 
 	required_device<cosmac_device> m_maincpu;

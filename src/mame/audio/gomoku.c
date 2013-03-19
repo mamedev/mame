@@ -27,16 +27,16 @@ const device_type GOMOKU = &device_creator<gomoku_sound_device>;
 
 gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GOMOKU, "Gomoku Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_last_channel(NULL),
-	  m_sound_rom(NULL),
-	  m_num_voices(0),
-	  m_sound_enable(0),
-	  m_stream(NULL),
-	  m_mixer_table(NULL),
-	  m_mixer_lookup(NULL),
-	  m_mixer_buffer(NULL),
-	  m_mixer_buffer_2(NULL)
+		device_sound_interface(mconfig, *this),
+		m_last_channel(NULL),
+		m_sound_rom(NULL),
+		m_num_voices(0),
+		m_sound_enable(0),
+		m_stream(NULL),
+		m_mixer_table(NULL),
+		m_mixer_lookup(NULL),
+		m_mixer_buffer(NULL),
+		m_mixer_buffer_2(NULL)
 {
 	memset(m_channel_list, 0, sizeof(gomoku_sound_channel)*GOMOKU_MAX_VOICES);
 	memset(m_soundregs1, 0, sizeof(UINT8)*0x20);
@@ -206,7 +206,7 @@ WRITE8_MEMBER( gomoku_sound_device::sound1_w )
 	m_stream->update();
 
 	/* set the register */
-	m_soundregs1[offset] = data; 
+	m_soundregs1[offset] = data;
 
 	/* recompute all the voice parameters */
 	for (ch = 0, base = 0, voice = m_channel_list; voice < m_channel_list + 3; ch++, voice++, base += 8)
@@ -258,4 +258,3 @@ WRITE8_MEMBER( gomoku_sound_device::sound2_w )
 			voice->oneshotplaying = 0;
 	}
 }
-

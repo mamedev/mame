@@ -1093,7 +1093,7 @@ void abc802_state::machine_reset()
 
 	// 50/60 Hz
 	m_dart->cts_w(1, BIT(config, 3)); // 0 = 50Hz, 1 = 60Hz
-	
+
 	m_dfd_in = 0;
 }
 
@@ -1174,7 +1174,7 @@ void abc806_state::machine_reset()
 
 	// 50/60 Hz
 	m_dart->cts_w(1, 0); // 0 = 50Hz, 1 = 60Hz
-	
+
 	m_dfd_in = 0;
 }
 

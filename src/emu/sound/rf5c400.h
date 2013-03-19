@@ -21,7 +21,7 @@
 
 struct rf5c400_channel
 {
-    rf5c400_channel() :
+	rf5c400_channel() :
 		startH(0),
 		startL(0),
 		freq(0),
@@ -42,8 +42,8 @@ struct rf5c400_channel
 		env_level(0.0),
 		env_step(0.0),
 		env_scale(0.0)
-    { }
-    
+	{ }
+
 	UINT16  startH;
 	UINT16  startL;
 	UINT16  freq;
@@ -74,7 +74,7 @@ struct rf5c400_channel
 // ======================> rf5c400_device
 
 class rf5c400_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -88,12 +88,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_READ16_MEMBER( rf5c400_r );
-    DECLARE_WRITE16_MEMBER( rf5c400_w );
+	DECLARE_READ16_MEMBER( rf5c400_r );
+	DECLARE_WRITE16_MEMBER( rf5c400_w );
 
 private:
-    void rf5c400_init_chip();
-    UINT8 decode80(UINT8 val);
+	void rf5c400_init_chip();
+	UINT8 decode80(UINT8 val);
 
 private:
 	INT16 *m_rom;

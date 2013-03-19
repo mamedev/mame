@@ -40,7 +40,7 @@ enum
 
 
 class cem3394_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -54,23 +54,23 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    // Set the voltage going to a particular parameter
-    void set_voltage(int input, double voltage);
+	// Set the voltage going to a particular parameter
+	void set_voltage(int input, double voltage);
 
-    // Get the translated parameter associated with the given input as follows:
-    //    CEM3394_VCO_FREQUENCY:      frequency in Hz
-    //    CEM3394_MODULATION_AMOUNT:  scale factor, 0.0 to 2.0
-    //    CEM3394_WAVE_SELECT:        voltage from this line
-    //    CEM3394_PULSE_WIDTH:        width fraction, from 0.0 to 1.0
-    //    CEM3394_MIXER_BALANCE:      balance, from -1.0 to 1.0
-    //    CEM3394_FILTER_RESONANCE:   resonance, from 0.0 to 1.0
-    //    CEM3394_FILTER_FREQENCY:    frequency, in Hz
-    //    CEM3394_FINAL_GAIN:         gain, in dB
-    double get_parameter(int input);
+	// Get the translated parameter associated with the given input as follows:
+	//    CEM3394_VCO_FREQUENCY:      frequency in Hz
+	//    CEM3394_MODULATION_AMOUNT:  scale factor, 0.0 to 2.0
+	//    CEM3394_WAVE_SELECT:        voltage from this line
+	//    CEM3394_PULSE_WIDTH:        width fraction, from 0.0 to 1.0
+	//    CEM3394_MIXER_BALANCE:      balance, from -1.0 to 1.0
+	//    CEM3394_FILTER_RESONANCE:   resonance, from 0.0 to 1.0
+	//    CEM3394_FILTER_FREQENCY:    frequency, in Hz
+	//    CEM3394_FINAL_GAIN:         gain, in dB
+	double get_parameter(int input);
 
 private:
-    double compute_db(double voltage);
-    UINT32 compute_db_volume(double voltage);
+	double compute_db(double voltage);
+	UINT32 compute_db_volume(double voltage);
 
 private:
 	void (*m_external)(device_t*, int, short*);/* callback to generate external samples */

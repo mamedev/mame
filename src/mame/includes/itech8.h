@@ -110,7 +110,7 @@ public:
 	inline void consume_rle(int count);
 	void perform_blit(address_space &space);
 	void itech8_update_interrupts(int periodic, int tms34061, int blitter);
-	
+
 	/*----------- defined in machine/slikshot.c -----------*/
 
 	DECLARE_READ8_MEMBER( slikz80_port_r );
@@ -126,10 +126,9 @@ public:
 							UINT16 *inter1, UINT16 *inter2, UINT16 *inter3, UINT8 *beams);
 	void inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *beams,
 							UINT16 *word1, UINT16 *word2, UINT16 *word3);
-							
+
 	void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beams,
 							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
 };
-

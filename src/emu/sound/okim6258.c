@@ -46,17 +46,17 @@ const device_type OKIM6258 = &device_creator<okim6258_device>;
 
 okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_status(0),
-	  m_master_clock(0),
-	  m_divider(0),
-	  m_adpcm_type(0),
-	  m_data_in(0),
-	  m_nibble_shift(0),
-	  m_stream(NULL),
-	  m_output_bits(0),
-	  m_signal(0),
-	  m_step(0)
+		device_sound_interface(mconfig, *this),
+		m_status(0),
+		m_master_clock(0),
+		m_divider(0),
+		m_adpcm_type(0),
+		m_data_in(0),
+		m_nibble_shift(0),
+		m_stream(NULL),
+		m_output_bits(0),
+		m_signal(0),
+		m_step(0)
 {
 }
 
@@ -338,5 +338,3 @@ WRITE8_MEMBER( okim6258_device::okim6258_ctrl_w )
 		m_status &= ~STATUS_RECORDING;
 	}
 }
-
-

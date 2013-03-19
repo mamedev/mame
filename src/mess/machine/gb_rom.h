@@ -18,10 +18,10 @@ public:
 	virtual void device_start() { shared_start(); };
 	virtual void device_reset() { shared_reset(); };
 	virtual void device_config_complete() { m_shortname = "gb_rom"; }
-	
+
 	void shared_start();
 	void shared_reset();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -131,7 +131,7 @@ public:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "megaduck_rom"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);

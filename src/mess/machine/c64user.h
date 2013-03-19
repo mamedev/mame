@@ -73,12 +73,12 @@ public:
 	c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _reset> void set_reset_callback(_reset reset) { m_write_reset.set_callback(reset); }
-	
+
 	template<class _cnt, class _sp> void set_cia1_callbacks(_cnt cnt, _sp sp) {
 		m_write_cnt1.set_callback(cnt);
 		m_write_sp1.set_callback(sp);
 	}
-	
+
 	template<class _cnt, class _sp, class _flag> void set_cia2_callbacks(_cnt cnt, _sp sp, _flag flag) {
 		m_write_cnt2.set_callback(cnt);
 		m_write_sp2.set_callback(sp);

@@ -131,4 +131,3 @@ ioport_constructor ne1000_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(ne1000);
 }
-

@@ -61,12 +61,12 @@ const device_type ZSG2 = &device_creator<zsg2_device>;
 
 zsg2_device::zsg2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ZSG2, "ZSG-2", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_alow(0),
-      m_ahigh(0),
-	  m_bank_samples(NULL),
-	  m_sample_rate(0),
-	  m_stream(NULL)
+		device_sound_interface(mconfig, *this),
+		m_alow(0),
+		m_ahigh(0),
+		m_bank_samples(NULL),
+		m_sample_rate(0),
+		m_stream(NULL)
 {
 	memset(m_act, 0, sizeof(UINT16)*3);
 }
@@ -239,4 +239,3 @@ READ16_MEMBER( zsg2_device::zsg2_r )
 
 	return 0;
 }
-

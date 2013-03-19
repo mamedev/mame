@@ -67,6 +67,3 @@ public:
 
 	DECLARE_WRITE16_MEMBER( galpani2_bg15_w );
 };
-
-
-

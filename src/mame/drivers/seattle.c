@@ -818,7 +818,7 @@ UINT32 seattle_state::pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 
 
 void seattle_state::pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
-{	
+{
 	m_galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
 		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
@@ -833,7 +833,7 @@ void seattle_state::pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UI
  *************************************/
 
 UINT32 seattle_state::pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
-{	
+{
 	UINT32 result = m_galileo.pci_3dfx_regs[reg];
 
 	switch (reg)

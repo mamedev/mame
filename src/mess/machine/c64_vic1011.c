@@ -93,18 +93,18 @@ void c64_vic1011_device::device_start()
 UINT8 c64_vic1011_device::c64_pb_r(address_space &space, offs_t offset)
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       Sin
-	    1       
-	    2       
-	    3       
+	    1
+	    2
+	    3
 	    4       DCDin
-	    5       
+	    5
 	    6       CTS
 	    7       DSR
-	
+
 	*/
 
 	UINT8 data = 0;
@@ -125,18 +125,18 @@ UINT8 c64_vic1011_device::c64_pb_r(address_space &space, offs_t offset)
 void c64_vic1011_device::c64_pb_w(address_space &space, offs_t offset, UINT8 data)
 {
 	/*
-	
+
 	    bit     description
-	
-	    0       
+
+	    0
 	    1       RTS
 	    2       DTR
-	    3       
-	    4       
+	    3
+	    4
 	    5       DCDout
-	    6       
-	    7       
-	
+	    6
+	    7
+
 	*/
 
 	m_rs232->rts_w(BIT(data, 1));

@@ -36,22 +36,22 @@ struct c140_interface
 
 struct C140_VOICE
 {
-    C140_VOICE() :
-	  ptoffset(0),
-	  pos(0),
-	  key(0),
-	  lastdt(0),
-	  prevdt(0),
-	  dltdt(0),
-	  rvol(0),
-	  lvol(0),
-	  frequency(0),
-	  bank(0),
-	  mode(0),
-	  sample_start(0),
-	  sample_end(0),
-	  sample_loop(0) {}
-    
+	C140_VOICE() :
+		ptoffset(0),
+		pos(0),
+		key(0),
+		lastdt(0),
+		prevdt(0),
+		dltdt(0),
+		rvol(0),
+		lvol(0),
+		frequency(0),
+		bank(0),
+		mode(0),
+		sample_start(0),
+		sample_end(0),
+		sample_loop(0) {}
+
 	long    ptoffset;
 	long    pos;
 	long    key;
@@ -89,15 +89,15 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_READ8_MEMBER( c140_r );
-    DECLARE_WRITE8_MEMBER( c140_w );
+	DECLARE_READ8_MEMBER( c140_r );
+	DECLARE_WRITE8_MEMBER( c140_w );
 
 public:
-    void set_base(void *base);
+	void set_base(void *base);
 
 private:
-    void init_voice( C140_VOICE *v );
-    long find_sample(long adrs, long bank, int voice);
+	void init_voice( C140_VOICE *v );
+	long find_sample(long adrs, long bank, int voice);
 
 private:
 	int m_sample_rate;

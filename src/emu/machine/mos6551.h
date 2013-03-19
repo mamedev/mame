@@ -66,7 +66,7 @@ public:
 	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
-	template<class _rxd, class _txd> void set_rxd_txd_callbacks(_rxd rxd, _txd txd) { 
+	template<class _rxd, class _txd> void set_rxd_txd_callbacks(_rxd rxd, _txd txd) {
 		m_read_rxd.set_callback(rxd);
 		m_write_txd.set_callback(txd);
 	}

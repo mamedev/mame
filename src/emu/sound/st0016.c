@@ -24,13 +24,13 @@ const device_type ST0016 = &device_creator<st0016_device>;
 
 st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ST0016, "ST0016", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_sound_ram(NULL)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_sound_ram(NULL)
 {
 	memset(m_vpos, 0, sizeof(int)*8);
-    memset(m_frac, 0, sizeof(int)*8);
-    memset(m_lponce, 0, sizeof(int)*8);
+	memset(m_frac, 0, sizeof(int)*8);
+	memset(m_lponce, 0, sizeof(int)*8);
 	memset(m_regs, 0, sizeof(UINT8)*0x100);
 }
 
@@ -159,4 +159,3 @@ WRITE8_MEMBER( st0016_device::st0016_snd_w )
 		}
 	}
 }
-

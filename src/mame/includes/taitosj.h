@@ -18,7 +18,7 @@ public:
 		m_collision_reg(*this, "collision_reg"),
 		m_kikstart_scrollram(*this, "kikstart_scroll"){ }
 
-	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,	
+	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
 	UINT8 m_sndnmi_disable;
 	UINT8 m_input_port_4_f0;

@@ -32,15 +32,15 @@ struct rf5c68_interface
 
 struct rf5c68_pcm_channel
 {
-    rf5c68_pcm_channel() :
-        enable(0),
-        env(0),
-        pan(0),
-        start(0),
-        addr(0),
-        step(0),
-        loopst(0) {}
-    
+	rf5c68_pcm_channel() :
+		enable(0),
+		env(0),
+		pan(0),
+		start(0),
+		addr(0),
+		step(0),
+		loopst(0) {}
+
 	UINT8       enable;
 	UINT8       env;
 	UINT8       pan;
@@ -55,7 +55,7 @@ struct rf5c68_pcm_channel
 // ======================> rf5c68_device
 
 class rf5c68_device : public device_t,
-					  public device_sound_interface
+						public device_sound_interface
 {
 public:
 	rf5c68_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -69,11 +69,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_READ8_MEMBER( rf5c68_r );
-    DECLARE_WRITE8_MEMBER( rf5c68_w );
+	DECLARE_READ8_MEMBER( rf5c68_r );
+	DECLARE_WRITE8_MEMBER( rf5c68_w );
 
-    DECLARE_READ8_MEMBER( rf5c68_mem_r );
-    DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
+	DECLARE_READ8_MEMBER( rf5c68_mem_r );
+	DECLARE_WRITE8_MEMBER( rf5c68_mem_w );
 
 private:
 	sound_stream*        m_stream;

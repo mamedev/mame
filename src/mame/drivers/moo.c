@@ -609,7 +609,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(4096)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(moo_state,bucky)
 MACHINE_CONFIG_END
 

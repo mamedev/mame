@@ -64,7 +64,7 @@ READ32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_r )
 }
 
 WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w )
-{	
+{
 	machine().scheduler().synchronize(); // force resync
 
 	if (ACCESSING_BITS_16_31)
@@ -80,7 +80,7 @@ WRITE32_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_protlatch_w )
 }
 
 READ16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_68k_protlatch_r )
-{	
+{
 	machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
@@ -1342,7 +1342,7 @@ void pgm_arm_type1_state::command_handler_oldsplus(int pc)
 }
 
 WRITE16_MEMBER(pgm_arm_type1_state::pgm_arm7_type1_sim_w )
-{	
+{
 	int pc = space.device().safe_pc();
 
 	if (offset == 0)

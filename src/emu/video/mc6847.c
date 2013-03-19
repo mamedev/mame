@@ -65,8 +65,8 @@
     if skew existed.  SockMaster has confirmed that scanlines are in
     fact 228 clock cycles.
 
-	The PAL emulation is little more than having more scanlines; surely
-	there are details that we are missing here.
+    The PAL emulation is little more than having more scanlines; surely
+    there are details that we are missing here.
 
 **********************************************************************/
 

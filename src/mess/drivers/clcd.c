@@ -62,7 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ramwrite_w)
 	{
 		// this area might be shared between rom & ram or it might be ram only
-//		printf( "ram write:%04x %02x\n", offset, data );
+//      printf( "ram write:%04x %02x\n", offset, data );
 	}
 
 	// these seem to control what appears in the memory space at various addresses.
@@ -70,64 +70,64 @@ public:
 
 	DECLARE_WRITE8_MEMBER(fa00_w)
 	{
-//		printf( "fa00\n" );
+//      printf( "fa00\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fa80_w)
 	{
-//		printf( "fa80\n" );
+//      printf( "fa80\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fb00_w)
 	{
-//		printf( "fb00\n" );
+//      printf( "fb00\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fb80_w)
 	{
-//		printf( "fb80\n" );
+//      printf( "fb80\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fc00_w)
 	{
-//		printf( "fc00\n" );
+//      printf( "fc00\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fc80_w)
 	{
-//		printf( "fc80\n" );
+//      printf( "fc80\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fd00_w)
 	{
-//		printf( "fd00\n" );
+//      printf( "fd00\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fd80_w)
 	{
-//		printf( "fd80\n" );
+//      printf( "fd80\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fe00_w)
 	{
-//		printf( "fe00\n" );
+//      printf( "fe00\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(fe80_w)
 	{
-//		printf( "fe80\n" );
+//      printf( "fe80\n" );
 	}
 
 	DECLARE_WRITE8_MEMBER(rombank_w)
 	{
-//		printf( "rom bank %02x\n", data);
+//      printf( "rom bank %02x\n", data);
 		// this might be for ram banking
 		membank("bankedroms")->set_entry(0);
 	}
 
 	DECLARE_WRITE8_MEMBER(ff80_w)
 	{
-//		printf( "ff80:%02x %02x\n", offset, data );
+//      printf( "ff80:%02x %02x\n", offset, data );
 	}
 
 	WRITE8_MEMBER( via0_pa_w )

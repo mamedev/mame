@@ -209,7 +209,7 @@ WRITE32_MEMBER(seibuspi_state::video_dma_address_w)
 }
 
 void seibuspi_state::drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
-{	
+{
 	const pen_t *pens = &gfx->machine().pens[gfx->colorbase()];
 	const UINT8 *dp;
 	int i, j;

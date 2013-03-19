@@ -480,8 +480,8 @@ WRITE8_MEMBER( thomson_state::to7_timer_port_out )
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) |           /* bits 4-6: border color */
-	                       ((data & 0x20) ? 2 : 0) |
-	                       ((data & 0x40) ? 4 : 0) );
+							((data & 0x20) ? 2 : 0) |
+							((data & 0x40) ? 4 : 0) );
 }
 
 
@@ -1571,9 +1571,9 @@ WRITE8_MEMBER( thomson_state::to770_timer_port_out )
 	thom_set_mode_point( data & 1 );          /* bit 0: video bank switch */
 	thom_set_caps_led( (data & 8) ? 1 : 0 ) ; /* bit 3: keyboard led */
 	thom_set_border_color( ((data & 0x10) ? 1 : 0) |          /* 4-bit border color */
-	                       ((data & 0x20) ? 2 : 0) |
-	                       ((data & 0x40) ? 4 : 0) |
-	                       ((data & 0x04) ? 0 : 8) );
+							((data & 0x20) ? 2 : 0) |
+							((data & 0x40) ? 4 : 0) |
+							((data & 0x04) ? 0 : 8) );
 }
 
 

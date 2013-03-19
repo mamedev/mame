@@ -57,9 +57,9 @@ const device_type TIAMC1 = &device_creator<tiamc1_sound_device>;
 
 tiamc1_sound_device::tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIAMC1, "TIA-MC1 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_channel(NULL),
-	  m_timer1_divider(0)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_timer1_divider(0)
 {
 }
 
@@ -80,11 +80,11 @@ void tiamc1_sound_device::device_start()
 	m_timer1_divider = 0;
 
 	for (i = 0; i < 2; i++)
-    {
+	{
 		struct timer8253struct *t = (i ? &m_timer1 : &m_timer0);
 
 		for (j = 0; j < 3; j++)
-        {
+		{
 			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].count);
 			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].cnval);
 			state_save_register_item(machine(), "channel", NULL, i * 3 + j, t->channel[j].bcdMode);
@@ -112,10 +112,10 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 	len = samples * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++)
-    {
+	{
 		m_timer1_divider++;
 		if (m_timer1_divider == 228)
-        {
+		{
 			m_timer1_divider = 0;
 			timer8253_tick(&m_timer1, 0);
 			timer8253_tick(&m_timer1, 1);
@@ -137,7 +137,7 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		orval = (orval << 1) | (((o0 | o1) ^ 0xff) & o2);
 
 		if ((count + 1) % CLOCK_DIVIDER == 0)
-        {
+		{
 			outputs[0][count / CLOCK_DIVIDER] = orval ? 0x2828 : 0;
 			orval = 0;
 		}
@@ -147,16 +147,16 @@ void tiamc1_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 
 void tiamc1_sound_device::timer8253_reset(struct timer8253struct *t)
 {
-    memset(t,0,sizeof(struct timer8253struct));
+	memset(t,0,sizeof(struct timer8253struct));
 }
 
 
 void tiamc1_sound_device::timer8253_tick(struct timer8253struct *t, int chn)
 {
-    if (t->channel[chn].enable && t->channel[chn].gate)
-    {		
-        switch (t->channel[chn].cntMode) 
-        {
+	if (t->channel[chn].enable && t->channel[chn].gate)
+	{
+		switch (t->channel[chn].cntMode)
+		{
 		case 0:
 			t->channel[chn].count--;
 			if (t->channel[chn].count == 0xffff)
@@ -181,7 +181,7 @@ void tiamc1_sound_device::timer8253_tick(struct timer8253struct *t, int chn)
 				t->channel[chn].output = 1;
 
 			if(t->channel[chn].count == 0xffff)
-            {
+			{
 				t->channel[chn].enable = 0;
 				t->channel[chn].output = 1;
 			}
@@ -196,18 +196,18 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 {
 	int chn;
 
-	switch (reg) 
-    {
+	switch (reg)
+	{
 	case T8253_CWORD:
 		chn = val >> 6;
-		if (chn < 3) 
-        {
+		if (chn < 3)
+		{
 			t->channel[chn].bcdMode = (val & 1) ? 1 : 0;
 			t->channel[chn].cntMode = (val >> 1) & 0x07;
 			t->channel[chn].valMode = (val >> 4) & 0x03;
 
 			switch (t->channel[chn].valMode)
-            {
+			{
 			case 1:
 			case 2:
 				t->channel[chn].loadCnt = 1;
@@ -222,7 +222,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 			}
 
 			switch (t->channel[chn].cntMode)
-            {
+			{
 			case 0:
 				t->channel[chn].output = 0;
 				t->channel[chn].enable = 0;
@@ -247,7 +247,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 		chn = reg;
 
 		switch (t->channel[chn].valMode)
-        {
+		{
 		case 1:
 			t->channel[chn].cnval = (t->channel[chn].cnval & 0xff00) | val;
 			break;
@@ -262,16 +262,16 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 		}
 
 		if (t->channel[chn].cntMode==0)
-        {
+		{
 			t->channel[chn].enable = 0;
 		}
 
 		t->channel[chn].loadCnt--;
 
 		if (t->channel[chn].loadCnt == 0)
-        {
+		{
 			switch (t->channel[chn].valMode)
-            {
+			{
 			case 1:
 			case 2:
 				t->channel[chn].loadCnt = 1;
@@ -286,7 +286,7 @@ void tiamc1_sound_device::timer8253_wr(struct timer8253struct *t, int reg, UINT8
 			}
 
 			switch (t->channel[chn].cntMode)
-            {
+			{
 			case 3:
 				t->channel[chn].count = t->channel[chn].cnval;
 				t->channel[chn].enable = 1;

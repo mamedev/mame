@@ -132,7 +132,7 @@ void gb_rom_mbc_device::shared_reset()
 	m_ram_bank = 0;
 	m_ram_enable = 0;
 	m_mode = 0;
-	
+
 	has_rumble = FALSE;
 	has_timer = FALSE;
 	has_battery = FALSE;
@@ -173,7 +173,7 @@ void gb_rom_mbc6_device::device_reset()
 	m_bank_6000 = 3;    // correct default?
 	m_latch1 = 0;   // correct default?
 	m_latch2 = 0;   // correct default?
-	
+
 	m_latch_bank = 2;   // correct default?
 	m_latch_bank2 = 3;  // correct default?
 	m_ram_bank = 0;
@@ -212,7 +212,7 @@ void gb_rom_sintax_device::device_start()
 
 void gb_rom_sintax_device::device_reset()
 {
-	shared_reset();	
+	shared_reset();
 	m_sintax_mode = 0;
 	m_currentxor = 0;
 	m_xor2 = 0;
@@ -709,18 +709,18 @@ READ8_MEMBER(gb_rom_chongwu_device::read_rom)
 
 void gb_rom_sintax_device::set_xor_for_bank(UINT8 bank)
 {
-	switch (bank & 0x0f) 
+	switch (bank & 0x0f)
 	{
-        case 0x00: case 0x04: case 0x08: case 0x0c:
+		case 0x00: case 0x04: case 0x08: case 0x0c:
 			m_currentxor = m_xor2;
 			break;
-        case 0x01: case 0x05: case 0x09: case 0x0d:
+		case 0x01: case 0x05: case 0x09: case 0x0d:
 			m_currentxor = m_xor3;
 			break;
-        case 0x02: case 0x06: case 0x0a: case 0x0e:
+		case 0x02: case 0x06: case 0x0a: case 0x0e:
 			m_currentxor = m_xor4;
 			break;
-        case 0x03: case 0x07: case 0x0b: case 0x0f:
+		case 0x03: case 0x07: case 0x0b: case 0x0f:
 			m_currentxor = m_xor5;
 			break;
 	}
@@ -739,10 +739,10 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 	if (offset < 0x2000)
 		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
 	else if (offset < 0x3000)
-	{    
+	{
 		set_xor_for_bank(data);
 
-		switch (m_sintax_mode & 0x0f) 
+		switch (m_sintax_mode & 0x0f)
 		{
 			case 0x0d:
 				data = BITSWAP8(data, 1,0,7,6,5,4,3,2);
@@ -767,8 +767,8 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 				data = BITSWAP8(data, 2,3,0,1,6,7,4,5); // 5 and 6 unconfirmed
 				break;
 		}
-		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;		
-	}	
+		m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
+	}
 	else if (offset < 0x4000)
 	{
 		m_latch_bank2 = (m_latch_bank2 & 0xff) | ((data & 0x01) << 8);
@@ -785,13 +785,13 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 		if (!m_sintax_mode)
 		{
 			m_sintax_mode = data;
-			write_bank(space, 0x2000, 1);	//force a fake bank switch
+			write_bank(space, 0x2000, 1);   //force a fake bank switch
 		}
-//		printf("sintax mode %x\n", m_sintax_mode & 0xf);
+//      printf("sintax mode %x\n", m_sintax_mode & 0xf);
 	}
 	else if (offset >= 0x7000)
 	{
-		switch ((offset & 0x00f0) >> 4) 
+		switch ((offset & 0x00f0) >> 4)
 		{
 			case 2:
 				m_xor2 = data;
@@ -803,14 +803,14 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 				m_xor4 = data;
 				break;
 			case 5:
-				m_xor5 = data;                                     
+				m_xor5 = data;
 				break;
 		}
-			
-		if (m_currentxor == 0) 
-			set_xor_for_bank(4);			
+
+		if (m_currentxor == 0)
+			set_xor_for_bank(4);
 	}
-		
+
 }
 
 READ8_MEMBER(gb_rom_sintax_device::read_ram)
@@ -828,15 +828,15 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_ram)
 }
 
 /*
- 
+
  Further MBC5 variants to emulate:
- 
+
  Digimon 2 & Digimon 4 (Yong Yong)
- 
+
  Digimon 2 writes at $2000 to select latch2 (data must be divided by 2, and 0 becomes 1),
  then writes to $2400 a series of values that the patched version does not write...
  Digimon 4 seems to share part of the $2000 behavior, but does not write to $2400...
- 
+
  */
 
 // MBC5 variant used by Digimon 2 (and maybe 4?)
@@ -855,29 +855,29 @@ WRITE8_MEMBER(gb_rom_digimon_device::write_bank)
 		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
 	else if (offset == 0x2000)
 	{
-//		printf("written $02 %X at %X\n", data, offset);
+//      printf("written $02 %X at %X\n", data, offset);
 		if (!data)
 			data++;
 		m_latch_bank2 = data/2;
 	}
 	else if (offset < 0x3000)
 	{
-//		printf("written $03 %X at %X\n", data, offset);
+//      printf("written $03 %X at %X\n", data, offset);
 	}
 	else if (offset < 0x4000)
 	{
-//		printf("written $04 %X at %X\n", data, offset);
+//      printf("written $04 %X at %X\n", data, offset);
 	}
 	else if (offset < 0x6000)
 	{
-//		printf("written $05-$06 %X at %X\n", data, offset);
+//      printf("written $05-$06 %X at %X\n", data, offset);
 		data &= 0x0f;
 		if (has_rumble)
 			data &= 0x7;
 		m_ram_bank = data;
 	}
-//	else
-//		printf("written $07 %X at %X\n", data, offset);
+//  else
+//      printf("written $07 %X at %X\n", data, offset);
 }
 
 READ8_MEMBER(gb_rom_digimon_device::read_ram)
@@ -917,7 +917,7 @@ WRITE8_MEMBER(gb_rom_rockman8_device::write_bank)
 			data = 1;
 		if (data > 0xf)
 			data -= 8;
-		
+
 		m_latch_bank2 = data;
 	}
 }
@@ -946,15 +946,15 @@ WRITE8_MEMBER(gb_rom_rockman8_device::write_ram)
 // 9th          --> 0x0b
 // 10th         --> 0x0c
 // 11th         --> 0x0d
-// 12th         --> 0x0f	
+// 12th         --> 0x0f
 // 13th         --> 0x13
 
-// writing data to 0x2000-0x2fff switches bank according to the table below 
+// writing data to 0x2000-0x2fff switches bank according to the table below
 // (the value values corresponding to table[0x0f] is not confirmed, choices
 // 0,1,2,3,8,c,f freeze the game, while 4,5,6,7,b,d,0x13 work with glitches)
 static UINT8 smb3_table1[0x20] =
 {
-	0x00,0x04,0x01,0x05, 0x02,0x06,0x03,0x05, 0x08,0x0c,0x03,0x0d, 0x03,0x0b,0x0b,0x08 /* original doc here put 0x0f (i.e. 11th unique bank) */,  
+	0x00,0x04,0x01,0x05, 0x02,0x06,0x03,0x05, 0x08,0x0c,0x03,0x0d, 0x03,0x0b,0x0b,0x08 /* original doc here put 0x0f (i.e. 11th unique bank) */,
 	0x05,0x06,0x0b,0x0d, 0x08,0x06,0x13,0x0b, 0x08,0x05,0x05,0x08, 0x0b,0x0d,0x06,0x05
 };
 
@@ -975,7 +975,7 @@ READ8_MEMBER(gb_rom_sm3sp_device::read_rom)
 
 WRITE8_MEMBER(gb_rom_sm3sp_device::write_bank)
 {
-//	printf("write 0x%x at %x\n", data, offset);
+//  printf("write 0x%x at %x\n", data, offset);
 	if (offset < 0x2000)
 		return;
 	else if (offset < 0x3000)
@@ -992,20 +992,20 @@ WRITE8_MEMBER(gb_rom_sm3sp_device::write_bank)
 
 		// 5bits only
 		data &= 0x1f;
-		
+
 		m_latch_bank2 = smb3_table1[data];
 		if (m_mode)
 		{
 			switch (m_latch_bank2)
 			{
-				case 0x02:	m_latch_bank2 = 4;	break;
-				case 0x03:	m_latch_bank2 = 6;	break;
-				case 0x04:	m_latch_bank2 = 2;	break;
-				case 0x05:	m_latch_bank2 = 3;	break;
-				case 0x06:	m_latch_bank2 = 5;	break;
-				case 0x0b:	m_latch_bank2 = 0xd;	break;
-				case 0x0c:	m_latch_bank2 = 0xb;	break;
-				case 0x0d:	m_latch_bank2 = 0xc;	break;
+				case 0x02:  m_latch_bank2 = 4;  break;
+				case 0x03:  m_latch_bank2 = 6;  break;
+				case 0x04:  m_latch_bank2 = 2;  break;
+				case 0x05:  m_latch_bank2 = 3;  break;
+				case 0x06:  m_latch_bank2 = 5;  break;
+				case 0x0b:  m_latch_bank2 = 0xd;    break;
+				case 0x0c:  m_latch_bank2 = 0xb;    break;
+				case 0x0d:  m_latch_bank2 = 0xc;    break;
 
 				case 0x00:
 				case 0x01:
@@ -1019,14 +1019,14 @@ WRITE8_MEMBER(gb_rom_sm3sp_device::write_bank)
 	}
 	else if (offset < 0x5000)
 	{
-//		printf("write $5 %X at %X\n", data, offset);
+//      printf("write $5 %X at %X\n", data, offset);
 		//maybe rumble??
 	}
 	else if (offset < 0x6000)
 	{
-//		printf("write mode %x\n", data);
+//      printf("write mode %x\n", data);
 		m_mode = BIT(data, 5);
-//		write_bank(space, 0x2000, 1);
+//      write_bank(space, 0x2000, 1);
 	}
 }
 

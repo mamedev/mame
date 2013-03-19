@@ -11,8 +11,8 @@
 #ifndef __68561MPCC_H__
 #define __68561MPCC_H__
 
-#define MCFG_MPCC68561_ADD(_tag, _clock, _intrq_cb)	\
-	MCFG_DEVICE_ADD(_tag, MPCC68561, _clock)	\
+#define MCFG_MPCC68561_ADD(_tag, _clock, _intrq_cb) \
+	MCFG_DEVICE_ADD(_tag, MPCC68561, _clock)    \
 	downcast<mpcc68561_t *>(device)->set_intrq_cb(_intrq_cb);
 
 class mpcc68561_t : public device_t

@@ -1,39 +1,39 @@
 /**************************************************************************************
 
-	Sega Saturn (c) 1994 Sega
+    Sega Saturn (c) 1994 Sega
 
-	List of things that needs to be implemented:
-	- There's definitely an ack mechanism in SCU irqs. This is almost surely done via
-	  the ISM register (i.e. going 0->1 to the given bit acks it).
-	- There might be a delay to exactly when SCU irqs happens. This is due to the basic
-	  fact that SCU runs at 14-ish MHz, so it needs some time before actually firing the
-	  irq.
-	- Vblank-Out actually happens at the last screen line, not at 0.
-	- VDP2 V counter has a similar roll-back as MD correspondent register:
-	  vpos line 0 == 0x1ff (Vblank-Out happens here)
-	  vpos line 1 == 0
+    List of things that needs to be implemented:
+    - There's definitely an ack mechanism in SCU irqs. This is almost surely done via
+      the ISM register (i.e. going 0->1 to the given bit acks it).
+    - There might be a delay to exactly when SCU irqs happens. This is due to the basic
+      fact that SCU runs at 14-ish MHz, so it needs some time before actually firing the
+      irq.
+    - Vblank-Out actually happens at the last screen line, not at 0.
+    - VDP2 V counter has a similar roll-back as MD correspondent register:
+      vpos line 0 == 0x1ff (Vblank-Out happens here)
+      vpos line 1 == 0
       ...
       vpos line 241 == 0xf0 (Vblank-In happens here)
       vpos line 246 == 0xf5
-	  vpos line 247 == 0x1ef (rolls back here)
-	  vpos line 263 == 0x1ff again
-	- HBlank bit seems to follow a normal logic instead.
-	- Timer 0 doesn't work if the TENB bit isn't enabled (documentation is a bit fussy
-	  over this).
-	- Timer 0 fires at the HBlank-In signal, not before.
-	- VDP2 H Counter actually counts x2 in non Hi-Res mode.
-	- Timer 1 is definitely annoying. Starts from H-Blank signal and starts counting from
-	  that position.
-	  H counter value 0x282 (642) -> timer 1 fires at setting 1
-	  H counter value 0x284 (644) -> 2
-	  H counter value 0x2a0 (672) -> 0x10
+      vpos line 247 == 0x1ef (rolls back here)
+      vpos line 263 == 0x1ff again
+    - HBlank bit seems to follow a normal logic instead.
+    - Timer 0 doesn't work if the TENB bit isn't enabled (documentation is a bit fussy
+      over this).
+    - Timer 0 fires at the HBlank-In signal, not before.
+    - VDP2 H Counter actually counts x2 in non Hi-Res mode.
+    - Timer 1 is definitely annoying. Starts from H-Blank signal and starts counting from
+      that position.
+      H counter value 0x282 (642) -> timer 1 fires at setting 1
+      H counter value 0x284 (644) -> 2
+      H counter value 0x2a0 (672) -> 0x10
       H counter value 0x2c0 (704) -> 0x20
       H counter value 0x300 (768) -> 0x40
       H counter value 0x340 (832) -> 0x60
-	  H counter value 0x352 (850) -> 0x69
-	  H counter value 0x000 (0)   -> 0x6a, V counter goes +1 here (max range?)
-	  H counter value 0x02c (44)  -> 0x80
-	  H counter value 0x0ec (236) -> 0xe0
+      H counter value 0x352 (850) -> 0x69
+      H counter value 0x000 (0)   -> 0x6a, V counter goes +1 here (max range?)
+      H counter value 0x02c (44)  -> 0x80
+      H counter value 0x0ec (236) -> 0xe0
       H counter value 0x12c (300) -> 0x100
     - Timer 1 seems to count backwards compared to Timer 0 from setting 0x6b onward.
 
@@ -250,9 +250,9 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 		case 0xa4/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
 			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled.
-		       Densetsu no Ogre Battle doesn't like this, so it needs investigation ...
+			   Densetsu no Ogre Battle doesn't like this, so it needs investigation ...
 			*/
-//			res = m_scu.ist | ~m_scu.ism;
+//          res = m_scu.ist | ~m_scu.ism;
 			res = m_scu.ist;
 			break;
 		case 0xc8/4:
@@ -474,7 +474,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	}
 
 	/* Burning Rangers doesn't agree with this. */
-//	m_scu.size[dma_ch] = 0;
+//  m_scu.size[dma_ch] = 0;
 	if(!(DRUP(dma_ch))) m_scu.src[dma_ch] = tmp_src;
 	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 

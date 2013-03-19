@@ -1937,4 +1937,3 @@ void thomson_state::thomson_index_callback(device_t *device, int state)
 		break;
 	}
 }
-

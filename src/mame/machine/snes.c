@@ -387,7 +387,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 
 
 	// other accesses (notice that WRMPYA, WRMPYB, WRDIVL, WRDIVH, WRDVDD, MEMSEL, RDDIVL, RDDIVH, RDMPYL, RDMPYH are handled by the CPU directly)
-	switch (offset)	// offset is from 0x000000
+	switch (offset) // offset is from 0x000000
 	{
 		case WMDATA:    /* Data to read from WRAM */
 			value = space.read_byte(0x7e0000 + m_wram_address++);

@@ -2,9 +2,9 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-    Loading instructions:
-    - install the D004 floppy disk interface into expansion slot.
-    - execute the command "JUMP FC"
+	Loading instructions:
+	- install the D004 floppy disk interface into expansion slot.
+	- execute the command "JUMP FC"
 -->
 
 <softwarelist name="kc_flop" description="VEB Mikroelektronik KC 85 disk images">

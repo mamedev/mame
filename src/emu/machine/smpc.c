@@ -299,7 +299,7 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
 
-//	printf("%02x %02x %02x\n",state->m_smpc.intback_buf[0],state->m_smpc.intback_buf[1],state->m_smpc.intback_buf[2]);
+//  printf("%02x %02x %02x\n",state->m_smpc.intback_buf[0],state->m_smpc.intback_buf[1],state->m_smpc.intback_buf[2]);
 
 	if(state->m_smpc.intback_buf[0] != 0)
 	{

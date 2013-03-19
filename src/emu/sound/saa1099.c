@@ -133,20 +133,20 @@ const device_type SAA1099 = &device_creator<saa1099_device>;
 
 saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-      m_stream(NULL),
-      m_all_ch_enable(0),
-      m_sync_state(0),
-      m_selected_reg(0),
-      m_sample_rate(0.0)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_all_ch_enable(0),
+		m_sync_state(0),
+		m_selected_reg(0),
+		m_sample_rate(0.0)
 {
-    memset(m_noise_params, 0, sizeof(int)*2);
-    memset(m_env_enable, 0, sizeof(int)*2);
-    memset(m_env_reverse_right, 0, sizeof(int)*2);
-    memset(m_env_mode, 0, sizeof(int)*2);
-    memset(m_env_bits, 0, sizeof(int)*2);
-    memset(m_env_clock, 0, sizeof(int)*2);
-    memset(m_env_step, 0, sizeof(int)*2);
+	memset(m_noise_params, 0, sizeof(int)*2);
+	memset(m_env_enable, 0, sizeof(int)*2);
+	memset(m_env_reverse_right, 0, sizeof(int)*2);
+	memset(m_env_mode, 0, sizeof(int)*2);
+	memset(m_env_bits, 0, sizeof(int)*2);
+	memset(m_env_clock, 0, sizeof(int)*2);
+	memset(m_env_step, 0, sizeof(int)*2);
 }
 
 

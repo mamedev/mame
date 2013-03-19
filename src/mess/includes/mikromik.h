@@ -26,9 +26,9 @@
 #define I8275_TAG       "ic59"
 #define UPD7201_TAG     "ic11"
 #define UPD7220_TAG     "ic101"
-#define RS232_A_TAG		"rs232a"
-#define RS232_B_TAG		"rs232b"
-#define RS232_C_TAG		"rs232c"
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+#define RS232_C_TAG     "rs232c"
 
 class mm1_state : public driver_device
 {

@@ -39,12 +39,12 @@ public:
 
 struct gomoku_sound_channel
 {
-    gomoku_sound_channel():
-	  channel(0),
-	  frequency(0),
-	  counter(0),
-	  volume(0),
-	  oneshotplaying(0) {}
+	gomoku_sound_channel():
+		channel(0),
+		frequency(0),
+		counter(0),
+		volume(0),
+		oneshotplaying(0) {}
 
 	int channel;
 	int frequency;
@@ -71,11 +71,11 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( sound1_w );
-    DECLARE_WRITE8_MEMBER( sound2_w );
+	DECLARE_WRITE8_MEMBER( sound1_w );
+	DECLARE_WRITE8_MEMBER( sound2_w );
 
 private:
-    void make_mixer_table(int voices, int gain);
+	void make_mixer_table(int voices, int gain);
 
 private:
 	/* data about the sound system */

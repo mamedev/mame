@@ -76,5 +76,5 @@ public:
 	DECLARE_WRITE8_MEMBER(fastfred_flip_screen_y_w);
 
 	DECLARE_WRITE8_MEMBER(imago_fg_videoram_w);
-	DECLARE_WRITE8_MEMBER(imago_charbank_w);	
+	DECLARE_WRITE8_MEMBER(imago_charbank_w);
 };

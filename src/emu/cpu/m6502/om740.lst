@@ -143,4 +143,3 @@ brk740_imp
 	P |= F_I; // Do *not* move after the prefetch
 	prefetch();
 	inst_state = -1;
-

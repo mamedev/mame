@@ -12,11 +12,11 @@ const device_type VC4000 = &device_creator<vc4000_sound_device>;
 
 vc4000_sound_device::vc4000_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VC4000, "VC 4000 Custom", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_channel(NULL),
-	  m_size(0),
-      m_pos(0),
-	  m_level(0)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_size(0),
+		m_pos(0),
+		m_level(0)
 {
 	memset(m_reg, 0, sizeof(UINT8)*1);
 }

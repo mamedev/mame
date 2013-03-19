@@ -100,21 +100,21 @@ enum SVISION_NOISE_Type
 
 struct SVISION_NOISE
 {
-    SVISION_NOISE() :
-	  on(0),
-      right(0), 
-      left(0), 
-      play(0),
-	  type(SVISION_NOISE_Type7Bit),
-	  state(0),
-	  volume(0),
-	  count(0),
-	  step(0.0),
-      pos(0.0),
-	  value(0)
-    {
-	    memset(reg, 0, sizeof(UINT8)*3);
-    }
+	SVISION_NOISE() :
+		on(0),
+		right(0),
+		left(0),
+		play(0),
+		type(SVISION_NOISE_Type7Bit),
+		state(0),
+		volume(0),
+		count(0),
+		step(0.0),
+		pos(0.0),
+		value(0)
+	{
+		memset(reg, 0, sizeof(UINT8)*3);
+	}
 
 	UINT8 reg[3];
 	int on, right, left, play;
@@ -128,19 +128,19 @@ struct SVISION_NOISE
 
 struct SVISION_DMA
 {
-    SVISION_DMA() :
-	  on(0),
-      right(0),
-      left(0),
-	  ca14to16(0),
-	  start(0),
-      size(0),
-	  pos(0.0),
-      step(0.0),
-	  finished(0)
-    {
-	    memset(reg, 0, sizeof(UINT8)*5);
-    }
+	SVISION_DMA() :
+		on(0),
+		right(0),
+		left(0),
+		ca14to16(0),
+		start(0),
+		size(0),
+		pos(0.0),
+		step(0.0),
+		finished(0)
+	{
+		memset(reg, 0, sizeof(UINT8)*5);
+	}
 
 	UINT8 reg[5];
 	int on, right, left;
@@ -152,16 +152,16 @@ struct SVISION_DMA
 
 struct SVISION_CHANNEL
 {
-    SVISION_CHANNEL() :
-	  on(0),
-	  waveform(0),
-      volume(0),
-	  pos(0),
-	  size(0),
-	  count(0)
-    {
-	    memset(reg, 0, sizeof(UINT8)*4);
-    }
+	SVISION_CHANNEL() :
+		on(0),
+		waveform(0),
+		volume(0),
+		pos(0),
+		size(0),
+		count(0)
+	{
+		memset(reg, 0, sizeof(UINT8)*4);
+	}
 
 	UINT8 reg[4];
 	int on;
@@ -175,7 +175,7 @@ struct SVISION_CHANNEL
 // ======================> svision_sound_device
 
 class svision_sound_device : public device_t,
-							 public device_sound_interface
+								public device_sound_interface
 {
 public:
 	svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -189,13 +189,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( svision_sounddma_w );
-    DECLARE_WRITE8_MEMBER( svision_noise_w );
-        
+	DECLARE_WRITE8_MEMBER( svision_sounddma_w );
+	DECLARE_WRITE8_MEMBER( svision_noise_w );
+
 public:
-    int *dma_finished();
-    void sound_decrement();
-    void soundport_w(int which, int offset, int data);
+	int *dma_finished();
+	void sound_decrement();
+	void soundport_w(int which, int offset, int data);
 
 private:
 	sound_stream *m_mixer_channel;

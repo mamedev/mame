@@ -1644,7 +1644,7 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 }
 
 void snes_ppu_class::ppu_start(running_machine &machine)
-{	
+{
 #if SNES_LAYER_DEBUG
 	memset(&debug_options, 0, sizeof(debug_options));
 #endif
@@ -1652,7 +1652,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	m_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
 	m_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
 	m_oam_ram = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
-	
+
 	/* Inititialize registers/variables */
 	m_update_windows = 1;
 	m_beam.latch_vert = 0;
@@ -1677,16 +1677,16 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 		for (int i = 0; i < 4096; i++)
 			m_mosaic_table[j][i] = (i / (j + 1)) * (j + 1);
 	}
-	
+
 	/* Init VRAM */
 	memset(m_vram, 0, SNES_VRAM_SIZE);
-	
+
 	/* Init Palette RAM */
 	memset((UINT8 *)m_cgram, 0, SNES_CGRAM_SIZE);
-	
+
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
-	
+
 	for (int i = 0; i < 6; i++)
 	{
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_layer[i].window1_enabled);
@@ -1706,10 +1706,10 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_layer[i].sub_bg_enabled);
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_layer[i].hoffs);
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_layer[i].voffs);
-		
+
 		state_save_register_item_array(machine, "snes_ppu", NULL, i, m_clipmasks[i]);
 	}
-	
+
 	state_save_register_global(machine, m_oam.address_low);
 	state_save_register_global(machine, m_oam.address_high);
 	state_save_register_global(machine, m_oam.saved_address_low);
@@ -1724,14 +1724,14 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_oam.first_sprite);
 	state_save_register_global(machine, m_oam.flip);
 	state_save_register_global(machine, m_oam.write_latch);
-	
+
 	state_save_register_global(machine, m_beam.latch_horz);
 	state_save_register_global(machine, m_beam.latch_vert);
 	state_save_register_global(machine, m_beam.current_horz);
 	state_save_register_global(machine, m_beam.current_vert);
 	state_save_register_global(machine, m_beam.last_visible_line);
 	state_save_register_global(machine, m_beam.interlace_count);
-	
+
 	state_save_register_global(machine, m_mode7.repeat);
 	state_save_register_global(machine, m_mode7.hflip);
 	state_save_register_global(machine, m_mode7.vflip);
@@ -1744,7 +1744,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_mode7.hor_offset);
 	state_save_register_global(machine, m_mode7.ver_offset);
 	state_save_register_global(machine, m_mode7.extbg);
-	
+
 	state_save_register_global(machine, m_mosaic_size);
 	state_save_register_global(machine, m_clip_to_black);
 	state_save_register_global(machine, m_prevent_color_math);
@@ -1753,7 +1753,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_direct_color);
 	state_save_register_global(machine, m_ppu_last_scroll);
 	state_save_register_global(machine, m_mode7_last_scroll);
-	
+
 	state_save_register_global(machine, m_ppu1_open_bus);
 	state_save_register_global(machine, m_ppu2_open_bus);
 	state_save_register_global(machine, m_ppu1_version);
@@ -1762,7 +1762,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_window1_right);
 	state_save_register_global(machine, m_window2_left);
 	state_save_register_global(machine, m_window2_right);
-	
+
 	state_save_register_global(machine, m_update_windows);
 	state_save_register_global(machine, m_update_offsets);
 	state_save_register_global(machine, m_update_oam_list);
@@ -1792,7 +1792,7 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 
 	state_save_register_global_pointer(machine, m_vram, SNES_VRAM_SIZE);
 	state_save_register_global_pointer(machine, m_cgram, SNES_CGRAM_SIZE/2);
-	state_save_register_global_pointer(machine, m_oam_ram, SNES_OAM_SIZE/2);	
+	state_save_register_global_pointer(machine, m_oam_ram, SNES_OAM_SIZE/2);
 }
 
 

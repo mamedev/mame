@@ -158,7 +158,7 @@ extern const rgb_t specimx_palette[16];
 /*----------- defined in audio/special.c -----------*/
 
 class specimx_sound_device : public device_t,
-							 public device_sound_interface
+								public device_sound_interface
 {
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -172,10 +172,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    void set_input(int index, int state);
+	void set_input(int index, int state);
 
 private:
-   	sound_stream *m_mixer_channel;
+	sound_stream *m_mixer_channel;
 	int m_specimx_input[3];
 };
 

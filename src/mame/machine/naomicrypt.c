@@ -27,7 +27,7 @@ struct game_keys
 static const struct game_keys keys_table[] =
 {
 
-	// name				key              gameid #		  year
+	// name             key              gameid #         year
 // M2
 	{ "wldkicks",        0x00ae2901 }, // 25209801    2000
 	{ "toukon4",         0x012e2901 }, // 25349801    2000
@@ -45,7 +45,7 @@ static const struct game_keys keys_table[] =
 	{ "ggram2",          0x00074a61 }, // 840-0007    1999
 	{ "vs2_2k",          0x00088b08 }, // 840-0010    1999
 	{ "toyfight",        0x0002ca85 }, // 840-0011    1999
-	{ "smlg99",          0x00048a01 }, // 840-0012    1999 
+	{ "smlg99",          0x00048a01 }, // 840-0012    1999
 	{ "jambo",           0x000fab95 }, // 840-0013    1999
 	{ "vtennis",         0x0003eb15 }, // 840-0015    1999
 	{ "derbyoc",         0x000fee35 }, // 840-0016    1999
@@ -79,13 +79,13 @@ static const struct game_keys keys_table[] =
 	{ "pstone2",         0x000b8dc0 }, // 841-0008    2000
 	{ "capsnk",          0x00000000 }, // 841-0011    2000
 	{ "capsnka",         0x00000000 }, // ^
-	{ "cspike",          0x000e2010 }, // 841-0012    2000 
+	{ "cspike",          0x000e2010 }, // 841-0012    2000
 	{ "ggx",             0x00076110 }, // 841-0013    2000
 	{ "gwing2",          0x000b25d0 }, // 841-0014    2000
 	{ "pjustic",         0x000725d0 }, // 841-0015    2000
 	{ "deathcox",        0x000b64d0 }, // 841-0016    2000
 	{ "gundmct",         0x000e8010 }, // 841-0017    2001
-	{ "zerogu2",         0x0007c010 }, // 841-0020    2001 
+	{ "zerogu2",         0x0007c010 }, // 841-0020    2001
 	{ "hmgeo",           0x00038510 }, // HMG016007   2001
 // M1
 	{ "qmegamis",        0x96489bcd }, // 840-0030    2000
@@ -99,12 +99,12 @@ static const struct game_keys keys_table[] =
 	{ "kick4csh",        0xc9570882 }, // 840-0140    2004
 	{ "mtkob2",          0x3892fb3a }, // 840-0150    2003
 // M4
-	{ "pokasuka",		0x4792bcde }, // 840-0170	  2007
-	{ "asndynmt",		0x00008784 }, // 840-0175	  2007
-	{ "sl2007",			0x88c274c7 }, // 841-0057	  2007
-	{ "ausfache",		0x092b6007 }, // 841-0058	  2008
-	{ "illvelo",		0xf3a5982c }, // 841-0059	  2008
-	{ "mbaa",			0xab0f2aba }, // 841-0061	  2008
+	{ "pokasuka",       0x4792bcde }, // 840-0170     2007
+	{ "asndynmt",       0x00008784 }, // 840-0175     2007
+	{ "sl2007",         0x88c274c7 }, // 841-0057     2007
+	{ "ausfache",       0x092b6007 }, // 841-0058     2008
+	{ "illvelo",        0xf3a5982c }, // 841-0059     2008
+	{ "mbaa",           0xab0f2aba }, // 841-0061     2008
 	{ NULL, 0 }    // end of table
 };
 
@@ -114,7 +114,7 @@ UINT32 get_naomi_key(running_machine &machine)
 
 	const char *gamename = machine.system().name;
 	const struct game_keys *k = &keys_table[0];
-	
+
 	while (k->name)
 	{
 		if (strcmp(k->name, gamename) == 0)
@@ -126,6 +126,6 @@ UINT32 get_naomi_key(running_machine &machine)
 	}
 
 	printf("get_naomi_key : KEY NOT FOUND\n");
-	
+
 	return 0;
 }

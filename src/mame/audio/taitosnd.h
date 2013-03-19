@@ -37,18 +37,18 @@ protected:
 	virtual void device_reset();
 
 public:
-    // MASTER (8bit bus) control functions
-    DECLARE_WRITE8_MEMBER( tc0140syt_port_w );
-    DECLARE_WRITE8_MEMBER( tc0140syt_comm_w );
-    DECLARE_READ8_MEMBER( tc0140syt_comm_r );
+	// MASTER (8bit bus) control functions
+	DECLARE_WRITE8_MEMBER( tc0140syt_port_w );
+	DECLARE_WRITE8_MEMBER( tc0140syt_comm_w );
+	DECLARE_READ8_MEMBER( tc0140syt_comm_r );
 
-    // SLAVE (8bit bus) control functions ONLY
-    DECLARE_WRITE8_MEMBER( tc0140syt_slave_port_w );
-    DECLARE_READ8_MEMBER( tc0140syt_slave_comm_r );
-    DECLARE_WRITE8_MEMBER( tc0140syt_slave_comm_w );
+	// SLAVE (8bit bus) control functions ONLY
+	DECLARE_WRITE8_MEMBER( tc0140syt_slave_port_w );
+	DECLARE_READ8_MEMBER( tc0140syt_slave_comm_r );
+	DECLARE_WRITE8_MEMBER( tc0140syt_slave_comm_w );
 
 private:
-    void interrupt_controller();
+	void interrupt_controller();
 
 private:
 	UINT8     m_slavedata[4];  /* Data on master->slave port (4 nibbles) */

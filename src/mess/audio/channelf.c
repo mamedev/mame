@@ -16,9 +16,9 @@ channelf_sound_device::channelf_sound_device(const machine_config &mconfig, cons
 		m_envelope(0),
 		m_sample_counter(0),
 		m_forced_ontime(0),
-		m_min_ontime(0)	
+		m_min_ontime(0)
 {
-	
+
 }
 
 //-------------------------------------------------

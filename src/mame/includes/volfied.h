@@ -49,5 +49,3 @@ public:
 	void volfied_cchip_init(  );
 	void volfied_cchip_reset(  );
 };
-
-

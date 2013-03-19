@@ -207,7 +207,7 @@ Info from Atariage and Atarimania
 				<rom name="3-d genesis (1983) (amiga, jerry lawson, dan mcelroy) (prototype).bin" size="8192" crc="931a0bdc" sha1="0e146e5eb1a68cba4f8fa55ec6f125438efcfcb4" offset="0" />
 			</dataarea>
 		</part>
-	</software>	
+	</software>
 
 	<software name="3dghostp">
 		<description>3-D Ghost Attack (Prototype)</description>
@@ -580,7 +580,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 		<software name="alicaben" cloneof="lilyadv">
 		<description>Alices Abenteuer - Lilly Adventure</description>
 		<year>1983</year>
@@ -1858,7 +1858,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="bibissc" cloneof="bibi">
 		<description>Bi! Bi! (2600 Screen Search Console)</description>
 		<year>199?</year>
@@ -1898,7 +1898,7 @@ Info from Atariage and Atarimania
 	- add correct parent/clone relations for games with different descriptions
 	- add programmers and serial numbers in <info>
 	- verify PAL publishers when multiple ones were present (only 1 got picked up the most common, but this might have
-	  lead to a bunch of mistakes, e.g. for Ariola releases)... case by case checks are needed!
+		lead to a bunch of mistakes, e.g. for Ariola releases)... case by case checks are needed!
 	- verify games with multiple titles
 	-->
 
@@ -3221,7 +3221,7 @@ Info from Atariage and Atarimania
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
-			
+
 			<dataarea name="rom" size="16384">
 				<rom name="challenge of.... nexar, the (hack?) (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="4096" crc="57b3d123" sha1="4a6bbd96f2c805cda13238486c828379257c5a44" offset="0" />
 			</dataarea>
@@ -17764,7 +17764,7 @@ Info from Atariage and Atarimania
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- This is here as a placeholder. It's a add-on for the a2600 and is a "bios" and need to be made into a slot-device for it -->
 
 	<software name="compumat" supported="no">

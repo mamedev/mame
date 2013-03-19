@@ -445,7 +445,7 @@ most methods set parameters, others actually draw
 class nv2a_renderer : public poly_manager<float, nvidia_object_data, 12, 6000>
 {
 public:
-	nv2a_renderer(running_machine &machine)	: poly_manager<float, nvidia_object_data, 12, 6000>(machine)
+	nv2a_renderer(running_machine &machine) : poly_manager<float, nvidia_object_data, 12, 6000>(machine)
 	{
 		memset(channel,0,sizeof(channel));
 		memset(pfifo,0,sizeof(pfifo));

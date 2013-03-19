@@ -261,7 +261,7 @@ void z80sti_device::device_start()
 void z80sti_device::device_reset()
 {
 	memset(m_tmc, 0, sizeof(m_tmc));
-	memset(m_to, 0, sizeof(m_to));	
+	memset(m_to, 0, sizeof(m_to));
 }
 
 
