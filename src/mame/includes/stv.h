@@ -139,16 +139,6 @@ public:
 	legacy_cpu_device* m_audiocpu;
 
 	bitmap_rgb32 m_tmpbitmap;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
-
-	DECLARE_DRIVER_INIT(saturnus);
-	DECLARE_DRIVER_INIT(saturneu);
-	DECLARE_DRIVER_INIT(saturnjp);
-	DECLARE_MACHINE_START(saturn);
-	DECLARE_MACHINE_RESET(saturn);
 	DECLARE_VIDEO_START(stv_vdp2);
 	UINT32 screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -174,18 +164,8 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
-	DECLARE_READ8_MEMBER(saturn_cart_type_r);
 	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
-	DECLARE_READ32_MEMBER(saturn_null_ram_r);
-	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
-	DECLARE_READ32_MEMBER(saturn_cart_dram0_r);
-	DECLARE_WRITE32_MEMBER(saturn_cart_dram0_w);
-	DECLARE_READ32_MEMBER(saturn_cart_dram1_r);
-	DECLARE_WRITE32_MEMBER(saturn_cart_dram1_w);
-	DECLARE_READ32_MEMBER(saturn_cs1_r);
-	DECLARE_WRITE32_MEMBER(saturn_cs1_w);
 	WRITE_LINE_MEMBER(scsp_to_main_irq);
-	void saturn_init_driver(int rgn);
 
 	int m_scsp_last_line;
 
@@ -194,8 +174,6 @@ public:
 	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
 	DECLARE_READ8_MEMBER( saturn_SMPC_r );
 	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sat_cart );
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
 	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
@@ -213,7 +191,6 @@ public:
 	DECLARE_WRITE32_MEMBER ( saturn_vdp2_cram_w );
 	DECLARE_WRITE16_MEMBER ( saturn_vdp2_regs_w );
 
-	DECLARE_READ32_MEMBER( abus_dummy_r );
 
 	/* VDP1 */
 	void stv_set_framebuffer_config( void );

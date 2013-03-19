@@ -1634,6 +1634,10 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \
 	$(MESS_MACHINE)/dccons.o    \
+	$(MESS_MACHINE)/sat_slot.o  \
+	$(MESS_MACHINE)/sat_rom.o   \
+	$(MESS_MACHINE)/sat_dram.o  \
+	$(MESS_MACHINE)/sat_bram.o  \
 	$(MESS_DRIVERS)/saturn.o    \
 	$(MESS_MACHINE)/sms.o       \
 	$(MESS_DRIVERS)/sms.o       \
