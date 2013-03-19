@@ -130,7 +130,6 @@ READ16_MEMBER(toaplan1_state::demonwld_BIO_r)
 
 void toaplan1_state::demonwld_dsp(int enable)
 {
-
 	m_dsp_on = enable;
 	if (enable)
 	{
@@ -381,7 +380,6 @@ MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 
 void toaplan1_state::toaplan1_driver_savestate()
 {
-
 	save_item(NAME(m_intenable));
 	save_item(NAME(m_coin_count));
 	save_item(NAME(m_unk_reset_port));
@@ -403,7 +401,6 @@ MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 
 void toaplan1_state::demonwld_driver_savestate()
 {
-
 	save_item(NAME(m_dsp_on));
 	save_item(NAME(m_dsp_addr_w));
 	save_item(NAME(m_main_ram_seg));
@@ -422,7 +419,6 @@ MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 
 void toaplan1_state::vimana_driver_savestate()
 {
-
 	save_item(NAME(m_vimana_coins[0]));
 	save_item(NAME(m_vimana_coins[1]));
 	save_item(NAME(m_vimana_credits));

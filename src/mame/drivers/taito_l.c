@@ -109,7 +109,6 @@ static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0
 
 void taitol_state::state_register(  )
 {
-
 	save_item(NAME(m_irq_adr_table));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_cur_rambank));

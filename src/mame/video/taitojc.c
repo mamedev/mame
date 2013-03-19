@@ -753,7 +753,6 @@ void taitojc_renderer::render_polygons(running_machine &machine, UINT16 *polygon
 
 void taitojc_state::taitojc_clear_frame()
 {
-
 	m_framebuffer.fill(0, machine().primary_screen->visible_area());
 	m_zbuffer.fill(0xffff, machine().primary_screen->visible_area());
 }

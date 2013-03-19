@@ -505,7 +505,6 @@ void m92_state::m92_update_scroll_positions()
 
 void m92_state::m92_draw_tiles(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-
 	if ((~m_pf_master_control[2] >> 4) & 1)
 	{
 		m_pf_layer[2].wide_tmap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);

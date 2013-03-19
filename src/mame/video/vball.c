@@ -83,7 +83,6 @@ void vball_state::vb_bgprombank_w( int bank )
 
 void vball_state::vb_spprombank_w( int bank )
 {
-
 	int i;
 	UINT8* color_prom;
 

@@ -953,7 +953,6 @@ void nmk16_state::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 void nmk16_state::redhawki_video_update(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 	m_bg_tilemap0->set_scrollx(0, m_afega_scroll_1[0]&0xff);
 	m_bg_tilemap0->set_scrolly(0, m_afega_scroll_1[1]&0xff);
 

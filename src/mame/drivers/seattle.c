@@ -2842,7 +2842,6 @@ ROM_END
 
 void seattle_state::init_common(int ioasic, int serialnum, int yearoffs, int config)
 {
-
 	/* initialize the subsystems */
 	midway_ioasic_init(machine(),ioasic, serialnum, yearoffs, ioasic_irq);
 

@@ -314,7 +314,6 @@ TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 
 void opwolf_state::updateDifficulty( int mode )
 {
-
 	// The game is made up of 6 rounds, when you complete the
 	// sixth you return to the start but with harder difficulty.
 	if (mode == 0)
@@ -709,7 +708,6 @@ TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 
 void opwolf_state::opwolf_cchip_init(  )
 {
-
 	m_cchip_ram.allocate(0x400 * 8);
 
 	save_item(NAME(m_current_bank));

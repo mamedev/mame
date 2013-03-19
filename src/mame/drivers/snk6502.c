@@ -305,7 +305,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(snk6502_state::sasuke_update_counter)
 
 void snk6502_state::sasuke_start_counter()
 {
-
 	m_sasuke_counter = 0;
 }
 

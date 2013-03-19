@@ -57,7 +57,6 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 
 void toaplan2_state::truxton2_create_tx_tilemap()
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
 	m_tx_tilemap->set_scroll_cols(1);
@@ -66,7 +65,6 @@ void toaplan2_state::truxton2_create_tx_tilemap()
 
 void toaplan2_state::register_state_save()
 {
-
 	save_item(NAME(m_tx_flip));
 }
 

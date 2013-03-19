@@ -134,7 +134,6 @@ WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
 
 void psikyo_state::psikyo_switch_banks( int tmap, int bank )
 {
-
 	if ((tmap == 0) && (bank != m_tilemap_0_bank))
 	{
 		m_tilemap_0_bank = bank;
@@ -256,7 +255,6 @@ Note:   Not all sprites are displayed: in the top part of spriteram
 
 void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
-
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
@@ -374,7 +372,6 @@ void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 // it might be a problem with the actual bootleg
 void psikyo_state::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen )
 {
-
 	/* tile layers 0 & 1 have priorities 1 & 2 */
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;

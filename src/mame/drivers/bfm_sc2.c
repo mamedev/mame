@@ -2265,7 +2265,6 @@ int bfm_sc2_state::sc2_find_project_string( )
 
 void bfm_sc2_state::sc2_common_init(int decrypt)
 {
-
 	if (decrypt) bfm_decode_mainrom(machine(), "maincpu", m_codec_data);         // decode main rom
 
 	memset(m_sc2_Inputs, 0, sizeof(m_sc2_Inputs));  // clear all inputs
@@ -3833,7 +3832,6 @@ MACHINE_CONFIG_END
 
 void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)
 {
-
 	int n;
 	sc2_common_init(decrypt);
 	/* setup n default 96 half step reels */
@@ -3848,7 +3846,6 @@ void bfm_sc2_state::sc2awp_common_init(int reels, int decrypt)
 
 void bfm_sc2_state::sc2awpdmd_common_init(int reels, int decrypt)
 {
-
 	int n;
 	BFM_dm01_config(machine(), &dm01_interface);
 	sc2_common_init(decrypt);

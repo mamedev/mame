@@ -220,7 +220,6 @@ VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common(
 
 void suna8_state::draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which)
 {
-
 	UINT8 *spriteram = m_spriteram + which * 0x2000 * 2;
 
 	int i;

@@ -1202,7 +1202,6 @@ WRITE32_MEMBER(ksys573_state::atapi_w)
 
 void ksys573_state::atapi_init()
 {
-
 	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
 	m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
@@ -1633,7 +1632,6 @@ READ32_MEMBER(ksys573_state::gx700pwbf_io_r)
 
 void ksys573_state::gx700pwbf_output( int offset, UINT8 data )
 {
-
 	if( m_gx700pwfbf_output_callback != NULL )
 	{
 		int i;
@@ -1694,7 +1692,6 @@ WRITE32_MEMBER(ksys573_state::gx700pwbf_io_w)
 
 void ksys573_state::gx700pwfbf_init( void (ksys573_state::*output_callback_func)( int offset, int data ) )
 {
-
 	memset( m_gx700pwbf_output_data, 0, sizeof( m_gx700pwbf_output_data ) );
 
 	m_gx700pwfbf_output_callback = output_callback_func;
@@ -1727,7 +1724,6 @@ static const int mask[] =
 
 void ksys573_state::gn845pwbb_do_w( int offset, int data )
 {
-
 	m_stage[ offset ].DO = !data;
 }
 
@@ -2058,7 +2054,6 @@ char *ksys573_state::binary( char *s, UINT32 data )
 
 void ksys573_state::gx894pwbba_output( int offset, UINT8 data )
 {
-
 	if( m_gx894pwbba_output_callback != NULL )
 	{
 		int i;

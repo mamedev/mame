@@ -377,7 +377,6 @@ void slapshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void slapshot_state::taito_handle_sprite_buffering(  )
 {
-
 	if (m_prepare_sprites)   /* no buffering */
 	{
 		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());

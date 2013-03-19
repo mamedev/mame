@@ -986,7 +986,6 @@ UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap
 
 void ssv_state::ssv_enable_video(int enable)
 {
-
 	m_enable_video = enable;
 }
 

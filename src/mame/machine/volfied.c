@@ -480,7 +480,6 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
 
 void volfied_state::volfied_cchip_init(  )
 {
-
 	m_cchip_ram = auto_alloc_array_clear(machine(), UINT8, 0x400 * 8);
 
 	save_item(NAME(m_current_bank));
@@ -492,7 +491,6 @@ void volfied_state::volfied_cchip_init(  )
 
 void volfied_state::volfied_cchip_reset(  )
 {
-
 	m_current_bank = 0;
 	m_current_flag = 0;
 	m_cc_port = 0;

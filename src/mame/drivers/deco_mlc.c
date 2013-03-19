@@ -148,7 +148,6 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 
 WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 {
-
 }
 
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
@@ -298,7 +297,6 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 {
 	if (mem_mask & 0xffff0000)
 	{
-
 	}
 
 	if (mem_mask & 0x0000ffff)

@@ -26,7 +26,6 @@ struct game_keys
 
 static const struct game_keys keys_table[] =
 {
-
 	// name             key              gameid #         year
 // M2
 	{ "wldkicks",        0x00ae2901 }, // 25209801    2000
@@ -111,7 +110,6 @@ static const struct game_keys keys_table[] =
 
 UINT32 get_naomi_key(running_machine &machine)
 {
-
 	const char *gamename = machine.system().name;
 	const struct game_keys *k = &keys_table[0];
 

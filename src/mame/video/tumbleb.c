@@ -284,7 +284,6 @@ VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 
 void tumbleb_state::tumbleb_draw_common(bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
 {
-
 	m_pf1_tilemap->set_scrollx(0, m_control_0[1] + pf1x_offs);
 	m_pf1_tilemap->set_scrolly(0, m_control_0[2] + pf1y_offs);
 	m_pf1_alt_tilemap->set_scrollx(0, m_control_0[1] + pf1x_offs);

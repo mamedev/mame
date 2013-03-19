@@ -20,7 +20,7 @@ public:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "sat_rom"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);
 };

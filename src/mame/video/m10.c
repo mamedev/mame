@@ -86,7 +86,6 @@ WRITE8_MEMBER(m10_state::m15_chargen_w)
 
 inline void m10_state::plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col )
 {
-
 	if (!m_flip)
 		bm.pix16(y, x) = col;
 	else

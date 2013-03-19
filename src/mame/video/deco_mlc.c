@@ -41,7 +41,6 @@ static void mlc_drawgfxzoomline(
 		int transparent_color,int use8bpp,
 		int scalex, int alpha, int srcline  )
 {
-
 	if (!scalex) return;
 
 	/*
@@ -372,7 +371,6 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 			if (raster_select==1 || raster_select==2 || raster_select==3)
 			{
-
 				int irq_base_reg; /* 6, 9, 12  are possible */
 				if (raster_select== 1) irq_base_reg = 6;    // OK upper screen.. left?
 				else if (raster_select== 2) irq_base_reg = 9; // OK upper screen.. main / center
@@ -455,7 +453,6 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 
 		for (bx=0; bx<w; bx++) {
-
 			int realxbase = xbase + bx * xinc;
 			int count = 0;
 			if (fx)

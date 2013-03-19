@@ -208,7 +208,6 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 
 void toaplan1_state::toaplan1_create_tilemaps()
 {
-
 	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pf2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_pf3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -225,14 +224,12 @@ void toaplan1_state::toaplan1_create_tilemaps()
 
 void toaplan1_state::toaplan1_paletteram_alloc()
 {
-
 	UINT32 bytes = (m_colorram1.bytes() + m_colorram2.bytes())/2;
 	m_generic_paletteram_16.allocate(bytes);
 }
 
 void toaplan1_state::toaplan1_vram_alloc()
 {
-
 	m_pf1_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 	m_pf2_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 	m_pf3_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
@@ -254,7 +251,6 @@ void toaplan1_state::toaplan1_vram_alloc()
 
 void toaplan1_state::toaplan1_spritevram_alloc()
 {
-
 	m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE/2);
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
 	m_spritesizeram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
@@ -267,7 +263,6 @@ void toaplan1_state::toaplan1_spritevram_alloc()
 
 void toaplan1_state::toaplan1_set_scrolls()
 {
-
 	m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
 	m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
 	m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
@@ -294,7 +289,6 @@ void toaplan1_state::toaplan1_flipscreen()
 
 void toaplan1_state::register_common()
 {
-
 	save_item(NAME(m_scrollx_offs1));
 	save_item(NAME(m_scrollx_offs2));
 	save_item(NAME(m_scrollx_offs3));

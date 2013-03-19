@@ -405,7 +405,6 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 
 void cyclemb_state::skydest_i8741_reset()
 {
-
 	m_mcu[0].rxd = 0;
 	m_mcu[0].txd = 0;
 	m_mcu[0].rst = 0;

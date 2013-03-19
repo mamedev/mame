@@ -630,7 +630,6 @@ UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bit
 
 void apexc_state::apexc_teletyper_init()
 {
-
 	m_letters = FALSE;
 	m_pos = 0;
 }

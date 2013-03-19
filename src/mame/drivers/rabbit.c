@@ -340,7 +340,6 @@ void rabbit_state::rabbit_clearspritebitmap( bitmap_ind16 &bitmap, const rectang
 /* todo: fix zoom, its inaccurate and this code is ugly */
 void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 	UINT32 x,y;
 	UINT16 *srcline;
 	UINT16 *dstline;

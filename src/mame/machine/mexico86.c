@@ -43,7 +43,6 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 
 void mexico86_state::mcu_simulate(  )
 {
-
 	if (!m_mcu_initialised)
 	{
 		if (m_protection_ram[0x01] == 0x00)

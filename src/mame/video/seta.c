@@ -508,7 +508,6 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 
 int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 {
-
 	int bank    =   (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
 

@@ -6265,7 +6265,6 @@ ROM_END
 
 void metro_state::metro_common(  )
 {
-
 	memset(m_requested_int, 0, ARRAY_LENGTH(m_requested_int));
 	m_vblank_bit = 0;
 	m_blitter_bit = 2;

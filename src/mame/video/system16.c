@@ -32,7 +32,6 @@
 
 void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 {
-
 	if (m_spritebank_type == 1)
 	{
 		static const UINT8 default_banklist[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };

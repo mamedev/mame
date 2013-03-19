@@ -871,7 +871,6 @@ WRITE16_MEMBER(namcos11_state::c76_speedup_w)
 
 void namcos11_state::namcos11_init_common(int n_daughterboard)
 {
-
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)
 	{

@@ -744,7 +744,6 @@ ADDRESS_MAP_END
 #if 1
 inline UINT32 tmnt_state::tmnt2_get_word( UINT32 addr )
 {
-
 	if (addr <= 0x07ffff / 2)
 		return(m_tmnt2_rom[addr]);
 	else if (addr >= 0x104000 / 2 && addr <= 0x107fff / 2)

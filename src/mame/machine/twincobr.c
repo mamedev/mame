@@ -320,7 +320,6 @@ MACHINE_RESET_MEMBER(twincobr_state,wardner)
 
 void twincobr_state::twincobr_driver_savestate()
 {
-
 	state_save_register_global(machine(), m_toaplan_main_cpu);
 	state_save_register_global(machine(), m_intenable);
 	state_save_register_global(machine(), m_dsp_on);

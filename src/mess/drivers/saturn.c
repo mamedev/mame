@@ -82,7 +82,7 @@ public:
 				: saturn_state(mconfig, type, tag)
 				, m_exp(*this, "exp")
 	{ }
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
@@ -90,10 +90,10 @@ public:
 
 	DECLARE_MACHINE_START(saturn);
 	DECLARE_MACHINE_RESET(saturn);
-	
+
 	DECLARE_READ8_MEMBER(saturn_cart_type_r);
 	DECLARE_READ32_MEMBER( abus_dummy_r );
-	
+
 	DECLARE_READ32_MEMBER(saturn_null_ram_r);
 	DECLARE_WRITE32_MEMBER(saturn_null_ram_w);
 
@@ -101,7 +101,7 @@ public:
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
 	DECLARE_DRIVER_INIT(saturnjp);
-	
+
 	required_device<sat_cart_slot_device> m_exp;
 };
 
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(saturn_minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(saturn_sinit_w)
-//	AM_RANGE(0x02000000, 0x023fffff) AM_ROM // Cartridge area
+//  AM_RANGE(0x02000000, 0x023fffff) AM_ROM // Cartridge area
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM // External Data RAM area
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM // External Battery RAM area
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, sat_console_state )
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
-//	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM // Cartridge area mirror
+//  AM_RANGE(0x22000000, 0x24ffffff) AM_ROM // Cartridge area mirror
 	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
@@ -617,18 +617,18 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 	m_audiocpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("audiocpu") );
 
 	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
 	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x02400000, 0x027fffff, read32_delegate(FUNC(sat_console_state::saturn_null_ram_r),this), write32_delegate(FUNC(sat_console_state::saturn_null_ram_w),this));
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
 	machine().device("slave")->memory().space(AS_PROGRAM).nop_readwrite(0x04000000, 0x047fffff);
-	
+
 	if (m_exp)
 	{
 		switch (m_exp->get_cart_type())
 		{
-			case 0x21:	// Battery RAM cart
+			case 0x21:  // Battery RAM cart
 			case 0x22:
 			case 0x23:
 			case 0x24:
@@ -637,7 +637,7 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_bram), m_exp->m_cart));
 				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_bram), m_exp->m_cart));
 				break;
-			case 0x5a:	// Data RAM cart
+			case 0x5a:  // Data RAM cart
 			case 0x5c:
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram0), m_exp->m_cart));
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram0), m_exp->m_cart));
@@ -648,7 +648,7 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram1), m_exp->m_cart));
 				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram1), m_exp->m_cart));
 				break;
-			case 0:	// ROM cart + mirror
+			case 0: // ROM cart + mirror
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x24ffffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
 				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
@@ -656,7 +656,7 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 				break;
 		}
 	}
-	
+
 	// save states
 	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
 	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);

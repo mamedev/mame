@@ -318,7 +318,6 @@ void sidearms_state::sidearms_draw_starfield( bitmap_ind16 &bitmap )
 
 void sidearms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_gameid == 2 || m_gameid == 3) // Dyger and Whizz have simple front-to-back sprite priority
 		draw_sprites_region(bitmap, cliprect, 0x0000, 0x1000);
 	else

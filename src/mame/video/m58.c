@@ -267,7 +267,6 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 
 void m58_state::draw_panel( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 	if (!*m_yard_score_panel_disabled)
 	{
 		const rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);

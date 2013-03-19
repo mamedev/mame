@@ -343,7 +343,6 @@ void aristmk4_state::video_start()
 
 void aristmk4_state::uBackgroundColour()
 {
-
 	/* SW7 can be set when the main door is open, this allows the colours for the background
 	to be adjusted whilst the machine is running.
 

@@ -51,4 +51,3 @@ READ32_MEMBER(saturn_rom_device::read_rom)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
-

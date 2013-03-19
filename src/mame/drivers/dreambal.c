@@ -65,7 +65,6 @@ public:
 
 UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	address_space &space = generic_space();
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 
@@ -291,7 +290,6 @@ void dreambal_state::machine_start()
 
 void dreambal_state::machine_reset()
 {
-
 }
 
 // xtals = 28.000, 9.8304

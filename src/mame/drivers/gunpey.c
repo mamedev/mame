@@ -1093,7 +1093,6 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		{
 			if(rle == 8)
 			{
-
 				// compressed stream format:
 				//
 				// byte 0 = source width   (data is often stored in fairly narrow columns)
@@ -1126,7 +1125,6 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 				for (;;)
 				{
-
 					int test = gunpey_state_get_stream_bits(2);
 					int data;
 					int getbits = 1;
@@ -1163,7 +1161,6 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 						//if (count<512)
 						{
 							{
-
 								if (test==0x0)
 								{
 									printf("00");
@@ -1507,7 +1504,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-
 	m_blit_rom = memregion("blit_data")->base();
 	m_blit_rom2 = memregion("blit_data2")->base();
 

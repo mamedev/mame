@@ -306,8 +306,6 @@ void vtech1_state::vtech1_get_track()
 
 void vtech1_state::vtech1_put_track()
 {
-
-
 	/* drive selected and image file ok? */
 	if (m_drive >= 0 && floppy_get_device(machine(),m_drive) != NULL)
 	{

@@ -29,10 +29,10 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_ext_bram) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_ext_bram) {}
 #endif
-	
+
 	virtual int get_cart_type() { return m_cart_type; };
-	
-	
+
+
 	void rom_alloc(running_machine &machine, UINT32 size);
 	UINT32* get_rom_base() { return m_rom; }
 	UINT32* get_ext_dram0_base() { return m_ext_dram0; }
@@ -61,8 +61,8 @@ public:
 // ======================> sat_cart_slot_device
 
 class sat_cart_slot_device : public device_t,
-							 public device_image_interface,
-							 public device_slot_interface
+								public device_image_interface,
+								public device_slot_interface
 {
 public:
 	// construction/destruction
@@ -101,7 +101,7 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1);
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
-	
+
 //protected:
 	device_sat_cart_interface*       m_cart;
 };
@@ -116,7 +116,7 @@ extern const device_type SATURN_CART_SLOT;
  ***************************************************************************/
 
 #define MCFG_SATURN_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot,_def_inp) \
-	MCFG_DEVICE_ADD(_tag, SATURN_CART_SLOT, 0)	\
+	MCFG_DEVICE_ADD(_tag, SATURN_CART_SLOT, 0)  \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 

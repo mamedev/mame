@@ -817,7 +817,6 @@ void taitof2_state::update_spritebanks(  )
 
 void taitof2_state::taitof2_handle_sprite_buffering(  )
 {
-
 	if (m_prepare_sprites)   /* no buffering */
 	{
 		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());
@@ -1052,7 +1051,6 @@ UINT32 taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_in
 
 void taitof2_state::draw_roz_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority)
 {
-
 	if (m_tc0280grd != NULL)
 		tc0280grd_zoom_draw(m_tc0280grd, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority);
 

@@ -1536,7 +1536,6 @@ ROM_END
 
 void mcr68_state::mcr68_common_init(int clip, int xoffset)
 {
-
 	m_sprite_clip = clip;
 	m_sprite_xoffset = xoffset;
 

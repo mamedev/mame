@@ -50,7 +50,6 @@ TILE_GET_INFO_MEMBER(snk68_state::get_searchar_tile_info)
 
 void snk68_state::common_video_start()
 {
-
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_fg_tilemap->set_scrolldx(0, machine().primary_screen->width() - 256);

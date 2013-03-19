@@ -7,16 +7,16 @@
     Despite the system having a single cart slot, 3 different kinds of cart can be inserted and
     different memory areas are exposed to each of them
     * ROM carts are accessed in range 0x02000000-0x023fffff and 0x22000000-0x24ffffff of both CPUs
-    * Data RAM carts are accessed in range 0x02400000-0x027fffff of both CPUs (each DRAM chip is 
-	  mapped independently, the 1st at 0x2400000, the second at 0x2600000)
+    * Data RAM carts are accessed in range 0x02400000-0x027fffff of both CPUs (each DRAM chip is
+      mapped independently, the 1st at 0x2400000, the second at 0x2600000)
     * Battery RAM carts are accessed in range 0x04000000-0x047fffff of both CPUs
- 
-    It is not clear what happens to accesses beyond the cart size (open bus? mirror of cart data?), 
+
+    It is not clear what happens to accesses beyond the cart size (open bus? mirror of cart data?),
     e.g. if you have a 16Mbit battery cart inserted and the system tries to read/write above 0x04400000,
-    so for the moment the whole range is mapped and an error message is printed for out-of-bounds 
+    so for the moment the whole range is mapped and an error message is printed for out-of-bounds
     accesses
- 
- 
+
+
  ***********************************************************************************************************/
 
 
@@ -128,7 +128,7 @@ bool sat_cart_slot_device::call_load()
 	{
 		UINT32 *ROM;
 		UINT32 len;
-		
+
 		if (software_entry() != NULL)
 			len = get_software_region_length("cart");
 		else
@@ -143,15 +143,15 @@ bool sat_cart_slot_device::call_load()
 			fread(ROM, len);
 
 		// fix endianness....
-//		for (int i = 0; i < len; i += 4)
-//		{
-//			UINT8 tempa = ROM[i+0];
-//			UINT8 tempb = ROM[i+1];
-//			ROM[i+1] = ROM[i+2];
-//			ROM[i+0] = ROM[i+3];
-//			ROM[i+3] = tempa;
-//			ROM[i+2] = tempb;
-//		}
+//      for (int i = 0; i < len; i += 4)
+//      {
+//          UINT8 tempa = ROM[i+0];
+//          UINT8 tempb = ROM[i+1];
+//          ROM[i+1] = ROM[i+2];
+//          ROM[i+0] = ROM[i+3];
+//          ROM[i+3] = tempa;
+//          ROM[i+2] = tempb;
+//      }
 		return IMAGE_INIT_PASS;
 	}
 
@@ -242,7 +242,7 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
 {
 	if (m_cart)
 	{
-		return (m_cart->read_ext_bram(space, offset * 2) << 16) 
+		return (m_cart->read_ext_bram(space, offset * 2) << 16)
 					| m_cart->read_ext_bram(space, offset * 2 + 1);
 	}
 	else

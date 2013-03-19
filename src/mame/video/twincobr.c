@@ -146,7 +146,6 @@ void twincobr_state::twincobr_restore_screen()
 
 void twincobr_state::twincobr_display(int enable)
 {
-
 	m_display_on = enable;
 	m_bg_tilemap->enable(enable);
 	m_fg_tilemap->enable(enable);
@@ -155,7 +154,6 @@ void twincobr_state::twincobr_display(int enable)
 
 void twincobr_state::twincobr_flipscreen(int flip)
 {
-
 	machine().tilemap().set_flip_all((flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 	m_flip_screen = flip;
 	if (flip) {
@@ -350,7 +348,6 @@ WRITE8_MEMBER(twincobr_state::wardner_sprite_w)
 
 void twincobr_state::wardner_sprite_priority_hack()
 {
-
 	if (m_fgscrollx != m_bgscrollx) {
 		UINT16 *buffered_spriteram16 = reinterpret_cast<UINT16 *>(m_spriteram8->buffer());
 		if ((m_fgscrollx==0x1c9) || (m_flip_screen && (m_fgscrollx==0x17a))) { /* in the shop ? */

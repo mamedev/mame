@@ -285,7 +285,6 @@ PALETTE_INIT_MEMBER(m62_state,spelunk2)
 
 void m62_state::register_savestate(  )
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_m62_background_hscroll));
 	save_item(NAME(m_m62_background_vscroll));

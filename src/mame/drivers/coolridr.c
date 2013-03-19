@@ -319,7 +319,6 @@ public:
 		m_io_an7(*this, "AN7"),
 		m_io_config(*this, "CONFIG")
 	{
-
 	}
 
 	// Blitter state
@@ -521,8 +520,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4blendlevel, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition); \
-
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4blendlevel, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition);
 
 
 /* video */
@@ -1014,8 +1012,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((UINT64)(void*)tempshape)&0xffffffff);*/ \
 			} \
 		} \
-	} \
-
+	}
 
 
 #define CHECK_DECODE \
@@ -1046,8 +1043,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 				continue; \
 	} \
 	else \
-		if (blankcount==0) continue; \
-
+		if (blankcount==0) continue;
 
 
 #define GET_SPRITE_NUMBER \
@@ -1096,15 +1092,12 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			} \
 		} \
 	} \
-	UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]); \
-
+	UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 
 #define DO_XCLIP_REAL \
 	if (drawx>clipmaxX) { break; } \
-	if (drawx<clipminX) { drawx++; continue; } \
-
-#define DO_XCLIP_NONE \
-
+	if (drawx<clipminX) { drawx++; continue; }
+#define DO_XCLIP_NONE
 
 #define GET_CURRENT_LINESCROLLZOOM \
 	UINT32 dword = object->indirect_zoom[v*16+realy]; \
@@ -1132,8 +1125,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 	case 3: \
 		/* invalid? */ \
 		break; \
-	} \
-
+	}
 
 
 
@@ -1179,8 +1171,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			} \
 		} \
 		drawy++; \
-	} \
-
+	}
 
 #define YXLOOP_NO_LINEZOOM \
 	for (int y = 0; y < blockhigh; y++) \
@@ -1198,8 +1189,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			GET_PIX; \
 			DRAW_PIX \
 		} \
-	} \
-
+	}
 
 
 #define YXLOOP_NO_ZOOM \
@@ -1216,8 +1206,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 			GET_PIX; \
 			DRAW_PIX \
 		} \
-	} \
-
+	}
 
 
 /* the two tables that the patent claims are located at:
@@ -1271,19 +1260,16 @@ TODO: fix anything that isn't text.
 			} \
 		} \
 	} \
-	drawx++; \
-
+	drawx++;
 
 
 //object->rearranged_16bit_gfx
 //object->expanded_10bit_gfx
 
 #define GET_PIX_ROTATED \
-		UINT16 pix = tempshape[realx*16+realy]; \
-
+		UINT16 pix = tempshape[realx*16+realy];
 #define GET_PIX_NORMAL \
-		UINT16 pix = tempshape[realy*16+realx]; \
-
+		UINT16 pix = tempshape[realy*16+realx];
 
 void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
@@ -1892,8 +1878,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// Splat some sprites
 	for (int v = 0; v < used_vCellCount; v++)
 	{
-
-
 		const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
 		const int pixelOffsetnextY = ((vPosition) + ((v+1)* 16 * vZoom)) / 0x40;
 
@@ -1921,7 +1905,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 		if (!indirect_zoom_enable)
 		{
-
 			int sizex = used_hCellCount * 16 * hZoom;
 
 			hPosition = hPositionx * 0x40;
@@ -1948,11 +1931,9 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		UINT32 lastSpriteNumber = 0xffffffff;
 		UINT16 blankcount = 0;
 		int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
-		int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5; \
-
+		int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5;
 		for (int h = 0; h < used_hCellCount; h++)
 		{
-
 			int current_decoded = false;
 
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
@@ -2187,9 +2168,6 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else if (blit0==1)
 	{
-
-
-
 		if (m_blitterMode&0x80)
 		{
 			// HACK...
@@ -2710,7 +2688,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 
 		case 0x02:
 		{
-
 			// writes 3d0dxxxx / 3d0exxxx before a level start.. offset for a transfer read at 0x400000c, stored in work RAM H
 
 			//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
@@ -3430,8 +3407,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 
 
 #define READ_COMPRESSED_ROM(chip) \
-	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1]; \
-
+	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1];
 // this helps you feth the 20bit words from an address in the compressed data
 UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
 {

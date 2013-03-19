@@ -240,7 +240,6 @@ inline void supracan_state::verboselog(const char *tag, int n_level, const char 
 
 int supracan_state::supracan_tilemap_get_region(int layer)
 {
-
 	// HACK!!!
 	if (layer==2)
 	{
@@ -283,7 +282,6 @@ int supracan_state::supracan_tilemap_get_region(int layer)
 
 void supracan_state::supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count)
 {
-
 	UINT16* supracan_vram = m_vram;
 
 	UINT32 base = (m_tilemap_base_addr[layer]);
@@ -337,7 +335,6 @@ void supracan_state::supracan_tilemap_get_info_common(int layer, tile_data &tile
 // I wonder how different this really is.. my guess, not at all.
 void supracan_state::supracan_tilemap_get_info_roz(int layer, tile_data &tileinfo, int count)
 {
-
 	UINT16* supracan_vram = m_vram;
 
 	UINT32 base = m_roz_base_addr;

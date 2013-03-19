@@ -119,7 +119,6 @@ READ8_MEMBER(tnzs_state::arknoid2_sh_f000_r)
 
 void tnzs_state::mcu_reset(  )
 {
-
 	m_mcu_initializing = 3;
 	m_mcu_coinage_init = 0;
 	m_mcu_coinage[0] = 1;
@@ -135,7 +134,6 @@ void tnzs_state::mcu_reset(  )
 
 void tnzs_state::mcu_handle_coins( int coin )
 {
-
 	/* The coin inputs and coin counters are managed by the i8742 mcu. */
 	/* Here we simulate it. */
 	/* Credits are limited to 9, so more coins should be rejected */

@@ -199,7 +199,6 @@ void starwars_state::starwars_mproc_reset()
 
 void starwars_state::run_mproc()
 {
-
 	int RAMWORD = 0;
 	int MA_byte;
 	int tmp;
