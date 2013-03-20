@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
 	AM_RANGE(0x13, 0x13) AM_READ(sys_status_r)
 	AM_RANGE(0x14, 0x14) AM_WRITE(fdd_motor_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY("dma8237", i8237_r, i8237_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("dma8237", i8237_device, i8237_r, i8237_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE(kb_ctrl_mcu_r, kb_ctrl_mcu_w)
 	AM_RANGE(0x50, 0x51) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	// Assert HLDA
-	i8237_hlda_w(m_dmac, state);
+	m_dmac->i8237_hlda_w(state);
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask)             { return space.read_byte(address); }

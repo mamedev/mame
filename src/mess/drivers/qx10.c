@@ -332,7 +332,7 @@ void qx10_state::qx10_upd765_interrupt(bool state)
 
 void qx10_state::drq_w(bool state)
 {
-	i8237_dreq0_w(m_dma_1, !state);
+	m_dma_1->i8237_dreq0_w(!state);
 }
 
 WRITE8_MEMBER( qx10_state::fdd_motor_w )
@@ -361,9 +361,9 @@ READ8_MEMBER( qx10_state::qx10_30_r )
 */
 WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
 {
-	device_t *device = machine().device("8237dma_1");
+	i8237_device *device = machine().device<i8237_device>("8237dma_1");
 	/* Assert HLDA */
-	i8237_hlda_w(device, state);
+	device->i8237_hlda_w(state);
 }
 
 READ8_MEMBER( qx10_state::gdc_dack_r )
@@ -690,8 +690,8 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 //  AM_RANGE(0x3b, 0x3b) GDC light pen req
 	AM_RANGE(0x3c, 0x3c) AM_READWRITE(mc146818_data_r, mc146818_data_w)
 	AM_RANGE(0x3d, 0x3d) AM_WRITE(mc146818_offset_w)
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE_LEGACY("8237dma_1", i8237_r, i8237_w)
-	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE_LEGACY("8237dma_2", i8237_r, i8237_w)
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("8237dma_1", i8237_device, i8237_r, i8237_w)
+	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("8237dma_2", i8237_device, i8237_r, i8237_w)
 //  AM_RANGE(0xfc, 0xfd) Multi-Font comms
 ADDRESS_MAP_END
 
@@ -916,7 +916,7 @@ void qx10_state::machine_start()
 
 void qx10_state::machine_reset()
 {
-	i8237_dreq0_w(m_dma_1, 1);
+	m_dma_1->i8237_dreq0_w(1);
 
 	m_memprom = 0;
 	m_memcmos = 0;

@@ -43,8 +43,8 @@ public:
 	device_t    *m_pit8254;
 	device_t    *m_pic8259_1;
 	device_t    *m_pic8259_2;
-	device_t    *m_dma8237_1;
-	device_t    *m_dma8237_2;
+	i8237_device    *m_dma8237_1;
+	i8237_device    *m_dma8237_2;
 
 	UINT32 m_idle_skip_ram;
 	required_device<cpu_device> m_maincpu;
@@ -76,14 +76,12 @@ public:
 
 READ8_MEMBER(voyager_state::at_dma8237_2_r)
 {
-	device_t *device = machine().device("dma8237_2");
-	return i8237_r(device, space, offset / 2);
+	return m_dma8237_2->i8237_r(space, offset / 2);
 }
 
 WRITE8_MEMBER(voyager_state::at_dma8237_2_w)
 {
-	device_t *device = machine().device("dma8237_2");
-	i8237_w(device, space, offset / 2, data);
+	m_dma8237_2->i8237_w(space, offset / 2, data);
 }
 
 READ8_MEMBER(voyager_state::at_page8_r)
@@ -134,7 +132,7 @@ WRITE_LINE_MEMBER(voyager_state::pc_dma_hrq_changed)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_1, state );
+	m_dma8237_1->i8237_hlda_w( state );
 }
 
 
@@ -420,7 +418,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
@@ -657,8 +655,8 @@ void voyager_state::machine_start()
 	m_pit8254 = machine().device( "pit8254" );
 	m_pic8259_1 = machine().device( "pic8259_1" );
 	m_pic8259_2 = machine().device( "pic8259_2" );
-	m_dma8237_1 = machine().device( "dma8237_1" );
-	m_dma8237_2 = machine().device( "dma8237_2" );
+	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
+	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 }
 
 /*************************************************************

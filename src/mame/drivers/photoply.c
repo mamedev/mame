@@ -36,8 +36,8 @@ public:
 	device_t    *m_pit8253;
 	device_t    *m_pic8259_1;
 	device_t    *m_pic8259_2;
-	device_t    *m_dma8237_1;
-	device_t    *m_dma8237_2;
+	i8237_device    *m_dma8237_1;
+	i8237_device    *m_dma8237_2;
 	DECLARE_READ32_MEMBER(ide_r);
 	DECLARE_WRITE32_MEMBER(ide_w);
 	DECLARE_READ32_MEMBER(fdc_r);
@@ -72,7 +72,7 @@ WRITE_LINE_MEMBER(photoply_state::pc_dma_hrq_changed)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_1, state );
+	m_dma8237_1->i8237_hlda_w( state );
 }
 
 
@@ -279,14 +279,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM//DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_device, i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
@@ -346,8 +346,8 @@ void photoply_state::machine_start()
 	m_pit8253 = machine().device( "pit8254" );
 	m_pic8259_1 = machine().device( "pic8259_1" );
 	m_pic8259_2 = machine().device( "pic8259_2" );
-	m_dma8237_1 = machine().device( "dma8237_1" );
-	m_dma8237_2 = machine().device( "dma8237_2" );
+	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
+	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
 }

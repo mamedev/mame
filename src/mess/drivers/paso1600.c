@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(paso1600_io, AS_IO, 16, paso1600_state)
 	ADDRESS_MAP_UNMAP_LOW
-	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8_LEGACY("8237dma", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000,0x000f) AM_DEVREADWRITE8("8237dma", i8237_device, i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x0010,0x0011) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r,pic8259_w, 0xffff) // i8259
 	AM_RANGE(0x001a,0x001b) AM_READ(test_hi_r) // causes RAM error otherwise?
 	AM_RANGE(0x0030,0x0033) AM_READWRITE8(key_r,key_w,0xffff) //UART keyboard?

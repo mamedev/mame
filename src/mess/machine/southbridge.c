@@ -8,7 +8,6 @@
 #include "cpu/i386/i386.h"
 #include "machine/southbridge.h"
 #include "machine/pc_keyboards.h"
-#include "machine/8237dma.h"
 
 const struct pic8259_interface at_pic8259_master_config =
 {
@@ -45,7 +44,7 @@ const struct pit8253_config at_pit8254_config =
 
 I8237_INTERFACE( at_dma8237_1_config )
 {
-	DEVCB_DEVICE_LINE("dma8237_2",i8237_dreq0_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2",am9517a_device,dreq0_w),
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, at_dma8237_out_eop),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_read_byte),
 	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, pc_dma_write_byte),
@@ -104,14 +103,14 @@ static const isa16bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir7_w),
 
 	// dma request
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq0_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq1_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq2_w),
-	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq0_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq3_w),
 
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq1_w),
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq2_w),
-	DEVCB_DEVICE_LINE("dma8237_2", i8237_dreq3_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq1_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8237_2", am9517a_device, dreq3_w),
 };
 
 static SLOT_INTERFACE_START(pc_isa_onboard)
@@ -194,7 +193,7 @@ void southbridge_device::device_start()
 {
 	address_space& spaceio = machine().device(":maincpu")->memory().space(AS_IO);
 
-	spaceio.install_legacy_readwrite_handler(*m_dma8237_1, 0x0000, 0x001f, FUNC(i8237_r), FUNC(i8237_w), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read),&(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write),&(*m_dma8237_1)), 0xffffffff);
 	spaceio.install_legacy_readwrite_handler(*m_pic8259_master, 0x0020, 0x003f, FUNC(pic8259_r), FUNC(pic8259_w), 0xffffffff);
 	spaceio.install_legacy_readwrite_handler(*m_pit8254, 0x0040, 0x005f, FUNC(pit8253_r), FUNC(pit8253_w), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_keybc_r),this), write8_delegate(FUNC(southbridge_device::at_keybc_w),this), 0xffffffff);
@@ -332,7 +331,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dma_hrq_changed )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_2, state );
+	m_dma8237_2->hack_w( state );
 }
 
 READ8_MEMBER(southbridge_device::pc_dma_read_byte)
@@ -424,7 +423,7 @@ WRITE_LINE_MEMBER( southbridge_device::pc_dack0_w ) { pc_select_dma_channel(0, s
 WRITE_LINE_MEMBER( southbridge_device::pc_dack1_w ) { pc_select_dma_channel(1, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack2_w ) { pc_select_dma_channel(2, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack3_w ) { pc_select_dma_channel(3, state); }
-WRITE_LINE_MEMBER( southbridge_device::pc_dack4_w ) { i8237_hlda_w( m_dma8237_1, state ? 0 : 1); } // it's inverted
+WRITE_LINE_MEMBER( southbridge_device::pc_dack4_w ) { m_dma8237_1->hack_w( state ? 0 : 1); } // it's inverted
 WRITE_LINE_MEMBER( southbridge_device::pc_dack5_w ) { pc_select_dma_channel(5, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack6_w ) { pc_select_dma_channel(6, state); }
 WRITE_LINE_MEMBER( southbridge_device::pc_dack7_w ) { pc_select_dma_channel(7, state); }
@@ -466,12 +465,12 @@ WRITE_LINE_MEMBER( southbridge_device::at_mc146818_irq )
 
 READ8_MEMBER( southbridge_device::at_dma8237_2_r )
 {
-	return i8237_r( m_dma8237_2, space, offset / 2);
+	return m_dma8237_2->read( space, offset / 2);
 }
 
 WRITE8_MEMBER( southbridge_device::at_dma8237_2_w )
 {
-	i8237_w( m_dma8237_2, space, offset / 2, data);
+	m_dma8237_2->write( space, offset / 2, data);
 }
 
 READ8_MEMBER( southbridge_device::at_keybc_r )

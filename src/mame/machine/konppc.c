@@ -143,7 +143,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 	const char *dsptag = (cgboard_id == 0) ? "dsp" : "dsp2";
 	const char *pcitag = (cgboard_id == 0) ? "k033906_1" : "k033906_2";
 	device_t *dsp = space.machine().device(dsptag);
-	device_t *k033906 = space.machine().device(pcitag);
+	k033906_device *k033906 = space.machine().device<k033906_device>(pcitag);
 //  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, space.device().safe_pc());
 
 	if (cgboard_id < MAX_CG_BOARDS)
@@ -158,7 +158,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 					dsp_state[cgboard_id] |= 0x10;
 
 				if (k033906 != NULL)    /* zr107.c has no PCI and some games only have one PCI Bridge */
-					k033906_set_reg(k033906, (data & 0x20000000) ? 1 : 0);
+					k033906->k033906_set_reg((data & 0x20000000) ? 1 : 0);
 
 				if (data & 0x10000000)
 					dsp->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -409,32 +409,32 @@ static void nwk_fifo_w(running_machine &machine, int board, UINT32 data)
 
 READ32_HANDLER( K033906_0_r )
 {
-	device_t *k033906_1 = space.machine().device("k033906_1");
+	k033906_device *k033906_1 = space.machine().device<k033906_device>("k033906_1");
 	if (nwk_device_sel[0] & 0x01)
 		return nwk_fifo_r(space, 0);
 	else
-		return k033906_r(k033906_1, space, offset, mem_mask);
+		return k033906_1->k033906_r(space, offset, mem_mask);
 }
 
 WRITE32_HANDLER( K033906_0_w )
 {
-	device_t *k033906_1 = space.machine().device("k033906_1");
-	k033906_w(k033906_1, space, offset, data, mem_mask);
+	k033906_device *k033906_1 = space.machine().device<k033906_device>("k033906_1");
+	k033906_1->k033906_w(space, offset, data, mem_mask);
 }
 
 READ32_HANDLER( K033906_1_r )
 {
-	device_t *k033906_2 = space.machine().device("k033906_2");
+	k033906_device *k033906_2 = space.machine().device<k033906_device>("k033906_2");
 	if (nwk_device_sel[1] & 0x01)
 		return nwk_fifo_r(space, 1);
 	else
-		return k033906_r(k033906_2, space, offset, mem_mask);
+		return k033906_2->k033906_r(space, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K033906_1_w)
 {
-	device_t *k033906_2 = space.machine().device("k033906_2");
-	k033906_w(k033906_2, space, offset, data, mem_mask);
+	k033906_device *k033906_2 = space.machine().device<k033906_device>("k033906_2");
+	k033906_2->k033906_w(space, offset, data, mem_mask);
 }
 
 /*****************************************************************************/

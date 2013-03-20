@@ -24,6 +24,7 @@
 #include "machine/3c505.h"
 #include "machine/68681.h"
 #include "machine/pc_fdc.h"
+#include "machine/8237dma.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -120,8 +121,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<sc499_device> m_ctape;
 
-	device_t *dma8237_1;
-	device_t *dma8237_2;
+	i8237_device *dma8237_1;
+	i8237_device *dma8237_2;
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
 

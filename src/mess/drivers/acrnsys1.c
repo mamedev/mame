@@ -114,7 +114,7 @@ WRITE8_MEMBER( acrnsys1_state::acrnsys1_led_segment_w )
 
 static ADDRESS_MAP_START( acrnsys1_map, AS_PROGRAM, 8, acrnsys1_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE_LEGACY("b1", ins8154_r, ins8154_w)
+	AM_RANGE(0x0e00, 0x0e7f) AM_MIRROR(0x100) AM_DEVREADWRITE("b1", ins8154_device, ins8154_r, ins8154_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0xf800, 0xf9ff) AM_MIRROR(0x600) AM_ROM
 ADDRESS_MAP_END

@@ -86,8 +86,8 @@ public:
 	device_t    *m_pit8254;
 	device_t    *m_pic8259_1;
 	device_t    *m_pic8259_2;
-	device_t    *m_dma8237_1;
-	device_t    *m_dma8237_2;
+	i8237_device    *m_dma8237_1;
+	i8237_device    *m_dma8237_2;
 
 	emu_timer *m_atapi_timer;
 	//SCSIInstance *m_inserted_cdrom;
@@ -110,12 +110,14 @@ public:
 
 static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
-	return i8237_r(device, space, offset / 2);
+	gammagic_state *state = space.machine().driver_data<gammagic_state>();
+	return state->m_dma8237_2->i8237_r(space, offset / 2);
 }
 
 static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
 {
-	i8237_w(device, space, offset / 2, data);
+	gammagic_state *state = space.machine().driver_data<gammagic_state>();
+	state->m_dma8237_2->i8237_w(space, offset / 2, data);
 }
 
 static READ8_HANDLER(at_page8_r)
@@ -163,10 +165,11 @@ static WRITE8_HANDLER(at_page8_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
+	gammagic_state *drvstate = device->machine().driver_data<gammagic_state>();
 	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	drvstate->m_dma8237_1->i8237_hlda_w( state );
 }
 
 static READ8_HANDLER( pc_dma_read_byte )
@@ -552,7 +555,7 @@ static ADDRESS_MAP_START( gammagic_map, AS_PROGRAM, 32, gammagic_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
@@ -636,8 +639,8 @@ static MACHINE_START(gammagic)
 	state->m_pit8254 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
 	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device( "dma8237_1" );
-	state->m_dma8237_2 = machine.device( "dma8237_2" );
+	state->m_dma8237_1 = machine.device<i8237_device>( "dma8237_1" );
+	state->m_dma8237_2 = machine.device<i8237_device>( "dma8237_2" );
 }
 
 static MACHINE_RESET( gammagic )

@@ -73,11 +73,11 @@ public:
 	// construction/destruction
 	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	UINT8 ins8154_r(UINT32 offset);
-	void ins8154_w(UINT32 offset, UINT8 data);
+	DECLARE_READ8_MEMBER( ins8154_r );
+	DECLARE_WRITE8_MEMBER( ins8154_w );
 
-	void ins8154_porta_w(UINT32 offset, UINT8 data);
-	void ins8154_portb_w(UINT32 offset, UINT8 data);
+	DECLARE_WRITE8_MEMBER( ins8154_porta_w );
+	DECLARE_WRITE8_MEMBER( ins8154_portb_w );
 
 protected:
 	// device-level overrides
@@ -109,18 +109,5 @@ private:
 
 // device type definition
 extern const device_type INS8154;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( ins8154_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ins8154_w );
-
-DECLARE_WRITE8_DEVICE_HANDLER( ins8154_porta_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ins8154_portb_w );
-
 
 #endif /* __INS8154_H__ */

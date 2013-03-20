@@ -443,14 +443,12 @@ WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
 
 READ8_MEMBER(mediagx_state::at_dma8237_2_r)
 {
-	device_t *device = machine().device("dma8237_2");
-	return i8237_r(device, space, offset / 2);
+	return m_dma8237_2->i8237_r(space, offset / 2);
 }
 
 WRITE8_MEMBER(mediagx_state::at_dma8237_2_w)
 {
-	device_t *device = machine().device("dma8237_2");
-	i8237_w(device, space, offset / 2, data);
+	m_dma8237_2->i8237_w(space, offset / 2, data);
 }
 
 
@@ -885,7 +883,7 @@ WRITE_LINE_MEMBER(mediagx_state::pc_dma_hrq_changed)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_1, state );
+	m_dma8237_1->i8237_hlda_w( state );
 }
 
 
@@ -957,7 +955,7 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)

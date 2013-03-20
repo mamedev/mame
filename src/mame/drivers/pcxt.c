@@ -426,7 +426,7 @@ WRITE_LINE_MEMBER(pcxt_state::pc_dma_hrq_changed)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( m_dma8237_1, state );
+	m_dma8237_1->i8237_hlda_w( state );
 }
 
 
@@ -557,7 +557,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE_LEGACY("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_device, i8237_r, i8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE_LEGACY("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)    //8253 PIT
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255

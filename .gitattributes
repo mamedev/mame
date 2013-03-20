@@ -1183,7 +1183,6 @@ src/emu/machine/cr589.c svneol=native#text/plain
 src/emu/machine/cr589.h svneol=native#text/plain
 src/emu/machine/ctronics.c svneol=native#text/plain
 src/emu/machine/ctronics.h svneol=native#text/plain
-src/emu/machine/devhelpr.h svneol=native#text/plain
 src/emu/machine/ds1302.c svneol=native#text/plain
 src/emu/machine/ds1302.h svneol=native#text/plain
 src/emu/machine/ds2401.c svneol=native#text/plain

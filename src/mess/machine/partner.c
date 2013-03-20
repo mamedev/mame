@@ -28,9 +28,9 @@ DRIVER_INIT_MEMBER(partner_state,partner)
 
 WRITE_LINE_MEMBER(partner_state::partner_wd17xx_drq_w)
 {
-	device_t *device = machine().device("dma8257");
+	i8257_device *device = machine().device<i8257_device>("dma8257");
 	if (state)
-		i8257_drq0_w(device, 1);
+		device->i8257_drq0_w(1);
 }
 
 const wd17xx_interface partner_wd17xx_interface =
@@ -364,7 +364,7 @@ WRITE_LINE_MEMBER(partner_state::hrq_w)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	i8257_hlda_w(machine().device("dma8257"), state);
+	machine().device<i8257_device>("dma8257")->i8257_hlda_w(state);
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }

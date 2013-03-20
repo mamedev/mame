@@ -19,8 +19,8 @@ struct bebox_devices_t
 {
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
-	device_t *dma8237_1;
-	device_t *dma8237_2;
+	i8237_device *dma8237_1;
+	i8237_device *dma8237_2;
 };
 
 

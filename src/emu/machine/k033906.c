@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "k033906.h"
 #include "video/voodoo.h"
-#include "devhelpr.h"
 
 
 //**************************************************************************
@@ -68,7 +67,7 @@ void k033906_device::device_start()
 }
 
 
-WRITE_LINE_DEVICE_HANDLER_TRAMPOLINE(k033906, k033906_set_reg)
+WRITE_LINE_MEMBER(k033906_device::k033906_set_reg)
 {
 	m_reg_set = state & 1;
 }
@@ -135,7 +134,7 @@ void k033906_device::k033906_reg_w(int reg, UINT32 data)
 	}
 }
 
-READ32_DEVICE_HANDLER_TRAMPOLINE(k033906, k033906_r)
+READ32_MEMBER(k033906_device::k033906_r)
 {
 	if(m_reg_set)
 	{
@@ -147,7 +146,7 @@ READ32_DEVICE_HANDLER_TRAMPOLINE(k033906, k033906_r)
 	}
 }
 
-WRITE32_DEVICE_HANDLER_TRAMPOLINE(k033906, k033906_w)
+WRITE32_MEMBER(k033906_device::k033906_w)
 {
 	if(m_reg_set)
 	{

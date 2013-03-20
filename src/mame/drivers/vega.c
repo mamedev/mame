@@ -190,7 +190,7 @@ WRITE8_MEMBER(vega_state::extern_w)
 			else
 			{
 				//register w ?
-				ins8154_w(m_ins8154,space,offset&0x7f,data);
+				m_ins8154->ins8154_w(space,offset&0x7f,data);
 			}
 		}
 		break;
@@ -321,7 +321,7 @@ READ8_MEMBER(vega_state::extern_r)
 			else
 			{
 				//register r ?
-				return ins8154_r(m_ins8154,space,offset&0x7f);
+				return m_ins8154->ins8154_r(space,offset&0x7f);
 			}
 
 		}

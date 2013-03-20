@@ -73,8 +73,8 @@ public:
 	// construction/destruction
 	f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	UINT8 f3853_r(UINT32 offset);
-	void f3853_w(UINT32 offset, UINT8 data);
+	DECLARE_READ8_MEMBER( f3853_r );
+	DECLARE_WRITE8_MEMBER( f3853_w );
 
 	void f3853_set_external_interrupt_in_line(int level);
 	void f3853_set_priority_in_line(int level);
@@ -113,17 +113,5 @@ private:
 
 // device type definition
 extern const device_type F3853;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( f3853_r );
-DECLARE_WRITE8_DEVICE_HANDLER( f3853_w );
-
-void f3853_set_external_interrupt_in_line(device_t *device, int level);
-void f3853_set_priority_in_line(device_t *device, int level);
 
 #endif /* __F3853_H__ */

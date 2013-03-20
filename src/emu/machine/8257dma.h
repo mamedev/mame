@@ -87,10 +87,20 @@ public:
 	i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* register access */
-	UINT8 i8257_r(UINT32 offset);
-	void i8257_w(UINT32 offset, UINT8 data);
+	DECLARE_READ8_MEMBER( i8257_r );
+	DECLARE_WRITE8_MEMBER( i8257_w );
+
+	/* hold acknowledge */
+	WRITE_LINE_MEMBER( i8257_hlda_w ) { } 
+
+	/* ready */
+	WRITE_LINE_MEMBER( i8257_ready_w ) { }
 
 	/* data request */
+	WRITE_LINE_MEMBER( i8257_drq0_w ) { i8257_drq_w(0, state); }
+	WRITE_LINE_MEMBER( i8257_drq1_w ) { i8257_drq_w(1, state); }
+	WRITE_LINE_MEMBER( i8257_drq2_w ) { i8257_drq_w(2, state); }
+	WRITE_LINE_MEMBER( i8257_drq3_w ) { i8257_drq_w(3, state); }
 	void i8257_drq_w(int channel, int state);
 
 protected:
@@ -139,27 +149,5 @@ private:
 
 // device type definition
 extern const device_type I8257;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-/* register access */
-DECLARE_READ8_DEVICE_HANDLER( i8257_r );
-DECLARE_WRITE8_DEVICE_HANDLER( i8257_w );
-
-/* hold acknowledge */
-WRITE_LINE_DEVICE_HANDLER( i8257_hlda_w );
-
-/* ready */
-WRITE_LINE_DEVICE_HANDLER( i8257_ready_w );
-
-/* data request */
-WRITE_LINE_DEVICE_HANDLER( i8257_drq0_w );
-WRITE_LINE_DEVICE_HANDLER( i8257_drq1_w );
-WRITE_LINE_DEVICE_HANDLER( i8257_drq2_w );
-WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w );
 
 #endif

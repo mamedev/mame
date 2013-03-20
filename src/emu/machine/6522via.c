@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "6522via.h"
-#include "devhelpr.h"
 
 /***************************************************************************
     PARAMETERS

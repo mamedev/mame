@@ -463,7 +463,7 @@ void bebox_state::fdc_interrupt(bool state)
 void bebox_state::fdc_dma_drq(bool state)
 {
 	if ( m_devices.dma8237_1 ) {
-		i8237_dreq2_w(m_devices.dma8237_1, state);
+		m_devices.dma8237_1->i8237_dreq2_w(state);
 	}
 }
 
@@ -707,7 +707,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( machine().device("dma8237_1"), state );
+	machine().device<i8237_device>("dma8237_1")->i8237_hlda_w( state );
 }
 
 
@@ -1001,8 +1001,8 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 TIMER_CALLBACK_MEMBER(bebox_state::bebox_get_devices){
 	m_devices.pic8259_master = machine().device("pic8259_master");
 	m_devices.pic8259_slave = machine().device("pic8259_slave");
-	m_devices.dma8237_1 = machine().device("dma8237_1");
-	m_devices.dma8237_2 = machine().device("dma8237_2");
+	m_devices.dma8237_1 = machine().device<i8237_device>("dma8237_1");
+	m_devices.dma8237_2 = machine().device<i8237_device>("dma8237_2");
 }
 
 

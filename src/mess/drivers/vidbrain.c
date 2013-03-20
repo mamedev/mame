@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( vidbrain_io, AS_IO, 8, vidbrain_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(keyboard_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(keyboard_r, sound_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(f3853_w)
-//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(F3853_TAG, f3853_r, f3853_w)
+//  AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(F3853_TAG, f3853_device, f3853_r, f3853_w)
 ADDRESS_MAP_END
 
 

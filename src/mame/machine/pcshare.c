@@ -157,7 +157,7 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	dynamic_cast<i8237_device*>(device)->i8237_hlda_w( state );
 }
 
 
@@ -326,14 +326,14 @@ static const struct pit8253_config at_pit8254_config =
 };
 
 ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, driver_device )
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM //AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8_LEGACY(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_device, i8237_r, i8237_w, 0xffff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT(pcat_common)

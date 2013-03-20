@@ -45,9 +45,9 @@ public:
 	// construction/destruction
 	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	UINT32 k033906_r(UINT32 offset);
-	void k033906_w(UINT32 offset, UINT32 data, UINT32 mem_mask);
-	void k033906_set_reg(UINT8 state);
+	DECLARE_READ32_MEMBER( k033906_r );
+	DECLARE_WRITE32_MEMBER( k033906_w );
+	DECLARE_WRITE_LINE_MEMBER( k033906_set_reg );
 
 protected:
 	// device-level overrides
@@ -74,16 +74,5 @@ private:
 
 // device type definition
 extern const device_type K033906;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-extern DECLARE_READ32_DEVICE_HANDLER( k033906_r );
-extern DECLARE_WRITE32_DEVICE_HANDLER( k033906_w );
-extern WRITE_LINE_DEVICE_HANDLER( k033906_set_reg );
-
 
 #endif  /* __K033906_H__ */

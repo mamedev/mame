@@ -31,7 +31,6 @@
 
 #include "emu.h"
 #include "8257dma.h"
-#include "devhelpr.h"
 
 #define I8257_STATUS_UPDATE     0x10
 #define I8257_STATUS_TC_CH3     0x08
@@ -346,7 +345,7 @@ void i8257_device::i8257_prepare_msb_flip()
 }
 
 
-READ8_DEVICE_HANDLER_TRAMPOLINE(i8257, i8257_r)
+READ8_MEMBER(i8257_device::i8257_r)
 {
 	UINT8 data = 0xFF;
 
@@ -382,7 +381,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(i8257, i8257_r)
 }
 
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8257, i8257_w)
+WRITE8_MEMBER(i8257_device::i8257_w)
 {
 	switch(offset)
 	{

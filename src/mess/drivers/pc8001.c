@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE(port30_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_READWRITE(port40_r, port40_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE(UPD3301_TAG, upd3301_device, read, write)
-	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE_LEGACY(I8257_TAG, i8257_r, i8257_w)
+	AM_RANGE(0x60, 0x68) AM_DEVREADWRITE(I8257_TAG, i8257_device, i8257_r, i8257_w)
 //  AM_RANGE(0x70, 0x7f) unused
 //  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext0_w)
 //  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(pc8011_ext1_w)
@@ -395,7 +395,7 @@ static UPD3301_INTERFACE( pc8001_upd3301_intf )
 	8,
 	pc8001_display_pixels,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8257_TAG, i8257_drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8257_TAG, i8257_device, i8257_drq2_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -435,7 +435,7 @@ WRITE_LINE_MEMBER( pc8001_state::hrq_w )
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	i8257_hlda_w(m_dma, state);
+	m_dma->i8257_hlda_w(state);
 }
 
 WRITE8_MEMBER( pc8001_state::dma_mem_w )
@@ -490,7 +490,7 @@ void pc8001_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* initialize DMA */
-	i8257_ready_w(m_dma, 1);
+	m_dma->i8257_ready_w(1);
 
 	/* setup memory banking */
 	UINT8 *ram = m_ram->pointer();

@@ -20,7 +20,6 @@
 
 #include "emu.h"
 #include "8237dma.h"
-#include "devhelpr.h"
 
 /***************************************************************************
     MACROS
@@ -499,7 +498,7 @@ void i8237_device::i8237_timerproc()
 }
 
 
-READ8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_r)
+READ8_MEMBER(i8237_device::i8237_r)
 {
 	UINT8 data = 0xFF;
 
@@ -555,7 +554,7 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_r)
 }
 
 
-WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
+WRITE8_MEMBER(i8237_device::i8237_w)
 {
 	offset &= 0x0F;
 
@@ -694,17 +693,3 @@ void i8237_device::i8237_drq_write(int channel, int state)
 
 	m_timer->enable( ( m_command & 0x04 ) ? 0 : 1 );
 }
-
-
-
-/***************************************************************************
-    TRAMPOLINES
-***************************************************************************/
-
-WRITE_LINE_DEVICE_HANDLER( i8237_hlda_w ) { downcast<i8237_device*>(device)->i8237_hlda_w(state); }
-WRITE_LINE_DEVICE_HANDLER( i8237_ready_w ) { }
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq0_w ) { downcast<i8237_device*>(device)->i8237_drq_write(0, state); }
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq1_w ) { downcast<i8237_device*>(device)->i8237_drq_write(1, state); }
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq2_w ) { downcast<i8237_device*>(device)->i8237_drq_write(2, state); }
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w ) { downcast<i8237_device*>(device)->i8237_drq_write(3, state); }
-WRITE_LINE_DEVICE_HANDLER( i8237_eop_w ) { }

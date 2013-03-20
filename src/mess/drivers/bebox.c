@@ -35,8 +35,8 @@
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
-READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return i8237_r(machine().device("dma8237_2"), space, offset / 2); }
-WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { i8237_w(machine().device("dma8237_2"), space, offset / 2, data); }
+READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return machine().device<i8237_device>("dma8237_2")->i8237_r(space, offset / 2); }
+WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { machine().device<i8237_device>("dma8237_2")->i8237_w(space, offset / 2, data); }
 
 static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF0F0, 0x7FFFF0F7) AM_READWRITE(bebox_cpu0_imask_r, bebox_cpu0_imask_w )
@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF3F0, 0x7FFFF3F7) AM_READWRITE(bebox_crossproc_interrupts_r, bebox_crossproc_interrupts_w )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
 
-	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, U64(0xffffffffffffffff) )

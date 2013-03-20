@@ -85,14 +85,23 @@ public:
 	i8237_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	/* register access */
-	UINT8 i8237_r(UINT32 offset);
-	void i8237_w(UINT32 offset, UINT8 data);
-
+	DECLARE_READ8_MEMBER( i8237_r );
+	DECLARE_WRITE8_MEMBER( i8237_w );
 	/* hold acknowledge */
-	void i8237_hlda_w(UINT8 state) { m_hlda = state; }
+	WRITE_LINE_MEMBER( i8237_hlda_w ) { m_hlda = state; }
+
+	/* ready */
+	WRITE_LINE_MEMBER( i8237_ready_w ) { }
 
 	/* data request */
+	WRITE_LINE_MEMBER( i8237_dreq0_w ) { i8237_drq_write(0, state); }
+	WRITE_LINE_MEMBER( i8237_dreq1_w ) { i8237_drq_write(1, state); }
+	WRITE_LINE_MEMBER( i8237_dreq2_w ) { i8237_drq_write(2, state); }
+	WRITE_LINE_MEMBER( i8237_dreq3_w ) { i8237_drq_write(3, state); }
 	void i8237_drq_write(int channel, int state);
+
+	/* end of process */
+	WRITE_LINE_MEMBER( i8237_eop_w ) { }
 
 	void i8237_timerproc();
 
@@ -181,30 +190,5 @@ private:
 
 // device type definition
 extern const device_type I8237;
-
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-/* register access */
-DECLARE_READ8_DEVICE_HANDLER( i8237_r );
-DECLARE_WRITE8_DEVICE_HANDLER( i8237_w );
-
-/* hold acknowledge */
-WRITE_LINE_DEVICE_HANDLER( i8237_hlda_w );
-
-/* ready */
-WRITE_LINE_DEVICE_HANDLER( i8237_ready_w );
-
-/* data request */
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq0_w );
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq1_w );
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq2_w );
-WRITE_LINE_DEVICE_HANDLER( i8237_dreq3_w );
-
-/* end of process */
-WRITE_LINE_DEVICE_HANDLER( i8237_eop_w );
 
 #endif

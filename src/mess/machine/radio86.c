@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(radio86_state::hrq_w)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
-	i8257_hlda_w(m_dma8257, state);
+	m_dma8257->i8257_hlda_w(state);
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
@@ -237,7 +237,7 @@ const i8275_interface radio86_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -248,7 +248,7 @@ const i8275_interface mikrosha_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -259,7 +259,7 @@ const i8275_interface apogee_i8275_interface = {
 	"screen",
 	6,
 	0,
-	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -270,7 +270,7 @@ const i8275_interface partner_i8275_interface = {
 	"screen",
 	6,
 	1,
-	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_DEVICE_LINE_MEMBER("dma8257", i8257_device, i8257_drq2_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
