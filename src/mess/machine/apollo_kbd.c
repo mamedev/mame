@@ -447,8 +447,10 @@ TIMER_CALLBACK( apollo_kbd_device::tx_fifo::static_timer_callback )
 
 apollo_kbd_device::keyboard_tty::keyboard_tty() :
 	m_device(NULL),
+#if defined(KBD_TTY_NAME)
 	m_tty_name(NULL),
 	m_tty_fd(-1),
+#endif
 	m_connected(0)
 {
 }
