@@ -27,10 +27,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
-#if 0
-	virtual DECLARE_READ8_MEMBER(read_ext_bram);
-	virtual DECLARE_WRITE8_MEMBER(write_ext_bram);
-#endif
 
 	UINT32 m_size;  // this is the size of Battery RAM in bytes
 };

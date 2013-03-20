@@ -208,7 +208,7 @@ int sat_cart_slot_device::get_cart_type()
 READ32_MEMBER(sat_cart_slot_device::read_rom)
 {
 	if (m_cart)
-		return m_cart->read_rom(space, offset);
+		return m_cart->read_rom(space, offset, mem_mask);
 	else
 		return 0xffffffff;
 }
@@ -216,7 +216,7 @@ READ32_MEMBER(sat_cart_slot_device::read_rom)
 READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram0(space, offset);
+		return m_cart->read_ext_dram0(space, offset, mem_mask);
 	else
 		return 0xffffffff;
 }
@@ -224,7 +224,7 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_dram0)
 READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
 {
 	if (m_cart)
-		return m_cart->read_ext_dram1(space, offset);
+		return m_cart->read_ext_dram1(space, offset, mem_mask);
 	else
 		return 0xffffffff;
 }
@@ -232,23 +232,10 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_dram1)
 READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
 {
 	if (m_cart)
-		return m_cart->read_ext_bram(space, offset);
+		return m_cart->read_ext_bram(space, offset, mem_mask);
 	else
 		return 0xffffffff;
 }
-
-#if 0
-READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
-{
-	if (m_cart)
-	{
-		return (m_cart->read_ext_bram(space, offset * 2) << 16)
-					| m_cart->read_ext_bram(space, offset * 2 + 1);
-	}
-	else
-		return 0xffffffff;
-}
-#endif
 
 /*-------------------------------------------------
  write
@@ -257,30 +244,17 @@ READ32_MEMBER(sat_cart_slot_device::read_ext_bram)
 WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram0)
 {
 	if (m_cart)
-		m_cart->write_ext_dram0(space, offset, data);
+		m_cart->write_ext_dram0(space, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(sat_cart_slot_device::write_ext_dram1)
 {
 	if (m_cart)
-		m_cart->write_ext_dram1(space, offset, data);
+		m_cart->write_ext_dram1(space, offset, data, mem_mask);
 }
 
 WRITE32_MEMBER(sat_cart_slot_device::write_ext_bram)
 {
 	if (m_cart)
-		m_cart->write_ext_bram(space, offset, data);
+		m_cart->write_ext_bram(space, offset, data, mem_mask);
 }
-
-#if 0
-WRITE32_MEMBER(sat_cart_slot_device::write_ext_bram)
-{
-	if (m_cart)
-	{
-		if (ACCESSING_BITS_16_23)
-			m_cart->write_ext_bram(space, offset * 2 + 0, (data & 0x00ff0000) >> 16);
-		if (ACCESSING_BITS_0_7)
-			m_cart->write_ext_bram(space, offset * 2 + 1, (data & 0x000000ff) >> 0);
-	}
-}
-#endif

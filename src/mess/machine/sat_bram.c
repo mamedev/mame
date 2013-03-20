@@ -98,26 +98,3 @@ WRITE32_MEMBER(saturn_bram_device::write_ext_bram)
 	else
 		mame_printf_error("Battery RAM write beyond its boundary! offs: %X data: %X\n", offset, data);
 }
-
-#if 0
-READ8_MEMBER(saturn_bram_device::read_ext_bram)
-{
-	if (offset < m_size)
-		return m_ext_bram[offset];
-	else
-	{
-		mame_printf_error("Battery RAM read beyond its boundary! offs: %X\n", offset);
-		return 0xff;
-	}
-}
-
-WRITE8_MEMBER(saturn_bram_device::write_ext_bram)
-{
-	if (offset < m_size)
-	{
-		m_ext_bram[offset] = data;
-	}
-	else
-		mame_printf_error("Battery RAM write beyond its boundary! offs: %X data: %X\n", offset, data);
-}
-#endif

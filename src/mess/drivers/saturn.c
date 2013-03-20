@@ -632,27 +632,27 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 			case 0x22:
 			case 0x23:
 			case 0x24:
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_bram), m_exp->m_cart));
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_bram), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_bram), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_bram), m_exp->m_cart));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x04000000, 0x047fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_bram), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x04000000, 0x047fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_bram), (sat_cart_slot_device*)m_exp));
 				break;
 			case 0x5a:  // Data RAM cart
 			case 0x5c:
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram0), m_exp->m_cart));
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram0), m_exp->m_cart));
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram1), m_exp->m_cart));
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram1), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram0), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram0), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(device_sat_cart_interface::read_ext_dram1), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(device_sat_cart_interface::write_ext_dram1), m_exp->m_cart));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02400000, 0x025fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram0), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x02400000, 0x025fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram0), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02600000, 0x027fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x02600000, 0x027fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
 				break;
 			case 0: // ROM cart + mirror
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x24ffffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
-				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x24ffffff, read32_delegate(FUNC(device_sat_cart_interface::read_rom), m_exp->m_cart));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
+				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x24ffffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
+				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x24ffffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
 				break;
 		}
 	}

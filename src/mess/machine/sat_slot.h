@@ -25,10 +25,6 @@ public:
 	// reading and writing to Extended BRAM chip
 	virtual DECLARE_READ32_MEMBER(read_ext_bram) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) {}
-#if 0
-	virtual DECLARE_READ8_MEMBER(read_ext_bram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ext_bram) {}
-#endif
 
 	virtual int get_cart_type() { return m_cart_type; };
 
@@ -43,7 +39,7 @@ public:
 	UINT32  get_ext_dram1_size() { return m_ext_dram1_size; }
 	UINT32  get_ext_bram_size() { return m_ext_bram_size; }
 
-//protected:
+protected:
 	int m_cart_type;
 
 	// internal state
@@ -102,7 +98,7 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
 
-//protected:
+private:
 	device_sat_cart_interface*       m_cart;
 };
 
