@@ -252,7 +252,7 @@ A code generator is used to support interrupting and restarting an
 instruction in the middle.  This is done through a two-level state
 machine with updates only at the boundaries.  More precisely,
 inst_state tells you which main state you're in.  It's equal to the
-opcode byte when 0-255, and 256 means reset.  It's always valid and
+opcode byte when 0-255, and 0xff00 means reset.  It's always valid and
 used by instructions like rmb.  inst_substate indicates at which step
 we are in an instruction, but it set only when an instruction has been
 interrupted.  Let's go back to the asl <abs> code:
@@ -458,7 +458,19 @@ to note that the exception path only happens when the contention/wait
 state goes further than the scheduling slice of the cpu.  That should
 not usually be the case, so the cost should be minimal.
 
-  10. Current TODO
+  10. Multi-dispatch variants
+
+Some variants currently in the process of being supported change
+instruction set depending on an internal flag, either switching to a
+16-bits mode or changing some register accesses to memory accesses.
+This is handled by having multiple dispatch tables for the cpu, the
+d<cpu>.lst not being 257 entries anymore but 256*n+1.  The variable
+inst_state_base must select which instruction table to use at a given
+time.  It must be a multiple of 256, and is in fact simply or-ed to
+the first instruction byte to get the dispatch table index (aka
+inst_state).
+
+  11. Current TODO
 
 - Implement the bus contention/wait states stuff, but that requires
   support on the memory map side first.

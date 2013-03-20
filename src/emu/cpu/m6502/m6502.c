@@ -100,6 +100,7 @@ void m6502_device::init()
 	save_item(NAME(v_state));
 	save_item(NAME(inst_state));
 	save_item(NAME(inst_substate));
+	save_item(NAME(inst_state_base));
 	save_item(NAME(irq_taken));
 	save_item(NAME(inhibit_interrupts));
 
@@ -122,6 +123,7 @@ void m6502_device::init()
 	v_state = false;
 	inst_state = STATE_RESET;
 	inst_substate = 0;
+	inst_state_base = 0;
 	sync = false;
 	end_cycles = 0;
 	inhibit_interrupts = false;
@@ -131,6 +133,7 @@ void m6502_device::device_reset()
 {
 	inst_state = STATE_RESET;
 	inst_substate = 0;
+	inst_state_base = 0;
 	nmi_state = false;
 	irq_state = false;
 	apu_irq_state = false;
@@ -406,7 +409,7 @@ void m6502_device::execute_run()
 	while(icount > 0) {
 		if(inst_state < 0x100) {
 			PPC = NPC;
-			inst_state = IR;
+			inst_state = IR | inst_state_base;
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
 				debugger_instruction_hook(this, NPC);
 		}
@@ -479,7 +482,7 @@ UINT32 m6502_device::disasm_max_opcode_bytes() const
 
 offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *table)
 {
-	const disasm_entry &e = table[oprom[0]];
+	const disasm_entry &e = table[oprom[0] | inst_state_base];
 	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
 	buffer += sprintf(buffer, "%s", e.opcode);
 

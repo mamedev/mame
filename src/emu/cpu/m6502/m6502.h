@@ -97,7 +97,7 @@ protected:
 	};
 
 	enum {
-		STATE_RESET = 0x100,
+		STATE_RESET = 0xff00,
 	};
 
 	enum {
@@ -182,6 +182,7 @@ protected:
 	UINT8   Y;                      /* Y index register */
 	UINT8   P;                      /* Processor status */
 	UINT8   IR;                     /* Prefetched instruction register */
+	int     inst_state_base;        /* Current instruction bank */
 
 	memory_interface *mintf;
 	int inst_state, inst_substate;

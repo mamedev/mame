@@ -7,7 +7,7 @@ Usage:
 import sys
 import logging
 
-MAX_STATES = 0x101
+MAX_STATES = 0
 
 def load_opcodes(fname):
     """Load opcodes from .lst file"""
@@ -174,7 +174,7 @@ DO_EXEC_PARTIAL_EPILOG="""\
 """
 
 DISASM_PROLOG="""\
-const %(device)s::disasm_entry %(device)s::disasm_entries[0x100] = {
+const %(device)s::disasm_entry %(device)s::disasm_entries[0x%(disasm_count)x] = {
 """
 
 DISASM_EPILOG="""\
@@ -182,15 +182,17 @@ DISASM_EPILOG="""\
 """
 
 def save_tables(f, device, states):
+    total_states = len(states)
+
     d = { "device": device,
+          "disasm_count": total_states-1
           }
-
-    assert len(states) == MAX_STATES
-
+    
+    
     emit(f, DO_EXEC_FULL_PROLOG % d)
     for n, state in enumerate(states):
         if state == ".": continue
-        if n < MAX_STATES - 1:
+        if n < total_states - 1:
             emit(f, "\tcase 0x%02x: %s_full(); break;\n" % (n, state))
         else:
             emit(f, "\tcase %s: %s_full(); break;\n" % ("STATE_RESET", state))
@@ -199,16 +201,16 @@ def save_tables(f, device, states):
     emit(f, DO_EXEC_PARTIAL_PROLOG % d)
     for n, state in enumerate(states):
         if state == ".": continue
-        if n < MAX_STATES - 1:
+        if n < total_states - 1:
             emit(f, "\tcase 0x%02x: %s_partial(); break;\n" % (n, state))
         else:
             emit(f, "\tcase %s: %s_partial(); break;\n" % ("STATE_RESET", state))
     emit(f, DO_EXEC_PARTIAL_EPILOG % d)
 
-    emit(f, DISASM_PROLOG % d)
+    emit(f, DISASM_PROLOG % d )
     for n, state in enumerate(states):
         if state == ".": continue
-        if n == MAX_STATES - 1: break
+        if n == total_states - 1: break
         tokens = state.split("_")
         opc = tokens[0]
         mode = tokens[-1]
@@ -262,8 +264,8 @@ def main(argv):
 
     states = load_disp(argv[3])
     logging.info("loaded %s states", len(states))
-    assert len(states) == MAX_STATES
 
+    assert (len(states) & 0xff) == 1
     save(argv[4], device_name, opcodes, states)
 
 
