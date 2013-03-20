@@ -121,7 +121,7 @@ private:
 	optional_device<votrax_sc01_device> m_votrax;
 
 	// internal state
-	bool            m_populate_votrax;
+	//bool            m_populate_votrax;
 	UINT8           m_last_speech_clock;
 
 #if USE_FAKE_VOTRAX

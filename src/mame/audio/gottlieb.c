@@ -343,7 +343,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 		m_riot(*this, "riot"),
 		m_dac(*this, "dac"),
 		m_votrax(*this, "votrax"),
-		m_populate_votrax(false),
+		//m_populate_votrax(false),
 		m_last_speech_clock(0)
 #if USE_FAKE_VOTRAX
 		, m_samples(*this, ":samples"),
@@ -361,7 +361,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 		m_riot(*this, "riot"),
 		m_dac(*this, "dac"),
 		m_votrax(*this, "votrax"),
-		m_populate_votrax(populate_votrax),
+		//m_populate_votrax(populate_votrax),
 		m_last_speech_clock(0)
 #if USE_FAKE_VOTRAX
 		, m_samples(*this, ":samples"),
