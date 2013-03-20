@@ -1219,7 +1219,7 @@ ROM_START( pc_drmro )   /* Dr Mario */
 	ROM_LOAD( "security.prm", 0x00000, 0x10, CRC(1b26e58c) SHA1(bd2d81d3cc54966ef154b3487d43ecbc316d6d22) )
 ROM_END
 
-ROM_START( pc_virus )   /* Virus */
+ROM_START( pc_virus )   /* Virus (from location test board) */
 	BIOS_CPU
 	ROM_LOAD( "u2",   0x0c000, 0x2000, CRC(d2764d91) SHA1(393b54148e9250f14d83318aed6686cc04b923e6) ) /* extra bios code for this game */
 	BIOS_GFX
@@ -1235,6 +1235,22 @@ ROM_START( pc_virus )   /* Virus */
 	ROM_RELOAD(         0x08000, 0x08000 )
 	ROM_RELOAD(         0x10000, 0x08000 )
 	ROM_RELOAD(         0x18000, 0x08000 )
+
+	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
+	ROM_LOAD( "security.u6", 0x00000, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
+ROM_END
+
+ROM_START( pc_bload )   /* Bases Loaded (from location test board) */
+	BIOS_CPU
+	ROM_LOAD( "new game 1.u2",   0x0c000, 0x2000, CRC(43879cc5) SHA1(dfde35e255825fffc22b5495c1e3bc1cfad7e9c0) ) /* extra bios code for this game */
+	BIOS_GFX
+
+	ROM_REGION( 0x50000, "cart", 0 )
+	ROM_LOAD( "u3",  0x10000, 0x20000, CRC(14a77a61) SHA1(6283f0dc8e9a2bbcd7ed452aa30cf646a6526837) )    /* banked */
+	ROM_LOAD( "bases loaded 9a70 prg-h.u4",  0x30000, 0x20000, CRC(f158f941) SHA1(e58bdcfb62d25348f5c81b2cf8001fc2c9e04eb2) )    /* banked */
+
+	ROM_REGION( 0x020000, "gfx2", 0 )   /* cart gfx */
+	ROM_LOAD( "u1",  0x00000, 0x20000, CRC(02ff6ae9) SHA1(ba15b91f917c9e722d1d8b24b5783bd5eac6a4e7) )
 
 	ROM_REGION( 0x0100,  "rp5h01", 0 )  /* rp5h01 data */
 	ROM_LOAD( "security.u6", 0x00000, 0x10, CRC(5b4f6930) SHA1(bd152d6907fe55f80125b34360fdb44cfc348906) )
@@ -1696,10 +1712,11 @@ GAME( 1988, pc_ddrgn, playch10, playch10, playch10, playch10_state, pcfboard, RO
 GAME( 1989, pc_ngaid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Ninja Gaiden (PlayChoice-10)", 0 )
 GAME( 1989, pc_tmnt,  playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Konami (Nintendo of America license)",     "Teenage Mutant Ninja Turtles (PlayChoice-10)", 0 )
 GAME( 1989, pc_ftqst, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Sunsoft (Nintendo of America license)",    "Uncle Fester's Quest: The Addams Family (PlayChoice-10)", 0 )
-GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS)
+GAME( 1989, pc_bstar, playch10, playch10, playch10, playch10_state, pcfboard_2, ROT0, "SNK (Nintendo of America license)",      "Baseball Stars: Be a Champ! (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, pc_tbowl, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Tecmo (Nintendo of America license)",      "Tecmo Bowl (PlayChoice-10)", 0 )
-GAME( 1990, pc_virus, playch10, playch10, playch10, playch10_state, virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
+GAME( 1990, pc_virus, pc_drmro, playch10, playch10, playch10_state, virus,    ROT0, "Nintendo",                                 "Virus (Dr. Mario prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_drmro, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Nintendo",                                 "Dr. Mario (PlayChoice-10)", 0 )
+GAME( 1990, pc_bload, playch10, playch10, playch10, playch10_state, virus,    ROT0, "Jaleco (Nintendo of America license)",     "Bases Loaded (Prototype, PlayChoice-10)", 0 )
 GAME( 1990, pc_ynoid, playch10, playch10, playch10, playch10_state, pcfboard, ROT0, "Capcom USA (Nintendo of America license)", "Yo! Noid (PlayChoice-10)", 0 )
 
 /* G-Board Games */
@@ -1714,11 +1731,11 @@ GAME( 1991, pc_ngai3, playch10, playch10, playch10, playch10_state, pcgboard, RO
 GAME( 1991, pc_pwbld, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Taito (Nintendo of America license)",      "Power Blade (PlayChoice-10)", 0 )
 GAME( 1991, pc_rkats, playch10, playch10, playch10, playch10_state, pcgboard, ROT0, "Atlus (Nintendo of America license)",      "Rockin' Kats (PlayChoice-10)", 0 )
 /* variant with 4 screen mirror */
-GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)",           "Rad Racer II (PlayChoice-10)", 0 )
-GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)",   "Gauntlet (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pc_radr2, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Square (Nintendo of America license)", "Rad Racer II (PlayChoice-10)", 0 )
+GAME( 1985, pc_gntlt, playch10, playch10, playch10, playch10_state, pcgboard_type2, ROT0, "Atari / Tengen (Nintendo of America license)", "Gauntlet (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
 
 /* H-Board Games */
-GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)",            "PinBot (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pc_pinbt, playch10, playch10_hboard, playch10, playch10_state, pchboard, ROT0, "Rare (Nintendo of America license)", "PinBot (PlayChoice-10)", GAME_IMPERFECT_GRAPHICS )
 
 /* i-Board Games */
 GAME( 1989, pc_cshwk, playch10, playch10, playch10, playch10_state, pciboard, ROT0, "Rare (Nintendo of America license)",       "Captain Sky Hawk (PlayChoice-10)", 0 )

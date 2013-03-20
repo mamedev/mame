@@ -786,6 +786,7 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 DRIVER_INIT_MEMBER(playch10_state,pcfboard)
 {
 	UINT8 *prg = memregion("cart")->base();
+	UINT32 len = memregion("cart")->bytes();
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	m_vram = NULL;
@@ -794,7 +795,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard)
 	/* Copy the initial banks */
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
-	m_mmc1_rom_mask = 0x07;
+	m_mmc1_rom_mask = ((len - 0x10000) / 0x4000) - 1;
 
 	/* MMC mapper at writes to $8000-$ffff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::mmc1_rom_switch_w),this));
