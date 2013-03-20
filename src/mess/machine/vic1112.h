@@ -61,7 +61,7 @@ private:
 	required_device<via6522_device> m_via1;
 	required_device<ieee488_device> m_bus;
 
-	UINT8 *m_rom;
+	//UINT8 *m_rom;
 
 	int m_via0_irq;
 	int m_via1_irq;

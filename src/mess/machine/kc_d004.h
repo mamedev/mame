@@ -73,7 +73,7 @@ private:
 	UINT16              m_rom_base;
 	UINT8               m_enabled;
 	UINT8               m_connected;
-	UINT8               m_active_fdd;
+	//UINT8               m_active_fdd;
 
 	floppy_image_device *m_floppy;
 };

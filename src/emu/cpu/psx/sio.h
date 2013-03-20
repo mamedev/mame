@@ -82,7 +82,7 @@ private:
 	int deviceCount;
 
 	int m_outputdata;
-	int m_inputdata;
+	//int m_inputdata;
 };
 
 class psxsio0_device : public psxsio_device

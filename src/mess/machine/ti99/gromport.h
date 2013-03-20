@@ -437,7 +437,7 @@ public:
 private:
 	emu_options&            m_options;      // need this to find the path to the nvram files
 	int                     m_type;
-	const char*             m_system_name;  // need this to find the path to the nvram files
+	//const char*             m_system_name;  // need this to find the path to the nvram files
 	tagged_list<rpk_socket> m_sockets;
 
 	void add_socket(const char* id, rpk_socket *newsock);

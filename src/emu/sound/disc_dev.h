@@ -98,7 +98,7 @@ DISCRETE_CLASS_STEP_RESET(dsd_555_vco1, 1,
 );
 
 DISCRETE_CLASS_STEP_RESET(dsd_566, 1,
-	unsigned int    m_state[2];                 /* keeps track of excess flip_flop changes during the current step */
+	//unsigned int    m_state[2];                 /* keeps track of excess flip_flop changes during the current step */
 	int             m_flip_flop;                /* 566 flip/flop output state */
 	double          m_cap_voltage;              /* voltage on cap */
 	double          m_v_sqr_low;                /* voltage for a squarewave at low */

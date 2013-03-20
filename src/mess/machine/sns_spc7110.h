@@ -63,7 +63,7 @@ public:
 
 private:
 	running_machine& m_machine;
-	UINT32 m_rom_size;
+	//UINT32 m_rom_size;
 };
 
 // ======================> sns_rom_spc7110_device

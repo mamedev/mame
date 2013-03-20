@@ -165,7 +165,7 @@ private:
 	devcb_resolved_write_line   m_out_tdo_func;
 	devcb_resolved_write_line   m_out_irq_func;
 
-	int m_device_type;                      /* device type */
+	//int m_device_type;                      /* device type */
 
 	/* registers */
 	UINT8 m_gpip;                           /* general purpose I/O register */
@@ -195,7 +195,7 @@ private:
 	int m_to[4];            /* timer out latch */
 
 	/* interrupt state */
-	int m_irqlevel;                         /* interrupt level latch */
+	//int m_irqlevel;                         /* interrupt level latch */
 
 	/* serial state */
 	UINT8 m_next_rsr;                       /* receiver status register latch */

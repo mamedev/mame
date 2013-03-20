@@ -67,7 +67,7 @@ private:
 
 	// internal state
 	sound_stream *          m_stream;
-	emu_timer *             m_timer[2];
+	//emu_timer *             m_timer[2];
 	void *                  m_chip;
 	UINT8                   m_lastreg;
 	devcb2_write_line       m_irqhandler;

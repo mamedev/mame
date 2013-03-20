@@ -207,8 +207,8 @@ public:
 	void reset(void);
 	void input_write(int sub_node, UINT8 data );
 private:
-	double      m_gain;             /* node gain */
-	double      m_offset;           /* node offset */
+	//double      m_gain;             /* node gain */
+	//double      m_offset;           /* node offset */
 	UINT8       m_data;             /* data written */
 };
 

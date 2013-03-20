@@ -71,7 +71,7 @@ private:
 	static const int m_fifo_size = 16;
 	UINT8 m_fifo_ptr, m_fifo[m_fifo_size];
 
-	int m_xfer_remaining;   // amount in the FIFO when we're in data in phase
+	//int m_xfer_remaining;   // amount in the FIFO when we're in data in phase
 
 	// read-only registers
 	UINT8 m_status, m_irq_status, m_internal_state, m_fifo_internal_state;

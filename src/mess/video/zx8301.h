@@ -116,7 +116,7 @@ private:
 
 	cpu_device *m_cpu;
 	screen_device *m_screen;
-	address_space *m_data;
+	//address_space *m_data;
 
 	int m_dispoff;                  // display off
 	int m_mode8;                    // mode8 active

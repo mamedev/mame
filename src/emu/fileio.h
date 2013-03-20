@@ -103,7 +103,7 @@ private:
 	path_iterator   m_iterator;
 	osd_directory * m_curdir;
 	astring         m_pathbuffer;
-	int             m_buflen;
+	//int             m_buflen;
 };
 
 

@@ -80,7 +80,7 @@ private:
 
 	scsihle_device* m_SCSIdevices[8];
 	UINT8 m_command[32];
-	UINT8 m_result[32];
+	//UINT8 m_result[32];
 	UINT8 m_command_index;
 	int m_result_length;
 	UINT32 m_result_index;

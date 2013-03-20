@@ -84,7 +84,7 @@ private:
 	device_image_interface *image;
 	astring &current_directory, &current_file;
 	const image_device_format *current_format;
-	int confirm_save_as_yes;
+	//int confirm_save_as_yes;
 	char filename_buffer[1024];
 };
 

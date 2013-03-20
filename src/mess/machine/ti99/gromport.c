@@ -1994,8 +1994,8 @@ DTD:
     Constructor.
 */
 rpk::rpk(emu_options& options, const char* sysname)
-	:m_options(options),
-	m_system_name(sysname)
+	:m_options(options)
+	//,m_system_name(sysname)
 {
 	m_sockets.reset();
 };

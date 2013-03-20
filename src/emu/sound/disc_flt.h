@@ -48,7 +48,7 @@ DISCRETE_CLASS_STEP_RESET(dst_crfilter, 1,
 	double          m_rc;
 	double          m_exponent;
 	UINT8           m_has_rc_nodes;
-	UINT8           m_is_fast;
+	//UINT8           m_is_fast;
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_op_amp_filt, 1,
@@ -164,7 +164,7 @@ DISCRETE_CLASS_STEP_RESET(dst_rcdiscN, 1,
 	double          m_x1;                   /* x[k-1], previous input value */
 	double          m_y1;                   /* y[k-1], previous output value */
 	double          m_a1;                   /* digital filter coefficients, denominator */
-	double          m_b[2];                 /* digital filter coefficients, numerator */
+	//double          m_b[2];                 /* digital filter coefficients, numerator */
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_rcdisc2N, 1,

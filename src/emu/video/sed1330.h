@@ -118,7 +118,7 @@ private:
 	int m_ov;                   // graphics mode layer composition
 
 	// devices
-	screen_device *m_screen;
+	//screen_device *m_screen;
 
 	// address space configurations
 	const address_space_config      m_space_config;

@@ -77,7 +77,7 @@ private:
 
 	UINT8 m_ram[0x800];
 
-	UINT8 m_hdc_addr;
+	//UINT8 m_hdc_addr;
 };
 
 

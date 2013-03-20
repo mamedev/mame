@@ -106,7 +106,7 @@ private:
 	int m_phase;
 	unsigned char m_status_port;  // read at 0xe96003
 	unsigned char m_status;       // status phase output
-	unsigned char m_message;
+	//unsigned char m_message;
 	unsigned char m_command[10];
 	unsigned char m_sense[4];
 	int m_command_byte_count;

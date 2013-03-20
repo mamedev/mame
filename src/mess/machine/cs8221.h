@@ -61,10 +61,10 @@ protected:
 private:
 
 	// internal state
-	address_space *m_space;
-	UINT8 *m_isa;
-	UINT8 *m_bios;
-	UINT8 *m_ram;
+	//address_space *m_space;
+	//UINT8 *m_isa;
+	//UINT8 *m_bios;
+	//UINT8 *m_ram;
 
 	// address selection
 	UINT8 m_address;

@@ -75,7 +75,7 @@ private:
 	s_pgm_t     m_pgm;              /* programming state */
 	bool        m_enabling_sdb;     /* set when a sdp enable command is in progress */
 	bool        m_disabling_sdb;    /* set when a sdp disable command is in progress */
-	bool        m_dirty;            /* set when the memory contents should be set */
+	//bool        m_dirty;            /* set when the memory contents should be set */
 	bool        m_toggle_bit;       // indicates flashing in progress (toggles for each query)
 	UINT8*      m_programming_buffer;
 	int         m_programming_last_offset;

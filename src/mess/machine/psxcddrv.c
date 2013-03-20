@@ -317,7 +317,7 @@ class mess_cdrom_driver : public cdrom_driver
 	int num_sectors, num_tracks;
 	toc_entry toc[100];
 	int bin_sector_size;
-	const char *err;
+	//const char *err;
 
 	io_status *read_sectors(const unsigned int startsec, const unsigned int numsec, unsigned char *buf);
 
@@ -340,7 +340,7 @@ public:
 };
 
 mess_cdrom_driver::mess_cdrom_driver()
-	: err(NULL)
+	//: err(NULL)
 {
 	for (int i=0; i<100; i++)
 		toc[i].type=track_illegal;

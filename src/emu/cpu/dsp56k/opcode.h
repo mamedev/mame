@@ -36,7 +36,7 @@ private:
 	ParallelMove* m_parallelMove;
 
 	UINT16 m_word0;
-	UINT16 m_word1;
+	//UINT16 m_word1;
 
 	astring dcString() const;
 };

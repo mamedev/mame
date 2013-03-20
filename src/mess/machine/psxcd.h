@@ -158,7 +158,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 
 private:
-	emu_timer *m_timer;
+	//emu_timer *m_timer;
 	UINT32 m_sysclock;
 	const char *m_devname;
 	cdrom_image_device *m_cddevice;

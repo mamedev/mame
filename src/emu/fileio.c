@@ -110,8 +110,8 @@ bool path_iterator::next(astring &buffer, const char *name)
 
 file_enumerator::file_enumerator(const char *searchpath)
 	: m_iterator(searchpath),
-		m_curdir(NULL),
-		m_buflen(0)
+		m_curdir(NULL)/*,
+		m_buflen(0)*/
 {
 }
 

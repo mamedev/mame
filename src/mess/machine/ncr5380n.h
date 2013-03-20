@@ -190,7 +190,7 @@ private:
 	UINT8 clock_conv, sync_offset, sync_period, bus_id, select_timeout, seq;
 	UINT16 tcount;
 	int mode;
-	int state, xfr_phase;
+	int state/*, xfr_phase*/;
 
 	bool irq, drq;
 

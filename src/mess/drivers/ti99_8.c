@@ -272,7 +272,7 @@ private:
 	/* Keyboard support */
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
-	int     m_alphalock_line;
+	//int     m_alphalock_line;
 };
 
 /*

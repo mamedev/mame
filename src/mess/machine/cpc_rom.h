@@ -77,7 +77,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "cpc_rom"; }
 
 private:
-	cpc_expansion_slot_device *m_slot;
+	//cpc_expansion_slot_device *m_slot;
 
 	rom_image_device* m_rom[6];
 };

@@ -167,8 +167,10 @@ private:
 		void putchar(UINT8 data);
 	private:
 		apollo_kbd_device *m_device; // pointer back to our device
+#if defined(KBD_TTY_NAME)
 		const char *m_tty_name;
 		int m_tty_fd; /* File descriptor of keyboard tty */
+#endif
 		int m_connected;
 	};
 

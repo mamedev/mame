@@ -273,7 +273,7 @@ public:
 	int m_ready_line, m_ready_line1;
 
 private:
-	int     m_joystick_select;
+	//int     m_joystick_select;
 	// Some values to keep. Rest is on the geneve_mapper.
 };
 

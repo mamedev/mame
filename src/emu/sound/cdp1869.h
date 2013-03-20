@@ -269,7 +269,7 @@ private:
 	cdp1869_char_ram_write_func     m_out_char_ram_func;
 
 	screen_device *m_screen;
-	address_space *m_page_ram;
+	//address_space *m_page_ram;
 	emu_timer *m_prd_timer;
 	sound_stream *m_stream;
 

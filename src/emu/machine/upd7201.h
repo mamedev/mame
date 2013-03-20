@@ -136,10 +136,10 @@ private:
 	devcb_resolved_write_line       m_out_int_func;
 
 	// timers
-	emu_timer *m_rx_a_timer;
-	emu_timer *m_tx_a_timer;
-	emu_timer *m_rx_b_timer;
-	emu_timer *m_tx_b_timer;
+	//emu_timer *m_rx_a_timer;
+	//emu_timer *m_tx_a_timer;
+	//emu_timer *m_rx_b_timer;
+	//emu_timer *m_tx_b_timer;
 };
 
 

@@ -341,9 +341,9 @@ private:
 
 	vga_device* m_vga;  // for pass-through
 	astring m_vga_tag;  // pass-through device tag
-	UINT8* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
+	//UINT8* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
 					// only one set of VRAM, so this will only be needed in standalone 8514/A cards
-	UINT32 m_vramsize;
+	//UINT32 m_vramsize;
 };
 
 // device type definition

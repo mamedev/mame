@@ -27,7 +27,7 @@ DISCRETE_CLASS_STEP_RESET(dss_counter, 1,
 	int             m_is_7492;
 	int             m_last_clock;
 	UINT32          m_last_count;
-	UINT32          m_last;                 /* Last clock state */
+	//UINT32          m_last;                 /* Last clock state */
 	UINT32          m_min;
 	UINT32          m_max;
 	UINT32          m_diff;
@@ -39,8 +39,8 @@ DISCRETE_CLASS_STEP_RESET(dss_lfsr_noise, 2,
 	int             m_last;                 /* Last clock state */
 	double          m_t_clock;              /* fixed counter clock in seconds */
 	double          m_t_left;               /* time unused during last sample in seconds */
-	double          m_sample_step;
-	double          m_t;
+	//double          m_sample_step;
+	//double          m_t;
 	UINT8           m_reset_on_high;
 	UINT8           m_invert_output;
 	UINT8           m_out_is_f0;
@@ -184,7 +184,7 @@ DISCRETE_CLASS_STEP_RESET(dss_schmitt_osc, 1,
 
 /* Not yet implemented */
 DISCRETE_CLASS_STEP_RESET(dss_adsrenv,  1,
-	double          m_phase;
+	//double          m_phase;
 );
 
 

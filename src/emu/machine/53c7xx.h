@@ -211,7 +211,7 @@ private:
 	emu_timer *m_tm;
 
 	int     m_scripts_state;
-	int     m_scripts_substate;
+	//int     m_scripts_substate;
 	void    (ncr53c7xx_device::*m_scripts_op)();
 
 	// callbacks

@@ -190,9 +190,9 @@ private:
 
 		UINT8 m_current_voice;
 		UINT8 m_current_reg;
-		UINT8 m_port;
-		UINT8 m_irq;
-		UINT8 m_dma;
+		//UINT8 m_port;
+		//UINT8 m_irq;
+		//UINT8 m_dma;
 
 		UINT8 m_adlib_cmd;
 		UINT8 m_mix_ctrl;

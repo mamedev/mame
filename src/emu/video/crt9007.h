@@ -176,8 +176,8 @@ private:
 	int m_vlt;
 	int m_drb;
 	int m_wben;
-	int m_slg;
-	int m_sld;
+	//int m_slg;
+	//int m_sld;
 	int m_lpstb;
 
 	// DMA
