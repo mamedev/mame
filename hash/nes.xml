@@ -3118,7 +3118,7 @@
 				<rom name="nes batman prg-ae29a4 ver 0.0 8-89" size="131072" crc="a8f5c8ed" sha1="dfef4abddee3e51e83f243fd8c819e4958585017" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="nes batman chr ver 0.0 8-89 / 972e8e" size="131072" crc="47c50822" sha1="2d07e4dc486b907218308f5d69b08f130d7c1a93" offset="00000" />
+				<rom name="nes batman chr ver 0.0 8-89 - 972e8e" size="131072" crc="47c50822" sha1="2d07e4dc486b907218308f5d69b08f130d7c1a93" offset="00000" />	<!-- Original label "nes batman chr ver 0.0 8-89 / 972e8e" -->
 			</dataarea>
 		</part>
 	</software>
