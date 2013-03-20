@@ -524,7 +524,8 @@ CCOMFLAGS += \
 	-Wno-tautological-compare \
 	-Wno-constant-logical-operand \
 	-Wno-format-security \
-	-Wno-shift-count-overflow
+	-Wno-shift-count-overflow \
+	-Wno-self-assign-field
 endif
 
 
