@@ -373,7 +373,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 -->
 	</software>
 
-<!-- Only Europe is confirmed -->
+<!-- Euro and USA verified -->
 	<software name="688atsub">
 		<description>688 Attack Sub (Euro, USA)</description>
 		<year>1991</year>
@@ -562,7 +562,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-<!-- Only Europe is confirmed -->
+<!-- Euro and USA verified -->
 	<software name="arcadecl">
 		<description>Arcade Classics (Euro, USA)</description>
 		<year>1996</year>
@@ -823,7 +823,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-<!-- Only Europe is confirmed -->
+<!-- Euro and Jpn confirmed -->
 	<software name="joemont2a" cloneof="joemont2">
 		<description>Joe Montana II Sports Talk Football (World)</description>
 		<year>1991</year>
@@ -845,7 +845,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="837-8861" />
 			<dataarea name="rom" size="1048576">
-				<rom name="lrog453-eta.bin" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog453-eta 92305" size="1048576" crc="05dc3ffc" sha1="be80f96bee64bab159614d29f882442abef9de76" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1105,7 +1105,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-<!-- Only Europe is confirmed -->
+<!-- Euro and Jpn confirmed -->
 	<software name="sharrier">
 		<description>Space Harrier II (World)</description>
 		<year>1989</year>
@@ -1250,7 +1250,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-<!-- Only Europe is confirmed -->
+<!-- Euro and USA verified -->
 	<software name="evander">
 		<description>Evander Holyfield's 'Real Deal' Boxing (World)</description>
 		<year>1992</year>
@@ -1388,7 +1388,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-<!-- Only Europe and Korea is confirmed -->
+<!-- Euro, Korea and USA confirmed -->
 	<software name="kidcham">
 		<description>Kid Chameleon (Euro, Korea, USA)</description>
 		<year>1992</year>
@@ -1440,6 +1440,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and Jpn confirmed -->
 	<!-- According to Elbarto:
 	    On the Quackshot PCB there is a 512Kb rom.
 	    Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
@@ -1499,13 +1500,14 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="sonic">
 		<description>Sonic the Hedgehog (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-13913-F" />
+			<feature name="ic1" value="MPR-13913-F, MPR-13913 W33" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13913-f.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -1765,8 +1767,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-18212-MX" />
+			<feature name="ic2" value="MPR-18213-MX" />
+			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="6-pak (usa).bin" size="3145728" crc="1a6f45dc" sha1="aa276048f010e94020f0c139dcf5829fb9ea6b21" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18212-mx.ic1" size="2097152" crc="f1a28bdc" sha1="980f80041d06f711bdc252f4de2f75144c589eab" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18213-mx.ic2" size="1048576" crc="21c7c561" sha1="37a599434b56b7d9aa102a7b23a084000d30d8fd" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2533,6 +2540,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="aquagame">
 		<description>The Aquatic Games Starring James Pond and the Aquabats (Euro, USA)</description>
 		<year>1992</year>
@@ -2962,6 +2970,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and Jpn confirmed -->
 	<software name="smgp2">
 		<description>Ayrton Senna's Super Monaco GP II (Euro, Jpn)</description>
 		<year>1992</year>
@@ -2972,7 +2981,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="??" />
-			<feature name="ic1" value="MPR-14861 W45" />
+			<feature name="ic1" value="MPR-14861 W45, MPR-14861-F" />
 			<feature name="ic2" value="MB8464A" />
 			<feature name="ic3" value="IL7-1026B" />
 			<feature name="ic4" value="HD74HC00P" />
@@ -3131,7 +3140,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro confirmed -->
 	<software name="balljack">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Ball Jacks (Euro, Jpn)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
@@ -3139,8 +3150,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19930423"/>
 		<info name="alt_title" value="ボールジャックス"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="837-9514" />
 			<dataarea name="rom" size="262144">
-				<rom name="ball jacks (euro, jpn).bin" size="262144" crc="f5c3c54f" sha1="c8aa71c5632a5cc59da430ca3870cffb37fbd30f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog454-mbj 93112" size="262144" crc="f5c3c54f" sha1="c8aa71c5632a5cc59da430ca3870cffb37fbd30f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3822,12 +3834,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="biohazrb">
 		<description>Bio Hazard Battle (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978BA" />
+			<feature name="pcb" value="171-5978BA, 171-5978B" />
 			<feature name="u1" value="MPR-15204 W97" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15204 w97.u1" size="1048576" crc="95b0ea2b" sha1="dca9d505302ce9ff1f98c4da95505139c7d3cafc" offset="000000" loadflag="load16_word_swap" />
@@ -4461,12 +4474,14 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 	<software name="burnforc">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Burning Force (Euro)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="837-8342" />
 			<dataarea name="rom" size="524288">
-				<rom name="burning force (euro).bin" size="524288" crc="776ff6ff" sha1="a25930ee55a2d88838e3999fb5939d9392fd0efa" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog4502-ebu 91372" size="524288" crc="776ff6ff" sha1="a25930ee55a2d88838e3999fb5939d9392fd0efa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4546,6 +4561,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="calgames">
 		<description>California Games (Euro, USA)</description>
 		<year>1991</year>
@@ -4643,13 +4659,14 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="castlill">
 		<description>Castle of Illusion Starring Mickey Mouse (Euro, USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-13491 S82" />
+			<feature name="ic1" value="MPR-13491 S82, MPR-13491 W36" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13491 s82.ic1" size="524288" crc="ba4e9fd0" sha1="4ac3687634a5acc55ac7f156c6de9749158713e4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -6402,13 +6419,14 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="drsc">
 		<description>David Robinson's Supreme Court (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-14835 W67" />
+			<feature name="ic1" value="MPR-14835 W67, MPR-14835-F" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14835 w67.ic1" size="524288" crc="512b7599" sha1="adcee1a54caa0db0aab0927b877d2be828964275" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -6760,6 +6778,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="dicktr">
 		<description>Dick Tracy (World)</description>
 		<year>1991</year>
@@ -8182,8 +8201,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-16047-T" />
+			<feature name="ic2" value="MPR-16048 T98" />
+			<feature name="ic3" value="HD74HC00P" />
 			<dataarea name="rom" size="3145728">
-				<rom name="eternal champions (usa).bin" size="3145728" crc="48f1a42e" sha1="5e978217c10b679a42d7d2966a4ccb77e1715962" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16047-t.ic1" size="2097152" crc="7252a1ef" sha1="5d9e25ea43185b481d241ac648874a63ddfb5573" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16048 t98.ic2" size="1048576" crc="69977fca" sha1="23d5d113743f560feec702c87507210aadc5eb08" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8495,6 +8519,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro, Jpn and USA confirmed -->
 	<software name="fantasia">
 		<description>Fantasia (World, Rev. A)</description>
 		<year>1991</year>
@@ -8585,8 +8610,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="SA-12" />
+			<feature name="ic1" value="MPR-15404 T17" />
+			<feature name="ic2" value="MPR-15409-F" />
+			<feature name="ic3" value="HD74HC00P" />
 			<dataarea name="rom" size="1572864">
-				<rom name="fatal fury (usa).bin" size="1572864" crc="98d49170" sha1="48b6277fc73368d8e96ba407a66f908c3bd87c39" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15404 t17.ic1" size="1048576" crc="40c67691" sha1="e96ee6fb0a5b53debabb5730afee36ee5b5d2057" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15409-f.ic2" size="524288" crc="28707491" sha1="ccdf39b180c9ca08eff1f022e6fc2d029da9a632" offset="0x100000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8630,6 +8660,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="fatallab">
 		<description>Fatal Labyrinth (Euro, USA)</description>
 		<year>1991</year>
@@ -9649,6 +9680,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and Jpn confirmed -->
 	<software name="goldnaxe">
 		<description>Golden Axe (World, Rev. A)</description>
 		<year>1989</year>
@@ -9658,7 +9690,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="alt_title" value="ゴールデンアックス"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-12806A S33" />
+			<feature name="ic1" value="MPR-12806A S33, MPR-12806A-S" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12806a s33.ic1" size="524288" crc="665d7df9" sha1="2ce17105ca916fbbe3ac9ae3a2086e66b07996dd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -9889,6 +9921,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="greendog">
 		<description>Greendog (Euro, USA)</description>
 		<year>1992</year>
@@ -10058,6 +10091,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro confirmed -->
 	<software name="harddriv">
 		<description>Hard Drivin' (World)</description>
 		<year>1991</year>
@@ -10066,8 +10100,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19901221 (JPN)"/>
 		<info name="alt_title" value="ハードドライビン"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-14393-SM" />
 			<dataarea name="rom" size="262144">
-				<rom name="mpr-13489.bin" size="262144" crc="3225baaf" sha1="e15a3e704900b9736bc274bcb49d4421f4a3605b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14393-sm.ic1" size="262144" crc="3225baaf" sha1="e15a3e704900b9736bc274bcb49d4421f4a3605b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11762,6 +11798,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="klax">
 		<description>Klax (Euro, USA)</description>
 		<year>1990</year>
@@ -12184,6 +12221,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="lhx">
 		<description>LHX Attack Chopper (Euro, USA)</description>
 		<year>1992</year>
@@ -12284,6 +12322,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="lionking">
 		<description>The Lion King (World)</description>
 		<year>1994</year>
@@ -12292,8 +12331,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19941209 (JPN)"/>
 		<info name="alt_title" value="ライオン・キング"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-17270-U, MPR-17270-F" />
+			<feature name="ic2" value="MPR-17274-F, MPR-17274 T18" />
+			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-17270.bin" size="3145728" crc="5696a5bc" sha1="24cbe4e75ec10e8e0ffbdb400cf86ecb072d4da9" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17270.ic1" size="2097152" crc="f36bcfd7" sha1="44def056d4d1bdd71ceb5c6bce21fea37afd0f20" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17274.ic2" size="1048576" crc="f87c9656" sha1="355619d1fd708819e413b94c61d4fecbfec46fc1" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -12740,13 +12784,16 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro verified -->
 	<software name="marble">
 		<description>Marble Madness (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="??" />
+			<feature name="u1" value="Marble MAR01 7089" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
-				<rom name="mar01.bin" size="524288" crc="79eba28a" sha1="059e99fde8726a45a584007186913eb9a01f738e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="marble mar01 7089.u1" size="524288" crc="79eba28a" sha1="059e99fde8726a45a584007186913eb9a01f738e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -12776,6 +12823,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="mariolh">
 		<description>Mario Lemieux Hockey (Euro, USA)</description>
 		<year>1991</year>
@@ -13299,6 +13347,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19901122"/>
 		<info name="alt_title" value="メガパネル"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="??" />
 			<dataarea name="rom" size="262144">
 				<rom name="lrog4511-mmg 90436.bin" size="262144" crc="6240f579" sha1="1822905930f5f3627e9f9109760205e617295fda" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -14011,13 +14060,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="mspacman">
 		<description>Ms. Pac-Man (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Tengen ~ Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5927" />
-			<feature name="u1" value="MPR-14178-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="pcb" value="171-5927, ?? (by Tengen)" />
+			<feature name="u1" value="MPR-14178-T, 335030-1050MP" />   <!-- location not really marked on 171-5927 -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-14178-t.u1" size="131072" crc="af041be6" sha1="29fff97e19a00904846ad99baf6b9037b28df15f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -14806,11 +14856,31 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="NBA ジャム トーナメントエディション"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="670125 REV 2" />
+			<feature name="u1" value="U1 NBA JAM TE" />
+			<feature name="u2" value="U2 NBA JAM TE" />
+			<feature name="u3" value="LZ95A53" />
 			<feature name="slot" value="rom_nbajamte" />
 			<dataarea name="rom" size="3145728">
-				<rom name="nba jam tournament edition (world).bin" size="3145728" crc="e9ffcb37" sha1="ddbf09c5e6ed5d528ef5ec816129a332c685f103" offset="000000" loadflag="load16_word_swap" />
+				<rom name="u1 nba jam te.u1" size="2097152" crc="6396cdc1" sha1="f1a53fe470d65e5be408809ab2aa717cc162ba60" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="u2 nba jam te.u2" size="1048576" crc="4b763b0d" sha1="62c5912ce769896a0d887e27eddd2b0d6b862056" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
+<!--
+    Roms Labeled
+
+    U1 NBA JAM TE
+    U1 (c) 1994
+    U1 ACCLAIM
+    U1 S489-U2
+    U1 9502 D
+
+    U2 NBA JAM TE
+    U2 (c) 1994
+    U2 ACCLAIM
+    U2 S489-U1
+    U2 9502 D
+-->
 	</software>
 
 	<software name="nbajamtef" cloneof="nbajamte">
@@ -15442,8 +15512,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6331A" />
+			<feature name="ic1" value="MPR-15005-SM" />
+			<feature name="ic2" value="MPR-15006 W88" />
+			<feature name="ic3" value="HD74HC00P" />
 			<dataarea name="rom" size="1572864">
-				<rom name="mpr-15005+mpr-15006.bin" size="1572864" crc="ce0b1fe1" sha1="3c97396cb4cc566013d06f055384105983582067" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15005-sm.ic1" size="1048576" crc="fe6e1dcf" sha1="8dcb55cb473e8f1ec1a35d94b04747341399a8c3" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15006 w88.ic2" size="524288" crc="69fa64b5" sha1="d952772bdf3cdaee8e3b2d9bfb30dff34c8f54af" offset="0x100000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15978,15 +16053,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="olympgldj" cloneof="olympgld">
-		<description>Olympic Gold (Jpn, Kor, Rev. A)</description>
+<!-- USA and Jpn confirmed -->
+	<software name="olympgldu" cloneof="olympgld">
+		<description>Olympic Gold (Jpn, USA, Kor, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4081"/>
 		<info name="release" value="19920724"/>
 		<info name="alt_title" value="オリンピックゴールド"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14858A-T" />
 			<dataarea name="rom" size="524288">
@@ -15995,7 +16070,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="olympgldu" cloneof="olympgld">
+	<software name="olympgldu1" cloneof="olympgld">
 		<description>Olympic Gold (USA)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -16006,7 +16081,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="olympgldu1" cloneof="olympgld" supported="no">
+	<software name="olympgldu2" cloneof="olympgld" supported="no">
 		<description>Olympic Gold (USA, Alt)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
@@ -16371,13 +16446,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="pacmania">
 		<description>Pac-Mania (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-14392-SM (Euro), MPR-14256-SM (USA)" />
 			<dataarea name="rom" size="262144">
-				<rom name="mpr-14392.bin" size="262144" crc="74bba09b" sha1="e21546f653607d95f2747305703ddd6bf118f90a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14392-sm.ic1" size="262144" crc="74bba09b" sha1="e21546f653607d95f2747305703ddd6bf118f90a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18433,14 +18511,21 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA confirmed -->
 	<software name="ringspow">
 		<description>Rings of Power (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nhlpa" />
+			<feature name="pcb" value="??" />
+			<feature name="u1" value="RINGS OF POWER RIN09" /> <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u3" value="SN74LS139N" />
+			<feature name="u4" value="SN74LS125AN" />
+			<feature name="u5" value="SN74LS74AN" />
+			<feature name="u6" value="X24C01P" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rin09.bin" size="1048576" crc="41fcc497" sha1="84851ce4527761b8d74ce581c19e15d0dd17f368" offset="000000" loadflag="load16_word_swap" />
+				<rom name="rings of power rin09.u1" size="1048576" crc="41fcc497" sha1="84851ce4527761b8d74ce581c19e15d0dd17f368" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18570,8 +18655,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6331A" />
+			<feature name="u1" value="ROAD RASH U1 ROA03-4" /> <!-- location not really marked on PCB, using u1 for consistency -->
+			<!-- U2 not present on the PCB-->
+			<feature name="u3" value="ROAD RASH U3 ROA03-1" /> <!-- location not really marked on PCB, using u3 for consistency -->
+			<feature name="u4" value="SN74LS138N" /> <!-- location not really marked on PCB, using u4 for consistency -->
 			<dataarea name="rom" size="786432">
-				<rom name="road rash (euro, usa).bin" size="786432" crc="dea53d19" sha1="8ff2b2a58b09c42eeb95f633bd8ea5227ac71358" offset="000000" loadflag="load16_word_swap" />
+				<rom name="road rash u1 roa03-4.u1" size="524288" crc="e90337ee" sha1="f025979d35fdb7285a0158e390fdb824551a1ee1" offset="000000" loadflag="load16_word_swap" />
+				<!-- no even rom, like f22a -->
+				<rom name="road rash u3 roa03-1.u3" size="131072" crc="32c1af50" sha1="7e43c8cb6cc2047c1ac8457e8bcc83d2b326172c" offset="0x080000" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -18830,12 +18922,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="rthun2">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Rolling Thunder 2 (Euro)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="837-9127" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rolling thunder 2 (euro).bin" size="1048576" crc="c440f292" sha1="e8ae09b2945eac555d6f0d39a1f768724b221357" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog4532-ert 92452" size="1048576" crc="c440f292" sha1="e8ae09b2945eac555d6f0d39a1f768724b221357" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19054,8 +19148,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-17608-U" />
+			<feature name="ic2" value="MPR-17609-U" />
+			<feature name="ic3" value="SN74HC00N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="samurai shodown (euro).bin" size="3145728" crc="c972014f" sha1="86384123c49c05b6f90cffd7327c11882f01e9c0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17608-u.ic1" size="2097152" crc="f70d4334" sha1="c7c31510ce0b15e00beabc680a395991c60c35f1" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17609-u.ic2" size="1048576" crc="8713fc5e" sha1="f987d1b33b041e4c5008b7225557463a53427813" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19065,8 +19164,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-17501-SM" />
+			<feature name="ic2" value="MPR-17502-SM" />
+			<feature name="ic3" value="74HC00AP" />
 			<dataarea name="rom" size="3145728">
-				<rom name="samurai shodown (usa).bin" size="3145728" crc="5bb8b2d4" sha1="504cc7a948f96ce1989f8e91ffb42acc6a956e47" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17501-sm.ic1" size="2097152" crc="e06dd5cb" sha1="fe6dd1618b1e263c2a8485c70d02e172eb46070a" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17502-sm.ic2" size="1048576" crc="63bb11a6" sha1="db9be899159039c9f500c57de611e70a4e7e74a3" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19157,8 +19261,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="93653-2" />
+			<feature name="ic1" value="SLM-GS-1" />
+			<feature name="ic2" value="SLM-GS-2" />
+			<feature name="ic3" value="HD74HC139P" />
 			<dataarea name="rom" size="4194304">
-				<rom name="saturday night slammasters (usa).bin" size="4194304" crc="2fb4eaba" sha1="7252006bf41e41b92c6261c6722766a1352a6dca" offset="000000" loadflag="load16_word_swap" />
+				<rom name="slm-gs-1.ic1" size="2097152" crc="04132699" sha1="cc5e310a8835641001fbfa116dcf03d95957c9c5" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="slm-gs-2.ic2" size="2097152" crc="3a20db0a" sha1="f48873b2662c1ccf5635d5331d92f58175982e6f" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19223,8 +19332,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-17323-F" />
+			<feature name="ic2" value="MPR-17328-F" />
+			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="2621440">
-				<rom name="sega sports 1 (euro).bin" size="2621440" crc="07fedaf1" sha1="ff03bb2aced48c82de0ddfb048b114ec84daf16a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17323-f.ic1" size="2097152" crc="dc8c0473" sha1="e7a47bc9e9ebb6946b3b520c2826e0a097fa502d" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17328-f.ic2" size="524288" crc="50f85508" sha1="45d8bce549605534dfda9822664b42c318ba3109" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20365,8 +20479,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-19101-MX" />
+			<feature name="ic2" value="MPR-19102-MX" />
+			<feature name="ic3" value="SN74HC00N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="sonic 3d blast -- sonic 3d - flickies' island (euro, usa, kor).bin" size="4194304" crc="44a2ca44" sha1="89957568386a5023d198ac2251ded9dfb2ab65e7" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19101-mx.ic1" size="2097152" crc="ebd93b32" sha1="49fe35a5515d935961eafe396e261e194f194d10" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19102-mx.ic2" size="2097152" crc="7ed2592f" sha1="1ba5e24e193cfdb5c023d6fec74ec279905279be" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20588,6 +20707,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and Jpn confirmed -->
 	<software name="sonic2">
 		<description>Sonic the Hedgehog 2 (World, Rev. A)</description>
 		<year>1992</year>
@@ -20596,7 +20716,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19921121 (JPN)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="u1" value="MPR-15000A W99" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
@@ -21578,8 +21697,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-6570A" />
+			<feature name="ic1" value="MPR-15910 W39" />
+			<feature name="ic2" value="MPR-15911 T65" />
+			<feature name="ic3" value="HD74HC00P" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-15910+mpr-15911.bin" size="3145728" crc="56d41136" sha1="2a406e2e4743de98785c85322f858abfb8221ae0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15910 w39.ic1" size="2097152" crc="77a2d058" sha1="586ec3031de0a80b9b80f3945f468b5676bc23fc" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15911 t65.ic2" size="1048576" crc="a9ab58ba" sha1="76fa72262e7cf93f4ae866e0aab64cdb43bbf6f7" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21614,8 +21738,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="93653-2" />
+			<feature name="ic1" value="SF2P-GS-1" />
+			<feature name="ic2" value="SF2P-GS-2" />
+			<feature name="ic3" value="74HC139AP" />
 			<dataarea name="rom" size="3145728">
-				<rom name="street fighter ii' - special champion edition (usa).bin" size="3145728" crc="13fe08a1" sha1="a5aad1d108046d9388e33247610dafb4c6516e0b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="sf2p-gs-1.ic1" size="2097152" crc="8cfffff5" sha1="b25000ac155132a05ad01c8fefdde24dd0b9ea87" offset="0x000000" loadflag="load16_word_swap" />
+				<rom name="sf2p-gs-2.ic2" size="1048576" crc="a9ab58ba" sha1="76fa72262e7cf93f4ae866e0aab64cdb43bbf6f7" offset="0x200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -22800,7 +22929,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="670100 REV 1O" />
+			<feature name="pcb" value="670100 REV 10" />
 			<feature name="ic1" value="ACCLAIM CLASSIC TERMINATOR 2 JUDGEMENT DAY 9520 D" />
 			<dataarea name="rom" size="1048576">
 				<rom name="terminator 2 judgement day.ic1" size="1048576" crc="2f75e896" sha1="6144fbb941c1bf0df285f6d13906432c23af2ba6" offset="000000" loadflag="load16_word_swap" />
@@ -22808,13 +22937,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="t2ag">
 		<description>T2 - The Arcade Game (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher> <!-- This was published by Arena in USA, in fact -->
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="670100 REV 1O" />
-			<feature name="ic1" value="MPR-15238 T03" />
+			<feature name="pcb" value="670100 REV 10, 171-5978BA" />
+			<feature name="ic1" value="MPR-15238 T03, MPR-15238-S" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15238 t03.ic1" size="1048576" crc="a1264f17" sha1="85cc1cf3379d3ce23ca3c03d84fe6e2b3adc9c56" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -22874,6 +23004,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="talespin">
 		<description>TaleSpin (Euro, USA)</description>
 		<year>1992</year>
@@ -22949,6 +23080,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and Jpn confirmed -->
 	<software name="truxton">
 		<description>Truxton (Euro, USA) ~ Tatsujin (Jpn)</description>
 		<year>1989</year>
@@ -22958,13 +23090,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="タツジン"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-12752 R87" />
+			<feature name="ic1" value="MPR-12752 R87,MPR-12752-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12752 r87.ic1" size="524288" crc="5bd0882d" sha1="90039844478e7cb99951fdff1979c3bda04d080a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="tazmania">
 		<description>Taz-Mania (World)</description>
 		<year>1992</year>
@@ -24868,6 +25001,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Euro and USA verified -->
 	<software name="vrtroop">
 		<description>VR Troopers (Euro, USA)</description>
 		<year>1994</year>
@@ -25330,12 +25464,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wintol">
+		<!-- Namcot PCB (blob epoxy chips) -->
 		<description>Winter Olympics (Euro)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="837-10096 / 171-6587A" />
+			<!-- two epoxy blocks are present on the PCB, 1MB each?!? -->
 			<dataarea name="rom" size="2097152">
-				<rom name="winter olympics (euro).bin" size="2097152" crc="fa537a45" sha1="84528efaf0729637167774d59a00694deadd5d6d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog4621 93501" size="2097152" crc="fa537a45" sha1="84528efaf0729637167774d59a00694deadd5d6d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
