@@ -610,7 +610,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				break;
 			case PIT0:
 			case PIT1:
-				if (m_gpu_regs[PIT0])
+				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
 					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
 					timer_set(sample_period, TID_PIT);
