@@ -128,7 +128,7 @@ else
 ifeq ($(DISTRO),ubuntu-intrepid)
 # Force gcc-4.2 on ubuntu-intrepid
 CC = @gcc -V 4.2
-LD = g++-4.2
+LD = @g++-4.2
 else
 ifeq ($(DISTRO),gcc44-generic)
 CC = @gcc-4.4
@@ -439,6 +439,7 @@ SDLOS_TARGETOS = $(BASE_TARGETOS)
 # TEST_GCC for GCC version-specific stuff
 #-------------------------------------------------
 
+ifeq (,$(findstring clang,$(CC)))
 # TODO: needs to use $(CC)
 TEST_GCC = $(shell gcc --version)
 
@@ -455,6 +456,7 @@ endif
 
 ifeq ($(findstring 4.7.,$(TEST_GCC)),4.7.)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
+endif
 endif
 
 #-------------------------------------------------
@@ -599,9 +601,11 @@ endif
 # Static linking
 
 LDFLAGS += -static-libgcc
+ifeq (,$(findstring clang,$(CC)))
 ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
+endif
 endif
 
 ifndef NO_USE_QTDEBUG
