@@ -151,11 +151,6 @@
 #define LOG_UNHANDLED_BLITS 0
 
 
-// FIXME: this should be 1, but then MAME performance will be s*** with this
-//    (i.e. it drops the performance from 400% to 6% on an i5 machine).
-// But the PIT irq is definitely needed by some games (for example Pitfall refuses
-//    to enter into gameplay without this enabled).
-const int PIT_MULT_DBG_HACK = 64;
 
 
 // interrupts to main CPU:
@@ -615,9 +610,9 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 				break;
 			case PIT0:
 			case PIT1:
-				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
+				if (m_gpu_regs[PIT0])
 				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK);
+					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
 					timer_set(sample_period, TID_PIT);
 				}
 				break;
@@ -730,7 +725,7 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 			if (m_gpu_regs[PIT0] != 0)
 			{
-				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK);
+				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK/2);
 				timer_set(sample_period, TID_PIT);
 			}
 			break;
