@@ -916,7 +916,7 @@ const char * base_md_cart_slot_device::get_default_card_software(const machine_c
 READ16_MEMBER(base_md_cart_slot_device::read)
 {
 	if (m_cart)
-		return m_cart->read(space, offset);
+		return m_cart->read(space, offset, mem_mask);
 	else
 		return 0xffff;
 }
@@ -924,7 +924,7 @@ READ16_MEMBER(base_md_cart_slot_device::read)
 READ16_MEMBER(base_md_cart_slot_device::read_a13)
 {
 	if (m_cart)
-		return m_cart->read_a13(space, offset);
+		return m_cart->read_a13(space, offset, mem_mask);
 	else
 		return 0xffff;
 }
@@ -932,7 +932,7 @@ READ16_MEMBER(base_md_cart_slot_device::read_a13)
 READ16_MEMBER(base_md_cart_slot_device::read_a15)
 {
 	if (m_cart)
-		return m_cart->read_a15(space, offset);
+		return m_cart->read_a15(space, offset, mem_mask);
 	else
 		return 0xffff;
 }
@@ -945,17 +945,17 @@ READ16_MEMBER(base_md_cart_slot_device::read_a15)
 WRITE16_MEMBER(base_md_cart_slot_device::write)
 {
 	if (m_cart)
-		m_cart->write(space, offset, data);
+		m_cart->write(space, offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(base_md_cart_slot_device::write_a13)
 {
 	if (m_cart)
-		m_cart->write_a13(space, offset, data);
+		m_cart->write_a13(space, offset, data, mem_mask);
 }
 
 WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
 {
 	if (m_cart)
-		m_cart->write_a15(space, offset, data);
+		m_cart->write_a15(space, offset, data, mem_mask);
 }

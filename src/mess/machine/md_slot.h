@@ -178,7 +178,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
 	virtual DECLARE_READ16_MEMBER(read_a15);
 	virtual DECLARE_WRITE16_MEMBER(write_a15);
-	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data); };
+	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data, mem_mask); };
 
 // TODO: this only needs to be public because megasvp copies rom into memory region, so we need to rework that code...
 //private:
