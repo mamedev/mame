@@ -31,7 +31,7 @@ void boogwing_state::mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
-	sprite_bitmap2 = &m_sprgen1->get_sprite_temp_bitmap();
+	sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
 	priority_bitmap = &machine().priority_bitmap;
 
 	UINT32* dstline;
