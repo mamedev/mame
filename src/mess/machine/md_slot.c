@@ -389,7 +389,7 @@ int base_md_cart_slot_device::load_list()
  *************************************/
 
 /* code taken directly from GoodGEN by Cowering */
-static int genesis_is_SMD(unsigned char *buf,unsigned int len)
+static int genesis_is_SMD(unsigned char *buf, unsigned int len)
 {
 	if (buf[0x2080] == 'S' && buf[0x80] == 'E' && buf[0x2081] == 'G' && buf[0x81] == 'A')
 		return 1;
@@ -459,47 +459,55 @@ static int genesis_is_SMD(unsigned char *buf,unsigned int len)
 int base_md_cart_slot_device::load_nonlist()
 {
 	unsigned char *ROM, *tmpROM;
-	UINT32 len = m_cart->get_padded_size(length()); // if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
+	bool is_smd, is_md;
+	UINT32 tmplen = length(), offset, len;
 
+	// STEP 1: store a (possibly headered) copy of the file and determine its type (SMD? MD? BIN?)
+	tmpROM = global_alloc_array(unsigned char, tmplen);
+	fread(tmpROM, tmplen);
+	is_smd = genesis_is_SMD(&tmpROM[0x200], tmplen - 0x200);
+	is_md = (tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G');
+
+	// take header into account, if any
+	offset = is_smd ? 0x200 : 0;
+
+	// STEP 2: allocate space for the real copy of the game
+	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
+	len = m_cart->get_padded_size(tmplen - offset);
 	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
 	m_cart->rom_alloc(machine(), (len == 0x500000) ? 0x900000 : len);
 
+
+	// STEP 3: copy the game data in the appropriate way
 	ROM = (unsigned char *)m_cart->get_rom_base();
-	tmpROM = global_alloc_array(unsigned char, len);
 
-	// STEP 1: determine the file type (SMD? MD? BIN?)
-	fread(tmpROM, len);
-
-	/* is this a SMD file? */
-	if (genesis_is_SMD(&tmpROM[0x200], len))
+	if (is_smd)
 	{
 		mame_printf_debug("SMD!\n");
 
-		for (int ptr = 0; ptr < (len - 0x200) / 0x2000; ptr += 2)
+		for (int ptr = 0; ptr < (tmplen - 0x200) / 0x2000; ptr += 2)
 		{
 			for (int x = 0; x < 0x2000; x++)
 			{
-				*ROM++ = *(tmpROM + 0x200 + ((ptr + 1) * 0x2000) + x);
-				*ROM++ = *(tmpROM + 0x200 + ((ptr + 0) * 0x2000) + x);
+				ROM[ptr * 0x2000 + x * 2 + 0] = tmpROM[0x200 + ((ptr + 1) * 0x2000) + x];
+				ROM[ptr * 0x2000 + x * 2 + 1] = tmpROM[0x200 + ((ptr + 0) * 0x2000) + x];
 			}
 		}
-
-		len -= 0x200;
 	}
-	/* is this a MD file? */
-	else if ((tmpROM[0x80] == 'E') && (tmpROM[0x81] == 'A') && (tmpROM[0x82] == 'M' || tmpROM[0x82] == 'G'))
+	else if (is_md)
 	{
 		mame_printf_debug("MD!\n");
 
-		for (int ptr = 0; ptr < len; ptr += 2)
+		for (int ptr = 0; ptr < tmplen; ptr += 2)
 		{
-			ROM[ptr] = tmpROM[(len >> 1) + (ptr >> 1)];
+			ROM[ptr] = tmpROM[(tmplen >> 1) + (ptr >> 1)];
 			ROM[ptr + 1] = tmpROM[(ptr >> 1)];
 		}
 	}
-	/* BIN it is, then */
 	else
 	{
+		mame_printf_debug("BIN!\n");
+
 		fseek(0, SEEK_SET);
 		fread(ROM, len);
 	}
@@ -507,15 +515,17 @@ int base_md_cart_slot_device::load_nonlist()
 	global_free(tmpROM);
 
 	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
-	if (len > length())
-		memset(m_cart->get_rom_base() + length()/2, 0xffff, (len - length())/2);
+	if (len > (tmplen - offset))
+		memset(m_cart->get_rom_base() + (tmplen - offset)/2, 0xffff, (len - tmplen + offset)/2);
 
-	// STEP 2: determine the cart type (to deal with pirate mappers & eeprom)
-	m_type = get_cart_type(ROM, length());
+
+	// STEP 4: determine the cart type (to deal with sram/eeprom & pirate mappers)
+	m_type = get_cart_type(ROM, len);
 
 	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
 	if (m_type != SSF2 && m_type != PSOLAR)
 		m_cart->rom_map_setup(len);
+
 
 #ifdef LSB_FIRST
 	unsigned char fliptemp;
@@ -889,13 +899,16 @@ const char * base_md_cart_slot_device::get_default_card_software(const machine_c
 
 	if (open_image_file(options))
 	{
-		UINT32 len = core_fsize(m_file);
+		UINT32 len = core_fsize(m_file), offset = 0;;
 		UINT8 *ROM = global_alloc_array(UINT8, len);
 		int type;
 
 		core_fread(m_file, ROM, len);
 
-		type = get_cart_type(ROM, len);
+		if (genesis_is_SMD(&ROM[0x200], len - 0x200))
+				offset = 0x200;
+
+		type = get_cart_type(ROM + offset, len - offset);
 		slot_string = md_get_slot(type);
 
 		global_free(ROM);
