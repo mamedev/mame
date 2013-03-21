@@ -1106,6 +1106,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 #define GET_CURRENT_LINESCROLLZOOM \
 	UINT32 dword = object->indirect_zoom[v*16+realy]; \
 	UINT16 hZoomHere = hZoom + (dword>>16); \
+	if (!hZoomHere) { drawy++; continue; } \
 	/* bit 0x8000 does get set too, but only on some lines, might have another meaning? */ \
 	int linescroll = dword&0x7fff; \
 	if (linescroll & 0x4000) linescroll -= 0x8000; \
@@ -1139,7 +1140,6 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 	{ \
 		int realy = ((y*incy)>>21); \
 		GET_CURRENT_LINESCROLLZOOM \
-		if (!hZoomHere) { drawy++; continue; } \
 		const int pixelOffsetX = ((hPositionTable) + (h* 16 * hZoomHere)) / 0x40; \
 		const int pixelOffsetnextX = ((hPositionTable) + ((h+1)* 16 * hZoomHere)) / 0x40; \
 		if (drawy>clipmaxY) { break; }; \
