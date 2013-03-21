@@ -848,10 +848,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				cpustate->sreg[SS].selector = stack.selector;
 				i386_load_protected_mode_segment(cpustate,&cpustate->sreg[SS],NULL);
 				i386_set_descriptor_accessed(cpustate, stack.selector);
-				if(flags & 0x0008)
-					REG32(ESP) = i386_get_stack_ptr(cpustate,DPL);
-				else
-					REG16(SP) = i386_get_stack_ptr(cpustate,DPL);
+				REG32(ESP) = newESP;
 				if(V8086_MODE)
 				{
 					//logerror("IRQ (%08x): Interrupt during V8086 task\n",cpustate->pc);
@@ -928,24 +925,33 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 				}
 			}
 		}
-
-		if(type != 0x0e && type != 0x0f)  // if not 386 interrupt or trap gate
+		UINT32 tempSP = REG32(ESP);
+		try
 		{
-			PUSH16(cpustate, oldflags & 0xffff );
-			PUSH16(cpustate, cpustate->sreg[CS].selector );
-			if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
-				PUSH16(cpustate, cpustate->eip );
+			// this is ugly but the alternative is worse
+			if(type != 0x0e && type != 0x0f)  // if not 386 interrupt or trap gate
+			{
+				PUSH16(cpustate, oldflags & 0xffff );
+				PUSH16(cpustate, cpustate->sreg[CS].selector );
+				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+					PUSH16(cpustate, cpustate->eip );
+				else
+					PUSH16(cpustate, cpustate->prev_eip );
+			}
 			else
-				PUSH16(cpustate, cpustate->prev_eip );
+			{
+				PUSH32(cpustate, oldflags & 0x00ffffff );
+				PUSH32(cpustate, cpustate->sreg[CS].selector );
+				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
+					PUSH32(cpustate, cpustate->eip );
+				else
+					PUSH32(cpustate, cpustate->prev_eip );
+			}
 		}
-		else
+		catch(UINT64 e)
 		{
-			PUSH32(cpustate, oldflags & 0x00ffffff );
-			PUSH32(cpustate, cpustate->sreg[CS].selector );
-			if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
-				PUSH32(cpustate, cpustate->eip );
-			else
-				PUSH32(cpustate, cpustate->prev_eip );
+			REG32(ESP) = tempSP;
+			throw e;
 		}
 		if(SetRPL != 0)
 			segment = (segment & ~0x03) | cpustate->CPL;
@@ -1780,7 +1786,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 					offset = gate.offset;
 
 					cpustate->CPL = (stack.flags >> 5) & 0x03;
-					/* check for page fault at new stack TODO: check if stack frame crosses page boundary */
+					/* check for page fault at new stack */
 					WRITE_TEST(cpustate, stack.base+newESP-1);
 					/* switch to new stack */
 					oldSS = cpustate->sreg[SS].selector;
@@ -1794,10 +1800,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 						oldESP = REG16(SP);
 					}
 					i386_load_segment_descriptor(cpustate, SS );
-					if(operand32 != 0)
-						REG32(ESP) = i386_get_stack_ptr(cpustate,gate.selector & 0x03);
-					else
-						REG16(SP) = i386_get_stack_ptr(cpustate,gate.selector & 0x03) & 0x0000ffff;
+					REG32(ESP) = newESP;
 
 					if(operand32 != 0)
 					{
@@ -1917,26 +1920,38 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 
 	if(SetRPL != 0)
 		selector = (selector & ~0x03) | cpustate->CPL;
-	if(operand32 == 0)
+
+	UINT32 tempSP = REG32(ESP);
+	try
 	{
-		/* 16-bit operand size */
-		PUSH16(cpustate, cpustate->sreg[CS].selector );
-		PUSH16(cpustate, cpustate->eip & 0x0000ffff );
-		cpustate->sreg[CS].selector = selector;
-		cpustate->performed_intersegment_jump = 1;
-		cpustate->eip = offset;
-		i386_load_segment_descriptor(cpustate,CS);
+		// this is ugly but the alternative is worse
+		if(operand32 == 0)
+		{
+			/* 16-bit operand size */
+			PUSH16(cpustate, cpustate->sreg[CS].selector );
+			PUSH16(cpustate, cpustate->eip & 0x0000ffff );
+			cpustate->sreg[CS].selector = selector;
+			cpustate->performed_intersegment_jump = 1;
+			cpustate->eip = offset;
+			i386_load_segment_descriptor(cpustate,CS);
+		}
+		else
+		{
+			/* 32-bit operand size */
+			PUSH32(cpustate, cpustate->sreg[CS].selector );
+			PUSH32(cpustate, cpustate->eip );
+			cpustate->sreg[CS].selector = selector;
+			cpustate->performed_intersegment_jump = 1;
+			cpustate->eip = offset;
+			i386_load_segment_descriptor(cpustate, CS );
+		}
 	}
-	else
+	catch(UINT64 e)
 	{
-		/* 32-bit operand size */
-		PUSH32(cpustate, cpustate->sreg[CS].selector );
-		PUSH32(cpustate, cpustate->eip );
-		cpustate->sreg[CS].selector = selector;
-		cpustate->performed_intersegment_jump = 1;
-		cpustate->eip = offset;
-		i386_load_segment_descriptor(cpustate, CS );
+		REG32(ESP) = tempSP;
+		throw e;
 	}
+
 	CHANGE_PC(cpustate,cpustate->eip);
 }
 
