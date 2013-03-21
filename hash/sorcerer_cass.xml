@@ -9,8 +9,8 @@
 		<description>Chomp</description>
 		<year>1981</year>
 		<publisher>W. S. King</publisher>
-		<part name="cass" interface="">
-			<dataarea name="cass" size="">
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="23392316">
 				<rom name="chomp (1981)(w.s.king).wav" size="23392316" crc="95971024" sha1="62672de80e5139af35424184c76f1c9c18493c3a" offset="0" status="baddump" />
 			</dataarea>
 		</part>
@@ -20,8 +20,8 @@
 		<description>Eliza</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="">
-			<dataarea name="cass" size="">
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="12578876">
 				<rom name="eliza (19xx)(-).wav" size="12578876" crc="9173759e" sha1="23d35784fd1ab492cb0371552bd1a981214c0192" offset="0" status="baddump" />
 			</dataarea>
 		</part>
@@ -31,8 +31,8 @@
 		<description>Galaxians</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="">
-			<dataarea name="cass" size="">
+		<part name="cass" interface="sorcerer_cass">
+			<dataarea name="cass" size="16506020">
 				<rom name="galaxians (19xx)(-).wav" size="16506020" crc="c6f686b2" sha1="41928aa796e6609de37301b3594d3a9a9eb975ac" offset="0" status="baddump" />
 			</dataarea>
 		</part>

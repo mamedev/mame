@@ -52,7 +52,7 @@ MZ-821 Sharp BASIC Trainer (Germany):   Account Manager: Einnahmen/Ausgaben-Verw
 		<year>19??</year>
 		<publisher>Proton Software</publisher>
 		<part name="cass" interface="mz_cass">
-			<dataarea name="cass" size="">
+			<dataarea name="cass" size="48256">
 				<rom name="g.p.s. program.mzf" size="48256" crc="16bba2ba" sha1="7b4394bc88a1f0d37ddcb0951addfdca7f683b90" offset="0" />
 			</dataarea>
 		</part>

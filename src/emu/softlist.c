@@ -686,7 +686,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						unknown_attribute(swlist, attributes[0]);
 				}
 
-				if ( str_name && str_interface )
+				if ( str_name && str_interface && strcmp(str_name, "") && strcmp(str_interface, "") )
 				{
 					if ( swlist->softinfo )
 					{
@@ -709,7 +709,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				}
 				else
 				{
-					/* Incomplete/incorrect part definition */
+					/* Incomplete/incorrect part definition ("" names are invalid too) */
 					parse_error(&swlist->state, "%s: Incomplete part definition (line %lu)\n",
 						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
@@ -738,7 +738,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else
 						unknown_attribute(swlist, attributes[0]);
 				}
-				if ( str_name && str_size )
+				if ( str_name && str_size && strcmp(str_name, "") && strcmp(str_size, "") )
 				{
 					if ( swlist->softinfo )
 					{
@@ -756,7 +756,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				}
 				else
 				{
-					/* Missing dataarea name or size */
+					/* Missing dataarea name or size ("" are invalid too) */
 					parse_error(&swlist->state, "%s: Incomplete dataarea definition (line %lu)\n",
 						swlist->file->filename(),XML_GetCurrentLineNumber(swlist->state.parser));
 				}
