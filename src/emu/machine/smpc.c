@@ -220,6 +220,14 @@ static TIMER_CALLBACK( smpc_sound_enable )
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
 }
 
+static TIMER_CALLBACK( smpc_cd_enable )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	state->m_smpc.OREG[31] = param + 0x08; //read-back for last command issued
+	state->m_smpc.SF = 0x08; //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
+}
+
 static void smpc_system_reset(running_machine &machine)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
@@ -699,8 +707,11 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 				space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_sound_enable),data & 1);
 			break;
 		/*CD (SH-1) ON/OFF */
-		//case 0x08:
-		//case 0x09:
+		case 0x08:
+		case 0x09:
+			printf ("SMPC: CD %s\n",(data & 1) ? "off" : "on");
+			space.machine().scheduler().timer_set(attotime::from_usec(40), FUNC(smpc_cd_enable),data & 1);
+			break;
 		case 0x0d:
 			if(LOG_SMPC) printf ("SMPC: System Reset\n");
 			smpc_system_reset(space.machine());
@@ -850,7 +861,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 		smpc_comreg_exec(space,data,1);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0xe && data != 0xf && data != 0x19 && data != 0x1a)
+		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0x08 && data != 0x09 && data != 0xe && data != 0xf && data != 0x19 && data != 0x1a)
 		{
 			state->m_smpc.OREG[31] = data; //read-back command
 			state->m_smpc.SF = 0x00;
@@ -1010,6 +1021,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 
 			switch(cur_ddr & 0x60)
 			{
+				case 0x00: break; // in diag test
 				case 0x40: return_data = smpc_th_control_mode(offset == 0x77); break;
 				case 0x60: return_data = smpc_direct_mode(offset == 0x77); break;
 				default:
@@ -1060,7 +1072,7 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 		smpc_comreg_exec(space,data,0);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x0e && data != 0x0f && data != 0x19 && data != 0x1a)
+		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x08 && data != 0x09 && data != 0x0e && data != 0x0f && data != 0x19 && data != 0x1a)
 		{
 			m_smpc.OREG[31] = data; //read-back for last command issued
 			m_smpc.SF = 0x00; //clear hand-shake flag
