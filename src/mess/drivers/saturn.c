@@ -660,7 +660,7 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x22600000, 0x227fffff, read32_delegate(FUNC(sat_cart_slot_device::read_ext_dram1), (sat_cart_slot_device*)m_exp));
 				machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x22600000, 0x227fffff, write32_delegate(FUNC(sat_cart_slot_device::write_ext_dram1), (sat_cart_slot_device*)m_exp));
 				break;
-			case 0: // ROM cart + mirror
+			case 0xff: // ROM cart + mirror
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
 				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x22000000, 0x223fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
 				machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x02000000, 0x023fffff, read32_delegate(FUNC(sat_cart_slot_device::read_rom), (sat_cart_slot_device*)m_exp));
