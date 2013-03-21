@@ -90,8 +90,8 @@
 
 #define LOG_SCANLINE            0
 #define LOG_HSYNC               0
-#define LOG_FSYNC               1
-#define LOG_FLUSH               1
+#define LOG_FSYNC               0
+#define LOG_FLUSH               0
 #define LOG_INPUT               0
 
 
