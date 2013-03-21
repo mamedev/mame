@@ -311,7 +311,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="u1" value="ACCLAIM ES133-1 RISE OF THE ROBOTS 9447 D" />
 			<feature name="u2" value="ACCLAIM ES133-2 RISE OF THE ROBOTS 9447 D" />
 			<feature name="u3" value="DV74ALS139N" />
-			<dataarea name="rom" size="4194304">
+			<dataarea name="rom" size="3145728">
 				<rom name="es133-1 rise of the robots.u1" size="2097152" crc="ed583ef7" sha1="b9f43d5bf31819a1d76c1495e81cfa1d38bcde1c" offset="000000" />
 				<rom name="es133-2 rise of the robots.u2" size="1048576" crc="fcf18470" sha1="09f8ba0b295da42359c354e71b9b7c780a465046" offset="0x200000" />
 			</dataarea>
@@ -23929,6 +23929,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="toe jam &amp; earl in panic on funkotron (jpn).bin" size="2097152" crc="e1b36850" sha1="141af8fd1e5b4ba5118a384771b0d75f40af312f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toejam2p" cloneof="toejam2">
+		<description>Toe Jam &amp; Earl in Panic on Funkotron (Prototype)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="toejam&amp;earl.58bd.bin" size="2097152" crc="c6a1a8dc" sha1="a9f7a493e3470a2843c632c221e238080eed2de2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
