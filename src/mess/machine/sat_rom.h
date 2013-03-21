@@ -14,8 +14,6 @@ public:
 	saturn_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	saturn_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	virtual int get_cart_type() { return 0xff; }
-
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
