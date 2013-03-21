@@ -2053,7 +2053,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					const int pixelOffsetnextX = ((hPosition) + ((h+1)* 16 * hZoom)) / 0x40;
 
 					int blockwide = pixelOffsetnextX-pixelOffsetX;
-					UINT32 incx = 0x8000000 / hZoom;
+					UINT32 incx = 0x8000000 / (object->spriteblit[8] & 0x0000ffff);
 
 					if (pixelOffsetX+blockwide < clipminX)
 						continue;
