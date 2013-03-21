@@ -26,7 +26,7 @@ saturn_rom_device::saturn_rom_device(const machine_config &mconfig, const char *
 					: device_t(mconfig, SATURN_ROM, "Saturn ROM Carts", tag, owner, clock),
 						device_sat_cart_interface( mconfig, *this )
 {
-	m_cart_type = 0; // actually not clear if ROM carts have a type ID like DRAM/BRAM carts, we use 0 to install handlers
+	m_cart_type = 0xff; // actually not clear if ROM carts have a type ID like DRAM/BRAM carts
 }
 
 
