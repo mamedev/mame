@@ -169,7 +169,7 @@ DMA TODO:
 #define DnMV_0(_ch_) m_scu.status&=~(0x10 << 4 * _ch_)
 
 /*For area checking*/
-#define BIOS_BUS(var)   (var & 0x07000000) == 0
+#define BIOS_BUS(var)   (var & 0x07f00000) == 0
 #define ABUS(_lv_)       ((m_scu.src[_lv_] & 0x07000000) >= 0x02000000) && ((m_scu.src[_lv_] & 0x07000000) <= 0x04000000)
 #define BBUS(_lv_)       ((scu_##_lv_ & 0x07ffffff) >= 0x05a00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05ffffff)
 #define VDP1_REGS(_lv_)  ((scu_##_lv_ & 0x07ffffff) >= 0x05d00000) && ((scu_##_lv_ & 0x07ffffff) <= 0x05dfffff)
