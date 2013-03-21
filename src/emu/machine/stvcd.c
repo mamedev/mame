@@ -1597,6 +1597,8 @@ UINT16 saturn_state::cd_readWord(UINT32 addr)
 	{
 		case 0x0008:    // read HIRQ register
 		case 0x000a:
+		case 0x8008:
+		case 0x800a:
 			rv = hirqreg;
 
 			rv &= ~DCHG;    // always clear bit 6 (tray open)
@@ -1612,27 +1614,37 @@ UINT16 saturn_state::cd_readWord(UINT32 addr)
 
 		case 0x000c:
 		case 0x000e:
+		case 0x800c:
+		case 0x800e:
 //          CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
 			printf("RW HIRM: %04x\n", hirqmask);
 			return hirqmask;
 
 		case 0x0018:
 		case 0x001a:
+		case 0x8018:
+		case 0x801a:
 //          CDROM_LOG(("RW CR1: %04x\n", cr1))
 			return cr1;
 
 		case 0x001c:
 		case 0x001e:
+		case 0x801c:
+		case 0x801e:
 //          CDROM_LOG(("RW CR2: %04x\n", cr2))
 			return cr2;
 
 		case 0x0020:
 		case 0x0022:
+		case 0x8020:
+		case 0x8022:
 //          CDROM_LOG(("RW CR3: %04x\n", cr3))
 			return cr3;
 
 		case 0x0024:
 		case 0x0026:
+		case 0x8024:
+		case 0x8026:
 //          CDROM_LOG(("RW CR4: %04x\n", cr4))
 			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
 			cmd_pending = 0;
@@ -1870,17 +1882,23 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 	{
 	case 0x0008:
 	case 0x000a:
+	case 0x8008:
+	case 0x800a:
 //      CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data))
 		hirqreg &= data;
 		return;
 	case 0x000c:
 	case 0x000e:
+	case 0x800c:
+	case 0x800e:
 //      CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
 		printf("WW HIRM: %04x => %04x\n", hirqmask, data);
 		hirqmask = data;
 		return;
 	case 0x0018:
 	case 0x001a:
+	case 0x8018:
+	case 0x801a:
 //      CDROM_LOG(("WW CR1: %04x\n", data))
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
@@ -1888,18 +1906,24 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 		break;
 	case 0x001c:
 	case 0x001e:
+	case 0x801c:
+	case 0x801e:
 //      CDROM_LOG(("WW CR2: %04x\n", data))
 		cr2 = data;
 		cmd_pending |= 2;
 		break;
 	case 0x0020:
 	case 0x0022:
+	case 0x8020:
+	case 0x8022:
 //      CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
 		cmd_pending |= 4;
 		break;
 	case 0x0024:
 	case 0x0026:
+	case 0x8024:
+	case 0x8026:
 //      CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
 		cmd_pending |= 8;
@@ -1919,6 +1943,18 @@ READ32_MEMBER( saturn_state::stvcd_r )
 
 	switch (offset)
 	{
+		case 0x88008:
+		case 0x8800a:
+		case 0x8800c:
+		case 0x8800e:
+		case 0x88018:
+		case 0x8801a:
+		case 0x8801c:
+		case 0x8801e:
+		case 0x88020:
+		case 0x88022:
+		case 0x88024:
+		case 0x88026:
 		case 0x90008:
 		case 0x9000a:
 		case 0x9000c:
@@ -1956,7 +1992,7 @@ READ32_MEMBER( saturn_state::stvcd_r )
 			break;
 
 		default:
-			CDROM_LOG(("Unknown CD read @ %x\n", offset))
+			printf("Unknown CD read %x\n", offset);
 			break;
 	}
 
@@ -1976,6 +2012,18 @@ WRITE32_MEMBER( saturn_state::stvcd_w )
 				printf("CD: Unknown data buffer write @ mask = %08x\n", mem_mask);
 			break;
 
+		case 0x88008:
+		case 0x8800a:
+		case 0x8800c:
+		case 0x8800e:
+		case 0x88018:
+		case 0x8801a:
+		case 0x8801c:
+		case 0x8801e:
+		case 0x88020:
+		case 0x88022:
+		case 0x88024:
+		case 0x88026:
 		case 0x90008:
 		case 0x9000a:
 		case 0x9000c:
