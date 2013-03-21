@@ -1629,6 +1629,7 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_MACHINE)/md_eeprom.o \
 	$(MESS_MACHINE)/md_jcart.o  \
 	$(MESS_MACHINE)/md_stm95.o  \
+	$(MESS_MACHINE)/md_svp.o    \
 	$(MESS_MACHINE)/megasvp.o   \
 	$(MESS_DRIVERS)/megadriv.o  \
 	$(MESS_DRIVERS)/dccons.o    \

@@ -3,7 +3,7 @@
 #include "includes/md.h"
 #include "machine/md_slot.h"
 #include "machine/md_rom.h"
-//#include "machine/md_svp.h"
+#include "machine/md_svp.h"
 #include "machine/md_sk.h"
 #include "machine/md_eeprom.h"
 #include "machine/md_jcart.h"
@@ -296,8 +296,7 @@ static MACHINE_RESET( ms_megadriv )
 
 static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_STD_ROM)
-//  SLOT_INTERFACE_INTERNAL("rom_svp",  MD_ROM_SVP) // not ready yet...
+	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_ROM_SVP) // in progress...
 	SLOT_INTERFACE_INTERNAL("rom_sk",  MD_ROM_SK)
 // NVRAM handling
 	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)

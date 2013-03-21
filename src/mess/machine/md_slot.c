@@ -228,8 +228,7 @@ struct md_slot
 static const md_slot slot_list[] =
 {
 	{ SEGA_SK, "rom_sk" },
-	{ SEGA_STD, "rom_svp"},
-//  { SEGA_SVP, "rom_svp"},     // not ready yet...
+	{ SEGA_SVP, "rom_svp"},
 
 	{ SEGA_SRAM, "rom_sram" },
 	{ SEGA_FRAM, "rom_fram" },
