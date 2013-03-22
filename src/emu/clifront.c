@@ -670,6 +670,8 @@ void cli_frontend::listslots(const char *gamename)
 					global_free(dev);
 				}
 			}
+			if (intf==NULL || (intf!=NULL && intf[0].name == NULL))
+				printf("%-15s %s\n", "[none]","No options available");
 			// end the line
 			printf("\n");
 			first = false;
