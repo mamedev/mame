@@ -24,6 +24,7 @@ public:
 	virtual void device_config_complete() { m_shortname = "md_rom_svp"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
+	virtual void set_bank_to_rom(const char *banktag, UINT32 offset);
 	
 	required_device<device_t> m_svp;
 	required_ioport m_test_ipt;

@@ -314,10 +314,10 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 ADDRESS_MAP_START( md_svp_ssp_map, AS_PROGRAM, 16, md_rom_svp_device )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
-	AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
-//	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank3")
-//	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank4")
+//	AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
+//	AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
+	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("iram_svp")
+	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("cart_svp")
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -361,6 +361,13 @@ ioport_constructor md_rom_svp_device::device_input_ports() const
 }
 
 
+void md_rom_svp_device::set_bank_to_rom(const char *banktag, UINT32 offset)
+{
+	if (membank(banktag))
+		membank(banktag)->set_base(m_rom + offset);
+}
+
+
 void md_rom_svp_device::device_start()
 {
 	memset(m_pmac_read, 0, ARRAY_LENGTH(m_pmac_read));
@@ -373,8 +380,12 @@ void md_rom_svp_device::device_start()
 	m_xst2 = 0;
 
 	/* SVP stuff */
+	// DRAM
 	m_dram = auto_alloc_array(machine(), UINT8, 0x20000);
+	// IRAM
 	m_iram = auto_alloc_array(machine(), UINT8, 0x800);
+	this->membank("iram_svp")->set_base(m_iram);
+	// the other bank, "cart_svp", is setup at call_load 
 }
 
 READ16_MEMBER(md_rom_svp_device::read)

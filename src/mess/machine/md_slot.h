@@ -109,6 +109,7 @@ public:
 	virtual UINT16* get_nvram_base() { return m_nvram; };
 	virtual UINT32 get_rom_size() { return m_rom_size; };
 	virtual UINT32 get_nvram_size() { return m_nvram_size; };
+	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) {};
 
 	void rom_map_setup(UINT32 size);
 	UINT32 get_padded_size(UINT32 size);

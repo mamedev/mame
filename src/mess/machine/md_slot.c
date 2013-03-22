@@ -335,6 +335,10 @@ bool base_md_cart_slot_device::call_load()
 
 		if (res == IMAGE_INIT_PASS)
 		{
+			//speed-up rom access from SVP add-on, if present
+			if (m_type == SEGA_SVP)
+				m_cart->set_bank_to_rom("cart_svp", 0x800/2);
+
 			// STEP 3: install memory handlers for this type of cart
 			setup_custom_mappers();
 
