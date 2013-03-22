@@ -75,6 +75,16 @@ extern int megadrive_6buttons_pad;
 #define MP_ROM  0x10
 #define MP_GAME 0
 
+
+struct genesis_z80_vars
+{
+	int z80_is_reset;
+	int z80_has_bus;
+	UINT32 z80_bank_addr;
+	UINT8* z80_prgram;
+};
+
+
 class md_base_state : public driver_device
 {
 public:
@@ -91,6 +101,8 @@ public:
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
+
+	genesis_z80_vars m_genz80;
 
 	DECLARE_DRIVER_INIT(megadriv_c2);
 	DECLARE_DRIVER_INIT(megadrie);
