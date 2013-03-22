@@ -56,7 +56,7 @@ public:
 
 	UINT8 *m_iram; // IRAM (0-0x7ff)
 	UINT8 *m_dram; // [0x20000];
-	UINT32 m_pmac_read[6];  // read modes/addrs for PM0-PM5
+	UINT32 m_pmac_read[12];  // read modes/addrs for PM0-PM5
 	UINT32 m_pmac_write[6]; // write ...
 	PAIR m_pmc;
 	UINT32 m_emu_status;
