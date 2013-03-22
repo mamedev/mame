@@ -25,8 +25,6 @@
 
 #define MD_CPU_REGION_SIZE 0x800000
 
-extern int sega_cd_connected;
-
 
 /*----------- defined in machine/megadriv.c -----------*/
 
@@ -40,8 +38,6 @@ MACHINE_CONFIG_EXTERN( megadriv_timers );
 MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
-
-extern cpu_device *_svp_cpu;
 
 extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(running_machine &machine);
@@ -85,11 +81,11 @@ public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
 		m_vdp(*this,"gen_vdp"),
+		m_segacd(*this,"segacd"),
 		m_megadrive_ram(*this,"megadrive_ram")
-	{
-		sega_cd_connected = 0;
-	}
+	{ }
 	required_device<sega_genesis_vdp_device> m_vdp;
+	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
 	DECLARE_DRIVER_INIT(megadriv_c2);

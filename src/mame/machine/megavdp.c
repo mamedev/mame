@@ -9,11 +9,7 @@
 
 #include "sound/sn76496.h"
 
-extern cpu_device *_svp_cpu;
-extern int sega_cd_connected;
 extern timer_device* megadriv_scanline_timer;
-
-
 
 
 #define MAX_HPOSITION 480
@@ -470,6 +466,8 @@ void sega_genesis_vdp_device::update_m_vdp_code_and_address(void)
 
 UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space68k);
 
+// if either SVP CPU or segaCD is present, there is a lag we have to compensate for
+// hence, variants of this call will be defined in megadriv_init_common for segacd and svp
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k)
 {
 	// should we limit the valid areas here?
@@ -478,33 +476,15 @@ UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source
 
 	//printf("vdp_get_word_from_68k_mem_default %08x\n", source);
 
-	if ( source <= 0x3fffff )
-	{
-		if (_svp_cpu != NULL)
-		{
-			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
-		}
-
-		// likewise segaCD, at least when reading wordram?
-		// we might need to check what mode we're in here..
-		if (sega_cd_connected)
-		{
-			source -= 2;
-		}
-
+	if (source <= 0x3fffff)
 		return space68k.read_word(source);
-	}
-	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
-	{
+	else if ((source >= 0xe00000) && (source <= 0xffffff))
 		return space68k.read_word(source);
-	}
 	else
 	{
 		printf("DMA Read unmapped %06x\n",source);
 		return machine.rand();
 	}
-
-
 }
 
 /*  Table from Charles Macdonald

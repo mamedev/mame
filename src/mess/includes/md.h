@@ -58,7 +58,5 @@ public:
 ADDRESS_MAP_EXTERN( svp_ssp_map, driver_device );
 ADDRESS_MAP_EXTERN( svp_ext_map, driver_device );
 extern void svp_init(running_machine &machine);
-extern cpu_device *_svp_cpu;
-
 
 #endif

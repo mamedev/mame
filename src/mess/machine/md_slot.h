@@ -163,6 +163,8 @@ public:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
+	int get_type() { return m_type; }
+
 	int load_list();
 	int load_nonlist();
 	int get_cart_type(UINT8 *ROM, UINT32 len);

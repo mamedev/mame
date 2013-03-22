@@ -33,7 +33,6 @@ static cpu_device *_genesis_snd_z80_cpu;
 int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
-cpu_device *_svp_cpu;
 
 struct genesis_z80_vars
 {
@@ -380,6 +379,7 @@ static UINT8 megadrive_io_read_sctrl_port(int portnum)
 
 READ16_HANDLER( megadriv_68k_io_read )
 {
+	md_base_state *state = space.machine().driver_data<md_base_state>();
 	UINT8 retdata;
 
 	retdata = 0;
@@ -401,7 +401,7 @@ READ16_HANDLER( megadriv_68k_io_read )
 			logerror("%06x read version register\n", space.device().safe_pc());
 			retdata = megadrive_region_export<<7 | // Export
 						megadrive_region_pal<<6 | // NTSC
-						(sega_cd_connected?0x00:0x20) | // 0x20 = no sega cd
+						(state->m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
 						0x00 | // Unused (Always 0)
 						0x00 | // Bit 3 of Version Number
 						0x00 | // Bit 2 of Version Number
@@ -1201,6 +1201,24 @@ static int megadriv_tas_callback(device_t *device)
 	return 0; // writeback not allowed
 }
 
+// the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
+// likewise segaCD, at least when reading wordram? we might need to check what mode we're in here..
+UINT16 vdp_get_word_from_68k_mem_delayed(running_machine &machine, UINT32 source, address_space & space68k)
+{
+	if (source <= 0x3fffff)
+	{
+		source -= 2;	// compensate DMA lag
+		return space68k.read_word(source);
+	}
+	else if ((source >= 0xe00000) && (source <= 0xffffff))
+		return space68k.read_word(source);
+	else
+	{
+		printf("DMA Read unmapped %06x\n",source);
+		return machine.rand();
+	}
+}
+
 void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
@@ -1227,17 +1245,22 @@ void md_base_state::megadriv_init_common()
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
 	}
 
-	_svp_cpu = machine().device<cpu_device>("svp");
-	if (_svp_cpu != NULL)
-	{
-		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag());
-	}
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
+
+	if (machine().device("svp"))
+	{
+		printf("SVP (cpu) found '%s'\n", machine().device("svp")->tag());
+		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
+	}
+	if (machine().device("segacd"))
+	{ 
+		printf("SegaCD found '%s'\n", machine().device("segacd")->tag());
+		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
+	}	
 
 	m68k_set_tas_callback(machine().device("maincpu"), megadriv_tas_callback);
 

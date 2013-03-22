@@ -4,11 +4,6 @@
 #include "sound/rf5c68.h"
 
 
-
-// the main MD emulation needs to know the state of these because it appears in the MD regs / affect DMA operations
-int sega_cd_connected = 0x00;
-
-
 // not in the state because the IRQ_CALLBACK needs it, and that can't be a member function?
 UINT16 a12000_halt_reset_reg = 0x0000;
 
@@ -1568,7 +1563,6 @@ READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
 void sega_segacd_device::device_start()
 {
 	_segacd_68k_cpu = machine().device<cpu_device>(":segacd:segacd_68k");
-	sega_cd_connected = 1;
 
 	segacd_gfx_conversion_timer = machine().device<timer_device>(":segacd:stamp_timer");
 	segacd_irq3_timer = machine().device<timer_device>(":segacd:irq3_timer");

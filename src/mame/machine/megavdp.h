@@ -154,6 +154,9 @@ extern void megadriv_reset_vdp(running_machine &machine);
 extern int genvdp_use_cram;
 
 
+UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
+
+
 class sega_genesis_vdp_device : public sega315_5124_device
 {
 public:
