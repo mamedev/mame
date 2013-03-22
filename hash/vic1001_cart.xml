@@ -1893,7 +1893,7 @@
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="maze (hes)(1983)(c3??)(ju).a0" size="0x2000" crc="003f5d8d" sha1="127feec36e5a57f84722aa3e8ce1aac0b5dd7d42" offset="0x0000" />
+				<rom name="maze (hes)(1983)(c3--)(ju).a0" size="0x2000" crc="003f5d8d" sha1="127feec36e5a57f84722aa3e8ce1aac0b5dd7d42" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2100,7 +2100,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="cart" interface="vic1001_cart">
 			<dataarea name="blk5" size="0x2000">
-				<rom name="mosquito infestation (hes)(1982)(c3??).a0" size="0x1000" crc="ab89be36" sha1="575fc5d44c90b46b07e7ba22adfcf713042f025d" offset="0x0000" />
+				<rom name="mosquito infestation (hes)(1982)(c3--).a0" size="0x1000" crc="ab89be36" sha1="575fc5d44c90b46b07e7ba22adfcf713042f025d" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

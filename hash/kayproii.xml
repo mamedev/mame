@@ -10,7 +10,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="cp-m 2.2 boot disk (19??)(digital research)(de).td0" size="139911" crc="ab5d7ae0" sha1="b73622c17306e32b42cef31d58616378329605ef" offset="0" />
+				<rom name="cp-m 2.2 boot disk (19xx)(digital research)(de).td0" size="139911" crc="ab5d7ae0" sha1="b73622c17306e32b42cef31d58616378329605ef" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="cp-m 2.2 (19??)(digital research).imd" size="188479" crc="602c4f18" sha1="c4158b4f84066514af2b74cb6d0915f661402819" offset="0" />
+				<rom name="cp-m 2.2 (19xx)(digital research).imd" size="188479" crc="602c4f18" sha1="c4158b4f84066514af2b74cb6d0915f661402819" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect writer - docs and utilities (198?)(-).imd" size="151202" crc="94cda75d" sha1="46348510ff682ef3a8a1e5a27f1625beae21980e" offset="0" />
+				<rom name="perfect writer - docs and utilities (198x)(-).imd" size="151202" crc="94cda75d" sha1="46348510ff682ef3a8a1e5a27f1625beae21980e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@
 		<publisher>Perfect Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="195328">
-				<rom name="perfect writer - lessons (198?)(perfect software).imd" size="180829" crc="b8bba8ca" sha1="6e18f014337efcb70248b8cff2483bc1d5c8ec4f" offset="0" />
+				<rom name="perfect writer - lessons (198x)(perfect software).imd" size="180829" crc="b8bba8ca" sha1="6e18f014337efcb70248b8cff2483bc1d5c8ec4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -1243,7 +1243,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="programmer" value="Gil Williamson and Charles Dear" />
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="q*bert (europe).bin" size="8192" crc="202f2749" sha1="80d76d5c56fc716a8f7a55166390658c320e4c34" offset="0" />
+				<rom name="q-bert (europe).bin" size="8192" crc="202f2749" sha1="80d76d5c56fc716a8f7a55166390658c320e4c34" offset="0" />
 			</dataarea>
 		</part>
 	</software>

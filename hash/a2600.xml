@@ -3223,7 +3223,7 @@ Info from Atariage and Atarimania
 		<part name="cart" interface="a2600_cart">
 
 			<dataarea name="rom" size="16384">
-				<rom name="challenge of.... nexar, the (hack?) (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="4096" crc="57b3d123" sha1="4a6bbd96f2c805cda13238486c828379257c5a44" offset="0" />
+				<rom name="challenge of.... nexar, the (hack maybe) (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="4096" crc="57b3d123" sha1="4a6bbd96f2c805cda13238486c828379257c5a44" offset="0" />
 			</dataarea>
 		</part>
 	</software>

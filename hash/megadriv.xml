@@ -24532,7 +24532,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="tecmo cup (jpn) (prototype?) (bad dump).bin" size="524288" crc="88fdd060" sha1="67e9261097e1ed9c8d7d11fd45a7c7e04ac1145f" offset="000000" status="baddump" loadflag="load16_word_swap" />
+				<rom name="tecmo cup (jpn) (prototype maybe) (bad dump).bin" size="524288" crc="88fdd060" sha1="67e9261097e1ed9c8d7d11fd45a7c7e04ac1145f" offset="000000" status="baddump" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -29937,7 +29937,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="compatibility" value="PAL" />
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_svp" />
+			<feature name="slot" value="rom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16420.bin" size="2097152" crc="9624d4ef" sha1="2c3812f8a010571e51269a33a989598787d27c2d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -29955,7 +29955,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="compatibility" value="EUR-JPN" />
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_svp" />
+			<feature name="slot" value="rom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16389.bin" size="2097152" crc="53a293b5" sha1="0ad38a3ab1cc99edac72184f8ae420e13df5cac6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -29970,7 +29970,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="compatibility" value="NTSC-U" />
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_svp" />
+			<feature name="slot" value="rom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="virtua racing (usa).bin" size="2097152" crc="7e1a324a" sha1="ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

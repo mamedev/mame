@@ -2409,7 +2409,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bs race game 97mp (japan) (derby stallion 96?).bs" size="1048576" crc="1c19967c" sha1="9c1dfe24be936943a4b4a7902265942b0b70bf00" offset="0x000000" />
+				<rom name="bs race game 97mp (japan) (derby stallion 96 maybe).bs" size="1048576" crc="1c19967c" sha1="9c1dfe24be936943a4b4a7902265942b0b70bf00" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2422,7 +2422,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="same game koma editor 4 (data pack)(?).bs" size="1048576" crc="d8479c20" sha1="2160f0034c1474d05937d6fdb5af16f4b06bbc4e" offset="0x000000" />
+				<rom name="same game koma editor 4 (data pack)(maybe).bs" size="1048576" crc="d8479c20" sha1="2160f0034c1474d05937d6fdb5af16f4b06bbc4e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3149,7 +3149,7 @@
 
 			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
-				<rom name="unknown music data (bad?).bs" size="1048576" crc="f96d9d29" sha1="48980784d21f2e9568d18bb326af033fa1e33889" offset="0x000000" />
+				<rom name="unknown music data (bad maybe).bs" size="1048576" crc="f96d9d29" sha1="48980784d21f2e9568d18bb326af033fa1e33889" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
