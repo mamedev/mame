@@ -102,6 +102,7 @@ public:
 	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
+	int m_other_hacks;	// misc hacks
 	genesis_z80_vars m_genz80;
 
 	DECLARE_DRIVER_INIT(megadriv_c2);

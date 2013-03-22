@@ -28,8 +28,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 MACHINE_CONFIG_EXTERN( megadriv );
 
-int genesis_other_hacks = 0; // misc hacks
-
 timer_device* megadriv_scanline_timer;
 
 
@@ -942,7 +940,7 @@ MACHINE_RESET( megadriv )
 		megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
-	if (genesis_other_hacks)
+	if (state->m_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
@@ -1295,7 +1293,7 @@ void md_base_state::megadriv_init_common()
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
 	genvdp_use_cram = 0;
-	genesis_other_hacks = 0;
+	m_other_hacks = 0;
 
 	megadriv_init_common();
 	megadriv_framerate = 60;
@@ -1306,7 +1304,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 DRIVER_INIT_MEMBER(md_base_state,megadriv)
 {
 	genvdp_use_cram = 1;
-	genesis_other_hacks = 1;
+	m_other_hacks = 1;
 
 	megadriv_init_common();
 	megadriv_framerate = 60;
@@ -1315,7 +1313,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 DRIVER_INIT_MEMBER(md_base_state,megadrij)
 {
 	genvdp_use_cram = 1;
-	genesis_other_hacks = 1;
+	m_other_hacks = 1;
 
 	megadriv_init_common();
 	megadriv_framerate = 60;
@@ -1324,7 +1322,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 DRIVER_INIT_MEMBER(md_base_state,megadrie)
 {
 	genvdp_use_cram = 1;
-	genesis_other_hacks = 1;
+	m_other_hacks = 1;
 
 	megadriv_init_common();
 	megadriv_framerate = 50;
