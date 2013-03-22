@@ -655,21 +655,17 @@ static TIMER_CALLBACK( megadriv_z80_run_state )
 	/* Is the z80 RESET line pulled? */
 	if (state->m_genz80.z80_is_reset)
 	{
-		machine.device("genesis_snd_z80" )->reset();
-		machine.device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
-		machine.device("ymsnd" )->reset();
+		state->m_z80snd->reset();
+		state->m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		machine.device("ymsnd")->reset();
 	}
 	else
 	{
 		/* Check if z80 has the bus */
 		if (state->m_genz80.z80_has_bus)
-		{
-			machine.device<cpu_device>( "genesis_snd_z80" )->resume(SUSPEND_REASON_HALT );
-		}
+			state->m_z80snd->resume(SUSPEND_REASON_HALT);
 		else
-		{
-			machine.device<cpu_device>( "genesis_snd_z80" )->suspend(SUSPEND_REASON_HALT, 1 );
-		}
+			state->m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
 	}
 }
 
@@ -1012,7 +1008,8 @@ static NVRAM_HANDLER( megadriv )
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
 void genesis_vdp_sndirqline_callback_genesis_z80(running_machine &machine, bool state)
 {
-	if (machine.device(":genesis_snd_z80") != NULL)
+	md_base_state *md_state = machine.driver_data<md_base_state>();
+	if (md_state->m_z80snd)
 	{
 		if (state == true)
 		{
