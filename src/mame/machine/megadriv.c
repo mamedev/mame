@@ -35,12 +35,13 @@ void megadriv_z80_hold(running_machine &machine)
 {
 	md_base_state *state = machine.driver_data<md_base_state>();
 	if ((state->m_genz80.z80_has_bus == 1) && (state->m_genz80.z80_is_reset == 0))
-		machine.device(":genesis_snd_z80")->execute().set_input_line(0, HOLD_LINE);
+		state->m_z80snd->set_input_line(0, HOLD_LINE);
 }
 
 void megadriv_z80_clear(running_machine &machine)
 {
-	machine.device(":genesis_snd_z80")->execute().set_input_line(0, CLEAR_LINE);
+	md_base_state *state = machine.driver_data<md_base_state>();
+	state->m_z80snd->set_input_line(0, CLEAR_LINE);
 }
 
 static void megadriv_z80_bank_w(address_space &space, UINT16 data)
@@ -770,7 +771,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 static READ8_HANDLER( z80_read_68k_banked_data )
 {
 	md_base_state *state = space.machine().driver_data<md_base_state>();
-	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	address_space &space68k = state->m_maincpu->space();
 	UINT8 ret = space68k.read_byte(state->m_genz80.z80_bank_addr+offset);
 	return ret;
 }
@@ -778,7 +779,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 static WRITE8_HANDLER( z80_write_68k_banked_data )
 {
 	md_base_state *state = space.machine().driver_data<md_base_state>();
-	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	address_space &space68k = state->m_maincpu->space();
 	space68k.write_byte(state->m_genz80.z80_bank_addr+offset,data);
 }
 
@@ -1012,19 +1013,21 @@ void genesis_vdp_sndirqline_callback_genesis_z80(running_machine &machine, bool 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
 void genesis_vdp_lv6irqline_callback_genesis_68k(running_machine &machine, bool state)
 {
-	if (state==true)
-		machine.device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	md_base_state *md_state = machine.driver_data<md_base_state>();
+	if (state == true)
+		md_state->m_maincpu->set_input_line(6, HOLD_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
+		md_state->m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
 void genesis_vdp_lv4irqline_callback_genesis_68k(running_machine &machine, bool state)
 {
-	if (state==true)
-		machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+	md_base_state *md_state = machine.driver_data<md_base_state>();
+	if (state == true)
+		md_state->m_maincpu->set_input_line(4, HOLD_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+		md_state->m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 /* Callback when the 68k takes an IRQ */
@@ -1373,7 +1376,7 @@ SCREEN_VBLANK(megadriv)
 	md_base_state *state = screen.machine().driver_data<md_base_state>();
 
 	if (screen.ioport(":RESET")->read_safe(0x00) & 0x01)
-		screen.machine().device(":maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge
 	if (vblank_on)
