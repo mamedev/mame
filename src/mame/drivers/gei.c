@@ -610,11 +610,11 @@ static INPUT_PORTS_START(reelfun_standard)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1 Left A-Z")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("2 Right A-Z")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("3 Select Letter")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("4 Start")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("5 Solve Puzzle")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1 Left A-Z")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2 Right A-Z")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3 Select Letter")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4 Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5 Solve Puzzle")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -632,11 +632,11 @@ static INPUT_PORTS_START(trivia_standard)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")   /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -846,6 +846,36 @@ static INPUT_PORTS_START( findout )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_INCLUDE(reelfun_standard)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(sexappl)
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(    0x07, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Orientation" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "Horizontal" )
+	PORT_DIPSETTING(    0x00, "Vertical" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7") /* Shows Message #1 and "hangs" ??? */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_INCLUDE(trivia_standard)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gt103 )
@@ -1815,6 +1845,20 @@ ROM_START( quiz211 )
 	ROM_LOAD( "pal10l8cn.bin",   0x0000, 0x002c, CRC(86095226) SHA1(e7496efbd5ca240f0df2dfa5627402342c7f5384) )
 ROM_END
 
+ROM_START( sexappl )  /* TRIV3D PCB, stickered SEX APPL 6.02 5/92 */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "6.02_cont", 0x00000, 0x4000, CRC(63ad3593) SHA1(fd93a71b82ef04757d79485ca4c7e306b2983c76) )
+	ROM_LOAD( "6.02_kb",   0x08000, 0x2000, CRC(025a5c7e) SHA1(bc935fb5ac081d089f3f9991d04cdf3708fa35c6) )   /* banked */
+	ROM_LOAD( "hot_sex",   0x10000, 0x8000, CRC(f16b3363) SHA1(a05bb2ae6467cd28021321bb526ea2ae3da82361) )   /* banked ROMs for solution data */
+	ROM_LOAD( "wild_sex",  0x18000, 0x8000, CRC(f257a023) SHA1(9c72c18f1acd7b36033a20dd1c8fafc801a3d174) )
+	ROM_LOAD( "hard_sex",  0x20000, 0x8000, CRC(bdab9ac1) SHA1(e09a5276a5bd346e2b88dd8fa196f204267efe09) )
+	ROM_LOAD( "kinky_sex", 0x28000, 0x8000, CRC(6b4c016d) SHA1(7d0b8af7c5ef384412535ab3e2ed1eb7c4ecd824) )
+	ROM_LOAD( "adult_sex", 0x30000, 0x8000, CRC(05798340) SHA1(8db308bb725112327027a725b2c69299e6da1dad) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "sexappl.nvram",   0x0000, 0x0800, CRC(be65737c) SHA1(5b8a603a9ddecdad4aaef0b9e8ef373885b236c0) ) /* Defualts but with card dispenser OFF! */
+ROM_END
+
 /*
 GEI Multi Game System
 (c) 1992
@@ -1957,5 +2001,7 @@ GAME( 1986, suprpokrb,suprpokr, suprpokr, suprpokr, driver_device, 0,       ROT0
 
 GAME( 1991, quiz211,  0,        findout,  quiz, driver_device,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2.11)",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,ROT0, "Grayhound Electronics", "GEI Multi Game",                          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,ROT0, "Classic Games",         "Sports Authority",                        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, sexappl,  0,        findout,  sexappl, driver_device,  0,       ROT0, "Grayhound Electronics", "Sex Appeal (Version 6.02)",               GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+GAME( 1992, geimulti, 0,        geimulti, geimulti, gei_state, geimulti,    ROT0, "Grayhound Electronics", "GEI Multi Game",                          GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1992, sprtauth, 0,        sprtauth, sprtauth, gei_state, geimulti,    ROT0, "Classic Games",         "Sports Authority",                        GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
