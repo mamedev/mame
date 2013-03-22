@@ -193,12 +193,6 @@ _32x32_START
 	_32x32_SEQUENCE_1_FLIP
 _32x32_END
 
-extern UINT16 a12000_halt_reset_reg;
-
-
-
-
-
 
 
 class sega_segacd_device : public device_t
@@ -206,7 +200,7 @@ class sega_segacd_device : public device_t
 public:
 	sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type);
 
-	cpu_device *_segacd_68k_cpu;
+	required_device<cpu_device> m_scdcpu;
 	lc89510_temp_device *lc89510_temp;
 
 	UINT16 *segacd_backupram;
@@ -265,7 +259,7 @@ public:
 	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );
 	UINT16 m_dmaaddr;
 
-
+	UINT16 m_a12000_halt_reset_reg;
 
 	void segacd_mark_tiles_dirty(running_machine& machine, int offset);
 	int segacd_get_active_stampmap_tilemap(void);

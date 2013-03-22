@@ -4,24 +4,18 @@
 #include "sound/rf5c68.h"
 
 
-// not in the state because the IRQ_CALLBACK needs it, and that can't be a member function?
-UINT16 a12000_halt_reset_reg = 0x0000;
-
 /* Callback when the genesis enters interrupt code */
-// needs to be a member
 IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
 {
 	if (irqline==2)
 	{
 		// clear this bit
-		a12000_halt_reset_reg &= ~0x0100;
-		device.machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
+		m_a12000_halt_reset_reg &= ~0x0100;
+		m_scdcpu->set_input_line(2, CLEAR_LINE);
 	}
 
 	return (0x60+irqline*4)/4; // vector address
 }
-
-
 
 
 const device_type SEGA_SEGACD_US = &device_creator<sega_segacd_us_device>;
@@ -29,7 +23,8 @@ const device_type SEGA_SEGACD_JAPAN = &device_creator<sega_segacd_japan_device>;
 const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device>;
 
 sega_segacd_device::sega_segacd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type)
-	: device_t(mconfig, type, "sega_segacd_device", tag, owner, clock)
+	: device_t(mconfig, type, "sega_segacd_device", tag, owner, clock),
+		m_scdcpu(*this, "segacd_68k")
 {
 }
 
@@ -137,9 +132,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_TIMER_DRIVER_ADD("scd_dma_timer", sega_segacd_device, scd_dma_timer_callback)
 
 
-
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
-
 
 
 	MCFG_RF5C68_ADD("rfsnd", SEGACD_CLOCK) // RF5C164!
@@ -159,10 +152,6 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( segacd_fragment );
 }
-
-
-
-
 
 
 
@@ -292,49 +281,49 @@ void sega_segacd_device::segacd_1meg_mode_word_write(running_machine& machine, i
 
 WRITE16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_w )
 {
-	UINT16 old_halt = a12000_halt_reset_reg;
+	UINT16 old_halt = m_a12000_halt_reset_reg;
 
-	COMBINE_DATA(&a12000_halt_reset_reg);
+	COMBINE_DATA(&m_a12000_halt_reset_reg);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line
-		if (a12000_halt_reset_reg&0x0001)
+		if (m_a12000_halt_reset_reg & 0x0001)
 		{
-			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_scdcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
-			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_scdcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
-		if (a12000_halt_reset_reg&0x0002)
+		if (m_a12000_halt_reset_reg & 0x0002)
 		{
-			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_scdcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
-			space.machine().device(":segacd:segacd_68k")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_scdcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		if (a12000_halt_reset_reg&0x0100)
+		if (m_a12000_halt_reset_reg & 0x0100)
 		{
 			running_machine& machine = space.machine();
 			CHECK_SCD_LV2_INTERRUPT
 		}
 
-		if (a12000_halt_reset_reg&0x8000)
+		if (m_a12000_halt_reset_reg & 0x8000)
 		{
 			// not writable.. but can read irq mask here?
-			//printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
+			//printf("m_a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
 		}
 
 
@@ -343,7 +332,7 @@ WRITE16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_w )
 
 READ16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_r )
 {
-	return a12000_halt_reset_reg;
+	return m_a12000_halt_reset_reg;
 }
 
 
@@ -1562,8 +1551,6 @@ READ16_MEMBER( sega_segacd_device::segacd_font_converted_r )
 
 void sega_segacd_device::device_start()
 {
-	_segacd_68k_cpu = machine().device<cpu_device>(":segacd:segacd_68k");
-
 	segacd_gfx_conversion_timer = machine().device<timer_device>(":segacd:stamp_timer");
 	segacd_irq3_timer = machine().device<timer_device>(":segacd:irq3_timer");
 	scd_dma_timer = machine().device<timer_device>(":segacd:scd_dma_timer");
@@ -1603,7 +1590,7 @@ void sega_segacd_device::device_start()
 
 
 
-	machine().device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
+	m_scdcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
 
 	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
 
@@ -1650,12 +1637,12 @@ WRITE16_MEMBER( sega_segacd_device::segacd_dmaaddr_w )
 
 void sega_segacd_device::device_reset()
 {
-	_segacd_68k_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	_segacd_68k_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_scdcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_scdcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
 
-
+	m_a12000_halt_reset_reg = 0x0000;
 
 	scd_rammode = 0;
 	scd_mode_dmna_ret_flags = 0x5421;
@@ -1675,7 +1662,7 @@ void sega_segacd_device::device_reset()
 	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
 	// too slow and has bad sound.  -- Investigate!
 
-	_segacd_68k_cpu->set_clock_scale(1.5000f);
+	m_scdcpu->set_clock_scale(1.5000f);
 
 
 	// initialize some stuff on reset
