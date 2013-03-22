@@ -56,7 +56,10 @@ static UINT32 pm_io(address_space &space, int reg, int write, UINT32 d)
 	mdsvp_state *state = space.machine().driver_data<mdsvp_state>();
 	if (state->m_emu_status & SSP_PMC_SET)
 	{
-		state->m_pmac_read[write ? reg + 6 : reg] = state->m_pmc.d;
+		if (write)
+			state->m_pmac_write[reg] = state->m_pmc.d;
+		else
+			state->m_pmac_read[reg] = state->m_pmc.d;
 		state->m_emu_status &= ~SSP_PMC_SET;
 		return 0;
 	}
@@ -126,7 +129,10 @@ static UINT32 pm_io(address_space &space, int reg, int write, UINT32 d)
 		}
 
 		// PMC value corresponds to last PMR accessed (not sure).
-		state->m_pmc.d = state->m_pmac_read[write ? reg + 6 : reg];
+		if (write)
+			state->m_pmc.d = state->m_pmac_write[reg];
+		else
+			state->m_pmc.d = state->m_pmac_read[reg];
 
 		return d;
 	}
