@@ -76,16 +76,21 @@ sns_rom_seta11dsp_device::sns_rom_seta11dsp_device(const machine_config &mconfig
 
 void sns_rom20_necdsp_device::device_start()
 {
+	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x2000/4);
+	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x800/2);
 }
 
 void sns_rom21_necdsp_device::device_start()
 {
+	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x2000/4);
+	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x800/2);
 }
 
 void sns_rom_setadsp_device::device_start()
 {
+	m_dsp_prg = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_dsp_data = auto_alloc_array(machine(), UINT16, 0x1000/2);
 }
-
 
 /*-------------------------------------------------
  mapper specific handlers
@@ -345,6 +350,48 @@ machine_config_constructor sns_rom_seta10dsp_device::device_mconfig_additions() 
 machine_config_constructor sns_rom_seta11dsp_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( snes_st011 );
+}
+
+
+// To make faster DSP access to its internal rom, let's install read banks and map m_bios there with correct byte order
+
+void sns_rom20_necdsp_device::speedup_addon_bios_access()
+{
+	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
+	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
+	membank("dsp_prg")->set_base(m_dsp_prg);
+	membank("dsp_data")->set_base(m_dsp_data);
+	// copy data in the correct format
+	for (int x = 0; x < 0x800; x++)
+		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
+	for (int x = 0; x < 0x400; x++)
+		m_dsp_data[x] = (m_bios[0x2000 + x * 2] << 8) | m_bios[0x2000 + x * 2 + 1];
+}
+
+void sns_rom21_necdsp_device::speedup_addon_bios_access()
+{
+	m_upd7725->space(AS_PROGRAM).install_read_bank(0x0000, 0x07ff, "dsp_prg");
+	m_upd7725->space(AS_DATA).install_read_bank(0x0000, 0x03ff, "dsp_data");
+	membank("dsp_prg")->set_base(m_dsp_prg);
+	membank("dsp_data")->set_base(m_dsp_data);
+	// copy data in the correct format
+	for (int x = 0; x < 0x800; x++)
+		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
+	for (int x = 0; x < 0x400; x++)
+		m_dsp_data[x] = (m_bios[0x2000 + x * 2] << 8) | m_bios[0x2000 + x * 2 + 1];
+}
+
+void sns_rom_setadsp_device::speedup_addon_bios_access()
+{
+	m_upd96050->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "dsp_prg");
+	m_upd96050->space(AS_DATA).install_read_bank(0x0000, 0x07ff, "dsp_data");
+	membank("dsp_prg")->set_base(m_dsp_prg);
+	membank("dsp_data")->set_base(m_dsp_data);
+	// copy data in the correct format
+	for (int x = 0; x < 0x3fff; x++)
+		m_dsp_prg[x] = (m_bios[x * 4] << 24) | (m_bios[x * 4 + 1] << 16) | (m_bios[x * 4 + 2] << 8) | 0x00;
+	for (int x = 0; x < 0x07ff; x++)
+		m_dsp_data[x] = (m_bios[0x10000 + x * 2] << 8) | m_bios[0x10000 + x * 2 + 1];
 }
 
 

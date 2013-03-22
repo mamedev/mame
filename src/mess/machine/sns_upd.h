@@ -19,6 +19,7 @@ public:
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_necdsp"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void speedup_addon_bios_access();
 
 	required_device<upd7725_device> m_upd7725;
 
@@ -28,6 +29,9 @@ public:
 
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+	
+	UINT32 *m_dsp_prg;
+	UINT16 *m_dsp_data;
 };
 
 // ======================> sns_rom21_necdsp_device
@@ -43,6 +47,7 @@ public:
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom21_necdsp"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void speedup_addon_bios_access();
 
 	required_device<upd7725_device> m_upd7725;
 
@@ -52,6 +57,9 @@ public:
 
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
+
+	UINT32 *m_dsp_prg;
+	UINT16 *m_dsp_data;
 };
 
 // ======================> sns_rom_setadsp_device
@@ -65,6 +73,7 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_setadsp"; }
+	virtual void speedup_addon_bios_access();
 
 	required_device<upd96050_device> m_upd96050;
 
@@ -74,6 +83,9 @@ public:
 
 	virtual DECLARE_READ32_MEMBER(setadsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(setadsp_data_r);
+	
+	UINT32 *m_dsp_prg;
+	UINT16 *m_dsp_data;
 };
 
 // ======================> sns_rom_seta10dsp_device

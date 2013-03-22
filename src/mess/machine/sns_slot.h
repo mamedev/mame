@@ -115,6 +115,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram) { UINT32 mask = m_nvram_size - 1; m_nvram[offset & mask] = data; return; } // NVRAM access
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
+	virtual void speedup_addon_bios_access() {};
 
 	void rom_alloc(running_machine &machine, UINT32 size);
 	void nvram_alloc(running_machine &machine, UINT32 size);

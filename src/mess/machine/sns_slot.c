@@ -671,6 +671,11 @@ bool base_sns_cart_slot_device::call_load()
 		if (software_entry() == NULL)
 			setup_addon_from_fullpath();
 
+		// in carts with an add-on CPU having internal dump, this speeds up access to the internal rom
+		// by installing read_bank in address space and mapping m_bios there
+		m_cart->speedup_addon_bios_access();
+
+
 		setup_nvram();
 
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
