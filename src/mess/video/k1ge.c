@@ -894,7 +894,7 @@ static DEVICE_RESET( k1ge )
 const device_type K1GE = &device_creator<k1ge_device>;
 
 k1ge_device::k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K1GE, "", tag, owner, clock)
+	: device_t(mconfig, K1GE, "K1GE Monochrome Graphics + LCD", tag, owner, clock)
 {
 	m_token = global_alloc_clear(k1ge_t);
 }
@@ -937,7 +937,7 @@ void k1ge_device::device_reset()
 const device_type K2GE = &device_creator<k2ge_device>;
 
 k2ge_device::k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: k1ge_device(mconfig, K2GE, "", tag, owner, clock)
+	: k1ge_device(mconfig, K2GE, "K2GE Color Graphics + LCD", tag, owner, clock)
 {
 }
 
