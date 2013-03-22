@@ -83,7 +83,11 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 {
 	if (m_emu_status & SSP_PMC_SET)
 	{
-		m_pmac_read[write ? reg + 6 : reg] = m_pmc.d;
+		if (write)
+			m_pmac_write[reg] = m_pmc.d;
+		else
+			m_pmac_read[reg] = m_pmc.d;
+
 		m_emu_status &= ~SSP_PMC_SET;
 		return 0;
 	}
@@ -155,7 +159,10 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 		}
 		
 		// PMC value corresponds to last PMR accessed (not sure).
-		m_pmc.d = m_pmac_read[write ? reg + 6 : reg];
+		if (write)
+			m_pmc.d = m_pmac_write[reg];
+		else
+			m_pmc.d = m_pmac_read[reg];
 		
 		return d;
 	}
