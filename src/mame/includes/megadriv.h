@@ -80,10 +80,14 @@ class md_base_state : public driver_device
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_z80snd(*this,"genesis_snd_z80"),
 		m_vdp(*this,"gen_vdp"),
 		m_segacd(*this,"segacd"),
 		m_megadrive_ram(*this,"megadrive_ram")
 	{ }
+	optional_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_z80snd;
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;

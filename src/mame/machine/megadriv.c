@@ -28,8 +28,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 MACHINE_CONFIG_EXTERN( megadriv );
 
-
-static cpu_device *_genesis_snd_z80_cpu;
 int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
@@ -1222,13 +1220,11 @@ UINT16 vdp_get_word_from_68k_mem_delayed(running_machine &machine, UINT32 source
 void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu = machine().device<cpu_device>("genesis_snd_z80");
-	if (_genesis_snd_z80_cpu != NULL)
+	if (machine().device("genesis_snd_z80"))
 	{
-		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
-
+		//printf("GENESIS Sound Z80 cpu found '%s'\n", machine().device("genesis_snd_z80")->tag());
 		genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
-		membank("bank1")->set_base(genz80.z80_prgram );
+		membank("bank1")->set_base(genz80.z80_prgram);
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
