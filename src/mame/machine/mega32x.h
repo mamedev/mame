@@ -22,17 +22,17 @@
 
 #include "sound/dac.h"
 
-#define _32X_MASTER_TAG (":sega32x:32x_master_sh2")
-#define _32X_SLAVE_TAG (":sega32x:32x_slave_sh2")
-
-
 class sega_32x_device : public device_t
 {
 public:
 	sega_32x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type);
 
+	required_device<cpu_device> m_master_cpu;
+	required_device<cpu_device> m_slave_cpu;
 	required_device<dac_device> m_lch_pwm;
 	required_device<dac_device> m_rch_pwm;
+
+	void pause_cpu();
 
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );

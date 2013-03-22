@@ -93,12 +93,14 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
 		m_vdp(*this,"gen_vdp"),
+		m_32x(*this,"sega32x"),
 		m_segacd(*this,"segacd"),
 		m_megadrive_ram(*this,"megadrive_ram")
 	{ }
 	optional_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	required_device<sega_genesis_vdp_device> m_vdp;
+	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
 
@@ -392,17 +394,6 @@ public:
 	: md_base_state(mconfig, type, tag) { }
 
 };
-
-
-
-extern cpu_device *_32x_master_cpu;
-extern cpu_device *_32x_slave_cpu;
-
-// called from out main scanline timers...
-
-
-
-
 
 class segacd_state : public _32x_state  // use _32x_state as base to make easier the combo 32X + SCD
 {

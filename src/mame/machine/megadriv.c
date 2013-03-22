@@ -923,7 +923,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	if (machine.device("genesis_snd_z80") != NULL)
+	if (state->m_z80snd)
 	{
 		state->m_genz80.z80_is_reset = 1;
 		state->m_genz80.z80_has_bus = 1;
@@ -951,20 +951,9 @@ MACHINE_RESET( megadriv )
 	megadriv_reset_vdp(machine);
 
 
-
-	/* if any of these extra CPUs exist, pause them until we actually turn them on */
-	if (_32x_master_cpu != NULL)
-	{
-		_32x_master_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-
-	if (_32x_slave_cpu != NULL)
-	{
-		_32x_slave_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-
-
-
+	// if the system has a 32x, pause the extra CPUs until they are actually turned on
+	if (state->m_32x)
+		state->m_32x->pause_cpu();
 }
 
 void megadriv_stop_scanline_timer(running_machine &machine)
@@ -1223,34 +1212,22 @@ void md_base_state::megadriv_init_common()
 		membank("bank1")->set_base(m_genz80.z80_prgram);
 	}
 
-	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = machine().device<cpu_device>(_32X_MASTER_TAG);
-	if (_32x_master_cpu != NULL)
-	{
-		printf("32x MASTER SH2 cpu found '%s'\n", _32x_master_cpu->tag() );
-	}
-
-	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = machine().device<cpu_device>(_32X_SLAVE_TAG);
-	if (_32x_slave_cpu != NULL)
-	{
-		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
-	}
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
+	if (machine().device("sega32x"))
+		printf("32X found 'sega32x'\n");
 	if (machine().device("svp"))
 	{
-		printf("SVP (cpu) found '%s'\n", machine().device("svp")->tag());
+		printf("SVP (cpu) found 'svp'\n");
 		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
 	}
 	if (machine().device("segacd"))
 	{ 
-		printf("SegaCD found '%s'\n", machine().device("segacd")->tag());
+		printf("SegaCD found 'segacd'\n");
 		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
 	}	
 
