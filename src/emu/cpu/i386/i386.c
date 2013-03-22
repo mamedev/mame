@@ -37,8 +37,6 @@ static void i386_task_switch(i386_state* cpustate, UINT16 selector, UINT8 nested
 
 /*************************************************************************/
 
-#define INT_DEBUG   1
-
 static UINT32 i386_load_protected_mode_segment(i386_state *cpustate, I386_SREG *seg, UINT64 *desc )
 {
 	UINT32 v1,v2;
@@ -3425,7 +3423,7 @@ CPU_GET_INFO( i386 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:   info->i = 0;                    break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:   info->i = 0;                    break;
 		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 32;                   break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 32;                   break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 16;                   break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:     info->i = 0;                    break;
 
 		case CPUINFO_INT_INPUT_STATE:                   info->i = CLEAR_LINE;                   break;
@@ -3621,11 +3619,10 @@ CPU_GET_INFO( i386SX )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:    info->i = 16;                    break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 16;                  break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;                  break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:     info->i = 16;                    break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:     info->i = 16;                    break;
-		default:                                        CPU_GET_INFO_CALL(i386);               break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 16;                  break;
+		default:                                     CPU_GET_INFO_CALL(i386);       break;
 	}
 }
 
