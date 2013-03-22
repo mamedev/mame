@@ -10532,10 +10532,10 @@
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="32768">
-				<rom name="fist prom 22/5/90" size="32768" crc="1c63e706" sha1="1ff1395e4cd78e29bd8d0a86c851d9c2d8cd505d" offset="00000" />
+				<rom name="fist prom 22-5-90" size="32768" crc="1c63e706" sha1="1ff1395e4cd78e29bd8d0a86c851d9c2d8cd505d" offset="00000" />	<!-- Original label "fist prom 22/5/90" -->
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="fist grom 22/5/90" size="32768" crc="4a4dcc7e" sha1="a6859293e5182f2c2fc8f65b515c201f00e2f0a6" offset="00000" />
+				<rom name="fist grom 22-5-90" size="32768" crc="4a4dcc7e" sha1="a6859293e5182f2c2fc8f65b515c201f00e2f0a6" offset="00000" />	<!-- Original label "fist grom 22/5/90" -->
 			</dataarea>
 		</part>
 	</software>
@@ -15040,7 +15040,7 @@
 			<feature name="pcb" value="NES-UNEPROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="heroquest nes 21/8 rn0003" size="131072" crc="f9fc0700" sha1="5b4d6ee48e2a17529ae8bc2a4922d6f0f8107d65" offset="00000" />
+				<rom name="heroquest nes 21-8 rn0003" size="131072" crc="f9fc0700" sha1="5b4d6ee48e2a17529ae8bc2a4922d6f0f8107d65" offset="00000" />	<!-- Original label "heroquest nes 21/8 rn0003" -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -16916,7 +16916,7 @@
 			<feature name="pcb" value="NES-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="prg" size="131072">
-				<rom name="cricket prg 24/8/92" size="131072" crc="9db6a3ed" sha1="1f8ffef26eaaa4080ef35e8e3e2013067c1f5940" offset="00000" />
+				<rom name="cricket prg 24-8-92" size="131072" crc="9db6a3ed" sha1="1f8ffef26eaaa4080ef35e8e3e2013067c1f5940" offset="00000" />	<!-- Original label "cricket prg 24/8/92" -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="0.chr" size="131072" crc="f8c1fb2b" sha1="ef429f90ce81d36cbbdf48499f10ed2118bafc05" offset="00000" />
@@ -26501,7 +26501,7 @@
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="131072">
-				<rom name="8/22 1" size="131072" crc="5d40c08a" sha1="a668f1dd5b6c27cbd207a03e84a8de3155968878" offset="00000" />
+				<rom name="8-22 1" size="131072" crc="5d40c08a" sha1="a668f1dd5b6c27cbd207a03e84a8de3155968878" offset="00000" />	<!-- Original label "8/22 1" -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -33196,10 +33196,10 @@
 			<feature name="pcb" value="NES-TKEPROM" />
 			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="prg" size="131072">
-				<rom name="star wars 6/14/91 program" size="131072" crc="6526ea5f" sha1="a9d3778a930907bd58501a6f74fe0eac368987fd" offset="00000" />
+				<rom name="star wars 6-14-91 program" size="131072" crc="6526ea5f" sha1="a9d3778a930907bd58501a6f74fe0eac368987fd" offset="00000" />	<!-- Original label "star wars 6/14/91 program" -->
 			</dataarea>
 			<dataarea name="chr" size="131072">
-				<rom name="star wars 6/14/91 graphics" size="131072" crc="4fd41ac1" sha1="8f40165ee7dd74f8898fc8782a669ae34e4a24c1" offset="00000" />
+				<rom name="star wars 6-14-91 graphics" size="131072" crc="4fd41ac1" sha1="8f40165ee7dd74f8898fc8782a669ae34e4a24c1" offset="00000" />	<!-- Original label "star wars 6/14/91 graphics" -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -36334,11 +36334,11 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TKEPROM" />
 			<feature name="mmc3_type" value="MMC3C" />
-			<dataarea name="chr" size="131072">
-				<rom name="t*hq inc. thomas nes ver 0.4 chr 70de" size="131072" crc="851d7db8" sha1="d0bd2dcde33ef342242d1a3e684b2475cefbe492" offset="00000" />
-			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="t*hq inc. thomas nes ver 0.4 prg 3539" size="131072" crc="ee93a07a" sha1="3fe6c824e911bf6e7308eb32c7183f8294c549c0" offset="00000" />
+				<rom name="t-hq inc. thomas nes ver 0.4 prg 3539" size="131072" crc="ee93a07a" sha1="3fe6c824e911bf6e7308eb32c7183f8294c549c0" offset="00000" />	<!-- Original label "t*hq inc. thomas nes ver 0.4 prg 3539" -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="t-hq inc. thomas nes ver 0.4 chr 70de" size="131072" crc="851d7db8" sha1="d0bd2dcde33ef342242d1a3e684b2475cefbe492" offset="00000" />	<!-- Original label "t*hq inc. thomas nes ver 0.4 chr 70de" -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -37743,10 +37743,10 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-GNROM" />
 			<dataarea name="prg" size="32768">
-				<rom name="6/3 p" size="32768" crc="7a039fec" sha1="ac89473dc6c754e52174a46c6e818946b19f3df8" offset="00000" />
+				<rom name="6-3 p" size="32768" crc="7a039fec" sha1="ac89473dc6c754e52174a46c6e818946b19f3df8" offset="00000" />		<!-- Original label "6/3 p" -->
 			</dataarea>
 			<dataarea name="chr" size="32768">
-				<rom name="6/3 c" size="32768" crc="2c8c5c5c" sha1="23fb45f79427e57d53ee75249020e59df9b14471" offset="00000" />
+				<rom name="6-3 c" size="32768" crc="2c8c5c5c" sha1="23fb45f79427e57d53ee75249020e59df9b14471" offset="00000" />		<!-- Original label "6/3 c" -->
 			</dataarea>
 		</part>
 	</software>
