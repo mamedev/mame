@@ -123,8 +123,8 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 	else
 	{
 		UINT8 svp_test = 0;
-		if (machine.root_device().ioport(":mdslot:rom_svp:MEMORY_TEST"))
-			svp_test = state->ioport(":mdslot:rom_svp:MEMORY_TEST")->read();
+		if (state->m_slotcart)
+			svp_test = state->m_slotcart->read_test();
 
 		// handle test input for SVP test
 		if (portnum == 0 && svp_test)

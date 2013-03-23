@@ -301,6 +301,11 @@ READ16_MEMBER( md_rom_svp_device::rom_read2 )
 	return m_rom[offset + 0x800/2]; 
 }
 
+int md_rom_svp_device::read_test() 
+{ 
+	return m_test_ipt->read();
+}
+
 
 static INPUT_PORTS_START( md_svp )
 	PORT_START("MEMORY_TEST") /* special memtest mode */

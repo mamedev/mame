@@ -35,6 +35,8 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_a15);
 	virtual DECLARE_WRITE16_MEMBER(write_a15);
 
+	virtual int read_test();
+
 	virtual DECLARE_READ16_MEMBER(rom_read1);
 	virtual DECLARE_READ16_MEMBER(rom_read2);
 
