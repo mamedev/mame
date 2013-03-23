@@ -57,6 +57,14 @@ offs_t m740_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
 
+void m740_device::device_start()
+{
+	m6502_device::device_start();
+
+	save_item(NAME(m_irq_multiplex));
+	save_item(NAME(m_irq_vector));
+}
+
 void m740_device::device_reset()
 {
 	inst_state_base = 0;

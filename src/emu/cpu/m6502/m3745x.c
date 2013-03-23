@@ -92,6 +92,15 @@ void m3745x_device::device_start()
 
 	m740_device::device_start();
 
+	save_item(NAME(m_ports));
+	save_item(NAME(m_ddrs));
+	save_item(NAME(m_intreq1));
+	save_item(NAME(m_intreq2));
+	save_item(NAME(m_intctrl1));
+	save_item(NAME(m_intctrl2));
+	save_item(NAME(m_adctrl));
+	save_item(NAME(m_last_all_ints));
+
 	// all ports reset to input on startup
 	memset(m_ddrs, 0, sizeof(m_ddrs));
 	memset(m_ports, 0, sizeof(m_ports));
