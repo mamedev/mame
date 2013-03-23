@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE16_MEMBER( _32x_sh2_master_401e_w );
 	DECLARE_WRITE16_MEMBER( _32x_sh2_slave_401e_w );
 
-	UINT32* _32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline);
+	UINT32* _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 	void _32x_check_framebuffer_swap(bool enabled);
@@ -125,14 +125,14 @@ public:
 	UINT32 m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
 
-	void handle_pwm_callback(void);
-	void calculate_pwm_timer(running_machine &machine);
-	UINT16 m_pwm_ctrl,m_pwm_cycle,m_pwm_tm_reg;
+	void handle_pwm_callback();
+	void calculate_pwm_timer();
+	UINT16 m_pwm_ctrl, m_pwm_cycle, m_pwm_tm_reg;
 	UINT16 m_cur_lch[0x10],m_cur_rch[0x10];
 	UINT16 m_pwm_cycle_reg; //used for latching
 	UINT8 m_pwm_timer_tick;
-	UINT8 m_lch_index_r,m_rch_index_r,m_lch_index_w,m_rch_index_w;
-	UINT16 m_lch_fifo_state,m_rch_fifo_state;
+	UINT8 m_lch_index_r, m_rch_index_r, m_lch_index_w, m_rch_index_w;
+	UINT16 m_lch_fifo_state, m_rch_fifo_state;
 
 
 	UINT16 get_hposition(void);

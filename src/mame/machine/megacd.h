@@ -15,20 +15,20 @@
 #define CHECK_SCD_LV3_INTERRUPT \
 	if (lc89510_temp->get_segacd_irq_mask() & 0x08) \
 	{ \
-		machine().device(":segacd:segacd_68k")->execute().set_input_line(3, HOLD_LINE); \
+		m_scdcpu->set_input_line(3, HOLD_LINE); \
 	}
 // from master
 #define CHECK_SCD_LV2_INTERRUPT \
 	if (lc89510_temp->get_segacd_irq_mask() & 0x04) \
 	{ \
-		machine.device(":segacd:segacd_68k")->execute().set_input_line(2, HOLD_LINE); \
+		m_scdcpu->set_input_line(2, HOLD_LINE); \
 	}
 
 // gfx convert
 #define CHECK_SCD_LV1_INTERRUPT \
 	if (lc89510_temp->get_segacd_irq_mask() & 0x02) \
 	{ \
-		machine().device(":segacd:segacd_68k")->execute().set_input_line(1, HOLD_LINE); \
+		m_scdcpu->set_input_line(1, HOLD_LINE); \
 	}
 
 #define SEGACD_IRQ3_TIMER_SPEED (attotime::from_nsec(segacd_irq3_timer_reg*30720))
@@ -253,7 +253,7 @@ public:
 
 	inline void write_pixel(running_machine& machine, UINT8 pix, int pixeloffset );
 	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
-	void segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm);
+	void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm);
 
 	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
 	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );

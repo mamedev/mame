@@ -796,7 +796,7 @@ TODO:
 
 
 
-void sega_32x_device::calculate_pwm_timer(running_machine &machine)
+void sega_32x_device::calculate_pwm_timer()
 {
 	if(m_pwm_tm_reg == 0) { m_pwm_tm_reg = 16; } // zero gives max range
 	if(m_pwm_cycle == 0) { m_pwm_cycle = 4095; } // zero gives max range
@@ -815,7 +815,7 @@ void sega_32x_device::calculate_pwm_timer(running_machine &machine)
 }
 
 
-void sega_32x_device::handle_pwm_callback(void)
+void sega_32x_device::handle_pwm_callback()
 {
 	if(m_lch_index_r < PWM_FIFO_SIZE)
 	{
@@ -887,11 +887,11 @@ WRITE16_MEMBER( sega_32x_device::_32x_pwm_w )
 		case 0x00/2:
 			m_pwm_ctrl = data & 0xffff;
 			m_pwm_tm_reg = (m_pwm_ctrl & 0xf00) >> 8;
-			calculate_pwm_timer(space.machine());
+			calculate_pwm_timer();
 			break;
 		case 0x02/2:
 			m_pwm_cycle = m_pwm_cycle_reg = data & 0xfff;
-			calculate_pwm_timer(space.machine());
+			calculate_pwm_timer();
 			break;
 		case 0x04/2:
 			if(m_lch_index_w < PWM_FIFO_SIZE)
@@ -1602,7 +1602,7 @@ int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT3
 
 
 
-UINT32* sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline)
+UINT32* sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanline)
 {
 	int x;
 

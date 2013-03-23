@@ -2513,7 +2513,7 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 	}
 
 
-	if (_32xdev) _32xdev->_32x_render_videobuffer_to_screenbuffer_helper(machine, scanline);
+	if (_32xdev) _32xdev->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
 
 
 

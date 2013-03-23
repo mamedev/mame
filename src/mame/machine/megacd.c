@@ -218,7 +218,7 @@ UINT16 sega_segacd_device::segacd_1meg_mode_word_read(int offset, UINT16 mem_mas
 }
 
 
-void sega_segacd_device::segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
+void sega_segacd_device::segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -316,7 +316,6 @@ WRITE16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_w )
 	{
 		if (m_a12000_halt_reset_reg & 0x0100)
 		{
-			running_machine& machine = space.machine();
 			CHECK_SCD_LV2_INTERRUPT
 		}
 
@@ -705,11 +704,11 @@ WRITE16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_w )
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 			if (scd_rammode&1)
 			{
-				segacd_1meg_mode_word_write(space.machine(), offset+0x20000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
 			}
 			else
 			{
-				segacd_1meg_mode_word_write(space.machine(), offset+0x00000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
 			}
 		}
 		else
@@ -1172,11 +1171,11 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_w )
 
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space.machine(), offset/2+0x00000/2, data , mem_mask, 1);
+			segacd_1meg_mode_word_write(offset/2+0x00000/2, data , mem_mask, 1);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space.machine(), offset/2+0x20000/2, data, mem_mask, 1);
+			segacd_1meg_mode_word_write(offset/2+0x20000/2, data, mem_mask, 1);
 		}
 
 	//  printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
@@ -1220,11 +1219,11 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part2_w )
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(space.machine(),offset+0x00000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(space.machine(),offset+0x20000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
 		}
 
 	}
@@ -1716,7 +1715,7 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 	UINT8 *dest;
 	int srcoffset = 0;
 	int dstoffset = 0;
-	address_space& space = machine().device(":segacd:segacd_68k")->memory().space(AS_PROGRAM);
+	address_space& space = m_scdcpu->space(AS_PROGRAM);
 
 	bool PCM_DMA = false;
 
@@ -1779,11 +1778,11 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 						if (!(scd_rammode & 1))
 						{
-							segacd_1meg_mode_word_write(space.machine(),(dstoffset+0x20000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write((dstoffset+0x20000)/2, data, 0xffff, 0);
 						}
 						else
 						{
-							segacd_1meg_mode_word_write(space.machine(),(dstoffset+0x00000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write((dstoffset+0x00000)/2, data, 0xffff, 0);
 						}
 					}
 
