@@ -1,5 +1,5 @@
 /***************************************************************************
-
+ 
 Namco System II driver by K.Wilkins  (Jun1998, Oct1999)
 Email: kwns2@dysfunction.demon.co.uk
 
@@ -462,6 +462,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #define M68K_CPU_CLOCK      (MAIN_OSC_CLOCK / 4)        /* 12.288MHz clock for 68000 (Master & Slave) */
 #define M68B09_CPU_CLOCK    (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 68B09 sound CPU */
 #define C65_CPU_CLOCK       (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
+#define C68_CPU_CLOCK       (MAIN_OSC_CLOCK / 6)        /* 8.192MHz clock for 37450 I/O CPU */
 #define YM2151_SOUND_CLOCK  XTAL_3_579545MHz        /* 3.579545MHz FM clock */
 #define C140_SOUND_CLOCK    (MAIN_OSC_CLOCK / 384 / 6)  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
@@ -571,6 +572,12 @@ READ8_MEMBER(namcos2_state::dpram_byte_r)
 WRITE8_MEMBER(namcos2_state::dpram_byte_w)
 {
 	m_dpram[offset] = data;
+}
+
+READ8_MEMBER(namcos2_state::ack_mcu_vbl_r)
+{
+	m_c68->set_input_line(m37450_device::M3745X_INT1_LINE, CLEAR_LINE);
+	return 0;
 }
 
 /*************************************************************/
@@ -777,6 +784,42 @@ static ADDRESS_MAP_START( mcu_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+
+/*************************************************************/
+/* 37450 (C68) IO CPU Memory declarations                    */
+/*************************************************************/
+READ8_MEMBER(namcos2_state::c68_p5_r)
+{
+	UINT8 rv;
+
+	if (m_player_mux)
+	{
+		rv = space.machine().root_device().ioport("MCUB2")->read();
+	}
+	else
+	{
+		rv = space.machine().root_device().ioport("MCUB")->read();
+	}
+
+	return rv;
+}
+
+WRITE8_MEMBER(namcos2_state::c68_p3_w)
+{
+	m_player_mux = (data & 0x80) ? 1 : 0;
+}
+
+static ADDRESS_MAP_START( c68_default_am, AS_PROGRAM, 8, namcos2_state )
+	/* input ports and dips are mapped here */
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("MCUDI0")
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("MCUDI1")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("MCUDI2")
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("MCUDI3")
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dpram_byte_r,dpram_byte_w) AM_SHARE("dpram")
+	AM_RANGE(0x6000, 0x6fff) AM_READ(ack_mcu_vbl_r)	// VBL ack
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c68", 0)
+ADDRESS_MAP_END
 
 /*************************************************************/
 /*                                                           */
@@ -1382,6 +1425,58 @@ static INPUT_PORTS_START( sgunner )
 	NAMCOS2_MCU_DIAL_DEFAULT
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sgunner2 )
+	PORT_START("MCUB")	/* M37450 - PORT 5 (multiplexed) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("MCUB2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_PLAYER(2)
+
+	PORT_START("MCUC")      /* M37450 - PORT 6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("AN0")       /* M37450 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN4")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
+	PORT_START("AN5")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(2)
+	PORT_START("AN6")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8)
+	PORT_START("AN7")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_PLAYER(2)
+
+	PORT_START("MCUH")      /* M37450 - PORT 3 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_0) /* Make it accessible by default*/ \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	NAMCOS2_MCU_DIPSW_DEFAULT
+	NAMCOS2_MCU_DIAL_DEFAULT
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up") /* Gear shift up */
@@ -1794,6 +1889,60 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_CPU_ADD("mcu", HD63705, C65_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - I/O handling */
 	MCFG_CPU_PROGRAM_MAP(mcu_default_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state,  irq0_line_hold)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
+
+	MCFG_MACHINE_START_OVERRIDE(namcos2_state,namcos2)
+	MCFG_MACHINE_RESET_OVERRIDE(namcos2_state,namcos2)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
+	MCFG_SCREEN_SIZE(384, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(namcos2_state, screen_update_sgunner)
+
+	MCFG_GFXDECODE(sgunner)
+	MCFG_PALETTE_LENGTH(0x2000)
+
+	MCFG_VIDEO_START_OVERRIDE(namcos2_state, sgunner)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_SOUND_CONFIG(c140_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
+
+	MCFG_YM2151_ADD("ymsnd", YM2151_SOUND_CLOCK) /* 3.579545MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( sgunner2, namcos2_state )
+	MCFG_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
+	MCFG_CPU_PROGRAM_MAP(master_sgunner_am)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state,  namcos2_68k_master_vblank)
+
+	MCFG_CPU_ADD("slave", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
+	MCFG_CPU_PROGRAM_MAP(slave_sgunner_am)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state,  namcos2_68k_slave_vblank)
+
+	MCFG_CPU_ADD("audiocpu", M6809, M68B09_CPU_CLOCK) /* 2.048MHz (49.152MHz OSC/24) - Sound handling */
+	MCFG_CPU_PROGRAM_MAP(sound_default_am)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos2_shared_state, irq0_line_hold,  2*60)
+	MCFG_CPU_PERIODIC_INT_DRIVER(namcos2_shared_state, irq1_line_hold,  120)
+
+	MCFG_CPU_ADD("c68", M37450, C68_CPU_CLOCK) /* C68 @ 8.192MHz (49.152MHz OSC/6) - I/O handling */
+	MCFG_M3745X_ADC14_CALLBACKS(IOPORT("AN0"), IOPORT("AN1"), IOPORT("AN2"), IOPORT("AN3"))
+	MCFG_M3745X_ADC58_CALLBACKS(IOPORT("AN4"), IOPORT("AN5"), IOPORT("AN6"), IOPORT("AN7"))
+	MCFG_M3745X_PORT3_CALLBACKS(IOPORT("MCUH"), WRITE8(namcos2_state, c68_p3_w))	// coins/test/service
+	MCFG_M3745X_PORT5_CALLBACKS(READ8(namcos2_state, c68_p5_r), NULL) // muxed player 1/2
+	MCFG_M3745X_PORT6_CALLBACKS(IOPORT("MCUC"), NULL) // unused in sgunner2
+	MCFG_CPU_PROGRAM_MAP(c68_default_am)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state, irq0_line_assert)	// 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 
@@ -4125,10 +4274,6 @@ ROM_START( sgunner2 )
 	ROM_CONTINUE( 0x010000, 0x01c000 )
 	ROM_RELOAD(  0x010000, 0x020000 )
 
-	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
 	ROM_REGION( 0x8000, "c68", 0 ) /* C68 (M37450) I/O MCU program */
 	ROM_LOAD( "sys2_c68.3f",  0x000000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 
@@ -5327,7 +5472,7 @@ DRIVER_INIT_MEMBER(namcos2_state,luckywld)
 /* from sys2c65b to sys2c65c sometime between 1988 and 1990 as mirai ninja    */
 /* and metal hawk have the B version and dragon saber has the C version       */
 
-/*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY, FULLNAME */
+/*    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR, COMPANY, FULLNAME */
 GAMEL(1987, finallap,  0,        finallap, finallap, namcos2_state, finallap, ROT0,   "Namco", "Final Lap (Rev E)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_finallap )
 GAMEL(1987, finallapd, finallap, finallap, finallap, namcos2_state, finallap, ROT0,   "Namco", "Final Lap (Rev D)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_finallap )
 GAMEL(1987, finallapc, finallap, finallap, finallap, namcos2_state, finallap, ROT0,   "Namco", "Final Lap (Rev C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND, layout_finallap )
@@ -5379,8 +5524,8 @@ GAME( 1990, rthun2j,   rthun2,   default3, default, namcos2_state,  rthun2j,  RO
 GAME( 1990, sgunner,   0,        sgunner,  sgunner, namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner", 0 )
 GAME( 1990, sgunnerj,  sgunner,  sgunner,  sgunner, namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner (Japan)", 0 )
 
-GAME( 1991, sgunner2,  0,        sgunner,  sgunner, namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", 0 )
-GAME( 1991, sgunner2j, sgunner2, sgunner,  sgunner, namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
+GAME( 1991, sgunner2,  0,        sgunner2, sgunner2,namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (US)", 0 )
+GAME( 1991, sgunner2j, sgunner2, sgunner2, sgunner2,namcos2_state,  sgunner2, ROT0,   "Namco", "Steel Gunner 2 (Japan)", 0 )
 
 GAME( 1991, cosmogng,  0,        default,  default, namcos2_state,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME( 1991, cosmogngj, cosmogng, default,  default, namcos2_state,  cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )

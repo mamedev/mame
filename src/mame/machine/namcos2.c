@@ -83,8 +83,17 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 static void
 ResetAllSubCPUs( running_machine &machine, int state )
 {
+	namcos2_shared_state *s2state = machine.driver_data<namcos2_shared_state>();
+
 	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, state);
-	machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, state);
+	if (s2state->m_c68)
+	{
+		machine.device("c68")->execute().set_input_line(INPUT_LINE_RESET, state);
+	}
+	else
+	{
+		machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, state);
+	}
 	switch( machine.driver_data<namcos2_shared_state>()->m_gametype )
 	{
 	case NAMCOS21_SOLVALOU:
@@ -134,6 +143,8 @@ MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 
 	/* reset POSIRQ timer */
 	namcos2_posirq_timer->adjust(attotime::never);
+	
+	m_player_mux = 0;
 }
 
 /*************************************************************/

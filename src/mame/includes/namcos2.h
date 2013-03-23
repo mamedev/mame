@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "namcoic.h"
+#include "cpu/m6502/m3745x.h"
 
 /* CPU reference numbers */
 
@@ -94,6 +95,7 @@ class namcos2_shared_state : public driver_device
 public:
 	namcos2_shared_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_c68(*this, "c68"),
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
 			m_c169_roz_gfxbank(0),
@@ -101,6 +103,8 @@ public:
 			m_c355_obj_gfxbank(0),
 			m_c355_obj_palxor(0)
 	{ }
+
+	optional_device<m37450_device> m_c68;
 
 	// game type helpers
 	bool is_system21();
@@ -174,6 +178,8 @@ protected:
 	UINT16 m_c355_obj_position[4];
 	UINT16 m_c355_obj_ram[0x20000/2];
 
+	UINT8 m_player_mux;
+
 public:
 	// general
 	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
@@ -217,10 +223,14 @@ public:
 			m_roz_ctrl(*this, "rozctrl"),
 			m_c45_road(*this, "c45_road")
 	{ }
+
+	DECLARE_READ8_MEMBER(c68_p5_r);
+	DECLARE_WRITE8_MEMBER(c68_p3_w);
 	DECLARE_READ16_MEMBER(dpram_word_r);
 	DECLARE_WRITE16_MEMBER(dpram_word_w);
 	DECLARE_READ8_MEMBER(dpram_byte_r);
 	DECLARE_WRITE8_MEMBER(dpram_byte_w);
+	DECLARE_READ8_MEMBER(ack_mcu_vbl_r);
 	DECLARE_DRIVER_INIT(cosmogng);
 	DECLARE_DRIVER_INIT(sgunner2);
 	DECLARE_DRIVER_INIT(kyukaidk);
