@@ -1,6 +1,6 @@
 
 #include "emu.h"
-#include "includes/md.h"
+#include "includes/megadriv.h"
 #include "machine/md_slot.h"
 #include "machine/md_rom.h"
 #include "machine/md_svp.h"
@@ -15,6 +15,36 @@
 #include "imagedev/cartslot.h"
 
 #include "formats/imageutl.h"
+
+class md_cons_state : public md_base_state
+{
+public:
+	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_base_state(mconfig, type, tag),
+	m_slotcart(*this, "mdslot")
+	{ }
+	
+	emu_timer *m_mess_io_timeout[3];
+	int m_mess_io_stage[3];
+	
+	optional_device<md_cart_slot_device> m_slotcart;
+	
+	DECLARE_DRIVER_INIT(mess_md_common);
+	DECLARE_DRIVER_INIT(genesis);
+	DECLARE_DRIVER_INIT(md_eur);
+	DECLARE_DRIVER_INIT(md_jpn);
+};
+
+class pico_state : public md_cons_state
+{
+public:
+	pico_state(const machine_config &mconfig, device_type type, const char *tag)
+	: md_cons_state(mconfig, type, tag),
+	m_picocart(*this, "picoslot") { }
+	
+	optional_device<pico_cart_slot_device> m_picocart;
+	UINT8 m_page_register;
+};
 
 
 /*************************************

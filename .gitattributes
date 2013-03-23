@@ -6484,7 +6484,6 @@ src/mess/includes/mboard.h svneol=native#text/plain
 src/mess/includes/mc1000.h svneol=native#text/plain
 src/mess/includes/mc68328.h svneol=native#text/plain
 src/mess/includes/mc80.h svneol=native#text/plain
-src/mess/includes/md.h svneol=native#text/plain
 src/mess/includes/micronic.h svneol=native#text/plain
 src/mess/includes/microtan.h svneol=native#text/plain
 src/mess/includes/mikro80.h svneol=native#text/plain
