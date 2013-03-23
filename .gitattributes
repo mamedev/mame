@@ -7316,7 +7316,6 @@ src/mess/machine/md_stm95.c svneol=native#text/plain
 src/mess/machine/md_stm95.h svneol=native#text/plain
 src/mess/machine/md_svp.c svneol=native#text/plain
 src/mess/machine/md_svp.h svneol=native#text/plain
-src/mess/machine/megasvp.c svneol=native#text/plain
 src/mess/machine/mface2.c svneol=native#text/plain
 src/mess/machine/mface2.h svneol=native#text/plain
 src/mess/machine/microdrv.c svneol=native#text/plain
