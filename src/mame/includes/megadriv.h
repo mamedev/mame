@@ -360,32 +360,6 @@ public:
 	UINT32 screen_update_megatech_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-struct megadriv_cart
-{
-	int type;
-
-	// SRAM related
-	UINT16 *sram;
-	int last_loaded_image_length;
-	int sram_start, sram_end;
-	int sram_active, sram_readonly;
-	int sram_handlers_installed;
-	int sram_detected;
-
-	// EEPROM related
-	int has_serial_eeprom;
-
-	// I2C related
-	UINT8 i2c_mem, i2c_clk;
-
-	// mapper related (mostly for pirate carts)
-	UINT16 squirrel_king_extra;
-	UINT16 lion2_prot1_data, lion2_prot2_data;
-	UINT16 realtec_bank_addr, realtec_bank_size, realtec_old_bank_addr;
-	UINT16 l3alt_pdat, l3alt_pcmd;
-	int ssf2_lastoff, ssf2_lastdata;
-};
-
 
 UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum);
 
