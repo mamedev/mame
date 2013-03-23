@@ -51,7 +51,7 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 
 READ8_MEMBER(simpsons_state::simpsons_sound_r)
 {
-	return k053260_r(machine().device("k053260"), space, 2 + offset);
+	return machine().device<k053260_device>("k053260")->k053260_r(space, 2 + offset);
 }
 
 

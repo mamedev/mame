@@ -13,85 +13,112 @@
 
 #define BASE_SHIFT  16
 
-struct k053260_channel
-{
-	UINT32      rate;
-	UINT32      size;
-	UINT32      start;
-	UINT32      bank;
-	UINT32      volume;
-	int         play;
-	UINT32      pan;
-	UINT32      pos;
-	int         loop;
-	int         ppcm; /* packed PCM ( 4 bit signed ) */
-	int         ppcm_data;
-};
 
-struct k053260_state
-{
-	sound_stream *              channel;
-	int                         mode;
-	int                         regs[0x30];
-	UINT8                       *rom;
-	int                         rom_size;
-	UINT32                      *delta_table;
-	k053260_channel             channels[4];
-	const k053260_interface     *intf;
-	device_t                *device;
-};
+// device type definition
+const device_type K053260 = &device_creator<k053260_device>;
 
-INLINE k053260_state *get_safe_token(device_t *device)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  k053260_device - constructor
+//-------------------------------------------------
+
+k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K053260, "K053260", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_channel(NULL),
+	  m_mode(0),
+	  m_rom(NULL),
+	  m_rom_size(0),
+	  m_delta_table(NULL),
+	  m_intf(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == K053260);
-	return (k053260_state *)downcast<k053260_device *>(device)->token();
+	memset(m_regs, 0, sizeof(int)*0x30);
 }
 
 
-static void InitDeltaTable( k053260_state *ic, int rate, int clock )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k053260_device::device_start()
 {
-	int     i;
-	double  base = ( double )rate;
-	double  max = (double)(clock); /* Hz */
-	UINT32 val;
+	static const k053260_interface defintrf = { 0 };
+	int rate = clock() / 32;
+	int i;
 
-	for( i = 0; i < 0x1000; i++ ) {
-		double v = ( double )( 0x1000 - i );
-		double target = (max) / v;
-		double fixed = ( double )( 1 << BASE_SHIFT );
+	/* Initialize our chip structure */
+	m_intf = (static_config() != NULL) ? (const k053260_interface *)static_config() : &defintrf;
 
-		if ( target && base ) {
-			target = fixed / ( base / target );
-			val = ( UINT32 )target;
-			if ( val == 0 )
-				val = 1;
-		} else
-			val = 1;
+	m_mode = 0;
 
-		ic->delta_table[i] = val;
+	memory_region *region = (m_intf->rgnoverride != NULL) ? memregion(m_intf->rgnoverride) : this->region();
+
+	m_rom = *region;
+	m_rom_size = region->bytes();
+
+	device_reset();
+
+	for ( i = 0; i < 0x30; i++ )
+		m_regs[i] = 0;
+
+	m_delta_table = auto_alloc_array( machine(), UINT32, 0x1000 );
+
+	m_channel = stream_alloc( 0, 2, rate );
+
+	InitDeltaTable( rate, clock() );
+
+	/* register with the save state system */
+	save_item(NAME(m_mode));
+	save_item(NAME(m_regs));
+
+	for ( i = 0; i < 4; i++ )
+	{
+		save_item(NAME(m_channels[i].rate), i);
+		save_item(NAME(m_channels[i].size), i);
+		save_item(NAME(m_channels[i].start), i);
+		save_item(NAME(m_channels[i].bank), i);
+		save_item(NAME(m_channels[i].volume), i);
+		save_item(NAME(m_channels[i].play), i);
+		save_item(NAME(m_channels[i].pan), i);
+		save_item(NAME(m_channels[i].pos), i);
+		save_item(NAME(m_channels[i].loop), i);
+		save_item(NAME(m_channels[i].ppcm), i);
+		save_item(NAME(m_channels[i].ppcm_data), i);
 	}
+
+	/* setup SH1 timer if necessary */
+	if ( m_intf->irq )
+		machine().scheduler().timer_pulse( attotime::from_hz(clock()) * 32, m_intf->irq, "m_intf->irq" );
 }
 
-static DEVICE_RESET( k053260 )
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k053260_device::device_reset()
 {
-	k053260_state *ic = get_safe_token(device);
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
-		ic->channels[i].rate = 0;
-		ic->channels[i].size = 0;
-		ic->channels[i].start = 0;
-		ic->channels[i].bank = 0;
-		ic->channels[i].volume = 0;
-		ic->channels[i].play = 0;
-		ic->channels[i].pan = 0;
-		ic->channels[i].pos = 0;
-		ic->channels[i].loop = 0;
-		ic->channels[i].ppcm = 0;
-		ic->channels[i].ppcm_data = 0;
+		m_channels[i].rate = 0;
+		m_channels[i].size = 0;
+		m_channels[i].start = 0;
+		m_channels[i].bank = 0;
+		m_channels[i].volume = 0;
+		m_channels[i].play = 0;
+		m_channels[i].pan = 0;
+		m_channels[i].pos = 0;
+		m_channels[i].loop = 0;
+		m_channels[i].ppcm = 0;
+		m_channels[i].ppcm_data = 0;
 	}
 }
+
 
 INLINE int limit( int val, int max, int min )
 {
@@ -106,7 +133,11 @@ INLINE int limit( int val, int max, int min )
 #define MAXOUT 0x7fff
 #define MINOUT -0x8000
 
-static STREAM_UPDATE( k053260_update )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	static const long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
 
@@ -115,20 +146,19 @@ static STREAM_UPDATE( k053260_update )
 	UINT32 delta[4], end[4], pos[4];
 	int dataL, dataR;
 	signed char d;
-	k053260_state *ic = (k053260_state *)param;
 
 	/* precache some values */
 	for ( i = 0; i < 4; i++ ) {
-		rom[i]= &ic->rom[ic->channels[i].start + ( ic->channels[i].bank << 16 )];
-		delta[i] = ic->delta_table[ic->channels[i].rate];
-		lvol[i] = ic->channels[i].volume * ic->channels[i].pan;
-		rvol[i] = ic->channels[i].volume * ( 8 - ic->channels[i].pan );
-		end[i] = ic->channels[i].size;
-		pos[i] = ic->channels[i].pos;
-		play[i] = ic->channels[i].play;
-		loop[i] = ic->channels[i].loop;
-		ppcm[i] = ic->channels[i].ppcm;
-		ppcm_data[i] = ic->channels[i].ppcm_data;
+		rom[i]= &m_rom[m_channels[i].start + ( m_channels[i].bank << 16 )];
+		delta[i] = m_delta_table[m_channels[i].rate];
+		lvol[i] = m_channels[i].volume * m_channels[i].pan;
+		rvol[i] = m_channels[i].volume * ( 8 - m_channels[i].pan );
+		end[i] = m_channels[i].size;
+		pos[i] = m_channels[i].pos;
+		play[i] = m_channels[i].play;
+		loop[i] = m_channels[i].loop;
+		ppcm[i] = m_channels[i].ppcm;
+		ppcm_data[i] = m_channels[i].ppcm_data;
 		if ( ppcm[i] )
 			delta[i] /= 2;
 	}
@@ -184,7 +214,7 @@ static STREAM_UPDATE( k053260_update )
 						pos[i] += delta[i];
 					}
 
-					if ( ic->mode & 2 ) {
+					if ( m_mode & 2 ) {
 						dataL += ( d * lvol[i] ) >> 2;
 						dataR += ( d * rvol[i] ) >> 2;
 					}
@@ -197,123 +227,95 @@ static STREAM_UPDATE( k053260_update )
 
 	/* update the regs now */
 	for ( i = 0; i < 4; i++ ) {
-		ic->channels[i].pos = pos[i];
-		ic->channels[i].play = play[i];
-		ic->channels[i].ppcm_data = ppcm_data[i];
+		m_channels[i].pos = pos[i];
+		m_channels[i].play = play[i];
+		m_channels[i].ppcm_data = ppcm_data[i];
 	}
 }
 
-static DEVICE_START( k053260 )
+
+void k053260_device::InitDeltaTable( int rate, int clock )
 {
-	static const k053260_interface defintrf = { 0 };
-	k053260_state *ic = get_safe_token(device);
-	int rate = device->clock() / 32;
-	int i;
+	int     i;
+	double  base = ( double )rate;
+	double  max = (double)(clock); /* Hz */
+	UINT32 val;
 
-	/* Initialize our chip structure */
-	ic->device = device;
-	ic->intf = (device->static_config() != NULL) ? (const k053260_interface *)device->static_config() : &defintrf;
+	for( i = 0; i < 0x1000; i++ ) {
+		double v = ( double )( 0x1000 - i );
+		double target = (max) / v;
+		double fixed = ( double )( 1 << BASE_SHIFT );
 
-	ic->mode = 0;
+		if ( target && base ) {
+			target = fixed / ( base / target );
+			val = ( UINT32 )target;
+			if ( val == 0 )
+				val = 1;
+		} else
+			val = 1;
 
-	memory_region *region = (ic->intf->rgnoverride != NULL) ? device->machine().root_device().memregion(ic->intf->rgnoverride) : device->region();
-
-	ic->rom = *region;
-	ic->rom_size = region->bytes();
-
-	DEVICE_RESET_CALL(k053260);
-
-	for ( i = 0; i < 0x30; i++ )
-		ic->regs[i] = 0;
-
-	ic->delta_table = auto_alloc_array( device->machine(), UINT32, 0x1000 );
-
-	ic->channel = device->machine().sound().stream_alloc( *device, 0, 2, rate, ic, k053260_update );
-
-	InitDeltaTable( ic, rate, device->clock() );
-
-	/* register with the save state system */
-	device->save_item(NAME(ic->mode));
-	device->save_item(NAME(ic->regs));
-
-	for ( i = 0; i < 4; i++ )
-	{
-		device->save_item(NAME(ic->channels[i].rate), i);
-		device->save_item(NAME(ic->channels[i].size), i);
-		device->save_item(NAME(ic->channels[i].start), i);
-		device->save_item(NAME(ic->channels[i].bank), i);
-		device->save_item(NAME(ic->channels[i].volume), i);
-		device->save_item(NAME(ic->channels[i].play), i);
-		device->save_item(NAME(ic->channels[i].pan), i);
-		device->save_item(NAME(ic->channels[i].pos), i);
-		device->save_item(NAME(ic->channels[i].loop), i);
-		device->save_item(NAME(ic->channels[i].ppcm), i);
-		device->save_item(NAME(ic->channels[i].ppcm_data), i);
+		m_delta_table[i] = val;
 	}
-
-	/* setup SH1 timer if necessary */
-	if ( ic->intf->irq )
-		device->machine().scheduler().timer_pulse( attotime::from_hz(device->clock()) * 32, ic->intf->irq, "ic->intf->irq" );
 }
 
-INLINE void check_bounds( k053260_state *ic, int channel )
-{
-	int channel_start = ( ic->channels[channel].bank << 16 ) + ic->channels[channel].start;
-	int channel_end = channel_start + ic->channels[channel].size - 1;
 
-	if ( channel_start > ic->rom_size ) {
+void k053260_device::check_bounds( int channel )
+{
+	int channel_start = ( m_channels[channel].bank << 16 ) + m_channels[channel].start;
+	int channel_end = channel_start + m_channels[channel].size - 1;
+
+	if ( channel_start > m_rom_size ) {
 		logerror("K53260: Attempting to start playing past the end of the ROM ( start = %06x, end = %06x ).\n", channel_start, channel_end );
 
-		ic->channels[channel].play = 0;
+		m_channels[channel].play = 0;
 
 		return;
 	}
 
-	if ( channel_end > ic->rom_size ) {
+	if ( channel_end > m_rom_size ) {
 		logerror("K53260: Attempting to play past the end of the ROM ( start = %06x, end = %06x ).\n", channel_start, channel_end );
 
-		ic->channels[channel].size = ic->rom_size - channel_start;
+		m_channels[channel].size = m_rom_size - channel_start;
 	}
-	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04x, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
+	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04x, PPCM = %s\n", channel_start, channel_end, m_channels[channel].rate, m_channels[channel].ppcm ? "yes" : "no" );
 }
 
-WRITE8_DEVICE_HANDLER( k053260_w )
+
+WRITE8_MEMBER( k053260_device::k053260_w )
 {
 	int i, t;
 	int r = offset;
 	int v = data;
-
-	k053260_state *ic = get_safe_token(device);
 
 	if ( r > 0x2f ) {
 		logerror("K053260: Writing past registers\n" );
 		return;
 	}
 
-		ic->channel->update();
+		m_channel->update();
 
 	/* before we update the regs, we need to check for a latched reg */
 	if ( r == 0x28 ) {
-		t = ic->regs[r] ^ v;
+		t = m_regs[r] ^ v;
 
 		for ( i = 0; i < 4; i++ ) {
 			if ( t & ( 1 << i ) ) {
 				if ( v & ( 1 << i ) ) {
-					ic->channels[i].play = 1;
-					ic->channels[i].pos = 0;
-					ic->channels[i].ppcm_data = 0;
-					check_bounds( ic, i );
+					m_channels[i].play = 1;
+					m_channels[i].pos = 0;
+					m_channels[i].ppcm_data = 0;
+					check_bounds( i );
 				} else
-					ic->channels[i].play = 0;
+					m_channels[i].play = 0;
 			}
 		}
 
-		ic->regs[r] = v;
+		m_regs[r] = v;
 		return;
 	}
 
 	/* update regs */
-	ic->regs[r] = v;
+	m_regs[r] = v;
 
 	/* communication registers */
 	if ( r < 8 )
@@ -325,41 +327,41 @@ WRITE8_DEVICE_HANDLER( k053260_w )
 
 		switch ( ( r - 8 ) & 0x07 ) {
 			case 0: /* sample rate low */
-				ic->channels[channel].rate &= 0x0f00;
-				ic->channels[channel].rate |= v;
+				m_channels[channel].rate &= 0x0f00;
+				m_channels[channel].rate |= v;
 			break;
 
 			case 1: /* sample rate high */
-				ic->channels[channel].rate &= 0x00ff;
-				ic->channels[channel].rate |= ( v & 0x0f ) << 8;
+				m_channels[channel].rate &= 0x00ff;
+				m_channels[channel].rate |= ( v & 0x0f ) << 8;
 			break;
 
 			case 2: /* size low */
-				ic->channels[channel].size &= 0xff00;
-				ic->channels[channel].size |= v;
+				m_channels[channel].size &= 0xff00;
+				m_channels[channel].size |= v;
 			break;
 
 			case 3: /* size high */
-				ic->channels[channel].size &= 0x00ff;
-				ic->channels[channel].size |= v << 8;
+				m_channels[channel].size &= 0x00ff;
+				m_channels[channel].size |= v << 8;
 			break;
 
 			case 4: /* start low */
-				ic->channels[channel].start &= 0xff00;
-				ic->channels[channel].start |= v;
+				m_channels[channel].start &= 0xff00;
+				m_channels[channel].start |= v;
 			break;
 
 			case 5: /* start high */
-				ic->channels[channel].start &= 0x00ff;
-				ic->channels[channel].start |= v << 8;
+				m_channels[channel].start &= 0x00ff;
+				m_channels[channel].start |= v << 8;
 			break;
 
 			case 6: /* bank */
-				ic->channels[channel].bank = v & 0xff;
+				m_channels[channel].bank = v & 0xff;
 			break;
 
 			case 7: /* volume is 7 bits. Convert to 8 bits now. */
-				ic->channels[channel].volume = ( ( v & 0x7f ) << 1 ) | ( v & 1 );
+				m_channels[channel].volume = ( ( v & 0x7f ) << 1 ) | ( v & 1 );
 			break;
 		}
 
@@ -369,24 +371,24 @@ WRITE8_DEVICE_HANDLER( k053260_w )
 	switch( r ) {
 		case 0x2a: /* loop, ppcm */
 			for ( i = 0; i < 4; i++ )
-				ic->channels[i].loop = ( v & ( 1 << i ) ) != 0;
+				m_channels[i].loop = ( v & ( 1 << i ) ) != 0;
 
 			for ( i = 4; i < 8; i++ )
-				ic->channels[i-4].ppcm = ( v & ( 1 << i ) ) != 0;
+				m_channels[i-4].ppcm = ( v & ( 1 << i ) ) != 0;
 		break;
 
 		case 0x2c: /* pan */
-			ic->channels[0].pan = v & 7;
-			ic->channels[1].pan = ( v >> 3 ) & 7;
+			m_channels[0].pan = v & 7;
+			m_channels[1].pan = ( v >> 3 ) & 7;
 		break;
 
 		case 0x2d: /* more pan */
-			ic->channels[2].pan = v & 7;
-			ic->channels[3].pan = ( v >> 3 ) & 7;
+			m_channels[2].pan = v & 7;
+			m_channels[3].pan = ( v >> 3 ) & 7;
 		break;
 
 		case 0x2f: /* control */
-			ic->mode = v & 7;
+			m_mode = v & 7;
 			/* bit 0 = read ROM */
 			/* bit 1 = enable sound output */
 			/* bit 2 = unknown */
@@ -394,86 +396,37 @@ WRITE8_DEVICE_HANDLER( k053260_w )
 	}
 }
 
-READ8_DEVICE_HANDLER( k053260_r )
+READ8_MEMBER( k053260_device::k053260_r )
 {
-	k053260_state *ic = get_safe_token(device);
-
 	switch ( offset ) {
 		case 0x29: /* channel status */
 			{
 				int i, status = 0;
 
 				for ( i = 0; i < 4; i++ )
-					status |= ic->channels[i].play << i;
+					status |= m_channels[i].play << i;
 
 				return status;
 			}
 		break;
 
 		case 0x2e: /* read ROM */
-			if ( ic->mode & 1 )
+			if ( m_mode & 1 )
 			{
-				UINT32 offs = ic->channels[0].start + ( ic->channels[0].pos >> BASE_SHIFT ) + ( ic->channels[0].bank << 16 );
+				UINT32 offs = m_channels[0].start + ( m_channels[0].pos >> BASE_SHIFT ) + ( m_channels[0].bank << 16 );
 
-				ic->channels[0].pos += ( 1 << 16 );
+				m_channels[0].pos += ( 1 << 16 );
 
-				if ( offs > ic->rom_size ) {
-					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", device->machine().describe_context(),offs,ic->rom_size );
+				if ( offs > m_rom_size ) {
+					logerror("%s: K53260: Attempting to read past ROM size in ROM Read Mode (offs = %06x, size = %06x).\n", machine().describe_context(),offs,m_rom_size );
 
 					return 0;
 				}
 
-				return ic->rom[offs];
+				return m_rom[offs];
 			}
 		break;
 	}
 
-	return ic->regs[offset];
-}
-
-const device_type K053260 = &device_creator<k053260_device>;
-
-k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K053260, "K053260", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(k053260_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k053260_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k053260_device::device_start()
-{
-	DEVICE_START_NAME( k053260 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k053260_device::device_reset()
-{
-	DEVICE_RESET_NAME( k053260 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void k053260_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	return m_regs[offset];
 }

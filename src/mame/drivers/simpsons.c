@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
 	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
-	AM_RANGE(0x1fc6, 0x1fc7) AM_READ(simpsons_sound_r) AM_DEVWRITE_LEGACY("k053260",k053260_w)
+	AM_RANGE(0x1fc6, 0x1fc7) AM_READ(simpsons_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w)
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, k053260_r, k053260_w)
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(z80_bankswitch_w)
 ADDRESS_MAP_END
 

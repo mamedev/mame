@@ -95,8 +95,8 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 
 READ8_MEMBER(parodius_state::parodius_sound_r)
 {
-	device_t *device = machine().device("k053260");
-	return k053260_r(device, space, 2 + offset);
+	k053260_device *device = machine().device<k053260_device>("k053260");
+	return device->k053260_r(space, 2 + offset);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3fc0, 0x3fc0) AM_READ(watchdog_reset_r) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w) /* K053260 */
+	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w) /* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r, parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")            /* banked ROM */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r,k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -309,7 +309,7 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k053260", K053260, 3579545)
+	MCFG_K053260_ADD("k053260", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.70)
 MACHINE_CONFIG_END

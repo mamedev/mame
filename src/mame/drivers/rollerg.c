@@ -49,10 +49,10 @@ READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 
 READ8_MEMBER(rollerg_state::rollerg_sound_r)
 {
-	device_t *device = machine().device("k053260");
 	/* If the sound CPU is running, read the status, otherwise
 	   just make it pass the test */
-	return k053260_r(device, space, 2 + offset);
+	k053260_device *device = machine().device<k053260_device>("k053260");
+	return device->k053260_r(space, 2 + offset);
 }
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)
@@ -79,7 +79,7 @@ READ8_MEMBER(rollerg_state::pip_r)
 static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE(watchdog_reset_r,watchdog_reset_w)
-	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)  /* K053260 */
+	AM_RANGE(0x0030, 0x0031) AM_READ(rollerg_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w)  /* K053260 */
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")
 	AM_RANGE(0x0051, 0x0051) AM_READ_PORT("P2")
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa02f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r,k053260_w)
+	AM_RANGE(0xa000, 0xa02f) AM_DEVREADWRITE("k053260", k053260_device, k053260_r, k053260_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
@@ -303,7 +303,7 @@ static MACHINE_CONFIG_START( rollerg, rollerg_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k053260", K053260, 3579545)
+	MCFG_K053260_ADD("k053260", 3579545)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

@@ -219,8 +219,8 @@ READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 
 READ8_MEMBER(vendetta_state::vendetta_sound_r)
 {
-	device_t *device = machine().device("k053260");
-	return k053260_r(device, space, 2 + offset);
+	k053260_device *device = machine().device<k053260_device>("k053260");
+	return device->k053260_r(space, 2 + offset);
 }
 
 /********************************************/
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_READ(vendetta_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_READ(vendetta_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)      // Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)    // EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)            // Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_READ(vendetta_sound_r) AM_DEVWRITE_LEGACY("k053260", k053260_w)     // Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_READ(vendetta_sound_r) AM_DEVWRITE("k053260", k053260_device, k053260_w)     // Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD_LEGACY("k053246", k053246_r)                // 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP                // Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -531,7 +531,7 @@ static MACHINE_CONFIG_START( vendetta, vendetta_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)    /* verified with PCB */
+	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)    /* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
