@@ -120,6 +120,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  AM_RANGE(0xe4, 0xe7) SFD upd765
+//	AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
+//	AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
+//	AM_RANGE(0xf4, 0xf7) MFD upd765
+//	AM_RANGE(0xf8, 0xfb) MFD I/O port
+//	AM_RANGE(0xfc, 0xff) memory mapper
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_slave_map, AS_PROGRAM, 8, mz3500_state )
@@ -130,6 +136,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
+//	AM_RANGE(0x10, 0x1f) i8251
+//	AM_RANGE(0x20, 0x2f) pit8253
+//	AM_RANGE(0x30, 0x3f) i8255
+//	AM_RANGE(0x40, 0x4f) 8-bit input port
+//	AM_RANGE(0x50, 0x5f) CRTC
+//	AM_RANGE(0x60, 0x6f) upd7220 gfx
+//	AM_RANGE(0x70, 0x7f) upd7220 chr
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mz3500 )
