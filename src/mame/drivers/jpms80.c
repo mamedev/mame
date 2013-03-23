@@ -247,8 +247,21 @@ ROM_START( j80tumbl )
 ROM_END
 
 
-
 ROM_START( j80wsprt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "winsprint4-1.bin", 0x0000, 0x1000, CRC(57259716) SHA1(76ac953f3edefd0fe540e931bd73f564ea49d0c5) )
+	ROM_LOAD( "winsprint4-2.bin", 0x1000, 0x1000, CRC(f097bde3) SHA1(22bccd74564fbc2df63ffed3972199d25059b881) )
+	ROM_LOAD( "winsprint4-3.bin", 0x2000, 0x1000, CRC(c7318871) SHA1(6534f06be122ed0c9665437485fb860547dd1d7f) )
+ROM_END
+
+ROM_START( j80wsprt3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "winsprint3-1.bin", 0x0000, 0x1000, CRC(1af581c2) SHA1(5e04bf37551fc8fc7f477770635f8a573d659a2f) )
+	ROM_LOAD( "winsprint3-2.bin", 0x1000, 0x1000, CRC(f097bde3) SHA1(22bccd74564fbc2df63ffed3972199d25059b881) )
+	ROM_LOAD( "winsprint3-3.bin", 0x2000, 0x1000, CRC(73098120) SHA1(e353714350681c84f4d3d093dbf07f7e8c70e109) )
+ROM_END
+
+ROM_START( j80wsprt2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "winsprint.p1", 0x0000, 0x1000, CRC(e440c7bb) SHA1(5ef85a93a6170115c750257ac6c755b18b3114a9) )
 	ROM_LOAD( "winsprint.p2", 0x1000, 0x1000, CRC(225674bf) SHA1(d8a15226ff4f7b16f7f1a8dff969585a6b4536fe) )
@@ -301,7 +314,9 @@ GAME(198?, j80supbk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM
 GAME(198?, j80topsp ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Sprint (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80topup ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Up (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80tumbl ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Tumble (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j80wsprt ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt, 0   		,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V4, 5x20p) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt3, j80wsprt	,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt2,j80wsprt   ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V2, 10x10p) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
 
 GAME(198?, j80blbnk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "PCP","Blankity Bank (PCP) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
 

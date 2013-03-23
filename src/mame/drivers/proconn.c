@@ -1041,9 +1041,16 @@ ROM_END
 ROM_START( pr_hit6 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hit the six (27512)", 0x0000, 0x010000, CRC(6d4c2139) SHA1(8ee1316e644590d679646f52b7816a9634265737) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( pr_hit6a )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hitthesix.bin", 0x0000, 0x010000, CRC(993990ff) SHA1(9ac16aaf52599a310498eb0ba6f40a763b01dc59) )
+ROM_END
+
+ROM_START( pr_hit6b )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "ht6902a10pn_300_ds_8515.bin", 0x0000, 0x010000, CRC(c212be54) SHA1(da28eea13fb04ae9fe93639df7566aaa44edcb86) )
 ROM_END
 
 ROM_START( pr_hotcs )
@@ -1160,6 +1167,7 @@ ROM_START( pr_sevab )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "7sab.bin", 0x0000, 0x010000, CRC(f7381284) SHA1(244c8981ce5080168eba117abc905f0a5339711b) )
+	ROM_LOAD( "7sabv.bin", 0x0000, 0x010000, CRC(2cd65671) SHA1(26051b37189d30997f2022686bd4dad562500ee7) )
 	ROM_LOAD( "7sabove.bin", 0x0000, 0x010000, CRC(b16f278f) SHA1(786c1ea1b701489c655c35c0bc83f35e70a9fe39) )
 	ROM_LOAD( "sevens_above", 0x0000, 0x010000, CRC(9cdfaa94) SHA1(a7063b4fc30a56f8b162ca8ef2651ada05758771) )
 ROM_END
@@ -1172,6 +1180,7 @@ ROM_START( pr_sevml )
 	ROM_LOAD( "sevenmelonsprocon5p(27256)", 0x0000, 0x008000, CRC(ebee9be6) SHA1(efd713852213a8dcf2bc302195acffee3f60da10) ) // looks like a bad dump
 	ROM_LOAD( "sevens&melons4-80(20ptube).bin", 0x0000, 0x010000, CRC(2d08a94a) SHA1(0e0bb7b830cfbf6696059f8af384880a8917dd9c) )
 	ROM_LOAD( "sevensandmelons.bin", 0x0000, 0x010000, CRC(e9942539) SHA1(4e782a0506c734e87871bfee815da84dbc7f6edb) )
+	ROM_LOAD( "7andmel.bin", 0x0000, 0x008000, CRC(109e6dff) SHA1(34f5b5d70d2607ef10698cee87fdd8c8267a0d5c) )
 ROM_END
 
 ROM_START( pr_theme )
@@ -1223,6 +1232,11 @@ ROM_END
 ROM_START( pr_whlft )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "wof.bin", 0x0000, 0x010000, CRC(67f0e4ff) SHA1(dbabb3ffd057de8dce24e5b88dc399ac4a1564f7) )
+ROM_END
+
+ROM_START( pr_wnstk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "cwrldwnstrk_v1_1.bin", 0x0000, 0x010000, CRC(5d701d88) SHA1(3e57faba4d549c00593736158840b80aed732451) )
 ROM_END
 
 ROM_START( pr_wldkn )
@@ -1343,7 +1357,9 @@ GAME( 199?, pr_gdft         ,0          ,proconn    ,proconn    , proconn_state,
 GAME( 199?, pr_happy        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Happy Days (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_heato        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "The Heat Is On (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_hiclm        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hi Climber (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_hit6         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hit The Six (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hit6         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hit The Six (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hit6a        ,pr_hit6    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hit The Six (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_hit6b        ,pr_hit6    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hit The Six (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_hotcs        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hot Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_hotsp        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Hot Spots (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_jkpt7        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
@@ -1405,4 +1421,5 @@ GAME( 199?, pr_gnuc         ,0          ,proconn    ,proconn    , proconn_state,
 GAME( 199?, pr_gnuca        ,pr_gnuc    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_magln        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_maglna       ,pr_magln   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_wnstk        ,0		    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Winning Streak (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_swop         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )

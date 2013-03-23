@@ -11958,6 +11958,8 @@ j80topsp    // Top Sprint (JPM)
 j80topup    // Top Up (JPM)
 j80tumbl    // Tumble (JPM)
 j80wsprt    // Winsprint (JPM)
+j80wsprt3   // Winsprint (JPM)
+j80wsprt2   // Winsprint (JPM)
 
 j80blbnk    // Blankity Bank (PCP)
 
@@ -28018,6 +28020,8 @@ pr_happy        // Happy Days (Project)
 pr_heato        // The Heat Is On (Project)
 pr_hiclm        // Hi Climber (Project)
 pr_hit6         // Hit The Six (Project)
+pr_hit6a
+pr_hit6b
 pr_hotcs        // Hot Cash (Project)
 pr_hotsp        // Hot Spots (Project)
 pr_jkpt7        // Jackpot 7's (Project)
@@ -28075,6 +28079,7 @@ pr_gnuc         // Golden Nugget (Coinworld)
 pr_gnuca
 pr_magln        // Magic Lines (Coinworld)
 pr_maglna
+pr_wnstk        // Winning Streak (Coinworld)
 pr_swop         // Swop It (Ace)
 pr_sptb         // Simply The Best (Pcp)
 
