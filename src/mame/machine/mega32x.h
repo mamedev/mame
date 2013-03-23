@@ -9,7 +9,7 @@
 #define MAX_HPOSITION 480
 /* need to make some pwm stuff part of device */
 #define PWM_FIFO_SIZE m_pwm_tm_reg // guess, Marsch calls this register as FIFO width
-#define PWM_CLOCK megadrive_region_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
+#define PWM_CLOCK m_32x_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
 
 
 
@@ -33,7 +33,12 @@ public:
 	required_device<dac_device> m_rch_pwm;
 
 	void pause_cpu();
+	
+	// set some variables at start, depending on region (shall be moved to a device interface?)
+	void set_framerate(int rate) { m_framerate = rate; }
+	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
 
+	
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_common_4004_common_4006_r );
@@ -102,10 +107,10 @@ public:
 	UINT32* _32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
-	void _32x_check_framebuffer_swap(void);
-	void _32x_check_irqs(running_machine& machine);
-	void _32x_scanline_cb0(running_machine& machine);
-	void _32x_scanline_cb1();
+	void _32x_check_framebuffer_swap(bool enabled);
+	void _32x_check_irqs();
+	void _32x_scanline_cb0();
+	void _32x_scanline_cb1(int scanline);
 
 	/* our current main rendering code needs to know this for mixing in */
 	int m_32x_displaymode;
@@ -165,6 +170,9 @@ private:
 	UINT16 m_hint_vector[2];
 	UINT16 m_a15100_reg;
 	int m_32x_68k_a15102_reg;
+
+	int m_framerate;
+	int m_32x_pal;
 
 	UINT16 m_commsram[8];
 

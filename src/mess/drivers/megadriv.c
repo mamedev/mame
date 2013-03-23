@@ -456,24 +456,18 @@ DRIVER_INIT_MEMBER(md_cons_state,genesis)
 {
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 1;
-	megadrive_region_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_cons_state,md_eur)
 {
 	DRIVER_INIT_CALL(megadrie);
 	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 1;
-	megadrive_region_pal = 1;
 }
 
 DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 {
 	DRIVER_INIT_CALL(megadrij);
 	DRIVER_INIT_CALL(mess_md_common);
-	megadrive_region_export = 0;
-	megadrive_region_pal = 0;
 }
 
 /****************************************** 32X emulation ****************************************/
@@ -965,7 +959,7 @@ static READ16_HANDLER( pico_68k_io_read )
 	switch (offset)
 	{
 		case 0: /* Version register ?XX?????? where XX is 00 for japan, 01 for europe and 10 for USA*/
-			retdata = (megadrive_region_export << 6) | (megadrive_region_pal << 5);
+			retdata = (state->m_export << 6) | (state->m_pal << 5);
 			break;
 		case 1:
 			retdata = state->ioport("PAD")->read_safe(0);

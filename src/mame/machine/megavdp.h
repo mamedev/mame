@@ -151,7 +151,6 @@ typedef void (*genesis_vdp_lv4irqline_callback_func)(running_machine &machine, b
 
 TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
 extern void megadriv_reset_vdp(running_machine &machine);
-extern int genvdp_use_cram;
 
 
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
@@ -187,6 +186,15 @@ public:
 	void vdp_clear_irq6_pending(void) { megadrive_irq6_pending = 0; };
 	void vdp_clear_irq4_pending(void) { megadrive_irq4_pending = 0; };
 
+	// set some VDP variables at start (shall be moved to a device interface?)
+	void set_scanline_counter(int scanline) { m_scanline_counter = scanline; }
+	void set_total_scanlines(int total) { m_base_total_scanlines = total; }
+	void set_framerate(int rate) { m_framerate = rate; }
+	void set_vdp_pal(bool pal) { m_vdp_pal = pal ? 1 : 0; }
+	void set_use_cram(int cram) { m_vdp_use_cram = cram; }
+	int get_framerate() { return m_framerate; }
+
+
 	void vdp_clear_bitmap(void)
 	{
 		if (m_render_bitmap)
@@ -220,14 +228,21 @@ private:
 	int m_sprite_collision;
 	int megadrive_irq6_pending;
 	int megadrive_irq4_pending;
+	int m_scanline_counter;
 
 	int megadrive_imode;
 
+	int m_visible_scanlines;
+	int m_irq6_scanline;
+	int m_z80irq_scanline;
+	// this is updated at runtime (atm we still need a global one, to handle 32x and SCD timers)
+	// int m_total_scanlines;
+	// this is only set at init: 262 for PAL, 313 for NTSC
+	int m_base_total_scanlines;
 
-	int megadrive_visible_scanlines;
-	int megadrive_irq6_scanline;
-	int megadrive_z80irq_scanline;
-
+	int m_framerate;
+	int m_vdp_pal;
+	int m_vdp_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 
 	UINT16* m_vdp_regs;
 	UINT16* m_vram;
@@ -242,7 +257,6 @@ private:
 	emu_timer* irq6_on_timer;
 	emu_timer* irq4_on_timer;
 	emu_timer* megadriv_render_timer;
-
 
 
 	UINT16 vdp_vram_r(void);

@@ -112,9 +112,6 @@ MACHINE_START_MEMBER(segac2_state,segac2)
 
 MACHINE_RESET_MEMBER(segac2_state,segac2)
 {
-//  megadriv_framerate = 60;
-
-
 //  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 //  megadriv_scanline_timer->adjust(attotime::zero);
 	segac2_bg_pal_lookup[0] = 0x00;
@@ -1861,8 +1858,6 @@ void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int 
 	DRIVER_INIT_CALL(megadriv_c2);
 
 	state->m_prot_func = func;
-
-	genvdp_use_cram = 0;
 
 	if (upd != NULL)
 		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));

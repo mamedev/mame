@@ -389,8 +389,8 @@ READ16_HANDLER( megadriv_68k_io_read )
 	{
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
-			retdata = megadrive_region_export<<7 | // Export
-						megadrive_region_pal<<6 | // NTSC
+			retdata = state->m_export << 7 | // Export
+						state->m_pal << 6 | // NTSC or PAL?
 						(state->m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
 						0x00 | // Unused (Always 0)
 						0x00 | // Bit 3 of Version Number
@@ -866,9 +866,6 @@ MACHINE_CONFIG_END
 
 
 
-
-
-
 SCREEN_UPDATE_RGB32(megadriv)
 {
 	sega_genesis_vdp_device *vdp = screen.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
@@ -900,14 +897,6 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 
 
-
-
-
-
-
-
-
-
 /*****************************************************************************************/
 
 
@@ -929,7 +918,7 @@ MACHINE_RESET( megadriv )
 		state->m_genz80.z80_is_reset = 1;
 		state->m_genz80.z80_has_bus = 1;
 		state->m_genz80.z80_bank_addr = 0;
-		genesis_scanline_counter = -1;
+		state->m_vdp->set_scanline_counter(-1);
 		machine.scheduler().timer_set(attotime::zero, FUNC(megadriv_z80_run_state));
 	}
 
@@ -943,7 +932,6 @@ MACHINE_RESET( megadriv )
 
 	if (state->m_other_hacks)
 	{
-	//  set_refresh_rate(megadriv_framerate);
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
 		if (state->m_megadrive_ram)
 			memset(state->m_megadrive_ram,0x00,0x10000);
@@ -1193,7 +1181,7 @@ UINT16 vdp_get_word_from_68k_mem_delayed(running_machine &machine, UINT32 source
 {
 	if (source <= 0x3fffff)
 	{
-		source -= 2;	// compensate DMA lag
+		source -= 2;    // compensate DMA lag
 		return space68k.read_word(source);
 	}
 	else if ((source >= 0xe00000) && (source <= 0xffffff))
@@ -1229,10 +1217,10 @@ void md_base_state::megadriv_init_common()
 		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
 	}
 	if (machine().device("segacd"))
-	{ 
+	{
 		printf("SegaCD found 'segacd'\n");
 		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
-	}	
+	}
 
 	m68k_set_tas_callback(machine().device("maincpu"), megadriv_tas_callback);
 
@@ -1268,44 +1256,92 @@ void md_base_state::megadriv_init_common()
 		}
 		mame_printf_debug("\n");
 	}
+
+	m_export = 0;
+	m_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
-	genvdp_use_cram = 0;
 	m_other_hacks = 0;
 
 	megadriv_init_common();
-	megadriv_framerate = 60;
+
+	m_vdp->set_use_cram(0); // C2 uses its own palette ram
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(313);
 }
 
 
 
 DRIVER_INIT_MEMBER(md_base_state,megadriv)
 {
-	genvdp_use_cram = 1;
 	m_other_hacks = 1;
 
 	megadriv_init_common();
-	megadriv_framerate = 60;
+
+	// todo: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(313);
+	if (m_32x)
+	{
+		m_32x->set_framerate(60);
+		m_32x->set_32x_pal(FALSE);
+	}
+	if (m_segacd)
+		m_segacd->set_framerate(60);
+
+	m_export = 1;
+	m_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrij)
 {
-	genvdp_use_cram = 1;
 	m_other_hacks = 1;
 
 	megadriv_init_common();
-	megadriv_framerate = 60;
+
+	// todo: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(313);
+	if (m_32x)
+	{
+		m_32x->set_framerate(60);
+		m_32x->set_32x_pal(FALSE);
+	}
+	if (m_segacd)
+		m_segacd->set_framerate(60);
+
+	m_export = 0;
+	m_pal = 0;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrie)
 {
-	genvdp_use_cram = 1;
 	m_other_hacks = 1;
 
 	megadriv_init_common();
-	megadriv_framerate = 50;
+
+	// todo: move this to the device interface?
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(TRUE);
+	m_vdp->set_framerate(50);
+	m_vdp->set_total_scanlines(262);
+	if (m_32x)
+	{
+		m_32x->set_framerate(50);
+		m_32x->set_32x_pal(TRUE);
+	}
+	if (m_segacd)
+		m_segacd->set_framerate(50);
+
+	m_export = 1;
+	m_pal = 1;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,mpnew)
@@ -1365,8 +1401,6 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
 	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
 }
-
-
 
 
 

@@ -106,6 +106,8 @@ public:
 
 	int m_other_hacks;	// misc hacks
 	genesis_z80_vars m_genz80;
+	int m_pal;
+	int m_export;
 
 	DECLARE_DRIVER_INIT(megadriv_c2);
 	DECLARE_DRIVER_INIT(megadrie);
@@ -407,14 +409,9 @@ public:
 /* machine/megavdp.c */
 extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space);
 extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space& space);
-extern int megadriv_framerate;
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
-extern int genesis_scanline_counter;
 extern UINT16* megadrive_vdp_palette_lookup;
-
-extern int megadrive_region_export;
-extern int megadrive_region_pal;
 
 /* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );

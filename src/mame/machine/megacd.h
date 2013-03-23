@@ -261,8 +261,13 @@ public:
 
 	UINT16 m_a12000_halt_reset_reg;
 
+	int m_framerate;
+
 	void segacd_mark_tiles_dirty(running_machine& machine, int offset);
 	int segacd_get_active_stampmap_tilemap(void);
+
+	// set some variables at start, depending on region (shall be moved to a device interface?)
+	void set_framerate(int rate) { m_framerate = rate; }
 
 	void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index );

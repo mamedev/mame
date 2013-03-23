@@ -169,6 +169,12 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 	segaic16_tileram_0 = reinterpret_cast<UINT16 *>(memshare("tileram")->ptr());
 	segaic16_textram_0 = reinterpret_cast<UINT16 *>(memshare("textram")->ptr());
 
+	// configure VDP
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
+
 	// save state
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_lghost_value));
@@ -202,7 +208,6 @@ void segas18_state::machine_reset()
 	segaic16_tilemap_reset(machine(), 0);
 
 	megadriv_reset_vdp(machine());
-	genvdp_use_cram = 1;
 
 	// if we are running with a real live 8751, we need to boost the interleave at startup
 	if (m_mcu != NULL && m_mcu->type() == I8751)
