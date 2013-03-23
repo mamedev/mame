@@ -11,6 +11,7 @@
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
 #include "video/upd7220.h"
+#include "machine/upd765.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -23,6 +24,7 @@ public:
 			m_slave(*this, "slave"),
 			m_hgdc1(*this, "upd7220_chr"),
 			m_hgdc2(*this, "upd7220_gfx"),
+			m_fdc(*this, "upd765a"),
 			m_video_ram(*this, "video_ram")
 	{ }
 
@@ -31,6 +33,7 @@ public:
 	required_device<cpu_device> m_slave;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
+	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
@@ -52,6 +55,8 @@ public:
 	DECLARE_READ8_MEMBER(mz3500_io_r);
 	DECLARE_WRITE8_MEMBER(mz3500_io_w);
 	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
+	DECLARE_READ8_MEMBER(mz3500_fdc_r);
+	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -254,8 +259,6 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 				case 0x1: return mz3500_basic_r(space,(offset & 0x1fff) | 0x4000);
 				case 0x2: return mz3500_basic_r(space,(offset & 0x1fff) | 0x6000);
 			}
-
-			printf("Error: read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
 		}
 		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
 		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
@@ -281,7 +284,7 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 			}
 		}
 
-		printf("Error: read with unmapped memory bank offset %04x MS %02x MA %02x\n",offset,m_ms,m_ma);
+		printf("Error: read with unmapped memory bank offset %04x MS %02x MA %02x MO %02x\n",offset,m_ms,m_ma,m_mo);
 	}
 
 	return 0xff;
@@ -414,6 +417,30 @@ WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
 		m_crtc[offset] = data;
 }
 
+READ8_MEMBER(mz3500_state::mz3500_fdc_r)
+{
+	/*
+	---- -x-- Motor
+	---- --x- Index
+	---- ---x Drq
+	*/
+	floppy_image_device *floppy;
+	floppy = machine().device<floppy_connector>(":upd765a:0")->get_device();
+
+	return floppy->idx_r() << 1;
+}
+
+WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
+{
+	/*
+	x--- ---- FDC int enable
+	-x-- ---- FDD select signal
+	--x- ---- FDC TC
+	---x ---- motor on signal
+	---- xxxx Select FDD 0-3 (bit-wise)
+	*/
+}
+
 static ADDRESS_MAP_START( mz3500_master_map, AS_PROGRAM, 8, mz3500_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
 ADDRESS_MAP_END
@@ -423,9 +450,9 @@ static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
 //	AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
 //	AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
-//	AM_RANGE(0xf4, 0xf7) MFD upd765
+	AM_RANGE(0xf4, 0xf5) AM_DEVICE("upd765a", upd765a_device, map) // MFD upd765
 //	AM_RANGE(0xf8, 0xfb) MFD I/O port
-	AM_RANGE(0xf8, 0xf8) AM_READNOP // TODO
+	AM_RANGE(0xf8, 0xf8) AM_READWRITE(mz3500_fdc_r,mz3500_fdc_w)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
 ADDRESS_MAP_END
 
@@ -572,6 +599,10 @@ static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, mz3500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
+static SLOT_INTERFACE_START( mz3500_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
 /* TODO: clocks */
 static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
@@ -583,6 +614,12 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
 	MCFG_CPU_IO_MAP(mz3500_slave_io)
+
+	MCFG_UPD765A_ADD("upd765a", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 
 	MCFG_UPD7220_ADD("upd7220_chr", MAIN_CLOCK/5, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_gfx", MAIN_CLOCK/5, hgdc_2_intf, upd7220_2_map)
