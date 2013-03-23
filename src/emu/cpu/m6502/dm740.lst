@@ -1,9 +1,9 @@
 # m740 device
 brk740_imp  ora_idx     kil_non     bbs_acc     nop_zpg     ora_zpg     asl_zpg     bbs_bzr     php_imp     ora_imm     asl_acc     seb_acc     nop_aba     ora_aba     asl_aba     seb_biz
-bpl_rel     ora_idy     clt_imp     bbc_acc     nop_zpx     ora_zpx     asl_zpx     bbc_bzr     clc_imp     ora_aby     nop_imp     clb_acc     nop_abx     ora_abx     asl_abx     clb_biz
+bpl_rel     ora_idy     clt_imp     bbc_acc     nop_zpx     ora_zpx     asl_zpx     bbc_bzr     clc_imp     ora_aby     dec_acc     clb_acc     nop_abx     ora_abx     asl_abx     clb_biz
 jsr_adr     and_idx     jsr_spg     bbs_acc     bit_zpg     and_zpg     rol_zpg     bbs_bzr     plp_imp     and_imm     rol_acc     seb_acc     bit_aba     and_aba     rol_aba     seb_biz
-bmi_rel     and_idy     set_imp     bbc_acc     nop_zpx     and_zpx     rol_zpx     bbc_bzr     sec_imp     and_aby     nop_imp     clb_acc     ldm_imz     and_abx     rol_abx     clb_biz
-rti_imp     eor_idx     kil_non     bbs_acc     nop_zpg     eor_zpg     lsr_zpg     bbs_bzr     pha_imp     eor_imm     lsr_acc     seb_acc     jmp_adr     eor_aba     lsr_aba     seb_biz
+bmi_rel     and_idy     set_imp     bbc_acc     nop_zpx     and_zpx     rol_zpx     bbc_bzr     sec_imp     and_aby     inc_acc     clb_acc     ldm_imz     and_abx     rol_abx     clb_biz
+rti_imp     eor_idx     kil_non     bbs_acc     com_zpg     eor_zpg     lsr_zpg     bbs_bzr     pha_imp     eor_imm     lsr_acc     seb_acc     jmp_adr     eor_aba     lsr_aba     seb_biz
 bvc_rel     eor_idy     kil_non     bbc_acc     nop_zpx     eor_zpx     lsr_zpx     bbc_bzr     cli_imp     eor_aby     nop_imp     clb_acc     nop_abx     eor_abx     lsr_abx     clb_biz
 rts_imp     adc_idx     kil_non     bbs_acc     nop_zpg     adc_zpg     ror_zpg     bbs_bzr     pla_imp     adc_imm     ror_acc     seb_acc     jmp_ind     adc_aba     ror_aba     seb_biz
 bvs_rel     adc_idy     kil_non     bbc_acc     nop_zpx     adc_zpx     ror_zpx     bbc_bzr     sei_imp     adc_aby     nop_imp     clb_acc     nop_abx     adc_abx     ror_abx     clb_biz
@@ -15,4 +15,20 @@ cpy_imm     cmp_idx     nop_imm     bbs_acc     cpy_zpg     cmp_zpg     dec_zpg 
 bne_rel     cmp_idy     kil_non     bbc_acc     nop_zpx     cmp_zpx     dec_zpx     bbc_bzr     cld_imp     cmp_aby     nop_imp     clb_acc     nop_abx     cmp_abx     dec_abx     clb_biz
 cpx_imm     sbc_idx     nop_imm     bbs_acc     cpx_zpg     sbc_zpg     inc_zpg     bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_acc     cpx_aba     sbc_aba     inc_aba     seb_biz
 beq_rel     sbc_idy     kil_non     bbc_acc     nop_zpx     sbc_zpx     inc_zpx     bbc_bzr     sed_imp     sbc_aby     nop_imp     clb_acc     nop_abx     sbc_abx     inc_abx     clb_biz
+brk740_imp  ort_idx     kil_non     bbs_acc     nop_zpg     ort_zpg     asl_zpg     bbs_bzr     php_imp     ort_imm     asl_acc     seb_acc     nop_aba     ort_aba     asl_aba     seb_biz
+bpl_rel     ort_idy     clt_imp     bbc_acc     nop_zpx     ort_zpx     asl_zpx     bbc_bzr     clc_imp     ort_aby     dect_acc     clb_acc     nop_abx     ort_abx     asl_abx     clb_biz
+jsr_adr     andt_idx     jsr_spg     bbs_acc     bit_zpg     andt_zpg     rol_zpg     bbs_bzr     plp_imp     andt_imm     rol_acc     seb_acc     bit_aba     andt_aba     rol_aba     seb_biz
+bmi_rel     andt_idy     set_imp     bbc_acc     nop_zpx     andt_zpx     rol_zpx     bbc_bzr     sec_imp     andt_aby     inct_acc     clb_acc     ldm_imz     andt_abx     rol_abx     clb_biz
+rti_imp     eort_idx     kil_non     bbs_acc     com_zpg     eort_zpg     lsr_zpg     bbs_bzr     pha_imp     eort_imm     lsr_acc     seb_acc     jmp_adr     eort_aba     lsr_aba     seb_biz
+bvc_rel     eort_idy     kil_non     bbc_acc     nop_zpx     eort_zpx     lsr_zpx     bbc_bzr     cli_imp     eort_aby     nop_imp     clb_acc     nop_abx     eort_abx     lsr_abx     clb_biz
+rts_imp     adct_idx     kil_non     bbs_acc     nop_zpg     adct_zpg     ror_zpg     bbs_bzr     pla_imp     adct_imm     ror_acc     seb_acc     jmp_ind     adct_aba     ror_aba     seb_biz
+bvs_rel     adct_idy     kil_non     bbc_acc     nop_zpx     adct_zpx     ror_zpx     bbc_bzr     sei_imp     adct_aby     nop_imp     clb_acc     nop_abx     adct_abx     ror_abx     clb_biz
+bra_rel     sta_idx     rrf_zpg     bbs_acc     sty_zpg     sta_zpg     stx_zpg     bbs_bzr     dey_imp     nop_imm     txa_imp     seb_acc     sty_aba     sta_aba     stx_aba     seb_biz
+bcc_rel     sta_idy     kil_non     bbc_acc     sty_zpx     sta_zpx     stx_zpy     bbc_bzr     tya_imp     sta_aby     txs_imp     clb_acc     shy_abx     sta_abx     shx_aby     clb_biz
+ldy_imm     ldt_idx     ldx_imm     bbs_acc     ldy_zpg     ldt_zpg     ldx_zpg     bbs_bzr     tay_imp     ldt_imm     tax_imp     seb_acc     ldy_aba     ldt_aba     ldx_aba     seb_biz
+bcs_rel     ldt_idy     jmp_zpi     bbc_acc     ldy_zpx     ldt_zpx     ldx_zpy     bbc_bzr     clv_imp     ldt_aby     tsx_imp     clb_acc     ldy_abx     ldt_abx     ldx_aby     clb_biz
+cpy_imm     cmp_idx     nop_imm     bbs_acc     cpy_zpg     cmpt_zpg     dec_zpg     bbs_bzr     iny_imp     cmpt_imm     dex_imp     seb_acc     cpy_aba     cmpt_aba     dec_aba     seb_biz
+bne_rel     cmp_idy     kil_non     bbc_acc     nop_zpx     cmpt_zpx     dec_zpx     bbc_bzr     cld_imp     cmpt_aby     nop_imp     clb_acc     nop_abx     cmpt_abx     dec_abx     clb_biz
+cpx_imm     sbct_idx     nop_imm     bbs_acc     cpx_zpg     sbct_zpg     inc_zpg     bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_acc     cpx_aba     sbct_aba     inc_aba     seb_biz
+beq_rel     sbct_idy     kil_non     bbc_acc     nop_zpx     sbct_zpx     inc_zpx     bbc_bzr     sed_imp     sbc_aby     nop_imp     clb_acc     nop_abx     sbct_abx     inc_abx     clb_biz
 reset740

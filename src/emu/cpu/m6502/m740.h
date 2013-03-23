@@ -70,7 +70,9 @@ public:
 
 		virtual void device_reset();
 
-		static const disasm_entry disasm_entries[0x100];
+		static const disasm_entry disasm_entries[0x200];
+
+		virtual void state_string_export(const device_state_entry &entry, astring &string);
 
 		virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 		virtual void do_exec_full();
@@ -83,6 +85,12 @@ protected:
 	UINT8 do_clb(UINT8 in, UINT8 bit);
 	UINT8 do_seb(UINT8 in, UINT8 bit);
 	UINT8 do_rrf(UINT8 in);
+	void do_sbc_dt(UINT8 val);
+	void do_sbc_ndt(UINT8 val);
+	void do_sbct(UINT8 val);
+	void do_adc_dt(UINT8 val);
+	void do_adc_ndt(UINT8 val);
+	void do_adct(UINT8 val);
 
 	// m740 opcodes
 	O(brk740_imp);
@@ -98,6 +106,19 @@ protected:
 	O(rrf_zpg);
 	O(bra_rel);
 	O(jmp_zpi);
+
+	O(adct_aba); O(adct_abx); O(adct_aby); O(adct_idx); O(adct_idy); O(adct_imm); O(adct_zpg); O(adct_zpx);
+	O(andt_aba); O(andt_abx); O(andt_aby); O(andt_imm); O(andt_idx); O(andt_idy); O(andt_zpg); O(andt_zpx);
+	O(cmpt_aba); O(cmpt_abx); O(cmpt_aby); O(cmpt_idx); O(cmpt_idy); O(cmpt_imm); O(cmpt_zpg); O(cmpt_zpx);
+	O(com_zpg);
+	O(dec_acc);
+	O(dect_acc);
+	O(eort_aba); O(eort_abx); O(eort_aby); O(eort_idx); O(eort_idy); O(eort_imm); O(eort_zpg); O(eort_zpx);
+	O(inc_acc);
+	O(inct_acc);
+	O(ldt_aba); O(ldt_abx); O(ldt_aby); O(ldt_idx); O(ldt_idy); O(ldt_imm); O(ldt_zpg); O(ldt_zpx);
+	O(ort_aba); O(ort_abx); O(ort_aby); O(ort_imm); O(ort_idx); O(ort_idy); O(ort_zpg); O(ort_zpx);
+	O(sbct_aba); O(sbct_abx); O(sbct_aby); O(sbct_idx); O(sbct_idy); O(sbct_imm); O(sbct_zpg); O(sbct_zpx);
 
 #undef O
 

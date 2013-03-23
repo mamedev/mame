@@ -407,7 +407,7 @@ void m6502_device::execute_run()
 		do_exec_partial();
 
 	while(icount > 0) {
-		if(inst_state < 0x100) {
+		if(inst_state < 0xff00) {
 			PPC = NPC;
 			inst_state = IR | inst_state_base;
 			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
