@@ -837,7 +837,7 @@ ADDRESS_MAP_END
 
 /************************************ Megadrive Bootlegs *************************************/
 
-// smaller ROM region because some bootlegs check for RAM there
+// smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
 static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
@@ -953,32 +953,6 @@ void megadriv_stop_scanline_timer(running_machine &machine)
 		megadriv_scanline_timer->reset();
 }
 
-
-
-static UINT16* megadriv_backupram;
-static int megadriv_backupram_length;
-
-static NVRAM_HANDLER( megadriv )
-{
-	if (megadriv_backupram!=NULL)
-	{
-		if (read_or_write)
-			file->write(megadriv_backupram, megadriv_backupram_length);
-		else
-		{
-			if (file)
-			{
-				file->read(megadriv_backupram, megadriv_backupram_length);
-			}
-			else
-			{
-				int x;
-				for (x=0;x<megadriv_backupram_length/2;x++)
-					megadriv_backupram[x]=0xffff;//machine.rand(); // dino dini's needs 0xff or game rules are broken
-			}
-		}
-	}
-}
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
@@ -1098,8 +1072,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
-	MCFG_NVRAM_HANDLER(megadriv)
-
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(megadriv)
@@ -1148,8 +1120,6 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
-
-	MCFG_NVRAM_HANDLER(megadriv)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
@@ -1204,8 +1174,6 @@ void md_base_state::megadriv_init_common()
 	}
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
-	megadriv_backupram = NULL;
-	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 

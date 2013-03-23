@@ -42,7 +42,7 @@ this reason.
 Only a handful of games were released for this system.
 
 Bugs:
- Most of this is guesswork and should be verified on real hw.  Sometims after inserting
+ Most of this is guesswork and should be verified on real hw.  Sometimes after inserting
  a coin and pressing start the 'press start' message remains on screen and no credit is
  deducted.  (timing?)
 

@@ -377,7 +377,6 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -388,7 +387,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_MACHINE_START( ms_megadriv )
 	MCFG_MACHINE_RESET( ms_megadriv )
@@ -522,7 +520,6 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 
 static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 
@@ -554,7 +551,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 
@@ -586,7 +582,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
 
@@ -841,7 +836,6 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( megdsvp, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
@@ -857,7 +851,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( megdsvp_pal, mdsvp_state )
 	MCFG_FRAGMENT_ADD( md_pal )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
@@ -1076,7 +1069,6 @@ static MACHINE_START(pico)
 
 static MACHINE_CONFIG_START( pico, pico_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
@@ -1092,7 +1084,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( picopal, pico_state )
 	MCFG_FRAGMENT_ADD( md_pal )
-	MCFG_NVRAM_HANDLER_CLEAR()
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pico_mem)
