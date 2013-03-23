@@ -269,9 +269,9 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      3do,        3do,    driver_device, 0,      "3DO",  "3DO (NTSC)",   GAME_NOT_WORKING | GAME_NO_SOUND )
-CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,    driver_device, 0,      "3DO",  "3DO (PAL)",    GAME_NOT_WORKING | GAME_NO_SOUND )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                   COMPANY             FULLNAME        FLAGS */
+CONS( 1991, 3do,        0,      0,      3do,        3do,    driver_device, 0,      "The 3DO Company",  "3DO (NTSC)",   GAME_NOT_WORKING | GAME_NO_SOUND )
+CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,    driver_device, 0,      "The 3DO Company",  "3DO (PAL)",    GAME_NOT_WORKING | GAME_NO_SOUND )
 
-GAME( 1991, 3dobios,    0,      3do,    3do, driver_device, 0, ROT0,     "3DO",  "3DO Bios",   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT )
+GAME( 1991, 3dobios,    0,      3do,    3do, driver_device, 0, ROT0,     "The 3DO Company",  "3DO Bios",   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IS_BIOS_ROOT )
 GAME( 199?, orbatak,    3dobios,3do,    3do, driver_device, 0, ROT0,     "<unknown>", "Orbatak (prototype)", GAME_NOT_WORKING | GAME_NO_SOUND )
