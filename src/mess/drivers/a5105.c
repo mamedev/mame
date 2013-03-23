@@ -71,7 +71,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_ram_base;
 	UINT8 *m_rom_base;
-	UINT8 *m_char_rom;
+	UINT8 *m_char_ram;
 	UINT16 m_pcg_addr;
 	UINT16 m_pcg_internal_addr;
 	UINT8 m_key_mux;
@@ -117,7 +117,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for( yi = 0; yi < lr; yi++)
 		{
-			tile_data = state->m_char_rom[(tile*8+yi) & 0x7ff];
+			tile_data = state->m_char_ram[(tile*8+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x && device->machine().primary_screen->frame_number() & 0x10)
 				tile_data^=0xff;
@@ -163,7 +163,7 @@ WRITE8_MEMBER( a5105_state::pcg_addr_w )
 
 WRITE8_MEMBER( a5105_state::pcg_val_w )
 {
-	m_char_rom[m_pcg_addr | m_pcg_internal_addr] = data;
+	m_char_ram[m_pcg_addr | m_pcg_internal_addr] = data;
 
 	machine().gfx[0]->mark_dirty(m_pcg_addr >> 3);
 
@@ -528,7 +528,7 @@ void a5105_state::palette_init()
 void a5105_state::video_start()
 {
 	// find memory regions
-	m_char_rom = memregion("pcg")->base();
+	m_char_ram = memregion("pcg")->base();
 }
 
 static UPD7220_INTERFACE( hgdc_intf )

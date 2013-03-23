@@ -1,6 +1,8 @@
 /***************************************************************************
 
-Template for skeleton drivers
+	MZ-3500 (c) 198? Sharp
+
+	preliminary driver by Angelo Salese
 
 ***************************************************************************/
 
@@ -8,6 +10,7 @@ Template for skeleton drivers
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "video/upd7220.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -17,18 +20,26 @@ public:
 	mz3500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_master(*this, "master"),
-			m_slave(*this, "slave")
+			m_slave(*this, "slave"),
+			m_hgdc1(*this, "upd7220_chr"),
+			m_hgdc2(*this, "upd7220_gfx"),
+			m_video_ram(*this, "video_ram")
 	{ }
 
 	// devices
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
+	required_device<upd7220_device> m_hgdc1;
+	required_device<upd7220_device> m_hgdc2;
+	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
 	UINT8 *m_work_ram;
 	UINT8 *m_shared_ram;
+	UINT8 *m_char_rom;
 
 	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
+	UINT8 m_crtc[0x10];
 
 	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
 	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
@@ -40,9 +51,10 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_shared_ram_w);
 	DECLARE_READ8_MEMBER(mz3500_io_r);
 	DECLARE_WRITE8_MEMBER(mz3500_io_w);
+	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -57,10 +69,137 @@ void mz3500_state::video_start()
 {
 }
 
-UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+/*
+CRTC regs
+[0]
+---- -x-- "Choice of whether attribute or cursor be put on the frame  that displayed on CRT2" (whatever that means ...)
+---- --x- CRT2 output
+---- ---x CRT1 output
+[1]
+---- -GRB CRT1 color output
+[2]
+---- -GRB CRT2 color output
+[3]
+---- -GRB background color output
+[4]
+---- --x- border color mode in effect
+---- ---x color mode
+[5]
+---- --x- width setting (0: 40 chars, 1: 80 chars)
+---- ---x data size for graphics RAM (0: 8 bits, 1: 16 bits)
+[6]
+---- -x-- "Connection of graphic GDC"
+---- --x- "Connection of the 96K bytes VRAM"
+---- ---x "Connection of a 400 raster CRT"
+[7]
+---- ---x 0: 25 lines, 1: 20 lines display
+[d]
+(mirror of [5]?)
+*/
+
+static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
+	// ...
+}
+
+static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
+{
+	mz3500_state *state = device->machine().driver_data<mz3500_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	int x;
+	int xi,yi;
+	int tile;
+	int attr;
+	UINT8 tile_data;
+	UINT8 width80;
+	UINT8 char_size;
+	UINT8 hires;
+
+//	popmessage("%02x",state->m_crtc[6]);
+
+	width80 = (state->m_crtc[5] & 2) >> 1;
+	hires = (state->m_crtc[6] & 1);
+	char_size = (hires) ? 16 : 8;
+
+	for( x = 0; x < pitch; x++ )
+	{
+		tile = (state->m_video_ram[((addr+x)*2) & 0x1fff] & 0xff);
+		attr = (state->m_video_ram[((addr+x)*2+1) & 0x3ffff] & 0x0f);
+
+		//if(hires)
+		//	tile <<= 1;
+
+		for( yi = 0; yi < lr; yi++)
+		{
+			tile_data = state->m_char_rom[((tile*16+yi) & 0xfff) | (hires*0x1000)];
+
+			for( xi = 0; xi < 8; xi++)
+			{
+				int res_x,res_y;
+				int pen;
+
+				/* TODO: color attribute needs double check */
+
+				if(yi >= char_size)
+					pen = -1;
+				else
+				{
+					if(state->m_crtc[4] & 1)
+						pen = (tile_data >> (7-xi)) & 1 ? (attr >> 1) : -1;
+					else
+						pen = (tile_data >> (7-xi)) & 1 ? 7 : -1;
+				}
+
+				res_x = x * 8 + xi;
+				res_y = y * lr + yi;
+
+				if(pen != -1)
+				{
+					if(!width80)
+					{
+						bitmap.pix32(res_y, res_x*2+0) = palette[pen];
+						bitmap.pix32(res_y, res_x*2+1) = palette[pen];
+					}
+					else
+						bitmap.pix32(res_y, res_x) = palette[pen];
+				}
+			}
+		}
+	}
+
+}
+
+UINT32 mz3500_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	bitmap.fill(machine().pens[(m_crtc[4] & 2) ? m_crtc[3] & 7 : 0], cliprect);
+
+	/* graphics */
+	m_hgdc2->screen_update(screen, bitmap, cliprect);
+	m_hgdc1->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
+
+
+
+static UPD7220_INTERFACE( hgdc_1_intf )
+{
+	"screen",
+	NULL,
+	hgdc_draw_text,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER("upd7220_gfx", upd7220_device, ext_sync_w),
+	DEVCB_NULL
+};
+
+static UPD7220_INTERFACE( hgdc_2_intf )
+{
+	"screen",
+	hgdc_display_pixels,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 READ8_MEMBER(mz3500_state::mz3500_ipl_r)
 {
@@ -262,6 +401,19 @@ WRITE8_MEMBER(mz3500_state::mz3500_io_w)
 	}
 }
 
+WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
+{
+	if(offset & 8)
+	{
+		if(offset == 0xd)
+			m_crtc[offset & 7] = data;
+		else
+			printf("CRTC register access %02x\n",offset); // probably just a mirror, but who knows ...
+	}
+	else
+		m_crtc[offset] = data;
+}
+
 static ADDRESS_MAP_START( mz3500_master_map, AS_PROGRAM, 8, mz3500_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
 ADDRESS_MAP_END
@@ -273,6 +425,7 @@ static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 //	AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
 //	AM_RANGE(0xf4, 0xf7) MFD upd765
 //	AM_RANGE(0xf8, 0xfb) MFD I/O port
+	AM_RANGE(0xf8, 0xf8) AM_READNOP // TODO
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
 ADDRESS_MAP_END
 
@@ -289,9 +442,9 @@ static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 //	AM_RANGE(0x20, 0x2f) pit8253
 //	AM_RANGE(0x30, 0x3f) i8255
 //	AM_RANGE(0x40, 0x4f) 8-bit input port
-//	AM_RANGE(0x50, 0x5f) CRTC
-//	AM_RANGE(0x60, 0x6f) upd7220 gfx
-//	AM_RANGE(0x70, 0x7f) upd7220 chr
+	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("upd7220_gfx", upd7220_device, read, write)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mz3500 )
@@ -350,19 +503,33 @@ static INPUT_PORTS_START( mz3500 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout charlayout =
+static const gfx_layout charlayout_8x8 =
 {
 	8,8,
-	RGN_FRAC(1,1),
+	0x100,
 	1,
 	{ RGN_FRAC(0,1) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	8*16
+};
+
+
+static const gfx_layout charlayout_8x16 =
+{
+	8,16,
+	0x100,
+	1,
+	{ RGN_FRAC(0,1) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ STEP16(0,8) },
+	8*16
 };
 
 static GFXDECODE_START( mz3500 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_8x8,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x0008, charlayout_8x8,     0, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
 GFXDECODE_END
 
 
@@ -370,6 +537,7 @@ void mz3500_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
 	m_basic_rom = memregion("basic")->base();
+	m_char_rom = memregion("gfx1")->base();
 	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x40000);
 	m_shared_ram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 }
@@ -382,14 +550,29 @@ void mz3500_state::machine_reset()
 	m_mo = 0;
 	m_me1 = 0;
 	m_me2 = 0;
-	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
 void mz3500_state::palette_init()
 {
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine(), i,pal1bit((i >> 1) & 1),pal1bit(i >> 2),pal1bit((i >> 0) & 1));
+
 }
 
+static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, mz3500_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x00000, 0x1fff) AM_RAM AM_SHARE("video_ram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, mz3500_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
+ADDRESS_MAP_END
+
+/* TODO: clocks */
 static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	/* basic machine hardware */
@@ -400,6 +583,9 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
 	MCFG_CPU_IO_MAP(mz3500_slave_io)
+
+	MCFG_UPD7220_ADD("upd7220_chr", MAIN_CLOCK/5, hgdc_1_intf, upd7220_1_map)
+	MCFG_UPD7220_ADD("upd7220_gfx", MAIN_CLOCK/5, hgdc_2_intf, upd7220_2_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
