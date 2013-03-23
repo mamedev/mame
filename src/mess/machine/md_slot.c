@@ -805,6 +805,9 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 				(!memcmp((char *)&ROM[0x0180], "GM T-12053", 10) && !memcmp(&ROM[0x18e], rockman_sig, sizeof(rockman_sig)))) // / Rock Man (EEPROM version)
 				type = SEGA_EEPROM;
 
+			if (!memcmp((char *)&ROM[0x0150], "Virtua Racing", 13))
+				type = SEGA_SVP;
+
 			break;
 
 		case 0x200005:
