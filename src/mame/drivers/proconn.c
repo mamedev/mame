@@ -1236,7 +1236,7 @@ ROM_END
 
 ROM_START( pr_wnstk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "cwrldwnstrk_v1_1.bin", 0x0000, 0x010000, CRC(5d701d88) SHA1(3e57faba4d549c00593736158840b80aed732451) )
+	ROM_LOAD( "cwrldwnstrk_v1_1.bin", 0x0000, 0x008000, CRC(5d701d88) SHA1(3e57faba4d549c00593736158840b80aed732451) )
 ROM_END
 
 ROM_START( pr_wldkn )
