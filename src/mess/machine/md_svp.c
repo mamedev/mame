@@ -304,9 +304,9 @@ READ16_MEMBER( md_rom_svp_device::rom_read2 )
 
 static INPUT_PORTS_START( md_svp )
 	PORT_START("MEMORY_TEST") /* special memtest mode */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Test ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x01, 0x00, "SVP Test" )
+	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 //-------------------------------------------------

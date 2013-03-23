@@ -122,8 +122,12 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 	/* Otherwise it's a 3 buttons Joypad */
 	else
 	{
+		UINT8 svp_test = 0;
+		if (machine.root_device().ioport(":mdslot:rom_svp:MEMORY_TEST"))
+			svp_test = state->ioport(":mdslot:rom_svp:MEMORY_TEST")->read();
+
 		// handle test input for SVP test
-		if (portnum == 0 && machine.root_device().ioport("MEMORY_TEST")->read_safe(0x00))
+		if (portnum == 0 && svp_test)
 		{
 			retdata = (megadrive_io_data_regs[0] & 0xc0);
 		}
