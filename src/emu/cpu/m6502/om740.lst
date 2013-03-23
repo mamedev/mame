@@ -152,7 +152,9 @@ adct_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 adct_abx
@@ -163,7 +165,9 @@ adct_abx
 	}
 	TMP += X;
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 adct_aby
@@ -174,7 +178,9 @@ adct_aby
 	}
 	TMP += Y;
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 adct_idx
@@ -183,7 +189,9 @@ adct_idx
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP2 = read(X);
 	do_adct(read(TMP));
+	write(X, TMP2);
 	prefetch();
 
 adct_idy
@@ -193,25 +201,33 @@ adct_idy
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
+	TMP2 = read(X);
 	do_adct(read(TMP+Y));
+	write(X, TMP2);
 	prefetch();
 
 adct_imm
 	TMP = read_pc();
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 adct_zpg
 	TMP = read_pc();
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 adct_zpx
 	TMP = read_pc();
 	read(TMP);
 	TMP = read(UINT8(TMP+X));
+	TMP2 = read(X);
 	do_adct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 andt_aba
@@ -654,7 +670,9 @@ sbct_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 sbct_abx
@@ -665,7 +683,9 @@ sbct_abx
 	}
 	TMP += X;
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 sbct_aby
@@ -676,7 +696,9 @@ sbct_aby
 	}
 	TMP += Y;
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 sbct_idx
@@ -685,7 +707,9 @@ sbct_idx
 	TMP2 += X;
 	TMP = read(TMP2 & 0xff);
 	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	TMP2 = read(X);
 	do_sbct(read(TMP));
+	write(X, TMP2);
 	prefetch();
 
 sbct_idy
@@ -695,24 +719,32 @@ sbct_idy
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
+	TMP2 = read(X);
 	do_sbct(read(TMP+Y));
+	write(X, TMP2);
 	prefetch();
 
 sbct_imm
 	TMP = read_pc();
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 sbct_zpg
 	TMP = read_pc();
 	TMP = read(TMP);
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 
 sbct_zpx
 	TMP = read_pc();
 	read(TMP);
 	TMP = read(UINT8(TMP+X));
+	TMP2 = read(X);
 	do_sbct(TMP);
+	write(X, TMP2);
 	prefetch();
 

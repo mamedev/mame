@@ -113,7 +113,6 @@ void m740_device::do_sbc_dt(UINT8 val)
 {
 	UINT8 c = P & F_C ? 0 : 1;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	TMP2 = read(X);
 	UINT16 diff = TMP2 - val - c;
 	UINT8 al = (TMP2 & 15) - (val & 15) - c;
 	if(INT8(al) < 0)
@@ -130,15 +129,11 @@ void m740_device::do_sbc_dt(UINT8 val)
 	if(INT8(ah) < 0)
 		ah -= 6;
 	TMP2 = (ah << 4) | (al & 15);
-	write(X, TMP2);
 }
 
 void m740_device::do_sbc_ndt(UINT8 val)
 {
-	UINT16 diff;
-
-	TMP2 = read(X);
-	diff = TMP2 - val - (P & F_C ? 0 : 1);
+	UINT16 diff = TMP2 - val - (P & F_C ? 0 : 1);
 	P &= ~(F_N|F_V|F_Z|F_C);
 	if(!UINT8(diff))
 		P |= F_Z;
@@ -149,7 +144,6 @@ void m740_device::do_sbc_ndt(UINT8 val)
 	if(!(diff & 0xff00))
 		P |= F_C;
 	TMP2 = diff;
-	write(X, TMP2);
 }
 
 void m740_device::do_sbct(UINT8 val)
@@ -164,7 +158,6 @@ void m740_device::do_adc_dt(UINT8 val)
 {
 	UINT8 c = P & F_C ? 1 : 0;
 	P &= ~(F_N|F_V|F_Z|F_C);
-	TMP2 = read(X);
 	UINT8 al = (TMP2 & 15) + (val & 15) + c;
 	if(al > 9)
 		al += 6;
@@ -180,13 +173,11 @@ void m740_device::do_adc_dt(UINT8 val)
 	if(ah > 15)
 		P |= F_C;
 	TMP2 = (ah << 4) | (al & 15);
-	write(X, TMP2);
 }
 
 void m740_device::do_adc_ndt(UINT8 val)
 {
 	UINT16 sum;
-	TMP2 = read(X);
 	sum = TMP2 + val + (P & F_C ? 1 : 0);
 	P &= ~(F_N|F_V|F_Z|F_C);
 	if(!UINT8(sum))
@@ -198,7 +189,6 @@ void m740_device::do_adc_ndt(UINT8 val)
 	if(sum & 0xff00)
 		P |= F_C;
 	TMP2 = sum;
-	write(X, TMP2);
 }
 
 void m740_device::do_adct(UINT8 val)
