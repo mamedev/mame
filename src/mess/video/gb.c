@@ -526,18 +526,14 @@ void gb_state::sgb_update_sprites()
 void gb_state::sgb_refresh_border()
 {
 	UINT16 data, data2;
-	UINT16 yidx, xidx, xindex;
-	UINT8 *map, *tiles, *tiles2;
-	UINT8 pal, i;
-	bitmap_ind16 &bitmap = m_bitmap;
+	UINT8 *tiles, *tiles2;
 
-	map = m_sgb_tile_map - 64;
-
-	for( yidx = 0; yidx < 224; yidx++ )
+	for( UINT16 yidx = 0; yidx < 224; yidx++ )
 	{
-		xindex = 0;
-		map += (yidx % 8) ? 0 : 64;
-		for( xidx = 0; xidx < 64; xidx+=2 )
+		UINT8 *map = m_sgb_tile_map + ( ( yidx >> 3 ) * 64 );
+		UINT16 xindex = 0;
+		
+		for( UINT16 xidx = 0; xidx < 64; xidx+=2 )
 		{
 			if( map[xidx+1] & 0x80 ) /* Vertical flip */
 				tiles = m_sgb_tile_data + ( ( 7 - ( yidx % 8 ) ) << 1 );
@@ -545,7 +541,7 @@ void gb_state::sgb_refresh_border()
 				tiles = m_sgb_tile_data + ( ( yidx % 8 ) << 1 );
 			tiles2 = tiles + 16;
 
-			pal = (map[xidx+1] & 0x1C) >> 2;
+			UINT8 pal = (map[xidx+1] & 0x1C) >> 2;
 			if( pal == 0 )
 				pal = 1;
 			pal <<= 4;
@@ -564,7 +560,7 @@ void gb_state::sgb_refresh_border()
 				data2 = tiles2[ map[xidx] * 32 ] | ( tiles2[ (map[xidx] * 32 ) + 1 ] << 8 );
 			}
 
-			for( i = 0; i < 8; i++ )
+			for( UINT8 i = 0; i < 8; i++ )
 			{
 				register UINT8 colour;
 				if( (map[xidx+1] & 0x40) )  /* Horizontal flip */
@@ -588,7 +584,7 @@ void gb_state::sgb_refresh_border()
 				if( !((yidx >= SGB_YOFFSET && yidx < SGB_YOFFSET + 144) &&
 					(xindex >= SGB_XOFFSET && xindex < SGB_XOFFSET + 160)) )
 				{
-					gb_plot_pixel(bitmap, xindex, yidx, m_sgb_pal[pal + colour]);
+					gb_plot_pixel(m_bitmap, xindex, yidx, m_sgb_pal[pal + colour]);
 				}
 				xindex++;
 			}
