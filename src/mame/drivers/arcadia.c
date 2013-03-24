@@ -477,7 +477,7 @@ ROM_END
 /*
     Magic Johnson's Fast Break
 
-    Piggyback 1.5mb rom board
+    PIGGYBACK 1.5 MBYTE ROM BOARD REV A
 
              3h       7h       x
              2h       6h       x
@@ -511,8 +511,8 @@ ROM_START( ar_fast )
 	ROM_LOAD16_BYTE( "fast-v28_5-hi.u19", 0x080000, 0x10000, CRC(6daf4817) SHA1(ca0bf79e77a3e878da1f97ff9a64107e8c112aee) )
 	ROM_LOAD16_BYTE( "fast-v28_5-lo.u23", 0x080001, 0x10000, CRC(f489da29) SHA1(5e70183acfd0d849ae9691b312ca98698b1a2252) )
 	ROM_LOAD16_BYTE( "fast-v28_6-hi.u18", 0x0a0000, 0x10000, CRC(b23dbcfd) SHA1(67495235016e4bcbf6251e4073d6938a3c5b0eea) )
-	ROM_LOAD16_BYTE( "fast-v28_6-lo.u17", 0x0a0001, 0x10000, CRC(4e23e807) SHA1(69c910d70fb85d037257b19a1be9e99c617bf1c4) )
-	ROM_LOAD16_BYTE( "fast-v28_7-hi.u21", 0x0c0000, 0x10000, CRC(74d598eb) SHA1(9434169d316fc2802e7790e5b09be086fccab351) )
+	ROM_LOAD16_BYTE( "fast-v28_6-lo.u22", 0x0a0001, 0x10000, CRC(4e23e807) SHA1(69c910d70fb85d037257b19a1be9e99c617bf1c4) )
+	ROM_LOAD16_BYTE( "fast-v28_7-hi.u17", 0x0c0000, 0x10000, CRC(74d598eb) SHA1(9434169d316fc2802e7790e5b09be086fccab351) )
 	ROM_LOAD16_BYTE( "fast-v28_7-lo.u21", 0x0c0001, 0x10000, CRC(b0649050) SHA1(a8efdfc82a63fc16ee2103b4c96b92d6f9e7afc6) )
 	ROM_LOAD16_BYTE( "fast-v28_8-hi.u28", 0x0e0000, 0x10000, CRC(3650aaf0) SHA1(cc37aa94360159f45076eafaae8140a661bd52f6) )
 	ROM_LOAD16_BYTE( "fast-v28_8-lo.u32", 0x0e0001, 0x10000, CRC(82603f68) SHA1(8affe73e97b966b8e63bff2c7914fb5ead7b60ff) )
@@ -522,23 +522,50 @@ ROM_START( ar_fast )
 ROM_END
 
 
-/* Arcadia LEADER BOARD V 2.5 on 1.5 MBYTE ROM BOARD REV ? */
+/* Arcadia Magic Johnson's Fast Break V 2.7 on PIGGYBACK 1.5 MBYTE ROM BOARD REV A  */
+ROM_START( ar_fasta )
+	ARCADIA_BIOS
+
+	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fast-v27_1-hi.u11", 0x000000, 0x10000, CRC(58ce7e02) SHA1(73fa33858dceb924e86b95130f8d6a0d3ae5cc6f) )
+	ROM_LOAD16_BYTE( "fast-v27_1-lo.u15", 0x000001, 0x10000, CRC(6bf75490) SHA1(3df610dd488e0711a190a9ec47adfd047313a597) )
+	ROM_LOAD16_BYTE( "fast-v27_2-hi.u10", 0x020000, 0x10000, CRC(3a3dd931) SHA1(7be3316e2acf6b14b29ef2e36d8f76999d5d4e94) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_2-lo.u14", 0x020001, 0x10000, CRC(4838d7e5) SHA1(d2ae5b8f25df51936937ddf62001347fccdf830a) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_3-hi.u9",  0x040000, 0x10000, CRC(db94fa62) SHA1(4fe79a4226161b15ecdda9d85c1ad84cf31b6a30) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_3-lo.u13", 0x040001, 0x10000, CRC(a400367d) SHA1(a4362beeb35fa0c9020883eab0a71194f3a90b9a) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_4-hi.u20", 0x060000, 0x10000, CRC(c0a021dd) SHA1(c4c40c05050a2831b55683d85ee39b8870e0bf88) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_4-lo.u24", 0x060001, 0x10000, CRC(870e60f1) SHA1(0f0566da96dfc898dbbc35dfaba489d1fc9ab435) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_5-hi.u19", 0x080000, 0x10000, CRC(6daf4817) SHA1(ca0bf79e77a3e878da1f97ff9a64107e8c112aee) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_5-lo.u23", 0x080001, 0x10000, CRC(f489da29) SHA1(5e70183acfd0d849ae9691b312ca98698b1a2252) ) /* matches v2.8 */
+	ROM_LOAD16_BYTE( "fast-v27_6-hi.u18", 0x0a0000, 0x10000, CRC(e36424a4) SHA1(e17375de39dccb7bec6aaaa06879a20b532d0199) )
+	ROM_LOAD16_BYTE( "fast-v27_6-lo.u22", 0x0a0001, 0x10000, CRC(23441bac) SHA1(25fd776cdafbb88b5f63201d30d42eeafde88733) )
+	ROM_LOAD16_BYTE( "fast-v27_7-hi.u17", 0x0c0000, 0x10000, CRC(2ac2f165) SHA1(5d7501de510efc4ca34765d99ed8c2c374309659) )
+	ROM_LOAD16_BYTE( "fast-v27_7-lo.u21", 0x0c0001, 0x10000, CRC(41255827) SHA1(494e3da21845c6d62ce3c7ba75e2557fb016b91a) )
+	ROM_LOAD16_BYTE( "fast-v27_8-hi.u28", 0x0e0000, 0x10000, CRC(8e838770) SHA1(73ad9e925f725b173ce554e97c28426cb20ec194) )
+	ROM_LOAD16_BYTE( "fast-v27_8-lo.u32", 0x0e0001, 0x10000, CRC(2d55af35) SHA1(5a6a3b12c222d16c30bc7f2a7904433614448e10) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pal16l8-sec-scpa.bin", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+
+/* Arcadia LEADER BOARD V 2.5 on PIGGYBACK 1.5 MBYTE ROM BOARD REV A */
 ROM_START( ar_ldrb )
 	ARCADIA_BIOS
 
 	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "leader_board_01-hi_v2.5.u11", 0x00000, 0x10000, CRC(0236511c) SHA1(22b2ee076ed57ba38413c16a52510383d8488e25) )
 	ROM_LOAD16_BYTE( "leader_board_01-lo_v2.5.u15", 0x00001, 0x10000, CRC(786d34b9) SHA1(5fd6ef94f65c6fd503d3682154b576d6509a3aa9) )
-	ROM_LOAD16_BYTE( "leader_board_02-hi_v2.5.u10", 0x20000, 0x10000, CRC(64e5fbae) SHA1(0dde0d05b05f232aac9ad44398cedd8c7627f146) )
-	ROM_LOAD16_BYTE( "leader_board_02-lo_v2.5.u14", 0x20001, 0x10000, CRC(bb115e1c) SHA1(768cf51661f630b1c0a4b83b9f6124c78a517d0a) )
-	ROM_LOAD16_BYTE( "leader_board_03-hi_v2.5.u9",  0x40000, 0x10000, CRC(1d290e28) SHA1(0d589628fe59de9d7e2a57ddeabca991d1c79fdf) )
-	ROM_LOAD16_BYTE( "leader_board_03-lo_v2.5.u13", 0x40001, 0x10000, CRC(b1352a77) SHA1(ac7337a3778442d444002f730e2880f61f32cf2a) )
-	ROM_LOAD16_BYTE( "leader_board_04-hi_v2.5.u20", 0x60000, 0x10000, CRC(b621c688) SHA1(f2a50ebfc50725cdef77bb8a4864405dbb203784) )
-	ROM_LOAD16_BYTE( "leader_board_04-lo_v2.5.u24", 0x60001, 0x10000, CRC(13f9c4b0) SHA1(08a1fab271307191c5caa108c4ae284f92c270e4) )
-	ROM_LOAD16_BYTE( "leader_board_05-hi_v2.5.u19", 0x80000, 0x10000, CRC(71273172) SHA1(2b6204fdf03268e920b5948c999aa725fc66cac6) )
-	ROM_LOAD16_BYTE( "leader_board_05-lo_v2.5.u23", 0x80001, 0x10000, CRC(d9028183) SHA1(009b496da31f67b11de54e50254a9897ea68cd92) )
-	ROM_LOAD16_BYTE( "leader_board_06-hi_v2.5.u18", 0xa0000, 0x10000, CRC(a6ce61a4) SHA1(6cd64b7d589c91aeee06293f473fd1b3c56b19e0) )
-	ROM_LOAD16_BYTE( "leader_board_06-lo_v2.5.u22", 0xa0001, 0x10000, CRC(13c71422) SHA1(93e6dca2b28e1b5235b922f064be96eed0bedd8c) )
+	ROM_LOAD16_BYTE( "leader_board_02-hi_v2.5.u10", 0x20000, 0x10000, CRC(64e5fbae) SHA1(0dde0d05b05f232aac9ad44398cedd8c7627f146) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_02-lo_v2.5.u14", 0x20001, 0x10000, CRC(bb115e1c) SHA1(768cf51661f630b1c0a4b83b9f6124c78a517d0a) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_03-hi_v2.5.u9",  0x40000, 0x10000, CRC(1d290e28) SHA1(0d589628fe59de9d7e2a57ddeabca991d1c79fdf) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_03-lo_v2.5.u13", 0x40001, 0x10000, CRC(b1352a77) SHA1(ac7337a3778442d444002f730e2880f61f32cf2a) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_04-hi_v2.5.u20", 0x60000, 0x10000, CRC(b621c688) SHA1(f2a50ebfc50725cdef77bb8a4864405dbb203784) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_04-lo_v2.5.u24", 0x60001, 0x10000, CRC(13f9c4b0) SHA1(08a1fab271307191c5caa108c4ae284f92c270e4) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_05-hi_v2.5.u19", 0x80000, 0x10000, CRC(71273172) SHA1(2b6204fdf03268e920b5948c999aa725fc66cac6) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_05-lo_v2.5.u23", 0x80001, 0x10000, CRC(d9028183) SHA1(009b496da31f67b11de54e50254a9897ea68cd92) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_06-hi_v2.5.u18", 0xa0000, 0x10000, CRC(a6ce61a4) SHA1(6cd64b7d589c91aeee06293f473fd1b3c56b19e0) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "leader_board_06-lo_v2.5.u22", 0xa0001, 0x10000, CRC(13c71422) SHA1(93e6dca2b28e1b5235b922f064be96eed0bedd8c) ) /* matches v2.4 */
 	ROM_LOAD16_BYTE( "leader_board_07-hi_v2.5.u17", 0xc0000, 0x10000, CRC(4ebb8d12) SHA1(c328a26139ba0792cab1020b32eb4b8e39d51a22) )
 	ROM_LOAD16_BYTE( "leader_board_07-lo_v2.5.u21", 0xc0001, 0x10000, CRC(1afa9a4f) SHA1(3e5ca56e03d693a72424b9ad0717494ea8eb561e) )
 	ROM_LOAD16_BYTE( "leader_board_08-hi_v2.5.u28", 0xe0000, 0x10000, CRC(fbdca9af) SHA1(9612eb777a00ba4153f40eaefd162ca5b5efdb54) )
@@ -546,7 +573,7 @@ ROM_START( ar_ldrb )
 ROM_END
 
 
-/* Arcadia LEADER BOARD V 2.4 on 1.5 MBYTE ROM BOARD REV A  */
+/* Arcadia LEADER BOARD V 2.4 on PIGGYBACK 1.5 MBYTE ROM BOARD REV A  */
 ROM_START( ar_ldrba )
 	ARCADIA_BIOS
 
@@ -569,25 +596,25 @@ ROM_START( ar_ldrba )
 	ROM_LOAD16_BYTE( "leader_board_08-lo_v2.4.u32", 0xe0001, 0x10000, CRC(1f1ea828) SHA1(4af463bc6d58d64d4f082971c71654a6bb0c26bc) )
 ROM_END
 
-/* Arcadia LEADER BOARD v ?.?  on 1.5 MBYTE ROM BOARD REV ? */
-ROM_START( ar_ldrbb )
+/* Arcadia LEADER BOARD v 2.6?  on PIGGYBACK 1.5 MBYTE ROM BOARD REV ? */
+ROM_START( ar_ldrbb ) /* Later then v2.5?? as 7H & 7L match v2.5 and are newer then v2.4 */
 	ARCADIA_BIOS
 
 	ROM_REGION16_BE( 0x180000, "user3", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "ldrb_1h.u11", 0x00000, 0x10000, CRC(97dcde78) SHA1(d324415b853de17646b5266581bea27e571fa08f) )
 	ROM_LOAD16_BYTE( "ldrb_1l_gcp_22.u15", 0x00001, 0x10000, CRC(b51d17f7) SHA1(56add2f69c35e5082926bd59be7f98a6a223c549) )
-	ROM_LOAD16_BYTE( "ldrb_2h.u10", 0x20000, 0x10000, CRC(64e5fbae) SHA1(0dde0d05b05f232aac9ad44398cedd8c7627f146) )
-	ROM_LOAD16_BYTE( "ldrb_2l.u14", 0x20001, 0x10000, CRC(bb115e1c) SHA1(768cf51661f630b1c0a4b83b9f6124c78a517d0a) )
-	ROM_LOAD16_BYTE( "ldrb_3h.u9",  0x40000, 0x10000, CRC(1d290e28) SHA1(0d589628fe59de9d7e2a57ddeabca991d1c79fdf) )
-	ROM_LOAD16_BYTE( "ldrb_3l.u13", 0x40001, 0x10000, CRC(b1352a77) SHA1(ac7337a3778442d444002f730e2880f61f32cf2a) )
-	ROM_LOAD16_BYTE( "ldrb_4h.u20", 0x60000, 0x10000, CRC(b621c688) SHA1(f2a50ebfc50725cdef77bb8a4864405dbb203784) )
-	ROM_LOAD16_BYTE( "ldrb_4l.u24", 0x60001, 0x10000, CRC(13f9c4b0) SHA1(08a1fab271307191c5caa108c4ae284f92c270e4) )
-	ROM_LOAD16_BYTE( "ldrb_5h.u19", 0x80000, 0x10000, CRC(71273172) SHA1(2b6204fdf03268e920b5948c999aa725fc66cac6) )
-	ROM_LOAD16_BYTE( "ldrb_5l.u23", 0x80001, 0x10000, CRC(d9028183) SHA1(009b496da31f67b11de54e50254a9897ea68cd92) )
-	ROM_LOAD16_BYTE( "ldrb_6h.u18", 0xa0000, 0x10000, CRC(a6ce61a4) SHA1(6cd64b7d589c91aeee06293f473fd1b3c56b19e0) )
-	ROM_LOAD16_BYTE( "ldrb_6l.u22", 0xa0001, 0x10000, CRC(13c71422) SHA1(93e6dca2b28e1b5235b922f064be96eed0bedd8c) )
-	ROM_LOAD16_BYTE( "ldrb_7h.u17", 0xc0000, 0x10000, CRC(4ebb8d12) SHA1(c328a26139ba0792cab1020b32eb4b8e39d51a22) )
-	ROM_LOAD16_BYTE( "ldrb_7l.u21", 0xc0001, 0x10000, CRC(1afa9a4f) SHA1(3e5ca56e03d693a72424b9ad0717494ea8eb561e) )
+	ROM_LOAD16_BYTE( "ldrb_2h.u10", 0x20000, 0x10000, CRC(64e5fbae) SHA1(0dde0d05b05f232aac9ad44398cedd8c7627f146) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_2l.u14", 0x20001, 0x10000, CRC(bb115e1c) SHA1(768cf51661f630b1c0a4b83b9f6124c78a517d0a) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_3h.u9",  0x40000, 0x10000, CRC(1d290e28) SHA1(0d589628fe59de9d7e2a57ddeabca991d1c79fdf) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_3l.u13", 0x40001, 0x10000, CRC(b1352a77) SHA1(ac7337a3778442d444002f730e2880f61f32cf2a) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_4h.u20", 0x60000, 0x10000, CRC(b621c688) SHA1(f2a50ebfc50725cdef77bb8a4864405dbb203784) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_4l.u24", 0x60001, 0x10000, CRC(13f9c4b0) SHA1(08a1fab271307191c5caa108c4ae284f92c270e4) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_5h.u19", 0x80000, 0x10000, CRC(71273172) SHA1(2b6204fdf03268e920b5948c999aa725fc66cac6) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_5l.u23", 0x80001, 0x10000, CRC(d9028183) SHA1(009b496da31f67b11de54e50254a9897ea68cd92) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_6h.u18", 0xa0000, 0x10000, CRC(a6ce61a4) SHA1(6cd64b7d589c91aeee06293f473fd1b3c56b19e0) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_6l.u22", 0xa0001, 0x10000, CRC(13c71422) SHA1(93e6dca2b28e1b5235b922f064be96eed0bedd8c) ) /* matches v2.4 */
+	ROM_LOAD16_BYTE( "ldrb_7h.u17", 0xc0000, 0x10000, CRC(4ebb8d12) SHA1(c328a26139ba0792cab1020b32eb4b8e39d51a22) ) /* matches v2.5 */
+	ROM_LOAD16_BYTE( "ldrb_7l.u21", 0xc0001, 0x10000, CRC(1afa9a4f) SHA1(3e5ca56e03d693a72424b9ad0717494ea8eb561e) ) /* matches v2.5 */
 	ROM_LOAD16_BYTE( "ldrb_8h.u28", 0xe0000, 0x10000, CRC(701f50ba) SHA1(4ea6be00aa2d32d739fa6ec70ec8bce470b28f90) )
 	ROM_LOAD16_BYTE( "ldrb_8l.u32", 0xe0001, 0x10000, CRC(80642c1d) SHA1(fc2101b749db3ebb3499c8870026c05acf46fa4d) )
 ROM_END
@@ -874,6 +901,7 @@ GAME( 1987, ar_dart,    ar_bios, arcadia, arcadia, arcadia_amiga_state, dart,  R
 GAME( 1987, ar_dart2,   ar_dart, arcadia, arcadia, arcadia_amiga_state, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, set 2)", GAME_NOT_WORKING ) // bad dump
 
 GAME( 1988, ar_fast,    ar_bios, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
+GAME( 1988, ar_fasta,   ar_fast, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.7)", 0 )
 
 GAME( 1988, ar_ldrb,    ar_bios, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
 GAME( 1988, ar_ldrba,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )

@@ -9483,9 +9483,10 @@ ar_airh2        // (c) 1988
 ar_bowl         // (c) 1988
 ar_dart         // (c) 1987
 ar_dart2        // (c) 1987
-ar_fast         // (c) 1988
-ar_ldrb         // (c) 1988
-ar_ldrba        // (c) 1988
+ar_fast         // (c) 1988 v2.8
+ar_fasta        // (c) 1988 v2.7
+ar_ldrb         // (c) 1988 v2.5
+ar_ldrba        // (c) 1988 v2.4
 ar_ldrbb        // (c) 1988
 ar_ninj         // (c) 1987
 ar_ninj2        // (c) 1987
