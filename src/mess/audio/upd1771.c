@@ -80,8 +80,8 @@
      L -> selector of left or right half of the ram word
     ?bits:
      D (having to do with the DAC)
-     N (having to do with the pseudorandom noise interrupt, namely setting the clock divider ratio for the PRNG clock vs cpu clock)
-     MODE (enabling/disabling/acking the noise interrupt, and the tone interrupts (there are four!))
+     N (3 bits? having to do with the pseudorandom noise interrupt, namely setting the clock divider ratio for the PRNG clock vs cpu clock)
+     MODE (5 or more bits? enabling/disabling/acking the noise interrupt, and the tone interrupts (there are four!))
      SP (the stack pointer, probably 5 bits, points to the stack ram; may encompass H and L as above!)
      FLO: unsure. quite possibly 'flag overflow' used for branching. there likely exists other flags as well...
      ODF: 'output data flag?', selects which half of a selected ram word is output to the dac not really sure of this?
@@ -145,8 +145,7 @@
 
     (NOTE: the photomicrograph in the bristow book makes it fairly clear due to
     pad thicknessess that the real VCC is pin 8 and the real GND is pin 14.
-    Pins 16 and 17 are some sort of ?mode? inputs but could be the /EXTINT pin too?
-    Pin 15 MIGHT be the reset pin or could be a TEST pin. RESET could also be pin 7.)
+    The function of pin 7 is unknown.
 
     Pins 11 and 13 go to a special circuit, which according to kevtris's analysis
     of my schematics, consist of a balanced output (not unlike XLR cables),
