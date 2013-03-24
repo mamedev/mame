@@ -733,13 +733,12 @@ WRITE16_MEMBER(md_rom_lion2_device::write)
  LION KING 3
  -------------------------------------------------*/
 
-// TODO: Sould Edge vs Samurai Spirits uses this same mechanism (or a very similar one)
-// but expects to bankswitch more than the first 32k chunk...
+#define MD_LION3_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom_size - 1))/2
 
 READ16_MEMBER(md_rom_lion3_device::read)
 {
-	if (offset < 0x8000/2)
-		return m_rom[offset + (m_bank * 0x8000)/2];
+	if (offset < 0x100000/2)
+		return m_rom[MD_LION3_ADDR(offset)];
 	else if (offset >= 0x600000/2 && offset < 0x700000/2)
 	{
 		switch (offset & 0x7)
@@ -847,10 +846,12 @@ READ16_MEMBER(md_rom_soulb_device::read)
  POKEMON STADIUM / KAIJU
  -------------------------------------------------*/
 
+#define MD_POKESTAD_ADDR(a)  (((offset << 1) | (m_bank << 15)) & (m_rom_size - 1))/2
+
 READ16_MEMBER(md_rom_pokestad_device::read)
 {
-	if (offset < 0x8000/2)
-		return m_rom[offset + (m_bank * 0x8000)/2];
+	if (offset < 0x100000/2)
+		return m_rom[MD_POKESTAD_ADDR(offset)];
 	return m_rom[MD_ADDR(offset)];
 }
 
