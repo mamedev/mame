@@ -6,10 +6,14 @@
 
     TODO:
     - What's the LCDC type? Custom?
-    - Why RAM isn't recognized? Perhaps RAM is back-upped and needs default
-      data?
     - Unless I've missed something in the schems, this one shouldn't have any
       sound capability.
+	- backup RAM.
+	- Rewrite video emulation from scratch.
+
+	Notes:
+	- on start-up there's a "memory illegal" warning. Enter "RESET" command
+	  to initialize it (thanks to Takeda Toshiya for pointing this out).
 
 ***************************************************************************/
 
