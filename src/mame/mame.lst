@@ -9335,12 +9335,13 @@ actionhw        // (c) 1995
 
 // U.S. Games games
 usg32           // (c) 1987
-usg82           // (c) 1988
-usg83           // (c) 1988
+superten        // (c) 1988
 usg83x          // (c) 1988
+usg82           // (c) 1988
+usgames         // (c) 1992
+usg187c         // (c) 1991
+usg185          // (c) 1990
 usg182          // (c) 1989
-usg185          // (c) 1991
-usg252          // (c) 1992
 
 // Sanritsu games
 mermaid         // (c) 1982 Rock-ola,  made by Sanritsu

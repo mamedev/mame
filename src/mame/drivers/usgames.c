@@ -1,15 +1,15 @@
-/* US Games - Trivia / Quiz / 'Amusement Only' Gambling Games */
-
 /*
+
+US Games - Trivia / Quiz / 'Amusement Only' Gambling Games
+
 
 there is a 'Security Test' in service mode
 
-'usg82', 'usg83' and 'usg83x' don't seem to be able to record
+'superten', 'usg82', and 'usg83x' don't seem to be able to record
 the changes you make in the "test mode" 8(
 
-*/
 
-/* readme info
+readme info
 
 US Games
 Counter Top Mini Games
@@ -277,39 +277,35 @@ ROM_START( usg32 )
 ROM_END
 
 
-/* You can't change the status of "Sexy Triv I" and "Sexy Triv II" */
-ROM_START( usg83 )
+ROM_START( superten ) /*  Version 8.3 - You can't change the status of "Sexy Triv I" and "Sexy Triv II" */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "grom08-3.rom", 0x08000, 0x08000, CRC(aae84186) SHA1(8385b5c1dded1ea6f90c277b045778c7110a45db) )
+	ROM_LOAD( "usg83-rom0.bin", 0x08000, 0x08000, CRC(aae84186) SHA1(8385b5c1dded1ea6f90c277b045778c7110a45db) ) /* FRI JUL 01 22:43:10 1988, Checksum=30DF19 */
 	/* for the banked region */
-	ROM_LOAD( "usg83-1.bin", 0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) )
-	ROM_LOAD( "usg83-2.bin", 0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) )
-	ROM_LOAD( "grom3.rom",   0x38000, 0x10000, CRC(4e110844) SHA1(b51c596a41760f1f0f70f49ae81f03d98a17fb6f) )
-	ROM_LOAD( "usg83-4.bin", 0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) )
+	ROM_LOAD( "usg83-rom1.bin", 0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) ) /* WED JUL 13 02:01:33 1988, Checksum=26F176 */
+	ROM_LOAD( "usg83-rom2.bin", 0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) ) /* THU FEB 04 12:27:14 1988, Checksum=7068E1 */
+	ROM_LOAD( "usg83-rom3.bin", 0x38000, 0x10000, CRC(4e110844) SHA1(b51c596a41760f1f0f70f49ae81f03d98a17fb6f) ) /* WED NOV 25 14:57:05 1987, Checksum=6E3126 */
+	ROM_LOAD( "usg83-rom4.bin", 0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) ) /* WED NOV 25 14:53:29 1987, Checksum DC7BF5 */
 ROM_END
 
-/* Similar to 'usg83', but you can change the status of "Sexy Triv I" */
-ROM_START( usg83x )
+ROM_START( usg83x ) /* Version 8.3x - You can change the status of "Sexy Triv I" */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "usg83-0.bin", 0x08000, 0x08000, CRC(4ad9b6e0) SHA1(54940619511b37577bbcd9d05b941079ba793c72) )
+	ROM_LOAD( "usg83x-rom0.bin", 0x08000, 0x08000, CRC(4ad9b6e0) SHA1(54940619511b37577bbcd9d05b941079ba793c72) ) /* FRI JUL 01 22:43:10 1988, Checksum=30DF51 */
 	/* for the banked region */
-	ROM_LOAD( "usg83-1.bin", 0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) )
-	ROM_LOAD( "usg83-2.bin", 0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) )
-	ROM_LOAD( "usg83-3.bin", 0x38000, 0x08000, CRC(41c475ac) SHA1(48019843e2f57bf4c2fca5136e3d0a64de3dfc04) )
-	ROM_LOAD( "usg83-4.bin", 0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) )
+	ROM_LOAD( "usg83-rom1.bin",  0x18000, 0x08000, CRC(7b520b6f) SHA1(2231e63fecc6e9026dd4b6ee3e21a74cc0e0ae44) ) /* WED JUL 13 02:01:33 1988, Checksum=26F176 */
+	ROM_LOAD( "usg83-rom2.bin",  0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) ) /* THU FEB 04 12:27:14 1988, Checksum=7068E1 */
+	ROM_LOAD( "usg83x-rom3.bin", 0x38000, 0x08000, CRC(41c475ac) SHA1(48019843e2f57bf4c2fca5136e3d0a64de3dfc04) ) /* WED NOV 25 14:50:08 1987, Checksum=6E815F */
+	ROM_LOAD( "usg83-rom4.bin",  0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) ) /* WED NOV 25 14:53:29 1987, Checksum DC7BF5 */
 ROM_END
 
-/* Similar to 'usg83', but "Sport Triv" and "Rush Hour" aren't available by default */
-ROM_START( usg82 )
+ROM_START( usg82 ) /*  Version 8.2 - "Sport Triv" and "Rush Hour" aren't available by default */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "rom0.rom",   0x08000, 0x08000, CRC(09c20b78) SHA1(8b622fef536e98e22866a15c6a5b5da583169e8c) )
+	ROM_LOAD( "usg82-rom0.bin", 0x08000, 0x08000, CRC(09c20b78) SHA1(8b622fef536e98e22866a15c6a5b5da583169e8c) ) /* MON FEB 08 11:23:01 1988, Checksum=31911A */
 	/* for the banked region */
-	ROM_LOAD( "grom1.rom",   0x18000, 0x08000, CRC(915a9ff4) SHA1(5007210ed46a9cea530c18a8c4a67b07b87cb781) )
-	ROM_LOAD( "usg83-2.bin", 0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) )
-	ROM_LOAD( "grom3.rom",   0x38000, 0x10000, CRC(4e110844) SHA1(b51c596a41760f1f0f70f49ae81f03d98a17fb6f) )
-	ROM_LOAD( "usg83-4.bin", 0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) )
+	ROM_LOAD( "usg82-rom1.bin", 0x18000, 0x08000, CRC(915a9ff4) SHA1(5007210ed46a9cea530c18a8c4a67b07b87cb781) ) /* FRI FEB 05 16:17:13 1988, Checksum=36B7A3 */
+	ROM_LOAD( "usg82-rom2.bin", 0x28000, 0x08000, CRC(29fbb23b) SHA1(6c2c17897e60ec8d4cdeaf9b382ef00ab71f6e0a) ) /* THU FEB 04 12:27:14 1988, Checksum=7068E1 */
+	ROM_LOAD( "usg82-rom3.bin", 0x38000, 0x10000, CRC(4e110844) SHA1(b51c596a41760f1f0f70f49ae81f03d98a17fb6f) ) /* WED NOV 25 14:57:05 1987, Checksum=6E3126 */
+	ROM_LOAD( "usg82-rom4.bin", 0x48000, 0x08000, CRC(437697c4) SHA1(d14ae6f0b7adfb921c69ae3fdcd2cb525cb731fa) ) /* WED NOV 25 14:53:29 1987, Checksum DC7BF5 */
 ROM_END
-
 
 
 /*
@@ -337,57 +333,93 @@ PCB Layout
 |LED GROM4                                         |-|
 |    PAL      6116                                 |
 |--------------------------------------------------|
+
+Rom labels verified for v18.5, which look like this:
+
+Copyright 1986-90     Copyright 1986-90     Copyright 1986-90     Copyright 1986-90     Copyright 1986-90
+  U.S.Games.Inc.        U.S.Games.Inc.        U.S.Games.Inc.        U.S.Games.Inc.        U.S.Games.Inc.
+   Version 18.5          Version 18.5          Version 18.5          Version 18.5          Version 18.5
+  ROM 0 CS=315D5C       ROM 1 CS=2CB91D       ROM 2 CS=8973C0       ROM 3 CS=76AEBF       ROM 4 CS=90B95E
+
+The first screen that comes up reports:
+
++--------------+-----------------------------+
+|SPECIAL THANKS| ROM0  V18.5  315D5C  ****** |
+|MARGARET+JAMIE+-----------------------------+
+|FOR EVERYTHING| ROM1  V18.5       0  2CB91D |
+|TESTSWITCH:OK!+-----------------------------+
+|SYSTEM RAM:OK!| ROM2  V18.5  4957A2  8973C0 |
+|CHARAC RAM:OK!+-----------------------------+
+|COLOR  RAM:OK!| ROM3  V18.5  3ADB28  76AEBF |
+|BLOCK  RAM:OK!+-----------------------------+
+|+12 VOLTS :OK!| ROM4  V18.5  53125B  90B95E |
++--------------+-----------------------------+
+
+This show corresponding version number and checksums as listed on the labels.
+
 */
 
-ROM_START( usg182 )
+ROM_START( usgames ) /* Version 25.4x */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "grom0.u12",    0x08000, 0x08000, CRC(f5a053c1) SHA1(ae2740cd9af0af7a74a88720ebafd785bfc8614b) )
+	ROM_LOAD( "version_25.4x_rom0_cs=324591.u12", 0x08000, 0x08000, CRC(766a855a) SHA1(e67ca9944d92192de423de6aa8a60f2e28b17db1) )
 	/* for the banked region */
-	ROM_LOAD( "grom4.u36",    0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
-	ROM_LOAD( "grom3.u35",    0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) )
-	ROM_LOAD( "grom2.u28",    0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) )
-	ROM_LOAD( "grom1.u18",    0x48000, 0x08000, CRC(73bbc1c8) SHA1(9bb5067bf914b7c87a1ee29d6818de782fa28637) )
+	ROM_LOAD( "version_25.4x_rom2_cs=6a42e7.u28", 0x1c000, 0x04000, CRC(d44d2ffa) SHA1(8bd756418b4f8ad11cb0f2044fb91c63d7771497) )  // ROM 2
+	ROM_CONTINUE(                                 0x18000, 0x04000 )
+	ROM_CONTINUE(                                 0x14000, 0x04000 )
+	ROM_CONTINUE(                                 0x10000, 0x04000 )
+	ROM_LOAD( "version_25.4x_rom1_cs=31a223.u18", 0x2c000, 0x04000, CRC(2fff1da2) SHA1(c44718f7aab82f45379f21b68e8ee2668fe3a378) )  // ROM 1
+	ROM_CONTINUE(                                 0x28000, 0x04000 )
+	ROM_CONTINUE(                                 0x24000, 0x04000 )
+	ROM_CONTINUE(                                 0x20000, 0x04000 )
+	ROM_LOAD( "version_25.4x_rom4_cs=5a447e.u36", 0x3c000, 0x04000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) )  // ROM 4
+	ROM_CONTINUE(                                 0x38000, 0x04000 )
+	ROM_CONTINUE(                                 0x34000, 0x04000 )
+	ROM_CONTINUE(                                 0x30000, 0x04000 )
+	ROM_LOAD( "version_25.4x_rom3_cs=7924ba.u35", 0x4c000, 0x04000, CRC(9542295b) SHA1(56dd7b8fd581779656cb71cc42dbb9f77fb303f4) )  // ROM 3
+	ROM_CONTINUE(                                 0x48000, 0x04000 )
+	ROM_CONTINUE(                                 0x44000, 0x04000 )
+	ROM_CONTINUE(                                 0x40000, 0x04000 )
 ROM_END
 
 
-ROM_START( usg185 ) // an upgraded 182?
+ROM_START( usg187c ) /* Version 18.7C */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "usg182.u12",   0x08000, 0x08000, CRC(2f4ed125) SHA1(6ea2ce263b8abe8d283d1c85d403ec908a422448) )
+	ROM_LOAD( "version_18.7c_rom0_cs=30a6ba.u12", 0x08000, 0x08000, CRC(2f4ed125) SHA1(6ea2ce263b8abe8d283d1c85d403ec908a422448) )
 	/* for the banked region */
-	ROM_LOAD( "usg185.u36",   0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) ) // ROM 4
-	ROM_LOAD( "usg185.u35",   0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) ) // ROM 3
-	ROM_LOAD( "usg185.u28",   0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) ) // ROM 2
-	ROM_LOAD( "usg185.u18",   0x40000, 0x10000, CRC(1cfd934d) SHA1(544c41c5fcc2e576f5a8c88996f9257956f6c580) ) // ROM 1
+	ROM_LOAD( "version_18.7c_rom4_cs=90b95e.u36", 0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
+	ROM_LOAD( "version_18.7c_rom3_cs=76aebf.u35", 0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) )
+	ROM_LOAD( "version_18.7c_rom2_cs=8973c0.u28", 0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) )
+	ROM_LOAD( "version_18.7c_rom1_cs=6dcfd3.u18", 0x40000, 0x10000, CRC(1cfd934d) SHA1(544c41c5fcc2e576f5a8c88996f9257956f6c580) )
 ROM_END
 
 
-ROM_START( usg252 )
+ROM_START( usg185 ) /* Version 18.5 */
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "usg252.u12",   0x08000, 0x08000, CRC(766a855a) SHA1(e67ca9944d92192de423de6aa8a60f2e28b17db1) )
+	ROM_LOAD( "version_18.5_rom0_cs=315d5c.u12", 0x08000, 0x08000, CRC(2cc68502) SHA1(e00b5bb5ca5a4a5f5ee3c8b0fd779659337f881f) )
 	/* for the banked region */
-	ROM_LOAD( "usg252.u28",   0x1c000, 0x04000, CRC(d44d2ffa) SHA1(8bd756418b4f8ad11cb0f2044fb91c63d7771497) )  // ROM 2
-	ROM_CONTINUE(             0x18000, 0x04000 )
-	ROM_CONTINUE(             0x14000, 0x04000 )
-	ROM_CONTINUE(             0x10000, 0x04000 )
-	ROM_LOAD( "usg252.u18",   0x2c000, 0x04000, CRC(2fff1da2) SHA1(c44718f7aab82f45379f21b68e8ee2668fe3a378) )  // ROM 1
-	ROM_CONTINUE(             0x28000, 0x04000 )
-	ROM_CONTINUE(             0x24000, 0x04000 )
-	ROM_CONTINUE(             0x20000, 0x04000 )
-	ROM_LOAD( "usg252.u36",   0x3c000, 0x04000, CRC(b6d007be) SHA1(ec2afe983fd925d9f4602f47ddadd117bcc74972) )  // ROM 4
-	ROM_CONTINUE(             0x38000, 0x04000 )
-	ROM_CONTINUE(             0x34000, 0x04000 )
-	ROM_CONTINUE(             0x30000, 0x04000 )
-	ROM_LOAD( "usg252.u35",   0x4c000, 0x04000, CRC(9542295b) SHA1(56dd7b8fd581779656cb71cc42dbb9f77fb303f4) )  // ROM 3
-	ROM_CONTINUE(             0x48000, 0x04000 )
-	ROM_CONTINUE(             0x44000, 0x04000 )
-	ROM_CONTINUE(             0x40000, 0x04000 )
+	ROM_LOAD( "version_18.5_rom4_cs=90b95e.u36", 0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
+	ROM_LOAD( "version_18.5_rom3_cs=76aebf.u35", 0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) )
+	ROM_LOAD( "version_18.5_rom2_cs=8973c0.u28", 0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) )
+	ROM_LOAD( "version_18.5_rom1_cs=2cb91d.u18", 0x40000, 0x08000, CRC(bd384e5a) SHA1(1a09e2485471aa22f4260e6993f4636f7310e0b5) )
 ROM_END
 
 
-GAME( 1987, usg32,  0,     usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
-GAME( 1988, usg83,  0,     usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
-GAME( 1988, usg83x, usg83, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 )
-GAME( 1988, usg82,  usg83, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)   // "Feb.08,1988"
-GAME( 1989, usg182, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
-GAME( 1991, usg185, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
-GAME( 1992, usg252, 0,     usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )
+ROM_START( usg182 ) /* Version 18.2 */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "version_18.2_rom0_cs=2e6ae3.u12",    0x08000, 0x08000, CRC(f5a053c1) SHA1(ae2740cd9af0af7a74a88720ebafd785bfc8614b) )
+	/* for the banked region */
+	ROM_LOAD( "version_18.2_rom4_cs=90b95e.u36", 0x10000, 0x10000, CRC(b104744d) SHA1(fa2128c39a135b119ef625eed447afa523f912c0) )
+	ROM_LOAD( "version_18.2_rom3_cs=76aebf.u35", 0x20000, 0x10000, CRC(795e71c8) SHA1(852dceab906f79d05da67a81f855c71738662430) )
+	ROM_LOAD( "version_18.2_rom2_cs=8973c0.u28", 0x30000, 0x10000, CRC(c6ba8a81) SHA1(e826492626707e30782d4d2f42419357970d67b3) )
+	ROM_LOAD( "version_18.2_rom1_cs=2bf00d.u18", 0x48000, 0x08000, CRC(73bbc1c8) SHA1(9bb5067bf914b7c87a1ee29d6818de782fa28637) )
+ROM_END
+
+
+GAME( 1987, usg32,    0,        usg32,  usg32, driver_device, 0, ROT0, "U.S. Games", "Super Duper Casino (California V3.2)", 0 )
+GAME( 1988, superten, 0,        usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3", 0 )
+GAME( 1988, usg83x,   superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.3X", 0 ) /* "Experimental" version?? */
+GAME( 1988, usg82,    superten, usg32,  usg83, driver_device, 0, ROT0, "U.S. Games", "Super Ten V8.2" , 0)
+GAME( 1992, usgames,  0,        usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V25.4X", 0 )
+GAME( 1991, usg187c,  usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.7C", 0 )
+GAME( 1990, usg185,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.5", 0 )
+GAME( 1989, usg182,   usgames,  usg185, usg83, driver_device, 0, ROT0, "U.S. Games", "Games V18.2", 0 )
