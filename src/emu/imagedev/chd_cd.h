@@ -31,6 +31,7 @@ class cdrom_image_device :  public device_t,
 public:
 	// construction/destruction
 	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~cdrom_image_device();
 
 	// image-level overrides

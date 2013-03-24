@@ -2,17 +2,9 @@
 #define _included_psxcdrom_
 
 #include "imagedev/chd_cd.h"
-#include "psxcddrv.h"
 #include "sound/spu.h"
 
 #define MAX_PSXCD_TIMERS    (4)
-
-class event;
-
-//
-//
-//
-
 const int num_commands=0x20;
 
 //
@@ -24,21 +16,12 @@ const int num_commands=0x20;
 //**************************************************************************
 
 #define MCFG_PSXCD_ADD(_tag, _devname) \
-	MCFG_DEVICE_ADD(_tag, PSXCD, 0) \
-	MCFG_PSXCD_DEVNAME(_devname)
+	MCFG_DEVICE_ADD(_tag, PSXCD, 0)
 
 #define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
 	devcb = &psxcd_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PSXCD_DEVNAME(_name) \
-	psxcd_device::static_set_devname(*device, _name);
-
-struct psxcd_interface
-{
-};
-
-class psxcd_device : public device_t,
-						public psxcd_interface
+class psxcd_device : public cdrom_image_device
 {
 public:
 
@@ -55,12 +38,11 @@ private:
 	};
 
 	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
+	static const unsigned int raw_sector_size=2352;
 
 	unsigned char sr,res,ir,cmdmode,
 								cmdbuf[64],*cbp,
 								mode,
-								loc[3],
-								curpos[3],
 								secbuf[raw_sector_size*sector_buffer_size],
 								*secptr,
 								filter_file,
@@ -72,16 +54,35 @@ private:
 			secin;
 	command_result *res_queue,
 									*cur_res;
+
+	union CDPOS {
+		UINT8 b[4];
+		UINT32 w;
+	};
+	CDPOS loc, curpos;
+
+#ifdef LSB_FIRST
+	enum {
+		M = 2,
+		S = 1,
+		F = 0
+	};
+#else
+	enum {
+		M = 1,
+		S = 2,
+		F = 3
+	};
+#endif
+
 	bool open,
 				streaming,
 				first_open;
-	event *next_read_event;
+	device_timer_id next_read_event;
 	INT64 next_sector_t;
 	unsigned int autopause_sector,
 								xa_prefetch_sector,
 								cdda_prefetch_sector;
-
-	cdrom_driver *driver;
 
 	unsigned int start_read_delay,
 								read_sector_cycles,
@@ -128,7 +129,7 @@ private:
 
 	void cmd_complete(command_result *res);
 	void add_result(command_result *res);
-	event *send_result(const unsigned int res,
+	void send_result(const unsigned int res,
 											const unsigned char *data=NULL,
 											const unsigned int sz=0,
 											const unsigned int delay=default_irq_delay);
@@ -138,19 +139,19 @@ private:
 	void start_streaming();
 	void stop_read();
 	void read_sector();
-	void prefetch_next_sector();
-	bool read_next_sector(const bool block=true);
+	bool read_next_sector();
 	bool play_cdda_sector(const unsigned int sector, unsigned char *rawsec);
 	void play_sector();
 	void preread_sector();
+	UINT32 sub_loc(CDPOS src1, CDPOS src2);
 
 public:
-	void set_driver(cdrom_driver *d);
-	cdrom_driver *get_driver() const { return driver; }
 
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual bool call_load();
+	virtual void call_unload();
 
 	void start_dma(UINT8 *mainram, UINT32 size);
 
@@ -158,35 +159,23 @@ public:
 	DECLARE_READ8_MEMBER( read );
 
 private:
-	//emu_timer *m_timer;
+	UINT32 m_param_count;
 	UINT32 m_sysclock;
-	const char *m_devname;
-	cdrom_image_device *m_cddevice;
-	cdrom_file  *m_cd;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS];
-	event *m_eventfortimer[MAX_PSXCD_TIMERS];
 	bool m_timerinuse[MAX_PSXCD_TIMERS];
 
-	void add_system_event(event *ev);
+	int add_system_event(int type, UINT64 t, void *ptr);
 
 	devcb2_write_line m_irq_handler;
 	cpu_device *m_maincpu;
 	spu_device *m_spu;
+
+	UINT8 bcd_to_decimal(const UINT8 bcd) { return ((bcd>>4)*10)+(bcd&0xf); }
+	UINT8 decimal_to_bcd(const UINT8 dec) { return ((dec/10)<<4)|(dec%10); }
+	UINT32 msf_to_lba_ps(UINT32 msf) { msf = msf_to_lba(msf); return (msf>150)?(msf-150):msf; }
+	UINT32 lba_to_msf_ps(UINT32 lba) { return lba_to_msf_alt(lba+150); }
+
 };
-
-
-// miniature version of pSX's event class, which we emulate with device timers
-const int max_event_data=64;
-
-class event
-{
-public:
-	UINT64 t;               // expire time
-	unsigned int type;
-	unsigned char data[max_event_data];
-	emu_timer *timer;
-};
-
 
 // device type definition
 extern const device_type PSXCD;

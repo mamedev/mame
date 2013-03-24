@@ -30,6 +30,11 @@ cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char
 {
 }
 
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name,  tag, owner, clock),
+		device_image_interface(mconfig, *this)
+{
+}
 //-------------------------------------------------
 //  cdrom_image_device - destructor
 //-------------------------------------------------
