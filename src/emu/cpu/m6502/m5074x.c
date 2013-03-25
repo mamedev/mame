@@ -204,8 +204,8 @@ void m5074x_device::recalc_irqs()
 		all_ints |= 0x10;
 	}
 
-	// check all 6 IRQ bits for changes
-	for (int i = 0; i < 6; i++)
+	// check all 5 IRQ bits for changes
+	for (int i = 0; i < 5; i++)
 	{
 		// if bit is set now
 		if (all_ints & (1 << i))
