@@ -4,6 +4,21 @@
 
 	preliminary driver by Angelo Salese
 
+	Notes:
+	Sub-CPU test meanings:
+	* RA (tests RAM, first is work RAM, other two are shared RAM banks)
+	* VR (tests VRAM)
+	* CRT interface test:
+		- 40x20
+		- 80x25
+		- monochrome attribute test
+		- 80x25 color test (text B-R-G-W, border: black, blue, red, green, black)
+		- 40x20 color test (text B-R-G-W, border: black, blue, red, green, black)
+	* Speaker test
+	* PR (Printer interface test)
+	* LP (Light pen test)
+	* RS (RS-232C interface test)
+
 ***************************************************************************/
 
 
@@ -43,6 +58,8 @@ public:
 
 	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
 	UINT8 m_crtc[0x10];
+
+	UINT8 m_fdd_sel;
 
 	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
 	DECLARE_WRITE8_MEMBER(mz3500_master_mem_w);
@@ -119,9 +136,11 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 width80;
 	UINT8 char_size;
 	UINT8 hires;
+	UINT8 color_mode;
 
 //	popmessage("%02x",state->m_crtc[6]);
 
+	color_mode = state->m_crtc[4] & 1;
 	width80 = (state->m_crtc[5] & 2) >> 1;
 	hires = (state->m_crtc[6] & 1);
 	char_size = (hires) ? 16 : 8;
@@ -143,16 +162,29 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				int res_x,res_y;
 				int pen;
 
-				/* TODO: color attribute needs double check */
-
 				if(yi >= char_size)
 					pen = -1;
 				else
 				{
-					if(state->m_crtc[4] & 1)
-						pen = (tile_data >> (7-xi)) & 1 ? (attr >> 1) : -1;
+					if(color_mode)
+						pen = (tile_data >> (7-xi)) & 1 ? (attr ^ 7) : -1;
 					else
+					{
+						/* TODO: "highlight"  */
+						//if(attr & 4)
+						//	tile_data ^= 0xff;
+
+						if(attr & 1) // VL
+							tile_data |= 8;
+
+						/* TODO: correct position of HL */
+						if(attr & 2 && yi == char_size/2) // HL
+							tile_data |= 0xff;
+
+						/* TODO: blink (bit 3) */
+
 						pen = (tile_data >> (7-xi)) & 1 ? 7 : -1;
+					}
 				}
 
 				res_x = x * 8 + xi;
@@ -419,13 +451,15 @@ WRITE8_MEMBER(mz3500_state::mz3500_crtc_w)
 
 READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 {
+	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
+
 	/*
 	---- -x-- Motor
 	---- --x- Index
 	---- ---x Drq
 	*/
 	floppy_image_device *floppy;
-	floppy = machine().device<floppy_connector>(":upd765a:0")->get_device();
+	floppy = machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device();
 
 	return floppy->idx_r() << 1;
 }
@@ -439,6 +473,19 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 	---x ---- motor on signal
 	---- xxxx Select FDD 0-3 (bit-wise)
 	*/
+	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
+
+	for(int i=0;i<4;i++)
+	{
+		if(data & 1 << i)
+		{
+			m_fdd_sel = i;
+			break;
+		}
+	}
+
+	machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device()->mon_w(data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
+
 }
 
 static ADDRESS_MAP_START( mz3500_master_map, AS_PROGRAM, 8, mz3500_state )
@@ -447,6 +494,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
 //	AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
 //	AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
@@ -464,19 +512,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
 //	AM_RANGE(0x10, 0x1f) i8251
 //	AM_RANGE(0x20, 0x2f) pit8253
 //	AM_RANGE(0x30, 0x3f) i8255
-//	AM_RANGE(0x40, 0x4f) 8-bit input port
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
 	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("upd7220_gfx", upd7220_device, read, write)
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mz3500 )
-	/* dummy active high structure */
-	PORT_START("SYSA")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -498,9 +546,9 @@ static INPUT_PORTS_START( mz3500 )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Sub-CPU Test" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* dummy active low structure */
 	PORT_START("DSWA")
@@ -614,6 +662,8 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_CPU_ADD("slave",Z80,MAIN_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(mz3500_slave_map)
 	MCFG_CPU_IO_MAP(mz3500_slave_io)
+
+	MCFG_QUANTUM_PERFECT_CPU("master")
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
