@@ -264,7 +264,7 @@ connector, but of course, I can be wrong.
  *
  *************************************/
 
-static WRITE16_HANDLER( aladmdb_w )
+WRITE16_MEMBER(md_boot_state::aladmdb_w )
 {
 	/*
 	Values returned from the log file :
@@ -276,20 +276,19 @@ static WRITE16_HANDLER( aladmdb_w )
 	logerror("aladmdb_w : %06x - data = %04x\n",space.device().safe_pc(),data);
 }
 
-static READ16_HANDLER( aladmdb_r )
+READ16_MEMBER(md_boot_state::aladmdb_r )
 {
-	md_boot_state *state = space.machine().driver_data<md_boot_state>();
 	if (space.device().safe_pc()==0x1b2a56)
 	{
-		state->m_aladmdb_mcu_port = state->ioport("MCU")->read();
+		m_aladmdb_mcu_port = ioport("MCU")->read();
 
-		if (state->m_aladmdb_mcu_port & 0x100)
-			return ((state->m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
+		if (m_aladmdb_mcu_port & 0x100)
+			return ((m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
 		else
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
 	if (space.device().safe_pc()==0x1b2a72) return 0x0000;
-	if (space.device().safe_pc()==0x1b2d24) return (space.machine().root_device().ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
+	if (space.device().safe_pc()==0x1b2d24) return (ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
 	if (space.device().safe_pc()==0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",space.device().safe_pc());
@@ -297,28 +296,100 @@ static READ16_HANDLER( aladmdb_r )
 	return 0x0000;
 }
 
-static READ16_HANDLER( mk3mdb_dsw_r )
+READ16_MEMBER(md_boot_state::mk3mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return space.machine().root_device().ioport(dswname[offset])->read();
+	return ioport(dswname[offset])->read();
 }
 
-static READ16_HANDLER( ssf2mdb_dsw_r )
+READ16_MEMBER(md_boot_state::ssf2mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return space.machine().root_device().ioport(dswname[offset])->read();
+	return ioport(dswname[offset])->read();
 }
 
-static READ16_HANDLER( srmdb_dsw_r )
+READ16_MEMBER(md_boot_state::srmdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return space.machine().root_device().ioport(dswname[offset])->read();
+	return ioport(dswname[offset])->read();
 }
 
-static READ16_HANDLER( topshoot_200051_r )
+READ16_MEMBER(md_boot_state::topshoot_200051_r )
 {
 	return -0x5b;
 }
+
+// jzth protection
+WRITE16_MEMBER(md_boot_state::bl_710000_w)
+{
+	int pc = space.device().safe_pc();
+
+	logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
+
+	// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
+	// startup
+	/*
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+	*/
+	// before lv stage 3
+	/*
+	059ce0 writing to bl_710000_w 0008 ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0x4)
+	*/
+	// start level 3
+	/*
+	059ce0 writing to bl_710000_w ff08 ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000e ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0x5)
+
+	// after end sequence
+	059ce0 writing to bl_710000_w 0008 ffff
+	059d04 writing to bl_710000_w 000a ffff
+	059d04 writing to bl_710000_w 000b ffff
+	059d04 writing to bl_710000_w 000c ffff
+	059d04 writing to bl_710000_w 000f ffff
+	059d1c writing to bl_710000_w ff09 ffff
+	059d2a reading from bl_710000_r  (wants 0xe)
+
+	*/
+	m_protcount++;
+}
+
+
+READ16_MEMBER(md_boot_state::bl_710000_r)
+{
+	UINT16 ret;
+	int pc = space.device().safe_pc();
+	logerror("%06x reading from bl_710000_r\n", pc);
+
+	if (m_protcount==6) { ret = 0xe; }
+	else if (m_protcount==5) { ret = 0x5; }
+	else if (m_protcount==4) { ret = 0x4; }
+	else ret = 0xf;
+
+	m_protcount = 0;
+	return ret;
+}
+
 
 /*************************************
  *
@@ -664,8 +735,8 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x220000, 0x220001, FUNC(aladmdb_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x330000, 0x330001, FUNC(aladmdb_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16_delegate(FUNC(md_boot_state::aladmdb_r),this));
 
 	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadrij);
@@ -714,7 +785,7 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(mk3mdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::mk3mdb_dsw_r),this));
 
 	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadriv);
@@ -728,7 +799,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 	machine().root_device().membank("bank5")->set_base(machine().root_device().memregion( "maincpu" )->base() + 0x400000 );
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::ssf2mdb_dsw_r),this));
 
 	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadrij);
@@ -757,7 +828,7 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 	rom[0x06] = 0xd2;
 	rom[0x07] = 0x00;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(srmdb_dsw_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::srmdb_dsw_r),this));
 
 	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
@@ -765,7 +836,7 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 DRIVER_INIT_MEMBER(md_boot_state,topshoot)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x200050, 0x200051, FUNC(topshoot_200051_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200050, 0x200051, read16_delegate(FUNC(md_boot_state::topshoot_200051_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200044, 0x200045, "IN1");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");

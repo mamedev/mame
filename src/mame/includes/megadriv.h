@@ -164,77 +164,6 @@ public:
 
 	int m_protcount;
 
-	// jzth protection
-	DECLARE_WRITE16_MEMBER( bl_710000_w )
-	{
-		int pc = space.device().safe_pc();
-
-		logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
-
-		// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
-		// startup
-		/*
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
-		*/
-		// before lv stage 3
-		/*
-		059ce0 writing to bl_710000_w 0008 ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0x4)
-		*/
-		// start level 3
-		/*
-		059ce0 writing to bl_710000_w ff08 ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000e ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0x5)
-
-		// after end sequence
-		059ce0 writing to bl_710000_w 0008 ffff
-		059d04 writing to bl_710000_w 000a ffff
-		059d04 writing to bl_710000_w 000b ffff
-		059d04 writing to bl_710000_w 000c ffff
-		059d04 writing to bl_710000_w 000f ffff
-		059d1c writing to bl_710000_w ff09 ffff
-		059d2a reading from bl_710000_r  (wants 0xe)
-
-		*/
-		m_protcount++;
-	}
-
-
-	DECLARE_READ16_MEMBER( bl_710000_r )
-	{
-		UINT16 ret;
-		int pc = space.device().safe_pc();
-		logerror("%06x reading from bl_710000_r\n", pc);
-
-		if (m_protcount==6) { ret = 0xe; }
-		else if (m_protcount==5) { ret = 0x5; }
-		else if (m_protcount==4) { ret = 0x4; }
-		else ret = 0xf;
-
-		m_protcount = 0;
-		return ret;
-	}
-
 	DECLARE_DRIVER_INIT(aladmdb);
 	DECLARE_DRIVER_INIT(mk3mdb);
 	DECLARE_DRIVER_INIT(ssf2mdb);
@@ -242,6 +171,16 @@ public:
 	DECLARE_DRIVER_INIT(topshoot);
 	DECLARE_DRIVER_INIT(puckpkmn);
 	DECLARE_DRIVER_INIT(hshavoc);
+	DECLARE_WRITE16_MEMBER( bl_710000_w );
+	DECLARE_READ16_MEMBER( bl_710000_r );
+	DECLARE_WRITE16_MEMBER( aladmdb_w );
+	DECLARE_READ16_MEMBER( aladmdb_r );
+	DECLARE_READ16_MEMBER( mk3mdb_dsw_r );
+	DECLARE_READ16_MEMBER( ssf2mdb_dsw_r );
+	DECLARE_READ16_MEMBER( srmdb_dsw_r );
+	DECLARE_READ16_MEMBER( topshoot_200051_r );	
+	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
+	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
 };
 
 
