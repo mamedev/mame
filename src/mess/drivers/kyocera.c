@@ -31,7 +31,6 @@
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot
     - soft power on/off
-    - IM6042 UART
     - pc8201 48K RAM option
     - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
     - pc8201 NEC PC-8233 floppy controller
@@ -39,7 +38,6 @@
     - trsm100 Tandy Portable Disk Drive (TPDD: 100k 3?", TPDD2: 200k 3?") (undumped HD63A01V1 MCU + full custom uPD65002, serial comms via the missing IM6042, not going to happen anytime soon)
     - trsm100 Chipmunk disk drive (384k 3?") (full custom logic, not going to happen)
     - trsm100 RS232/modem select
-    - tandy200 UART8251
     - tandy200 RTC alarm
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
@@ -239,7 +237,8 @@ READ8_MEMBER( kc85_state::uart_status_r )
 
 	UINT8 data = 0x40;
 
-	// TODO carrier detect
+	// carrier detect
+	data |= m_rs232->dcd_r();
 
 	// overrun error
 	data |= m_uart->oe_r() << 1;
@@ -281,7 +280,8 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 
 	UINT8 data = 0x40;
 
-	// TODO data carrier detect / ring detect
+	// data carrier detect / ring detect
+	data |= m_rs232->dcd_r();
 
 	// overrun error
 	data |= m_uart->oe_r() << 1;
@@ -965,6 +965,10 @@ WRITE8_MEMBER( kc85_state::i8155_pb_w )
 	m_bell = BIT(data, 5);
 
 	if (m_buzzer) speaker_level_w(m_speaker, m_bell);
+
+	// RS-232
+	m_rs232->dtr_w(BIT(data, 6));
+	m_rs232->rts_w(BIT(data, 7));
 }
 
 READ8_MEMBER( kc85_state::i8155_pc_r )
@@ -990,6 +994,10 @@ READ8_MEMBER( kc85_state::i8155_pc_r )
 	// centronics busy
 	data |= m_centronics->not_busy_r() << 1;
 	data |= m_centronics->busy_r() << 2;
+
+	// RS-232
+	data |= m_rs232->cts_r() << 4;
+	data |= m_rs232->dsr_r() << 5;
 
 	return data;
 }
@@ -1082,8 +1090,12 @@ READ8_MEMBER( tandy200_state::i8155_pc_r )
 
 	UINT8 data = 0x01;
 
+	// centronics
 	data |= m_centronics->not_busy_r() << 1;
 	data |= m_centronics->busy_r() << 2;
+
+	// RS-232
+	data |= m_rs232->dcd_r() << 4;
 
 	return data;
 }
@@ -1113,8 +1125,8 @@ static IM6402_INTERFACE( uart_intf )
 {
 	0,
 	0,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1124,10 +1136,23 @@ static IM6402_INTERFACE( uart_intf )
 
 static const i8251_interface tandy200_uart_intf =
 {
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dsr_r),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1281,16 +1306,14 @@ static const cassette_interface kc85_cassette_interface =
 	NULL
 };
 
-WRITE_LINE_MEMBER(kc85_state::kc85_sod_w)
+WRITE_LINE_MEMBER( kc85_state::kc85_sod_w )
 {
-	device_t *device = machine().device(CASSETTE_TAG);
-	dynamic_cast<cassette_image_device *>(device)->output(state ? +1.0 : -1.0);
+	m_cassette->output(state ? +1.0 : -1.0);
 }
 
-READ_LINE_MEMBER(kc85_state::kc85_sid_r)
+READ_LINE_MEMBER( kc85_state::kc85_sid_r )
 {
-	device_t *device = machine().device(CASSETTE_TAG);
-	return dynamic_cast<cassette_image_device *>(device)->input() > 0.0;
+	return m_cassette->input() > 0.0;
 }
 
 static I8085_CONFIG( kc85_i8085_config )
@@ -1327,6 +1350,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
@@ -1364,6 +1388,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 
@@ -1407,6 +1432,7 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, kc85_8155_intf)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, kc85_upd1990a_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
@@ -1455,6 +1481,7 @@ static MACHINE_CONFIG_START( tandy200, tandy200_state )
 	MCFG_I8155_ADD(I8155_TAG, XTAL_4_9152MHz/2, tandy200_8155_intf)
 	MCFG_RP5C01_ADD(RP5C01A_TAG, XTAL_32_768kHz, tandy200_rtc_intf)
 	MCFG_I8251_ADD(I8251_TAG, /*XTAL_4_9152MHz/2,*/ tandy200_uart_intf)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 //  MCFG_MC14412_ADD(MC14412_TAG, XTAL_1MHz)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, kc85_cassette_interface)

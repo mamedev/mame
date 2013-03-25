@@ -14,6 +14,7 @@
 #include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
+#include "machine/serial.h"
 #include "machine/upd1990a.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
@@ -37,6 +38,7 @@
 #define HD44102_8_TAG   "m9"
 #define HD44102_9_TAG   "m10"
 #define CENTRONICS_TAG  "centronics"
+#define RS232_TAG		"rs232"
 
 //#define I8085_TAG     "m19"
 //#define I8155_TAG     "m12"
@@ -68,6 +70,7 @@ public:
 			m_speaker(*this, SPEAKER_TAG),
 			m_cassette(*this, CASSETTE_TAG),
 			m_ram(*this, RAM_TAG),
+			m_rs232(*this, RS232_TAG),
 			m_rom(*this, I8085_TAG),
 			m_option(*this, "option"),
 			m_y0(*this, "Y0"),
@@ -99,6 +102,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
 	required_memory_region m_option;
 	required_ioport m_y0;
@@ -191,6 +195,7 @@ public:
 			m_speaker(*this, SPEAKER_TAG),
 			m_cassette(*this, CASSETTE_TAG),
 			m_ram(*this, RAM_TAG),
+			m_rs232(*this, RS232_TAG),
 			m_rom(*this, I8085_TAG),
 			m_option(*this, "option"),
 			m_y0(*this, "Y0"),
@@ -211,6 +216,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<rs232_port_device> m_rs232;
 	required_memory_region m_rom;
 	required_memory_region m_option;
 	required_ioport m_y0;
