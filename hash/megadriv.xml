@@ -30252,8 +30252,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_svp" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6736A" />
+			<feature name="ic1" value="315-5750" />		<!-- SVP -->
+			<feature name="ic2" value="MPR-16389-H" />
+			<feature name="ic3" value="TC511664BJ-80" />
+			<feature name="ic4" value="HC04" />
+			<feature name="ic5" value="HC08" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16389.bin" size="2097152" crc="53a293b5" sha1="0ad38a3ab1cc99edac72184f8ae420e13df5cac6" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16389-h.ic2" size="2097152" crc="53a293b5" sha1="0ad38a3ab1cc99edac72184f8ae420e13df5cac6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
