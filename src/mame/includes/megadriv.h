@@ -385,9 +385,6 @@ public:
 	DECLARE_WRITE8_MEMBER (megatech_bios_port_7f_w);
 };
 
-
-UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum);
-
 class _32x_state : public md_base_state
 {
 public:
