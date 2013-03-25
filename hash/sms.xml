@@ -3919,6 +3919,18 @@
 		</part>
 	</software>
 
+	<software name="nemesis2">
+		<description>Nemesis 2 (Kor)</description>
+		<year>1987</year>
+		<publisher>Zemina</publisher>
+		<info name="alt_title" value="그라디우 2 ~ Gradius 2 (Box?)"/>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="nemesis 2 (kr).bin" size="131072" crc="0a77fa5e" sha1="4b0c286448bde49f9247a4f9a5add38d48021fd7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Alt. Title: I Ninja (Ita Box) -->
 	<software name="ninja">
 		<description>The Ninja (Euro, USA)</description>

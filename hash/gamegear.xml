@@ -6,7 +6,6 @@ The following games existed according to VGRebirth
   - NBA Jam T.E. (Jpn) by Acclaim
   - NFL Quarterback Club 95 (Jpn) by Acclaim
   - Robocop 3 (Jpn) by Acclaim
-  - Scratch Golf (USA) by Vic Tokai
   - Sonic Drift (Euro) by Sega
   - Super Golf (USA) by Sage's Creations
   - Terminator 2 - Judgement Day (Jpn) by Acclaim
@@ -1821,6 +1820,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="cutthroat island (usa, europe).bin" size="524288" crc="6a24e47e" sha1="95d2012c4027228fda50ef434b53ae5633a7eb8c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cutthrp" cloneof="cutthr">
+		<description>Cutthroat Island (Prototype 19950916)</description>
+		<year>1995</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="cutthroat island [proto].bin" size="524288" crc="6352ef00" sha1="b2d1fd7a1bbbac3d4f1cf9babd6ff85ed7962c1a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6294,6 +6304,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="scratchg">
+		<description>Scratch Golf (USA)</description>
+		<year>1994</year>
+		<publisher>Vic Tokai</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="scratch golf (us).bin" size="262144" crc="c10df4ce" sha1="263033b62101a4bca2a4311695cef8b7dfbbcc4b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scratchgj" cloneof="scratchg">
 		<description>Scratch Golf (Jpn)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
