@@ -63,11 +63,10 @@ WRITE8_MEMBER(md_base_state::megadriv_z80_z80_bank_w)
 
 READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 {
-	device_t *device = machine().device("ymsnd");
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		return ym2612_r(device, space, offset);
+		return ym2612_r(m_ymsnd, space, offset);
 	}
 	else
 	{
@@ -81,11 +80,10 @@ READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 
 WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 {
-	device_t *device = machine().device("ymsnd");
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		ym2612_w(device, space, offset, data);
+		ym2612_w(m_ymsnd, space, offset, data);
 	}
 	else
 	{
@@ -429,7 +427,7 @@ WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_6button)
 		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			m_io_stage[portnum]++;
-			m_io_timeout[portnum]->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+			m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192));
 		}
 
 	}
@@ -630,7 +628,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 	{
 		m_z80snd->reset();
 		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
-		machine().device("ymsnd")->reset();
+		m_ymsnd->reset();
 	}
 	else
 	{
@@ -838,22 +836,16 @@ MACHINE_CONFIG_END
 
 UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sega_genesis_vdp_device *vdp = machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
 
-		if (!vdp->m_use_alt_timing)
-		{
-			srcy = &vdp->m_render_bitmap->pix(y, 0);
-		}
+		if (!m_vdp->m_use_alt_timing)
+			srcy = &m_vdp->m_render_bitmap->pix(y, 0);
 		else
-		{
-			srcy = vdp->m_render_line;
-		}
+			srcy = m_vdp->m_render_line;
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

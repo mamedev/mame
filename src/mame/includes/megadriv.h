@@ -62,6 +62,7 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_z80snd(*this,"genesis_snd_z80"),
+		m_ymsnd(*this,"ymsnd"),
 		m_vdp(*this,"gen_vdp"),
 		m_32x(*this,"sega32x"),
 		m_segacd(*this,"segacd"),
@@ -70,6 +71,7 @@ public:
 	{ }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
+	optional_device<device_t> m_ymsnd;
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
