@@ -30,6 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
 #include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
 
@@ -560,7 +561,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device();
 
-	return ((floppy->idx_r()) << 1) | (m_fdc->get_drq() & 1);
+	return (floppy->mon_r() << 2) | (floppy->idx_r() << 1) | (m_fdc->get_drq() & 1);
 }
 
 WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
