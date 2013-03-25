@@ -2602,12 +2602,6 @@ void sega_genesis_vdp_device::genesis_render_scanline(running_machine &machine)
 	}
 }
 
-
-VIDEO_START(megadriv)
-{
-}
-
-
 void sega_genesis_vdp_device::vdp_handle_scanline_callback(running_machine &machine, int scanline)
 {
 /* Compensate for some rounding errors

@@ -1248,7 +1248,7 @@ static const ym3438_interface ym3438_intf =
 
 VIDEO_START_MEMBER(segac2_state,segac2_new)
 {
-	VIDEO_START_CALL_LEGACY(megadriv);
+	VIDEO_START_CALL_MEMBER(megadriv);
 }
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
@@ -1379,7 +1379,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_STATIC( megadriv )
+	MCFG_SCREEN_VBLANK_DRIVER(segac2_state, screen_eof_megadriv )
 
 	MCFG_PALETTE_LENGTH(2048*3)
 

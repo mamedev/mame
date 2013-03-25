@@ -428,7 +428,7 @@ DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 VIDEO_START_MEMBER(mtech_state,mtnew)
 {
 	init_for_megadrive(machine()); // create an sms vdp too, for compatibility mode
-	VIDEO_START_CALL_LEGACY(megadriv);
+	VIDEO_START_CALL_MEMBER(megadriv);
 }
 
 //attotime::never
@@ -436,7 +436,7 @@ UINT32 mtech_state::screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bit
 {
 	/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 	if (!m_current_game_is_sms)
-		SCREEN_UPDATE32_CALL(megadriv);
+		screen_update_megadriv(screen, bitmap, cliprect);
 	else
 		SCREEN_UPDATE32_CALL(megatech_md_sms);
 	return 0;
@@ -446,7 +446,7 @@ void mtech_state::screen_eof_mtnew(screen_device &screen, bool state)
 {
 	bool vblank_on = state;
 	if (!m_current_game_is_sms)
-		SCREEN_VBLANK_CALL(megadriv);
+		screen_eof_megadriv(screen, state);
 	else
 		SCREEN_VBLANK_CALL(megatech_md_sms);
 }
@@ -455,7 +455,7 @@ MACHINE_RESET_MEMBER(mtech_state,mtnew)
 {
 	m_mt_bank_addr = 0;
 
-	MACHINE_RESET_CALL_LEGACY(megadriv);
+	MACHINE_RESET_CALL_MEMBER(megadriv);
 	MACHINE_RESET_CALL_LEGACY(megatech_md_sms);
 	megatech_select_game(0);
 }

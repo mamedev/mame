@@ -836,9 +836,9 @@ MACHINE_CONFIG_END
 
 
 
-SCREEN_UPDATE_RGB32(megadriv)
+UINT32 md_base_state::screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	sega_genesis_vdp_device *vdp = screen.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
+	sega_genesis_vdp_device *vdp = machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
 
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -869,51 +869,51 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 /*****************************************************************************************/
 
-
-MACHINE_START( megadriv )
+VIDEO_START_MEMBER(md_base_state,megadriv)
 {
-	md_base_state *state = machine.driver_data<md_base_state>();
-	if (state->m_megadrive_6buttons_pad)
-		state->init_megadri6_io();
 }
 
-MACHINE_RESET( megadriv )
+MACHINE_START_MEMBER(md_base_state,megadriv)
 {
-	md_base_state *state = machine.driver_data<md_base_state>();
+	if (m_megadrive_6buttons_pad)
+		init_megadri6_io();
+}
 
+MACHINE_RESET_MEMBER(md_base_state,megadriv)
+{
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	if (state->m_z80snd)
+	if (m_z80snd)
 	{
-		state->m_genz80.z80_is_reset = 1;
-		state->m_genz80.z80_has_bus = 1;
-		state->m_genz80.z80_bank_addr = 0;
-		state->m_vdp->set_scanline_counter(-1);
-		machine.scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),state));
+		m_genz80.z80_is_reset = 1;
+		m_genz80.z80_has_bus = 1;
+		m_genz80.z80_bank_addr = 0;
+		m_vdp->set_scanline_counter(-1);
+		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
 	}
 
-	state->megadrive_reset_io();
+	megadrive_reset_io();
 
-	if (!state->m_vdp->m_use_alt_timing)
+	if (!m_vdp->m_use_alt_timing)
 	{
-		megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+		megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 		megadriv_scanline_timer->adjust(attotime::zero);
 	}
 
-	if (state->m_other_hacks)
+	if (m_other_hacks)
 	{
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-		if (state->m_megadrive_ram)
-			memset(state->m_megadrive_ram,0x00,0x10000);
+		if (m_megadrive_ram)
+			memset(m_megadrive_ram,0x00,0x10000);
 	}
 
-	megadriv_reset_vdp(machine);
+	megadriv_reset_vdp(machine());
 
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
-	if (state->m_32x)
-		state->m_32x->pause_cpu();
+	if (m_32x)
+		m_32x->pause_cpu();
 }
 
 void md_base_state::megadriv_stop_scanline_timer()
@@ -1018,8 +1018,8 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START(megadriv)
-	MCFG_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
@@ -1036,14 +1036,14 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
 	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1071,8 +1071,8 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MCFG_MACHINE_START(megadriv)
-	MCFG_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START_OVERRIDE(md_base_state,megadriv)
+	MCFG_MACHINE_RESET_OVERRIDE(md_base_state,megadriv)
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
@@ -1087,12 +1087,12 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
 	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
-	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
+	MCFG_SCREEN_UPDATE_DRIVER(md_base_state,screen_update_megadriv) /* Copies a bitmap */
+	MCFG_SCREEN_VBLANK_DRIVER(md_base_state,screen_eof_megadriv) /* Used to Sync the timing */
 
 	MCFG_PALETTE_LENGTH(0x200)
 
-	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_START_OVERRIDE(md_base_state,megadriv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1341,19 +1341,17 @@ void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
 
 
 
-SCREEN_VBLANK(megadriv)
+void md_base_state::screen_eof_megadriv(screen_device &screen, bool state)
 {
-	md_base_state *state = screen.machine().driver_data<md_base_state>();
-
 	if (screen.ioport(":RESET")->read_safe(0x00) & 0x01)
-		state->m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge
-	if (vblank_on)
+	if (state)
 	{
-		if (!state->m_vdp->m_use_alt_timing)
+		if (!m_vdp->m_use_alt_timing)
 		{
-			state->m_vdp->vdp_handle_eof(screen.machine());
+			m_vdp->vdp_handle_eof(machine());
 			megadriv_scanline_timer->adjust(attotime::zero);
 		}
 	}

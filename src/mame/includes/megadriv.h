@@ -39,18 +39,6 @@ MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
-MACHINE_START( megadriv );
-MACHINE_RESET( megadriv );
-VIDEO_START( megadriv );
-SCREEN_UPDATE_RGB32( megadriv );
-SCREEN_VBLANK( megadriv );
-
-
-
-
-
-extern int m_megadrive_6buttons_pad;
-
 /* Megaplay - Megatech specific */
 /* It might be possible to move the following structs in the drivers */
 
@@ -156,6 +144,13 @@ public:
 	void megadrive_io_write_sctrl_port(int portnum, UINT16 data);	
 	
 	void megadriv_stop_scanline_timer();	
+	
+	DECLARE_MACHINE_START( megadriv );
+	DECLARE_MACHINE_RESET( megadriv );
+	DECLARE_VIDEO_START( megadriv );
+	UINT32 screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_eof_megadriv(screen_device &screen, bool state);
+	
 };
 
 class md_boot_state : public md_base_state
@@ -477,7 +472,5 @@ extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
 extern UINT16* megadrive_vdp_palette_lookup;
-
-/* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
 extern timer_device* megadriv_scanline_timer;

@@ -600,14 +600,14 @@ ADDRESS_MAP_END
 VIDEO_START_MEMBER(mplay_state,megplay)
 {
 	//printf("megplay vs\n");
-	VIDEO_START_CALL_LEGACY(megadriv);
+	VIDEO_START_CALL_MEMBER(megadriv);
 //  VIDEO_START_CALL_MEMBER(megaplay_normal);
 }
 
 UINT32 mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//printf("megplay vu\n");
-	SCREEN_UPDATE32_CALL(megadriv);
+	screen_update_megadriv(screen,bitmap,cliprect);
 //  SCREEN_UPDATE32_CALL(megaplay_normal);
 	SCREEN_UPDATE32_CALL(megaplay_bios);
 	return 0;
@@ -620,14 +620,14 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	m_bios_mode = MP_ROM;
 	m_mp_bios_bank_addr = 0;
 	m_readpos = 1;
-	MACHINE_RESET_CALL_LEGACY(megadriv);
+	MACHINE_RESET_CALL_MEMBER(megadriv);
 	MACHINE_RESET_CALL_LEGACY(megatech_bios);
 }
 
 void mplay_state::screen_eof_megaplay(screen_device &screen, bool state)
 {
 	bool vblank_on = state;
-	SCREEN_VBLANK_CALL(megadriv);
+	screen_eof_megadriv(screen,state);
 	SCREEN_VBLANK_CALL(megatech_bios);
 }
 
