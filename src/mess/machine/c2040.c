@@ -11,6 +11,8 @@
 
     TODO:
 
+	- 2040/3040/4040 have a Shugart SA390 drive (FLOPPY_525_SSSD_35T)
+
     - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
 
         FE70: jsr  $104D
