@@ -39,17 +39,6 @@ MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
-extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
-extern void megadriv_stop_scanline_timer(running_machine &machine);
-
-
-/* These are needed to create external input handlers (see e.g. MESS) */
-/* Regs are also used by Megaplay! */
-extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine &machine, int offset);
-extern void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, UINT16 data);
-extern UINT8 m_megadrive_io_data_regs[3];
-extern UINT8 m_megadrive_io_ctrl_regs[3];
-
 MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
@@ -88,7 +77,8 @@ public:
 		m_vdp(*this,"gen_vdp"),
 		m_32x(*this,"sega32x"),
 		m_segacd(*this,"segacd"),
-		m_megadrive_ram(*this,"megadrive_ram")
+		m_megadrive_ram(*this,"megadrive_ram"),
+		m_megadrive_6buttons_pad(0)
 	{ }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
@@ -135,6 +125,37 @@ public:
 	DECLARE_READ8_MEMBER( z80_unmapped_r );
 	DECLARE_WRITE8_MEMBER( z80_unmapped_w );	
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
+	
+	/* Megadrive / Genesis has 3 I/O ports */
+	emu_timer *m_io_timeout[3];
+	int m_io_stage[3];
+	UINT8 m_megadrive_io_data_regs[3];
+	UINT8 m_megadrive_io_ctrl_regs[3];
+	UINT8 m_megadrive_io_tx_regs[3];
+	int m_megadrive_6buttons_pad;
+	read8_delegate m_megadrive_io_read_data_port_ptr;
+	write16_delegate m_megadrive_io_write_data_port_ptr;
+	
+
+	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
+	void init_megadri6_io();
+	void megadrive_reset_io();
+	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
+	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
+	UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl);
+	UINT8 megadrive_io_read_ctrl_port(int portnum);
+	UINT8 megadrive_io_read_tx_port(int portnum);
+	UINT8 megadrive_io_read_rx_port(int portnum);
+	UINT8 megadrive_io_read_sctrl_port(int portnum);
+
+	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_3button);
+	DECLARE_WRITE16_MEMBER(megadrive_io_write_data_port_6button);
+	void megadrive_io_write_ctrl_port(int portnum, UINT16 data);
+	void megadrive_io_write_tx_port(int portnum, UINT16 data);
+	void megadrive_io_write_rx_port(int portnum, UINT16 data);
+	void megadrive_io_write_sctrl_port(int portnum, UINT16 data);	
+	
+	void megadriv_stop_scanline_timer();	
 };
 
 class md_boot_state : public md_base_state
@@ -285,12 +306,28 @@ public:
 	DECLARE_DRIVER_INIT(pclubjv2);
 	DECLARE_DRIVER_INIT(pclubjv4);
 	DECLARE_DRIVER_INIT(pclubjv5);
-	void segac2_common_init(running_machine& machine, int (*func)(int in));
+	void segac2_common_init(int (*func)(int in));
 	DECLARE_VIDEO_START(segac2_new);
 	DECLARE_MACHINE_START(segac2);
 	DECLARE_MACHINE_RESET(segac2);
 
 	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int m_segac2_bg_pal_lookup[4];
+	int m_segac2_sp_pal_lookup[4];
+	void recompute_palette_tables();	
+	
+	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
+	DECLARE_READ16_MEMBER( palette_r );
+	DECLARE_WRITE16_MEMBER( palette_w );
+	DECLARE_READ16_MEMBER( io_chip_r );
+	DECLARE_WRITE16_MEMBER( io_chip_w );
+	DECLARE_WRITE16_MEMBER( control_w );
+	DECLARE_READ16_MEMBER( prot_r );
+	DECLARE_WRITE16_MEMBER( prot_w );
+	DECLARE_WRITE16_MEMBER( counter_timer_w );
+	DECLARE_READ16_MEMBER( printer_r );
+	DECLARE_WRITE16_MEMBER( print_club_camera_w );	
+	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
 };
 
 class mplay_state : public md_base_state
@@ -395,6 +432,23 @@ public:
 	UINT32 screen_update_megatech_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	
 	void megatech_set_megadrive_z80_as_megadrive_z80(const char* tag);
+	
+	DECLARE_READ8_MEMBER( megatech_cart_select_r );
+	TIMER_CALLBACK_MEMBER( megatech_z80_run_state );
+	TIMER_CALLBACK_MEMBER( megatech_z80_stop_state );
+	void megatech_select_game(int gameno);
+	DECLARE_WRITE8_MEMBER( megatech_cart_select_w );
+	DECLARE_READ8_MEMBER( bios_ctrl_r );
+	DECLARE_WRITE8_MEMBER( bios_ctrl_w );
+	DECLARE_READ8_MEMBER( megatech_z80_read_68k_banked_data );
+	DECLARE_WRITE8_MEMBER( megatech_z80_write_68k_banked_data );
+	void megatech_z80_bank_w(UINT16 data);
+	DECLARE_WRITE8_MEMBER( mt_z80_bank_w );
+	DECLARE_READ8_MEMBER( megatech_banked_ram_r );
+	DECLARE_WRITE8_MEMBER( megatech_banked_ram_w );
+	DECLARE_WRITE8_MEMBER( megatech_bios_port_ctrl_w );
+	DECLARE_READ8_MEMBER( megatech_bios_joypad_r );
+	DECLARE_WRITE8_MEMBER (megatech_bios_port_7f_w);
 };
 
 

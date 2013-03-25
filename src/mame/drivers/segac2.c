@@ -88,11 +88,6 @@
 #define LOG_PALETTE         0
 #define LOG_IOCHIP          0
 
-int segac2_bg_pal_lookup[4];
-int segac2_sp_pal_lookup[4];
-
-static void recompute_palette_tables( running_machine &machine );
-
 /******************************************************************************
     Machine init
 *******************************************************************************
@@ -114,15 +109,15 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 {
 //  megadriv_scanline_timer = machine().device<timer_device>("md_scan_timer");
 //  megadriv_scanline_timer->adjust(attotime::zero);
-	segac2_bg_pal_lookup[0] = 0x00;
-	segac2_bg_pal_lookup[1] = 0x10;
-	segac2_bg_pal_lookup[2] = 0x20;
-	segac2_bg_pal_lookup[3] = 0x30;
+	m_segac2_bg_pal_lookup[0] = 0x00;
+	m_segac2_bg_pal_lookup[1] = 0x10;
+	m_segac2_bg_pal_lookup[2] = 0x20;
+	m_segac2_bg_pal_lookup[3] = 0x30;
 
-	segac2_sp_pal_lookup[0] = 0x00;
-	segac2_sp_pal_lookup[1] = 0x10;
-	segac2_sp_pal_lookup[2] = 0x20;
-	segac2_sp_pal_lookup[3] = 0x30;
+	m_segac2_sp_pal_lookup[0] = 0x00;
+	m_segac2_sp_pal_lookup[1] = 0x10;
+	m_segac2_sp_pal_lookup[2] = 0x20;
+	m_segac2_sp_pal_lookup[3] = 0x30;
 
 	megadriv_reset_vdp(machine());
 
@@ -140,7 +135,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 	m_bg_palbase = 0;
 	m_sp_palbase = 0;
 
-	recompute_palette_tables(machine());
+	recompute_palette_tables();
 
 }
 
@@ -159,20 +154,19 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 ******************************************************************************/
 
 /* handle writes to the UPD7759 */
-static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
+WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
-
+	device_t *upd = machine().device("upd");
 	/* make sure we have a UPD chip */
-	if (!state->m_sound_banks)
+	if (!m_sound_banks)
 		return;
 
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(device, space, 0, data & 0xff);
-		upd7759_start_w(device, 0);
-		upd7759_start_w(device, 1);
+		upd7759_port_w(upd, space, 0, data & 0xff);
+		upd7759_start_w(upd, 0);
+		upd7759_start_w(upd, 1);
 	}
 }
 
@@ -195,32 +189,30 @@ static WRITE16_DEVICE_HANDLER( segac2_upd7759_w )
 ******************************************************************************/
 
 /* handle reads from the paletteram */
-static READ16_HANDLER( palette_r )
+READ16_MEMBER(segac2_state::palette_r )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	offset &= 0x1ff;
-	if (state->m_segac2_alt_palette_mode)
+	if (m_segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
 
-	return state->m_paletteram[offset + state->m_palbank * 0x200];
+	return m_paletteram[offset + m_palbank * 0x200];
 }
 
 /* handle writes to the paletteram */
-static WRITE16_HANDLER( palette_w )
+WRITE16_MEMBER(segac2_state::palette_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	int r, g, b, newword;
 	int tmpr, tmpg, tmpb;
 
 	/* adjust for the palette bank */
 	offset &= 0x1ff;
-	if (state->m_segac2_alt_palette_mode)
+	if (m_segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
-	offset += state->m_palbank * 0x200;
+	offset += m_palbank * 0x200;
 
 	/* combine data */
-	COMBINE_DATA(&state->m_paletteram[offset]);
-	newword = state->m_paletteram[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	newword = m_paletteram[offset];
 
 	/* up to 8 bits */
 	r = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01);
@@ -276,25 +268,24 @@ static WRITE16_HANDLER( palette_w )
 
 ******************************************************************************/
 
-static void recompute_palette_tables( running_machine &machine )
+void segac2_state::recompute_palette_tables()
 {
-	segac2_state *state = machine.driver_data<segac2_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		int bgpal = 0x000 + state->m_bg_palbase * 0x40 + i * 0x10;
-		int sppal = 0x100 + state->m_sp_palbase * 0x40 + i * 0x10;
+		int bgpal = 0x000 + m_bg_palbase * 0x40 + i * 0x10;
+		int sppal = 0x100 + m_sp_palbase * 0x40 + i * 0x10;
 
-		if (!state->m_segac2_alt_palette_mode)
+		if (!m_segac2_alt_palette_mode)
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * state->m_palbank + bgpal;
-			segac2_sp_pal_lookup[i] = 0x200 * state->m_palbank + sppal;
+			m_segac2_bg_pal_lookup[i] = 0x200 * m_palbank + bgpal;
+			m_segac2_sp_pal_lookup[i] = 0x200 * m_palbank + sppal;
 		}
 		else
 		{
-			segac2_bg_pal_lookup[i] = 0x200 * state->m_palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
-			segac2_sp_pal_lookup[i] = 0x200 * state->m_palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
+			m_segac2_bg_pal_lookup[i] = 0x200 * m_palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
+			m_segac2_sp_pal_lookup[i] = 0x200 * m_palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
 
@@ -313,9 +304,8 @@ static void recompute_palette_tables( running_machine &machine )
 
 ******************************************************************************/
 
-static READ16_HANDLER( io_chip_r )
+READ16_MEMBER(segac2_state::io_chip_r )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
@@ -331,11 +321,11 @@ static READ16_HANDLER( io_chip_r )
 		case 0x0c/2:
 		case 0x0e/2:
 			/* if the port is configured as an output, return the last thing written */
-			if (state->m_misc_io_data[0x1e/2] & (1 << offset))
-				return state->m_misc_io_data[offset];
+			if (m_misc_io_data[0x1e/2] & (1 << offset))
+				return m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			if (offset == 0x04/2 && state->m_sound_banks)
+			if (offset == 0x04/2 && m_sound_banks)
 				return (space.machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(space.machine().device("upd")) << 6);
 			return space.machine().root_device().ioport(portnames[offset])->read();
 
@@ -352,27 +342,26 @@ static READ16_HANDLER( io_chip_r )
 		/* CNT register & mirror */
 		case 0x18/2:
 		case 0x1c/2:
-			return state->m_misc_io_data[0x1c/2];
+			return m_misc_io_data[0x1c/2];
 
 		/* port direction register & mirror */
 		case 0x1a/2:
 		case 0x1e/2:
-			return state->m_misc_io_data[0x1e/2];
+			return m_misc_io_data[0x1e/2];
 	}
 	return 0xffff;
 }
 
 
-static WRITE16_HANDLER( io_chip_w )
+WRITE16_MEMBER(segac2_state::io_chip_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	UINT8 newbank;
 //  UINT8 old;
 
 	/* generic implementation */
 	offset &= 0x1f/2;
-//  old = state->m_misc_io_data[offset];
-	state->m_misc_io_data[offset] = data;
+//  old = m_misc_io_data[offset];
+	m_misc_io_data[offset] = data;
 
 	switch (offset)
 	{
@@ -416,23 +405,23 @@ static WRITE16_HANDLER( io_chip_w )
 			 D0 : To A9 of color RAM
 			*/
 			newbank = data & 3;
-			if (newbank != state->m_palbank)
+			if (newbank != m_palbank)
 			{
 				//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
-				state->m_palbank = newbank;
-				recompute_palette_tables(space.machine());
+				m_palbank = newbank;
+				recompute_palette_tables();
 			}
-			if (state->m_sound_banks > 1)
+			if (m_sound_banks > 1)
 			{
 				device_t *upd = space.machine().device("upd");
-				newbank = (data >> 2) & (state->m_sound_banks - 1);
+				newbank = (data >> 2) & (m_sound_banks - 1);
 				upd7759_set_bank_base(upd, newbank * 0x20000);
 			}
 			break;
 
 		/* CNT register */
 		case 0x1c/2:
-			if (state->m_sound_banks > 1)
+			if (m_sound_banks > 1)
 			{
 				device_t *upd = space.machine().device("upd");
 				upd7759_reset_w(upd, (data >> 1) & 1);
@@ -452,9 +441,8 @@ static WRITE16_HANDLER( io_chip_w )
 
 ******************************************************************************/
 
-static WRITE16_HANDLER( control_w )
+WRITE16_MEMBER(segac2_state::control_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	/* skip if not LSB */
 	if (!ACCESSING_BITS_0_7)
 		return;
@@ -462,15 +450,15 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 0 controls display enable */
 	//segac2_enable_display(space.machine(), ~data & 1);
-	state->m_segac2_enable_display = ~data & 1;
+	m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))
-		state->m_prot_write_buf = state->m_prot_read_buf = 0;
+		m_prot_write_buf = m_prot_read_buf = 0;
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
-	state->m_segac2_alt_palette_mode = ((~data & 4) >> 2);
-	recompute_palette_tables(space.machine());
+	m_segac2_alt_palette_mode = ((~data & 4) >> 2);
+	recompute_palette_tables();
 }
 
 
@@ -488,18 +476,16 @@ static WRITE16_HANDLER( control_w )
 ******************************************************************************/
 
 /* protection chip reads */
-static READ16_HANDLER( prot_r )
+READ16_MEMBER(segac2_state::prot_r )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), state->m_prot_func ? state->m_prot_read_buf : 0xff);
-	return state->m_prot_read_buf | 0xf0;
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_func ? m_prot_read_buf : 0xff);
+	return m_prot_read_buf | 0xf0;
 }
 
 
 /* protection chip writes */
-static WRITE16_HANDLER( prot_w )
+WRITE16_MEMBER(segac2_state::prot_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
 	int new_sp_palbase = (data >> 2) & 3;
 	int new_bg_palbase = data & 3;
 	int table_index;
@@ -509,24 +495,24 @@ static WRITE16_HANDLER( prot_w )
 		return;
 
 	/* compute the table index */
-	table_index = (state->m_prot_write_buf << 4) | state->m_prot_read_buf;
+	table_index = (m_prot_write_buf << 4) | m_prot_read_buf;
 
 	/* keep track of the last write for the next table lookup */
-	state->m_prot_write_buf = data & 0x0f;
+	m_prot_write_buf = data & 0x0f;
 
 	/* determine the value to return, should a read occur */
-	if (state->m_prot_func)
-		state->m_prot_read_buf = state->m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, state->m_prot_read_buf);
+	if (m_prot_func)
+		m_prot_read_buf = m_prot_func(table_index);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
-	if (new_sp_palbase != state->m_sp_palbase || new_bg_palbase != state->m_bg_palbase)
+	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
 	{
 		//space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 1);
-		state->m_sp_palbase = new_sp_palbase;
-		state->m_bg_palbase = new_bg_palbase;
-		recompute_palette_tables(space.machine());
-		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", state->m_bg_palbase, state->m_sp_palbase, space.machine().primary_screen->vpos());
+		m_sp_palbase = new_sp_palbase;
+		m_bg_palbase = new_bg_palbase;
+		recompute_palette_tables();
+		if (LOG_PALETTE) logerror("Set palbank: %d/%d (scan=%d)\n", m_bg_palbase, m_sp_palbase, space.machine().primary_screen->vpos());
 	}
 }
 
@@ -542,7 +528,7 @@ static WRITE16_HANDLER( prot_w )
 
 ******************************************************************************/
 
-static WRITE16_HANDLER( counter_timer_w )
+WRITE16_MEMBER(segac2_state::counter_timer_w )
 {
 	/* only LSB matters */
 	if (ACCESSING_BITS_0_7)
@@ -590,16 +576,14 @@ static WRITE16_HANDLER( counter_timer_w )
 
 ******************************************************************************/
 
-static READ16_HANDLER( printer_r )
+READ16_MEMBER(segac2_state::printer_r )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
-	return state->m_cam_data;
+	return m_cam_data;
 }
 
-static WRITE16_HANDLER( print_club_camera_w )
+WRITE16_MEMBER(segac2_state::print_club_camera_w )
 {
-	segac2_state *state = space.machine().driver_data<segac2_state>();
-	state->m_cam_data = data;
+	m_cam_data = data;
 }
 
 
@@ -615,12 +599,12 @@ static WRITE16_HANDLER( print_club_camera_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segac2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE_LEGACY(prot_r, prot_w)
-	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE_LEGACY(control_w)
-	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE_LEGACY(io_chip_r, io_chip_w)
+	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE(prot_r, prot_w)
+	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE(control_w)
+	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
 	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3438_r, ym3438_w, 0x00ff)
-	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE_LEGACY(counter_timer_w)
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE_LEGACY(palette_r, palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -1294,33 +1278,33 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 			switch (src & 0x1c0)
 			{
 				case 0x000:
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
 					break;
 				case 0x040:
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4]];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4]];
 					break;
 				case 0x080:
-					desty[x] = paldata[(src&0x0f) | segac2_sp_pal_lookup[(src & 0x30)>>4]];
+					desty[x] = paldata[(src&0x0f) | m_segac2_sp_pal_lookup[(src & 0x30)>>4]];
 					break;
 				case 0x0c0:
 					// bg pen
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
 					break;
 				case 0x100:
 					// shadow
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x800];
 					break;
 				case 0x140:
 					// normal
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4]];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4]];
 					break;
 				case 0x180:
 					// sprite
-					desty[x] = paldata[(src&0x0f) | segac2_sp_pal_lookup[(src & 0x30)>>4]];
+					desty[x] = paldata[(src&0x0f) | m_segac2_sp_pal_lookup[(src & 0x30)>>4]];
 					break;
 				case 0x1c0:
 					// highlight
-					desty[x] = paldata[(src&0x0f) | segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
+					desty[x] = paldata[(src&0x0f) | m_segac2_bg_pal_lookup[(src & 0x30)>>4] | 0x1000];
 					break;
 			}
 		}
@@ -1850,17 +1834,15 @@ it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-void segac2_state::segac2_common_init(running_machine& machine, int (*func)(int in))
+void segac2_state::segac2_common_init(int (*func)(int in))
 {
-	segac2_state *state = machine.driver_data<segac2_state>();
-	device_t *upd = machine.device("upd");
-
 	DRIVER_INIT_CALL(megadriv_c2);
+	device_t *upd = machine().device("upd");
 
-	state->m_prot_func = func;
+	m_prot_func = func;
 
 	if (upd != NULL)
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(*upd, 0x880000, 0x880001, 0, 0x13fefe, FUNC(segac2_upd7759_w));
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 
 
@@ -2090,153 +2072,153 @@ static int prot_func_pclubjv5(int in)
 
 DRIVER_INIT_MEMBER(segac2_state,c2boot)
 {
-	segac2_common_init(machine(), NULL);
+	segac2_common_init(NULL);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,bloxeedc)
 {
-	segac2_common_init(machine(), NULL);
+	segac2_common_init(NULL);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,columns)
 {
-	segac2_common_init(machine(), prot_func_columns);
+	segac2_common_init(prot_func_columns);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,columns2)
 {
-	segac2_common_init(machine(), prot_func_columns2);
+	segac2_common_init(prot_func_columns2);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,tfrceac)
 {
-	segac2_common_init(machine(), prot_func_tfrceac);
+	segac2_common_init(prot_func_tfrceac);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
 {
 	/* disable the palette bank switching from the protection chip */
-	segac2_common_init(machine(), NULL);
+	segac2_common_init(NULL);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x800000, 0x800001);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,borench)
 {
-	segac2_common_init(machine(), prot_func_borench);
+	segac2_common_init(prot_func_borench);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,twinsqua)
 {
-	segac2_common_init(machine(), prot_func_twinsqua);
+	segac2_common_init(prot_func_twinsqua);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,ribbit)
 {
-	segac2_common_init(machine(), prot_func_ribbit);
+	segac2_common_init(prot_func_ribbit);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,puyo)
 {
-	segac2_common_init(machine(), prot_func_puyo);
+	segac2_common_init(prot_func_puyo);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,tantr)
 {
-	segac2_common_init(machine(), prot_func_tantr);
+	segac2_common_init(prot_func_tantr);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,tantrkor)
 {
-	segac2_common_init(machine(), prot_func_tantrkor);
+	segac2_common_init(prot_func_tantrkor);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,potopoto)
 {
-	segac2_common_init(machine(), prot_func_potopoto);
+	segac2_common_init(prot_func_potopoto);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,stkclmns)
 {
-	segac2_common_init(machine(), prot_func_stkclmns);
+	segac2_common_init(prot_func_stkclmns);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,stkclmnj)
 {
-	segac2_common_init(machine(), prot_func_stkclmnj);
+	segac2_common_init(prot_func_stkclmnj);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,ichir)
 {
-	segac2_common_init(machine(), prot_func_ichir);
+	segac2_common_init(prot_func_ichir);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,ichirk)
 {
-	segac2_common_init(machine(), prot_func_ichirk);
+	segac2_common_init(prot_func_ichirk);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,ichirj)
 {
-	segac2_common_init(machine(), prot_func_ichirj);
+	segac2_common_init(prot_func_ichirj);
 }
 
-static READ16_HANDLER( ichirjbl_prot_r )
+READ16_MEMBER(segac2_state::ichirjbl_prot_r )
 {
 	return 0x00f5;
 }
 
 DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
 {
-	segac2_common_init(machine(), NULL);
+	segac2_common_init(NULL);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x840108, 0x840109, FUNC(ichirjbl_prot_r) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(FUNC(segac2_state::ichirjbl_prot_r),this) );
 }
 
 DRIVER_INIT_MEMBER(segac2_state,puyopuy2)
 {
-	segac2_common_init(machine(), prot_func_puyopuy2);
+	segac2_common_init(prot_func_puyopuy2);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,zunkyou)
 {
-	segac2_common_init(machine(), prot_func_zunkyou);
+	segac2_common_init(prot_func_zunkyou);
 }
 
 
 DRIVER_INIT_MEMBER(segac2_state,pclub)
 {
-	segac2_common_init(machine(), prot_func_pclub);
+	segac2_common_init(prot_func_pclub);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
-	segac2_common_init(machine(), prot_func_pclubjv2);
+	segac2_common_init(prot_func_pclubjv2);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
-	segac2_common_init(machine(), prot_func_pclubjv4);
+	segac2_common_init(prot_func_pclubjv4);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
-	segac2_common_init(machine(), prot_func_pclubjv5);
+	segac2_common_init(prot_func_pclubjv5);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880120, 0x880121, FUNC(printer_r) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x880124, 0x880125, FUNC(printer_r) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x880124, 0x880125, FUNC(print_club_camera_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 

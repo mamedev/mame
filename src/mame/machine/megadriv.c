@@ -93,28 +93,20 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 	}
 }
 
-/* Megadrive / Genesis has 3 I/O ports */
-static emu_timer *m_io_timeout[3];
-static int m_io_stage[3];
-
-static TIMER_CALLBACK( io_timeout_timer_callback )
+TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
 {
 	m_io_stage[(int)(FPTR)ptr] = -1;
 }
 
-static void init_megadri6_io(running_machine &machine)
+void md_base_state::init_megadri6_io()
 {
 	int i;
 
 	for (i=0; i<3; i++)
 	{
-		m_io_timeout[i] = machine.scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
 	}
 }
-
-/* pointers to our io data read/write functions */
-UINT8 (*megadrive_io_read_data_port_ptr)(running_machine &machine, int offset);
-void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, UINT16 data);
 
 /*
 
@@ -201,12 +193,7 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
 INPUT_PORTS_END
 
-UINT8 m_megadrive_io_data_regs[3];
-UINT8 m_megadrive_io_ctrl_regs[3];
-static UINT8 m_megadrive_io_tx_regs[3];
-int m_megadrive_6buttons_pad = 0;
-
-static void megadrive_reset_io(running_machine &machine)
+void md_base_state::megadrive_reset_io()
 {
 	int i;
 
@@ -227,8 +214,9 @@ static void megadrive_reset_io(running_machine &machine)
 }
 
 /************* 6 buttons version **************************/
-static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int portnum)
+READ8_MEMBER(md_base_state::megadrive_io_read_data_port_6button)
 {
+	int portnum = offset;
 	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 	static const char *const pad6names[] = { "EXTRA1", "EXTRA2", "IN0", "UNK" };
@@ -239,14 +227,14 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read B, C & the additional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x30) |
-							(machine.root_device().ioport(pad6names[portnum])->read_safe(0) & 0x0f)) & ~helper);
+						(((ioport(pad3names[portnum])->read_safe(0) & 0x30) |
+							(ioport(pad6names[portnum])->read_safe(0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) & ~helper);
+						((ioport(pad3names[portnum])->read_safe(0) & 0x3f) & ~helper);
 		}
 	}
 	else
@@ -255,20 +243,20 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) & ~helper);
+						(((ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (m_io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
+						((((ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
-							(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03)) & ~helper);
+						((((ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+							(ioport(pad3names[portnum])->read_safe(0) & 0x03)) & ~helper);
 		}
 	}
 
@@ -279,8 +267,9 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 
 
 /************* 3 buttons version **************************/
-UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
+READ8_MEMBER(md_base_state::megadrive_io_read_data_port_3button)
 {
+	int portnum = offset;
 	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
@@ -288,39 +277,39 @@ UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
 	{
 		/* here we read B, C & the directional buttons */
 		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper);
+					(((ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
 		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
-					((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
-						(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper);
+					((((ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+						(ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper);
 	}
 
 	return retdata;
 }
 
 /* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
-UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
+UINT8 md_base_state::megatech_bios_port_cc_dc_r(int offset, int ctrl)
 {
 	UINT8 retdata;
 
 	if (ctrl == 0x55)
 	{
 			/* A keys */
-			retdata = ((machine.root_device().ioport("PAD1")->read() & 0x40) >> 2) |
-				((machine.root_device().ioport("PAD2")->read() & 0x40) >> 4) | 0xeb;
+			retdata = ((ioport("PAD1")->read() & 0x40) >> 2) |
+				((ioport("PAD2")->read() & 0x40) >> 4) | 0xeb;
 	}
 	else
 	{
 		if (offset == 0)
 		{
-			retdata = (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
+			retdata = (ioport("PAD1")->read() & 0x3f) | ((ioport("PAD2")->read() & 0x03) << 6);
 		}
 		else
 		{
-			retdata = ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0xf0;
+			retdata = ((ioport("PAD2")->read() & 0x3c) >> 2) | 0xf0;
 		}
 
 	}
@@ -328,7 +317,7 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
 	return retdata;
 }
 
-static UINT8 megadrive_io_read_ctrl_port(int portnum)
+UINT8 md_base_state::megadrive_io_read_ctrl_port(int portnum)
 {
 	UINT8 retdata;
 	retdata = m_megadrive_io_ctrl_regs[portnum];
@@ -337,19 +326,19 @@ static UINT8 megadrive_io_read_ctrl_port(int portnum)
 	return retdata | (retdata << 8);
 }
 
-static UINT8 megadrive_io_read_tx_port(int portnum)
+UINT8 md_base_state::megadrive_io_read_tx_port(int portnum)
 {
 	UINT8 retdata;
 	retdata = m_megadrive_io_tx_regs[portnum];
 	return retdata | (retdata << 8);
 }
 
-static UINT8 megadrive_io_read_rx_port(int portnum)
+UINT8 md_base_state::megadrive_io_read_rx_port(int portnum)
 {
 	return 0x00;
 }
 
-static UINT8 megadrive_io_read_sctrl_port(int portnum)
+UINT8 md_base_state::megadrive_io_read_sctrl_port(int portnum)
 {
 	return 0x00;
 }
@@ -392,7 +381,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 		case 0x2:
 		case 0x3:
 //          retdata = megadrive_io_read_data_port(offset-1);
-			retdata = megadrive_io_read_data_port_ptr(space.machine(), offset-1);
+			retdata = m_megadrive_io_read_data_port_ptr(space, offset-1, 0xff);
 			break;
 
 		case 0x4:
@@ -421,8 +410,9 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 }
 
 
-static void megadrive_io_write_data_port_3button(running_machine &machine, int portnum, UINT16 data)
+WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_3button)
 {
+	int portnum = offset;
 	m_megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 
@@ -431,14 +421,15 @@ static void megadrive_io_write_data_port_3button(running_machine &machine, int p
 
 /****************************** 6 buttons version*****************************/
 
-static void megadrive_io_write_data_port_6button(running_machine &machine, int portnum, UINT16 data)
+WRITE16_MEMBER(md_base_state::megadrive_io_write_data_port_6button)
 {
+	int portnum = offset;
 	if (m_megadrive_io_ctrl_regs[portnum]&0x40)
 	{
 		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			m_io_stage[portnum]++;
-			m_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+			m_io_timeout[portnum]->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 		}
 
 	}
@@ -451,22 +442,22 @@ static void megadrive_io_write_data_port_6button(running_machine &machine, int p
 
 /*************************** 3 buttons version ****************************/
 
-static void megadrive_io_write_ctrl_port(running_machine &machine, int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_ctrl_port(int portnum, UINT16 data)
 {
 	m_megadrive_io_ctrl_regs[portnum] = data;
 //  mame_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
-static void megadrive_io_write_tx_port(running_machine &machine, int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_tx_port(int portnum, UINT16 data)
 {
 	m_megadrive_io_tx_regs[portnum] = data;
 }
 
-static void megadrive_io_write_rx_port(running_machine &machine, int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_rx_port(int portnum, UINT16 data)
 {
 }
 
-static void megadrive_io_write_sctrl_port(running_machine &machine, int portnum, UINT16 data)
+void md_base_state::megadrive_io_write_sctrl_port(int portnum, UINT16 data)
 {
 }
 
@@ -488,28 +479,28 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_io_write )
 		case 0x2:
 		case 0x3:
 //          megadrive_io_write_data_port(offset-1,data);
-			megadrive_io_write_data_port_ptr(space.machine(), offset-1,data);
+			m_megadrive_io_write_data_port_ptr(space, offset-1,data, 0xffff);
 			break;
 
 		case 0x4:
 		case 0x5:
 		case 0x6:
-			megadrive_io_write_ctrl_port(space.machine(),offset-4,data);
+			megadrive_io_write_ctrl_port(offset-4,data);
 			break;
 
 		/* Serial I/O Registers */
 
-		case 0x7: megadrive_io_write_tx_port(space.machine(),0,data); break;
-		case 0x8: megadrive_io_write_rx_port(space.machine(),0,data); break;
-		case 0x9: megadrive_io_write_sctrl_port(space.machine(),0,data); break;
+		case 0x7: megadrive_io_write_tx_port(0,data); break;
+		case 0x8: megadrive_io_write_rx_port(0,data); break;
+		case 0x9: megadrive_io_write_sctrl_port(0,data); break;
 
-		case 0xa: megadrive_io_write_tx_port(space.machine(),1,data); break;
-		case 0xb: megadrive_io_write_rx_port(space.machine(),1,data); break;
-		case 0xc: megadrive_io_write_sctrl_port(space.machine(),1,data); break;
+		case 0xa: megadrive_io_write_tx_port(1,data); break;
+		case 0xb: megadrive_io_write_rx_port(1,data); break;
+		case 0xc: megadrive_io_write_sctrl_port(1,data); break;
 
-		case 0xd: megadrive_io_write_tx_port(space.machine(),2,data); break;
-		case 0xe: megadrive_io_write_rx_port(space.machine(),2,data); break;
-		case 0xf: megadrive_io_write_sctrl_port(space.machine(),2,data); break;
+		case 0xd: megadrive_io_write_tx_port(2,data); break;
+		case 0xe: megadrive_io_write_rx_port(2,data); break;
+		case 0xf: megadrive_io_write_sctrl_port(2,data); break;
 	}
 }
 
@@ -881,8 +872,9 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 MACHINE_START( megadriv )
 {
-	if (m_megadrive_6buttons_pad)
-		init_megadri6_io(machine);
+	md_base_state *state = machine.driver_data<md_base_state>();
+	if (state->m_megadrive_6buttons_pad)
+		state->init_megadri6_io();
 }
 
 MACHINE_RESET( megadriv )
@@ -901,7 +893,7 @@ MACHINE_RESET( megadriv )
 		machine.scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),state));
 	}
 
-	megadrive_reset_io(machine);
+	state->megadrive_reset_io();
 
 	if (!state->m_vdp->m_use_alt_timing)
 	{
@@ -924,11 +916,9 @@ MACHINE_RESET( megadriv )
 		state->m_32x->pause_cpu();
 }
 
-void megadriv_stop_scanline_timer(running_machine &machine)
+void md_base_state::megadriv_stop_scanline_timer()
 {
-	md_base_state *state = machine.driver_data<md_base_state>();
-
-	if (!state->m_vdp->m_use_alt_timing)
+	if (!m_vdp->m_use_alt_timing)
 		megadriv_scanline_timer->reset();
 }
 
@@ -1174,14 +1164,14 @@ void md_base_state::megadriv_init_common()
 	// the drivers which need 6 buttons pad set this to 1 in their init befare calling the megadrive init
 	if (m_megadrive_6buttons_pad)
 	{
-		megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_6button;
-		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;
+		m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
+		m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 		mame_printf_debug("6 button game\n");
 	}
 	else
 	{
-		megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_3button;
-		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_3button;
+		m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
+		m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 		mame_printf_debug("3 button game\n");
 	}
 
@@ -1294,8 +1284,8 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 DRIVER_INIT_MEMBER(md_base_state,mpnew)
 {
 	DRIVER_INIT_CALL(megadrij);
-	megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_3button;
-	megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_3button;
+	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
+	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
 }
 
 /* used by megatech */
