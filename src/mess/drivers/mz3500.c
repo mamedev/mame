@@ -81,6 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
 	DECLARE_READ8_MEMBER(mz3500_fdc_r);
 	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
+	DECLARE_READ8_MEMBER(mz3500_fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(mz3500_pa_w);
 	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
 	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
@@ -331,8 +332,45 @@ READ8_MEMBER(mz3500_state::mz3500_master_mem_r)
 
 		printf("Error: read with unmapped memory bank offset %04x MS %02x MA %02x MO %02x\n",offset,m_ms,m_ma,m_mo);
 	}
+	else if (m_ms == 3) // RAM based BASIC
+	{
+		if((offset & 0xe000) == 0x0000) { return mz3500_work_ram_r(space,offset & 0x1fff); }
+		if((offset & 0xe000) == 0x2000)
+		{
+			switch(m_mo)
+			{
+				case 0x0: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0x2000);
+				case 0x1: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0xc000);
+				case 0x2: return mz3500_work_ram_r(space,(offset & 0x1fff) | 0xe000);
+			}
 
-	return 0xff;
+			printf("Error: read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
+		}
+		if((offset & 0xc000) == 0x4000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x4000); }
+		if((offset & 0xc000) == 0x8000) { return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x8000); }
+		if((offset & 0xc000) == 0xc000)
+		{
+			switch(m_ma)
+			{
+				case 0x0: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x10000);
+				case 0x1: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x14000);
+				case 0x2: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x18000);
+				case 0x3: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x1c000);
+				case 0x4: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x20000);
+				case 0x5: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x24000);
+				case 0x6: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x28000);
+				case 0x7: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x2c000);
+				case 0x8: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x30000);
+				case 0x9: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x34000);
+				case 0xa: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x38000);
+				case 0xb: return mz3500_work_ram_r(space,(offset & 0x3fff) | 0x3c000);
+				case 0xf: return mz3500_shared_ram_r(space,(offset & 0x7ff));
+			}
+		}
+	}
+
+
+	return 0xff; // shouldn't happen
 }
 
 WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
@@ -387,7 +425,42 @@ WRITE8_MEMBER(mz3500_state::mz3500_master_mem_w)
 
 		printf("Error: write with unmapped memory bank offset %04x data %02x MS %02x MA %02x\n",offset,data,m_ms,m_ma);
 	}
+	else if (m_ms == 3) // RAM based BASIC
+	{
+		if((offset & 0xe000) == 0x0000) { mz3500_work_ram_w(space,offset & 0x1fff,data); return; }
+		if((offset & 0xe000) == 0x2000)
+		{
+			switch(m_mo)
+			{
+				case 0x0: mz3500_work_ram_w(space,(offset & 0x1fff) | 0x2000,data); return;
+				case 0x1: mz3500_work_ram_w(space,(offset & 0x1fff) | 0xc000,data); return;
+				case 0x2: mz3500_work_ram_w(space,(offset & 0x1fff) | 0xe000,data); return;
+			}
 
+			printf("Error: read with unmapped memory bank offset %04x MS %02x MO %02x\n",offset,m_ms,m_mo);
+		}
+		if((offset & 0xc000) == 0x4000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x4000,data); return; }
+		if((offset & 0xc000) == 0x8000) { mz3500_work_ram_w(space,(offset & 0x3fff) | 0x8000,data); return; }
+		if((offset & 0xc000) == 0xc000)
+		{
+			switch(m_ma)
+			{
+				case 0x0: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x10000,data); return;
+				case 0x1: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x14000,data); return;
+				case 0x2: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x18000,data); return;
+				case 0x3: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x1c000,data); return;
+				case 0x4: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x20000,data); return;
+				case 0x5: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x24000,data); return;
+				case 0x6: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x28000,data); return;
+				case 0x7: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x2c000,data); return;
+				case 0x8: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x30000,data); return;
+				case 0x9: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x34000,data); return;
+				case 0xa: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x38000,data); return;
+				case 0xb: mz3500_work_ram_w(space,(offset & 0x3fff) | 0x3c000,data); return;
+				case 0xf: mz3500_shared_ram_w(space,(offset & 0x7ff),data); return;
+			}
+		}
+	}
 }
 
 READ8_MEMBER(mz3500_state::mz3500_shared_ram_r)
@@ -487,7 +560,7 @@ READ8_MEMBER(mz3500_state::mz3500_fdc_r)
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device();
 
-	return floppy->idx_r() << 1;
+	return ((floppy->idx_r()) << 1) | (m_fdc->get_drq() & 1);
 }
 
 WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
@@ -517,6 +590,11 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 
 }
 
+READ8_MEMBER(mz3500_state::mz3500_fdc_dma_r)
+{
+	return m_fdc->dma_r();
+}
+
 static ADDRESS_MAP_START( mz3500_master_map, AS_PROGRAM, 8, mz3500_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mz3500_master_mem_r,mz3500_master_mem_w)
 ADDRESS_MAP_END
@@ -530,6 +608,7 @@ static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 	AM_RANGE(0xf4, 0xf5) AM_DEVICE("upd765a", upd765a_device, map) // MFD upd765
 //	AM_RANGE(0xf8, 0xfb) MFD I/O port
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(mz3500_fdc_r,mz3500_fdc_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ(mz3500_fdc_dma_r)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
 ADDRESS_MAP_END
 
@@ -690,7 +769,7 @@ void mz3500_state::fdc_irq(bool state)
 
 void mz3500_state::fdc_drq(bool state)
 {
-  printf("%02x DRQ\n",state);
+	printf("%02x DRQ\n",state);
 }
 
 void mz3500_state::machine_start()
@@ -728,10 +807,10 @@ void mz3500_state::machine_reset()
 			for(int i=0;i<4;i++)
 			{
 				machine().device<floppy_connector>(m_fddnames[i])->get_device()->mon_w(ASSERT_LINE);
-				machine().device<floppy_connector>(m_fddnames[i])->get_device()->set_rpm(360);
+				machine().device<floppy_connector>(m_fddnames[i])->get_device()->set_rpm(300);
 			}
 
-			machine().device<upd765a_device>("upd765a")->set_rate(500000);
+			machine().device<upd765a_device>("upd765a")->set_rate(250000);
 		}
 	}
 
@@ -752,7 +831,7 @@ void mz3500_state::palette_init()
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x00000, 0x1fff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, mz3500_state )
@@ -760,7 +839,7 @@ static ADDRESS_MAP_START( upd7220_2_map, AS_0, 8, mz3500_state )
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( mz3500_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
 /* TODO: clocks */
@@ -780,10 +859,10 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_I8255A_ADD( "i8255", i8255_intf )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", mz3500_floppies, "525ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", 0, floppy_image_device::default_floppy_formats)
 
 	MCFG_UPD7220_ADD("upd7220_chr", MAIN_CLOCK/5, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_gfx", MAIN_CLOCK/5, hgdc_2_intf, upd7220_2_map)

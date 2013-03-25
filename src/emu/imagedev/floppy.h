@@ -98,6 +98,7 @@ public:
 	int dskchg_r() { return dskchg; }
 	bool trk00_r() { return cyl != 0; }
 	int idx_r() { return idx; }
+	int mon_r() { return mon; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
 
