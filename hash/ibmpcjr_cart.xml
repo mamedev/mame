@@ -40,7 +40,7 @@ Fraction Fever (Spinaker)
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
-			<dataarea name="rom" size="65536">
+			<dataarea name="rom" size="32768">
 				<rom name="basic.bin" size="32768" crc="8fc2a724" sha1="216915e954d393e42a30d1eb8666371439dcbd38" offset="0" />
 				<rom size="32768" offset="0x8000" loadflag="reload" />
 			</dataarea>

@@ -163,6 +163,18 @@
 			</dataarea>
 		</part>
 	</software>
+ 
+	<software name="ghouls">
+		<description>Ghouls 'n' Ghosts</description>
+		<year>1989</year>
+		<publisher>US Gold</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="259471">
+				<rom name="ghouls'n'ghosts.ipf" size="259471" crc="5f056018" sha1="1d84d01a5d349843bcd4743bfb23c7a82ad9704c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="herolanc">
 		<description>Heroes of the Lance</description>

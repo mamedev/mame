@@ -3222,7 +3222,7 @@ Info from Atariage and Atarimania
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
 
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="4096">
 				<rom name="challenge of.... nexar, the (hack maybe) (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="4096" crc="57b3d123" sha1="4a6bbd96f2c805cda13238486c828379257c5a44" offset="0" />
 			</dataarea>
 		</part>
@@ -3280,7 +3280,7 @@ Info from Atariage and Atarimania
 		<publisher>Jone Yuan Telephonic Enterprise CO</publisher>
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="2048">
 				<rom name="checkers (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="2048" crc="ca3d8c74" sha1="9b9a9b6b6d3461485c31d80a830948ce70ea7ff1" offset="0" />
 			</dataarea>
 		</part>
@@ -3408,7 +3408,7 @@ Info from Atariage and Atarimania
 		<info name="serial" value="771/333" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="a2600_cart">
-			<dataarea name="rom" size="16384">
+			<dataarea name="rom" size="4096">
 				<rom name="chopper command (2600 screen search console) (jone yuan telephonic enterprise co).bin" size="4096" crc="102f3178" sha1="529634d1eaf0e13c3e807f052a0f117e6d8306dc" offset="0" />
 			</dataarea>
 		</part>
