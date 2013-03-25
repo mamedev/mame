@@ -4,6 +4,10 @@
 
 	preliminary driver by Angelo Salese
 
+	TODO:
+	- BUSREQ / BUSACK signals.
+	- master/slave comms aren't perfect (especially noticeable if you change the video DIP)
+
 	Notes:
 	Sub-CPU test meanings:
 	* RA (tests RAM, first is work RAM, other two are shared RAM banks)
@@ -24,9 +28,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "sound/ay8910.h"
-#include "video/upd7220.h"
 #include "machine/upd765.h"
+#include "machine/i8255.h"
+#include "sound/beep.h"
+#include "video/upd7220.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -59,6 +64,8 @@ public:
 	UINT8 m_ma,m_mo,m_ms,m_me2,m_me1;
 	UINT8 m_crtc[0x10];
 
+	UINT8 m_srdy;
+
 	UINT8 m_fdd_sel;
 
 	DECLARE_READ8_MEMBER(mz3500_master_mem_r);
@@ -74,6 +81,12 @@ public:
 	DECLARE_WRITE8_MEMBER(mz3500_crtc_w);
 	DECLARE_READ8_MEMBER(mz3500_fdc_r);
 	DECLARE_WRITE8_MEMBER(mz3500_fdc_w);
+	DECLARE_WRITE8_MEMBER(mz3500_pa_w);
+	DECLARE_WRITE8_MEMBER(mz3500_pb_w);
+	DECLARE_WRITE8_MEMBER(mz3500_pc_w);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -400,6 +413,14 @@ READ8_MEMBER(mz3500_state::mz3500_io_r)
 	---- -xxx interrupt status
 	*/
 
+	switch(offset)
+	{
+		case 2:
+			return ((machine().root_device().ioport("SYSTEM_DSW")->read() & 0x0f) << 1) | ((machine().root_device().ioport("FD_DSW")->read() & 0x8) >> 3);
+		case 3:
+			return ((machine().root_device().ioport("FD_DSW")->read() & 0x7)<<5) | (m_srdy << 4);
+	}
+
 	return 0;
 }
 
@@ -422,6 +443,11 @@ WRITE8_MEMBER(mz3500_state::mz3500_io_w)
 
 	switch(offset)
 	{
+		case 0:
+			/* HACK: actually busreq */
+			m_slave->set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
+
+			break;
 		case 1:
 			m_ms = data & 3;
 			break;
@@ -475,16 +501,19 @@ WRITE8_MEMBER(mz3500_state::mz3500_fdc_w)
 	*/
 	static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
 
-	for(int i=0;i<4;i++)
+	if(data & 0x40)
 	{
-		if(data & 1 << i)
+		for(int i=0;i<4;i++)
 		{
-			m_fdd_sel = i;
-			break;
+			if(data & 1 << i)
+			{
+				m_fdd_sel = i;
+				break;
+			}
 		}
 	}
 
-	machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device()->mon_w(data & 0x10 ? ASSERT_LINE : CLEAR_LINE);
+	machine().device<floppy_connector>(m_fddnames[m_fdd_sel])->get_device()->mon_w(data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -516,12 +545,56 @@ static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 //	AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
 //	AM_RANGE(0x10, 0x1f) i8251
 //	AM_RANGE(0x20, 0x2f) pit8253
-//	AM_RANGE(0x30, 0x3f) i8255
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
 	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("upd7220_gfx", upd7220_device, read, write)
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("upd7220_chr", upd7220_device, read, write)
 ADDRESS_MAP_END
+
+WRITE8_MEMBER(mz3500_state::mz3500_pa_w)
+{
+	// printer data
+}
+
+WRITE8_MEMBER(mz3500_state::mz3500_pb_w)
+{
+	/*
+	x--- ---- CG select (ROM and/or upd7220 clock?)
+	-x-- ---- SRDY signal (to master)
+	--xx xxxx upd1990 RTC (CLK, Din, C2, C1, C0, STRB)
+
+	*/
+	//printf("%02x PB\n",data);
+
+	m_srdy = (data & 0x40) >> 6;
+}
+
+WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
+{
+	/*
+	x--- ---- printer OBF output
+	-x-- ---- printer ACK input
+	--x- ---- printer STROBE
+	---x ---- buzzer
+	---- -xxx Keyboard (ACKC, STC, DC)
+	*/
+	//printf("%02x PC\n",data);
+
+	machine().device<beep_device>(BEEPER_TAG)->set_state(data & 0x10);
+
+}
+
+static I8255A_INTERFACE( i8255_intf )
+{
+	DEVCB_NULL,                     /* Port A read */
+	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pa_w),            /* Port A write */
+	DEVCB_NULL,     /* Port B read */
+	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pb_w),            /* Port B write */
+	DEVCB_NULL,     /* Port C read */
+	DEVCB_DRIVER_MEMBER(mz3500_state,mz3500_pc_w),            /* Port C write */
+};
+
 
 static INPUT_PORTS_START( mz3500 )
 	PORT_START("DSW")
@@ -546,12 +619,11 @@ static INPUT_PORTS_START( mz3500 )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Sub-CPU Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Sub-CPU Test" ) /* hack */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* dummy active low structure */
-	PORT_START("DSWA")
+	PORT_START("FD_DSW")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -561,20 +633,22 @@ static INPUT_PORTS_START( mz3500 )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+
+	PORT_START("SYSTEM_DSW")
+	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x00, "CRT Select" )
+	PORT_DIPSETTING(    0x04, "Normal Display (MZ1D01, MZ1D06)" )
+	PORT_DIPSETTING(    0x00, "Hi-Res Display (MZ1D02, MZ1D03)" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -607,6 +681,17 @@ static GFXDECODE_START( mz3500 )
 	GFXDECODE_ENTRY( "gfx1", 0x1000, charlayout_8x16,     0, 1 )
 GFXDECODE_END
 
+void mz3500_state::fdc_irq(bool state)
+{
+//  printf("%d IRQ\n",state);
+	m_master->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+
+}
+
+void mz3500_state::fdc_drq(bool state)
+{
+  printf("%02x DRQ\n",state);
+}
 
 void mz3500_state::machine_start()
 {
@@ -626,7 +711,34 @@ void mz3500_state::machine_reset()
 	m_me1 = 0;
 	m_me2 = 0;
 	//m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_srdy = 0;
+
+	upd765a_device *fdc;
+	fdc = machine().device<upd765a_device>(":upd765a");
+
+	if (fdc)
+	{
+		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_irq), this));
+		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(mz3500_state::fdc_drq), this));
+
+		m_fdd_sel = 0;
+		{
+			static const char *const m_fddnames[4] = { "upd765a:0", "upd765a:1", "upd765a:2", "upd765a:3"};
+
+			for(int i=0;i<4;i++)
+			{
+				machine().device<floppy_connector>(m_fddnames[i])->get_device()->mon_w(ASSERT_LINE);
+				machine().device<floppy_connector>(m_fddnames[i])->get_device()->set_rpm(360);
+			}
+
+			machine().device<upd765a_device>("upd765a")->set_rate(500000);
+		}
+	}
+
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
+
 
 
 void mz3500_state::palette_init()
@@ -665,6 +777,8 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("master")
 
+	MCFG_I8255A_ADD( "i8255", i8255_intf )
+
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", mz3500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
@@ -688,8 +802,9 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 
