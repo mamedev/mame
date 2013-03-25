@@ -900,8 +900,7 @@ MACHINE_RESET_MEMBER(md_base_state,megadriv)
 			memset(m_megadrive_ram,0x00,0x10000);
 	}
 
-	megadriv_reset_vdp(machine());
-
+	m_vdp->device_reset_old();
 
 	// if the system has a 32x, pause the extra CPUs until they are actually turned on
 	if (m_32x)

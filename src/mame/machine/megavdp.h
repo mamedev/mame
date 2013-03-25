@@ -150,8 +150,6 @@ typedef void (*genesis_vdp_lv6irqline_callback_func)(running_machine &machine, b
 typedef void (*genesis_vdp_lv4irqline_callback_func)(running_machine &machine, bool state);
 
 TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing );
-extern void megadriv_reset_vdp(running_machine &machine);
-
 
 UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space & space68k);
 

@@ -119,7 +119,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 	m_segac2_sp_pal_lookup[2] = 0x20;
 	m_segac2_sp_pal_lookup[3] = 0x30;
 
-	megadriv_reset_vdp(machine());
+	m_vdp->device_reset_old();
 
 	/* determine how many sound banks */
 	m_sound_banks = 0;
@@ -1262,15 +1262,13 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 		return 0;
 	}
 
-	sega_genesis_vdp_device *vdp = m_vdp;
-
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32* desty = &bitmap.pix32(y, 0);
 		UINT16* srcy;
 
-		srcy = vdp->m_render_line_raw;
+		srcy = m_vdp->m_render_line_raw;
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{

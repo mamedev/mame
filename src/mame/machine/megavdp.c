@@ -2749,17 +2749,6 @@ void sega_genesis_vdp_device::vdp_handle_eof(running_machine &machine)
 }
 
 
-
-
-
-void megadriv_reset_vdp(running_machine &machine)
-{
-	sega_genesis_vdp_device *vdp = machine.device<sega_genesis_vdp_device>("gen_vdp"); // yuck
-	vdp->device_reset_old();
-}
-
-
-
 // called at the start of each scanline
 TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback )
 {
