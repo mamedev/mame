@@ -1602,7 +1602,7 @@ int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT3
 
 
 
-UINT32* sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanline)
+void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanline)
 {
 	int x;
 
@@ -1707,8 +1707,50 @@ UINT32* sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scan
 			}
 		}
 	}
+}
 
-	return m_32x_linerender;
+int sega_32x_device::_32x_render_videobuffer_to_screenbuffer_lopri(int x, UINT16 &lineptr)
+{
+	int drawn = 0;
+
+	if (m_32x_displaymode != 0)
+	{
+		if (!m_32x_videopriority)
+		{
+			if (!(m_32x_linerender[x] & 0x8000))
+			{
+				lineptr = m_32x_linerender[x] & 0x7fff;
+				drawn = 1;
+			}
+		}
+		else
+		{
+			if (m_32x_linerender[x] & 0x8000)
+			{
+				lineptr = m_32x_linerender[x] & 0x7fff;
+				drawn = 1;
+			}
+		}
+	}
+
+	return drawn;
+}
+
+void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_hipri(int x, UINT16 &lineptr)
+{
+	if (m_32x_displaymode != 0)
+	{
+		if (!m_32x_videopriority)
+		{
+			if (m_32x_linerender[x] & 0x8000)
+				lineptr = m_32x_linerender[x] & 0x7fff;
+		}
+		else
+		{
+			if (!(m_32x_linerender[x] & 0x8000))
+				lineptr = m_32x_linerender[x] & 0x7fff;
+		}
+	}
 }
 
 static const sh2_cpu_core sh2_conf_master = { 0, NULL, _32x_fifo_available_callback };

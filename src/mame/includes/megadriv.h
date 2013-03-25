@@ -97,7 +97,7 @@ public:
 		m_segacd(*this,"segacd"),
 		m_megadrive_ram(*this,"megadrive_ram")
 	{ }
-	optional_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_device<sega_32x_device> m_32x;

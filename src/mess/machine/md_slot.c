@@ -886,6 +886,8 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		}
 		else
 		{
+			logerror("No SRAM detected from header, using fallback SRAM in case this is a broken header\n");
+
 			// Unfortunately, there are ROMs without correct info in the header,
 			// Hence, when loading from fullpath we do the SRAM mapping anyway...
 			// but treat it in a custom way

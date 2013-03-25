@@ -33,12 +33,12 @@ public:
 	required_device<dac_device> m_rch_pwm;
 
 	void pause_cpu();
-	
+
 	// set some variables at start, depending on region (shall be moved to a device interface?)
 	void set_framerate(int rate) { m_framerate = rate; }
 	void set_32x_pal(bool pal) { m_32x_pal = pal ? 1 : 0; }
 
-	
+
 	DECLARE_READ32_MEMBER( _32x_sh2_master_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_slave_4000_common_4002_r );
 	DECLARE_READ32_MEMBER( _32x_sh2_common_4004_common_4006_r );
@@ -104,7 +104,9 @@ public:
 	DECLARE_WRITE16_MEMBER( _32x_sh2_master_401e_w );
 	DECLARE_WRITE16_MEMBER( _32x_sh2_slave_401e_w );
 
-	UINT32* _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
+	void _32x_render_videobuffer_to_screenbuffer_helper(int scanline);
+	int _32x_render_videobuffer_to_screenbuffer_lopri(int x, UINT16 &lineptr);
+	void _32x_render_videobuffer_to_screenbuffer_hipri(int x, UINT16 &lineptr);
 	int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 	void _32x_check_framebuffer_swap(bool enabled);
@@ -112,18 +114,11 @@ public:
 	void _32x_scanline_cb0();
 	void _32x_scanline_cb1(int scanline);
 
-	/* our current main rendering code needs to know this for mixing in */
-	int m_32x_displaymode;
-	int m_32x_videopriority;
 	/* our main vblank handler resets this */
 	int m_32x_hcount_compare_val;
 	int m_sh2_are_running;
 	int m_32x_240mode;
 	UINT16 m_32x_a1518a_reg;
-
-
-	UINT32 m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
-
 
 	void handle_pwm_callback();
 	void calculate_pwm_timer();
@@ -138,6 +133,7 @@ public:
 	UINT16 get_hposition(void);
 
 	emu_timer *m_32x_pwm_timer;
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -145,7 +141,13 @@ protected:
 	// optional information overrides
 //  virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+
 private:
+
+	int m_32x_displaymode;
+	int m_32x_videopriority;
+	UINT32 m_32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
+
 //  virtual void device_config_complete();
 	int m_32x_adapter_enabled;
 	int m_32x_access_auth;

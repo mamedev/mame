@@ -2498,124 +2498,50 @@ void sega_genesis_vdp_device::genesis_render_videoline_to_videobuffer(int scanli
 void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running_machine &machine, int scanline)
 {
 	sega_32x_device *_32xdev = machine.device<sega_32x_device>("sega32x"); // take this out of the VDP eventually
-
-
-	UINT16*lineptr;
-	int x;
+	UINT16 *lineptr;
 
 	if (!m_use_alt_timing)
-	{
 		lineptr = &m_render_bitmap->pix16(scanline);
-	}
 	else
-	{
 		lineptr = m_render_line;
-	}
-
 
 	if (_32xdev) _32xdev->_32x_render_videobuffer_to_screenbuffer_helper(scanline);
 
-
-
-	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
+	for (int x = 0; x < 320; x++)
 	{
-		for (x=0;x<320;x++)
+		UINT32 dat = m_video_renderline[x];
+		int drawn = 0;
+
+		// low priority 32x - if it's the bg pen, we have a 32x, and its display is enabled...
+		if (_32xdev && dat & 0x20000)
+			drawn = _32xdev->_32x_render_videobuffer_to_screenbuffer_lopri(x, lineptr[x]);
+
+		if (!(dat & 0x20000))
+			m_render_line_raw[x] = 0x100;
+		else
+			m_render_line_raw[x] = 0x000;
+
+
+		if (!drawn)
 		{
-			UINT32 dat;
-			dat = m_video_renderline[x];
-			int drawn = 0;
-
-			// low priority 32x - if it's the bg pen, we have a 32x, and it's display is enabled...
-			if (_32xdev)
+			if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 			{
-				if ((dat&0x20000) && (_32xdev->m_32x_displaymode != 0))
+				if (dat & 0x10000)
 				{
-					if (!_32xdev->m_32x_videopriority)
-					{
-						if (!(_32xdev->m_32x_linerender[x]&0x8000))
-						{
-							lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
-							drawn = 1;
-						}
-					}
-					else
-					{
-						if ((_32xdev->m_32x_linerender[x]&0x8000))
-						{
-							lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
-							drawn = 1;
-						}
-					}
-				}
-			}
-
-			if (!(dat&0x20000))
-				m_render_line_raw[x] = 0x100;
-			else
-				m_render_line_raw[x] = 0x000;
-
-
-			if (drawn==0)
-			{
-				if (dat&0x10000)
-				{
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x3f)];
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 				}
 				else
 				{
-					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x3f)];
+					lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
 					m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 				}
+
 			}
-
-
-
-		}
-	}
-	else
-	{
-		for (x=0;x<320;x++)
-		{
-			UINT32 dat;
-			dat = m_video_renderline[x];
-
-			int drawn = 0;
-
-			// low priority 32x - if it's the bg pen, we have a 32x, and it's display is enabled...
-			if (_32xdev)
-			{
-				if ((dat&0x20000) && (_32xdev->m_32x_displaymode != 0))
-				{
-					if (!_32xdev->m_32x_videopriority)
-					{
-						if (!(_32xdev->m_32x_linerender[x]&0x8000))
-						{
-							lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
-							drawn = 1;
-						}
-					}
-					else
-					{
-						if ((_32xdev->m_32x_linerender[x]&0x8000))
-						{
-							lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
-							drawn = 1;
-						}
-					}
-				}
-			}
-
-			if (!(dat&0x20000))
-				m_render_line_raw[x] = 0x100;
 			else
-				m_render_line_raw[x] = 0x000;
-
-
-			if (drawn==0)
 			{
 				/* Verify my handling.. I'm not sure all cases are correct */
-				switch (dat&0x1e000)
+				switch (dat & 0x1e000)
 				{
 					case 0x00000: // low priority, no shadow sprite, no highlight = shadow
 					case 0x02000: // low priority, shadow sprite, no highlight = shadow
@@ -2623,26 +2549,26 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 					case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 					case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 					case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x3f)];
+						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat & 0x3f)];
 						m_render_line_raw[x] |= (dat & 0x3f) | 0x000;
 						break;
 
 					case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 					case 0x8000: // low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x3f)];
+						lineptr[x] = megadrive_vdp_palette_lookup[(dat & 0x3f)];
 						m_render_line_raw[x] |= (dat & 0x3f) | 0x040;
 						break;
 
 					case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 					case 0x18000: // (sprite) low pri, highlight sprite = normal;
-						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x3f)];
+						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat & 0x3f)];
 						m_render_line_raw[x] |= (dat & 0x3f) | 0x080;
 						break;
 
 
 					case 0x0c000: // normal pri, highlight set = highlight?
 					case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x3f)];
+						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat & 0x3f)];
 						m_render_line_raw[x] |= (dat & 0x3f) | 0x0c0;
 						break;
 
@@ -2651,44 +2577,22 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = m_render_line_raw[x] |= (machine.rand()&0x3f);
-					break;
-				}
-
-			}
-
-
-
-		}
-
-	}
-
-
-	// high priority 32x
-	if (_32xdev)
-	{
-		if (_32xdev->m_32x_displaymode != 0)
-		{
-			for (x=0;x<320;x++)
-			{
-				if (!_32xdev->m_32x_videopriority)
-				{
-					if ((_32xdev->m_32x_linerender[x]&0x8000))
-						lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
-				}
-				else
-				{
-					if (!(_32xdev->m_32x_linerender[x]&0x8000))
-						lineptr[x] = _32xdev->m_32x_linerender[x]&0x7fff;
+						lineptr[x] = m_render_line_raw[x] |= (machine.rand() & 0x3f);
+						break;
 				}
 			}
 		}
+
+		// high priority 32x
+		if (_32xdev)
+			_32xdev->_32x_render_videobuffer_to_screenbuffer_hipri(x, lineptr[x]);
 	}
 }
 
 void sega_genesis_vdp_device::genesis_render_scanline(running_machine &machine)
 {
 	int scanline = genesis_get_scanline_counter(machine);
+
 	if (scanline >= 0 && scanline < m_visible_scanlines)
 	{
 		//if (MEGADRIVE_REG01_DMA_ENABLE==0) mame_printf_debug("off\n");
