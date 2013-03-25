@@ -1036,6 +1036,7 @@ CPUOBJS += $(CPUOBJ)/m6502/deco16.o \
 			$(CPUOBJ)/m6502/r65c02.o \
 			$(CPUOBJ)/m6502/m740.o \
 			$(CPUOBJ)/m6502/m3745x.o \
+			$(CPUOBJ)/m6502/m5074x.o \
 
 DASMOBJS +=
 endif
@@ -1119,6 +1120,9 @@ $(CPUOBJ)/m6502/m740.o:     $(CPUSRC)/m6502/m740.c \
 
 $(CPUOBJ)/m6502/m3745x.o:   $(CPUSRC)/m6502/m3745x.c \
 							$(CPUSRC)/m6502/m3745x.h
+
+$(CPUOBJ)/m6502/m5074x.o:   $(CPUSRC)/m6502/m5074x.c \
+							$(CPUSRC)/m6502/m5074x.h
 
 # rule to generate the C files
 $(CPUOBJ)/m6502/deco16.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst
