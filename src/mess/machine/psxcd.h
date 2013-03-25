@@ -43,15 +43,14 @@ private:
 	unsigned char sr,res,ir,cmdmode,
 								cmdbuf[64],*cbp,
 								mode,
-								secbuf[raw_sector_size*sector_buffer_size],
+								secbuf[sector_buffer_size][raw_sector_size],
 								*secptr,
 								filter_file,
 								filter_channel,
 								lastsechdr[8],
 								status;
 	int rdp,secsize,secleft,secskip,
-			sechead,sectail,
-			secin;
+			sechead,sectail;
 	command_result *res_queue,
 									*cur_res;
 
@@ -76,8 +75,7 @@ private:
 #endif
 
 	bool open,
-				streaming,
-				first_open;
+				streaming;
 	device_timer_id next_read_event;
 	INT64 next_sector_t;
 	unsigned int autopause_sector,
@@ -140,7 +138,6 @@ private:
 	void stop_read();
 	void read_sector();
 	bool read_next_sector();
-	bool play_cdda_sector(const unsigned int sector, unsigned char *rawsec);
 	void play_sector();
 	void preread_sector();
 	UINT32 sub_loc(CDPOS src1, CDPOS src2);
