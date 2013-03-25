@@ -1154,8 +1154,8 @@ void psxcd_device::play_sector()
 
 	if (status&status_playing)
 	{
-		sectail=(sectail+1)&(sector_buffer_size-1);
 		m_spu->play_cdda(0,secbuf[sectail]);
+		sectail=(sectail+1)&(sector_buffer_size-1);
 
 		curpos.b[F]++;
 		if (curpos.b[F]==75)
