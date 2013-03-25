@@ -121,6 +121,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 
+	<!-- Majesco re-release comes on a 010179 REV 1 PCB, with a single chip marked as 6-Pak. Needs to be verified. -->
 	<software name="6pak">
 		<description>6-Pak (USA)</description>
 		<year>1996</year>
@@ -442,7 +443,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-12538F" />
+			<feature name="ic1" value="MPR-12538F, MPR-12538-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-12538f.ic1" size="524288" crc="154d59bb" sha1="38945360d824d2fb9535b4fd7f25b9aa9b32f019" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -498,7 +499,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="AQUATIC AQUA01" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="aquatic aqua01.u1" size="524288" crc="400f4ba7" sha1="3bbd0853099f655cd33b52d32811f8ccb64b0418" offset="000000" loadflag="load16_word_swap" />
@@ -684,7 +685,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6278A" />
 			<feature name="ic1" value="MPR-17593-H" />
-			<feature name="ic2" value="GM76C88ALK" />
+			<feature name="ic2" value="GM76C88ALK-15" />
 			<feature name="ic3" value="M74HC00B1" />
 			<feature name="ic4" value="BA6162" />
 			<feature name="batt-1" value="(Lithium Cell)" />
@@ -707,9 +708,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-14861 W45, MPR-14861-F" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
 			<feature name="ic3" value="IL7-1026B" />
 			<feature name="ic4" value="HD74HC00P" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -1249,7 +1250,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19900630 (JPN)"/>
 		<info name="alt_title" value="コラムス"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-13193-T" />
 			<feature name="ic2" value="(unpopulated)" />
 			<feature name="ic3" value="(unpopulated)" />
@@ -1400,6 +1401,21 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="dahnak" cloneof="dahna">
+		<description>Dahna (Kor)</description>
+		<year>199?</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="GM 8031 JT"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-14636-SM" />   <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-14636.u1" size="1048576" crc="10829ea1" sha1="655486eaf3b197063902224a8f1cc15b664f7637" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Both Euro and USA confirmed -->
 	<software name="drsc">
 		<description>David Robinson's Supreme Court (Euro, USA)</description>
@@ -1528,7 +1544,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6278A" />
 			<feature name="ic1" value="MPR-17097" />
-			<feature name="ic2" value="GM76C88ALK" />
+			<feature name="ic2" value="GM76C88ALK-15" />
 			<feature name="ic3" value="SN74HC00N" />
 			<feature name="ic4" value="BA6162" />
 			<feature name="batt-1" value="(Lithium Cell)" />
@@ -1720,7 +1736,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Tengen)" />
 			<feature name="ic1" value="MPR-16078 R03" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16078 r03.ic1" size="1048576" crc="841edbc0" sha1="75854a732d4cf9a310c4359092cf5c2482df49a7" offset="000000" loadflag="load16_word_swap" />
@@ -2245,7 +2261,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="P10002 REV H" />
+			<feature name="pcb" value="PWA P10002 REV H" />
 			<feature name="u1" value="FIFA95B1 SOCCER" />
 			<feature name="u2" value="GM76C88ALK-15" />
 			<feature name="u3" value="GD74LS138" />
@@ -2255,6 +2271,26 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 				<rom name="fifa95b1 soccer.u1" size="2097152" crc="b389d036" sha1="586f9d0f218cf6bb3388a8610b44b6ebb9538fb5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="fifa95k" cloneof="fifa95">
+		<description>FIFA Soccer 95 (Kor)</description>
+		<year>1994</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="GM-95003JT"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="PWA P10002 REV K" />
+			<feature name="u1" value="LH5370HD" />
+			<feature name="u2" value="GM76C88ALK-15" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="337-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
+			<dataarea name="rom" size="2097152">
+				<rom name="lh5370hd.u1" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2363,21 +2399,20 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<software name="gameto" supported="no"> <!-- It needs full EEPROM support -->
-		<description>Game Toshokan (Jpn, Rev. A)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4503"/>
+<!-- Only Jpn is confirmed -->
+	<software name="gground">
+		<description>Gain Ground (World)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher> <!-- This was published by Renovation in the USA, in fact -->
+		<info name="serial" value="G-4036 (JPN)"/>
+		<info name="release" value="19910103 (JPN)"/>
+		<info name="alt_title" value="ゲイングランド"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_eeprom" />
-			<feature name="pcb" value="171-5878" />
-			<feature name="ic1" value="MPR-12750A-T" />
-			<feature name="ic2" value="X24C01P" />
-			<feature name="ic3" value="D74HC125C" />
-			<feature name="ic4" value="D74HC74C" />
-			<feature name="ic5" value="D74HC32C" />
-			<dataarea name="rom" size="131072">
-				<rom name="mpr-12750a-t.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
+			<!-- Japanese cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13642 S87" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13642 s87.ic1" size="524288" crc="8641a2ab" sha1="a5017e44b5f470e0499f4a9b494385c567632864" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2401,22 +2436,47 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Jpn is confirmed -->
-	<software name="gground">
-		<description>Gain Ground (World)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher> <!-- This was published by Renovation in the USA, in fact -->
-		<info name="serial" value="G-4036 (JPN)"/>
-		<info name="release" value="19910103 (JPN)"/>
-		<info name="alt_title" value="ゲイングランド"/>
+	<software name="gameto" supported="no"> <!-- It needs full EEPROM support -->
+		<description>Game Toshokan (Jpn, Rev. A)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4503"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
-			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-13642 S87" />
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-13642 s87.ic1" size="524288" crc="8641a2ab" sha1="a5017e44b5f470e0499f4a9b494385c567632864" offset="000000" loadflag="load16_word_swap" />
+			<feature name="slot" value="rom_eeprom" />
+			<feature name="pcb" value="171-5878" />
+			<feature name="ic1" value="MPR-12750A-T" />
+			<feature name="ic2" value="X24C01P" />
+			<feature name="ic3" value="D74HC125C" />
+			<feature name="ic4" value="D74HC74C" />
+			<feature name="ic5" value="D74HC32C" />
+			<dataarea name="rom" size="131072">
+				<rom name="mpr-12750a-t.ic1" size="131072" crc="c185c819" sha1="9673b519c16883c146924c347ec6764281fa3a57" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
+	</software>
+
+
+<!-- Only Euro is confirmed -->
+	<software name="wintchal1" cloneof="wintchal">
+		<description>The Games: Winter Challenge (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Ballistic</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="ACSGEE1191 REV A" />	<!-- blurry pic, might be not 100% exact -->
+			<feature name="u1" value="9153 (c) 12/91 ACWCSG" />
+			<feature name="u2" value="KM28C16-20" />
+			<feature name="u3" value="74HC00AP" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9153 12-91 acwcsg.u1" size="1048576" crc="dbc3ed1c" sha1="d2afa782f8d05afc0c3a3d6684bd4966034705c6" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+<!-- LABEL(S)
+
+    ACCOLADE, INC.
+    9153 (c) 12/91
+    ACWCSG
+    RK142
+-->
 	</software>
 
 
@@ -2872,7 +2932,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19930618"/>
 		<info name="alt_title" value="Jリーグ・オフィシャルTVゲームプロストライカー ~ J.League Pro Striker (Box)"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-15554A W13" />
 			<feature name="ic2" value="FM1208S-250PC" />
 			<feature name="ic3" value="HD74HC00P" />
@@ -2887,7 +2947,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+<!-- Only Euro is confirmed, USA with label C55-01? needs to be verified -->
 	<software name="jbdougko">
 		<description>James 'Buster' Douglas Knockout Boxing (Euro, USA)</description>
 		<year>1990</year>
@@ -2928,7 +2988,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="Pond II:Robocod ROB02" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="pond ii robocod rob02.u1" size="524288" crc="c32b5d66" sha1="20e70c2a8236915a6e4746b6ad1b603563aecf48" offset="000000" />
@@ -3268,6 +3328,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Both Euro and USA are confirmed -->
+<!-- US version also found on a 800068-01 REV A PCB, with 335040-1050 label? needs to be verified! -->
 	<software name="klax">
 		<description>Klax (Euro, USA)</description>
 		<year>1990</year>
@@ -3321,7 +3382,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6278A" />
 			<feature name="ic1" value="MPR-15976-S" />
-			<feature name="ic2" value="MB8464A-10LL" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
 			<feature name="ic3" value="HD74HC00P" />
 			<feature name="ic4" value="BA6162" />
 			<dataarea name="rom" size="2097152">
@@ -3341,7 +3402,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6278A" />
 			<feature name="ic1" value="MPR-15977-F" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
 			<feature name="ic3" value="HD74HC00P" />
 			<feature name="ic4" value="BA6162" />
 			<feature name="batt-1" value="(Lithium Cell)" />
@@ -3432,7 +3493,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="PWA P10001 REV F" />
 			<feature name="u1" value="LHX ATTACK CH LHX04" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="lhx attack ch lhx04.u1" size="1048576" crc="70c3428d" sha1="f23c6d0bc6daae11a3398d73961f621e508c9229" offset="000000" loadflag="load16_word_swap" />
@@ -3550,7 +3611,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="Marble MAR01 7089" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="marble mar01 7089.u1" size="524288" crc="79eba28a" sha1="059e99fde8726a45a584007186913eb9a01f738e" offset="000000" loadflag="load16_word_swap" />
@@ -3770,7 +3831,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19901122"/>
 		<info name="alt_title" value="メガパネル"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Namcot)" />
 			<dataarea name="rom" size="262144">
 				<rom name="lrog4511-mmg 90436.bin" size="262144" crc="6240f579" sha1="1822905930f5f3627e9f9109760205e617295fda" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3850,7 +3911,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A" />
-			<feature name="ic1" value="MPR-17089-H" />
+			<feature name="ic1" value="MPR-17089-H, MPR-17089-U" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-17089-h.ic1" size="2097152" crc="cb5a8b85" sha1="6bcbf683a5d0e9f67b9ed8f79bc593fab594d84a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -3985,7 +4046,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="alt_title" value="NBA Action '95 Starring David Robinson (Box)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-17443-U" />
 			<feature name="ic2" value="KM62256BLP" />
 			<feature name="ic3" value="BA6162" />
@@ -4104,7 +4165,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="PWA P10002 REV J" />
 			<feature name="u1" value="NBA95B6 BASKETBALL" />
-			<feature name="u2" value="GM76C88ALK" />
+			<feature name="u2" value="GM76C88ALK-15" />
 			<feature name="u3" value="SN74LS138N" />
 			<feature name="u4" value="419-1026B" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -4112,6 +4173,26 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 				<rom name="nba95b6 basketball.u1" size="2097152" crc="66018abc" sha1="f86bc9601751ac94119ab2f3ecce2029d5678f01" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="nbaliv95k" cloneof="nbaliv95">
+		<description>NBA Live 95 (Kor)</description>
+		<year>1994</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="GM-95002JT"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="PWA P10002 REV K" />
+			<feature name="u1" value="LH5370HC" />
+			<feature name="u2" value="UM6164BK-20" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="337-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
+			<dataarea name="rom" size="2097152">
+				<rom name="lh5370hc.bin" size="2097152" crc="779c1244" sha1="115c2e8cfa6bc45767ba47efc00aede424a6de66" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4240,7 +4321,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="PWA P10002 REV H" />
 			<feature name="u1" value="NHL94 HL9402" />
-			<feature name="u2" value="GM76C88ALK" />
+			<feature name="u2" value="GM76C88ALK-15" />
 			<feature name="u3" value="GD74LS138" />
 			<feature name="u4" value="355-1026B" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -4310,7 +4391,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6278A" />
 			<feature name="ic1" value="MPR-17287-U" />
-			<feature name="ic2" value="GM76C88AL" />
+			<feature name="ic2" value="GM76C88ALK-15" />
 			<feature name="ic3" value="74HC00N" />
 			<feature name="ic4" value="BA6162" />
 			<feature name="batt-1" value="(Lithium Cell)" />
@@ -4492,7 +4573,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+<!-- Only Euro is confirmed, US version should be on a 800068-01 PCB but it has to be verified -->
 	<software name="paperboy">
 		<description>Paperboy (Euro, USA)</description>
 		<year>1991</year>
@@ -4542,7 +4623,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-16281-F" />
 			<feature name="ic2" value="CXK58257ASP" />
 			<feature name="ic3" value="BA6162" />
@@ -4567,7 +4648,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="PWA P10002 REV G?" />
 			<feature name="u1" value="PGA TOUR GOLF PGT04" />
-			<feature name="u2" value="MB8464A" />
+			<feature name="u2" value="MB8464A-10LL-SK" />
 			<feature name="u3" value="GD74LS138" />
 			<feature name="u4" value="2K5-1026B" />
 			<feature name="(batt)" value="(Lithium Cell)" />
@@ -4644,7 +4725,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="MPR-12851A S40" />
 			<feature name="ic2" value="MPR-12852A-S" />
 			<feature name="ic3" value="MB8464A-15LL-SK" />
-			<feature name="ic4" value="067" />
+			<feature name="ic4" value="067-1026B" />
 			<feature name="ic5" value="PC74HC139P" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-12851a s40.ic1" size="524288" crc="74714110" sha1="99038db23ab38c5eaabd3b27dea96059324fee6a" offset="000000" />
@@ -4723,7 +4804,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-19098-MX" />
 			<feature name="ic2" value="LH52256CD" />
 			<feature name="ic3" value="BA6162" />
@@ -4828,7 +4909,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Tengen)" />
 			<feature name="ic1" value="MPR-16594-MX" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16594-mx.ic1" size="2097152" crc="4eb4d5e4" sha1="3e94f52d311fae140da870f55e3cb103d7923d44" offset="000000" loadflag="load16_word_swap" />
@@ -4960,7 +5041,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nhlpa" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="RINGS OF POWER RIN09" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<feature name="u3" value="SN74LS139N" />
 			<feature name="u4" value="SN74LS125AN" />
@@ -5034,13 +5115,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+<!-- Only Euro is confirmed, USA version might be in a single chip (marked as ROAD RASH RRASH04) on a PWA P10001 REV H PCB but needs to be verifed -->
 	<software name="roadrash">
 		<description>Road Rash (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-6331A" />
+			<feature name="pcb" value="?? (Electronic Arts 1991)" />
 			<feature name="u1" value="ROAD RASH U1 ROA03-4" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<!-- U2 not present on the PCB-->
 			<feature name="u3" value="ROAD RASH U3 ROA03-1" /> <!-- location not really marked on PCB, using u3 for consistency -->
@@ -5187,7 +5268,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-5919" />
 			<feature name="ic1" value="MPR-17922-MX" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
 			<feature name="ic3" value="BA6162" />
 			<feature name="ic4" value="PC74HC00P" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -5224,7 +5305,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="SHADOW SHA01" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="shadow sha01.u1" size="1048576" crc="bd385c27" sha1="2f6f5165d3aa40213c8020149d5e4b29f86dfba8" offset="000000" loadflag="load16_word_swap" />
@@ -5298,6 +5379,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic2" value="GM76C88ALK-15" />
 			<feature name="ic3" value="SN74HC00N" />
 			<feature name="ic4" value="BA6162" />
+			<feature name="batt-1" value="(Lithium Cell)" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-16933-h.ic1" size="2097152" crc="83cb46d1" sha1="a2ba86f4d756f98886f8f9a56f20cbf8c3b2945e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5495,8 +5577,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A" />
-			<feature name="ic1" value="MPR-18203-MX" />
-			<feature name="ic2" value="MPR-18204-MX" />
+			<feature name="ic1" value="MPR-18203-MX, MPR-18203-U" />
+			<feature name="ic2" value="MPR-18204-MX, MPR-18204-U" />
 			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-18203-mx.ic1" size="2097152" crc="fe61c79e" sha1="08a92494e23bd53248aa4031233e151394f044f5" offset="000000" />
@@ -5576,6 +5658,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro and Jpn are confirmed -->
+<!-- USA has been found on a 171-5702 PCB with two chips MPR-12360 T23 + MPR-12361 T24, but needs to be verified -->
 	<software name="sharrier">
 		<description>Space Harrier II (World)</description>
 		<year>1989</year>
@@ -5716,15 +5799,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 	<software name="thorf" cloneof="thor">
-		<!-- Alt. Title: La Légende de Thor (Box and cart) -->
 		<description>The Story of Thor - A Successor of The Light (Fra)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="alt_title" value="La Légende de Thor (Box and cart)"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-6583B" />
 			<feature name="ic1" value="MPR-17720-SM" />
-			<feature name="ic2" value="MPR-17720-SM" />
+			<feature name="ic2" value="MPR-17721-SM" />
 			<feature name="ic3" value="GH76C8BALK-15" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-17720-sm.ic1" size="2097152" crc="5385f970" sha1="30d80bfdbfa4758d1ad5aaad12899cf3e6dd1b63" offset="000000" />
@@ -5742,8 +5825,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6570A" />
-			<feature name="ic1" value="MPR-15910 W39" />
-			<feature name="ic2" value="MPR-15911 T65" />
+			<feature name="ic1" value="MPR-15910 W39, MPR-15910-S" />
+			<feature name="ic2" value="MPR-15911 T65, MPR-15911-S" />
 			<feature name="ic3" value="HD74HC00P" />
 			<dataarea name="rom" size="3145728">
 				<rom name="mpr-15910 w39.ic1" size="2097152" crc="77a2d058" sha1="586ec3031de0a80b9b80f3945f468b5676bc23fc" offset="0x000000" loadflag="load16_word_swap" />
@@ -5830,7 +5913,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A" />
-			<feature name="ic1" value="MPR-15309-M" />
+			<feature name="ic1" value="MPR-15309-M, MPR-15309-T" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-15309-m.ic1" size="2097152" crc="42e3efdc" sha1="a0d3a216278aef5564dcbed83df0dd59222812c8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -5873,7 +5956,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-17612 W64" />
 			<feature name="ic2" value="KM62256BLP" />
 			<feature name="ic3" value="BA6162" />
@@ -5929,7 +6012,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-5919" />
 			<feature name="ic1" value="MPR-12477A-H" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-15LL-SK" />
 			<feature name="ic3" value="147-1026B" />
 			<feature name="ic4" value="PC74HC00P" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -5953,7 +6036,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-5821" />
 			<feature name="ic1" value="MPR-12477" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-15LL-SK" />
 			<feature name="ic3" value="?" />
 			<feature name="ic4" value="HD74LS00P" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -6031,7 +6114,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="slot" value="rom_sram" />
 			<feature name="pcb" value="171-5919" />
 			<feature name="ic1" value="MPR-15420-F" />
-			<feature name="ic2" value="MB8464A" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
 			<feature name="ic3" value="295-1026B" />
 			<feature name="ic4" value="PC74HC00P" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -6691,7 +6774,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Euro is confirmed -->
+<!-- Only Euro is confirmed, USA comes on a 171-5958B-8/16 PCB? Needs to be verified -->
 	<software name="vecman">
 		<description>Vectorman (Euro, USA)</description>
 		<year>1995</year>
@@ -6734,6 +6817,21 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" size="4194304">
 				<rom name="mpr-19107-mx.ic1" size="2097152" crc="1645fd9f" sha1="10571f7171e2b9e48178a8031d9654ee8883717b" offset="0x000000" loadflag="load16_word_swap" />
 				<rom name="mpr-19108-mx.ic2" size="2097152" crc="03ca9dc2" sha1="aed36c31c5f33e49e2909d83a3649e66c7932b40" offset="0x200000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="vf2k" cloneof="vf2">
+		<description>Virtua Fighter 2 - Genesis (Kor)</description>
+		<year>1997</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="GM 96002 JG"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-7147A" />
+			<feature name="ic1" value="MPR-19369-U" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-19369-u.ic1" size="4194304" crc="a95d0949" sha1="dff095c9c252bf4af5aae52b83bc3c9d243176b7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6978,9 +7076,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
-			<feature name="pcb" value="??" />
+			<feature name="pcb" value="?? (Sega)" />
 			<feature name="ic1" value="MPR-16683-F" />
-			<feature name="ic2" value="GM76C88ALK" />
+			<feature name="ic2" value="GM76C88ALK-15" />
 			<feature name="ic3" value="BA6162" />
 			<feature name="ic4" value="74HC00AP" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -7257,8 +7355,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_codemast" />
 			<feature name="pcb" value="SRJCV2-1" />
+			<feature name="u1" value="MICRO MACHINES2 MDM 2BEAD" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mdm_2bead.bin" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" loadflag="load16_word_swap" />
+				<rom name="micro machines2 mdm 2bead.u1" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7271,8 +7371,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mm96" />
 			<feature name="pcb" value="SRJCV2-2" />
+			<feature name="u1" value="M/MACHINES 96MM96MDEDDB" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mm96mdeddb.bin" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="m-machines 96mm96mdeddb.u1" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7325,8 +7427,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_jcart" />
 			<feature name="pcb" value="SRJCV1-2" />
+			<feature name="u1" value="SAMPRAS TENNIS MDST6636" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mdst6636.bin" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="sampras tennis mdst6636.u1" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7459,22 +7563,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-	<software name="fifa95k" cloneof="fifa95">
-		<description>FIFA Soccer 95 (Kor)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="lh5370hd.bin" size="2097152" crc="012591f9" sha1="ad1202a2e4166f8266d5633b8c5beb59c6cbd005" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
 
-
-
-
-
-<!-- Old scrambled/interleaved dumps -->
+<!-- 
+Old scrambled/interleaved dumps. 
+Some carts have been partially documented, based on available pics (from Nepereny's old website, or from MikeHaggar's and ICEKnight's contributions), 
+but dumps still have to be confirmed.
+-->
 
 	<software name="13mahjan">
 		<description>13 Ma Jiang - 98 Mei Shao Nu Pian (Chi)</description>
@@ -8246,8 +8340,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978B-8/16" />
+			<feature name="ic1" value="MPR-16830-T" />
 			<dataarea name="rom" size="2097152">
-				<rom name="art of fighting (usa).bin" size="2097152" crc="c9a57e07" sha1="7603f33a98994e8145c942e1ed28e6b072332324" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16830-t.ic1" size="2097152" crc="c9a57e07" sha1="7603f33a98994e8145c942e1ed28e6b072332324" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -8539,8 +8636,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5955A" />
+			<feature name="ic1" value="MPR-14866 W49" />
+			<feature name="ic2" value="MB8464A-10LL-SK" />
+			<feature name="ic3" value="237-1026B" />
+			<feature name="ic4" value="PC74HC00P" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
-				<rom name="ayrton senna's super monaco gp ii (usa).bin" size="1048576" crc="eac8ded6" sha1="1ee87744d86c4bdd4958cc70d77538351aa206e6" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-14866 w49.ic1" size="1048576" crc="eac8ded6" sha1="1ee87744d86c4bdd4958cc70d77538351aa206e6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -9294,8 +9398,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA 100003 REV F?" />
+			<feature name="u1" value="COLLEGE FOOT BWCF01" />
+			<feature name="u3" value="GD74LS139" />
+			<feature name="u4" value="??" />	<!-- Not readable in the pic -->
+			<feature name="u5" value="GD74LS74A" />
+			<feature name="u6" value="X24C01P" />
 			<dataarea name="rom" size="1048576">
-				<rom name="bwcf01.bin" size="1048576" crc="3ed83362" sha1="2bbb454900ac99172a2d72d1e6f96a96b8d6840b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="college foot bwcf01.u1" size="1048576" crc="3ed83362" sha1="2bbb454900ac99172a2d72d1e6f96a96b8d6840b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -9783,8 +9894,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="ACSGBSW" />
+			<feature name="u1" value="ACBUSGM" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
-				<rom name="bubsy in claws encounters of the furred kind (euro, usa).bin" size="2097152" crc="3e30d365" sha1="719140754763e5062947ef9e76ee748cfad38202" offset="000000" loadflag="load16_word_swap" />
+				<rom name="acbusgm.u1" size="2097152" crc="3e30d365" sha1="719140754763e5062947ef9e76ee748cfad38202" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9794,8 +9908,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="7100 00002" />
+			<feature name="u1" value="BU2SG" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
-				<rom name="bu2sg.bin" size="2097152" crc="f8beff56" sha1="0cfb6c619798ba47f35069dea094fbc96f974ecb" offset="000000" loadflag="load16_word_swap" />
+				<rom name="bu2sg.u1" size="2097152" crc="f8beff56" sha1="0cfb6c619798ba47f35069dea094fbc96f974ecb" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9805,8 +9922,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Electronic Arts)" />
+			<feature name="u1" value="BUCK RODGERS BUC05" />   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="UM6264AL-10LL" />
+			<feature name="u3" value="SN74LS138N" />
+			<feature name="u4" value="1K5-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
-				<rom name="buc05.bin" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="buck rodgers buc05.u1" size="1048576" crc="44e3bfff" sha1="89c39f00745f2a8798fe985ad8ce28411b977f9e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9860,8 +9984,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1990</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Namcot)" />
+			<feature name="ic1" value="NAMCO GBU" />
 			<dataarea name="rom" size="524288">
-				<rom name="burning force (usa).bin" size="524288" crc="bdc8f02c" sha1="28fcb1c9b5c72255443ab5bb950a52030baaf409" offset="000000" loadflag="load16_word_swap" />
+				<rom name="namco gbu.ic1" size="524288" crc="bdc8f02c" sha1="28fcb1c9b5c72255443ab5bb950a52030baaf409" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9962,8 +10089,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="353536" />
+			<feature name="u1" value="MPR-16380 W42" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="castlevania - bloodlines (usa).bin" size="1048576" crc="fb1ea6df" sha1="4809cf80ced70e77bc7479bb652a9d9fe22ce7e6" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16380 w42.u1" size="1048576" crc="fb1ea6df" sha1="4809cf80ced70e77bc7479bb652a9d9fe22ce7e6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -10633,8 +10763,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6278A" />
+			<feature name="ic1" value="MPR-18308-F" />
+			<feature name="ic2" value="GM76C88ALK-15" />
+			<feature name="ic3" value="74HC00N" />
+			<feature name="ic4" value="BA6162" />
+			<feature name="batt-1" value="(Lithium Cell)" />
 			<dataarea name="rom" size="2097152">
-				<rom name="college football's national championship ii (usa).bin" size="2097152" crc="65b64413" sha1="9609f9934a80dba183dab603ae07f445f02b919d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18308-f.ic1" size="2097152" crc="65b64413" sha1="9609f9934a80dba183dab603ae07f445f02b919d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -10851,8 +10988,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978B-8/16" />
+			<feature name="ic1" value="MPR-18005-MX" />
 			<dataarea name="rom" size="2097152">
-				<rom name="comix zone (usa).bin" size="2097152" crc="17da0354" sha1="e8747eefdf61172be9da8787ba5be447ec73180f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18005-mx.ic1" size="2097152" crc="17da0354" sha1="e8747eefdf61172be9da8787ba5be447ec73180f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -11273,7 +11413,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-	<software name="dahnam">
+	<software name="dahna">
 		<description>Dahna Megami Tanjou (Jpn)</description>
 		<year>1991</year>
 		<publisher>IGS</publisher>
@@ -11287,18 +11427,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
-	<software name="dahnamk" cloneof="dahnam">
-		<description>Dahna (Kor)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="mpr-14636.bin" size="1048576" crc="10829ea1" sha1="655486eaf3b197063902224a8f1cc15b664f7637" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hercules" cloneof="dahnam">
+	<software name="hercules" cloneof="dahna">
 		<description>Hercules</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -13154,8 +13283,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P10001 REV J" />
+			<feature name="u1" value="FIFA SOCCER10" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
-				<rom name="soccer10.bin" size="2097152" crc="bddbb763" sha1="1cbef8c4541311b84d7388365d12a93a1f712dc4" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fifa soccer10.u1" size="2097152" crc="bddbb763" sha1="1cbef8c4541311b84d7388365d12a93a1f712dc4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -13180,8 +13312,15 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P10002 REV M" />
+			<feature name="u1" value="SOCCER FIFA01" />
+			<feature name="u2" value="GM76C88ALK-15" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="510-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="2097152">
-				<rom name="fifa01.bin" size="2097152" crc="bad30ffa" sha1="a7fcfe478b368d7d33bcbca65245f5faed9a1e07" offset="000000" loadflag="load16_word_swap" />
+				<rom name="soccer fifa01.u1" size="2097152" crc="bad30ffa" sha1="a7fcfe478b368d7d33bcbca65245f5faed9a1e07" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -13430,8 +13569,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978B-8/16" />
+			<feature name="ic1" value="Frogger" />
 			<dataarea name="rom" size="524288">
-				<rom name="frogger (usa).bin" size="524288" crc="ea2e48c0" sha1="c0ccfec43ea859ab1e83293a38cfb302c0191719" offset="000000" loadflag="load16_word_swap" />
+				<rom name="frogger.ic1" size="524288" crc="ea2e48c0" sha1="c0ccfec43ea859ab1e83293a38cfb302c0191719" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15591,8 +15733,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="The Legend of Galahad (Euro Box)"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Electronic Arts)" />
+			<feature name="u1" value="GALAHAD GAL01" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="gal01.bin" size="1048576" crc="679557bc" sha1="3368af01da1f3f9e0ea7c80783170aeb08f5c24d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="galahad gal01.bin" size="1048576" crc="679557bc" sha1="3368af01da1f3f9e0ea7c80783170aeb08f5c24d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -15847,8 +15992,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P10001 REV K?" />
+			<feature name="u1" value="LOTUS LOT205" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="lot205.bin" size="1048576" crc="1d8ee010" sha1="5a00e8aaae8d987ee0f18fc4604230265aea699e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lotus lot205.u1" size="1048576" crc="1d8ee010" sha1="5a00e8aaae8d987ee0f18fc4604230265aea699e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -16611,8 +16759,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978B-8/16" />
+			<feature name="ic1" value="MPR-17086-U" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mickey mania - the timeless adventures of mickey mouse (usa).bin" size="2097152" crc="629e5963" sha1="20779867821bab019f63ce42e3067ffafb4fe480" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17086-u.ic1" size="2097152" crc="629e5963" sha1="20779867821bab019f63ce42e3067ffafb4fe480" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -17092,8 +17243,11 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="670128 REV 1" />
+			<feature name="u1" value="MORTAL KOMBAT 3 PAL" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mortal_kombat_3_pal.bin" size="4194304" crc="af6de3e8" sha1="7f555d647972fee4e86b66e840848e91082f9c2d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mortal kombat 3 pal.u1" size="4194304" crc="af6de3e8" sha1="7f555d647972fee4e86b66e840848e91082f9c2d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -17783,8 +17937,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Arena</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nbajam" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="670120 REV 2" />
+			<feature name="u1" value="GEN NBA JAM 9402 VER 1.00 S285" />
+			<feature name="u2" value="T74LS138B1" />
+			<feature name="u3" value="GD74???" />
+			<feature name="u4" value="T74LS125AB1" />
+			<feature name="u5" value="X24C02P" />
 			<dataarea name="rom" size="2097152">
-				<rom name="s285_ver_1.00.bin" size="2097152" crc="10fa248f" sha1="99c5bc57fdea7f9df0cd8dec54160b162342344d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="gen nba jam 9402 ver 1.00 s285.u1" size="2097152" crc="10fa248f" sha1="99c5bc57fdea7f9df0cd8dec54160b162342344d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -17812,17 +17973,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_nbajamte" />
 			<dataarea name="rom" size="3145728">
 				<rom name="nba jam tournament edition (world) (fixed).bin" size="3145728" crc="6e25ebf0" sha1="0f5bb5d5352fe2ebe4b4051a1dd9b9fde4b505ab" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nbaliv95k" cloneof="nbaliv95">
-		<description>NBA Live 95 (Kor)</description>
-		<year>1994</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="lh5370hc.bin" size="2097152" crc="779c1244" sha1="115c2e8cfa6bc45767ba47efc00aede424a6de66" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -18585,8 +18735,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nhlpa" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P1000? REV F" />
+			<feature name="u1" value="NHLPA93 H9306" />
+			<feature name="u3" value="GD74LS139" />
+			<feature name="u4" value="GD74LS125AN?" />
+			<feature name="u5" value="SN74LS74AN" />
+			<feature name="u6" value="X24C01P" />
 			<dataarea name="rom" size="524288">
-				<rom name="nhlpa hockey 93 (euro, usa).bin" size="524288" crc="cbbf4262" sha1="8efc1cacb079ea223966dda065c16c49e584cac2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="nhlpa93 h9306.u1" size="524288" crc="cbbf4262" sha1="8efc1cacb079ea223966dda065c16c49e584cac2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19337,8 +19494,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P10002 REV H" />
+			<feature name="u1" value="EURO EUR003" />
+			<feature name="u2" value="GM76C88ALK-15" />
+			<feature name="u3" value="GD74LS138" />
+			<feature name="u4" value="331-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
-				<rom name="euro03.bin" size="1048576" crc="8ca45acd" sha1="640615be6891a8457d94bb81b0e8e1fa7c5119a8" offset="000000" loadflag="load16_word_swap" />
+				<rom name="euro euro03.u1" size="1048576" crc="8ca45acd" sha1="640615be6891a8457d94bb81b0e8e1fa7c5119a8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -19351,6 +19515,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Electronic Arts)" />
+			<feature name="u1" value="PGA TOUR 96 PGA9601" />   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="UM62256D-70LL" />
+			<feature name="u3" value="??74HC??" />	<!-- not readable in the pic -->
+			<feature name="u4" value="523-1026B" />
+			<feature name="u5" value="GD74HC32" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pga9601.bin" size="2097152" crc="9698bbde" sha1="abc2a8d773724cd8fb1aeae483f5ca72f47e77fa" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -19364,8 +19536,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Electronic Arts)" />
+			<feature name="u1" value="PGA Tour U1 PGA09" />   <!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u2" value="LH5160D-10L" />
+			<feature name="u3" value="HD74LS138P" />
+			<feature name="u4" value="215-1026B" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="524288">
-				<rom name="pga09.bin" size="524288" crc="c1f0b4e1" sha1="1b173a1b674a6d5bdcd539c4fe8fe984586c3a8a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="pga tour u1 pga09.u1" size="524288" crc="c1f0b4e1" sha1="1b173a1b674a6d5bdcd539c4fe8fe984586c3a8a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -19987,8 +20166,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Namcot)" />
+			<feature name="ic1" value="NAMCO GPB" />
 			<dataarea name="rom" size="524288">
-				<rom name="powerball (usa).bin" size="524288" crc="7adf232f" sha1="217d64da0b09b88dfa3fd91b7fa081ec7a8666e0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="namco gpb.ic1" size="524288" crc="7adf232f" sha1="217d64da0b09b88dfa3fd91b7fa081ec7a8666e0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20024,8 +20206,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Sega)" />
+			<feature name="ic1" value="MPR-18473-U" />
+			<feature name="ic2" value="UM62256D-70LL" />
+			<feature name="ic3" value="BA6162" />
+			<feature name="ic4" value="74HC00N" />
+			<feature name="ic5" value="74HC00N" />
+			<feature name="bat" value="(Lithium Cell)" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-18473.bin" size="1048576" crc="303b889f" sha1="2916e5ef628e077cde87be873e0ea2507ef5c844" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18473-u.ic1" size="1048576" crc="303b889f" sha1="2916e5ef628e077cde87be873e0ea2507ef5c844" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="65536">
 			</dataarea>
@@ -20131,8 +20321,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info based on US cart -->
+			<feature name="pcb" value="353536" />
+			<feature name="u1" value="FV010A1" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
-				<rom name="contra - hard corps (usa, kor).bin" size="2097152" crc="c579f45e" sha1="68ea84146105bda91f6056932ff4fb42aa3eb4a7" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fv010a1.u1" size="2097152" crc="c579f45e" sha1="68ea84146105bda91f6056932ff4fb42aa3eb4a7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20461,8 +20654,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-16020-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="race drivin' (usa).bin" size="524288" crc="d737cf3d" sha1="7961b37d364c8296d96f08a79577985113f72ba5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16020-f.ic1" size="524288" crc="d737cf3d" sha1="7961b37d364c8296d96f08a79577985113f72ba5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20522,8 +20718,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="800057-02" />
+			<feature name="ic1" value="MPR-15125 335026-1050" />
 			<dataarea name="rom" size="524288">
-				<rom name="rampart (usa).bin" size="524288" crc="9c4dd057" sha1="9dd4ee99e2ccf8759446d355584a9cbf685a3d8b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15125 335026-1050.ic1" size="524288" crc="9c4dd057" sha1="9dd4ee99e2ccf8759446d355584a9cbf685a3d8b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20626,8 +20825,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info from US cart -->
+			<feature name="pcb" value="800068-01 REV A" />
+			<feature name="ic1" value="TWI 1994 335079-1050" />
 			<dataarea name="rom" size="2097152">
-				<rom name="red zone (euro, usa).bin" size="2097152" crc="56512ee5" sha1="2e01a1ee8ff31b3eee0c422d30b529aedd7ffdc1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="twi 1994 335079-1050.ic1" size="2097152" crc="56512ee5" sha1="2e01a1ee8ff31b3eee0c422d30b529aedd7ffdc1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20944,8 +21146,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Road 3 Rash (Box)"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info based on USA cart -->
+			<feature name="pcb" value="PWA P10001 REV K" />
+			<feature name="u1" value="ROAD RASH3 RR3B3" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="2097152">
-				<rom name="rr3b3.bin" size="2097152" crc="15785956" sha1="b2324833bf81223a9626a6060cafc203dd203468" offset="000000" loadflag="load16_word_swap" />
+				<rom name="road rash3 rr3b3.u1" size="2097152" crc="15785956" sha1="b2324833bf81223a9626a6060cafc203dd203468" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20966,8 +21171,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Tengen</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="800068-01 REV A" />
+			<feature name="ic1" value="335032-1050" />
 			<dataarea name="rom" size="524288">
-				<rom name="roadblasters (usa).bin" size="524288" crc="ec6cd5f0" sha1="927cdb93e688152f2ff9a89a1b22cd6517ada652" offset="000000" loadflag="load16_word_swap" />
+				<rom name="335032-1050.ic1" size="524288" crc="ec6cd5f0" sha1="927cdb93e688152f2ff9a89a1b22cd6517ada652" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21029,8 +21237,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-16019-U" />
 			<dataarea name="rom" size="2097152">
-				<rom name="robocop versus the terminator (usa).bin" size="2097152" crc="bbad77a4" sha1="b67b708006145406f2a8dacb237517ededec359a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16019-u.ic1" size="2097152" crc="bbad77a4" sha1="b67b708006145406f2a8dacb237517ededec359a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -21134,8 +21345,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Namcot)" />
+			<feature name="u1" value="NAMCO GRT" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="rolling thunder 2 (usa).bin" size="1048576" crc="3ace429b" sha1="1b451389910e6b353c713f56137863ce2aff109d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="namco grt.u1" size="1048576" crc="3ace429b" sha1="1b451389910e6b353c713f56137863ce2aff109d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -22769,8 +22983,16 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_fram" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6656A" />
+			<feature name="ic1" value="MPR-16263 W43" />
+			<feature name="ic2" value="FM1208S-200CC" />
+			<feature name="ic3" value="HD74HC74P" />
+			<feature name="ic4" value="HD74HC139P" />
+			<feature name="ic5" value="74HC00N" />
+			<feature name="ic6" value="74HC157AP" />
 			<dataarea name="rom" size="2097152">
-				<rom name="sonic the hedgehog 3 (usa).bin" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16263 w43.ic1" size="2097152" crc="9bc192ce" sha1="75e9c4705259d84112b3e697a6c00a0813d47d71" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="fram" size="1024">
 			</dataarea>
@@ -22883,8 +23105,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info based on US cart -->
+			<feature name="pcb" value="353536" />
+			<feature name="u1" value="FX004" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="sparkster (euro).bin" size="1048576" crc="d63e9f2d" sha1="91057f22c5cea9bf08edf62862c56b939d570770" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fx004.u1" size="1048576" crc="d63e9f2d" sha1="91057f22c5cea9bf08edf62862c56b939d570770" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23031,12 +23256,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="splatth3">
+		<!-- Namcot PCB (blob epoxy chip) -->
 		<description>Splatterhouse 3 (USA)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Namcot)" />
 			<dataarea name="rom" size="2097152">
-				<rom name="splatterhouse 3 (usa).bin" size="2097152" crc="00f05d07" sha1="7f29f00ec724e20cb93907f1e33ac4af16879827" offset="000000" loadflag="load16_word_swap" />
+				<rom name="lrog456-gsh3 93364.bin" size="2097152" crc="00f05d07" sha1="7f29f00ec724e20cb93907f1e33ac4af16879827" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23908,8 +24136,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="?? (Konami)" />
+			<feature name="u1" value="MPR-15305" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-15305.bin" size="524288" crc="0ff33054" sha1="4a4f2cf397ade091e83e07bb3ffc7aa5862aeedd" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15305.u1" size="524288" crc="0ff33054" sha1="4a4f2cf397ade091e83e07bb3ffc7aa5862aeedd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -23955,8 +24186,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-15124-H" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="mpr-15124.bin" size="1048576" crc="927975be" sha1="ed4f8a98eed7838d29fa31a6f34d11f6d8887c7f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15124-h.u1" size="1048576" crc="927975be" sha1="ed4f8a98eed7838d29fa31a6f34d11f6d8887c7f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24091,8 +24325,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="ACSGPC291?" />
+			<feature name="u1" value="ACORSG" />	<!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
-				<rom name="super off road (euro, usa).bin" size="524288" crc="8f2fdada" sha1="89f264afba7aa8764b301d46cc8c51f74c23919e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="acorsg.u1" size="524288" crc="8f2fdada" sha1="89f264afba7aa8764b301d46cc8c51f74c23919e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24152,6 +24389,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ssf2" />
+			<!-- Dump To Be Confirmed (and split properly!) -->
+			<feature name="pcb" value="94666-1" />
+			<feature name="ic1" value="SSF-GS-1A" />
+			<feature name="ic2" value="SEGA 215-5779 A24" />
+			<feature name="ic2" value="SSF-GS-2A" />
+			<feature name="ic3" value="SSF-GS-3" />
 			<dataarea name="rom" size="9437184">
 				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24431,8 +24674,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1990</year>
 		<publisher>Dreamworks Games</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13142-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="target earth (usa).bin" size="524288" crc="cddf62d3" sha1="e19f7a02f140882e0364f11cd096aec712e56f83" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13142-f.ic1" size="524288" crc="cddf62d3" sha1="e19f7a02f140882e0364f11cd096aec712e56f83" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24741,8 +24987,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="353586" />
+			<feature name="u1" value="FV001A1" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="teenage mutant ninja turtles - the hyperstone heist (usa).bin" size="1048576" crc="679c41de" sha1="f440dfa689f65e782a150c1686ab90d7e5cc6355" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fv001a1.u1" size="1048576" crc="679c41de" sha1="f440dfa689f65e782a150c1686ab90d7e5cc6355" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24883,8 +25132,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="release" value="19900608"/>
 		<info name="alt_title" value="サンダーフォースIII"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info based on US cart -->
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13143-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="thunder force iii (usa, jpn).bin" size="524288" crc="1b3f399a" sha1="9eadee76eb0509d5a0f16372fc9eac7a883e5f2d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13143-f.ic1" size="524288" crc="1b3f399a" sha1="9eadee76eb0509d5a0f16372fc9eac7a883e5f2d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25077,8 +25329,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6329A" />
+			<feature name="ic1" value="MPR-16179-MX" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16179.bin" size="2097152" crc="47b0a871" sha1="ac05701d86ba8957adb8fe0b67d8b4bb51328d98" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16179-mx.ic1" size="2097152" crc="47b0a871" sha1="ac05701d86ba8957adb8fe0b67d8b4bb51328d98" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25185,8 +25440,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-17297-SM" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="top gear 2 (usa).bin" size="1048576" crc="bd3074d2" sha1="e548e2ed4f69c32dd601a2b90bcf4eeb34d36c49" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17297-sm.u1" size="1048576" crc="bd3074d2" sha1="e548e2ed4f69c32dd601a2b90bcf4eeb34d36c49" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25247,8 +25505,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Disney Interactive</publisher>
 		<info name="alt_title" value="Disney's Toy Story (Box)"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-7147A" />
+			<feature name="ic1" value="MPR-18552-U" />
 			<dataarea name="rom" size="4194304">
-				<rom name="toy story (usa).bin" size="4194304" crc="829fe313" sha1="49be571cd943fd594949c318a0bdbe6263fdd512" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18552-u.ic1" size="4194304" crc="829fe313" sha1="49be571cd943fd594949c318a0bdbe6263fdd512" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25414,8 +25675,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1991</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, PCB info based on ICEKnight's pic -->
+			<feature name="pcb" value="ACSGTU991 REV A" />
+			<feature name="u1" value="ACTUSG591" />
+			<feature name="u2" value="SN74LS04N" />
+			<feature name="u3" value="SN74LS374N" />
 			<dataarea name="rom" size="524288">
-				<rom name="turrican (euro, usa).bin" size="524288" crc="634d67a6" sha1="5a471a276909dcc428cd66c51047aa8a142c76a8" offset="000000" loadflag="load16_word_swap" />
+				<rom name="actusg591.u1" size="524288" crc="634d67a6" sha1="5a471a276909dcc428cd66c51047aa8a142c76a8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25649,8 +25915,10 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="uzukeo">
 		<description>Uzu Keobukseon (Kor)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Samsung</publisher>
+		<info name="serial" value="GM 4054 KS"/>
+		<info name="alt_title" value="우주거북선"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="uzu keobukseon (kor).bin" size="524288" crc="a7255ba8" sha1="1d59864916be04640a117082c62453c09bcbf8b8" offset="000000" loadflag="load16_word_swap" />
@@ -25771,8 +26039,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-7147A" />
+			<feature name="ic1" value="MPR-19092-U" />
 			<dataarea name="rom" size="3145728">
-				<rom name="vectorman 2 (usa).bin" size="3145728" crc="c1a24088" sha1="c5adca10408f055c0431e1ffc01d4fbab53ade01" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19092-u.ic1" size="3145728" crc="c1a24088" sha1="c5adca10408f055c0431e1ffc01d4fbab53ade01" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25862,8 +26133,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>American Sammy</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-7147A" />
+			<feature name="ic1" value="MPR-17357-SM" />
 			<dataarea name="rom" size="2097152">
-				<rom name="viewpoint (usa).bin" size="2097152" crc="59c71866" sha1="f25f770464448da4e49eab3832100ba480c9844a" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17357-sm.ic1" size="2097152" crc="59c71866" sha1="f25f770464448da4e49eab3832100ba480c9844a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -25875,17 +26149,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="viewpoint (usa) (beta).bin" size="1572864" crc="f2e69ce7" sha1="7c7a7812e8d1ab438907233ad03ec0b763a9b556" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vf2k" cloneof="vf2">
-		<description>Virtua Fighter 2 - Genesis (Kor)</description>
-		<year>1997</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="mpr-19369.bin" size="4194304" crc="a95d0949" sha1="dff095c9c252bf4af5aae52b83bc3c9d243176b7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -26370,21 +26633,21 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="ACSGEE1191 REV A" />	<!-- blurry pic, might be not 100% exact -->
+			<feature name="u1" value="9341 (c) 1/92 ACWCSG-1" />
+			<feature name="u2" value="KM28C16-20" />
+			<feature name="u3" value="KS74HCTLS00N" />
 			<dataarea name="rom" size="1048576">
-				<rom name="acwcsg-1_(1-92).bin" size="1048576" crc="f57c7068" sha1="6c948c98bbf52b849ffa1920e127c74ae04d75d1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="9341 1-92 acwcsg-1.u1" size="1048576" crc="f57c7068" sha1="6c948c98bbf52b849ffa1920e127c74ae04d75d1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software>
+<!-- LABEL(S)
 
-	<software name="wintchal1" cloneof="wintchal">
-		<description>The Games: Winter Challenge (Euro, USA)</description>
-		<year>1992</year>
-		<publisher>Ballistic</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="acwcsg_(12-91).bin" size="1048576" crc="dbc3ed1c" sha1="d2afa782f8d05afc0c3a3d6684bd4966034705c6" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+    ACCOLADE, INC.
+    9341 (c) 1/92
+    ACWCSG-1
+-->
 	</software>
 
 	<software name="wintchalp" cloneof="wintchal">
@@ -27589,10 +27852,28 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump Needed of single chips, PCB info from Euro cart -->
+			<feature name="pcb" value="670121 REV 3" />
+			<feature name="u1" value="WRESTLEMANIA ACCLAIM DR U1" />
+			<feature name="u2" value="WRESTLEMANIA ACCLAIM DR U2" />
 			<dataarea name="rom" size="4194304">
 				<rom name="9539d+9540d.bin" size="4194304" crc="a5d023f9" sha1="e49ad2f9119b0788bbbb7258908d605c032989b4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
+<!-- LABEL(S)
+
+    WRESTLEMANIA
+    (c) 1995
+    ACCLAIM DR U1
+    ENTERTAINMENT
+    9540D
+
+    WRESTLEMANIA
+    (c) 1995
+    ACCLAIM DR U2
+    ENTERTAINMENT
+    9539D
+-->
 	</software>
 
 	<software name="wwfagp" cloneof="wwfag" supported="no">
@@ -28094,8 +28375,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="353536" />
+			<feature name="u1" value="FV005" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
-				<rom name="zombies ate my neighbors (usa).bin" size="1048576" crc="2bf3626f" sha1="57090434ee3ffb060b33a1dcce91d1108bf60c47" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fv005.u1" size="1048576" crc="2bf3626f" sha1="57090434ee3ffb060b33a1dcce91d1108bf60c47" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -28106,8 +28390,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="PWA P10001 REV H" />
+			<feature name="u1" value="ZOOL ZOOL04" />
 			<dataarea name="rom" size="1048576">
-				<rom name="zool04.bin" size="1048576" crc="1ee58b03" sha1="cab14f63b7d00b35a11a3a7f60cf231199121dc8" offset="000000" loadflag="load16_word_swap" />
+				<rom name="zool zool04.u1" size="1048576" crc="1ee58b03" sha1="cab14f63b7d00b35a11a3a7f60cf231199121dc8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -28129,8 +28416,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-5978BA" />
+			<feature name="u1" value="MPR-18564-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-18564.bin" size="524288" crc="2fdac6ab" sha1="9914956f974b71d24b65e82ae3c980d0eb23c2e5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18564-f.u1" size="524288" crc="2fdac6ab" sha1="9914956f974b71d24b65e82ae3c980d0eb23c2e5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -29937,8 +30227,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_svp" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6737A" />
+			<feature name="ic1" value="315-5750?" />		<!-- SVP -->
+			<feature name="ic2" value="MPR-16420-T" />
+			<feature name="ic3" value="TC511664BJ-80" />
+			<feature name="ic4" value="HC04" />
+			<feature name="ic5" value="HC08" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mpr-16420.bin" size="2097152" crc="9624d4ef" sha1="2c3812f8a010571e51269a33a989598787d27c2d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16420-t.ic2" size="2097152" crc="9624d4ef" sha1="2c3812f8a010571e51269a33a989598787d27c2d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -29970,8 +30267,15 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<sharedfeat name="addon" value="SVP" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_svp" />
+			<!-- Dump To Be Confirmed -->
+			<feature name="pcb" value="171-6737A" />
+			<feature name="ic1" value="315-5750" />		<!-- SVP -->
+			<feature name="ic2" value="MPR-16419-T" />
+			<feature name="ic3" value="TC511664BJ-80" />
+			<feature name="ic4" value="HC04" />
+			<feature name="ic5" value="HC08" />
 			<dataarea name="rom" size="2097152">
-				<rom name="virtua racing (usa).bin" size="2097152" crc="7e1a324a" sha1="ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-16419-t.ic2" size="2097152" crc="7e1a324a" sha1="ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
