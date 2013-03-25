@@ -42,20 +42,13 @@ MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(running_machine &machine);
 
-void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag);
-
-
-/* These handlers are needed by megaplay.c */
-extern DECLARE_READ16_HANDLER( megadriv_68k_io_read );
-extern DECLARE_WRITE16_HANDLER( megadriv_68k_io_write );
-
 
 /* These are needed to create external input handlers (see e.g. MESS) */
 /* Regs are also used by Megaplay! */
 extern UINT8 (*megadrive_io_read_data_port_ptr)(running_machine &machine, int offset);
 extern void (*megadrive_io_write_data_port_ptr)(running_machine &machine, int offset, UINT16 data);
-extern UINT8 megadrive_io_data_regs[3];
-extern UINT8 megadrive_io_ctrl_regs[3];
+extern UINT8 m_megadrive_io_data_regs[3];
+extern UINT8 m_megadrive_io_ctrl_regs[3];
 
 MACHINE_START( megadriv );
 MACHINE_RESET( megadriv );
@@ -67,7 +60,7 @@ SCREEN_VBLANK( megadriv );
 
 
 
-extern int megadrive_6buttons_pad;
+extern int m_megadrive_6buttons_pad;
 
 /* Megaplay - Megatech specific */
 /* It might be possible to move the following structs in the drivers */
@@ -121,6 +114,27 @@ public:
 	void megadriv_init_common();
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
+	
+	void megadriv_z80_bank_w(UINT16 data);
+	DECLARE_WRITE16_MEMBER( megadriv_68k_z80_bank_write );
+	DECLARE_WRITE8_MEMBER(megadriv_z80_z80_bank_w);
+	DECLARE_READ16_MEMBER( megadriv_68k_io_read );
+	DECLARE_WRITE16_MEMBER( megadriv_68k_io_write );
+	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_ram );
+	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_ram );
+	DECLARE_READ16_MEMBER( megadriv_68k_check_z80_bus );
+	DECLARE_WRITE16_MEMBER( megadriv_68k_req_z80_bus );
+	DECLARE_WRITE16_MEMBER ( megadriv_68k_req_z80_reset );
+	DECLARE_READ8_MEMBER( z80_read_68k_banked_data );
+	DECLARE_WRITE8_MEMBER( z80_write_68k_banked_data );
+	DECLARE_WRITE8_MEMBER( megadriv_z80_vdp_write );
+	DECLARE_READ8_MEMBER( megadriv_z80_vdp_read );
+	DECLARE_READ8_MEMBER( megadriv_z80_unmapped_read );
+	DECLARE_READ8_MEMBER( z80_unmapped_port_r );
+	DECLARE_WRITE8_MEMBER( z80_unmapped_port_w );
+	DECLARE_READ8_MEMBER( z80_unmapped_r );
+	DECLARE_WRITE8_MEMBER( z80_unmapped_w );	
+	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
 };
 
 class md_boot_state : public md_base_state
@@ -318,6 +332,27 @@ public:
 
 	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megaplay(screen_device &screen, bool state);
+	
+	DECLARE_READ8_MEMBER( megaplay_bios_banksel_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_banksel_w );
+	DECLARE_READ8_MEMBER( megaplay_bios_gamesel_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_gamesel_w );
+	DECLARE_WRITE16_MEMBER( megaplay_io_write );
+	DECLARE_READ16_MEMBER( megaplay_io_read );
+	DECLARE_READ8_MEMBER( bank_r );
+	DECLARE_WRITE8_MEMBER( bank_w );
+	DECLARE_READ8_MEMBER( megaplay_bios_6402_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_6402_w );
+	DECLARE_READ8_MEMBER( megaplay_bios_6204_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_width_w );
+	DECLARE_READ8_MEMBER( megaplay_bios_6404_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_6404_w );
+	DECLARE_READ8_MEMBER( megaplay_bios_6600_r );
+	DECLARE_WRITE8_MEMBER( megaplay_bios_6600_w );
+	DECLARE_WRITE8_MEMBER( megaplay_game_w );
+	void mplay_start();
+	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_extra_ram );
+	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_extra_ram );	
 };
 
 class mtech_state : public md_base_state
@@ -358,6 +393,8 @@ public:
 	UINT32 screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mtnew(screen_device &screen, bool state);
 	UINT32 screen_update_megatech_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	void megatech_set_megadrive_z80_as_megadrive_z80(const char* tag);
 };
 
 

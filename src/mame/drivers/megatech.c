@@ -238,7 +238,7 @@ static TIMER_CALLBACK( megatech_z80_run_state )
 	{
 		printf("disabling SMS Z80\n");
 		state->m_current_game_is_sms = 0;
-		megatech_set_megadrive_z80_as_megadrive_z80(machine, "genesis_snd_z80");
+		state->megatech_set_megadrive_z80_as_megadrive_z80("genesis_snd_z80");
 		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}

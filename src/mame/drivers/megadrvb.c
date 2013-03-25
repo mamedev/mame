@@ -667,7 +667,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x220000, 0x220001, FUNC(aladmdb_w));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x330000, 0x330001, FUNC(aladmdb_r));
 
-	megadrive_6buttons_pad = 0;
+	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadrij);
 }
 
@@ -716,7 +716,7 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(mk3mdb_dsw_r) );
 
-	megadrive_6buttons_pad = 1;
+	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -730,7 +730,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
 
-	megadrive_6buttons_pad = 1;
+	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadrij);
 }
 
@@ -759,7 +759,7 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x770070, 0x770075, FUNC(srmdb_dsw_r) );
 
-	megadrive_6buttons_pad = 0;
+	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -771,7 +771,7 @@ DRIVER_INIT_MEMBER(md_boot_state,topshoot)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
 
-	megadrive_6buttons_pad = 0;
+	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 

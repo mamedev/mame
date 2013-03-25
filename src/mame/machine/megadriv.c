@@ -28,7 +28,7 @@ Known Non-Issues (confirmed on Real Genesis)
 
 MACHINE_CONFIG_EXTERN( megadriv );
 
-timer_device* megadriv_scanline_timer;
+extern timer_device* megadriv_scanline_timer;
 
 
 void megadriv_z80_hold(running_machine &machine)
@@ -44,34 +44,22 @@ void megadriv_z80_clear(running_machine &machine)
 	state->m_z80snd->set_input_line(0, CLEAR_LINE);
 }
 
-static void megadriv_z80_bank_w(address_space &space, UINT16 data)
+void md_base_state::megadriv_z80_bank_w(UINT16 data)
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
-	state->m_genz80.z80_bank_addr = ((state->m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
+	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
+WRITE16_MEMBER(md_base_state::megadriv_68k_z80_bank_write )
 {
 	//logerror("%06x: 68k writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
-	megadriv_z80_bank_w(space, data & 0x01);
+	megadriv_z80_bank_w(data & 0x01);
 }
 
-static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
+WRITE8_MEMBER(md_base_state::megadriv_z80_z80_bank_w)
 {
 	//logerror("%04x: z80 writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
-	megadriv_z80_bank_w(space, data & 0x01);
+	megadriv_z80_bank_w(data & 0x01);
 }
-
-
-static DECLARE_READ16_HANDLER( megadriv_68k_check_z80_bus );
-static DECLARE_WRITE16_HANDLER(megadriv_68k_req_z80_bus);
-
-static DECLARE_READ16_HANDLER( megadriv_68k_read_z80_ram );
-static DECLARE_WRITE16_HANDLER( megadriv_68k_write_z80_ram );
-
-static DECLARE_WRITE16_HANDLER( megadriv_68k_req_z80_reset );
-
-
 
 READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 {
@@ -106,12 +94,12 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 }
 
 /* Megadrive / Genesis has 3 I/O ports */
-static emu_timer *io_timeout[3];
-static int io_stage[3];
+static emu_timer *m_io_timeout[3];
+static int m_io_stage[3];
 
 static TIMER_CALLBACK( io_timeout_timer_callback )
 {
-	io_stage[(int)(FPTR)ptr] = -1;
+	m_io_stage[(int)(FPTR)ptr] = -1;
 }
 
 static void init_megadri6_io(running_machine &machine)
@@ -120,7 +108,7 @@ static void init_megadri6_io(running_machine &machine)
 
 	for (i=0; i<3; i++)
 	{
-		io_timeout[i] = machine.scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
+		m_io_timeout[i] = machine.scheduler().timer_alloc(FUNC(io_timeout_timer_callback), (void*)(FPTR)i);
 	}
 }
 
@@ -213,78 +201,78 @@ INPUT_PORTS_START( megadri6 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_NAME("P2 MODE") // mode
 INPUT_PORTS_END
 
-UINT8 megadrive_io_data_regs[3];
-UINT8 megadrive_io_ctrl_regs[3];
-static UINT8 megadrive_io_tx_regs[3];
-int megadrive_6buttons_pad = 0;
+UINT8 m_megadrive_io_data_regs[3];
+UINT8 m_megadrive_io_ctrl_regs[3];
+static UINT8 m_megadrive_io_tx_regs[3];
+int m_megadrive_6buttons_pad = 0;
 
 static void megadrive_reset_io(running_machine &machine)
 {
 	int i;
 
-	megadrive_io_data_regs[0] = 0x7f;
-	megadrive_io_data_regs[1] = 0x7f;
-	megadrive_io_data_regs[2] = 0x7f;
-	megadrive_io_ctrl_regs[0] = 0x00;
-	megadrive_io_ctrl_regs[1] = 0x00;
-	megadrive_io_ctrl_regs[2] = 0x00;
-	megadrive_io_tx_regs[0] = 0xff;
-	megadrive_io_tx_regs[1] = 0xff;
-	megadrive_io_tx_regs[2] = 0xff;
+	m_megadrive_io_data_regs[0] = 0x7f;
+	m_megadrive_io_data_regs[1] = 0x7f;
+	m_megadrive_io_data_regs[2] = 0x7f;
+	m_megadrive_io_ctrl_regs[0] = 0x00;
+	m_megadrive_io_ctrl_regs[1] = 0x00;
+	m_megadrive_io_ctrl_regs[2] = 0x00;
+	m_megadrive_io_tx_regs[0] = 0xff;
+	m_megadrive_io_tx_regs[1] = 0xff;
+	m_megadrive_io_tx_regs[2] = 0xff;
 
 	for (i=0; i<3; i++)
 	{
-		io_stage[i] = -1;
+		m_io_stage[i] = -1;
 	}
 }
 
 /************* 6 buttons version **************************/
 static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int portnum)
 {
-	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from m_megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 	static const char *const pad6names[] = { "EXTRA1", "EXTRA2", "IN0", "UNK" };
 
-	if (megadrive_io_data_regs[portnum] & 0x40)
+	if (m_megadrive_io_data_regs[portnum] & 0x40)
 	{
-		if (io_stage[portnum] == 2)
+		if (m_io_stage[portnum] == 2)
 		{
 			/* here we read B, C & the additional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x30) |
 							(machine.root_device().ioport(pad6names[portnum])->read_safe(0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 						((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) & ~helper);
 		}
 	}
 	else
 	{
-		if (io_stage[portnum] == 1)
+		if (m_io_stage[portnum] == 1)
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
-			retdata = (megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) & ~helper);
 		}
-		else if (io_stage[portnum]==2)
+		else if (m_io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
-			retdata = (megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (megadrive_io_data_regs[portnum] & helper) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
 							(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03)) & ~helper);
 		}
 	}
 
-//  mame_printf_debug("read io data port stage %d port %d %02x\n",io_stage[portnum],portnum,retdata);
+//  mame_printf_debug("read io data port stage %d port %d %02x\n",m_io_stage[portnum],portnum,retdata);
 
 	return retdata | (retdata << 8);
 }
@@ -293,19 +281,19 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 /************* 3 buttons version **************************/
 UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
 {
-	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
+	UINT8 retdata, helper = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from m_megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
-	if (megadrive_io_data_regs[portnum] & 0x40)
+	if (m_megadrive_io_data_regs[portnum] & 0x40)
 	{
 		/* here we read B, C & the directional buttons */
-		retdata = (megadrive_io_data_regs[portnum] & helper) |
+		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 					(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
-		retdata = (megadrive_io_data_regs[portnum] & helper) |
+		retdata = (m_megadrive_io_data_regs[portnum] & helper) |
 					((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
 						(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper);
 	}
@@ -343,7 +331,7 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
 static UINT8 megadrive_io_read_ctrl_port(int portnum)
 {
 	UINT8 retdata;
-	retdata = megadrive_io_ctrl_regs[portnum];
+	retdata = m_megadrive_io_ctrl_regs[portnum];
 	//mame_printf_debug("read io ctrl port %d %02x\n",portnum,retdata);
 
 	return retdata | (retdata << 8);
@@ -352,7 +340,7 @@ static UINT8 megadrive_io_read_ctrl_port(int portnum)
 static UINT8 megadrive_io_read_tx_port(int portnum)
 {
 	UINT8 retdata;
-	retdata = megadrive_io_tx_regs[portnum];
+	retdata = m_megadrive_io_tx_regs[portnum];
 	return retdata | (retdata << 8);
 }
 
@@ -367,9 +355,8 @@ static UINT8 megadrive_io_read_sctrl_port(int portnum)
 }
 
 
-READ16_HANDLER( megadriv_68k_io_read )
+READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	UINT8 retdata;
 
 	retdata = 0;
@@ -389,9 +376,9 @@ READ16_HANDLER( megadriv_68k_io_read )
 	{
 		case 0:
 			logerror("%06x read version register\n", space.device().safe_pc());
-			retdata = state->m_export << 7 | // Export
-						state->m_pal << 6 | // NTSC or PAL?
-						(state->m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
+			retdata = m_export << 7 | // Export
+						m_pal << 6 | // NTSC or PAL?
+						(m_segacd ? 0x00 : 0x20) | // 0x20 = no sega cd
 						0x00 | // Unused (Always 0)
 						0x00 | // Bit 3 of Version Number
 						0x00 | // Bit 2 of Version Number
@@ -436,7 +423,7 @@ READ16_HANDLER( megadriv_68k_io_read )
 
 static void megadrive_io_write_data_port_3button(running_machine &machine, int portnum, UINT16 data)
 {
-	megadrive_io_data_regs[portnum] = data;
+	m_megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 
 }
@@ -446,17 +433,17 @@ static void megadrive_io_write_data_port_3button(running_machine &machine, int p
 
 static void megadrive_io_write_data_port_6button(running_machine &machine, int portnum, UINT16 data)
 {
-	if (megadrive_io_ctrl_regs[portnum]&0x40)
+	if (m_megadrive_io_ctrl_regs[portnum]&0x40)
 	{
-		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
+		if (((m_megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
-			io_stage[portnum]++;
-			io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+			m_io_stage[portnum]++;
+			m_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
 		}
 
 	}
 
-	megadrive_io_data_regs[portnum] = data;
+	m_megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 
 }
@@ -466,13 +453,13 @@ static void megadrive_io_write_data_port_6button(running_machine &machine, int p
 
 static void megadrive_io_write_ctrl_port(running_machine &machine, int portnum, UINT16 data)
 {
-	megadrive_io_ctrl_regs[portnum] = data;
+	m_megadrive_io_ctrl_regs[portnum] = data;
 //  mame_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
 static void megadrive_io_write_tx_port(running_machine &machine, int portnum, UINT16 data)
 {
-	megadrive_io_tx_regs[portnum] = data;
+	m_megadrive_io_tx_regs[portnum] = data;
 }
 
 static void megadrive_io_write_rx_port(running_machine &machine, int portnum, UINT16 data)
@@ -484,7 +471,7 @@ static void megadrive_io_write_sctrl_port(running_machine &machine, int portnum,
 }
 
 
-WRITE16_HANDLER( megadriv_68k_io_write )
+WRITE16_MEMBER(md_base_state::megadriv_68k_io_write )
 {
 //  mame_printf_debug("IO Write #%02x data %04x mem_mask %04x\n",offset,data,mem_mask);
 
@@ -532,16 +519,16 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read,megadriv_68k_io_write)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
 //  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_SHARE("megadrive_vdp_vram")
@@ -560,14 +547,13 @@ ADDRESS_MAP_END
 /* z80 sounds/sub CPU */
 
 
-static READ16_HANDLER( megadriv_68k_read_z80_ram )
+READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	//mame_printf_debug("read z80 ram %04x\n",mem_mask);
 
-	if ((state->m_genz80.z80_has_bus == 0) && (state->m_genz80.z80_is_reset == 0))
+	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		return state->m_genz80.z80_prgram[(offset<<1)^1] | (state->m_genz80.z80_prgram[(offset<<1)]<<8);
+		return m_genz80.z80_prgram[(offset<<1)^1] | (m_genz80.z80_prgram[(offset<<1)]<<8);
 	}
 	else
 	{
@@ -576,24 +562,23 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	}
 }
 
-static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
+WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	//logerror("write z80 ram\n");
 
-	if ((state->m_genz80.z80_has_bus == 0) && (state->m_genz80.z80_is_reset == 0))
+	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
 		if (!ACCESSING_BITS_0_7) // byte (MSB) access
 		{
-			state->m_genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;
+			m_genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;
 		}
 		else if (!ACCESSING_BITS_8_15)
 		{
-			state->m_genz80.z80_prgram[(offset<<1)^1] = (data & 0x00ff);
+			m_genz80.z80_prgram[(offset<<1)^1] = (data & 0x00ff);
 		}
 		else // for WORD access only the MSB is used, LSB is ignored
 		{
-			state->m_genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;
+			m_genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;
 		}
 	}
 	else
@@ -603,9 +588,8 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 }
 
 
-static READ16_HANDLER( megadriv_68k_check_z80_bus )
+READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	UINT16 retvalue;
 
 	/* Double Dragon, Shadow of the Beast, Super Off Road, and Time Killers have buggy
@@ -621,7 +605,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	/* Check if the 68k has the z80 bus */
 	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{
-		if (state->m_genz80.z80_has_bus || state->m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
+		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
 		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", space.device().safe_pc(),retvalue, mem_mask);
@@ -631,7 +615,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
 		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", space.device().safe_pc(),mem_mask);
-		if (state->m_genz80.z80_has_bus || state->m_genz80.z80_is_reset) retvalue = 0x0001;
+		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
 		return retvalue;
@@ -639,7 +623,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	else
 	{
 		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", space.device().safe_pc(),mem_mask);
-		if (state->m_genz80.z80_has_bus || state->m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
+		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
 	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", space.device().safe_pc(),mem_mask, retvalue);
@@ -648,42 +632,40 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 }
 
 
-static TIMER_CALLBACK( megadriv_z80_run_state )
+TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 {
-	md_base_state *state = machine.driver_data<md_base_state>();
 	/* Is the z80 RESET line pulled? */
-	if (state->m_genz80.z80_is_reset)
+	if (m_genz80.z80_is_reset)
 	{
-		state->m_z80snd->reset();
-		state->m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
-		machine.device("ymsnd")->reset();
+		m_z80snd->reset();
+		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		machine().device("ymsnd")->reset();
 	}
 	else
 	{
 		/* Check if z80 has the bus */
-		if (state->m_genz80.z80_has_bus)
-			state->m_z80snd->resume(SUSPEND_REASON_HALT);
+		if (m_genz80.z80_has_bus)
+			m_z80snd->resume(SUSPEND_REASON_HALT);
 		else
-			state->m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+			m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
 	}
 }
 
 
-static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
+WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	/* Request the Z80 bus, allows 68k to read/write Z80 address space */
 	if (!ACCESSING_BITS_0_7) // byte access
 	{
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 0;
+			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 1;
+			m_genz80.z80_has_bus = 1;
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -691,12 +673,12 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		if (data & 0x0001)
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 0;
+			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 1;
+			m_genz80.z80_has_bus = 1;
 		}
 	}
 	else // word access
@@ -704,34 +686,33 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 0;
+			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_has_bus = 1;
+			m_genz80.z80_has_bus = 1;
 		}
 	}
 
 	/* If the z80 is running, sync the z80 execution state */
-	if (!state->m_genz80.z80_is_reset)
-		space.machine().scheduler().timer_set(attotime::zero, FUNC(megadriv_z80_run_state));
+	if (!m_genz80.z80_is_reset)
+		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
 }
 
-static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
+WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
 	if (!ACCESSING_BITS_0_7) // byte access
 	{
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 0;
+			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 1;
+			m_genz80.z80_is_reset = 1;
 		}
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
@@ -739,12 +720,12 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		if (data & 0x0001)
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 0;
+			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 1;
+			m_genz80.z80_is_reset = 1;
 		}
 	}
 	else // word access
@@ -752,15 +733,15 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		if (data & 0x0100)
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 0;
+			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
-			state->m_genz80.z80_is_reset = 1;
+			m_genz80.z80_is_reset = 1;
 		}
 	}
-	space.machine().scheduler().timer_set( attotime::zero, FUNC(megadriv_z80_run_state ));
+	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),this));
 }
 
 
@@ -768,23 +749,21 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 // add-on hardware which changes the cpu mapping like the 32x and SegaCD.
 // - we might need to add exceptions for example, z80 reading / writing the
 //   z80 area of the 68k if games misbehave
-static READ8_HANDLER( z80_read_68k_banked_data )
+READ8_MEMBER(md_base_state::z80_read_68k_banked_data )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
-	address_space &space68k = state->m_maincpu->space();
-	UINT8 ret = space68k.read_byte(state->m_genz80.z80_bank_addr+offset);
+	address_space &space68k = m_maincpu->space();
+	UINT8 ret = space68k.read_byte(m_genz80.z80_bank_addr+offset);
 	return ret;
 }
 
-static WRITE8_HANDLER( z80_write_68k_banked_data )
+WRITE8_MEMBER(md_base_state::z80_write_68k_banked_data )
 {
-	md_base_state *state = space.machine().driver_data<md_base_state>();
-	address_space &space68k = state->m_maincpu->space();
-	space68k.write_byte(state->m_genz80.z80_bank_addr+offset,data);
+	address_space &space68k = m_maincpu->space();
+	space68k.write_byte(m_genz80.z80_bank_addr+offset,data);
 }
 
 
-static WRITE8_HANDLER( megadriv_z80_vdp_write )
+WRITE8_MEMBER(md_base_state::megadriv_z80_vdp_write )
 {
 	switch (offset)
 	{
@@ -804,32 +783,32 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 
 
 
-static READ8_HANDLER( megadriv_z80_vdp_read )
+READ8_MEMBER(md_base_state::megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
 	return space.machine().rand();
 }
 
-static READ8_HANDLER( megadriv_z80_unmapped_read )
+READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
 {
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, md_base_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2612_r,ym2612_w)
 
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w) // wacky races uses this address
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x6100, 0x7eff) AM_READ_LEGACY(megadriv_z80_unmapped_read)
+	AM_RANGE(0x6100, 0x7eff) AM_READ(megadriv_z80_unmapped_read)
 
-	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE_LEGACY(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
 
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, md_base_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
@@ -842,14 +821,14 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read, megadriv_68k_io_write)
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
 
 	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
@@ -902,7 +881,7 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 MACHINE_START( megadriv )
 {
-	if (megadrive_6buttons_pad)
+	if (m_megadrive_6buttons_pad)
 		init_megadri6_io(machine);
 }
 
@@ -919,7 +898,7 @@ MACHINE_RESET( megadriv )
 		state->m_genz80.z80_has_bus = 1;
 		state->m_genz80.z80_bank_addr = 0;
 		state->m_vdp->set_scanline_counter(-1);
-		machine.scheduler().timer_set(attotime::zero, FUNC(megadriv_z80_run_state));
+		machine.scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(md_base_state::megadriv_z80_run_state),state));
 	}
 
 	megadrive_reset_io(machine);
@@ -1193,7 +1172,7 @@ void md_base_state::megadriv_init_common()
 	m68k_set_tas_callback(machine().device("maincpu"), megadriv_tas_callback);
 
 	// the drivers which need 6 buttons pad set this to 1 in their init befare calling the megadrive init
-	if (megadrive_6buttons_pad)
+	if (m_megadrive_6buttons_pad)
 	{
 		megadrive_io_read_data_port_ptr = megadrive_io_read_data_port_6button;
 		megadrive_io_write_data_port_ptr = megadrive_io_write_data_port_6button;
@@ -1320,54 +1299,53 @@ DRIVER_INIT_MEMBER(md_base_state,mpnew)
 }
 
 /* used by megatech */
-static READ8_HANDLER( z80_unmapped_port_r )
+READ8_MEMBER(md_base_state::z80_unmapped_port_r )
 {
 //  printf("unmapped z80 port read %04x\n",offset);
 	return 0;
 }
 
-static WRITE8_HANDLER( z80_unmapped_port_w )
+WRITE8_MEMBER(md_base_state::z80_unmapped_port_w )
 {
 //  printf("unmapped z80 port write %04x\n",offset);
 }
 
-static READ8_HANDLER( z80_unmapped_r )
+READ8_MEMBER(md_base_state::z80_unmapped_r )
 {
 	printf("unmapped z80 read %04x\n",offset);
 	return 0;
 }
 
-static WRITE8_HANDLER( z80_unmapped_w )
+WRITE8_MEMBER(md_base_state::z80_unmapped_w )
 {
 	printf("unmapped z80 write %04x\n",offset);
 }
 
 
 /* sets the megadrive z80 to it's normal ports / map */
-void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag)
+void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
 {
-	md_base_state *state = machine.driver_data<md_base_state>();
-	device_t *ym = machine.device("ymsnd");
+	device_t *ym = machine().device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	machine.device(tag)->memory().space(AS_IO).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
+	machine().device(tag)->memory().space(AS_IO).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_port_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_port_w),this));
 
 	/* catch any addresses that don't get mapped */
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_w),this));
 
 
-	machine.device(tag)->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	machine.root_device().membank("bank1")->set_base(state->m_genz80.z80_prgram);
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x1fff, "bank1");
+	machine().root_device().membank("bank1")->set_base(m_genz80.z80_prgram);
 
-	machine.device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, state->m_genz80.z80_prgram);
+	machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
 
 
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
-	machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x7f00, 0x7fff, read8_delegate(FUNC(mtech_state::megadriv_z80_vdp_read),this), write8_delegate(FUNC(mtech_state::megadriv_z80_vdp_write),this));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(mtech_state::z80_read_68k_banked_data),this), write8_delegate(FUNC(mtech_state::z80_write_68k_banked_data),this));
 }
 
 

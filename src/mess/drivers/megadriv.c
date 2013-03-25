@@ -85,8 +85,8 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 
 	UINT8 retdata;
 	int controller;
-	UINT8 helper_6b = (megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
-	UINT8 helper_3b = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
+	UINT8 helper_6b = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	UINT8 helper_3b = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
 
 	switch (portnum)
 	{
@@ -106,19 +106,19 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 	/* Are we using a 6 buttons Joypad? */
 	if (controller)
 	{
-		if (megadrive_io_data_regs[portnum] & 0x40)
+		if (m_megadrive_io_data_regs[portnum] & 0x40)
 		{
 			if (state->m_mess_io_stage[portnum] == 2)
 			{
 				/* here we read B, C & the additional buttons */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
 							(((state->ioport(pad6names[0][portnum])->read_safe(0) & 0x30) |
 								(state->ioport(pad6names[1][portnum])->read_safe(0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
 							((state->ioport(pad6names[0][portnum])->read_safe(0) & 0x3f) & ~helper_6b);
 			}
 		}
@@ -127,19 +127,19 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 			if (state->m_mess_io_stage[portnum] == 1)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
 							(((state->ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (state->m_mess_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
 							((((state->ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
-				retdata = (megadrive_io_data_regs[portnum] & helper_6b) |
+				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
 							((((state->ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) |
 								(state->ioport(pad6names[0][portnum])->read_safe(0) & 0x03)) & ~helper_6b);
 			}
@@ -159,18 +159,18 @@ static UINT8 mess_md_io_read_data_port(running_machine &machine, int portnum)
 		// handle test input for SVP test
 		if (portnum == 0 && svp_test)
 		{
-			retdata = (megadrive_io_data_regs[0] & 0xc0);
+			retdata = (m_megadrive_io_data_regs[0] & 0xc0);
 		}
-		else if (megadrive_io_data_regs[portnum] & 0x40)
+		else if (m_megadrive_io_data_regs[portnum] & 0x40)
 		{
 			/* here we read B, C & the directional buttons */
-			retdata = (megadrive_io_data_regs[portnum] & helper_3b) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
 						(((state->ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
-			retdata = (megadrive_io_data_regs[portnum] & helper_3b) |
+			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
 						((((state->ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
 							(state->ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper_3b);
 		}
@@ -202,9 +202,9 @@ static void mess_md_io_write_data_port(running_machine &machine, int portnum, UI
 
 	if (controller)
 	{
-		if (megadrive_io_ctrl_regs[portnum] & 0x40)
+		if (m_megadrive_io_ctrl_regs[portnum] & 0x40)
 		{
-			if (((megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
+			if (((m_megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
 				state->m_mess_io_stage[portnum]++;
 				state->m_mess_io_timeout[portnum]->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(8192));
@@ -212,7 +212,7 @@ static void mess_md_io_write_data_port(running_machine &machine, int portnum, UI
 
 		}
 	}
-	megadrive_io_data_regs[portnum] = data;
+	m_megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
 }
 

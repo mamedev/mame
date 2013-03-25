@@ -9,7 +9,7 @@
 
 #include "sound/sn76496.h"
 
-extern timer_device* megadriv_scanline_timer;
+timer_device* megadriv_scanline_timer;
 
 
 #define MAX_HPOSITION 480
