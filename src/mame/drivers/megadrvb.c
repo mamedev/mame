@@ -650,6 +650,26 @@ static MACHINE_CONFIG_START( megadrvb, md_boot_state )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 MACHINE_CONFIG_END
 
+MACHINE_START_MEMBER(md_boot_state, md_6button)
+{
+	MACHINE_START_CALL_MEMBER(megadriv);
+
+	m_io_pad_6b[0] = ioport("EXTRA1");
+	m_io_pad_6b[1] = ioport("EXTRA2");
+	m_io_pad_6b[2] = ioport("IN0");
+	m_io_pad_6b[3] = ioport("UNK");
+
+	// setup timers for 6 button pads	
+	for (int i = 0; i < 3; i++)
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+}
+
+static MACHINE_CONFIG_START( megadrvb_6b, md_boot_state )
+	MCFG_FRAGMENT_ADD(md_ntsc)
+	MCFG_MACHINE_START_OVERRIDE(md_boot_state, md_6button)
+MACHINE_CONFIG_END
+
+
 /*************************************
  *
  *  ROM definition(s)
@@ -738,7 +758,6 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x220000, 0x220001, write16_delegate(FUNC(md_boot_state::aladmdb_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x330000, 0x330001, read16_delegate(FUNC(md_boot_state::aladmdb_r),this));
 
-	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadrij);
 }
 
@@ -787,8 +806,10 @@ DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::mk3mdb_dsw_r),this));
 
-	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadriv);
+	// 6 button game, so overwrite 3 button io handlers
+	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
+	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
 DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
@@ -801,8 +822,10 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::ssf2mdb_dsw_r),this));
 
-	m_megadrive_6buttons_pad = 1;
 	DRIVER_INIT_CALL(megadrij);
+	// 6 button game, so overwrite 3 button io handlers
+	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_6button),this);
+	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
 DRIVER_INIT_MEMBER(md_boot_state,srmdb)
@@ -830,7 +853,6 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::srmdb_dsw_r),this));
 
-	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -842,7 +864,6 @@ DRIVER_INIT_MEMBER(md_boot_state,topshoot)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200046, 0x200047, "IN2");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200048, 0x200049, "IN3");
 
-	m_megadrive_6buttons_pad = 0;
 	DRIVER_INIT_CALL(megadriv);
 }
 
@@ -852,8 +873,8 @@ DRIVER_INIT_MEMBER(md_boot_state,topshoot)
  *
  *************************************/
 
-GAME( 1993, aladmdb,  0, megadrvb,   aladmdb, md_boot_state,  aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
-GAME( 1996, mk3mdb,   0, megadrvb,   mk3mdb, md_boot_state,   mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
-GAME( 1994, ssf2mdb,  0, megadrvb,   ssf2mdb, md_boot_state,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
-GAME( 1993, srmdb,    0, megadrvb,   srmdb, md_boot_state,    srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
-GAME( 1995, topshoot, 0, md_bootleg, topshoot, md_boot_state, topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
+GAME( 1993, aladmdb,  0, megadrvb,     aladmdb,  md_boot_state,  aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
+GAME( 1996, mk3mdb,   0, megadrvb_6b,  mk3mdb,   md_boot_state,  mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
+GAME( 1994, ssf2mdb,  0, megadrvb_6b,  ssf2mdb,  md_boot_state,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
+GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state,  srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
+GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state,  topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)

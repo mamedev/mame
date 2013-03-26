@@ -66,8 +66,7 @@ public:
 		m_vdp(*this,"gen_vdp"),
 		m_32x(*this,"sega32x"),
 		m_segacd(*this,"segacd"),
-		m_megadrive_ram(*this,"megadrive_ram"),
-		m_megadrive_6buttons_pad(0)
+		m_megadrive_ram(*this,"megadrive_ram")
 	{ }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
@@ -76,6 +75,10 @@ public:
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;
 	optional_shared_ptr<UINT16> m_megadrive_ram;
+
+	ioport_port *m_io_reset;
+	ioport_port *m_io_pad_3b[4];
+	ioport_port *m_io_pad_6b[4];
 
 	int m_other_hacks;	// misc hacks
 	genesis_z80_vars m_genz80;
@@ -122,13 +125,11 @@ public:
 	UINT8 m_megadrive_io_data_regs[3];
 	UINT8 m_megadrive_io_ctrl_regs[3];
 	UINT8 m_megadrive_io_tx_regs[3];
-	int m_megadrive_6buttons_pad;
 	read8_delegate m_megadrive_io_read_data_port_ptr;
 	write16_delegate m_megadrive_io_write_data_port_ptr;
 	
 
 	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
-	void init_megadri6_io();
 	void megadrive_reset_io();
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_6button);
 	DECLARE_READ8_MEMBER(megadrive_io_read_data_port_3button);
@@ -183,6 +184,8 @@ public:
 	DECLARE_READ16_MEMBER( topshoot_200051_r );	
 	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
 	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
+
+	DECLARE_MACHINE_START( md_6button );
 };
 
 

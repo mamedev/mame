@@ -24,6 +24,10 @@ public:
 	m_slotcart(*this, "mdslot")
 	{ }
 	
+	ioport_port *m_io_ctrlr;
+	ioport_port *m_io_pad3b[4];
+	ioport_port *m_io_pad6b[2][4];
+	
 	optional_device<md_cart_slot_device> m_slotcart;
 	
 	DECLARE_DRIVER_INIT(mess_md_common);
@@ -44,7 +48,12 @@ public:
 	pico_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_cons_state(mconfig, type, tag),
 	m_picocart(*this, "picoslot") { }
-	
+
+	ioport_port *m_io_page;
+	ioport_port *m_io_pad;
+	ioport_port *m_io_penx;
+	ioport_port *m_io_peny;
+
 	optional_device<pico_cart_slot_device> m_picocart;
 	UINT8 m_page_register;
 	
@@ -66,11 +75,6 @@ public:
 READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 {
 	int portnum = offset;
-	static const char *const pad6names[2][4] = {
-		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
-		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
-	};
-	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
 
 	UINT8 retdata;
 	int controller;
@@ -80,11 +84,11 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 	switch (portnum)
 	{
 		case 0:
-			controller = (ioport("CTRLSEL")->read() & 0x0f);
+			controller = (m_io_ctrlr->read() & 0x0f);
 			break;
 
 		case 1:
-			controller = (ioport("CTRLSEL")->read() & 0xf0);
+			controller = (m_io_ctrlr->read() & 0xf0);
 			break;
 
 		default:
@@ -101,14 +105,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read B, C & the additional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((ioport(pad6names[0][portnum])->read_safe(0) & 0x30) |
-								(ioport(pad6names[1][portnum])->read_safe(0) & 0x0f)) & ~helper_6b);
+							(((m_io_pad6b[0][portnum]->read_safe(0) & 0x30) |
+								(m_io_pad6b[1][portnum]->read_safe(0) & 0x0f)) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read B, C & the directional buttons */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((ioport(pad6names[0][portnum])->read_safe(0) & 0x3f) & ~helper_6b);
+							((m_io_pad6b[0][portnum]->read_safe(0) & 0x3f) & ~helper_6b);
 			}
 		}
 		else
@@ -117,20 +121,20 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 			{
 				/* here we read ((Start & A) >> 2) | 0x00 */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							(((ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) & ~helper_6b);
+							(((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) & ~helper_6b);
 			}
 			else if (m_io_stage[portnum]==2)
 			{
 				/* here we read ((Start & A) >> 2) | 0x0f */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
+							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper_6b);
 			}
 			else
 			{
 				/* here we read ((Start & A) >> 2) | Up and Down */
 				retdata = (m_megadrive_io_data_regs[portnum] & helper_6b) |
-							((((ioport(pad6names[0][portnum])->read_safe(0) & 0xc0) >> 2) |
-								(ioport(pad6names[0][portnum])->read_safe(0) & 0x03)) & ~helper_6b);
+							((((m_io_pad6b[0][portnum]->read_safe(0) & 0xc0) >> 2) |
+								(m_io_pad6b[0][portnum]->read_safe(0) & 0x03)) & ~helper_6b);
 			}
 		}
 
@@ -154,14 +158,14 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						(((ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper_3b);
+						(((m_io_pad3b[portnum]->read_safe(0) & 0x3f) | 0x40) & ~helper_3b);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (m_megadrive_io_data_regs[portnum] & helper_3b) |
-						((((ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
-							(ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper_3b);
+						((((m_io_pad3b[portnum]->read_safe(0) & 0xc0) >> 2) |
+							(m_io_pad3b[portnum]->read_safe(0) & 0x03) | 0x40) & ~helper_3b);
 		}
 	}
 
@@ -177,11 +181,11 @@ WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
 	switch (portnum)
 	{
 		case 0:
-			controller = (ioport("CTRLSEL")->read() & 0x0f);
+			controller = (m_io_ctrlr->read() & 0x0f);
 			break;
 
 		case 1:
-			controller = (ioport("CTRLSEL")->read() & 0xf0);
+			controller = (m_io_ctrlr->read() & 0xf0);
 			break;
 
 		default:
@@ -196,7 +200,7 @@ WRITE16_MEMBER(md_cons_state::mess_md_io_write_data_port)
 			if (((m_megadrive_io_data_regs[portnum] & 0x40) == 0x00) && ((data & 0x40) == 0x40))
 			{
 				m_io_stage[portnum]++;
-				m_io_timeout[portnum]->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+				m_io_timeout[portnum]->adjust(m_maincpu->cycles_to_attotime(8192));
 			}
 
 		}
@@ -318,7 +322,24 @@ UINT16 vdp_get_word_from_68k_mem_console(running_machine &machine, UINT32 source
 
 MACHINE_START_MEMBER(md_cons_state,ms_megadriv )
 {
-	init_megadri6_io();
+	static const char *const pad6names[2][4] = {
+		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
+		{ "EXTRA1", "EXTRA2", "UNUSED", "UNUSED" }
+	};
+	static const char *const pad3names[4] = { "PAD1_3B", "PAD2_3B", "UNUSED", "UNUSED" };
+
+	m_io_ctrlr = ioport("CTRLSEL");
+
+	for (int i = 0; i < 4; i++)
+	{
+		m_io_pad3b[i] = ioport(pad3names[i]);
+		m_io_pad6b[0][i] = ioport(pad6names[0][i]);
+		m_io_pad6b[1][i] = ioport(pad6names[1][i]);
+	}
+
+	// setup timers for 6 button pads	
+	for (int i = 0; i < 3; i++)
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_console;
 
@@ -886,13 +907,13 @@ UINT16 pico_state::pico_read_penpos(int pen)
 	switch (pen)
 	{
 		case PICO_PENX:
-			penpos = ioport("PENX")->read_safe(0);
+			penpos = m_io_penx->read_safe(0);
 			penpos |= 0x6;
 			penpos = penpos * 320 / 255;
 			penpos += 0x3d;
 			break;
 		case PICO_PENY:
-			penpos = ioport("PENY")->read_safe(0);
+			penpos = m_io_peny->read_safe(0);
 			penpos |= 0x6;
 			penpos = penpos * 251 / 255;
 			penpos += 0x1fc;
@@ -912,7 +933,7 @@ READ16_HANDLER(pico_state::pico_68k_io_read )
 			retdata = (m_export << 6) | (m_pal << 5);
 			break;
 		case 1:
-			retdata = ioport("PAD")->read_safe(0);
+			retdata = m_io_pad->read_safe(0);
 			break;
 
 			/*
@@ -945,7 +966,7 @@ READ16_HANDLER(pico_state::pico_68k_io_read )
 		   either page 5 or page 6 is often unused.
 		*/
 			{
-				UINT8 tmp = ioport("PAGE")->read_safe(0);
+				UINT8 tmp = m_io_page->read_safe(0);
 				if (tmp == 2 && m_page_register != 0x3f)
 				{
 					m_page_register <<= 1;
@@ -1017,6 +1038,11 @@ SLOT_INTERFACE_END
 
 MACHINE_START_MEMBER(pico_state,pico)
 {
+	m_io_page = ioport("PAGE");
+	m_io_pad = ioport("PAD");
+	m_io_penx = ioport("PENX");
+	m_io_peny = ioport("PENY");
+	
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));
