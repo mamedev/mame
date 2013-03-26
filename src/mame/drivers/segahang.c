@@ -661,6 +661,16 @@ static INPUT_PORTS_START( hangon )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hangon2 )
+	PORT_INCLUDE( hangon )
+
+	/* TODO: dips */
+
+	/* new inputs, specific to this version */
+	PORT_MODIFY("SERVICE")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Foot SW.R")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Foot SW.L")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( shangupb )
 	PORT_INCLUDE( hangon_generic )
@@ -1857,7 +1867,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1985, hangon,    0,        hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,   hangon,   hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On", 0 )
-GAME( 1985, hangon2,   hangon,   hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On (older?)", 0 )
+GAME( 1985, hangon2,   hangon,   hangon,   hangon2,   segahang_state,generic, ROT0,   "Sega", "Hang-On (older?)", 0 )
 GAME( 1987, shangonro, shangon,  shangonro,shangonro, segahang_state,generic, ROT0,   "Sega", "Super Hang-On (ride-on, Japan, FD1094 317-0038)", 0 )
 GAME( 1992, shangonrb, shangon,  shangupb, shangupb,  segahang_state,generic, ROT0,   "bootleg", "Super Hang-On (bootleg)", 0 )
 GAME( 1985, sharrier,  0,        sharrier, sharrier,  segahang_state,sharrier,ROT0,   "Sega", "Space Harrier (Rev A, 8751 315-5163A)", 0 )
