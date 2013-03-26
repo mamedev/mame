@@ -1047,6 +1047,7 @@ void spu_device::device_reset()
 
 	cdda_cnt=0;
 	cdda_playing=false;
+	m_cd_out_ptr = 0;
 
 	memset(spu_ram,0,spu_ram_size);
 	memset(reg,0,0x200);
@@ -2478,8 +2479,19 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 
 		while ((cdda_buffer->get_bytes_in()) && (n--))
 		{
-			dp[0]=clamp(dp[0]+((sp[0]*voll)>>15));
-			dp[1]=clamp(dp[1]+((sp[1]*volr)>>15));
+
+			INT16 vl = ((sp[0]*voll)>>15);
+			INT16 vr = ((sp[1]*volr)>>15);
+
+			*(signed short *)(spu_ram+m_cd_out_ptr)=vl;
+			*(signed short *)(spu_ram+m_cd_out_ptr+0x400)=vr;
+			m_cd_out_ptr=(m_cd_out_ptr+2)&0x3ff;
+
+			if((m_cd_out_ptr == (spureg.irq_addr & ~0x401)) && (spureg.ctrl & spuctrl_irq_enable))
+				m_irq_handler(1);
+
+			dp[0]=clamp(dp[0]+vl);
+			dp[1]=clamp(dp[1]+vr);
 			dp+=2;
 
 			cdda_cnt+=freq;
@@ -2501,6 +2513,14 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 			cdda_playing=false;
 
 //      if (n>0) printf("cdda buffer underflow (n=%d cdda_in=%d spf=%d)\n",n,cdda_buffer->get_bytes_in(),cdda_spf);
+	}
+	else if((spureg.irq_addr < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
+	{
+		UINT16 irq_addr = spureg.irq_addr & ~0x401;
+		UINT32 end = m_cd_out_ptr + (sz >> 1);
+		if((m_cd_out_ptr < irq_addr) && (end > irq_addr))
+			m_irq_handler(1);
+		m_cd_out_ptr =  end & 0x3fe;
 	}
 }
 

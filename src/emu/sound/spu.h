@@ -68,6 +68,8 @@ protected:
 					cur_generate_sample,
 					dirty_flags;
 
+	UINT16 m_cd_out_ptr;
+
 	signed short xa_last[4];
 	bool status_enabled,
 				xa_playing,

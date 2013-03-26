@@ -134,6 +134,7 @@ void psxcd_device::device_start()
 	secskip = 0;
 	next_read_event = -1;
 	cbp = cmdbuf;
+	m_mute = false;
 
 	status=status_shellopen;
 	sr=8|1;
@@ -556,6 +557,7 @@ void psxcd_device::cdcmd_mute()
 		printf("cdrom: mute\n");
 	#endif
 
+	m_mute = true;
 	send_result(intr_acknowledge);
 }
 
@@ -565,6 +567,7 @@ void psxcd_device::cdcmd_demute()
 		printf("cdrom: demute\n");
 	#endif
 
+	m_mute = false;
 	send_result(intr_acknowledge);
 }
 
@@ -828,9 +831,9 @@ void psxcd_device::cdcmd_id()
 		static unsigned char gamedata[8] = { 0x00, 0x00, 0x00, 0x00, 'S', 'C', 'E', 'A' };
 		static unsigned char audiodata[8] = { 0x00, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // drops into the audio CD player.  08 80 goes to the menu.
 
-		if(status & status_invalid)
+		if(cdrom_get_track_type(m_cdrom_handle, 0) == CD_TRACK_AUDIO)
 		{
-			audiodata[0] = status;
+			audiodata[0] = status | status_invalid;
 			send_result(intr_acknowledge,audiodata,8);
 		}
 		else
@@ -1138,7 +1141,9 @@ void psxcd_device::read_sector()
 			//read_next_sector();
 		} else
 		{
+#ifdef debug_cdrom
 			printf("autopause xa\n");
+#endif
 			stop_read();
 		}
 	}
@@ -1154,7 +1159,8 @@ void psxcd_device::play_sector()
 
 	if (status&status_playing)
 	{
-		m_spu->play_cdda(0,secbuf[sectail]);
+		if(!m_mute)
+			m_spu->play_cdda(0,secbuf[sectail]);
 		sectail=(sectail+1)&(sector_buffer_size-1);
 
 		curpos.b[F]++;
@@ -1179,14 +1185,15 @@ void psxcd_device::play_sector()
 		{
 			if (sector>=autopause_sector)
 			{
+#ifdef debug_cdrom
 				printf("autopause cdda\n");
-
+#endif
+				stop_read();
 				command_result *res=global_alloc(command_result);
 				res->res=intr_dataend;
-				res->data[0]=status_standby;
+				res->data[0]=status;
 				res->sz=1;
 				cmd_complete(res);
-				stop_read();
 				return;
 			}
 		}
@@ -1197,7 +1204,7 @@ void psxcd_device::play_sector()
 			UINT8 track = cdrom_get_track(m_cdrom_handle, sector) + 1;
 			res->res=intr_dataready;
 
-			res->data[0]=status_playing|status_standby;
+			res->data[0]=status;
 			res->data[1]=decimal_to_bcd(track);
 			res->data[2]=1;
 			if(sector & 0x10)
@@ -1229,12 +1236,12 @@ void psxcd_device::play_sector()
 
 		if(!read_next_sector())
 		{
+			stop_read(); // assume we've reached the end
 			command_result *res=global_alloc(command_result);
 			res->res=intr_dataend;
-			res->data[0]=status_standby;
+			res->data[0]=status;
 			res->sz=1;
 			cmd_complete(res);
-			stop_read(); // assume we've reached the end
 		}
 	}
 }
@@ -1250,9 +1257,19 @@ void psxcd_device::preread_sector()
 	int type;
 	next_read_event=-1;
 
-	//
-
 	UINT32 pos=msf_to_lba_ps(curpos.w);
+	//
+	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, pos + 150)) == CD_TRACK_AUDIO))
+	{
+		command_result *res=global_alloc(command_result);
+		res->res=intr_diskerror;
+		res->data[0]=status | status_error;
+		res->data[1]=0x40;
+		res->sz=2;
+		cmd_complete(res);
+		return;
+	}
+
 	unsigned char *buf=secbuf[sechead];
 	if (! cdrom_read_data(m_cdrom_handle, pos, buf, CD_TRACK_RAW_DONTCARE))
 	{
@@ -1419,8 +1436,6 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 		case event_change_disk:
 			open = false;
 			status |= status_standby;
-			if(cdrom_get_track_type(m_cdrom_handle, 0) == CD_TRACK_AUDIO)
-				status |= status_invalid;
 			break;
 	}
 }

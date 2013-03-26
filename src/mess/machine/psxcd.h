@@ -74,13 +74,11 @@ private:
 	};
 #endif
 
-	bool open,
+	bool open, m_mute,
 				streaming;
 	device_timer_id next_read_event;
 	INT64 next_sector_t;
-	unsigned int autopause_sector,
-								xa_prefetch_sector,
-								cdda_prefetch_sector;
+	unsigned int autopause_sector;
 
 	unsigned int start_read_delay,
 								read_sector_cycles,
