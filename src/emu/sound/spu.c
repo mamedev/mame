@@ -2518,7 +2518,7 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 	{
 		UINT16 irq_addr = spureg.irq_addr & ~0x401;
 		UINT32 end = m_cd_out_ptr + (sz >> 1);
-		if((m_cd_out_ptr < irq_addr) && (end > irq_addr))
+		if(((m_cd_out_ptr < irq_addr) && (end > irq_addr)) || ((m_cd_out_ptr > (end & 0x3ff)) && ((end & 0x3ff) > irq_addr)))
 			m_irq_handler(1);
 		m_cd_out_ptr =  end & 0x3fe;
 	}
