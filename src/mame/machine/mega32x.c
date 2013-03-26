@@ -1767,11 +1767,6 @@ const rom_entry *sega_32x_device::device_rom_region() const
 {
 	return ROM_NAME( 32x );
 }
-
-void sega_32x_device::device_config_complete()
-{
-	m_shortname = "32x";
-}
 #endif
 
 

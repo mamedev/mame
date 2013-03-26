@@ -200,7 +200,7 @@ void comx_eb_device::set_int(const char *tag, int state)
 //-------------------------------------------------
 
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock),
+	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock, "comx_eb", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "e000"),
 	m_select(0)

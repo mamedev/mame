@@ -50,7 +50,7 @@ public:
 		P0, P1, P2
 	};
 
-	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void serial_w(UINT8 val);
 

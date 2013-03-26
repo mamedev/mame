@@ -33,7 +33,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "diag264_loopback_cassette"; }
 	virtual void device_start();
 
 	// device_pet_datassette_port_interface overrides

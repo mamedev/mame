@@ -28,7 +28,7 @@ const device_type MPC105 = &device_creator<mpc105_device>;
 //-------------------------------------------------
 
 mpc105_device::mpc105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock),
+	: device_t(mconfig, MPC105, "MPC105", tag, owner, clock, "mpc105", __FILE__),
 	pci_device_interface( mconfig, *this ),
 	m_maincpu(NULL)
 {
@@ -76,7 +76,6 @@ void mpc105_device::device_config_complete()
 		m_bank_base_default = 0;
 
 	}
-	m_shortname = "mpc105";
 }
 
 //-------------------------------------------------

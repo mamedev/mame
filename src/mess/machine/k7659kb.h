@@ -58,7 +58,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete() { m_shortname = "k7659kb"; }
 	emu_timer *m_timer;
 
 private:

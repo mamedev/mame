@@ -16,7 +16,7 @@ class serial_mouse_device :
 		public device_serial_interface
 {
 public:
-	serial_mouse_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	serial_mouse_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual ioport_constructor device_input_ports() const;
 
@@ -55,7 +55,6 @@ protected:
 	virtual void set_frame() { set_data_frame(7, 2, SERIAL_PARITY_NONE); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
 	virtual void device_reset() {m_old_rts = 0; serial_mouse_device::device_reset();}
-	virtual void device_config_complete() { m_shortname = "microsoft_mouse"; }
 private:
 	void check_state();
 	UINT8 m_old_rts;
@@ -71,7 +70,6 @@ public:
 protected:
 	virtual void set_frame() { set_data_frame(8, 2, SERIAL_PARITY_NONE); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc);
-	virtual void device_config_complete() { m_shortname = "mouse_systems_mouse"; }
 private:
 	void check_state() { set_mouse_enable((m_dtr && m_rts)?true:false); }
 };

@@ -18,7 +18,7 @@ class northbridge_device :
 {
 public:
 		// construction/destruction
-		northbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+		northbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 protected:
 		// device-level overrides
 		virtual void device_start();

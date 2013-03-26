@@ -14,12 +14,11 @@ class md_std_rom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_std_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start() {};
-	virtual void device_config_complete() { m_shortname = "md_std_rom"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) { if (offset < 0x400000/2) return m_rom[MD_ADDR(offset)]; else return 0xffff; };
@@ -34,9 +33,6 @@ public:
 	// construction/destruction
 	md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_sram"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
@@ -50,9 +46,6 @@ class md_rom_fram_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_fram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_fram"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -72,7 +65,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_ssf2"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -94,7 +86,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_cm2in1"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -115,7 +106,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_mcpirate"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -134,9 +124,6 @@ public:
 	// construction/destruction
 	md_rom_bugslife_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_bugslife"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
 };
@@ -152,7 +139,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_chinf3"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -170,9 +156,6 @@ public:
 	// construction/destruction
 	md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_elfwor"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -184,9 +167,6 @@ class md_rom_yasech_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_yasech"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -200,9 +180,6 @@ public:
 	// construction/destruction
 	md_rom_kof98_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_kof98"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -214,9 +191,6 @@ class md_rom_kof99_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_kof99"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
@@ -233,7 +207,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_lion2"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -254,7 +227,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_lion3"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -273,9 +245,6 @@ public:
 	// construction/destruction
 	md_rom_mjlov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_mjlov"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -287,9 +256,6 @@ class md_rom_pokea_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_pokea"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
@@ -306,7 +272,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_pokestad"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -327,7 +292,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_realtec"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -345,9 +309,6 @@ public:
 	// construction/destruction
 	md_rom_redcl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_redcl"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -359,9 +320,6 @@ class md_rom_rx3_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_rx3"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
@@ -375,9 +333,6 @@ public:
 	// construction/destruction
 	md_rom_sbubl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_sbubl"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -390,9 +345,6 @@ public:
 	// construction/destruction
 	md_rom_smb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_smb"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
 };
@@ -404,9 +356,6 @@ class md_rom_smb2_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_smb2"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read_a13);
@@ -423,7 +372,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_smw64"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -443,9 +391,6 @@ public:
 	// construction/destruction
 	md_rom_smouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_smouse"; }
-
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 };
@@ -458,9 +403,6 @@ class md_rom_soulb_device : public md_std_rom_device
 public:
 	// construction/destruction
 	md_rom_soulb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_soulb"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -477,7 +419,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_squir"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -498,7 +439,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_topf"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -520,7 +460,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_radica"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -541,7 +480,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_beggarp"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -563,7 +501,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_rom_wukong"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);

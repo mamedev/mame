@@ -257,7 +257,7 @@ ioport_constructor s100_dj2db_device::device_input_ports() const
 //-------------------------------------------------
 
 s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S100_DJ2DB, "DJ2DB", tag, owner, clock),
+	device_t(mconfig, S100_DJ2DB, "DJ2DB", tag, owner, clock, "dj2db", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_fdc(*this, MB8866_TAG),
 	m_dbrg(*this, BR1941_TAG),

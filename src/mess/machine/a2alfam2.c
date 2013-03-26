@@ -65,24 +65,22 @@ machine_config_constructor a2bus_alfam2_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock),
+a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
 	m_sn3(*this, SN3_TAG)
 {
-	m_shortname = "a2alfam2";
 }
 
 a2bus_alfam2_device::a2bus_alfam2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, A2BUS_ALFAM2, "ALF Apple Music II", tag, owner, clock),
+	device_t(mconfig, A2BUS_ALFAM2, "ALF Apple Music II", tag, owner, clock, "a2alfam2", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_sn1(*this, SN1_TAG),
 	m_sn2(*this, SN2_TAG),
 	m_sn3(*this, SN3_TAG)
 {
-	m_shortname = "a2alfam2";
 }
 
 //-------------------------------------------------

@@ -11,13 +11,12 @@ class sns_rom21_device : public device_t,
 {
 public:
 	// construction/destruction
-	sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "sns_rom21"; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
@@ -35,7 +34,6 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "sns_rom21_srtc"; }
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);

@@ -20,7 +20,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5390_device)
 ADDRESS_MAP_END
 
 ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock)
+		: nscsi_device(mconfig, NCR5390, "5390 SCSI", tag, owner, clock, "ncr5390", __FILE__)
 {
 }
 
@@ -83,7 +83,6 @@ void ncr5390_device::device_config_complete()
 		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
 		memset(&m_drq_cb, 0, sizeof(m_drq_cb));
 	}
-	m_shortname = "ncr5390";
 }
 
 void ncr5390_device::reset_soft()

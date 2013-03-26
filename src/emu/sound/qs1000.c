@@ -183,7 +183,7 @@ ADDRESS_MAP_END
 //  qs1000_device - constructor
 //-------------------------------------------------
 qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, QS1000, "QS1000", "qs1000", tag, owner, clock),
+	: device_t(mconfig, QS1000, "QS1000", tag, owner, clock, "qs1000", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		m_space_config("samples", ENDIANNESS_LITTLE, 8, 24, 0, NULL),
@@ -191,7 +191,6 @@ qs1000_device::qs1000_device(const machine_config &mconfig, const char *tag, dev
 		m_direct(NULL),
 		m_cpu(*this, "cpu")
 {
-	m_shortname = "qs1000";
 	m_address_map[0] = *ADDRESS_MAP_NAME(qs1000);
 }
 

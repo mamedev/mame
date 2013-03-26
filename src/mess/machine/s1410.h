@@ -27,10 +27,6 @@ public:
 
 	virtual void ExecCommand( int *transferLength );
 	virtual void WriteData( UINT8 *data, int dataLength );
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
 };
 
 

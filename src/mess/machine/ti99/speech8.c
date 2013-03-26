@@ -30,10 +30,9 @@
 /****************************************************************************/
 
 ti998_spsyn_device::ti998_spsyn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, TI99_SPEECH8, "TI-99/8 Speech synthesizer (onboard)", tag, owner, clock)
+: bus8z_device(mconfig, TI99_SPEECH8, "TI-99/8 Speech synthesizer (onboard)", tag, owner, clock, "ti99_speech8", __FILE__)
 , m_load_pointer(0)
 {
-	m_shortname = "ti99_speech8";
 }
 
 /*

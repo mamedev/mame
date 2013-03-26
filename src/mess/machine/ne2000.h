@@ -21,7 +21,6 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "ne2000"; }
 private:
 	required_device<dp8390d_device> m_dp8390;
 	UINT8 m_irq;

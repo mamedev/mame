@@ -34,7 +34,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "vic10_standard"; }
 
 	// device_vic10_expansion_card_interface overrides
 	virtual UINT8 vic10_cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);

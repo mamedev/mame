@@ -12,12 +12,11 @@ class saturn_bram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size);
+	saturn_bram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "sat_bram"; }
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() { }
@@ -36,9 +35,6 @@ class saturn_bram4mb_device : public saturn_bram_device
 public:
 	// construction/destruction
 	saturn_bram4mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_bram_4mb"; }
 };
 
 class saturn_bram8mb_device : public saturn_bram_device
@@ -46,9 +42,6 @@ class saturn_bram8mb_device : public saturn_bram_device
 public:
 	// construction/destruction
 	saturn_bram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_bram_8mb"; }
 };
 
 class saturn_bram16mb_device : public saturn_bram_device
@@ -56,9 +49,6 @@ class saturn_bram16mb_device : public saturn_bram_device
 public:
 	// construction/destruction
 	saturn_bram16mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_bram_16mb"; }
 };
 
 class saturn_bram32mb_device : public saturn_bram_device
@@ -66,9 +56,6 @@ class saturn_bram32mb_device : public saturn_bram_device
 public:
 	// construction/destruction
 	saturn_bram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_bram_32mb"; }
 };
 
 

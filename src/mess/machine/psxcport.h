@@ -70,7 +70,6 @@ public:
 
 protected:
 	virtual void device_start() { }
-	virtual void device_config_complete() { m_shortname = "psx_standard_controller"; }
 private:
 	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata);
 

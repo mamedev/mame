@@ -43,7 +43,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "softbox"; }
 
 	// device_ieee488_interface overrides
 	void ieee488_atn(int state);

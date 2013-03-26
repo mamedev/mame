@@ -138,23 +138,21 @@ const rom_entry *a2bus_ssc_device::device_rom_region() const
 //**************************************************************************
 
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock),
+		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock, "a2ssc", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
 		m_acia(*this, SSC_ACIA_TAG)
 {
-	m_shortname = "a2ssc";
 }
 
-a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_dsw1(*this, "DSW1"),
 		m_dsw2(*this, "DSW2"),
 		m_acia(*this, SSC_ACIA_TAG)
 {
-	m_shortname = "a2ssc";
 }
 
 //-------------------------------------------------

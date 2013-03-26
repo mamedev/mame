@@ -67,7 +67,7 @@ ioport_constructor vic1110_device::device_input_ports() const
 //-------------------------------------------------
 
 vic1110_device::vic1110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VIC1110, "VIC1110", tag, owner, clock),
+	: device_t(mconfig, VIC1110, "VIC1110", tag, owner, clock, "vic1110", __FILE__),
 		device_vic20_expansion_card_interface(mconfig, *this),
 		m_sw(*this, "SW")
 {

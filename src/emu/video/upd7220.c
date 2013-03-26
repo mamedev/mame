@@ -679,7 +679,7 @@ inline void upd7220_device::get_graphics_partition(int index, UINT32 *sad, UINT1
 //-------------------------------------------------
 
 upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock),
+	: device_t(mconfig, UPD7220, "uPD7220", tag, owner, clock, "upd7220", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_mask(0),
 		m_pitch(0),
@@ -715,7 +715,6 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 		m_bitmap_mod(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 18, 0, NULL, *ADDRESS_MAP_NAME(upd7220_vram))
 {
-	m_shortname = "upd7220";
 	for (int i = 0; i < 16; i++)
 	{
 		m_fifo[i] = 0;

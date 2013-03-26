@@ -131,7 +131,7 @@ inline void c64_cpm_cartridge_device::update_signals()
 //-------------------------------------------------
 
 c64_cpm_cartridge_device::c64_cpm_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_CPM, "C64 CP/M cartridge", tag, owner, clock),
+	device_t(mconfig, C64_CPM, "C64 CP/M cartridge", tag, owner, clock, "c64_cpm", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, Z80_TAG),
 	m_enabled(0),

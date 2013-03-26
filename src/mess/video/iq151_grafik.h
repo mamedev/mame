@@ -33,7 +33,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "iq151_grafik"; }
 
 	// iq151cart_interface overrides
 	virtual void io_read(offs_t offset, UINT8 &data);

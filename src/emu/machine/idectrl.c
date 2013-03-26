@@ -1926,13 +1926,13 @@ const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
 //-------------------------------------------------
 
 ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock),
+	: device_t(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
 		ide_device_interface( mconfig, *this )
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		ide_device_interface(mconfig, *this)
 {
 }
@@ -1994,7 +1994,7 @@ const device_type IDE_HARDDISK_IMAGE = &device_creator<ide_hdd_image_device>;
 //-------------------------------------------------
 
 ide_hdd_image_device::ide_hdd_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ide_hdd_device(mconfig, IDE_HARDDISK_IMAGE, "IDE Hard Disk Image", tag, owner, clock)
+	: ide_hdd_device(mconfig, IDE_HARDDISK_IMAGE, "IDE Hard Disk Image", tag, owner, clock, "hdd_image", __FILE__)
 {
 }
 

@@ -62,36 +62,6 @@ const device_type MINI_CHIEF = &device_creator<mini_chief_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c1571_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	case TYPE_1570:
-		m_shortname = "c1570";
-		break;
-
-	default:
-	case TYPE_1571:
-		m_shortname = "c1571";
-		break;
-
-	case TYPE_1571CR:
-		m_shortname = "c1571cr";
-		break;
-
-	case TYPE_MINI_CHIEF:
-		m_shortname = "minichif";
-		break;
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( c1570 )
 //-------------------------------------------------
 
@@ -885,8 +855,8 @@ machine_config_constructor c1571_device::device_mconfig_additions() const
 //  c1571_device - constructor
 //-------------------------------------------------
 
-c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+c1571_device::c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -909,7 +879,7 @@ c1571_device::c1571_device(const machine_config &mconfig, device_type type, cons
 }
 
 c1571_device::c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C1571, "C1571", tag, owner, clock),
+	: device_t(mconfig, C1571, "C1571", tag, owner, clock, "c1571", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -938,7 +908,7 @@ c1571_device::c1571_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1570_device::c1570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, C1570, "C1570", tag, owner, clock, TYPE_1570)
+	: c1571_device(mconfig, C1570, "C1570", tag, owner, clock, TYPE_1570, "c1570", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525ssdd")
 {
 }
@@ -949,7 +919,7 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, TYPE_1571CR)
+	: c1571_device(mconfig, C1571CR, "C1571CR", tag, owner, clock, TYPE_1571CR, "c1571cr", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }
@@ -960,7 +930,7 @@ c1571cr_device::c1571cr_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, TYPE_MINI_CHIEF)
+	: c1571_device(mconfig, MINI_CHIEF, "ICT Mini Chief", tag, owner, clock, TYPE_MINI_CHIEF, "minichif", __FILE__)
 		//m_floppy(*this, WD1770_TAG":0:525dd")
 {
 }

@@ -116,7 +116,7 @@ ROM_END
 //-------------------------------------------------
 
 phillips_22vp931_device::phillips_22vp931_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", "22vp931", tag, owner, clock),
+	: laserdisc_device(mconfig, PHILLIPS_22VP931, "Phillips 22VP931", tag, owner, clock, "22vp931", __FILE__),
 		m_i8049_cpu(*this, "vp931"),
 		m_tracktimer(NULL),
 		m_i8049_out0(0),

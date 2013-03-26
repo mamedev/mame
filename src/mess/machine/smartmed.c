@@ -78,8 +78,8 @@ nand_device::nand_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, NAND, "NAND Flash Memory", tag, owner, clock)
 {
 }
-nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+nand_device::nand_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
@@ -793,7 +793,7 @@ void nand_device::device_reset()
 const device_type SMARTMEDIA = &device_creator<smartmedia_image_device>;
 
 smartmedia_image_device::smartmedia_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock),
+	: nand_device(mconfig, SMARTMEDIA, "SmartMedia Flash ROM", tag, owner, clock, "smartmedia", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_image_interface(NULL)
 {

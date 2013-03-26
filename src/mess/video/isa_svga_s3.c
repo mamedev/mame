@@ -59,10 +59,9 @@ const rom_entry *isa16_svga_s3_device::device_rom_region() const
 //-------------------------------------------------
 
 isa16_svga_s3_device::isa16_svga_s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA16_SVGA_S3, "SVGA S3 Graphics Card", tag, owner, clock),
+		device_t(mconfig, ISA16_SVGA_S3, "SVGA S3 Graphics Card", tag, owner, clock, "s3_764", __FILE__),
 		device_isa16_card_interface(mconfig, *this)
 {
-	m_shortname = "s3_764";
 }
 
 //-------------------------------------------------

@@ -189,12 +189,11 @@ class nes_rom_device : public device_t,
 public:
 	// construction/destruction
 	nes_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nes_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	nes_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	//protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "nes_rom"; }
 
 	// nescart_interface overrides
 //  virtual DECLARE_READ8_MEMBER(read_l);

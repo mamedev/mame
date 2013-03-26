@@ -160,7 +160,7 @@ machine_config_constructor softbox_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 softbox_device::softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SOFTBOX, "SoftBox", tag, owner, clock),
+	: device_t(mconfig, SOFTBOX, "SoftBox", tag, owner, clock, "softbox", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)
 {

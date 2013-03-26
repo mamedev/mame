@@ -33,7 +33,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "vb_std"; }
 	virtual void device_start();
 
 	// device_videobrain_expansion_card_interface overrides

@@ -280,8 +280,8 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map)
-	: cpu_device(mconfig, type, name, tag, owner, clock),
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, address_map_constructor internal_map, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),
 		m_pc(0),
@@ -312,15 +312,13 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031))
+	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031), "tms32031", __FILE__)
 {
-	m_shortname = "tms32031";
 }
 
 tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032))
+	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032), "tms32032", __FILE__)
 {
-	m_shortname = "tms32032";
 }
 
 
@@ -422,7 +420,7 @@ void tms3203x_device::device_start()
 	m_direct = &m_program->direct();
 
 	// set up the internal boot loader ROM
-	m_bootrom = reinterpret_cast<UINT32*>(memregion(m_shortname)->base());
+	m_bootrom = reinterpret_cast<UINT32*>(memregion(shortname())->base());
 	m_direct->set_direct_update(direct_update_delegate(FUNC(tms3203x_device::direct_handler), this));
 
 	// save state

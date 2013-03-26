@@ -165,7 +165,7 @@ machine_config_constructor cpc_dkspeech_device::device_mconfig_additions() const
 //**************************************************************************
 
 cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_SSA1, "SSA-1", tag, owner, clock),
+	device_t(mconfig, CPC_SSA1, "SSA-1", tag, owner, clock, "cpc_ssa1", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_lrq(1),
 	m_sp0256_device(*this,"sp0256")
@@ -173,7 +173,7 @@ cpc_ssa1_device::cpc_ssa1_device(const machine_config &mconfig, const char *tag,
 }
 
 cpc_dkspeech_device::cpc_dkspeech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_DKSPEECH, "DK'Tronics Speech Synthesiser", tag, owner, clock),
+	device_t(mconfig, CPC_DKSPEECH, "DK'Tronics Speech Synthesiser", tag, owner, clock, "cpc_dkspeech", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this),
 	m_lrq(1),
 	m_sp0256_device(*this,"sp0256")

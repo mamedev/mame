@@ -68,7 +68,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "grip"; }
 
 	// device_ecbbus_card_interface overrides
 	virtual UINT8 ecbbus_io_r(offs_t offset);

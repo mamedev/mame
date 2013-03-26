@@ -27,7 +27,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( int n_level, running_machine &machin
 }
 
 scsicb_device::scsicb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsidev_device(mconfig, SCSICB, "SCSI callback", tag, owner, clock),
+	: scsidev_device(mconfig, SCSICB, "SCSI callback", tag, owner, clock, "scsicb", __FILE__),
 	m_bsy_handler(*this),
 	m_sel_handler(*this),
 	m_cd_handler(*this),

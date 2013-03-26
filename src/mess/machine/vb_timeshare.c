@@ -28,7 +28,7 @@ const device_type VB_TIMESHARE = &device_creator<videobrain_timeshare_cartridge_
 //-------------------------------------------------
 
 videobrain_timeshare_cartridge_device::videobrain_timeshare_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VB_TIMESHARE, "VideoBrain Timeshare cartridge", tag, owner, clock),
+	device_t(mconfig, VB_TIMESHARE, "VideoBrain Timeshare cartridge", tag, owner, clock, "vb_timeshare", __FILE__),
 	device_videobrain_expansion_card_interface(mconfig, *this)
 {
 }

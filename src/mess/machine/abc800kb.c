@@ -107,8 +107,6 @@ void abc800_keyboard_device::device_config_complete()
 		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
 		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
-
-	m_shortname = "abc800kb";
 }
 
 
@@ -356,7 +354,7 @@ inline void abc800_keyboard_device::key_down(int state)
 //-------------------------------------------------
 
 abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock),
+	: device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock, "abc800kb", __FILE__),
 		m_maincpu(*this, I8048_TAG),
 		m_x0(*this, "X0"),
 		m_x1(*this, "X1"),

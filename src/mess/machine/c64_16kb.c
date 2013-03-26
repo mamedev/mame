@@ -98,7 +98,7 @@ ioport_constructor c64_16kb_cartridge_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_16kb_cartridge_device::c64_16kb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_16KB, "C64 16KB EPROM cartridge", tag, owner, clock),
+	device_t(mconfig, C64_16KB, "C64 16KB EPROM cartridge", tag, owner, clock, "c64_16kb", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_sw1(*this, "SW1")
 {

@@ -1,4 +1,4 @@
-/**********************************************************************
+	/**********************************************************************
 
     Wang PC keyboard emulation
 
@@ -65,7 +65,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "wangpckb"; }
 	virtual void device_start();
 	virtual void device_reset();
 

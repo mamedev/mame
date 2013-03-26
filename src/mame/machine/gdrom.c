@@ -29,7 +29,7 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 const device_type GDROM = &device_creator<gdrom_device>;
 
 gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, GDROM, "GDROM", tag, owner, clock)
+	: scsihle_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
 {
 }
 

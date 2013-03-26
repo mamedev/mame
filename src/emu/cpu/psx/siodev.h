@@ -21,7 +21,7 @@ class psxsiodev_device : public device_t
 
 public:
 	// construction/destruction
-	psxsiodev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	psxsiodev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides

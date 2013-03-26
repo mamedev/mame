@@ -63,7 +63,7 @@ ioport_constructor c64_4tba_device::device_input_ports() const
 //-------------------------------------------------
 
 c64_4tba_device::c64_4tba_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_4TBA, "C64 Tie Break Adapter", tag, owner, clock),
+	device_t(mconfig, C64_4TBA, "C64 Tie Break Adapter", tag, owner, clock, "c64_4tba", __FILE__),
 	device_c64_user_port_interface(mconfig, *this),
 	m_pb(*this, "PB"),
 	m_pa2(*this, "PA2")

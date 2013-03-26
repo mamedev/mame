@@ -128,22 +128,22 @@ static const rgb_t PALETTE[] =
 //  saa5050_device - constructor
 //-------------------------------------------------
 
-saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+saa5050_device::saa5050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_frame_count(0),
 		m_variant(variant)
 {
 }
 
 saa5050_device::saa5050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock),
+	: device_t(mconfig, SAA5050, "SAA5050", tag, owner, clock, "saa5050", __FILE__),
 		m_frame_count(0),
 		m_variant(TYPE_5050)
 {
 }
 
 saa5052_device::saa5052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052)
+	: saa5050_device(mconfig, SAA5052, "SAA5052", tag, owner, clock, TYPE_5052, "saa5052", __FILE__)
 {
 }
 
@@ -165,12 +165,6 @@ void saa5050_device::device_config_complete()
 	else
 	{
 		memset(&m_in_d_cb, 0, sizeof(m_in_d_cb));
-	}
-
-	switch (m_variant)
-	{
-		default:        m_shortname = "saa5050"; break;
-		case TYPE_5052: m_shortname = "saa5052"; break;
 	}
 }
 

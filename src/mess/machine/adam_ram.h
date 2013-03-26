@@ -32,7 +32,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "adam_ram"; }
 	virtual void device_start();
 
 	// device_adam_expansion_slot_card_interface overrides

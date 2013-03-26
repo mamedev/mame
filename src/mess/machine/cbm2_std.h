@@ -34,7 +34,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "cbm2_standard"; }
 	virtual void device_start();
 
 	// device_cbm2_expansion_card_interface overrides

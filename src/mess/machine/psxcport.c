@@ -29,7 +29,7 @@ machine_config_constructor psx_controller_port_device::device_mconfig_additions(
 const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		psxsiodev_device(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock)
+		psxsiodev_device(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock, "psxcontrollerports", __FILE__)
 {
 }
 
@@ -142,7 +142,7 @@ void device_psx_controller_interface::sel_w(bool state) {
 const device_type PSX_STANDARD_CONTROLLER = &device_creator<psx_standard_controller_device>;
 
 psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PSX_STANDARD_CONTROLLER, "Playstation Standard Controller", tag, owner, clock),
+		device_t(mconfig, PSX_STANDARD_CONTROLLER, "Playstation Standard Controller", tag, owner, clock, "psx_standard_controller", __FILE__),
 		device_psx_controller_interface(mconfig, *this),
 		m_pad0(*this,"PSXPAD0"),
 		m_pad1(*this,"PSXPAD1")

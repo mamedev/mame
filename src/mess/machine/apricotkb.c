@@ -44,8 +44,6 @@ void apricot_keyboard_device::device_config_complete()
 	{
 		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
 	}
-
-	m_shortname = "aprikb";
 }
 
 
@@ -269,7 +267,7 @@ ioport_constructor apricot_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 apricot_keyboard_device::apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock),
+	: device_t(mconfig, APRICOT_KEYBOARD, "Apricot Keyboard", tag, owner, clock, "aprikb", __FILE__),
 		m_y0(*this, "Y0"),
 		m_y1(*this, "Y1"),
 		m_y2(*this, "Y2"),

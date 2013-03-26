@@ -58,7 +58,7 @@ class esqpanel_device :  public device_t, public device_serial_interface, public
 {
 public:
 	// construction/destruction
-	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE_LINE_MEMBER( rx_w ) { check_for_start(state); }
 

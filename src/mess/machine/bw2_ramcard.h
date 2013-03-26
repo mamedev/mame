@@ -35,7 +35,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "bw2_ramcard"; }
 	virtual void device_start();
 	virtual void device_reset();
 

@@ -81,7 +81,7 @@ const device_type E01 = &device_creator<e01_device>;
 const device_type E01S = &device_creator<e01s_device>;
 
 e01s_device::e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:e01_device(mconfig, E01S, "Acorn FileStore E01S", tag, owner, clock) { m_variant = TYPE_E01S; }
+	:e01_device(mconfig, E01S, "Acorn FileStore E01S", tag, owner, clock, "e01s", __FILE__) { m_variant = TYPE_E01S; }
 
 
 //-------------------------------------------------
@@ -411,7 +411,7 @@ inline void e01_device::hdc_irq_enable(int enabled)
 //-------------------------------------------------
 
 e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock),
+	: device_t(mconfig, E01, "Acorn FileStore E01", tag, owner, clock, "e01" , __FILE__),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),
 		m_fdc(*this, WD2793_TAG),
@@ -435,8 +435,8 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 
-e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+e01_device::e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_econet_interface(mconfig, *this),
 		m_maincpu(*this, R65C102_TAG),
 		m_fdc(*this, WD2793_TAG),
@@ -458,29 +458,6 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 		m_clk_en(0)
 {
 }
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void e01_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	default:
-	case TYPE_E01:
-		m_shortname = "e01";
-		break;
-
-	case TYPE_E01S:
-		m_shortname = "e01s";
-		break;
-	}
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup

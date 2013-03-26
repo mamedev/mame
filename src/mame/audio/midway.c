@@ -77,7 +77,7 @@ extern const device_type MIDWAY_SQUAWK_N_TALK = &device_creator<midway_squawk_n_
 //-------------------------------------------------
 
 midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MIDWAY_SSIO, "Midway SSIO Sound Board", "midssio", tag, owner, clock),
+	: device_t(mconfig, MIDWAY_SSIO, "Midway SSIO Sound Board", tag, owner, clock, "midssio", __FILE__),
 		device_mixer_interface(mconfig, *this, 2),
 		m_cpu(*this, "cpu"),
 		m_ay0(*this, "ay0"),
@@ -541,7 +541,7 @@ void midway_ssio_device::device_timer(emu_timer &timer, device_timer_id id, int 
 //-------------------------------------------------
 
 midway_chip_squeak_deluxe_device::midway_chip_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MIDWAY_CHIP_SQUEAK_DELUXE, "Midway Chip Squeak Deluxe Sound Board", "midcsd", tag, owner, clock),
+	: device_t(mconfig, MIDWAY_CHIP_SQUEAK_DELUXE, "Midway Chip Squeak Deluxe Sound Board", tag, owner, clock, "midcsd", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -756,7 +756,7 @@ void midway_chip_squeak_deluxe_device::device_timer(emu_timer &timer, device_tim
 //-------------------------------------------------
 
 midway_sounds_good_device::midway_sounds_good_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, "Midway Sounds Good Sound Board", "midsg", tag, owner, clock),
+	: device_t(mconfig, MIDWAY_SOUNDS_GOOD, "Midway Sounds Good Sound Board", tag, owner, clock, "midsg", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -943,7 +943,7 @@ void midway_sounds_good_device::device_timer(emu_timer &timer, device_timer_id i
 //-------------------------------------------------
 
 midway_turbo_chip_squeak_device::midway_turbo_chip_squeak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MIDWAY_TURBO_CHIP_SQUEAK, "Midway Turbo Chip Squeak Sound Board", "midtcs", tag, owner, clock),
+	: device_t(mconfig, MIDWAY_TURBO_CHIP_SQUEAK, "Midway Turbo Chip Squeak Sound Board", tag, owner, clock, "midtcs", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -1123,7 +1123,7 @@ void midway_turbo_chip_squeak_device::device_timer(emu_timer &timer, device_time
 //-------------------------------------------------
 
 midway_squawk_n_talk_device::midway_squawk_n_talk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, "Midway Squawk 'n' Talk Sound Board", "midsnt", tag, owner, clock),
+	: device_t(mconfig, MIDWAY_SQUAWK_N_TALK, "Midway Squawk 'n' Talk Sound Board", tag, owner, clock, "midsnt", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia0(*this, "pia0"),

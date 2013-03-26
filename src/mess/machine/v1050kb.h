@@ -69,7 +69,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "v1050kb"; }
 
 private:
 	required_device<cpu_device> m_maincpu;

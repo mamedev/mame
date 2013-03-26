@@ -115,9 +115,8 @@
 #define ESC 0x1b
 
 ti_rs232_pio_device::ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_RS232, "TI-99 RS232/PIO interface", tag, owner, clock)
+: ti_expansion_card_device(mconfig, TI99_RS232, "TI-99 RS232/PIO interface", tag, owner, clock, "ti99_rs232", __FILE__)
 {
-	m_shortname = "ti99_rs232";
 }
 
 

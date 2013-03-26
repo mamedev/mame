@@ -61,10 +61,9 @@ const rom_entry *isa16_vga_gfxultra_device::device_rom_region() const
 //-------------------------------------------------
 
 isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, ISA16_VGA_GFXULTRA, "ATi Graphics Ultra Graphics Card", tag, owner, clock),
+		device_t(mconfig, ISA16_VGA_GFXULTRA, "ATi Graphics Ultra Graphics Card", tag, owner, clock, "gfxultra", __FILE__),
 		device_isa16_card_interface(mconfig, *this)
 {
-	m_shortname = "gfxultra";
 }
 
 //-------------------------------------------------

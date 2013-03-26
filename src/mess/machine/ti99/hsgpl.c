@@ -129,9 +129,8 @@
 #define ROM6_EEPROM "u6_rom6"
 
 snug_high_speed_gpl_device::snug_high_speed_gpl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock)
+: ti_expansion_card_device(mconfig, TI99_HSGPL, "SNUG High-speed GPL card", tag, owner, clock, "ti99_hsgpl", __FILE__)
 {
-	m_shortname = "ti99_hsgpl";
 }
 
 /*

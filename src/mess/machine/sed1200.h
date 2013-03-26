@@ -58,7 +58,7 @@
 
 class sed1200_device : public device_t {
 public:
-	sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void control_w(UINT8 data);
 	UINT8 control_r();

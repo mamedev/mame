@@ -12,12 +12,11 @@ class sns_rom20_necdsp_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom20_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "sns_rom_necdsp"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void speedup_addon_bios_access();
 
@@ -40,12 +39,11 @@ class sns_rom21_necdsp_device : public sns_rom21_device
 {
 public:
 	// construction/destruction
-	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom21_necdsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "sns_rom21_necdsp"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void speedup_addon_bios_access();
 
@@ -68,11 +66,10 @@ class sns_rom_setadsp_device : public sns_rom_device
 {
 public:
 	// construction/destruction
-	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "sns_rom_setadsp"; }
 	virtual void speedup_addon_bios_access();
 
 	required_device<upd96050_device> m_upd96050;
@@ -97,7 +94,6 @@ public:
 	sns_rom_seta10dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sns_rom_seta10"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
@@ -110,7 +106,6 @@ public:
 	sns_rom_seta11dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sns_rom_seta11"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
@@ -133,7 +128,6 @@ public:
 	sns_rom20_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp1leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -145,7 +139,6 @@ public:
 	sns_rom20_necdsp1b_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp1bleg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -157,7 +150,6 @@ public:
 	sns_rom20_necdsp2_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp2leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -169,7 +161,6 @@ public:
 	sns_rom20_necdsp3_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp3leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -181,7 +172,6 @@ public:
 	sns_rom20_necdsp4_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp4leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -193,7 +183,6 @@ public:
 	sns_rom21_necdsp1_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "dsp1leg_hi"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -205,7 +194,6 @@ public:
 	sns_rom_seta10dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "seta10leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };
@@ -217,7 +205,6 @@ public:
 	sns_rom_seta11dsp_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "seta11leg"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 };

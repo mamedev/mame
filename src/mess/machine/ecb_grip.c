@@ -666,7 +666,7 @@ ioport_constructor grip_device::device_input_ports() const
 //-------------------------------------------------
 
 grip_device::grip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ECB_GRIP21, "GRIP-2.1", tag, owner, clock),
+	device_t(mconfig, ECB_GRIP21, "GRIP-2.1", tag, owner, clock, "grip", __FILE__),
 	device_ecbbus_card_interface(mconfig, *this),
 	m_ppi(*this, I8255A_TAG),
 	m_sti(*this, Z80STI_TAG),

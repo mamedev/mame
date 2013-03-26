@@ -271,7 +271,6 @@ protected:
 		virtual void device_start();
 		virtual void device_reset();
 		virtual void device_stop();
-		virtual void device_config_complete() { m_shortname = "isa_gus"; }
 private:
 		gf1_device* m_gf1;
 		acia6850_device* m_midi;

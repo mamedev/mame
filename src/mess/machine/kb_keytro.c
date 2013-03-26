@@ -398,11 +398,10 @@ ROM_END
 
 
 pc_kbd_keytronic_pc3270_device::pc_kbd_keytronic_pc3270_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock ),
+	device_t(mconfig, PC_KBD_KEYTRONIC_PC3270, "Keytronic PC3270", tag, owner, clock, "keytronic_pc3270", __FILE__),
 	device_pc_kbd_interface(mconfig, *this),
 	m_cpu(*this, "kb_keytr")
 {
-	m_shortname = "keytronic_pc3270";
 }
 
 

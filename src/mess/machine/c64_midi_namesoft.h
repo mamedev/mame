@@ -44,7 +44,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "c64_midins"; }
 	virtual void device_start();
 	virtual void device_reset();
 

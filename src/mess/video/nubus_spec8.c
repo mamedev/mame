@@ -66,17 +66,15 @@ const rom_entry *nubus_spec8s3_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS_SPEC8S3, "SuperMac Spectrum/8 Series III video card", tag, owner, clock),
+		device_t(mconfig, NUBUS_SPEC8S3, "SuperMac Spectrum/8 Series III video card", tag, owner, clock, "nb_sp8s3", __FILE__),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_shortname = "nb_sp8s3";
 }
 
-nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+nubus_spec8s3_device::nubus_spec8s3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_shortname = "nb_sp8s3";
 }
 
 //-------------------------------------------------

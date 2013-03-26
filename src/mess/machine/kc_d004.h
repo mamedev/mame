@@ -26,7 +26,7 @@ class kc_d004_device :
 public:
 	// construction/destruction
 	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -39,7 +39,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete() { m_shortname = "kc_d004"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0xa7; }
@@ -95,7 +94,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_d004gide"; }
 
 public:
 	DECLARE_READ8_MEMBER(gide_r);

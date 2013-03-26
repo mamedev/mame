@@ -171,11 +171,10 @@ inline void m50458_device::write_word(offs_t address, UINT16 data)
 //-------------------------------------------------
 
 m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, M50458, "m50458", tag, owner, clock),
+	: device_t(mconfig, M50458, "m50458", tag, owner, clock, "m50458", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(m50458_vram))
 {
-	m_shortname = "m50458";
 }
 
 

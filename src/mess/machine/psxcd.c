@@ -101,7 +101,7 @@ static struct cdrom_interface psx_cdrom =
 };
 
 psxcd_device::psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	cdrom_image_device(mconfig, PSXCD, "Cdrom", tag, owner, clock),
+	cdrom_image_device(mconfig, PSXCD, "Cdrom", tag, owner, clock, "psx_cd", __FILE__),
 	m_irq_handler(*this)
 {
 	static_set_static_config(*this, &psx_cdrom);

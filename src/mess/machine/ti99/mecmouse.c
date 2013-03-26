@@ -51,9 +51,8 @@
 #define POLL_TIMER 1
 
 mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: joyport_attached_device(mconfig, MECMOUSE, "Mechatronics Mouse", tag, owner, clock)
+	: joyport_attached_device(mconfig, MECMOUSE, "Mechatronics Mouse", tag, owner, clock, "mecmouse", __FILE__)
 {
-	m_shortname = "mecmouse";
 }
 
 

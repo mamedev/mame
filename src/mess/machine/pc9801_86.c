@@ -127,7 +127,7 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //-------------------------------------------------
 
 pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock),
+	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock, "pc9801_86", __FILE__),
 //      m_maincpu(*owner, "maincpu"),
 		m_opna(*this, "opna")
 {

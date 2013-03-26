@@ -38,14 +38,14 @@ const device_type COCO_PAK = &device_creator<coco_pak_device>;
 //-------------------------------------------------
 //  coco_pak_device - constructor
 //-------------------------------------------------
-coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+coco_pak_device::coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this )
 {
 }
 
 coco_pak_device::coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock),
+		: device_t(mconfig, COCO_PAK, "CoCo Program PAK", tag, owner, clock, "cocopak", __FILE__),
 		device_cococart_interface( mconfig, *this )
 {
 }
@@ -60,16 +60,6 @@ void coco_pak_device::device_start()
 	m_owner = dynamic_cast<cococart_slot_device *>(owner());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_pak_device::device_config_complete()
-{
-	m_shortname = "cocopak";
-}
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -135,19 +125,8 @@ const device_type COCO_PAK_BANKED = &device_creator<coco_pak_banked_device>;
 //-------------------------------------------------
 
 coco_pak_banked_device::coco_pak_banked_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock)
+		: coco_pak_device(mconfig, COCO_PAK_BANKED, "CoCo Program PAK (Banked)", tag, owner, clock, "cocopak_banked", __FILE__)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_pak_banked_device::device_config_complete()
-{
-	m_shortname = "cocopak_banked";
 }
 
 /*-------------------------------------------------

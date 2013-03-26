@@ -47,28 +47,6 @@ const device_type D9090 = &device_creator<d9090_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void base_d9060_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	default:
-	case TYPE_9060:
-		m_shortname = "d9060";
-		break;
-
-	case TYPE_9090:
-		m_shortname = "d9090";
-		break;
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( d9060 )
 //-------------------------------------------------
 
@@ -511,8 +489,8 @@ inline void base_d9060_device::update_ieee_signals()
 //  base_d9060_device - constructor
 //-------------------------------------------------
 
-base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_DOS_TAG),
 		m_hdccpu(*this, M6502_HDC_TAG),
@@ -534,7 +512,7 @@ base_d9060_device::base_d9060_device(const machine_config &mconfig, device_type 
 //-------------------------------------------------
 
 d9060_device::d9060_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_d9060_device(mconfig, D9060, "D9060", tag, owner, clock, TYPE_9060) { }
+	: base_d9060_device(mconfig, D9060, "D9060", tag, owner, clock, TYPE_9060, "d9060", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -542,7 +520,7 @@ d9060_device::d9060_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 d9090_device::d9090_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_d9060_device(mconfig, D9090, "D9090", tag, owner, clock, TYPE_9090) { }
+	: base_d9060_device(mconfig, D9090, "D9090", tag, owner, clock, TYPE_9090, "d9090", __FILE__) { }
 
 
 //-------------------------------------------------

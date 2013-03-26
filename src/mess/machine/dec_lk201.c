@@ -73,7 +73,7 @@ const rom_entry *lk201_device::device_rom_region() const
 //-------------------------------------------------
 
 lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock),
+	: device_t(mconfig, LK201, "DEC LK201 keyboard", tag, owner, clock, "lk201", __FILE__),
 	m_maincpu(*this, LK201_CPU_TAG)
 {
 }
@@ -93,11 +93,6 @@ void lk201_device::device_start()
 
 void lk201_device::device_reset()
 {
-}
-
-void lk201_device::device_config_complete()
-{
-	m_shortname = "lk201";
 }
 
 READ8_MEMBER( lk201_device::ddr_r )

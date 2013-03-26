@@ -49,7 +49,7 @@ const device_type IQ151_VIDEO64 = &device_creator<iq151_video64_device>;
 //-------------------------------------------------
 
 iq151_video64_device::iq151_video64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, IQ151_VIDEO64, "IQ151 video64", tag, owner, clock),
+		: device_t(mconfig, IQ151_VIDEO64, "IQ151 video64", tag, owner, clock, "iq151_video64", __FILE__),
 		device_iq151cart_interface( mconfig, *this )
 {
 }

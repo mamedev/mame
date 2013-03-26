@@ -439,7 +439,7 @@ ioport_constructor isa16_ide_cd_device::device_input_ports() const
 //-------------------------------------------------
 
 isa16_ide_cd_device::isa16_ide_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, ISA16_IDE_CD, "IDE CD Drive Adapter", tag, owner, clock),
+		: device_t(mconfig, ISA16_IDE_CD, "IDE CD Drive Adapter", tag, owner, clock, "isa_ide_cd", __FILE__),
 		device_isa16_card_interface( mconfig, *this ),
 		m_is_primary(true),
 		m_inserted_cdrom(NULL)

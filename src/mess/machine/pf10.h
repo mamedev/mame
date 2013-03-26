@@ -37,7 +37,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "epson_pf10"; }
 	virtual void device_start();
 
 	// device_epson_sio_interface overrides

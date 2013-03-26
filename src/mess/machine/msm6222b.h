@@ -51,7 +51,7 @@
 class msm6222b_device : public device_t {
 public:
 	msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	void control_w(UINT8 data);
 	UINT8 control_r();

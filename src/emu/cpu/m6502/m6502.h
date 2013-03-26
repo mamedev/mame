@@ -53,7 +53,7 @@ public:
 	};
 
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	UINT64 get_cycle();
 	bool get_sync() const { return sync; }

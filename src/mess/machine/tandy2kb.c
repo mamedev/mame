@@ -232,7 +232,7 @@ ioport_constructor tandy2k_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock),
+	: device_t(mconfig, TANDY2K_KEYBOARD, "Tandy 2000 Keyboard", tag, owner, clock, "tandy2kb", __FILE__),
 		m_maincpu(*this, I8048_TAG),
 		m_y0(*this, "Y0"),
 		m_y1(*this, "Y1"),
@@ -260,8 +260,6 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 
 void tandy2k_keyboard_device::device_config_complete()
 {
-	m_shortname = "tandy2kb";
-
 	// inherit a copy of the static data
 	const tandy2k_keyboard_interface *intf = reinterpret_cast<const tandy2k_keyboard_interface *>(static_config());
 	if (intf != NULL)

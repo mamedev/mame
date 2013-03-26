@@ -148,7 +148,7 @@ ioport_constructor vp590_device::device_input_ports() const
 //-------------------------------------------------
 
 vp590_device::vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VP590, "VP590", tag, owner, clock),
+	device_t(mconfig, VP590, "VP590", tag, owner, clock, "vp590", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_cgc(*this, CDP1862_TAG),
 	m_color_ram(*this, "color_ram"),

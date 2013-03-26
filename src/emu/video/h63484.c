@@ -26,7 +26,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 h63484_device::h63484_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, H63484, "H63484", tag, owner, clock),
+	: device_t(mconfig, H63484, "H63484", tag, owner, clock, "h63484", __FILE__),
 		device_memory_interface(mconfig, *this),
 	m_ar(0),
 	m_sr(0),
@@ -43,7 +43,6 @@ h63484_device::h63484_device(const machine_config &mconfig, const char *tag, dev
 	m_dcr(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(h63484_vram))
 {
-	m_shortname = "h63484";
 }
 
 enum

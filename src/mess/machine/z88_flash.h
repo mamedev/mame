@@ -26,7 +26,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "z88_1024k_flash"; }
 
 	// z88cart_interface overrides
 	virtual DECLARE_READ8_MEMBER(read);

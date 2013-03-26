@@ -264,7 +264,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //-------------------------------------------------
 
 s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock),
+	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),
 	m_ace1(*this, INS8250_1_TAG),

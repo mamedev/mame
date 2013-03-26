@@ -70,7 +70,7 @@ machine_config_constructor c64_vic1011_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 c64_vic1011_device::c64_vic1011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C64_VIC1011, "C64 VIC1011", tag, owner, clock),
+	: device_t(mconfig, C64_VIC1011, "C64 VIC1011", tag, owner, clock, "c64_vic1011", __FILE__),
 		device_c64_user_port_interface(mconfig, *this),
 		m_rs232(*this, RS232_TAG)
 {

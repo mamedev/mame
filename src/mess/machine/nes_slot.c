@@ -1212,13 +1212,13 @@ WRITE8_MEMBER(nes_cart_slot_device::write_h)
 const device_type NES_ROM = &device_creator<nes_rom_device>;
 
 nes_rom_device::nes_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, NES_ROM, "NES ROM", tag, owner, clock),
+					: device_t(mconfig, NES_ROM, "NES ROM", tag, owner, clock, "nes_rom", __FILE__),
 					device_nes_cart_interface( mconfig, *this )
 {
 }
 
-nes_rom_device::nes_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, type, name, tag, owner, clock),
+nes_rom_device::nes_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_nes_cart_interface( mconfig, *this )
 {
 }

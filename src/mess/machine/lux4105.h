@@ -53,7 +53,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "luxor_4105"; }
 
 	// device_abc1600bus_interface overrides
 	virtual void abc1600bus_cs(UINT8 data);

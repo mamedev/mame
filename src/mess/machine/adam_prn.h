@@ -45,7 +45,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "adam_prn"; }
 	virtual void device_start();
 
 	// device_adamnet_card_interface overrides

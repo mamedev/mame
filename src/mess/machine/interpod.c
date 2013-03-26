@@ -210,7 +210,7 @@ machine_config_constructor interpod_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 interpod_device::interpod_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock),
+	: device_t(mconfig, INTERPOD, "Interpod", tag, owner, clock, "interpod", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, R6502_TAG),
 		m_via(*this, R6522_TAG),
@@ -219,18 +219,6 @@ interpod_device::interpod_device(const machine_config &mconfig, const char *tag,
 		m_ieee(*this, IEEE488_TAG)
 {
 }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void interpod_device::device_config_complete()
-{
-	m_shortname = "interpod";
-}
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup

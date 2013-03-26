@@ -57,7 +57,7 @@ const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
 //-------------------------------------------------
 
 ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock),
+	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock, "ncr537xx", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0)
 {
@@ -188,9 +188,7 @@ void ncr53c7xx_device::device_config_complete()
 	else
 	{
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-	}
-
-	m_shortname = "ncr537xx";
+	}	
 }
 
 

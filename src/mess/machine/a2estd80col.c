@@ -26,17 +26,15 @@ const device_type A2EAUX_STD80COL = &device_creator<a2eaux_std80col_device>;
 //**************************************************************************
 
 a2eaux_std80col_device::a2eaux_std80col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, A2EAUX_STD80COL, "Apple IIe Standard 80-Column Card", tag, owner, clock),
+		device_t(mconfig, A2EAUX_STD80COL, "Apple IIe Standard 80-Column Card", tag, owner, clock, "a2estd80", __FILE__),
 		device_a2eauxslot_card_interface(mconfig, *this)
 {
-	m_shortname = "a2estd80";
 }
 
-a2eaux_std80col_device::a2eaux_std80col_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+a2eaux_std80col_device::a2eaux_std80col_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2eauxslot_card_interface(mconfig, *this)
 {
-	m_shortname = "a2estd80";
 }
 
 //-------------------------------------------------

@@ -27,7 +27,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, ncr5380n_device)
 ADDRESS_MAP_END
 
 ncr5380n_device::ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock)
+		: nscsi_device(mconfig, NCR5380N, "5380 SCSI (new)", tag, owner, clock, "ncr5380", __FILE__)
 {
 }
 
@@ -87,7 +87,6 @@ void ncr5380n_device::device_config_complete()
 		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
 		memset(&m_drq_cb, 0, sizeof(m_drq_cb));
 	}
-	m_shortname = "ncr5380";
 }
 
 void ncr5380n_device::reset_soft()

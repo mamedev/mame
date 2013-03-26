@@ -63,7 +63,7 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 duartn68681_device::duartn68681_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DUARTN68681, "DUART 68681 (new)", tag, owner, clock),
+	: device_t(mconfig, DUARTN68681, "DUART 68681 (new)", tag, owner, clock, "dun68681", __FILE__),
 	m_chanA(*this, CHANA_TAG),
 	m_chanB(*this, CHANB_TAG)
 {
@@ -120,8 +120,6 @@ void duartn68681_device::device_reset()
 
 void duartn68681_device::device_config_complete()
 {
-	m_shortname = "dun68681";
-
 	// inherit a copy of the static data
 	const duartn68681_config *intf = reinterpret_cast<const duartn68681_config *>(static_config());
 	if (intf != NULL)

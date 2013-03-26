@@ -24,8 +24,8 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, cons
 {
 }
 
-snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_interface(NULL),
 		m_delay_attoseconds(0)
@@ -97,6 +97,6 @@ const device_type QUICKLOAD = &device_creator<quickload_image_device>;
 //-------------------------------------------------
 
 quickload_image_device::quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: snapshot_image_device(mconfig, QUICKLOAD, "Quickload", tag, owner, clock)
+	: snapshot_image_device(mconfig, QUICKLOAD, "Quickload", tag, owner, clock, "quickload", __FILE__)
 {
 }

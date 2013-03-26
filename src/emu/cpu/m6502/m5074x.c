@@ -37,8 +37,8 @@ const device_type M50741 = &device_creator<m50741_device>;
 //-------------------------------------------------
 //  m5074x_device - constructor
 //-------------------------------------------------
-m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map) :
-	m740_device(mconfig, type, name, tag, owner, clock),
+m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
+	m740_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	read_p0(*this),
 	read_p1(*this),
@@ -49,11 +49,6 @@ m5074x_device::m5074x_device(const machine_config &mconfig, device_type type, co
 	write_p2(*this),
 	write_p3(*this)
 {
-}
-
-void m5074x_device::device_config_complete()
-{
-	m_shortname = "m5074x";
 }
 
 //-------------------------------------------------
@@ -483,12 +478,12 @@ static ADDRESS_MAP_START( m50740_map, AS_PROGRAM, 8, m50740_device )
 ADDRESS_MAP_END
 
 m50740_device::m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m5074x_device(mconfig, M50740, "Mitsubishi M50740", tag, owner, clock, ADDRESS_MAP_NAME(m50740_map))
+	m5074x_device(mconfig, M50740, "Mitsubishi M50740", tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), "m50740", __FILE__)
 {
 }
 
-m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50740_map))
+m50740_device::m50740_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50740_map), shortname, source)
 {
 }
 
@@ -502,12 +497,12 @@ static ADDRESS_MAP_START( m50741_map, AS_PROGRAM, 8, m50741_device )
 ADDRESS_MAP_END
 
 m50741_device::m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m5074x_device(mconfig, M50740, "Mitsubishi M50741", tag, owner, clock, ADDRESS_MAP_NAME(m50741_map))
+	m5074x_device(mconfig, M50740, "Mitsubishi M50741", tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), "m50741", __FILE__)
 {
 }
 
-m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map))
+m50741_device::m50741_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), shortname, source)
 {
 }
 

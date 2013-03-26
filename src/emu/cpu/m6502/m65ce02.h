@@ -45,7 +45,7 @@
 class m65ce02_device : public m65c02_device {
 public:
 	m65ce02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	m65ce02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	static const disasm_entry disasm_entries[0x100];
 

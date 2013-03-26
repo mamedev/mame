@@ -37,9 +37,8 @@ const wd17xx_interface ti_wd17xx_interface =
 };
 
 ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock)
+: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__)
 {
-	m_shortname = "ti99_fdc";
 }
 
 /*

@@ -82,9 +82,8 @@ mie_jvs_device::mie_jvs_device(const machine_config &mconfig, const char *tag, d
 }
 
 mie_device::mie_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: maple_device(mconfig, MIE, "MIE", tag, owner, clock)
+	: maple_device(mconfig, MIE, "MIE", tag, owner, clock, "mie", __FILE__)
 {
-	m_shortname = "mie";
 	memset(gpio_name, 0, sizeof(gpio_name));
 	jvs_name = 0;
 	cpu = 0;

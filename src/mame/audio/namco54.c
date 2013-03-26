@@ -182,20 +182,9 @@ static DEVICE_START( namco_54xx )
 const device_type NAMCO_54XX = &device_creator<namco_54xx_device>;
 
 namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, NAMCO_54XX, "Namco 54xx", tag, owner, clock)
+	: device_t(mconfig, NAMCO_54XX, "Namco 54xx", tag, owner, clock, "namco54", __FILE__)
 {
 	m_token = global_alloc_clear(namco_54xx_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void namco_54xx_device::device_config_complete()
-{
-	m_shortname = "namco54";
 }
 
 //-------------------------------------------------

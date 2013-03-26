@@ -104,7 +104,7 @@ machine_config_constructor cbm2_graphic_cartridge_device::device_mconfig_additio
 //-------------------------------------------------
 
 cbm2_graphic_cartridge_device::cbm2_graphic_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CBM2_GRAPHIC, "CBM 500/600/700 High Resolution Graphics", tag, owner, clock),
+	device_t(mconfig, CBM2_GRAPHIC, "CBM 500/600/700 High Resolution Graphics", tag, owner, clock, "cbm2_graphic", __FILE__),
 	device_cbm2_expansion_card_interface(mconfig, *this),
 	//m_gdc(*this, EF9365_TAG),
 	m_variant(TYPE_A)

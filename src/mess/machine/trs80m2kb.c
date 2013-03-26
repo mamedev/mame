@@ -235,7 +235,7 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock),
+	: device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock, "trs80m2kb", __FILE__),
 		m_maincpu(*this, I8021_TAG),
 		m_y0(*this, "Y0"),
 		m_y1(*this, "Y1"),
@@ -264,8 +264,6 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 
 void trs80m2_keyboard_device::device_config_complete()
 {
-	m_shortname = "trs80m2kb";
-
 	// inherit a copy of the static data
 	const trs80m2_keyboard_interface *intf = reinterpret_cast<const trs80m2_keyboard_interface *>(static_config());
 	if (intf != NULL)

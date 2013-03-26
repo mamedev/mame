@@ -383,7 +383,7 @@ ioport_constructor wangpc_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock),
+	: device_t(mconfig, WANGPC_KEYBOARD, "Wang PC Keyboard", tag, owner, clock, "wangpckb", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_maincpu(*this, I8051_TAG),
 		m_y0(*this, "Y0"),

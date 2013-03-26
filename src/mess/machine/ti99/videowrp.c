@@ -25,18 +25,18 @@
 /*
     Constructors
 */
-ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, type, name, tag, owner, clock)
+ti_video_device::ti_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 ti_std_video_device::ti_std_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_video_device(mconfig, TI99VIDEO, "Video subsystem", tag, owner, clock)
+	: ti_video_device(mconfig, TI99VIDEO, "Video subsystem", tag, owner, clock, "ti99_video", __FILE__)
 {
 }
 
 ti_exp_video_device::ti_exp_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: ti_video_device(mconfig, V9938VIDEO, "Video subsystem", tag, owner, clock)
+	: ti_video_device(mconfig, V9938VIDEO, "Video subsystem", tag, owner, clock, "v9938_video", __FILE__)
 {
 }
 

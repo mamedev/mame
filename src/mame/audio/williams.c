@@ -99,7 +99,7 @@ extern const device_type WILLIAMS_ADPCM_SOUND = &device_creator<williams_adpcm_s
 //-------------------------------------------------
 
 williams_cvsd_sound_device::williams_cvsd_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", "wmscvsd", tag, owner, clock),
+	: device_t(mconfig, WILLIAMS_CVSD_SOUND, "Williams CVSD Sound Board", tag, owner, clock, "wmscvsd", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_pia(*this, "pia"),
@@ -349,7 +349,7 @@ void williams_cvsd_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //-------------------------------------------------
 
 williams_narc_sound_device::williams_narc_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", "wmsnarc", tag, owner, clock),
+	: device_t(mconfig, WILLIAMS_NARC_SOUND, "Williams NARC Sound Board", tag, owner, clock, "wmsnarc", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu0(*this, "cpu0"),
 		m_cpu1(*this, "cpu1"),
@@ -722,7 +722,7 @@ void williams_narc_sound_device::device_timer(emu_timer &timer, device_timer_id 
 //-------------------------------------------------
 
 williams_adpcm_sound_device::williams_adpcm_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", "wmsadpcm", tag, owner, clock),
+	: device_t(mconfig, WILLIAMS_ADPCM_SOUND, "Williams ADPCM Sound Board", tag, owner, clock, "wmsadpcm", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_cpu(*this, "cpu"),
 		m_latch(0),

@@ -51,7 +51,7 @@ class generic_terminal_device :
 	public terminal_interface
 {
 public:
-	generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 	DECLARE_WRITE8_MEMBER(kbd_put);

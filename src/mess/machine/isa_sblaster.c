@@ -1117,8 +1117,8 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
-	device_t(mconfig, type, name, tag, owner, clock),
+sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_serial_interface(mconfig, *this),
 	m_dacl(*this, "sbdacl"),
 	m_dacr(*this, "sbdacr"),
@@ -1127,14 +1127,14 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 {
 }
 
-sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
-	sb_device(mconfig, type, tag, owner, clock, name),
+sb8_device::sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa8_card_interface(mconfig, *this)
 {
 }
 
-sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
-	sb_device(mconfig, type, tag, owner, clock, name),
+sb16_device::sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source) :
+	sb_device(mconfig, type, tag, owner, clock, name, shortname, source),
 	device_isa16_card_interface(mconfig, *this)
 {
 }
@@ -1144,17 +1144,17 @@ sb16_device::sb16_device(const machine_config &mconfig, device_type type, const 
 //-------------------------------------------------
 
 isa8_sblaster1_0_device::isa8_sblaster1_0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0")
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_0, tag, owner, clock, "Sound Blaster 1.0", "isa_sblaster1_0", __FILE__)
 {
 }
 
 isa8_sblaster1_5_device::isa8_sblaster1_5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5")
+	sb8_device(mconfig, ISA8_SOUND_BLASTER_1_5, tag, owner, clock, "Sound Blaster 1.5", "isa_sblaster1_5", __FILE__)
 {
 }
 
 isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16")
+	sb16_device(mconfig, ISA16_SOUND_BLASTER_16, tag, owner, clock, "Sound Blaster 16", "isa_sblaster_16", __FILE__)
 {
 }
 

@@ -47,28 +47,6 @@ const device_type C1581 = &device_creator<c1581_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c1581_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	default:
-	case TYPE_1581:
-		m_shortname = "c1581";
-		break;
-
-	case TYPE_1563:
-		m_shortname = "c1563";
-		break;
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( c1581 )
 //-------------------------------------------------
 
@@ -329,8 +307,8 @@ machine_config_constructor c1581_device::device_mconfig_additions() const
 //  c1581_device - constructor
 //-------------------------------------------------
 
-c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_cia(*this, M8520_TAG),
@@ -346,7 +324,7 @@ c1581_device::c1581_device(const machine_config &mconfig, device_type type, cons
 }
 
 c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C1581, "C1581", tag, owner, clock),
+	: device_t(mconfig, C1581, "C1581", tag, owner, clock, "c1581", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_cia(*this, M8520_TAG),
@@ -367,7 +345,7 @@ c1581_device::c1581_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c1581_device(mconfig, C1563, "C1563", tag, owner, clock, TYPE_1563) { }
+	: c1581_device(mconfig, C1563, "C1563", tag, owner, clock, TYPE_1563, "c1563", __FILE__) { }
 
 
 //-------------------------------------------------

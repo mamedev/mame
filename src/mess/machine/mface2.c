@@ -314,7 +314,7 @@ ioport_constructor cpc_multiface2_device::device_input_ports() const
 //**************************************************************************
 
 cpc_multiface2_device::cpc_multiface2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, CPC_MFACE2, "Multiface II", tag, owner, clock),
+	device_t(mconfig, CPC_MFACE2, "Multiface II", tag, owner, clock, "cpc_mf2", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this)
 {
 }

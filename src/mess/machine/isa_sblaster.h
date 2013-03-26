@@ -96,7 +96,7 @@ class sb_device :
 {
 public:
 		// construction/destruction
-		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
+		sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 
 		required_device<dac_device> m_dacl;
 		required_device<dac_device> m_dacr;
@@ -158,7 +158,7 @@ class sb8_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
+		sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 protected:
 		virtual void device_start();
 		virtual void drq_w(int state) { m_isa->drq1_w(state); }
@@ -178,7 +178,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete() { m_shortname = "isa_sblaster1_0"; }
 private:
 		// internal state
 };
@@ -194,7 +193,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete() { m_shortname = "isa_sblaster1_5"; }
 private:
 		// internal state
 };
@@ -204,7 +202,7 @@ class sb16_device : public sb_device,
 {
 public:
 		// construction/destruction
-		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
+		sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname, const char *source);
 		DECLARE_READ8_MEMBER(mpu401_r);
 		DECLARE_WRITE8_MEMBER(mpu401_w);
 		DECLARE_READ8_MEMBER(mixer_r);
@@ -236,7 +234,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete() { m_shortname = "isa_sblaster_16"; }
 private:
 		// internal state
 };

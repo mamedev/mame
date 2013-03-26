@@ -49,9 +49,8 @@ static const char *const joynames[2][4] =
 static const char *const keynames[] = { "KP0", "KP1", "KP2", "KP3", "KP4" };
 
 ti99_handset_device::ti99_handset_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: joyport_attached_device(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock)
+: joyport_attached_device(mconfig, HANDSET, "TI-99/4 IR handset", tag, owner, clock, "handset", __FILE__)
 {
-	m_shortname = "handset";
 }
 
 #define POLL_TIMER 1
@@ -494,9 +493,8 @@ INPUT_PORTS_START( joysticks )
 INPUT_PORTS_END
 
 ti99_twin_joystick::ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: joyport_attached_device(mconfig, HANDSET, "TI-99/4(A) Twin Joystick", tag, owner, clock)
+: joyport_attached_device(mconfig, HANDSET, "TI-99/4(A) Twin Joystick", tag, owner, clock, "twinjoy", __FILE__)
 {
-	m_shortname = "twinjoy";
 }
 
 void ti99_twin_joystick::device_start(void)

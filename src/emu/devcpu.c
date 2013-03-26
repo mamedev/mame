@@ -50,8 +50,8 @@
 //  cpu_device - constructor
 //-------------------------------------------------
 
-cpu_device::cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+cpu_device::cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_execute_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
@@ -74,7 +74,7 @@ cpu_device::~cpu_device()
 //-------------------------------------------------
 
 legacy_cpu_device::legacy_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func get_info)
-	: cpu_device(mconfig, type, "CPU", tag, owner, clock),
+	: cpu_device(mconfig, type, "CPU", tag, owner, clock, "", __FILE__),
 		m_get_info(get_info),
 		m_token(NULL),
 		m_set_info(reinterpret_cast<cpu_set_info_func>(get_legacy_fct(CPUINFO_FCT_SET_INFO))),

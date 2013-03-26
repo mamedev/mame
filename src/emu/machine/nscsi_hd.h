@@ -15,7 +15,6 @@ public:
 protected:
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "scsi_harddisk"; }
 
 	virtual void scsi_command();
 	virtual UINT8 scsi_get_data(int id, int pos);

@@ -48,7 +48,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "serbox"; }
 
 	// device_cbm_iec_interface overrides
 	void cbm_iec_atn(int state);

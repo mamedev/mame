@@ -167,7 +167,7 @@ class lynx_sound_device : public device_t,
 {
 public:
 	lynx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~lynx_sound_device() { global_free(m_token); }
 
 	// access to legacy token

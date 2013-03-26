@@ -81,7 +81,7 @@ machine_config_constructor c64_reu_cartridge_device::device_mconfig_additions() 
 //-------------------------------------------------
 
 c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, int jp1, size_t ram_size) :
-	device_t(mconfig, type, name, tag, owner, clock),
+	device_t(mconfig, type, name, tag, owner, clock, "c64_reu", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_dmac(*this, MOS8726R1_TAG),
 	m_variant(variant),

@@ -386,7 +386,7 @@ inline void c8280_device::update_ieee_signals()
 //-------------------------------------------------
 
 c8280_device::c8280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C8280, "C8280", tag, owner, clock),
+	: device_t(mconfig, C8280, "C8280", tag, owner, clock, "c8280", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_DOS_TAG),
 		m_fdccpu(*this, M6502_FDC_TAG),

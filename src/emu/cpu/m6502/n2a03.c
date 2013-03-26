@@ -43,7 +43,7 @@
 const device_type N2A03 = &device_creator<n2a03_device>;
 
 n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock)
+	m6502_device(mconfig, N2A03, "N2A03", tag, owner, clock, "n2a03", __FILE__)
 {
 }
 

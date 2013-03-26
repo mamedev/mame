@@ -28,7 +28,7 @@ const device_type C64_REX = &device_creator<c64_rex_cartridge_device>;
 //-------------------------------------------------
 
 c64_rex_cartridge_device::c64_rex_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_REX, "C64 Rex cartridge", tag, owner, clock),
+	device_t(mconfig, C64_REX, "C64 Rex cartridge", tag, owner, clock, "c64_rex", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

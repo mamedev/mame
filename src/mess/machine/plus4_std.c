@@ -28,7 +28,7 @@ const device_type PLUS4_STD = &device_creator<plus4_standard_cartridge_device>;
 //-------------------------------------------------
 
 plus4_standard_cartridge_device::plus4_standard_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PLUS4_STD, "Plus/4 standard cartridge", tag, owner, clock),
+	device_t(mconfig, PLUS4_STD, "Plus/4 standard cartridge", tag, owner, clock, "plus4_standard", __FILE__),
 	device_plus4_expansion_card_interface(mconfig, *this)
 {
 }

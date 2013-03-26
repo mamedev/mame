@@ -28,7 +28,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "i82371ab"; }
 
 	UINT32 pci_isa_r(device_t *busdevice, int offset, UINT32 mem_mask);
 	void pci_isa_w(device_t *busdevice, int offset, UINT32 data, UINT32 mem_mask);

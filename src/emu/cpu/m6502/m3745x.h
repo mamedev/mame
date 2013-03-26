@@ -59,7 +59,7 @@ public:
 	};
 
 	// construction/destruction
-	m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
+	m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	const address_space_config m_program_config;
 
@@ -122,7 +122,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete();
 	virtual void execute_set_input(int inputnum, int state);
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
 
@@ -144,7 +143,7 @@ class m37450_device : public m3745x_device
 {
 public:
 	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 

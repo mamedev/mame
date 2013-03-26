@@ -121,7 +121,7 @@ machine_config_constructor c64_tdos_cartridge_device::device_mconfig_additions()
 //-------------------------------------------------
 
 c64_tdos_cartridge_device::c64_tdos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_TDOS, "C64 TDOS cartridge", tag, owner, clock),
+	device_t(mconfig, C64_TDOS, "C64 TDOS cartridge", tag, owner, clock, "c64_tdos", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_ssda(*this, MC68A52P_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG)

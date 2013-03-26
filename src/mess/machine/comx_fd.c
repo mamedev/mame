@@ -128,7 +128,7 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock),
+	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock, "comx_fd", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, WD1770_TAG":0"),

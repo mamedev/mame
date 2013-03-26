@@ -509,8 +509,8 @@ lynx_sound_device::lynx_sound_device(const machine_config &mconfig, const char *
 	m_token = global_alloc_clear(lynx_sound_state);
 }
 
-lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+lynx_sound_device::lynx_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(lynx_sound_state);
@@ -558,7 +558,7 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, stream_sample_
 const device_type LYNX2 = &device_creator<lynx2_sound_device>;
 
 lynx2_sound_device::lynx2_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: lynx_sound_device(mconfig, LYNX2, "Mikey (Lynx II)", tag, owner, clock)
+	: lynx_sound_device(mconfig, LYNX2, "Mikey (Lynx II)", tag, owner, clock, "lynx2_sound", __FILE__)
 {
 }
 

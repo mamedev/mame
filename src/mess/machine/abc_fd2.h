@@ -43,7 +43,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "abc_fd2"; }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);

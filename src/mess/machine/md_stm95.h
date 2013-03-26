@@ -58,13 +58,12 @@ class md_eeprom_stm95_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_eeprom_stm95"; }
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);

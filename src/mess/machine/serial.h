@@ -37,7 +37,7 @@ class serial_port_device : public device_t,
 {
 public:
 	serial_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	virtual ~serial_port_device();
 
 	DECLARE_WRITE_LINE_MEMBER( tx ) { if(m_dev) m_dev->tx(state); }

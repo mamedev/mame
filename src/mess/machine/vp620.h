@@ -39,7 +39,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "vp620"; }
 	virtual void device_start();
 
 	// device_vip_byteio_port_interface overrides

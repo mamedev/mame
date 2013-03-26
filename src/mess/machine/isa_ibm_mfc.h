@@ -35,7 +35,6 @@ public:
 		// Optional information overrides
 		virtual machine_config_constructor  device_mconfig_additions() const;
 		virtual ioport_constructor          device_input_ports() const;
-		virtual void device_config_complete() { m_shortname = "ibm_mfc"; }
 
 		DECLARE_READ8_MEMBER( ppi0_i_a );
 		DECLARE_WRITE8_MEMBER( ppi0_o_b );

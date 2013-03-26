@@ -78,48 +78,6 @@ const device_type SFD1001 = &device_creator<sfd1001_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c2040_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	default:
-	case TYPE_2040:
-		m_shortname = "c2040";
-		break;
-
-	case TYPE_3040:
-		m_shortname = "c3040";
-		break;
-
-	case TYPE_4040:
-		m_shortname = "c4040";
-		break;
-
-	case TYPE_8050:
-		m_shortname = "c8050";
-		break;
-
-	case TYPE_8250:
-		m_shortname = "c8250";
-		break;
-
-	case TYPE_8250LP:
-		m_shortname = "c8250lp";
-		break;
-
-	case TYPE_SFD1001:
-		m_shortname = "sfd1001";
-		break;
-	}
-}
-
-
-//-------------------------------------------------
 //  ROM( c2040 )
 //-------------------------------------------------
 
@@ -1460,8 +1418,8 @@ inline void c2040_device::mpi_step_motor(int unit, int stp)
 //  c2040_device - constructor
 //-------------------------------------------------
 
-c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_fdccpu(*this, M6504_TAG),
@@ -1499,7 +1457,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 }
 
 c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C2040, "C2040", tag, owner, clock),
+	: device_t(mconfig, C2040, "C2040", tag, owner, clock, "c2040", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_fdccpu(*this, M6504_TAG),
@@ -1541,7 +1499,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c2040_device(mconfig, C3040, "C3040", tag, owner, clock, TYPE_3040) { }
+	: c2040_device(mconfig, C3040, "C3040", tag, owner, clock, TYPE_3040, "c3040", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1549,18 +1507,18 @@ c3040_device::c3040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c2040_device(mconfig, C4040, "C4040", tag, owner, clock, TYPE_4040) { }
+	: c2040_device(mconfig, C4040, "C4040", tag, owner, clock, TYPE_4040, "c4040", __FILE__) { }
 
 
 //-------------------------------------------------
 //  c8050_device - constructor
 //-------------------------------------------------
 
-c8050_device::c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: c2040_device(mconfig, type, name, tag, owner, clock, variant) { }
+c8050_device::c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: c2040_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
 
 c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c2040_device(mconfig, C8050, "C8050", tag, owner, clock, TYPE_8050) { }
+	: c2040_device(mconfig, C8050, "C8050", tag, owner, clock, TYPE_8050, "c8050", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1568,7 +1526,7 @@ c8050_device::c8050_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c8050_device(mconfig, C8250, "C8250", tag, owner, clock, TYPE_8250) { }
+	: c8050_device(mconfig, C8250, "C8250", tag, owner, clock, TYPE_8250, "c8250", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1576,7 +1534,7 @@ c8250_device::c8250_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c8050_device(mconfig, C8250LP, "C8250LP", tag, owner, clock, TYPE_8250LP) { }
+	: c8050_device(mconfig, C8250LP, "C8250LP", tag, owner, clock, TYPE_8250LP, "c8250lp", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1584,7 +1542,7 @@ c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: c8050_device(mconfig, SFD1001, "SFD1001", tag, owner, clock, TYPE_SFD1001) { }
+	: c8050_device(mconfig, SFD1001, "SFD1001", tag, owner, clock, TYPE_SFD1001, "sfd1001", __FILE__) { }
 
 
 //-------------------------------------------------

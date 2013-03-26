@@ -34,7 +34,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "plus4_standard"; }
 	virtual void device_start();
 
 	// device_plus4_expansion_card_interface overrides

@@ -78,23 +78,21 @@ const rom_entry *nubus_appleenet_device::device_rom_region() const
 //  nubus_mac8390_device - constructor
 //-------------------------------------------------
 
-nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock),
+nubus_mac8390_device::nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, NUBUS_ASNTMC3NB, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this),
 		m_dp83902(*this, MAC8390_839X)
 {
 }
 
 nubus_asntmc3nb_device::nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock)
+		nubus_mac8390_device(mconfig, NUBUS_ASNTMC3NB, "Asante MC3NB Ethernet card", tag, owner, clock, "nb_amc3b", __FILE__)
 {
-	m_shortname = "nb_amc3b";
 }
 
 nubus_appleenet_device::nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock)
+		nubus_mac8390_device(mconfig, NUBUS_APPLEENET, "Apple NuBus Ethernet card", tag, owner, clock, "nb_aenet", __FILE__)
 {
-	m_shortname = "nb_aenet";
 }
 
 //-------------------------------------------------

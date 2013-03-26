@@ -25,7 +25,6 @@ public:
 protected:
 	virtual void device_start() { m_owner = dynamic_cast<serial_port_device *>(owner()); }
 	virtual void device_reset() { }
-	virtual void device_config_complete() { m_shortname = "midiin_port"; }
 private:
 	serial_port_device *m_owner;
 	required_device<midiin_device> m_midiin;

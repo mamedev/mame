@@ -140,7 +140,7 @@ inline void sed1330_device::increment_csr()
 //-------------------------------------------------
 
 sed1330_device::sed1330_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SED1330, "SED1330", tag, owner, clock),
+	: device_t(mconfig, SED1330, "SED1330", tag, owner, clock, "sed1330", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_bf(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(sed1330))

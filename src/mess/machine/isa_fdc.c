@@ -59,8 +59,8 @@ static MACHINE_CONFIG_FRAGMENT( cfg_superio )
 MACHINE_CONFIG_END
 
 
-isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock),
+isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	fdc(*this, "fdc")
 {
@@ -105,9 +105,8 @@ void isa8_fdc_device::eop_w(int state)
 	fdc->tc_w(state == ASSERT_LINE);
 }
 
-isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits XT FDC hookup", tag, owner, clock)
+isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits XT FDC hookup", tag, owner, clock, "isa8_fdc_xt", __FILE__)
 {
-	m_shortname = "isa8_fdc_xt";
 }
 
 machine_config_constructor isa8_fdc_xt_device::device_mconfig_additions() const
@@ -115,9 +114,8 @@ machine_config_constructor isa8_fdc_xt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_xt);
 }
 
-isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_AT, "ISA 8bits AT FDC hookup", tag, owner, clock)
+isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_AT, "ISA 8bits AT FDC hookup", tag, owner, clock, "isa8_fdc_at", __FILE__)
 {
-	m_shortname = "isa8_fdc_at";
 }
 
 machine_config_constructor isa8_fdc_at_device::device_mconfig_additions() const
@@ -125,9 +123,8 @@ machine_config_constructor isa8_fdc_at_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_at);
 }
 
-isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits SMC FDC hookup", tag, owner, clock)
+isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits SMC FDC hookup", tag, owner, clock, "isa8_fdc_smc", __FILE__)
 {
-	m_shortname = "isa8_fdc_smc";
 }
 
 machine_config_constructor isa8_fdc_smc_device::device_mconfig_additions() const
@@ -135,9 +132,8 @@ machine_config_constructor isa8_fdc_smc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_smc);
 }
 
-isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, "ISA 8bits PS/2 FDC hookup", tag, owner, clock)
+isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, "ISA 8bits PS/2 FDC hookup", tag, owner, clock, "isa8_fdc_ps2", __FILE__)
 {
-	m_shortname = "isa8_fdc_ps2";
 }
 
 machine_config_constructor isa8_fdc_ps2_device::device_mconfig_additions() const
@@ -145,9 +141,8 @@ machine_config_constructor isa8_fdc_ps2_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_ps2);
 }
 
-isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, "ISA 8bits SUPERIO FDC hookup", tag, owner, clock)
+isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, "ISA 8bits SUPERIO FDC hookup", tag, owner, clock, "isa8_fdc_superio", __FILE__)
 {
-	m_shortname = "isa8_fdc_superio";
 }
 
 machine_config_constructor isa8_fdc_superio_device::device_mconfig_additions() const

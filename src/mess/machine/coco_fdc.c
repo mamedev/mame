@@ -186,14 +186,14 @@ const device_type COCO_FDC = &device_creator<coco_fdc_device>;
 //-------------------------------------------------
 //  coco_fdc_device - constructor
 //-------------------------------------------------
-coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+coco_fdc_device::coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cococart_interface( mconfig, *this )
 {
 }
 
 coco_fdc_device::coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock),
+		: device_t(mconfig, COCO_FDC, "CoCo FDC", tag, owner, clock, "coco_fdc", __FILE__),
 		device_cococart_interface( mconfig, *this )
 {
 }
@@ -214,16 +214,6 @@ void coco_fdc_device::device_start()
 	m_msm6242_rtc_address = 0;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_fdc_device::device_config_complete()
-{
-	m_shortname = "coco_fdc";
-}
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -449,12 +439,12 @@ const device_type DRAGON_FDC = &device_creator<dragon_fdc_device>;
 //-------------------------------------------------
 //  dragon_fdc_device - constructor
 //-------------------------------------------------
-dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: coco_fdc_device(mconfig, type, name, tag, owner, clock)
+dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: coco_fdc_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 dragon_fdc_device::dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: coco_fdc_device(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock)
+		: coco_fdc_device(mconfig, DRAGON_FDC, "Dragon FDC", tag, owner, clock, "dragon_fdc", __FILE__)
 {
 }
 
@@ -472,16 +462,6 @@ void dragon_fdc_device::device_start()
 	m_msm6242_rtc_address = 0;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void dragon_fdc_device::device_config_complete()
-{
-	m_shortname = "dragon_fdc";
-}
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -625,19 +605,8 @@ const device_type SDTANDY_FDC = &device_creator<sdtandy_fdc_device>;
 //-------------------------------------------------
 
 sdtandy_fdc_device::sdtandy_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: dragon_fdc_device(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock)
+		: dragon_fdc_device(mconfig, SDTANDY_FDC, "SDTANDY FDC", tag, owner, clock, "sdtandy_fdc", __FILE__)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void sdtandy_fdc_device::device_config_complete()
-{
-	m_shortname = "sdtandy_fdc";
 }
 
 //-------------------------------------------------
@@ -668,19 +637,8 @@ const device_type COCO_FDC_V11 = &device_creator<coco_fdc_v11_device>;
 //-------------------------------------------------
 
 coco_fdc_v11_device::coco_fdc_v11_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: coco_fdc_device(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock)
+		: coco_fdc_device(mconfig, COCO_FDC_V11, "CoCo FDC v1.1", tag, owner, clock, "coco_fdc_v11", __FILE__)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void coco_fdc_v11_device::device_config_complete()
-{
-	m_shortname = "coco_fdc_v11";
 }
 
 //-------------------------------------------------
@@ -708,19 +666,8 @@ const device_type CP400_FDC = &device_creator<cp400_fdc_device>;
 //-------------------------------------------------
 
 cp400_fdc_device::cp400_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: coco_fdc_device(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock)
+		: coco_fdc_device(mconfig, CP400_FDC, "CP400 FDC", tag, owner, clock, "cp400_fdc", __FILE__)
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cp400_fdc_device::device_config_complete()
-{
-	m_shortname = "cp400_fdc";
 }
 
 //-------------------------------------------------

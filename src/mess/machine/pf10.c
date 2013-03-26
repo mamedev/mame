@@ -88,7 +88,7 @@ machine_config_constructor epson_pf10_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EPSON_PF10, "EPSON PF-10 floppy drive", tag, owner, clock),
+	device_t(mconfig, EPSON_PF10, "EPSON PF-10 floppy drive", tag, owner, clock, "epson_pf10", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),
 	m_fdc(*this, "upd765a"),

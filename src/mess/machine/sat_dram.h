@@ -11,12 +11,11 @@ class saturn_dram_device : public device_t,
 {
 public:
 	// construction/destruction
-	saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size);
+	saturn_dram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 size, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "sat_dram"; }
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_ext_dram0);
@@ -32,9 +31,6 @@ class saturn_dram8mb_device : public saturn_dram_device
 public:
 	// construction/destruction
 	saturn_dram8mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_dram_8mb"; }
 };
 
 class saturn_dram32mb_device : public saturn_dram_device
@@ -42,9 +38,6 @@ class saturn_dram32mb_device : public saturn_dram_device
 public:
 	// construction/destruction
 	saturn_dram32mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "sat_dram_32mb"; }
 };
 
 

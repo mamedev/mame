@@ -280,28 +280,6 @@ machine_config_constructor fd2000_device::device_mconfig_additions() const
 }
 
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void fd2000_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	default:
-		m_shortname = "fd2000";
-		break;
-
-	case TYPE_FD4000:
-		m_shortname = "fd4000";
-		break;
-	}
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -311,7 +289,7 @@ void fd2000_device::device_config_complete()
 //-------------------------------------------------
 
 fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, FD2000, "FD-2000", tag, owner, clock),
+	: device_t(mconfig, FD2000, "FD-2000", tag, owner, clock, "fd2000", __FILE__),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, G65SC02PI2_TAG),
 		m_fdc(*this, DP8473V_TAG),
@@ -320,8 +298,8 @@ fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, R65C02P4_TAG),
 		m_fdc(*this, PC8477AV1_TAG),
@@ -336,7 +314,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 //-------------------------------------------------
 
 fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000) { }
+	: fd2000_device(mconfig, FD4000, "FD-4000", tag, owner, clock, TYPE_FD4000, "fd4000", __FILE__ ) { }
 
 
 //-------------------------------------------------

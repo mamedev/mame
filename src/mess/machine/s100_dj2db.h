@@ -46,7 +46,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "dj2db"; }
 
 	// device_s100_card_interface overrides
 	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset);

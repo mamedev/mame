@@ -178,61 +178,6 @@ const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
 const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_device>;
 const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_device>;
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void base_c1541_device::device_config_complete()
-{
-	switch (m_variant)
-	{
-	case TYPE_1540:
-		m_shortname = "c1540";
-		break;
-
-	default:
-	case TYPE_1541:
-		m_shortname = "c1541";
-		break;
-
-	case TYPE_1541C:
-		m_shortname = "c1541c";
-		break;
-
-	case TYPE_1541II:
-		m_shortname = "c1541ii";
-		break;
-
-	case TYPE_SX1541:
-		m_shortname = "sx1541";
-		break;
-
-	case TYPE_FSD2:
-		m_shortname = "fsd2";
-		break;
-
-	case TYPE_CSD1:
-		m_shortname = "csd1";
-		break;
-
-	case TYPE_1541_DOLPHIN_DOS:
-		m_shortname = "c1541dd";
-		break;
-
-	case TYPE_1541_PROFESSIONAL_DOS_V1:
-		m_shortname = "c1541pd";
-		break;
-
-	case TYPE_1541_PROLOGIC_DOS_CLASSIC:
-		m_shortname = "c1541pdc";
-		break;
-	}
-}
-
-
 //-------------------------------------------------
 //  ROM( c1540 )
 //-------------------------------------------------
@@ -995,8 +940,8 @@ inline void base_c1541_device::set_iec_data()
 //  base_c1541_device - constructor
 //-------------------------------------------------
 
-base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-	: device_t(mconfig, type, name, tag, owner, clock),
+base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_cbm_iec_interface(mconfig, *this),
 		device_c64_floppy_parallel_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -1017,7 +962,7 @@ base_c1541_device:: base_c1541_device(const machine_config &mconfig, device_type
 //-------------------------------------------------
 
 c1540_device::c1540_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, TYPE_1540) { }
+	: base_c1541_device(mconfig, C1540, "C1540", tag, owner, clock, TYPE_1540, "c1540", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1025,7 +970,7 @@ c1540_device::c1540_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541_device::c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, TYPE_1541) { }
+	: base_c1541_device(mconfig, C1541, "C1541", tag, owner, clock, TYPE_1541, "c1541", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1033,7 +978,7 @@ c1541_device::c1541_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, TYPE_1541C) {  }
+	: base_c1541_device(mconfig, C1541C, "C1541C", tag, owner, clock, TYPE_1541C, "c1541c", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1041,7 +986,7 @@ c1541c_device::c1541c_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, TYPE_1541II) {  }
+	: base_c1541_device(mconfig, C1541II, "C1541-II", tag, owner, clock, TYPE_1541II, "c1541ii", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1049,7 +994,7 @@ c1541ii_device::c1541ii_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, TYPE_SX1541) { }
+	: base_c1541_device(mconfig, SX1541, "SX1541", tag, owner, clock, TYPE_SX1541, "sx1541", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1057,7 +1002,7 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 //-------------------------------------------------
 
 fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2) { }
+	: base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2, "fsd2", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1065,7 +1010,7 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, CSD1, "CSD-1", tag, owner, clock, TYPE_CSD1) { }
+	: base_c1541_device(mconfig, CSD1, "CSD-1", tag, owner, clock, TYPE_CSD1, "csd1", __FILE__) { }
 
 
 //-------------------------------------------------
@@ -1073,7 +1018,7 @@ csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_
 //-------------------------------------------------
 
 c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, TYPE_1541_DOLPHIN_DOS) {  }
+	: base_c1541_device(mconfig, C1541_DOLPHIN_DOS, "C1541 Dolphin-DOS 2.0", tag, owner, clock, TYPE_1541_DOLPHIN_DOS, "c1541dd", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1081,7 +1026,7 @@ c1541_dolphin_dos_device::c1541_dolphin_dos_device(const machine_config &mconfig
 //-------------------------------------------------
 
 c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, TYPE_1541_PROFESSIONAL_DOS_V1) {  }
+	: base_c1541_device(mconfig, C1541_PROFESSIONAL_DOS_V1, "C1541 Professional-DOS v1", tag, owner, clock, TYPE_1541_PROFESSIONAL_DOS_V1, "c1541pd", __FILE__) {  }
 
 
 //-------------------------------------------------
@@ -1089,7 +1034,7 @@ c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine
 //-------------------------------------------------
 
 c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, TYPE_1541_PROLOGIC_DOS_CLASSIC),
+	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, TYPE_1541_PROLOGIC_DOS_CLASSIC, "c1541pdc", __FILE__),
 		m_pia(*this, MC6821_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_mmu_rom(*this, "mmu")

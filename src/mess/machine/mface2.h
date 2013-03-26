@@ -50,7 +50,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "cpc_mf2"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

@@ -329,20 +329,9 @@ static DEVICE_RESET( beta_disk )
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
 beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock)
+	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
 {
 	m_token = global_alloc_clear(beta_disk_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void beta_disk_device::device_config_complete()
-{
-	m_shortname = "betadisk";
 }
 
 //-------------------------------------------------

@@ -45,7 +45,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "vic1010"; }
 	virtual void device_start();
 	virtual void device_reset();
 

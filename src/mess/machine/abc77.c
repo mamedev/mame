@@ -82,8 +82,6 @@ void abc77_device::device_config_complete()
 		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
 		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
-
-	m_shortname = "abc77";
 }
 
 
@@ -445,7 +443,7 @@ inline void abc77_device::key_down(int state)
 //-------------------------------------------------
 
 abc77_device::abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock),
+	: device_t(mconfig, ABC77, "Luxor ABC 77", tag, owner, clock, "abc77", __FILE__),
 		m_maincpu(*this, I8035_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_x0(*this, "X0"),
@@ -468,8 +466,8 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+abc77_device::abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_maincpu(*this, I8035_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_x0(*this, "X0"),
@@ -493,7 +491,7 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 }
 
 abc55_device::abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock) { }
+	: abc77_device(mconfig, ABC55, "Luxor ABC 55", tag, owner, clock, "abc55", __FILE__) { }
 
 
 //-------------------------------------------------

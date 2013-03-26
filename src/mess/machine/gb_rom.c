@@ -27,52 +27,52 @@ const device_type GB_ROM_LASAMA = &device_creator<gb_rom_lasama_device>;
 const device_type MEGADUCK_ROM = &device_creator<megaduck_rom_device>;
 
 
-gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, type, name, tag, owner, clock),
+gb_rom_device::gb_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_gb_cart_interface( mconfig, *this )
 {
 }
 
 gb_rom_device::gb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, GB_STD_ROM, "GB Carts", tag, owner, clock),
+					: device_t(mconfig, GB_STD_ROM, "GB Carts", tag, owner, clock, "gb_rom", __FILE__),
 						device_gb_cart_interface( mconfig, *this )
 {
 }
 
 gb_rom_tama5_device::gb_rom_tama5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_TAMA5, "GB Tamagotchi", tag, owner, clock)
+					: gb_rom_device(mconfig, GB_ROM_TAMA5, "GB Tamagotchi", tag, owner, clock, "gb_rom_tama5", __FILE__)
 {
 }
 
 gb_rom_wisdom_device::gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_WISDOM, "GB Wisdom Tree Carts", tag, owner, clock)
+					: gb_rom_device(mconfig, GB_ROM_WISDOM, "GB Wisdom Tree Carts", tag, owner, clock, "gb_rom_wisdom", __FILE__)
 {
 }
 
 gb_rom_yong_device::gb_rom_yong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_YONG, "GB Yong Yong Carts", tag, owner, clock)
+					: gb_rom_device(mconfig, GB_ROM_YONG, "GB Yong Yong Carts", tag, owner, clock, "gb_rom_yong", __FILE__)
 {
 }
 
 gb_rom_atvrac_device::gb_rom_atvrac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_ATVRAC, "GB ATV Racin'", tag, owner, clock)
+					: gb_rom_device(mconfig, GB_ROM_ATVRAC, "GB ATV Racin'", tag, owner, clock, "gb_rom_atvrac", __FILE__)
 {
 }
 
 gb_rom_lasama_device::gb_rom_lasama_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: gb_rom_device(mconfig, GB_ROM_LASAMA, "GB LaSaMa", tag, owner, clock)
+					: gb_rom_device(mconfig, GB_ROM_LASAMA, "GB LaSaMa", tag, owner, clock, "gb_rom_lasama", __FILE__)
 {
 }
 
 
-megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, type, name, tag, owner, clock),
+megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_gb_cart_interface( mconfig, *this )
 {
 }
 
 megaduck_rom_device::megaduck_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: device_t(mconfig, MEGADUCK_ROM, "MegaDuck Carts", tag, owner, clock),
+					: device_t(mconfig, MEGADUCK_ROM, "MegaDuck Carts", tag, owner, clock, "megaduck_rom", __FILE__),
 					device_gb_cart_interface( mconfig, *this )
 {
 }

@@ -26,7 +26,7 @@ class dp8390_device : public device_t,
 {
 public:
 	// construction/destruction
-	dp8390_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock, float bandwidth);
+	dp8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, float bandwidth, const char *shortname, const char *source);
 
 	DECLARE_WRITE16_MEMBER( dp8390_w );
 	DECLARE_READ16_MEMBER( dp8390_r );

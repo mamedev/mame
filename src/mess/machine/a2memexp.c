@@ -71,25 +71,23 @@ const rom_entry *a2bus_ramfactor_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock),
+a2bus_memexp_device::a2bus_memexp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this)
 {
 }
 
 a2bus_memexpapple_device::a2bus_memexpapple_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, "Apple II Memory Expansion Card", tag, owner, clock)
+	a2bus_memexp_device(mconfig, A2BUS_MEMEXP, "Apple II Memory Expansion Card", tag, owner, clock, "a2memexp", __FILE__)
 {
-	m_shortname = "a2memexp";
 	m_isramfactor = false;
 	m_bankhior = 0xf0;
 	m_addrmask = 0xfffff;
 }
 
 a2bus_ramfactor_device::a2bus_ramfactor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, "Applied Engineering RamFactor", tag, owner, clock)
+	a2bus_memexp_device(mconfig, A2BUS_RAMFACTOR, "Applied Engineering RamFactor", tag, owner, clock, "a2ramfac", __FILE__)
 {
-	m_shortname = "a2ramfac";
 	m_isramfactor = true;
 	m_bankhior = 0x00;
 	m_addrmask = 0x7fffff;

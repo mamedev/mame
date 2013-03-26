@@ -74,23 +74,21 @@ const rom_entry *nubus_824gc_device::device_rom_region() const
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this)
 {
 }
 
 nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	jmfb_device(mconfig, NUBUS_48GC, "Apple 4*8 video card", tag, owner, clock)
+	jmfb_device(mconfig, NUBUS_48GC, "Apple 4*8 video card", tag, owner, clock, "nb_48gc", __FILE__)
 {
-	m_shortname = "nb_48gc";
 	m_is824 = false;
 }
 
 nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	jmfb_device(mconfig, NUBUS_824GC, "Apple 8*24 video card", tag, owner, clock)
+	jmfb_device(mconfig, NUBUS_824GC, "Apple 8*24 video card", tag, owner, clock, "nb_824gc", __FILE__)
 {
-	m_shortname = "nb_824gc";
 	m_is824 = true;
 }
 

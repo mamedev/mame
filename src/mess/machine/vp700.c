@@ -47,7 +47,7 @@ const rom_entry *vp700_device::device_rom_region() const
 //-------------------------------------------------
 
 vp700_device::vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VP700, "VP700", tag, owner, clock),
+	device_t(mconfig, VP700, "VP700", tag, owner, clock, "vp700", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_rom(*this, "vp700")
 {

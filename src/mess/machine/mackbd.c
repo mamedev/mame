@@ -124,7 +124,7 @@ const rom_entry *mackbd_device::device_rom_region() const
 //-------------------------------------------------
 
 mackbd_device::mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock),
+	: device_t(mconfig, MACKBD, "Macintosh keyboard", tag, owner, clock, "mackbd", __FILE__),
 	m_maincpu(*this, MACKBD_CPU_TAG)
 {
 }
@@ -145,11 +145,6 @@ void mackbd_device::device_start()
 
 void mackbd_device::device_reset()
 {
-}
-
-void mackbd_device::device_config_complete()
-{
-	m_shortname = "mackbd";
 }
 
 READ8_MEMBER(mackbd_device::p0_r)

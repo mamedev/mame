@@ -178,8 +178,8 @@ class ti_expansion_card_device : public bus8z_device, public device_slot_card_in
 	friend class peribox_slot_device;
 
 public:
-	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: bus8z_device(mconfig, type, name, tag, owner, clock),
+	ti_expansion_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_card_interface(mconfig, *this)
 	{
 		m_slot = static_cast<peribox_slot_device*>(owner);

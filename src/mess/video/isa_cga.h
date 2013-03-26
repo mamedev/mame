@@ -26,7 +26,7 @@ class isa8_cga_device :
 public:
 	// construction/destruction
 	isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -39,7 +39,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "cga"; }
 public:
 	void mode_control_w(UINT8 data);
 	void set_palette_luts();
@@ -87,7 +86,6 @@ class isa8_cga_superimpose_device :
 public:
 	// construction/destruction
 	isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual void device_config_complete() { m_shortname = "cga_superimpose"; }
 };
 
 // device type definition
@@ -104,7 +102,6 @@ public:
 	isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete() { m_shortname = "cga_mc1502"; }
 };
 
 // device type definition
@@ -121,7 +118,6 @@ public:
 	isa8_cga_poisk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete() { m_shortname = "cga_poisk1"; }
 };
 
 // device type definition
@@ -138,7 +134,6 @@ public:
 	isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete() { m_shortname = "cga_poisk2"; }
 };
 
 // device type definition
@@ -156,7 +151,6 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete() { m_shortname = "cga_pc1512"; }
 
 protected:
 	// device-level overrides
@@ -195,7 +189,6 @@ public:
 	isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
-	virtual void device_config_complete() { m_shortname = "wyse700"; }
 
 protected:
 	// device-level overrides

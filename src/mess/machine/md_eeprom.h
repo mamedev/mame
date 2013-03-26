@@ -16,13 +16,12 @@ class md_std_eeprom_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_std_eeprom"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -42,7 +41,6 @@ public:
 	md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_nbajam"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -59,7 +57,6 @@ public:
 	md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_nbajamte"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -76,7 +73,6 @@ public:
 	md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_cslam"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -93,7 +89,6 @@ public:
 	md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_nflqb"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -110,7 +105,6 @@ public:
 	md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_nhlpa"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -127,7 +121,6 @@ public:
 	md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_eeprom_blara"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing

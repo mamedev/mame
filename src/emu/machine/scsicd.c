@@ -23,12 +23,12 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 const device_type SCSICD = &device_creator<scsicd_device>;
 
 scsicd_device::scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, SCSICD, "SCSICD", tag, owner, clock)
+	: scsihle_device(mconfig, SCSICD, "SCSICD", tag, owner, clock, "scsicd", __FILE__)
 {
 }
 
-scsicd_device::scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	scsihle_device(mconfig, type, name, tag, owner, clock)
+scsicd_device::scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 

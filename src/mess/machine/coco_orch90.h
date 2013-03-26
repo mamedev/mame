@@ -26,7 +26,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete() { m_shortname = "coco_orch90"; }
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
 		// internal state

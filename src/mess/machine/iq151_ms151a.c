@@ -45,7 +45,7 @@ const device_type IQ151_MS151A = &device_creator<iq151_ms151a_device>;
 //-------------------------------------------------
 
 iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock),
+		: device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock, "iq151_ms151a", __FILE__),
 		device_iq151cart_interface( mconfig, *this )
 {
 }

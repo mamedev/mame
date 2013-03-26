@@ -19,7 +19,7 @@ class kc_8k_device :
 public:
 	// construction/destruction
 	kc_8k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 
@@ -27,7 +27,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_8k"; }
 	virtual const rom_entry *device_rom_region() const;
 
 	// kcexp_interface overrides
@@ -58,9 +57,6 @@ public:
 	kc_m006_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "kc_m006"; }
-
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0xfc; }
 	virtual void control_w(UINT8 data);
@@ -80,7 +76,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_m033"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0x01; }

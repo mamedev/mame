@@ -128,7 +128,7 @@ machine_config_constructor vp575_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 vp575_device::vp575_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, VP575, "VP575", tag, owner, clock),
+	device_t(mconfig, VP575, "VP575", tag, owner, clock, "vp575", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this)
 {
 	for (int i = 0; i < MAX_SLOTS; i++)

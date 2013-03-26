@@ -36,7 +36,7 @@ const device_type SWIM = &device_creator<swim_device>;
 //-------------------------------------------------
 
 swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: applefdc_base_device(APPLEFDC_SWIM, mconfig, SWIM, "Apple SWIM (Steve Woz Integrated Machine)", tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_SWIM, mconfig, SWIM, "Apple SWIM (Steve Woz Integrated Machine)", tag, owner, clock, "swim", __FILE__)
 {
 }
 

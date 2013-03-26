@@ -19,7 +19,7 @@ class coco_pak_device :
 public:
 		// construction/destruction
 		coco_pak_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+		coco_pak_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -30,7 +30,6 @@ protected:
 		// device-level overrides
 		virtual void device_start();
 		virtual void device_reset();
-		virtual void device_config_complete();
 
 		// internal state
 		device_image_interface *m_cart;
@@ -53,7 +52,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_reset();
-		virtual void device_config_complete();
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
 		void banked_pak_set_bank(UINT32 bank);

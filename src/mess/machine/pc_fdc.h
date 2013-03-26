@@ -18,7 +18,7 @@
 
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
-	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	required_device<upd765a_device> fdc;
 

@@ -173,7 +173,7 @@ machine_config_constructor abc_fd2_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock),
+	: device_t(mconfig, ABC_FD2, "ABC FD2", tag, owner, clock, "abc_fd2", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_pio(*this, Z80PIO_TAG),

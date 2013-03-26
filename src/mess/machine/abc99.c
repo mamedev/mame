@@ -109,8 +109,6 @@ void abc99_device::device_config_complete()
 		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
 		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
-
-	m_shortname = "abc99";
 }
 
 
@@ -523,7 +521,7 @@ inline void abc99_device::scan_mouse()
 //-------------------------------------------------
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock),
+	: device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
 		m_maincpu(*this, I8035_Z2_TAG),
 		m_mousecpu(*this, I8035_Z5_TAG),
 		m_speaker(*this, SPEAKER_TAG),

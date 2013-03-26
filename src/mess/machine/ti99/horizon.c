@@ -64,9 +64,9 @@
 #define LOG logerror
 
 horizon_ramdisk_device::horizon_ramdisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_HORIZON, "Horizon 4000 Ramdisk", tag, owner, clock) ,device_nvram_interface(mconfig, *this)
+: ti_expansion_card_device(mconfig, TI99_HORIZON, "Horizon 4000 Ramdisk", tag, owner, clock,"ti99_horizon",__FILE__),
+  device_nvram_interface(mconfig, *this)
 {
-	m_shortname = "ti99_horizon";
 }
 
 //-------------------------------------------------

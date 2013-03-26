@@ -25,7 +25,6 @@ public:
 protected:
 	virtual void device_start() { }
 	virtual void device_reset() { }
-	virtual void device_config_complete() { m_shortname = "midiout_port"; }
 private:
 	//serial_port_device *m_owner;
 	required_device<midiout_device> m_midiout;

@@ -19,7 +19,7 @@ class iq151_rom_device :
 {
 public:
 	// construction/destruction
-	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	iq151_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -45,9 +45,6 @@ public:
 	iq151_basic6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "iq151_basic6"; }
-
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, UINT8 &data);
 };
@@ -62,9 +59,6 @@ public:
 	iq151_basicg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "iq151_basicg"; }
-
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, UINT8 &data);
 };
@@ -80,9 +74,6 @@ public:
 	iq151_amos1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "iq151_amos1"; }
-
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void io_write(offs_t offset, UINT8 data);
@@ -101,9 +92,6 @@ public:
 	iq151_amos2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "iq151_amos2"; }
-
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void io_write(offs_t offset, UINT8 data);
@@ -122,9 +110,6 @@ public:
 	iq151_amos3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "iq151_amos3"; }
-
 	// iq151cart_interface overrides
 	virtual void read(offs_t offset, UINT8 &data);
 	virtual void io_write(offs_t offset, UINT8 data);

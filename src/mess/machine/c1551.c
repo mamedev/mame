@@ -430,7 +430,7 @@ ioport_constructor c1551_device::device_input_ports() const
 //-------------------------------------------------
 
 c1551_device::c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C1551, "C1551", tag, owner, clock),
+	: device_t(mconfig, C1551, "C1551", tag, owner, clock, "c1551", __FILE__),
 		device_plus4_expansion_card_interface(mconfig, *this),
 		m_maincpu(*this, M6510T_TAG),
 		m_tpi0(*this, M6523_0_TAG),

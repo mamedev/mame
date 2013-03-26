@@ -45,7 +45,7 @@ const device_type WANGPC_EMB = &device_creator<wangpc_emb_device>;
 //-------------------------------------------------
 
 wangpc_emb_device::wangpc_emb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, WANGPC_EMB, "Wang PC-PM031-B", tag, owner, clock),
+	device_t(mconfig, WANGPC_EMB, "Wang PC-PM031-B", tag, owner, clock, "wangpc_emb", __FILE__),
 	device_wangpcbus_card_interface(mconfig, *this),
 	m_ram(*this, "ram")
 {

@@ -136,27 +136,27 @@ machine_config_constructor abc850_device::device_mconfig_additions() const
 //  abc890_device - constructor
 //-------------------------------------------------
 
-abc890_device::abc890_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+abc890_device::abc890_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_abcbus_card_interface(mconfig, *this)
 {
 }
 
 abc890_device::abc890_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC890, "ABC 890", tag, owner, clock),
+	: device_t(mconfig, ABC890, "ABC 890", tag, owner, clock, "abc890", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_slots(7)
 {
 }
 
 abc894_device::abc894_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc890_device(mconfig, ABC894, "ABC 894", tag, owner, clock)
+	: abc890_device(mconfig, ABC894, "ABC 894", tag, owner, clock, "abc890", __FILE__)
 {
 	m_slots = 3;
 }
 
 abc850_device::abc850_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: abc890_device(mconfig, ABC850, "ABC 850", tag, owner, clock)
+	: abc890_device(mconfig, ABC850, "ABC 850", tag, owner, clock, "abc890", __FILE__)
 {
 	m_slots = 7;
 }

@@ -71,7 +71,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "cpc_ssa1"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;
@@ -108,7 +107,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "cpc_dkspeech"; }
 
 private:
 	cpc_expansion_slot_device *m_slot;

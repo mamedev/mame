@@ -94,9 +94,8 @@
 #define VERBOSE 1
 
 ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock)
+: ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__)
 {
-	m_shortname = "ti99_pcode";
 }
 
 READ8Z_MEMBER( ti_pcode_card_device::readz )

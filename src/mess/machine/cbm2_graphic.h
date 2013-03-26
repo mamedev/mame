@@ -43,7 +43,6 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "cbm2_graphic"; }
 	virtual void device_start();
 	virtual void device_reset();
 

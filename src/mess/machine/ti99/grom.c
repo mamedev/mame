@@ -92,7 +92,7 @@
     Constructor.
 */
 ti99_grom_device::ti99_grom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, GROM, "TI-99 GROM device", tag, owner, clock)
+: bus8z_device(mconfig, GROM, "TI-99 GROM device", tag, owner, clock, "ti99_grom", __FILE__)
 {
 }
 

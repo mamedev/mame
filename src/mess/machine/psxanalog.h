@@ -10,7 +10,7 @@ class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
+	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	virtual ioport_constructor device_input_ports() const;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
@@ -44,16 +44,12 @@ class psx_dualshock_device : public psx_analog_controller_device
 {
 public:
 	psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	virtual void device_config_complete() { m_shortname = "psx_dualshock_pad"; }
 };
 
 class psx_analog_joystick_device : public psx_analog_controller_device
 {
 public:
 	psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	virtual void device_config_complete() { m_shortname = "psx_analog_joystick"; }
 };
 
 #endif /* PSXANALOG_H_ */

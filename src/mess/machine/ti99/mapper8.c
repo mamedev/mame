@@ -55,7 +55,7 @@
 #define MAP8_INTS (void*)6L
 
 ti998_mapper_device::ti998_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, MAPPER8, "TI-99/8 Memory mapper", tag, owner, clock)
+: bus8z_device(mconfig, MAPPER8, "TI-99/8 Memory mapper", tag, owner, clock, "ti99_mapper8", __FILE__)
 {
 }
 

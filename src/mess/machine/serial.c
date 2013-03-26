@@ -21,8 +21,8 @@ serial_port_device::serial_port_device(const machine_config &mconfig, const char
 {
 }
 
-serial_port_device::serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+serial_port_device::serial_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this),
 		m_dev(NULL)
 {
@@ -69,7 +69,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 }
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: serial_port_device(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock)
+	: serial_port_device(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__)
 {
 }
 

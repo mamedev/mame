@@ -38,7 +38,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "vcs_lightpen"; }
 	virtual void device_start();
 
 	// device_vcs_control_port_interface overrides

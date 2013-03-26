@@ -40,7 +40,7 @@
 #include "emu.h"
 #include "i8x9x.h"
 
-i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
 	mcs96_device(mconfig, type, name, tag, owner, clock, 8),
 	io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
 {
@@ -387,12 +387,12 @@ void i8x9x_device::internal_update(UINT64 current_time)
 }
 
 c8095_device::c8095_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	i8x9x_device(mconfig, C8095, "C8095", tag, owner, clock)
+	i8x9x_device(mconfig, C8095, "C8095", tag, owner, clock, "c8095", __FILE__)
 {
 }
 
 p8098_device::p8098_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	i8x9x_device(mconfig, P8098, "P8098", tag, owner, clock)
+	i8x9x_device(mconfig, P8098, "P8098", tag, owner, clock, "p8098", __FILE__)
 {
 }
 

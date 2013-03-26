@@ -77,7 +77,7 @@ inline void pet_64k_expansion_device::write_ram(offs_t offset, UINT8 data)
 //-------------------------------------------------
 
 pet_64k_expansion_device::pet_64k_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PET_64K, "PET 64KB RAM", tag, owner, clock),
+	device_t(mconfig, PET_64K, "PET 64KB RAM", tag, owner, clock, "pet_64k", __FILE__),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_ram(*this, "ram"),
 	m_ctrl(0)

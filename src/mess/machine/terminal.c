@@ -136,8 +136,8 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock),
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_io_term_frame(*this, "TERM_FRAME"),
 		m_io_term_conf(*this, "TERM_CONF")
 {
@@ -447,7 +447,7 @@ ioport_constructor serial_terminal_device::device_input_ports() const
 }
 
 serial_terminal_device::serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock),
+	: generic_terminal_device(mconfig, SERIAL_TERMINAL, "Serial Terminal", tag, owner, clock, "serial_terminal", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_serial_port_interface(mconfig, *this)
 {
@@ -464,7 +464,6 @@ void serial_terminal_device::device_config_complete()
 	{
 		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
 	}
-	m_shortname = "serial_terminal";
 }
 
 static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};

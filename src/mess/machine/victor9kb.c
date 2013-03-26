@@ -236,7 +236,7 @@ ioport_constructor victor9k_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock),
+	: device_t(mconfig, VICTOR9K_KEYBOARD, "Victor 9000 Keyboard", tag, owner, clock, "victor9kb", __FILE__),
 		m_maincpu(*this, I8021_TAG),
 		m_y0(*this, "Y0"),
 		m_y1(*this, "Y1"),
@@ -266,8 +266,6 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 
 void victor9k_keyboard_device::device_config_complete()
 {
-	m_shortname = "victor9kb";
-
 	// inherit a copy of the static data
 	const victor9k_keyboard_interface *intf = reinterpret_cast<const victor9k_keyboard_interface *>(static_config());
 	if (intf != NULL)

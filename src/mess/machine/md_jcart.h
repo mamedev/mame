@@ -16,13 +16,12 @@ class md_jcart_device : public device_t,
 {
 public:
 	// construction/destruction
-	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_jcart"; }
 	virtual ioport_constructor device_input_ports() const;
 
 	// reading and writing
@@ -42,13 +41,12 @@ class md_seprom_codemast_device : public md_jcart_device
 {
 public:
 	// construction/destruction
-	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "md_seprom_codemast"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// reading and writing
@@ -71,7 +69,6 @@ public:
 	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_seprom_mm96"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 

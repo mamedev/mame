@@ -3,7 +3,7 @@
 const device_type KONAMI573CASSETTE = &device_creator<konami573cassette_device>;
 
 konami573cassette_device::konami573cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsiodev_device(mconfig, KONAMI573CASSETTE, "KONAMI 573 CASSETTE", tag, owner, clock)
+	psxsiodev_device(mconfig, KONAMI573CASSETTE, "KONAMI 573 CASSETTE", tag, owner, clock, "konami573", __FILE__)
 {
 }
 

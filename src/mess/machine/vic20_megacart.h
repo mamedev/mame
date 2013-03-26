@@ -39,7 +39,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "megacart"; }
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() { }

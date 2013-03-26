@@ -109,8 +109,6 @@ void abc80_keyboard_device::device_config_complete()
 	{
 		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
-
-	m_shortname = "abc80kb";
 }
 
 
@@ -192,7 +190,7 @@ ioport_constructor abc80_keyboard_device::device_input_ports() const
 //-------------------------------------------------
 
 abc80_keyboard_device::abc80_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock),
+	: device_t(mconfig, ABC80_KEYBOARD, "ABC-80 Keyboard", tag, owner, clock, "abc80kb", __FILE__),
 		m_maincpu(*this, I8048_TAG)
 {
 }

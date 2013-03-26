@@ -34,8 +34,8 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 ***************************************************************************/
 
 
-generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_io_kbd0(*this, "TERM_LINE0")
 	, m_io_kbd1(*this, "TERM_LINE1")
 	, m_io_kbd2(*this, "TERM_LINE2")
@@ -394,7 +394,7 @@ ioport_constructor serial_keyboard_device::device_input_ports() const
 }
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: generic_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock),
+	: generic_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock, "serial_keyboard", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_serial_port_interface(mconfig, *this)
 {
@@ -411,7 +411,6 @@ void serial_keyboard_device::device_config_complete()
 	{
 		memset(&m_out_tx_cb, 0, sizeof(m_out_tx_cb));
 	}
-	m_shortname = "serial_keyboard";
 }
 
 static int rates[] = {150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, 115200};

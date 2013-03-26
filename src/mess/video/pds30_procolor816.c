@@ -66,17 +66,15 @@ const rom_entry *nubus_procolor816_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock),
+		device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock, "pd3_pc16", __FILE__),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_shortname = "pd3_pc16";
 }
 
-nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, type, name, tag, owner, clock),
+nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this)
 {
-	m_shortname = "pd3_pc16";
 }
 
 //-------------------------------------------------

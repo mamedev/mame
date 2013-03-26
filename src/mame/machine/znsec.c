@@ -87,7 +87,7 @@
 const device_type ZNSEC = &device_creator<znsec_device>;
 
 znsec_device::znsec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsiodev_device(mconfig, ZNSEC, "ZNSEC", tag, owner, clock)
+	psxsiodev_device(mconfig, ZNSEC, "ZNSEC", tag, owner, clock, "znsec", __FILE__)
 {
 }
 

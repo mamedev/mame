@@ -831,8 +831,8 @@ static DEVICE_RESET( apollo_mono15i ) {
 	DEVICE_RESET_CALL(apollo_mono19i);
 }
 
-apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	m_token = global_alloc_clear(screen_data_t);
 }
@@ -840,7 +840,7 @@ apollo_mono_device::apollo_mono_device(const machine_config &mconfig, device_typ
 const device_type APOLLO_MONO19I = &device_creator<apollo_mono19i_device>;
 
 apollo_mono19i_device::apollo_mono19i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: apollo_mono_device(mconfig, APOLLO_MONO19I, "Apollo 19\" Monochrome Screen", tag, owner, clock)
+	: apollo_mono_device(mconfig, APOLLO_MONO19I, "Apollo 19\" Monochrome Screen", tag, owner, clock, "apollo_mono19i", __FILE__)
 {
 }
 
@@ -876,7 +876,7 @@ void apollo_mono19i_device::device_reset()
 const device_type APOLLO_MONO15I = &device_creator<apollo_mono15i_device>;
 
 apollo_mono15i_device::apollo_mono15i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: apollo_mono_device(mconfig, APOLLO_MONO15I, "Apollo 15\" Monochrome Screen", tag, owner, clock)
+	: apollo_mono_device(mconfig, APOLLO_MONO15I, "Apollo 15\" Monochrome Screen", tag, owner, clock, "apollo_mono15i", __FILE__)
 {
 }
 

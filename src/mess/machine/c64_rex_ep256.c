@@ -90,7 +90,7 @@ machine_config_constructor c64_rex_ep256_cartridge_device::device_mconfig_additi
 //-------------------------------------------------
 
 c64_rex_ep256_cartridge_device::c64_rex_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_REX_EP256, "C64 Rex 256KB EPROM cartridge", tag, owner, clock),
+	device_t(mconfig, C64_REX_EP256, "C64 Rex 256KB EPROM cartridge", tag, owner, clock, "rexep256", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_eprom(*this, "eprom")
 {

@@ -33,7 +33,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "diag264_serial_loopback"; }
 	virtual void device_start();
 
 	// device_cbm_iec_interface overrides

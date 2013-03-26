@@ -60,29 +60,28 @@ ROM_START( sed1200x0b )
 	ROM_LOAD( "sed1200-b.bin", 0x000, 0x800, CRC(d0741f51) SHA1(c8c856f1357286a2c8c806af81724a828345357e))
 ROM_END
 
-sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock)
+sed1200_device::sed1200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
-	m_shortname = "sed1200";
 }
 
 sed1200d0a_device::sed1200d0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sed1200_device(mconfig, SED1200D0A, "sed1200d-0a", tag, owner, clock)
+	sed1200_device(mconfig, SED1200D0A, "sed1200d-0a", tag, owner, clock, "sed1200", __FILE__)
 {
 }
 
 sed1200f0a_device::sed1200f0a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sed1200_device(mconfig, SED1200F0A, "sed1200f-0a", tag, owner, clock)
+	sed1200_device(mconfig, SED1200F0A, "sed1200f-0a", tag, owner, clock, "sed1200", __FILE__)
 {
 }
 
 sed1200d0b_device::sed1200d0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sed1200_device(mconfig, SED1200D0B, "sed1200d-0b", tag, owner, clock)
+	sed1200_device(mconfig, SED1200D0B, "sed1200d-0b", tag, owner, clock, "sed1200", __FILE__)
 {
 }
 
 sed1200f0b_device::sed1200f0b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	sed1200_device(mconfig, SED1200F0B, "sed1200f-0b", tag, owner, clock)
+	sed1200_device(mconfig, SED1200F0B, "sed1200f-0b", tag, owner, clock, "sed1200", __FILE__)
 {
 }
 

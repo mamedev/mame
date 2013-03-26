@@ -19,13 +19,12 @@ class kc_m011_device :
 public:
 	// construction/destruction
 	kc_m011_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	kc_m011_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_m011"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0xf6; }
@@ -61,9 +60,6 @@ public:
 	kc_m022_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "kc_m022"; }
-
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0xf4; }
 	virtual void read(offs_t offset, UINT8 &ata);
@@ -87,7 +83,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_m032"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0x79; }
@@ -113,7 +108,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_m034"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0x7a; }
@@ -137,9 +131,6 @@ public:
 	kc_m035_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "kc_m035"; }
-
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0x7b; }
 	virtual void control_w(UINT8 data);
@@ -164,7 +155,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "kc_m036"; }
 
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0x78; }

@@ -35,7 +35,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "vp585"; }
 	virtual void device_start();
 
 	// device_vip_expansion_card_interface overrides

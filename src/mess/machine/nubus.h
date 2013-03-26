@@ -49,7 +49,7 @@ class nubus_slot_device : public device_t,
 public:
 	// construction/destruction
 	nubus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	nubus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start();
@@ -84,7 +84,7 @@ class nubus_device : public device_t,
 public:
 	// construction/destruction
 	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	nubus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
 

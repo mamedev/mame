@@ -30,7 +30,7 @@ class coco_fdc_device :
 public:
 		// construction/destruction
 		coco_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+		coco_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -46,7 +46,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
 
@@ -82,9 +81,6 @@ public:
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
-protected:
-		// device-level overrides
-		virtual void device_config_complete();
 };
 
 
@@ -102,9 +98,6 @@ public:
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
-protected:
-		// device-level overrides
-		virtual void device_config_complete();
 };
 
 
@@ -119,7 +112,7 @@ class dragon_fdc_device :
 public:
 		// construction/destruction
 		dragon_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+		dragon_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
@@ -129,7 +122,6 @@ public:
 protected:
 		// device-level overrides
 		virtual void device_start();
-		virtual void device_config_complete();
 		virtual DECLARE_READ8_MEMBER(read);
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
@@ -150,9 +142,6 @@ public:
 
 		// optional information overrides
 		virtual const rom_entry *device_rom_region() const;
-protected:
-		// device-level overrides
-		virtual void device_config_complete();
 };
 
 

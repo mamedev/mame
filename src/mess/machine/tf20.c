@@ -158,7 +158,7 @@ machine_config_constructor epson_tf20_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, EPSON_TF20, "EPSON TF-20 dual floppy drive", tag, owner, clock),
+	device_t(mconfig, EPSON_TF20, "EPSON TF-20 dual floppy drive", tag, owner, clock, "epson_tf20", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),
 	m_ram(*this, "ram"),

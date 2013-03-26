@@ -113,7 +113,7 @@ inline UINT8 msm6255_device::read_byte(UINT16 ma, UINT8 ra)
 //-------------------------------------------------
 
 msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock),
+	: device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock, "msm6255", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(msm6255)),
 		m_cursor(0)

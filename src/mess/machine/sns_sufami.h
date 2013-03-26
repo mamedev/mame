@@ -15,7 +15,6 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "sns_rom_sufami"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// additional reading and writing
@@ -39,8 +38,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "sns_strom"; }
-
+	
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 };

@@ -222,7 +222,7 @@ static const floppy_interface ti99_4_floppy_interface =
 };
 
 peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock)
+: bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = NULL;
 }
@@ -559,7 +559,7 @@ int peribox_slot_device::get_index_from_tagname()
 }
 
 peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock), device_slot_interface(mconfig, *this)
+: bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock, "peribox_slot", __FILE__), device_slot_interface(mconfig, *this)
 {
 }
 

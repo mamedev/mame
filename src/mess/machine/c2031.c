@@ -407,7 +407,7 @@ inline int c2031_device::get_device_number()
 //-------------------------------------------------
 
 c2031_device::c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C2031, "C2031", tag, owner, clock),
+	: device_t(mconfig, C2031, "C2031", tag, owner, clock, "c2031", __FILE__),
 		device_ieee488_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
 		m_via0(*this, M6522_0_TAG),

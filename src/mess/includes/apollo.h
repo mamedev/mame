@@ -310,7 +310,7 @@ void apollo_netserver_init(const char *root_path,  apollo_netserver_transmit tx_
 class apollo_mono_device : public device_t
 {
 public:
-	apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	~apollo_mono_device() { global_free(m_token); }
 
 	// access to legacy token

@@ -333,7 +333,7 @@ WRITE8_MEMBER( egret_device::pram_w )
 //-------------------------------------------------
 
 egret_device::egret_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock),
+	: device_t(mconfig, EGRET, "Apple Egret", tag, owner, clock, "egret", __FILE__),
 	device_nvram_interface(mconfig, *this),
 	m_maincpu(*this, EGRET_CPU_TAG)
 {
@@ -352,8 +352,6 @@ void egret_device::static_set_type(device_t &device, int type)
 
 void egret_device::device_config_complete()
 {
-	m_shortname = "egret";
-
 	// inherit a copy of the static data
 	const egret_interface *intf = reinterpret_cast<const egret_interface *>(static_config());
 	if (intf != NULL)

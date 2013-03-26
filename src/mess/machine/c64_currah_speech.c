@@ -169,7 +169,7 @@ void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 //-------------------------------------------------
 
 c64_currah_speech_cartridge_device::c64_currah_speech_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_CURRAH_SPEECH, "C64 Currah Speech", tag, owner, clock),
+	device_t(mconfig, C64_CURRAH_SPEECH, "C64 Currah Speech", tag, owner, clock, "c64_cs", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_nsp(*this, SP0256_TAG)
 {

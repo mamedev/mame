@@ -130,7 +130,7 @@ const device_type KC_D004_GIDE = &device_creator<kc_d004_gide_device>;
 //-------------------------------------------------
 
 kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock),
+		: device_t(mconfig, KC_D004, "D004 Floppy Disk Interface", tag, owner, clock, "kc_d004", __FILE__),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
@@ -138,8 +138,8 @@ kc_d004_device::kc_d004_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, type, name, tag, owner, clock),
+kc_d004_device::kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_kcexp_interface( mconfig, *this ),
 		m_cpu(*this, Z80_TAG),
 		m_fdc(*this, UPD765_TAG),
@@ -389,7 +389,7 @@ void kc_d004_device::fdc_drq(bool state)
 //-------------------------------------------------
 
 kc_d004_gide_device::kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock),
+		: kc_d004_device(mconfig, KC_D004, "D004 Floppy Disk + GIDE Interface", tag, owner, clock, "kc_d004gide", __FILE__),
 		m_ide(*this, IDE_TAG)
 {
 }

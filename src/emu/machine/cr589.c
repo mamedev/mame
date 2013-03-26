@@ -10,7 +10,7 @@
 const device_type CR589 = &device_creator<cr589_device>;
 
 cr589_device::cr589_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsicd_device(mconfig, CR589, "CR589", tag, owner, clock)
+	: scsicd_device(mconfig, CR589, "CR589", tag, owner, clock, "cr589", __FILE__)
 {
 }
 

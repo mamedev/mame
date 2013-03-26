@@ -39,7 +39,7 @@ const rom_entry *abc_slutprov_device::device_rom_region() const
 //-------------------------------------------------
 
 abc_slutprov_device::abc_slutprov_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ABC_SLUTPROV, "Slutprov", tag, owner, clock),
+	: device_t(mconfig, ABC_SLUTPROV, "Slutprov", tag, owner, clock, "slutprov", __FILE__),
 		device_abcbus_card_interface(mconfig, *this)
 {
 }
