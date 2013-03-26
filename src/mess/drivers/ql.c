@@ -10,6 +10,7 @@
 
     TODO:
 
+	- slotify cartridges
     - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette
@@ -827,6 +828,12 @@ static LEGACY_FLOPPY_OPTIONS_START( ql )
 		SECTORS([40])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
+	LEGACY_FLOPPY_OPTION(ql, "img", "QDOS 800KB disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([5])
+		SECTOR_LENGTH([1024])
+		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface ql_floppy_interface =
@@ -1004,8 +1011,9 @@ static MACHINE_CONFIG_START( ql, ql_state )
 	MCFG_CARTSLOT_INTERFACE("ql_cart")
 
 	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql_cart")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "ql_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "ql")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "ql_flop")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1099,6 +1107,9 @@ ROM_START( ql )
 
 	ROM_REGION( 0x400, "plds", 0 )
 	ROM_LOAD( "hal16l8.ic38", 0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x4000, "printer", 0 ) // original Sinclair QL printer (based on Seikosha SP-1000 / SP-800QL, with custom QL font)
+	ROM_LOAD( "bql010-sqpp", 0x0000, 0x4000, CRC(07834797) SHA1(ba94bdad2303a263008b6ea744669a19938d9998) )
 ROM_END
 
 

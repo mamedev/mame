@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ql_cass" description="Sinclair QL Microdrive images">
+<softwarelist name="ql_cass" description="Sinclair QL cassettes">
 
 	<software name="abacus">
 		<description>Abacus</description>
@@ -34,6 +34,18 @@
 		<part name="cass1" interface="ql_cass">
 			<dataarea name="cass" size="174930">
 				<rom name="easel.mdv" size="174930" crc="d0fb3a25" sha1="e0e34e1b7e2b98c224f9da7e79a6bf6ac106dcb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="josiah">
+		<description>Josiah Oobadiah</description>
+		<year>1989</year>
+		<publisher>Mark Incley</publisher>
+
+		<part name="cass1" interface="ql_cass">
+			<dataarea name="cass" size="174930">
+				<rom name="josiah.mdv" size="174930" crc="cee152c2" sha1="faf89d9627805cbb4f468a85acfbca7732849247" offset="0" />
 			</dataarea>
 		</part>
 	</software>
