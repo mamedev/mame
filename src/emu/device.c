@@ -101,6 +101,7 @@ device_t::device_t(const machine_config &mconfig, device_type type, const char *
 		m_name(name),
 		m_shortname(shortname),
 		m_searchpath(shortname),
+		m_source(source),
 		m_owner(owner),
 		m_next(NULL),
 
