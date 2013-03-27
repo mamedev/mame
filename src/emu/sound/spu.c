@@ -1371,7 +1371,7 @@ spu_device::sample_cache *spu_device::get_sample_cache(const unsigned int addr)
 		if (ap->flags&adpcmflag_end) break;
 	}
 
-	if (ap->flags&adpcmflag_loop) sc->is_loop=true;
+	if ((a < 0x80000) && (ap->flags&adpcmflag_loop)) sc->is_loop=true;
 
 	sc->end=min(spu_ram_size,a+16);
 
