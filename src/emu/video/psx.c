@@ -144,12 +144,10 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 		n_coordx += m_n_displaystartx;
 		n_coordy += n_displaystarty;
 
-		n_coordx *= 511;
-		n_coordx /= DEBUG_MAX - 1;
-		n_coordx += 256;
-		n_coordy *= 511;
-		n_coordy /= DEBUG_MAX - 1;
-		n_coordy += 256;
+		n_coordx *= width - 1;
+		n_coordx /= 1023;
+		n_coordy *= height - 1;
+		n_coordy /= 1023;
 
 		m_debug.n_coordx[ m_debug.n_coord ] = n_coordx;
 		m_debug.n_coordy[ m_debug.n_coord ] = n_coordy;

@@ -53,7 +53,6 @@ extern const device_type CXD8654Q;
 #define MID_SHADE ( 0x80 )
 
 #define DEBUG_COORDS ( 10 )
-#define DEBUG_MAX ( 512 )
 
 struct psx_gpu_debug
 {
