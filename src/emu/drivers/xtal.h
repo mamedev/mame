@@ -188,7 +188,7 @@ enum
 	XTAL_45MHz          = 45000000,     /* Eolith with Hyperstone CPUs */
 	XTAL_45_158MHz      = 45158000,     /* Sega Model 2A video board, Model 3 CPU board */
 	XTAL_45_6192Mhz     = 45619200,     /* DEC VK100 */
-	XTAL_48MHz          = 48000000,     /* Williams/Midway Y/Z-unit system */
+	XTAL_48MHz          = 48000000,     /* Williams/Midway Y/Z-unit system / SSV board */
 	XTAL_48_66MHz       = 48660000,     /* Zaxxon */
 	XTAL_49_152MHz      = 49152000,     /* Used on some Namco PCBs, Baraduke h/w, System 21, Super System 22  */
 	XTAL_50MHz          = 50000000,     /* Williams/Midway T/W/V-unit system */

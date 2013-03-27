@@ -2571,19 +2571,25 @@ DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init_ssv(1); }
 DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init_ssv(0); }
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init_ssv(0); }
 
+#define SSV_MASTER_CLOCK XTAL_48MHz/3
+
+#define SSV_PIXEL_CLOCK XTAL_42_9545MHz/6
+#define SSV_HTOTAL 0x1c6
+#define SSV_HBEND 0
+#define SSV_HBSTART 0x150
+#define SSV_VTOTAL 0x106
+#define SSV_VBEND 0
+#define SSV_VBSTART 0xf0
 
 static MACHINE_CONFIG_START( ssv, ssv_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V60, 16000000) /* Based on STA-0001 & STA-0001B System boards */
+	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ssv_state, ssv_interrupt, "screen", 0, 1)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(0x1c6, 0x106)
-	MCFG_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MCFG_SCREEN_RAW_PARAMS(SSV_PIXEL_CLOCK,SSV_HTOTAL,SSV_HBEND,SSV_HBSTART,SSV_VTOTAL,SSV_VBEND,SSV_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_ssv)
 
 	MCFG_GFXDECODE(ssv)
@@ -2592,7 +2598,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ensoniq", ES5506, 16000000)
+	MCFG_SOUND_ADD("ensoniq", ES5506, SSV_MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(es5506_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -2605,7 +2611,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(drifto94_map)
 
-	MCFG_CPU_ADD("dsp", UPD96050, 10000000)
+	MCFG_CPU_ADD("dsp", UPD96050, 10000000) /* TODO: correct? */
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
