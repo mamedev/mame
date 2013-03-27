@@ -366,6 +366,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	// start to output info
 	fprintf(m_output, "\t<%s", emulator_info::get_xml_top());
 	fprintf(m_output, " name=\"%s\"", xml_normalize_string(device.shortname()));
+	fprintf(m_output, " sourcefile=\"%s\"", xml_normalize_string(device.source()));
 	fprintf(m_output, " isdevice=\"yes\"");
 	fprintf(m_output, " runnable=\"no\"");
 	fprintf(m_output, ">\n");
