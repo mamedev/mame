@@ -464,7 +464,6 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define CPS_B_21_QS4 0x2e,0x0c01,  -1,  -1,  -1,  -1,  0x1c,0x1e,0x08,  0x16,{0x00,0x02,0x28,0x2a},0x2c, {0x04,0x08,0x10,0x00,0x00}
 #define CPS_B_21_QS5 0x1e,0x0c02,  -1,  -1,  -1,  -1,  0x0c, -1,  -1,   0x2a,{0x2c,0x2e,0x30,0x32},0x1c, {0x04,0x08,0x10,0x00,0x00}
 #define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x0e,0x0e,0x0e,0x30,0x30}
-#define HACK_H_3      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x04,{0x12,0x10,0x0e,0x0c},0x0a, {0x02,0xc4,0x18,0x00,0x00}
 
 /*
 CPS_B_21_DEF is CPS-B-21 at default settings (no battery)
@@ -1386,12 +1385,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m3",       HACK_H_3,     mapper_S9263B, 0,    0, 0, 1 },
+	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 1 },
 	{"sf2m4",       HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m5",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m6",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m8",       HACK_H_3,     mapper_S9263B, 0,    0, 0, 1 },
+	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 1 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1801,7 +1800,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2_video)
 
 void cps_state::cps1_get_video_base()
 {
-	int layercontrol, videocontrol, scroll1xoff, scroll2xoff, scroll3xoff;
+	int layercontrol=0, videocontrol=0, scroll1xoff=0, scroll2xoff=0, scroll3xoff=0;
 
 	/* Re-calculate the VIDEO RAM base */
 	if (m_scroll1 != cps1_base(machine(), CPS1_SCROLL1_BASE, m_scroll_size))
@@ -1824,19 +1823,12 @@ void cps_state::cps1_get_video_base()
 	if (m_game_config->bootleg_kludge == 1)
 	{
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
-		m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
 		scroll1xoff = -0x0c;
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
 	}
-	else
-	{
-		m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
-		scroll1xoff = 0;
-		scroll2xoff = 0;
-		scroll3xoff = 0;
-	}
 
+	m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
 	m_other = cps1_base(machine(), CPS1_OTHER_BASE, m_other_size);
 
 	/* Get scroll values */
@@ -2787,14 +2779,12 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	if (videocontrol & 0x01)    /* linescroll enable */
 	{
 		int scrly = -m_scroll2y;
-		int i;
-		int otheroffs;
 
 		m_bg_tilemap[1]->set_scroll_rows(1024);
 
-		otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
+		int otheroffs = m_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
-		for (i = 0; i < 256; i++)
+		for (int i = 0; i < 256; i++)
 			m_bg_tilemap[1]->set_scrollx((i - scrly) & 0x3ff, m_scroll2x + m_other[(i + otheroffs) & 0x3ff]);
 	}
 	else
