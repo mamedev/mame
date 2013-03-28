@@ -3518,7 +3518,7 @@ Undumped Pirates:
 		<info name="release" value="19990319"/>
 		<info name="alt_title" value="大貝獣物語 ザ・ミラクル オブ ザ・ゾーンII"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc1" />
+			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="daikaijuu monogatari - the miracle of the zone ii (japan).bin" size="1048576" crc="692d6794" sha1="7bf6e2d7fc58e8abe61785e413bcf4150fa8bee5" offset="000000" />
 			</dataarea>
@@ -14561,7 +14561,7 @@ Undumped Pirates:
 		<info name="release" value="19990806"/>
 		<info name="alt_title" value="ポケットファミリーGB2"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket family gb2 (japan).bin" size="2097152" crc="2a273244" sha1="fc88fcf5aab548936cd6617c4e2ea07b77ee43c8" offset="000000" />
 			</dataarea>
@@ -15252,7 +15252,7 @@ Undumped Pirates:
 		<info name="release" value="19981218"/>
 		<info name="alt_title" value="ポケモンカードGB"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc1" />
+			<feature name="slot" value="rom_huc1" />
 			<dataarea name="rom" size="1048576">
 				<rom name="pokemon card gb (japan).bin" size="1048576" crc="1926f570" sha1="2287627c5b4d56bd9a01aab83408c301b9cf1a6c" offset="000000" />
 			</dataarea>
@@ -17114,7 +17114,7 @@ Undumped Pirates:
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-HREE-USA"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robopon - sun version (usa).bin" size="1048576" crc="32caef11" sha1="399c928a38a3901b7a1093bd61f5a4d8c05b9771" offset="000000" />
 			</dataarea>
@@ -17130,7 +17130,7 @@ Undumped Pirates:
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="DMG-H5UJ-JPN"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - comic bom bom special version (japan).bin" size="1048576" crc="4aa209cd" sha1="79d1eda07e792497506ff1494e5222db2a52702f" offset="000000" />
 			</dataarea>
@@ -17148,7 +17148,7 @@ Undumped Pirates:
 		<info name="release" value="19991224"/>
 		<info name="alt_title" value="ロボットポンコッツ月バージョン"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - moon version (japan).bin" size="1048576" crc="87a29030" sha1="7d6424bfecfeb17aee9f779dcb9bac47114730cd" offset="000000" />
 			</dataarea>
@@ -17166,7 +17166,7 @@ Undumped Pirates:
 		<info name="release" value="19981204"/>
 		<info name="alt_title" value="ロボットポンコッツ星バージョン"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - star version (japan).bin" size="1048576" crc="b28f32ac" sha1="27a96410b38e695d9b80ae861af3b472f0e84c60" offset="000000" />
 			</dataarea>
@@ -17184,7 +17184,7 @@ Undumped Pirates:
 		<info name="release" value="19981204"/>
 		<info name="alt_title" value="ロボットポンコッツ太陽バージョン"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="slot_huc3" />
+			<feature name="slot" value="rom_huc3" />
 			<dataarea name="rom" size="1048576">
 				<rom name="robot poncots - sun version (japan).bin" size="1048576" crc="cb0b8003" sha1="2f82dd4a1537111d14f11eb13c7ce6fc748e83fe" offset="000000" />
 			</dataarea>
