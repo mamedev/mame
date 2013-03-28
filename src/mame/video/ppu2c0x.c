@@ -99,6 +99,12 @@ const address_space_config *ppu2c0x_device::memory_space_config(address_spacenum
 }
 
 
+// static
+void ppu2c0x_device::set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb)
+{
+	ppu2c0x_device &dev = downcast<ppu2c0x_device &>(device);
+	dev.m_nmi_callback_proc = cb;
+}
 //-------------------------------------------------
 //  ppu2c0x_device - constructor
 //-------------------------------------------------
@@ -114,7 +120,6 @@ void ppu2c0x_device::device_config_complete()
 	m_hblank_callback_proc = ppu2c0x_hblank_delegate();
 	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
 
-	m_nmi_callback_proc = config->nmi_handler;
 	m_color_base = config->color_base;
 
 	m_cpu_tag = config->cpu_tag;
@@ -148,6 +153,8 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 	/* usually, no security value... */
 	m_security_value = 0;
+	
+	m_nmi_callback_proc = ppu2c0x_nmi_delegate();
 }
 
 
@@ -205,6 +212,9 @@ void ppu2c0x_device::device_start()
 	m_cpu = machine().device<cpu_device>( m_cpu_tag );
 
 	assert(m_screen && m_cpu);
+	
+	// bind our handler
+	m_nmi_callback_proc.bind_relative_to(*owner());
 
 	// allocate timers
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
@@ -476,8 +486,8 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 		case TIMER_NMI:
 			// Actually fire the VMI
-			if (m_nmi_callback_proc)
-				(*m_nmi_callback_proc) (this, regs);
+			if (!m_nmi_callback_proc.isnull())
+				m_nmi_callback_proc(regs);
 
 			m_nmi_timer->adjust(attotime::never);
 			break;

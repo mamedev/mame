@@ -702,6 +702,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 
 
 	MCFG_PPU2C03B_ADD("ppu", playch10_ppu_interface)
+	MCFG_PPU2C0X_SET_NMI(playch10_state, ppu_irq)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")

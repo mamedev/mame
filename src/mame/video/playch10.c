@@ -58,11 +58,10 @@ void playch10_state::palette_init()
 	ppu->init_palette_rgb(machine(), 256);
 }
 
-static void ppu_irq( device_t *device, int *ppu_regs )
+void playch10_state::ppu_irq(int *ppu_regs)
 {
-	playch10_state *state = device->machine().driver_data<playch10_state>();
-	device->machine().device("cart")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-	state->m_pc10_int_detect = 1;
+	machine().device("cart")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_pc10_int_detect = 1;
 }
 
 /* our ppu interface                                           */
@@ -75,8 +74,7 @@ const ppu2c0x_interface playch10_ppu_interface =
 	"bottom",
 	1,                  /* gfxlayout num */
 	256,                /* color base */
-	PPU_MIRROR_NONE,    /* mirroring */
-	ppu_irq             /* irq */
+	PPU_MIRROR_NONE     /* mirroring */
 };
 
 TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)

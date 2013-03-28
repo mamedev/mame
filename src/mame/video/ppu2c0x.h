@@ -103,16 +103,15 @@ enum
 #define MCFG_PPU2C05_04_ADD(_tag, _intrf)   \
 	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_04, _intrf)
 
+#define MCFG_PPU2C0X_SET_NMI( _class, _method) \
+	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+
 ///*************************************************************************
 //  TYPE DEFINITIONS
 ///*************************************************************************
-
-// callback datatypes
-typedef void (*ppu2c0x_nmi_cb)( device_t *device, int *ppu_regs );
-
 typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_scanline_delegate;
 typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_hblank_delegate;
-//typedef device_delegate<void (int *ppu_regs)> ppu2c0x_nmi_delegate;
+typedef device_delegate<void (int *ppu_regs)> ppu2c0x_nmi_delegate;
 typedef device_delegate<int (int address, int data)> ppu2c0x_vidaccess_delegate;
 
 
@@ -125,7 +124,6 @@ struct ppu2c0x_interface
 	int               gfx_layout_number;        /* gfx layout number used by each chip */
 	int               color_base;               /* color base to use per ppu */
 	int               mirroring;                /* mirroring options (PPU_MIRROR_* flag) */
-	ppu2c0x_nmi_cb    nmi_handler;          /* NMI handler */
 };
 
 
@@ -172,6 +170,7 @@ public:
 	void set_scanline_callback( ppu2c0x_scanline_delegate cb ) { m_scanline_callback_proc = cb; m_scanline_callback_proc.bind_relative_to(*owner()); };
 	void set_hblank_callback( ppu2c0x_hblank_delegate cb ) { m_hblank_callback_proc = cb; m_hblank_callback_proc.bind_relative_to(*owner()); };
 	void set_vidaccess_callback( ppu2c0x_vidaccess_delegate cb ) { m_vidaccess_callback_proc = cb; m_vidaccess_callback_proc.bind_relative_to(*owner()); };
+	static void set_nmi_delegate(device_t &device,ppu2c0x_nmi_delegate cb);
 	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; };
 
 	//27/12/2002 (HACK!)
@@ -189,7 +188,7 @@ public:
 	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
 	ppu2c0x_hblank_delegate   	m_hblank_callback_proc; /* optional hblank callback */
 	ppu2c0x_vidaccess_delegate  m_vidaccess_callback_proc;  /* optional video access callback */
-	ppu2c0x_nmi_cb              m_nmi_callback_proc;        /* nmi access callback from interface */
+	ppu2c0x_nmi_delegate        m_nmi_callback_proc;        /* nmi access callback from interface */
 	int                         m_regs[PPU_MAX_REG];        /* registers */
 	int                         m_refresh_data;         /* refresh-related */
 	int                         m_refresh_latch;        /* refresh-related */

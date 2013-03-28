@@ -454,9 +454,9 @@ static const nes_interface nes_apu_interface =
 };
 
 
-static void ppu_nmi(device_t *device, int *ppu_regs)
+void nes_state::ppu_nmi(int *ppu_regs)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -466,8 +466,7 @@ static const ppu2c0x_interface nes_ppu_interface =
 	"screen",
 	0,
 	0,
-	PPU_MIRROR_NONE,
-	ppu_nmi
+	PPU_MIRROR_NONE
 };
 
 static const floppy_interface nes_floppy_interface =
@@ -513,6 +512,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 	MCFG_PALETTE_LENGTH(4*16*8)
 
 	MCFG_PPU2C02_ADD( "ppu", nes_ppu_interface )
+	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

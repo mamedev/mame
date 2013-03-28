@@ -154,6 +154,7 @@ public:
 	void supergm3_set_bank();
 	void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
+	void ppu_irq(int *ppu_regs);
 };
 
 
@@ -1094,9 +1095,9 @@ void multigam_state::palette_init()
 	ppu->init_palette(machine(), 0);
 }
 
-static void ppu_irq( device_t *device, int *ppu_regs )
+void multigam_state::ppu_irq(int *ppu_regs)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -1106,8 +1107,7 @@ static const ppu2c0x_interface ppu_interface =
 	"screen",
 	0,                  /* gfxlayout num */
 	0,                  /* color base */
-	PPU_MIRROR_NONE,    /* mirroring */
-	ppu_irq             /* irq */
+	PPU_MIRROR_NONE     /* mirroring */
 };
 
 void multigam_state::video_start()
@@ -1210,6 +1210,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
+	MCFG_PPU2C0X_SET_NMI(multigam_state, ppu_irq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

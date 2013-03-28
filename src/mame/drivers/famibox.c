@@ -115,6 +115,7 @@ public:
 	void set_mirroring(famibox_state *state, int mirroring);
 	void famicombox_bankswitch(UINT8 bank);
 	void famicombox_reset();
+	void ppu_irq(int *ppu_regs);
 };
 
 /******************************************************
@@ -517,9 +518,9 @@ void famibox_state::palette_init()
 	ppu->init_palette(machine(), 0);
 }
 
-static void ppu_irq( device_t *device, int *ppu_regs )
+void famibox_state::ppu_irq(int *ppu_regs)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -529,8 +530,7 @@ static const ppu2c0x_interface ppu_interface =
 	"screen",
 	0,                  /* gfxlayout num */
 	0,                  /* color base */
-	PPU_MIRROR_NONE,    /* mirroring */
-	ppu_irq             /* irq */
+	PPU_MIRROR_NONE     /* mirroring */
 };
 
 void famibox_state::video_start()
@@ -595,6 +595,7 @@ static MACHINE_CONFIG_START( famibox, famibox_state )
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
+	MCFG_PPU2C0X_SET_NMI(famibox_state, ppu_irq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

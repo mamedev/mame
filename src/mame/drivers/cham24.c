@@ -90,6 +90,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
+	void ppu_irq(int *ppu_regs);
 };
 
 
@@ -283,9 +284,9 @@ void cham24_state::palette_init()
 	ppu->init_palette(machine(), 0);
 }
 
-static void ppu_irq( device_t *device, int *ppu_regs )
+void cham24_state::ppu_irq(int *ppu_regs)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */
@@ -295,8 +296,7 @@ static const ppu2c0x_interface ppu_interface =
 	"screen",
 	0,                  /* gfxlayout num */
 	0,                  /* color base */
-	PPU_MIRROR_NONE,    /* mirroring */
-	ppu_irq             /* irq */
+	PPU_MIRROR_NONE     /* mirroring */
 };
 
 void cham24_state::video_start()
@@ -362,6 +362,7 @@ static MACHINE_CONFIG_START( cham24, cham24_state )
 
 
 	MCFG_PPU2C04_ADD("ppu", ppu_interface)
+	MCFG_PPU2C0X_SET_NMI(cham24_state, ppu_irq)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
