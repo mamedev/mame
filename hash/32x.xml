@@ -28,8 +28,8 @@
 			<feature name="ic2" value="MPR=17352-F" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17351.ic1" size="2097152" crc="e0ef6ebc" sha1="30258efdcacb6c49873ef7de466c1b393e27b79d" offset="000000" />
-				<rom name="mpr-17352.ic1" size="1048576" crc="c7079709" sha1="0f22e68e3013fa7e4110cddbe989986d2639833b" offset="0x200000" />
+				<rom name="mpr-17351-f.ic1" size="2097152" crc="e0ef6ebc" sha1="30258efdcacb6c49873ef7de466c1b393e27b79d" offset="000000" />
+				<rom name="mpr-17352-f.ic2" size="1048576" crc="c7079709" sha1="0f22e68e3013fa7e4110cddbe989986d2639833b" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 			<feature name="pcb" value="171-6884A" />
 			<feature name="ic1" value="MPR-17353-MX" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17353.ic1" size="2097152" crc="ae3364e9" sha1="af0cb8626825e1b431eba07b8a9b571186745c16" offset="000000" />
+				<rom name="mpr-17353-mx.ic1" size="2097152" crc="ae3364e9" sha1="af0cb8626825e1b431eba07b8a9b571186745c16" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -57,7 +57,7 @@
 			<feature name="pcb" value="171-6884A" />
 			<feature name="ic1" value="MPR-17525-F" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17525.ic1" size="2097152" crc="5cac3587" sha1="8b0495257fa5392ef9ddcc9c3ba1860ae58f4f3d" offset="000000" />
+				<rom name="mpr-17525-f.ic1" size="2097152" crc="5cac3587" sha1="8b0495257fa5392ef9ddcc9c3ba1860ae58f4f3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -72,8 +72,8 @@
 			<feature name="ic2" value="MPR-17350-S" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17349.ic1" size="2097152" crc="f1f7f657" sha1="5ab5bd1e9cd6d8d43e7cf78c3619b087c1d931c2" offset="000000" />
-				<rom name="mpr-17350.ic2" size="524288" crc="55931049" sha1="3edd15d2e53b1a126559414290b8da23a7cbed5d" offset="0x200000" />
+				<rom name="mpr-17349 w79.ic1" size="2097152" crc="f1f7f657" sha1="5ab5bd1e9cd6d8d43e7cf78c3619b087c1d931c2" offset="000000" />
+				<rom name="mpr-17350-s.ic2" size="524288" crc="55931049" sha1="3edd15d2e53b1a126559414290b8da23a7cbed5d" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -89,8 +89,8 @@
 			<feature name="ic2" value="MPR-17927-MX" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17926.ic1" size="2097152" crc="543d310f" sha1="c8510d61dfca6bcf3949ad13cef33d92118688d9" offset="000000" />
-				<rom name="mpr-17927.ic2" size="2097152" crc="ecfef9e6" sha1="85a5859688742ab59ff16a8b67c872a2d2dbe076" offset="0x200000" />
+				<rom name="mpr-17926-mx.ic1" size="2097152" crc="543d310f" sha1="c8510d61dfca6bcf3949ad13cef33d92118688d9" offset="000000" />
+				<rom name="mpr-17927-mx.ic2" size="2097152" crc="ecfef9e6" sha1="85a5859688742ab59ff16a8b67c872a2d2dbe076" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -106,13 +106,14 @@
 			<feature name="ic2" value="MPR-17348 T34" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17347.ic1" size="2097152" crc="99e83be0" sha1="2b3e364494f6bdcae686e1535e51adee2aabca16" offset="000000" />
-				<rom name="mpr-17348.ic2" size="1048576" crc="aa2f8743" sha1="db85888bf3743195c0bf41e0b3d65486c328b197" offset="0x200000" />
+				<rom name="mpr-17347 w72.ic1" size="2097152" crc="99e83be0" sha1="2b3e364494f6bdcae686e1535e51adee2aabca16" offset="000000" />
+				<rom name="mpr-17348 t34.ic2" size="1048576" crc="aa2f8743" sha1="db85888bf3743195c0bf41e0b3d65486c328b197" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
 
 <!-- Old interleaved/unconfirmed dump -->
+<!-- PCB info and part numbers are taken from SMS Power and from nepereny's PCB pictures ando other sources -->
 
 	<software name="aburner">
 		<description>After Burner Complete (Euro)</description>
@@ -135,8 +136,11 @@
 		<info name="alt_title" value="アフターバーナー・コンプリート"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed, PCB info based on the US cart (nepereny's) -->
+			<feature name="pcb" value="171-6884A" />
+			<feature name="ic1" value="MPR-17534-U" />
 			<dataarea name="rom" size="4194304">
-				<rom name="after burner complete ~ after burner (japan, usa).bin" size="2097152" crc="204044c4" sha1="9cf575feb036e2f26e78350154d5eb2fd3825325" offset="000000" />
+				<rom name="mpr-17534-u.ic1" size="2097152" crc="204044c4" sha1="9cf575feb036e2f26e78350154d5eb2fd3825325" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -333,6 +337,11 @@
 		<info name="alt_title" value="ドゥーム"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts), PCB info based on the US cart (nepereny's) -->
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17252-U" />
+			<feature name="ic2" value="MPR-17253-U" />
+			<feature name="ic3" value="MC74HC139AN" />
 			<dataarea name="rom" size="4194304">
 				<rom name="doom (japan, usa).bin" size="3145728" crc="208332fd" sha1="b68e9c7af81853b8f05b8696033dfe4c80327e38" offset="000000" />
 			</dataarea>
@@ -1124,8 +1133,11 @@
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U,PAL"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed, PCB info based on the Euro cart? (SMS Power) -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-18439-U" />
 			<dataarea name="rom" size="4194304">
-				<rom name="kolibri (usa, europe).bin" size="3145728" crc="20ca53ef" sha1="191ae0b525ecf32664086d8d748e0b35f776ddfe" offset="000000" />
+				<rom name="mpr-18439-u.ic1" size="3145728" crc="20ca53ef" sha1="191ae0b525ecf32664086d8d748e0b35f776ddfe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1208,6 +1220,10 @@
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts), PCB info based on the Euro cart (SMS Power) -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-17709-MX" />
+			<feature name="ic2" value="MPR-17710-MX" />
 			<dataarea name="rom" size="4194304">
 				<rom name="metal head (europe) (en,ja).bin" size="3145728" crc="bf9b8376" sha1="2a7767024e23b55fe193d586a96a3ba3c92e7ea8" offset="000000" />
 			</dataarea>
@@ -1373,8 +1389,11 @@
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (nepereny's) -->
+			<feature name="pcb" value="171-6884A" />
+			<feature name="ic1" value="MPR-17258-F" />
 			<dataarea name="rom" size="4194304">
-				<rom name="motocross championship (usa).bin" size="2097152" crc="a21c5761" sha1="5f1a107991aaf9eff0b3ce864b2e3151f56abe7b" offset="000000" />
+				<rom name="mpr-17258-f.ic1" size="2097152" crc="a21c5761" sha1="5f1a107991aaf9eff0b3ce864b2e3151f56abe7b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1770,8 +1789,11 @@
 		<info name="alt_title" value="スペースハリアー"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed, PCB info based on the US cart (nepereny's) -->
+			<feature name="pcb" value="171-6884A" />
+			<feature name="ic1" value="MPR-17428 W73" />
 			<dataarea name="rom" size="4194304">
-				<rom name="space harrier (japan, usa).bin" size="2097152" crc="86e7f989" sha1="f32a52a7082761982024e40291dbd962a835b231" offset="000000" />
+				<rom name="mpr-17428 w73.ic1" size="2097152" crc="86e7f989" sha1="f32a52a7082761982024e40291dbd962a835b231" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1819,6 +1841,11 @@
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts) (nepereny's) -->
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17254-U" />
+			<feature name="ic2" value="MPR-17356 W26" />
+			<feature name="ic3" value="74HC139P" />
 			<dataarea name="rom" size="4194304">
 				<rom name="star wars arcade (usa).bin" size="2621440" crc="2f16b44a" sha1="f4ffaaf1d8330ea971643021be3f3203e1ea065d" offset="000000" />
 			</dataarea>
@@ -2044,6 +2071,10 @@
 		<info name="alt_title" value="テンポ"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts), PCB info based on the US cart? (SMS Power) -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-17250-SM" />
+			<feature name="ic2" value="MPR-17251-SM" />
 			<dataarea name="rom" size="4194304">
 				<rom name="tempo (japan, usa).bin" size="3145728" crc="14e5c575" sha1="6673ba83570b4f2c1b4a22415a56594c3cc6c6a9" offset="000000" />
 			</dataarea>
@@ -2167,6 +2198,11 @@
 		<info name="alt_title" value="バーチャファイター"/>
 		<sharedfeat name="compatibility" value="NTSC-J,NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts), PCB info based on the US cart (nepereny's) -->
+			<feature name="pcb" value="171-6885A-01" />
+			<feature name="ic1" value="MPR-18296-U" />
+			<feature name="ic2" value="MPR-18297-U" />
+			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua fighter (japan, usa).bin" size="4194304" crc="b5de9626" sha1="f35754f4bfe3a53722d7a799f88face0fd13c424" offset="000000" />
 			</dataarea>
@@ -2290,6 +2326,11 @@
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="_32x_cart">
+			<!-- Dump To Be Confirmed (and split in properly sized parts) (nepereny's) -->
+			<feature name="pcb" value="171-6885A" />
+			<feature name="ic1" value="MPR-17259 W71" />
+			<feature name="ic2" value="MPR-17260 T25" />
+			<feature name="ic3" value="HD74HC139P" />
 			<dataarea name="rom" size="4194304">
 				<rom name="virtua racing deluxe (usa).bin" size="3145728" crc="7896b62e" sha1="18dfdeb50780c2623e60a6587d7ed701a1cf81f1" offset="000000" />
 			</dataarea>

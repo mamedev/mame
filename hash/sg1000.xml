@@ -277,8 +277,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1046"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5382" />
+			<feature name="ic1" value="MPR-10159" />
+			<feature name="ic2" value="??" />   <!-- RAM should be present -->
 			<dataarea name="rom" size="32768">
-				<rom name="castle, the (japan).bin" size="32768" crc="092f29d6" sha1="2681786bffccf58b59410c331865d30a4d027087" offset="000000" />
+				<rom name="mpr-10159.ic1" size="32768" crc="092f29d6" sha1="2681786bffccf58b59410c331865d30a4d027087" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -358,8 +362,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1011"/>
 		<info name="alt_title" value="チャンピオンベースボール"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on Enri's website -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-6381" />
 			<dataarea name="rom" size="16384">
-				<rom name="champion baseball [16k].bin" size="16384" crc="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" offset="000000" />
+				<rom name="mpr-6381.ic1" size="16384" crc="5970a12b" sha1="737b9478c4ce6df2afcd36f78011019f5d669226" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -370,6 +377,10 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (dump to be splitted and PCB emulated properly) -->
+			<feature name="pcb" value="171-5043" />
+			<feature name="ic1" value="MPR-5503" />
+			<feature name="ic2" value="MPR-5504" />
 			<dataarea name="rom" size="40960">
 				<rom name="champion baseball [40k].bin" size="40960" crc="c0c16fa7" sha1="85e5c2f354b9110e5f7c7dfcc7ab9814598b7956" offset="000000" />
 			</dataarea>
@@ -422,8 +433,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1033"/>
 		<info name="alt_title" value="チャンピオン ボクシング"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-6100" />
 			<dataarea name="rom" size="32768">
-				<rom name="champion boxing (japan).bin" size="32768" crc="26f947d1" sha1="8cd55ee1efcab917087b80629ca18b4629edc15d" offset="000000" />
+				<rom name="mpr-6100.ic1" size="32768" crc="26f947d1" sha1="8cd55ee1efcab917087b80629ca18b4629edc15d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -461,8 +475,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1005"/>
 		<info name="alt_title" value="チャンピオン ゴルフ"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com -->
+			<feature name="pcb" value="171-5137" />
+			<feature name="ic1" value="MPR-5435" />
+			<feature name="ic2" value="TC40H004P" />
 			<dataarea name="rom" size="32768">
-				<rom name="champion golf (japan).bin" size="32768" crc="868419b5" sha1="05deb000f24b7d8625c6e9332dcc91416ed3258f" offset="000000" />
+				<rom name="mpr-5435.ic1" size="32768" crc="868419b5" sha1="05deb000f24b7d8625c6e9332dcc91416ed3258f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -603,8 +621,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1009"/>
 		<info name="alt_title" value="チャンピオン テニス"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com -->
+			<feature name="pcb" value="171-5070" />
+			<feature name="ic1" value="MPR-5439" />
+			<feature name="ic2" value="DM74125N" />
 			<dataarea name="rom" size="8192">
-				<rom name="champion tennis (japan).bin" size="8192" crc="7c663316" sha1="8b90300dcabc2cf8d58ee4800dce3084b739886b" offset="000000" />
+				<rom name="mpr-5439.ic1" size="8192" crc="7c663316" sha1="8b90300dcabc2cf8d58ee4800dce3084b739886b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -737,6 +759,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+<!-- MPR-5437 according to SC-3000.com pics, but not clear which version these correspond to -->
 	<software name="congo">
 		<description>Congo Bongo (Euro, Jpn, v1)</description>
 		<year>1983</year>
@@ -962,8 +985,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1028"/>
 		<info name="alt_title" value="エクセリオン"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (Jpn?) -->
+			<feature name="pcb" value="171-5044" />
+			<feature name="ic1" value="MPR-5692" />
+			<feature name="ic2" value="(unpopulated)" />
 			<dataarea name="rom" size="16384">
-				<rom name="exerion (japan, europe).bin" size="16384" crc="a2c45b61" sha1="839e19487b96d02222ff397b047cbc6a0fbc08ff" offset="000000" />
+				<rom name="mpr-5692.ic1" size="16384" crc="a2c45b61" sha1="839e19487b96d02222ff397b047cbc6a0fbc08ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -993,6 +1020,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+<!-- MPR-6145.IC1 according to SC-3000.com pics, PCB 171-5177, but not clear which version these correspond to -->
 	<software name="flicky">
 		<description>Flicky (Jpn, v1)</description>
 		<year>1984</year>
@@ -1091,8 +1119,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1040"/>
 		<info name="alt_title" value="GPワールド"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on Enri's website (which calls it ver. B) -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-6485" />
 			<dataarea name="rom" size="32768">
-				<rom name="gp world [v0].bin" size="32768" crc="942adf84" sha1="40ae9c24c61188c6f02eba1b83109c5c4d86e64b" offset="000000" />
+				<rom name="mpr-6485.ic1" size="32768" crc="942adf84" sha1="40ae9c24c61188c6f02eba1b83109c5c4d86e64b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1281,8 +1312,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1042"/>
 		<info name="alt_title" value="Konami no Hyper Sports ~ コナミのハイパースポーツ (on the game box)"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on Enri's website -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-6487" />
 			<dataarea name="rom" size="32768">
-				<rom name="hyper sports (japan).bin" size="32768" crc="ba09a0fd" sha1="8a13ee297f861f436b9529a5e2193cb697baa56f" offset="000000" />
+				<rom name="mpr-6487.ic1" size="32768" crc="ba09a0fd" sha1="8a13ee297f861f436b9529a5e2193cb697baa56f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1383,8 +1417,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1031"/>
 		<info name="alt_title" value="ロードランナー"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (Euro?) -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-5998" />
 			<dataarea name="rom" size="32768">
-				<rom name="lode runner (japan, europe).bin" size="32768" crc="00ed3970" sha1="f14f216edfda7dfd113f5cb32375a27be8a6409d" offset="000000" />
+				<rom name="mpr-5998.ic1" size="32768" crc="00ed3970" sha1="f14f216edfda7dfd113f5cb32375a27be8a6409d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1663,8 +1700,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1015"/>
 		<info name="alt_title" value="オーガス"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (Jpn?) -->
+			<feature name="pcb" value="171-5137" />
+			<feature name="ic1" value="MPR-5743" />
+			<feature name="ic2" value="TC40H004P" />
 			<dataarea name="rom" size="32768">
-				<rom name="orguss (japan, europe).bin" size="32768" crc="f4f78b76" sha1="c50b133dac95718e3a92a7ed45b6c7e83927abb0" offset="000000" />
+				<rom name="mpr-5743.ic1" size="32768" crc="f4f78b76" sha1="c50b133dac95718e3a92a7ed45b6c7e83927abb0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1702,8 +1743,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1020"/>
 		<info name="alt_title" value="パッカー"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (Euro) -->
+			<feature name="pcb" value="171-5044" />
+			<feature name="ic1" value="MPR-5556" />
+			<feature name="ic2" value="(unpopulated)" />
 			<dataarea name="rom" size="16384">
-				<rom name="pacar (japan, europe).bin" size="16384" crc="30c52e5e" sha1="91fd213308b83bb1bda1dfc7e971e576caace291" offset="000000" />
+				<rom name="mpr-5556.ic1" size="16384" crc="30c52e5e" sha1="91fd213308b83bb1bda1dfc7e971e576caace291" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1947,8 +1992,11 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1032"/>
 		<info name="alt_title" value="サファリレース"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on Enri's website -->
+			<feature name="pcb" value="171-5177" />
+			<feature name="ic1" value="MPR-5977" />
 			<dataarea name="rom" size="32768">
-				<rom name="safari race.bin" size="32768" crc="08707fe3" sha1="ecbba909f2227786e7ba3360d2dd158f6513cfd4" offset="000000" />
+				<rom name="mpr-5977.ic1" size="32768" crc="08707fe3" sha1="ecbba909f2227786e7ba3360d2dd158f6513cfd4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2088,8 +2136,12 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		<info name="serial" value="G-1012"/>
 		<info name="alt_title" value="シンドバッドミステリー"/>
 		<part name="cart" interface="sg1000_cart">
+			<!-- PCB info based on SC-3000.com (Jpn?) -->
+			<feature name="pcb" value="171-5044, 171-5043, 171-5177" />
+			<feature name="ic1" value="MPR-5546" />
+			<feature name="ic2" value="(unpopulated)" />
 			<dataarea name="rom" size="32768">
-				<rom name="sindbad mystery (japan, europe).bin" size="32768" crc="01932df9" sha1="90bb8b8337866339f32b3fd48b4d25d78d682b55" offset="000000" />
+				<rom name="mpr-5546.ic1" size="32768" crc="01932df9" sha1="90bb8b8337866339f32b3fd48b4d25d78d682b55" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2286,6 +2338,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
+<!-- MPR-5440 according to SC-3000.com pics, but not clear which version these correspond to -->
 	<software name="starjack">
 		<description>Star Jacker (Euro, Jpn, v1.2)</description>
 		<year>1983</year>

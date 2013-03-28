@@ -11,9 +11,13 @@
 		<description>The King of Fighters '95 (Euro, Jpn) (Support Cartridge)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
+		<info name="serial" value="T-3101G" />
 		<part name="cart" interface="sat_cart">
+			<!-- PCB info from Jpn cart pic -->
+			<feature name="pcb" value="171-7088A" />
+			<feature name="ic1" value="MPR-18811-MX" />
 			<dataarea name="cart" size="0x200000">
-				<rom name="kof95 (je).rom" size="0x200000" crc="90412e10" sha1="a67cd4f550751f8b91de2b8b74528ab4e0c11c77" offset="0" />
+				<rom name="mpr-18811-mx.ic1" size="0x200000" crc="90412e10" sha1="a67cd4f550751f8b91de2b8b74528ab4e0c11c77" offset="0" />
 			</dataarea>
 		</part>
 	</software>

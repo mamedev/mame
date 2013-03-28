@@ -22,6 +22,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
 
+<!-- PCB info and part numbers are taken from SMS Power, from nepereny's PCB pictures and other sources -->
+
 	<software name="5in1fun">
 		<description>5 in 1 Funpak (USA)</description>
 		<year>1994</year>
@@ -57,8 +59,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940624 (JPN)"/>
 		<info name="alt_title" value="アダムス・ファミリー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16234-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="addams family, the (world).bin" size="262144" crc="1d01f999" sha1="3231d574e5eb0ac3a77b1d65d74f3a581819a9c7" offset="000000" />
+				<rom name="mpr-16234-f.ic1" size="262144" crc="1d01f999" sha1="3231d574e5eb0ac3a77b1d65d74f3a581819a9c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -213,6 +218,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2525, 077.120"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16629" />
 			<dataarea name="rom" size="524288">
 				<rom name="aladdin (usa, europe).bin" size="524288" crc="7a41c1dc" sha1="20ba7f5e5c801fbe48a537d2551a3d4525eb63e7" offset="000000" />
 			</dataarea>
@@ -385,8 +393,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2411"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15394-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="ariel the little mermaid (usa, europe).bin" size="262144" crc="97e3a18c" sha1="d2f1b95a6d0a2cacd93ed307a5a6576f954a7d56" offset="000000" />
+				<rom name="mpr-15394-f.ic1" size="262144" crc="97e3a18c" sha1="d2f1b95a6d0a2cacd93ed307a5a6576f954a7d56" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -400,8 +411,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19911213"/>
 		<info name="alt_title" value="アーリエル クリスタル伝説"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-14389" />
+			<feature name="ic2" value="KM6264LG-10L" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="262144">
-				<rom name="arliel - crystal densetsu (japan).bin" size="262144" crc="35fa3f68" sha1="75a04fa483fccd12a52aa18e494d542f4486577f" offset="000000" />
+				<rom name="mpr-14389.ic1" size="262144" crc="35fa3f68" sha1="75a04fa483fccd12a52aa18e494d542f4486577f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -412,8 +428,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2520"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16718" />
 			<dataarea name="rom" size="524288">
-				<rom name="asterix and the great rescue (europe) (en,fr,de,es,it).bin" size="524288" crc="328c5cc8" sha1="6083f57bc33c761ebf06b7c7512d1ee10bf619c8" offset="000000" />
+				<rom name="mpr-16718.ic1" size="524288" crc="328c5cc8" sha1="6083f57bc33c761ebf06b7c7512d1ee10bf619c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -544,8 +563,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920828, 19931210 (Meisaku Collection)"/>
 		<info name="alt_title" value="アイルトン・セナ スーパーモナコGP II"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15044" />
 			<dataarea name="rom" size="262144">
-				<rom name="ayrton senna's super monaco gp ii (japan).bin" size="262144" crc="661faeff" sha1="44f2c2bfa6ab57c1fd533996a5e404ebaa07264b" offset="000000" />
+				<rom name="mpr-15044.ic1" size="262144" crc="661faeff" sha1="44f2c2bfa6ab57c1fd533996a5e404ebaa07264b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -556,8 +578,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2423"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15049-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="ayrton senna's super monaco gp ii (usa, europe).bin" size="262144" crc="1d1b1dd3" sha1="e6a86010a4dad0a6102783d3c00ad126e8221597" offset="000000" />
+				<rom name="mpr-15049-f.ic1" size="262144" crc="1d1b1dd3" sha1="e6a86010a4dad0a6102783d3c00ad126e8221597" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -608,8 +633,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19960126"/>
 		<info name="alt_title" value="ばくばくアニマル 世界飼育係選手権"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18706-S" />
 			<dataarea name="rom" size="262144">
-				<rom name="baku baku animal - sekai shiikugakari senshu-ken (japan).bin" size="262144" crc="7174b802" sha1="270e071342adb41406568e171df4959656ed02bf" offset="000000" />
+				<rom name="mpr-18706-s.ic1" size="262144" crc="7174b802" sha1="270e071342adb41406568e171df4959656ed02bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -630,8 +658,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16373" />
 			<dataarea name="rom" size="262144">
-				<rom name="bartman meets radioactive man (usa, europe).bin" size="262144" crc="ffa447a9" sha1="9dd99ca1b28dbb16f5f118e2729613d1452aba73" offset="000000" />
+				<rom name="mpr-16373.ic1" size="262144" crc="ffa447a9" sha1="9dd99ca1b28dbb16f5f118e2729613d1452aba73" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -660,8 +691,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921023 (JPN)"/>
 		<info name="alt_title" value="バットマン・リターンズ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="837-9154 171-6062B" />
+			<feature name="u1" value="(Epoxy block)" />
 			<dataarea name="rom" size="262144">
-				<rom name="batman returns (world).bin" size="262144" crc="7ac4a3ca" sha1="85994b2f506c7bded0b02a59d96b1d949e48d518" offset="000000" />
+				<rom name="epoxy.u1" size="262144" crc="7ac4a3ca" sha1="85994b2f506c7bded0b02a59d96b1d949e48d518" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -960,8 +994,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950127"/>
 		<info name="alt_title" value="美少女戦士セーラームーンS"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17715" />
 			<dataarea name="rom" size="524288">
-				<rom name="bishoujo senshi sailor moon s (japan).bin" size="524288" crc="fe7374d2" sha1="824e463d0be5c0e81205a475b5ad7e55c366e486" offset="000000" />
+				<rom name="mpr-17715.ic1" size="524288" crc="fe7374d2" sha1="824e463d0be5c0e81205a475b5ad7e55c366e486" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1174,8 +1211,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2569, 7766-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18846-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="bugs bunny in double trouble (usa, europe).bin" size="524288" crc="5c34d9cd" sha1="a29dabb90532ff6114437f28970203e16003c11e" offset="000000" />
+				<rom name="mpr-18846-s.ic1" size="524288" crc="5c34d9cd" sha1="a29dabb90532ff6114437f28970203e16003c11e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1273,9 +1313,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2401"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6169A" />
+			<feature name="ic1" value="MPR-13704-F" />
+
 			<feature name="pin_42" value="sms_mode" />
 			<dataarea name="rom" size="262144">
-				<rom name="castle of illusion starring mickey mouse (usa, europe).bin" size="262144" crc="59840fd6" sha1="06bbeb784f913b37f58c2581c66d4ecb099deace" offset="000000" />
+				<rom name="mpr-13704-f.ic1" size="262144" crc="59840fd6" sha1="06bbeb784f913b37f58c2581c66d4ecb099deace" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1321,8 +1365,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2535, 077.260"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087 AGG REVA" />
+			<feature name="ic1" value="MPR-18190-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="chicago syndicate (usa, europe).bin" size="524288" crc="6b0fcec3" sha1="d7746e4c78aa86bc698fc25a52a791ba27a71add" offset="000000" />
+				<rom name="mpr-18190-s.ic1" size="524288" crc="6b0fcec3" sha1="d7746e4c78aa86bc698fc25a52a791ba27a71add" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1611,8 +1658,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921030 (JPN)"/>
 		<info name="alt_title" value="チャックロック"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15054 J20" />
 			<dataarea name="rom" size="262144">
-				<rom name="chuck rock (world).bin" size="262144" crc="191b1ed8" sha1="2b08a3231c0504d86caca74c8508d85c8ef6a86a" offset="000000" />
+				<rom name="mpr-15054 j20.ic1" size="262144" crc="191b1ed8" sha1="2b08a3231c0504d86caca74c8508d85c8ef6a86a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1692,8 +1742,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940805"/>
 		<info name="alt_title" value="颯爽少年英雄伝 コカ・コーラキッド"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16686-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="coca cola kid (japan).bin" size="524288" crc="c7598b81" sha1="e0a6caba7d8433175a3b7f1dfb593f9ca2c67cd1" offset="000000" />
+				<rom name="mpr-16686-s.ic1" size="524288" crc="c7598b81" sha1="e0a6caba7d8433175a3b7f1dfb593f9ca2c67cd1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1733,8 +1786,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2201, 012.070"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6061A" />
+			<feature name="ic1" value="MPR-13696" />
 			<dataarea name="rom" size="32768">
-				<rom name="columns (usa, europe).bin" size="32768" crc="83fa26d9" sha1="05b73f39a90fd59e01262cbd3f4e7a21575d468a" offset="000000" />
+				<rom name="mpr-13696.ic1" size="32768" crc="83fa26d9" sha1="05b73f39a90fd59e01262cbd3f4e7a21575d468a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1784,8 +1840,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950224"/>
 		<info name="alt_title" value="クレヨンしんちゃん 対決!カンタムパニック!!"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17805" />
 			<dataarea name="rom" size="524288">
-				<rom name="crayon shin-chan - taiketsu! kantam panic!! (japan).bin" size="524288" crc="03d28eab" sha1="65bcbd89637b8e6837cf36c7f1241eacf85abaa9" offset="000000" />
+				<rom name="mpr-17805.ic1" size="524288" crc="03d28eab" sha1="65bcbd89637b8e6837cf36c7f1241eacf85abaa9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1807,8 +1866,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2502"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-14633" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="262144">
-				<rom name="crystal warriors (usa, europe).bin" size="262144" crc="529c864e" sha1="6b03183b7183de17ad6fbc9938599d3d18badc1a" offset="000000" />
+				<rom name="mpr-14633.ic1" size="262144" crc="529c864e" sha1="6b03183b7183de17ad6fbc9938599d3d18badc1a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1888,8 +1952,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2442"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-16032" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="262144">
-				<rom name="desert speedtrap (europe) (en,fr,de,es,it).bin" size="262144" crc="ec808026" sha1="a253283456010bd73d3bde209566f26b6f8c582f" offset="000000" />
+				<rom name="mpr-16032.ic1" size="262144" crc="ec808026" sha1="a253283456010bd73d3bde209566f26b6f8c582f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2053,8 +2122,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2446"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16075-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="dr. robotnik's mean bean machine (usa, europe).bin" size="262144" crc="3c2d4f48" sha1="c36bda8a86994d430506b196922ec1365622e560" offset="000000" />
+				<rom name="mpr-16075-f.ic1" size="262144" crc="3c2d4f48" sha1="c36bda8a86994d430506b196922ec1365622e560" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2100,8 +2172,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2305"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13800-S" />
 			<dataarea name="rom" size="131072">
-				<rom name="dragon crystal (usa, europe).bin" size="131072" crc="0ef2ed93" sha1="6d53f32001d419a5b5e9c16cb62e07e548d2f44a" offset="000000" />
+				<rom name="mpr-13800-s.ic1" size="131072" crc="0ef2ed93" sha1="6d53f32001d419a5b5e9c16cb62e07e548d2f44a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2124,10 +2199,16 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<description>Dropzone (Euro)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
+		<info name="alt_title" value="Archer Maclean's Dropzone (Box)"/>
 		<info name="serial" value="T-121007"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the cart -->
+			<feature name="pcb" value="S8GGV1-2 9412" />
+			<feature name="u1?" value="DROPZONE GGDZ E7F1" />
+			<feature name="u2?" value="TI16R4-25" />
+			<feature name="u3?" value="GD4011BD" />
 			<dataarea name="rom" size="131072">
-				<rom name="dropzone (europe).bin" size="131072" crc="152f0dcc" sha1="b78bc3fe6bfbc7d6f5e85d59d79be19bf7372bcc" offset="000000" />
+				<rom name="dropzone ggdz e7f1.u1" size="131072" crc="152f0dcc" sha1="b78bc3fe6bfbc7d6f5e85d59d79be19bf7372bcc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2140,8 +2221,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940916"/>
 		<info name="alt_title" value="ダンクキッズ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17023" />
 			<dataarea name="rom" size="524288">
-				<rom name="dunk kids (japan).bin" size="524288" crc="77ed48f5" sha1="7525923ba2531d5079d66b2b1156cb5e7d44c66a" offset="000000" />
+				<rom name="mpr-17023.ic1" size="524288" crc="77ed48f5" sha1="7525923ba2531d5079d66b2b1156cb5e7d44c66a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2237,8 +2321,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940311"/>
 		<info name="alt_title" value="エコー・ザ・ドルフィン"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16428-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="ecco the dolphin (japan).bin" size="524288" crc="a32eb9d5" sha1="5f0de698e8e0d4323b36bd78e2bd1af1c3370f3e" offset="000000" />
+				<rom name="mpr-16428-f.ic1" size="524288" crc="a32eb9d5" sha1="5f0de698e8e0d4323b36bd78e2bd1af1c3370f3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2314,8 +2401,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2419, 2419-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15391" />
 			<dataarea name="rom" size="262144">
-				<rom name="evander holyfield boxing (usa, europe).bin" size="262144" crc="36aaf536" sha1="3093d6e6e332c864da8473ac2eab7d17eb65b523" offset="000000" />
+				<rom name="mpr-15391.ic1" size="262144" crc="36aaf536" sha1="3093d6e6e332c864da8473ac2eab7d17eb65b523" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2401,8 +2491,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2308"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-14238" />
 			<dataarea name="rom" size="131072">
-				<rom name="factory panic (europe).bin" size="131072" crc="59e3be92" sha1="94beb8b6334bb9dc104ffdb0ad2bdd4964ed91a5" offset="000000" />
+				<rom name="mpr-14238.ic1" size="131072" crc="59e3be92" sha1="94beb8b6334bb9dc104ffdb0ad2bdd4964ed91a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2516,8 +2609,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951027 (JPN)"/>
 		<info name="alt_title" value="フォアマンフォーリアル"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18216" />
 			<dataarea name="rom" size="524288">
-				<rom name="foreman for real (world).bin" size="524288" crc="d46d5685" sha1="d7109dc1db52bb4828a01b433a4b2993ac2e59e1" offset="000000" />
+				<rom name="mpr-18216.ic1" size="524288" crc="d46d5685" sha1="d7109dc1db52bb4828a01b433a4b2993ac2e59e1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2713,8 +2809,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2560, 2560-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the US cart -->
+			<feature name="pcb" value="171-7000A" />
+			<feature name="ic1" value="315-5912" />
+			<feature name="ic2" value="MPR-18201-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="garfield - caught in the act (usa, europe).bin" size="1048576" crc="cd53f3af" sha1="dc65f458cad3c165d0963b9b6da258d438da2ef7" offset="000000" />
+				<rom name="mpr-18201-s.ic2" size="1048576" crc="cd53f3af" sha1="dc65f458cad3c165d0963b9b6da258d438da2ef7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2725,8 +2825,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Takara</publisher>
 		<info name="serial" value="T-103017"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17432" />
 			<dataarea name="rom" size="524288">
-				<rom name="garou densetsu special (japan).bin" size="524288" crc="9afb6f33" sha1="ec2f11e28bff47d149df1987673f80da08c1af6d" offset="000000" />
+				<rom name="mpr-17432.ic1" size="524288" crc="9afb6f33" sha1="ec2f11e28bff47d149df1987673f80da08c1af6d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2888,8 +2991,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940422"/>
 		<info name="alt_title" value="GPライダー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16589" />
 			<dataarea name="rom" size="524288">
-				<rom name="gp rider (japan).bin" size="524288" crc="7a26ec6a" sha1="b1c4315dc4afe58256f3834cff8e94c6b02bc1b6" offset="000000" />
+				<rom name="mpr-16589.ic1" size="524288" crc="7a26ec6a" sha1="b1c4315dc4afe58256f3834cff8e94c6b02bc1b6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2911,8 +3017,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2528"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16367-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="gp rider (usa, europe).bin" size="524288" crc="876e9b72" sha1="7777f091c8b540d3248fd7c0fb21e742af6f0ede" offset="000000" />
+				<rom name="mpr-16367-s.ic1" size="524288" crc="876e9b72" sha1="7777f091c8b540d3248fd7c0fb21e742af6f0ede" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2950,8 +3059,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="ガンスターヒーローズ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17847-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="gunstar heroes (japan).bin" size="524288" crc="c3c52767" sha1="c373d3876659095bb869ff0e4bb7ffc68123cf3e" offset="000000" />
+				<rom name="mpr-17847-f.ic1" size="524288" crc="c3c52767" sha1="c373d3876659095bb869ff0e4bb7ffc68123cf3e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3064,8 +3176,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="79138-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17442-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="hurricanes (europe).bin" size="524288" crc="0a25eec5" sha1="d4f0a691f11de7d91ede6ff95d26343a50840eb1" offset="000000" />
+				<rom name="mpr-17442-f.ic1" size="524288" crc="0a25eec5" sha1="d4f0a691f11de7d91ede6ff95d26343a50840eb1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3078,8 +3193,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920522"/>
 		<info name="alt_title" value="ひょっこりひょうたん島 ひょうたん島の大航海"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-14690-F" />
 			<dataarea name="rom" size="131072">
-				<rom name="hyokkori hyoutan jima - hyoutan jima no daikoukai (japan).bin" size="131072" crc="42389270" sha1="0b0270060342f4e79d58104a85a7be04426683bd" offset="000000" />
+				<rom name="mpr-14690-f.ic1" size="131072" crc="42389270" sha1="0b0270060342f4e79d58104a85a7be04426683bd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3092,8 +3210,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920424"/>
 		<info name="alt_title" value="超プロ野球'92"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-14759" />
 			<dataarea name="rom" size="131072">
-				<rom name="hyper pro yakyuu '92 (japan).bin" size="131072" crc="056cae74" sha1="245699bff66440b1e4483e8d68e468bbc3ba6ab3" offset="000000" />
+				<rom name="mpr-14759.ic1" size="131072" crc="056cae74" sha1="245699bff66440b1e4483e8d68e468bbc3ba6ab3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3121,8 +3242,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921023"/>
 		<info name="alt_title" value="インザ ウエイク オブ バンパイア"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15156" />
 			<dataarea name="rom" size="262144">
-				<rom name="in the wake of vampire (japan).bin" size="262144" crc="dab0f265" sha1="da5116b7ed890f35506c5b33c5c9716f528169b1" offset="000000" />
+				<rom name="mpr-15156.ic1" size="262144" crc="dab0f265" sha1="da5116b7ed890f35506c5b33c5c9716f528169b1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3208,8 +3332,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940722"/>
 		<info name="alt_title" value="Jリーグ GGプロストライカー'94"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-16821" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="524288">
-				<rom name="j.league gg pro striker '94 (japan).bin" size="524288" crc="a12a28a0" sha1="04248e53ce54c9f17daae9885fed87d39f0117b6" offset="000000" />
+				<rom name="mpr-16821.ic1" size="524288" crc="a12a28a0" sha1="04248e53ce54c9f17daae9885fed87d39f0117b6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3321,8 +3450,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19920522"/>
 		<info name="alt_title" value="ジョー・モンタナ フットボール"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-14319" />
 			<dataarea name="rom" size="262144">
-				<rom name="joe montana's football (japan).bin" size="262144" crc="4a98678b" sha1="253196b98d83b910c289b0211b6de025c66c916c" offset="000000" />
+				<rom name="mpr-14319.ic1" size="262144" crc="4a98678b" sha1="253196b98d83b910c289b0211b6de025c66c916c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3444,8 +3576,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2511"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15779" />
 			<dataarea name="rom" size="524288">
-				<rom name="jurassic park (usa, europe).bin" size="524288" crc="bd6f2321" sha1="0425dc09465a4b7be78ab7aa46107987ba61e82a" offset="000000" />
+				<rom name="mpr-15779.ic1" size="524288" crc="bd6f2321" sha1="0425dc09465a4b7be78ab7aa46107987ba61e82a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3512,8 +3647,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910329"/>
 		<info name="alt_title" value="キネティック コネクション"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6054A" />
+			<feature name="ic1" value="MPR-13610" />
 			<dataarea name="rom" size="131072">
-				<rom name="kinetic connection (japan).bin" size="131072" crc="4af7f2aa" sha1="7447e0ad5e8e14c3ae05a274d393ca34de044855" offset="000000" />
+				<rom name="mpr-13610.ic1" size="131072" crc="4af7f2aa" sha1="7447e0ad5e8e14c3ae05a274d393ca34de044855" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3526,8 +3664,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950901"/>
 		<info name="alt_title" value="鬼神童子ゼンキ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18210" />
 			<dataarea name="rom" size="524288">
-				<rom name="kishin douji zenki (japan).bin" size="524288" crc="7d622bdd" sha1="0fb3530633070551f3d5a04839fc42babc092fbd" offset="000000" />
+				<rom name="mpr-18210.ic1" size="524288" crc="7d622bdd" sha1="0fb3530633070551f3d5a04839fc42babc092fbd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3538,8 +3679,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Tengen</publisher>
 		<info name="serial" value="301040-0161, T-48048-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-15076-F" />
 			<dataarea name="rom" size="131072">
-				<rom name="klax (usa, europe).bin" size="131072" crc="9b40fc8e" sha1="4705bbc862169cdfeb3b30dba6f274b094ab99b3" offset="000000" />
+				<rom name="mpr-15076-f.ic1" size="131072" crc="9b40fc8e" sha1="4705bbc862169cdfeb3b30dba6f274b094ab99b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3550,8 +3694,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81078, T-81078-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15461-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="krusty's fun house (usa, europe).bin" size="262144" crc="d01e784f" sha1="a24fd153669e0c38d55ff939e1ea52b6a316ad0d" offset="000000" />
+				<rom name="mpr-15461-f.ic1" size="262144" crc="d01e784f" sha1="a24fd153669e0c38d55ff939e1ea52b6a316ad0d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3590,8 +3737,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2509"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15486" />
 			<dataarea name="rom" size="524288">
-				<rom name="land of illusion starring mickey mouse (usa, europe).bin" size="524288" crc="52dbf3e1" sha1="5975bf7d01c84b9433c2859e6d38d26545fd3bc9" offset="000000" />
+				<rom name="mpr-15486.ic1" size="524288" crc="52dbf3e1" sha1="5975bf7d01c84b9433c2859e6d38d26545fd3bc9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3717,8 +3867,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70158"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17271" />
 			<dataarea name="rom" size="524288">
-				<rom name="lion king, the (europe).bin" size="524288" crc="0cd9c20b" sha1="49f00887a297f70a51711fe18433bc168ec49fc9" offset="000000" />
+				<rom name="mpr-17271.ic1" size="524288" crc="0cd9c20b" sha1="49f00887a297f70a51711fe18433bc168ec49fc9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3744,8 +3897,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="2549, 1205"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17074" />
 			<dataarea name="rom" size="524288">
-				<rom name="lion king, the (usa).bin" size="524288" crc="9808d7b3" sha1="e21025b2f6d5bbc18107905ad6c0c58d061d9c17" offset="000000" />
+				<rom name="mpr-17074.ic1" size="524288" crc="9808d7b3" sha1="e21025b2f6d5bbc18107905ad6c0c58d061d9c17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3867,8 +4023,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2574"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the US cart -->
+			<feature name="pcb" value="171-7000A" />
+			<feature name="ic1" value="315-5912" />
+			<feature name="ic2" value="MPR-19811-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="lost world, the - jurassic park (usa).bin" size="1048576" crc="8d1597f5" sha1="1730b85fac5478da92b0905c6525e715bb4470d4" offset="000000" />
+				<rom name="mpr-19811-s.ic2" size="1048576" crc="8d1597f5" sha1="1730b85fac5478da92b0905c6525e715bb4470d4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3879,8 +4039,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2404"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-14461 J09" />
 			<dataarea name="rom" size="262144">
-				<rom name="lucky dime caper, the (usa, europe).bin" size="262144" crc="07a7815a" sha1="5cc5caa887a63c580c1e3ff344a4b0ade643f24b" offset="000000" />
+				<rom name="mpr-14461 j09.ic1" size="262144" crc="07a7815a" sha1="5cc5caa887a63c580c1e3ff344a4b0ade643f24b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3959,8 +4122,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940520"/>
 		<info name="alt_title" value="魔導物語II アルル16才"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-16616" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="524288">
-				<rom name="madou monogatari ii - arle 16-sai (japan).bin" size="524288" crc="12eb2287" sha1="deead79fa4cb2e87652a9c8a76f2a7174f48f37a" offset="000000" />
+				<rom name="mpr-16616.ic1" size="524288" crc="12eb2287" sha1="deead79fa4cb2e87652a9c8a76f2a7174f48f37a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4001,8 +4169,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19941216"/>
 		<info name="alt_title" value="魔法騎士レイアース"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-17115" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="524288">
-				<rom name="magic knight rayearth (japan).bin" size="524288" crc="8f82a6b9" sha1="6c13e3b9bb24eafc1186c5ffa322b1f40c676b3d" offset="000000" />
+				<rom name="mpr-17115.ic1" size="524288" crc="8f82a6b9" sha1="6c13e3b9bb24eafc1186c5ffa322b1f40c676b3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4015,8 +4188,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950804"/>
 		<info name="alt_title" value="魔法騎士レイアース2"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-18183-S" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="524288">
-				<rom name="magic knight rayearth 2 - making of magic knight (japan).bin" size="524288" crc="1c2c2b04" sha1="29615d86057f3323ecda75d47102e77d364f6499" offset="000000" />
+				<rom name="mpr-18183-s.ic1" size="524288" crc="1c2c2b04" sha1="29615d86057f3323ecda75d47102e77d364f6499" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4318,8 +4496,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="T-81288, T-81288-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17420-S" />
 			<dataarea name="rom" size="262144">
-				<rom name="monster truck wars (usa, europe).bin" size="262144" crc="453c5cec" sha1="f493d5aebef88b44cadcb3459d214a6c3ba155c8" offset="000000" />
+				<rom name="mpr-17420-s.ic1" size="262144" crc="453c5cec" sha1="f493d5aebef88b44cadcb3459d214a6c3ba155c8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4358,8 +4539,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81198, T-81198-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15771" />
 			<dataarea name="rom" size="524288">
-				<rom name="mortal kombat (usa, europe) (v2.6).bin" size="524288" crc="07494f2a" sha1="ef634649b846b3f49d2c68739b36019e4fae0464" offset="000000" />
+				<rom name="mpr-15771.ic1" size="524288" crc="07494f2a" sha1="ef634649b846b3f49d2c68739b36019e4fae0464" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4457,8 +4641,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940729"/>
 		<info name="alt_title" value="なぞぷよ アルルのルー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16849" />
 			<dataarea name="rom" size="262144">
-				<rom name="nazo puyo arle no roux (japan).bin" size="262144" crc="54ab42a4" sha1="20308b7389a9e860697a66510d4925d1af3b769a" offset="000000" />
+				<rom name="mpr-16849.ic1" size="262144" crc="54ab42a4" sha1="20308b7389a9e860697a66510d4925d1af3b769a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4836,8 +5023,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Arena</publisher>
 		<info name="serial" value="T-81248"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Euro cart?) -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-16421-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="nba jam (usa, europe).bin" size="524288" crc="8f17597e" sha1="2de5991810bad1a4120a2698530c66d4dbf16f7c" offset="000000" />
+				<rom name="mpr-16421-s.ic1" size="524288" crc="8f17597e" sha1="2de5991810bad1a4120a2698530c66d4dbf16f7c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4850,8 +5040,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950224 (JPN)"/>
 		<info name="alt_title" value="NBA ジャム トーナメントエディション"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17625" />
 			<dataarea name="rom" size="524288">
-				<rom name="nba jam tournament edition (usa, europe).bin" size="524288" crc="86c32e5b" sha1="c34e318852ca6f52e980c7a63721a145cd167843" offset="000000" />
+				<rom name="mpr-17625.ic1" size="524288" crc="86c32e5b" sha1="c34e318852ca6f52e980c7a63721a145cd167843" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5267,8 +5460,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="T-50048, T-50048-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17850-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="nhl hockey (usa, europe).bin" size="524288" crc="658713a5" sha1="8f243a6011f769538349c968929a500aff7d3e6d" offset="000000" />
+				<rom name="mpr-17850-s.ic1" size="524288" crc="658713a5" sha1="8f243a6011f769538349c968929a500aff7d3e6d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5307,8 +5503,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950721"/>
 		<info name="alt_title" value="-忍空-"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18000" />
 			<dataarea name="rom" size="524288">
-				<rom name="ninku (japan).bin" size="524288" crc="c3056e15" sha1="d22bfa865b34866568f3dd7fccec886170071c81" offset="000000" />
+				<rom name="mpr-18000.ic1" size="524288" crc="c3056e15" sha1="d22bfa865b34866568f3dd7fccec886170071c81" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5321,8 +5520,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951222"/>
 		<info name="alt_title" value="-忍空-2 ～天空龍への道～"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18695" />
 			<dataarea name="rom" size="524288">
-				<rom name="ninku 2 - tenkuuryuu e no michi (japan).bin" size="524288" crc="06247dd2" sha1="fd6452974da734fcd4292cb0cd728a0ac9aef714" offset="000000" />
+				<rom name="mpr-18695.ic1" size="524288" crc="06247dd2" sha1="fd6452974da734fcd4292cb0cd728a0ac9aef714" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5335,24 +5537,32 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951103"/>
 		<info name="alt_title" value="-忍空- 外伝 ヒロユキ大活劇"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18313" />
 			<dataarea name="rom" size="524288">
-				<rom name="ninku gaiden - hiroyuki daikatsugeki (japan).bin" size="524288" crc="9140f239" sha1="23003e39918f855bd37f58b7b8840960cc82196a" offset="000000" />
+				<rom name="mpr-18313.ic1" size="524288" crc="9140f239" sha1="23003e39918f855bd37f58b7b8840960cc82196a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- Alt. Title: Nomo Hideo no World Series Baseball (Box?) -->
 	<software name="nomowsb" cloneof="wsb95">
 		<description>Nomo's World Series Baseball (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3442"/>
 		<info name="release" value="19951201"/>
-		<info name="alt_title" value="野茂英雄のワールドシリーズベースボール"/>
+		<info name="alt_title" value="野茂英雄のワールドシリーズベースボール ~ Nomo Hideo no World Series Baseball (Box?)"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-18562" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
+
 			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="524288">
-				<rom name="nomo hideo no world series baseball (japan).bin" size="524288" crc="4ed45bda" sha1="127a7e6706f6d9b129d5cf0dd2bb417e9b108748" offset="000000" />
+				<rom name="mpr-18562.ic1" size="524288" crc="4ed45bda" sha1="127a7e6706f6d9b129d5cf0dd2bb417e9b108748" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5364,8 +5574,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="serial" value="79018-50, 79018-05, 79018-18"/>
 		<part name="cart" interface="gamegear_cart">
 			<feature name="pin_42" value="sms_mode" />
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6169A" />
+			<feature name="ic1" value="MPR-14752-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="olympic gold (europe) (en,fr,de,es,it,nl,pt,sv) (v1.1).bin" size="262144" crc="1d93246e" sha1="53fd026008be77cd0cda7080e67a87a7bad33a6a" offset="000000" />
+				<rom name="mpr-14752-f.ic1" size="262144" crc="1d93246e" sha1="53fd026008be77cd0cda7080e67a87a7bad33a6a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5479,8 +5692,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910129"/>
 		<info name="alt_title" value="パックマン"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13660" />
 			<dataarea name="rom" size="131072">
-				<rom name="pac-man (japan).bin" size="131072" crc="a16c5e58" sha1="d78b6aac927692f1b67e6a4b7494e2c7e709ae17" offset="000000" />
+				<rom name="mpr-13660.ic1" size="131072" crc="a16c5e58" sha1="d78b6aac927692f1b67e6a4b7494e2c7e709ae17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5554,8 +5770,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2202"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6061A" />
+			<feature name="ic1" value="MPR-13804-S" />
 			<dataarea name="rom" size="32768">
-				<rom name="pengo (usa, europe).bin" size="32768" crc="0da23cc1" sha1="e42f85feb631712b8615a0b19bfbf6432633ba00" offset="000000" />
+				<rom name="mpr-13804-s.ic1" size="32768" crc="0da23cc1" sha1="e42f85feb631712b8615a0b19bfbf6432633ba00" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5614,8 +5833,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48138 301045-0161, T-48138-50 301045-0161"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16044" />
 			<dataarea name="rom" size="262144">
-				<rom name="pga tour golf (usa, europe).bin" size="262144" crc="9700bb65" sha1="34a2b521c4577e4d1699311365722745d62f10aa" offset="000000" />
+				<rom name="mpr-16044.ic1" size="262144" crc="9700bb65" sha1="34a2b521c4577e4d1699311365722745d62f10aa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5625,8 +5847,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="800069 REV A" />
+			<feature name="ic1" value="MPR-17319-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="pga tour golf ii (usa, europe).bin" size="524288" crc="4a8ac851" sha1="871b94f1ff63e2a89bc165382110d4f79df53fa3" offset="000000" />
+				<rom name="mpr-17319-s.ic1" size="524288" crc="4a8ac851" sha1="871b94f1ff63e2a89bc165382110d4f79df53fa3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5818,8 +6043,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="301108-0161 T-48218, T-48218-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="800069 REV A" />
+			<feature name="ic1" value="MPR-18181" />
 			<dataarea name="rom" size="524288">
-				<rom name="primal rage (usa, europe).bin" size="524288" crc="2a34b5c7" sha1="6d193840463722ed141ed503c2cfc7ae0077ce35" offset="000000" />
+				<rom name="mpr-18181.ic1" size="524288" crc="2a34b5c7" sha1="6d193840463722ed141ed503c2cfc7ae0077ce35" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5887,9 +6115,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19930429"/>
 		<info name="alt_title" value="プロ野球GGリーグ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6309A" />
+			<feature name="ic1" value="MPR-15564" />
+
 			<feature name="eeprom" value="93c46" />
 			<dataarea name="rom" size="262144">
-				<rom name="pro yakyuu gg league (japan).bin" size="262144" crc="2da8e943" sha1="bf78122a549ad9b016e3704690c7eea1574af140" offset="000000" />
+				<rom name="mpr-15564.ic1" size="262144" crc="2da8e943" sha1="bf78122a549ad9b016e3704690c7eea1574af140" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5954,8 +6186,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19930319"/>
 		<info name="alt_title" value="ぷよぷよ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15464" />
 			<dataarea name="rom" size="262144">
-				<rom name="puyo puyo (japan).bin" size="262144" crc="d173a06f" sha1="8ea2e623858221c5d39eb1e0f6532a0b23b00305" offset="000000" />
+				<rom name="mpr-15464.ic1" size="262144" crc="d173a06f" sha1="8ea2e623858221c5d39eb1e0f6532a0b23b00305" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5968,8 +6203,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19941216"/>
 		<info name="alt_title" value="ぷよぷよ通"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17537" />
 			<dataarea name="rom" size="524288">
-				<rom name="puyo puyo 2 (japan).bin" size="524288" crc="3ab2393b" sha1="04ea9ff57faeeccd1bbb17490d22313ae94c86d6" offset="000000" />
+				<rom name="mpr-17537.ic1" size="524288" crc="3ab2393b" sha1="04ea9ff57faeeccd1bbb17490d22313ae94c86d6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5982,8 +6220,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940422"/>
 		<info name="alt_title" value="PUZZLE&amp;ACTION タントア～ル"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16607" />
 			<dataarea name="rom" size="524288">
-				<rom name="puzzle and action tanto-r (japan).bin" size="524288" crc="09151743" sha1="75f54793ac09e22e0be1864ea16e68b2fb4610ff" offset="000000" />
+				<rom name="mpr-16607.ic1" size="524288" crc="09151743" sha1="75f54793ac09e22e0be1864ea16e68b2fb4610ff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6022,8 +6263,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950407"/>
 		<info name="alt_title" value="ザクイズ ギアファイト!"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17816" />
 			<dataarea name="rom" size="524288">
-				<rom name="quiz gear fight!!, the (japan).bin" size="524288" crc="736cdb76" sha1="6ce8ff78d96a1a0e13997489d1a53b5a57a619c2" offset="000000" />
+				<rom name="mpr-17816.ic1" size="524288" crc="736cdb76" sha1="6ce8ff78d96a1a0e13997489d1a53b5a57a619c2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6034,8 +6278,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Time Warner Interactive</publisher>
 		<info name="serial" value="T-48168 301073-0161"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="800069 REV A" />
+			<feature name="ic1" value="MPR-17310-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="r.b.i. baseball '94 (usa).bin" size="524288" crc="6dc3295e" sha1="21e3800ecfb6c8210cfc1213a6cbf0bb63519633" offset="000000" />
+				<rom name="mpr-17310-s.ic1" size="524288" crc="6dc3295e" sha1="21e3800ecfb6c8210cfc1213a6cbf0bb63519633" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6232,8 +6479,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70128-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6398A" />
+			<feature name="ic1?" value="MPR-16049" />
+			<feature name="ic2?" value="315-5426" />
 			<dataarea name="rom" size="524288">
-				<rom name="robocop versus the terminator (usa, europe).bin" size="524288" crc="4ab7fa4e" sha1="13286df11fc66a8974a73a82e8478fa382fa2b43" offset="000000" />
+				<rom name="mpr-16049.ic1" size="524288" crc="4ab7fa4e" sha1="13286df11fc66a8974a73a82e8478fa382fa2b43" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6260,8 +6511,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910531"/>
 		<info name="alt_title" value="琉球"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13884" />
 			<dataarea name="rom" size="131072">
-				<rom name="ryuukyuu (japan).bin" size="131072" crc="95efd52b" sha1="ffaa1c97c64aec30176254f1ef655c06c63e1b53" offset="000000" />
+				<rom name="mpr-13884.ic1" size="131072" crc="95efd52b" sha1="ffaa1c97c64aec30176254f1ef655c06c63e1b53" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6322,8 +6576,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940325"/>
 		<info name="alt_title" value="スクラッチゴルフ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16454" />
 			<dataarea name="rom" size="262144">
-				<rom name="scratch golf (japan).bin" size="262144" crc="ec0f2c72" sha1="4c1d3b5057702341b5646d0a2fe65a9bda966211" offset="000000" />
+				<rom name="mpr-16454.ic1" size="262144" crc="ec0f2c72" sha1="4c1d3b5057702341b5646d0a2fe65a9bda966211" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6336,8 +6593,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950324"/>
 		<info name="alt_title" value="SDガンダム ウィナーズ ヒストリー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power  -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-17848" />
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam - winner's history (japan).bin" size="524288" crc="5e2b39b8" sha1="24e217098845ab5a0eb29e9dc6af2e86be1b0a84" offset="000000" />
+				<rom name="mpr-17848.ic1" size="524288" crc="5e2b39b8" sha1="24e217098845ab5a0eb29e9dc6af2e86be1b0a84" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6347,8 +6607,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15205" />
 			<dataarea name="rom" size="262144">
-				<rom name="sega game pack 4 in 1 (europe).bin" size="262144" crc="0924d2ec" sha1="02fa5c6c6f81f5f4e1d78eced5a37617888404d3" offset="000000" />
+				<rom name="mpr-15205.ic1" size="262144" crc="0924d2ec" sha1="02fa5c6c6f81f5f4e1d78eced5a37617888404d3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6412,8 +6675,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940305"/>
 		<info name="alt_title" value="上海II"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13494" />
 			<dataarea name="rom" size="131072">
-				<rom name="shanghai ii [v1] (jp).bin" size="131072" crc="81314249" sha1="82210b387344aaebae8cf03029967cd0c906beff" offset="000000" />
+				<rom name="mpr-13494.ic1" size="131072" crc="81314249" sha1="82210b387344aaebae8cf03029967cd0c906beff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6491,8 +6757,15 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19930625"/>
 		<info name="alt_title" value="シャイニング・フォース外伝II ～邪神の覚醒～"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the cart -->
+			<feature name="pcb" value="171-6418A" />
+			<feature name="u1" value="MPR-15570 J07" />
+			<feature name="u2" value="KM62256BLG-10L" />
+			<feature name="u3" value="337-26B" />
+			<feature name="u4" value="??" />
+			<feature name="batt" value="" />
 			<dataarea name="rom" size="524288">
-				<rom name="shining force gaiden ii - jashin no kakusei (japan).bin" size="524288" crc="30374681" sha1="2dd374db661315e51e9eedebf346a5a4ded0c3be" offset="000000" />
+				<rom name="mpr-15570 j07.u1" size="524288" crc="30374681" sha1="2dd374db661315e51e9eedebf346a5a4ded0c3be" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6550,8 +6823,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921211 (JPN)"/>
 		<info name="alt_title" value="ザ・GG シノビ II"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15154-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="shinobi ii - the silent fury (world).bin" size="262144" crc="6201c694" sha1="cd57301d16202ea02d9f97bd8b17d71772782c94" offset="000000" />
+				<rom name="mpr-15154-f.ic1" size="262144" crc="6201c694" sha1="cd57301d16202ea02d9f97bd8b17d71772782c94" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6574,8 +6850,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Flying Edge</publisher>
 		<info name="serial" value="T-81018, T-81018-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15229-S" />
 			<dataarea name="rom" size="262144">
-				<rom name="simpsons, the - bart vs. the space mutants (usa, europe).bin" size="262144" crc="c0009274" sha1="c8bbc1ea5b9b60ebcd15efc2dc850e0ffd20dae0" offset="000000" />
+				<rom name="mpr-15229-s.ic1" size="262144" crc="c0009274" sha1="c8bbc1ea5b9b60ebcd15efc2dc850e0ffd20dae0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6588,8 +6867,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940729 (JPN)"/>
 		<info name="alt_title" value="シンプソンズ バートワールド"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15978" />
 			<dataarea name="rom" size="262144">
-				<rom name="simpsons, the - bart vs. the world (usa, europe).bin" size="262144" crc="da7bd5c7" sha1="256672261c9a2d35e10eb06e990e8ebc46fb35c1" offset="000000" />
+				<rom name="mpr-15978.ic1" size="262144" crc="da7bd5c7" sha1="256672261c9a2d35e10eb06e990e8ebc46fb35c1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6718,8 +7000,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19961213 (JPN)"/>
 		<info name="alt_title" value="G・ソニック"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the US cart -->
+			<feature name="pcb" value="171-7000A" />
+			<feature name="ic1" value="315-5912" />
+			<feature name="ic2" value="MPR-19071-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="sonic blast (world).bin" size="1048576" crc="031b9da9" sha1="11241be4082f6f9d057488ae75ccdd482f623f8c" offset="000000" />
+				<rom name="mpr-19071-s.ic2" size="1048576" crc="031b9da9" sha1="11241be4082f6f9d057488ae75ccdd482f623f8c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6796,8 +7082,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2515, 1204, 077080"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15973-F" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic chaos (usa, europe).bin" size="524288" crc="663f2abb" sha1="5b5b7d9cd8adf0f8e1ee15fd4557828f91dfdca1" offset="000000" />
+				<rom name="mpr-15973-f.ic1" size="524288" crc="663f2abb" sha1="5b5b7d9cd8adf0f8e1ee15fd4557828f91dfdca1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6835,8 +7124,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950317 (JPN)"/>
 		<info name="alt_title" value="ソニックドリフト2"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17623" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic drift 2 (japan, usa).bin" size="524288" crc="d6e8a305" sha1="fe597c5cfbbc31e54f2484eb5b33c21c66cf0290" offset="000000" />
+				<rom name="mpr-17623.ic1" size="524288" crc="d6e8a305" sha1="fe597c5cfbbc31e54f2484eb5b33c21c66cf0290" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6849,8 +7141,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951117 (JPN)"/>
 		<info name="alt_title" value="ソニックラビリンス"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-18314-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic labyrinth (world).bin" size="524288" crc="5550173b" sha1="e24bf33d8d5a79f371485f20f207b6b26f5b341e" offset="000000" />
+				<rom name="mpr-18314-s.ic1" size="524288" crc="5550173b" sha1="e24bf33d8d5a79f371485f20f207b6b26f5b341e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7109,8 +7404,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19911228 (JPN), 19931210 (JPN, Meisaku Collection)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Euro cart?) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-14459A" />
 			<dataarea name="rom" size="262144">
-				<rom name="sonic the hedgehog (world) (v1.1).bin" size="262144" crc="d163356e" sha1="7dbbbca2229e74fcb8f90ec794aa6e5cb168e489" offset="000000" />
+				<rom name="mpr-14459a.ic1" size="262144" crc="d163356e" sha1="7dbbbca2229e74fcb8f90ec794aa6e5cb168e489" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7134,8 +7432,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19921121 (JPN), 19931210 (JPN, Meisaku Collection)"/>
 		<info name="alt_title" value="ソニック・ザ・ヘッジホッグ2"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15169 J02" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic the hedgehog 2 (world).bin" size="524288" crc="95a18ec7" sha1="dabb452e416b4fa9cb83d8ddd307c2a32c3a1a7f" offset="000000" />
+				<rom name="mpr-15169 j02.ic1" size="524288" crc="95a18ec7" sha1="dabb452e416b4fa9cb83d8ddd307c2a32c3a1a7f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7146,8 +7447,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2530, 2530-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Euro cart?) -->
+			<feature name="pcb" value="??" />
+			<feature name="ic1" value="MPR-17075" />
 			<dataarea name="rom" size="524288">
-				<rom name="sonic the hedgehog - triple trouble (usa, europe).bin" size="524288" crc="d23a2a93" sha1="4965af7ffe60382ffa805710b7c8006419cc4ac4" offset="000000" />
+				<rom name="mpr-17075.ic1" size="524288" crc="d23a2a93" sha1="4965af7ffe60382ffa805710b7c8006419cc4ac4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7185,8 +7489,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19911228 (JPN)"/>
 		<info name="alt_title" value="スペースハリアー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-14346" />
 			<dataarea name="rom" size="131072">
-				<rom name="space harrier (world).bin" size="131072" crc="600c15b3" sha1="d00b8ff195d4423f2a344490eb34156017f4ee64" offset="000000" />
+				<rom name="mpr-14346.ic1" size="131072" crc="600c15b3" sha1="d00b8ff195d4423f2a344490eb34156017f4ee64" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7794,8 +8101,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19930723 (JPN)"/>
 		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15665" />
 			<dataarea name="rom" size="524288">
-				<rom name="streets of rage ii (world).bin" size="524288" crc="0b618409" sha1="2804b355347bda6e2903078ba30ed6b3a289ebba" offset="000000" />
+				<rom name="mpr-15665.ic1" size="524288" crc="0b618409" sha1="2804b355347bda6e2903078ba30ed6b3a289ebba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7832,8 +8142,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950526"/>
 		<info name="alt_title" value="スーパーコラムス"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-17865" />
 			<dataarea name="rom" size="131072">
-				<rom name="super columns (japan).bin" size="131072" crc="2a100717" sha1="a1de915b0f10894bedc6ee8f0fd1f2da65bcfa68" offset="000000" />
+				<rom name="mpr-17865.ic1" size="131072" crc="2a100717" sha1="a1de915b0f10894bedc6ee8f0fd1f2da65bcfa68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7962,8 +8275,13 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19951215"/>
 		<info name="alt_title" value="スーパー 桃太郎電鉄III"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-18440" />
+			<feature name="ic2" value="??" />
+			<feature name="ic3" value="??" />
 			<dataarea name="rom" size="524288">
-				<rom name="super momotarou dentetsu iii (japan).bin" size="524288" crc="b731bb80" sha1="f62e0e433987f97143282d2526490cd45f3e7185" offset="000000" />
+				<rom name="mpr-18440.ic1" size="524288" crc="b731bb80" sha1="f62e0e433987f97143282d2526490cd45f3e7185" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7988,8 +8306,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2304, 012.140"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13771" />
 			<dataarea name="rom" size="131072">
-				<rom name="super monaco gp (usa, europe).bin" size="131072" crc="fcf12547" sha1="d834e43d7ec6dbadf2e367afd45b7e1e4362035b" offset="000000" />
+				<rom name="mpr-13771.ic1" size="131072" crc="fcf12547" sha1="d834e43d7ec6dbadf2e367afd45b7e1e4362035b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8063,8 +8384,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70068"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15504-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="superman - the man of steel (europe).bin" size="262144" crc="73df5a15" sha1="8e0d837cf285d8669d30ef1328453949cea70a6a" offset="000000" />
+				<rom name="mpr-15504-f.ic1" size="262144" crc="73df5a15" sha1="8e0d837cf285d8669d30ef1328453949cea70a6a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8196,8 +8520,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910928, 19930723 (Meisaku Collection)"/>
 		<info name="alt_title" value="対戦型 大戦略G"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the cart -->
+			<feature name="pcb" value="171-6088A" />
+			<feature name="ic1" value="MPR-14246" />
+			<feature name="ic2" value="KM6264BLG-10L" />
+			<feature name="ic3" value="165-26B" />
+			<feature name="battery" value="??" />
 			<dataarea name="rom" size="262144">
-				<rom name="taisen-gata daisenryaku g (japan).bin" size="262144" crc="7b7717b8" sha1="d290bba12f4b7341c3ce2a00be8b8d7e548327e1" offset="000000" />
+				<rom name="mpr-14246.ic1" size="262144" crc="7b7717b8" sha1="d290bba12f4b7341c3ce2a00be8b8d7e548327e1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8480,8 +8810,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2413"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on US cart (nepereny's) -->
+			<feature name="pcb" value="837-9119 171-6062B" />
+			<feature name="u1" value="(Epoxy block)" />
 			<dataarea name="rom" size="262144">
-				<rom name="taz-mania - the search for the lost seabirds (usa, europe).bin" size="262144" crc="36040c24" sha1="0d0285bc5350146f365dae1f271ed0828971cf4d" offset="000000" />
+				<rom name="epoxy.u1" size="262144" crc="36040c24" sha1="0d0285bc5350146f365dae1f271ed0828971cf4d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8494,8 +8827,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19950428 (JPN)"/>
 		<info name="alt_title" value="テンポJR."/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17792-S" />
 			<dataarea name="rom" size="524288">
-				<rom name="tempo jr. (world).bin" size="524288" crc="de466796" sha1="a2d800d2836a03f81dd8f3dda23cd2d8bfff18a5" offset="000000" />
+				<rom name="mpr-17792-s.ic1" size="524288" crc="de466796" sha1="a2d800d2836a03f81dd8f3dda23cd2d8bfff18a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8605,8 +8941,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Tengen</publisher>
 		<info name="serial" value="T-48118, T-48118-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15642-F" />
 			<dataarea name="rom" size="262144">
-				<rom name="tengen world cup soccer (usa, europe).bin" size="262144" crc="dd6d2e34" sha1="8e1beab60e120924656d8a741a38b112abd7ef97" offset="000000" />
+				<rom name="mpr-15642-f.ic1" size="262144" crc="dd6d2e34" sha1="8e1beab60e120924656d8a741a38b112abd7ef97" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8693,8 +9032,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940603"/>
 		<info name="alt_title" value="とられてたまるか!?"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16707" />
 			<dataarea name="rom" size="524288">
-				<rom name="torarete tamaru ka (japan).bin" size="524288" crc="5bcf9b97" sha1="fa87ac6b14c4b9eaa91fa8e4550b3c9049dd8ef2" offset="000000" />
+				<rom name="mpr-16707.ic1" size="524288" crc="5bcf9b97" sha1="fa87ac6b14c4b9eaa91fa8e4550b3c9049dd8ef2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8721,8 +9063,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19931029 (JPN)"/>
 		<info name="alt_title" value="アルティメイト サッカー"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15827" />
 			<dataarea name="rom" size="262144">
-				<rom name="ultimate soccer (japan, europe) (en,fr,de,es,it).bin" size="262144" crc="820965a3" sha1="7994621926628d2376a75e8d90cd066d48a4d502" offset="000000" />
+				<rom name="mpr-15827.ic1" size="262144" crc="820965a3" sha1="7994621926628d2376a75e8d90cd066d48a4d502" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8756,8 +9101,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2570"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on pics of the US cart -->
+			<feature name="pcb" value="171-7000A" />
+			<feature name="ic1" value="315-5912" />
+			<feature name="ic2" value="MPR-18864-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="virtua fighter animation (usa, europe).bin" size="1048576" crc="d431c452" sha1="222f3e49f595ceb4263af329c4021d64fc4772e6" offset="000000" />
+				<rom name="mpr-18864-s.ic2" size="1048576" crc="d431c452" sha1="222f3e49f595ceb4263af329c4021d64fc4772e6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8770,8 +9119,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19960329"/>
 		<info name="alt_title" value="バーチャファイターミニ"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on misc sources -->
+			<feature name="pcb" value="171-7000A" />
+			<feature name="ic1" value="315-5912" />
+			<feature name="ic2" value="MPR-18679-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="virtua fighter mini (japan).bin" size="1048576" crc="c05657f8" sha1="b0622ef2e58fc38af35ead0a632babc4bfe49e86" offset="000000" />
+				<rom name="mpr-18679-s.ic1" size="1048576" crc="c05657f8" sha1="b0622ef2e58fc38af35ead0a632babc4bfe49e86" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8796,8 +9149,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19910726"/>
 		<info name="alt_title" value="ワギャンランド"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-13930" />
 			<dataarea name="rom" size="262144">
-				<rom name="wagan land (japan).bin" size="262144" crc="29e697b2" sha1="6b74f3fddabd52ac6bb1b812043537154f8a43c5" offset="000000" />
+				<rom name="mpr-13930.ic1" size="262144" crc="29e697b2" sha1="6b74f3fddabd52ac6bb1b812043537154f8a43c5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8836,8 +9192,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19930226 (JPN)"/>
 		<info name="alt_title" value="ウィンブルドン"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-14994" />
 			<dataarea name="rom" size="131072">
-				<rom name="wimbledon (world).bin" size="131072" crc="ce1108fd" sha1="6aa588e0aa93c5c74c80f7044de49933291af4e9" offset="000000" />
+				<rom name="mpr-14994.ic1" size="131072" crc="ce1108fd" sha1="6aa588e0aa93c5c74c80f7044de49933291af4e9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8850,8 +9209,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940211"/>
 		<info name="alt_title" value="ウインターオリンピック"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power (Jpn cart) -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16350" />
 			<dataarea name="rom" size="524288">
-				<rom name="winter olympics - lillehammer '94 (japan) (en,fr,de,es,it,pt,sv,no).bin" size="524288" crc="d5195a39" sha1="578fc35fe155dca2c9adf17464d23aaf8205148f" offset="000000" />
+				<rom name="mpr-16350.ic1" size="524288" crc="d5195a39" sha1="578fc35fe155dca2c9adf17464d23aaf8205148f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8862,8 +9224,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>U.S. Gold</publisher>
 		<info name="serial" value="T-79088"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16024" />
 			<dataarea name="rom" size="524288">
-				<rom name="winter olympics - lillehammer '94 (usa, europe) (en,fr,de,es,it,pt,sv,no).bin" size="524288" crc="d15d335b" sha1="6f9942792072626f1322e11835dbc5e2e94aa718" offset="000000" />
+				<rom name="mpr-16024.ic1" size="524288" crc="d15d335b" sha1="6f9942792072626f1322e11835dbc5e2e94aa718" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8885,8 +9250,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="T-70078-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-15717-S" />
 			<dataarea name="rom" size="262144">
-				<rom name="wolfchild (europe).bin" size="262144" crc="840a8f8e" sha1="7889b67ee0e5c884fa267688aad4b6c23849268c" offset="000000" />
+				<rom name="mpr-15717-s.ic1" size="262144" crc="840a8f8e" sha1="7889b67ee0e5c884fa267688aad4b6c23849268c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8896,8 +9264,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6059A" />
+			<feature name="ic1" value="MPR-13912" />
 			<dataarea name="rom" size="131072">
-				<rom name="wonder boy (europe).bin" size="131072" crc="ea2dd3a7" sha1="f2c546bc87c5e89719fe01a59142bb3250861b83" offset="000000" />
+				<rom name="mpr-13912.ic1" size="131072" crc="ea2dd3a7" sha1="f2c546bc87c5e89719fe01a59142bb3250861b83" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8921,8 +9292,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-14768" />
 			<dataarea name="rom" size="262144">
-				<rom name="wonder boy - the dragon's trap (europe).bin" size="262144" crc="a74c97a7" sha1="d98344a2c644ce9a0184e8f836271c038aa16a23" offset="000000" />
+				<rom name="mpr-14768.ic1" size="262144" crc="a74c97a7" sha1="d98344a2c644ce9a0184e8f836271c038aa16a23" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8943,8 +9317,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6061A" />
+			<feature name="ic1" value="MPR-13808" />
 			<dataarea name="rom" size="32768">
-				<rom name="woody pop (usa, europe) (v1.1).bin" size="32768" crc="b74f3a4f" sha1="4efbfa1d3234d8f1800a06ab72b2177fba6914cb" offset="000000" />
+				<rom name="mpr-13808.ic1" size="32768" crc="b74f3a4f" sha1="4efbfa1d3234d8f1800a06ab72b2177fba6914cb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8966,8 +9343,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<publisher>Sega</publisher>
 		<info name="serial" value="2406, 2406-50"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-14251" />
 			<dataarea name="rom" size="262144">
-				<rom name="world class leader board (usa, europe).bin" size="262144" crc="868fe528" sha1="23b28cf137adc947ffd1af649cf3c8d64e6fadc1" offset="000000" />
+				<rom name="mpr-14251.ic1" size="262144" crc="868fe528" sha1="23b28cf137adc947ffd1af649cf3c8d64e6fadc1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9300,8 +9680,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940318"/>
 		<info name="alt_title" value="幽☆遊☆白書 滅びし者の逆襲"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-16456" />
 			<dataarea name="rom" size="524288">
-				<rom name="yu yu hakusho - horobishimono no gyakushuu (japan).bin" size="524288" crc="88ebbf9e" sha1="e75803c9241094f7cfe251b99cd370228cc0923c" offset="000000" />
+				<rom name="mpr-16456.ic1" size="524288" crc="88ebbf9e" sha1="e75803c9241094f7cfe251b99cd370228cc0923c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9314,8 +9697,11 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		<info name="release" value="19940930"/>
 		<info name="alt_title" value="幽☆遊☆白書II 激闘!七強の戦い"/>
 		<part name="cart" interface="gamegear_cart">
+			<!-- PCB info based on SMS Power -->
+			<feature name="pcb" value="171-6087A" />
+			<feature name="ic1" value="MPR-17084" />
 			<dataarea name="rom" size="524288">
-				<rom name="yu yu hakusho 2 - gekitou! nanakyou no tatakai (japan).bin" size="524288" crc="46ae9159" sha1="140efe67e886f52aeda2089a73599f7680c89f24" offset="000000" />
+				<rom name="mpr-17084.ic1" size="524288" crc="46ae9159" sha1="140efe67e886f52aeda2089a73599f7680c89f24" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
