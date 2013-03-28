@@ -3,9 +3,7 @@
 <!--
     Missing dumps:
 
-    325201-01   C16/C116/plus4 Burn In
     325057-01   C16/C116/plus4 DIAGNOSE
-    325062-01   C16/C116/plus4 Diagnostic Test
 -->
 <softwarelist name="plus4_cart" description="Commodore Plus/4 cartridges">
 
@@ -270,6 +268,30 @@
 			<dataarea name="c1l" size="0x4000">
 				<rom name="turboplus.u1" size="0x2000" crc="88b40daf" sha1="bb02e863193b9f7731e9bf5b554bb1e743a0a573" offset="0" />
 				<rom size="0x2000" offset="0x2000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="burnin">
+		<description>Burn In</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="325201-01" size="0x2000" crc="27119f88" sha1="8276558f6c2a519dd668fa17dd5e8787acde1de7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diagtest">
+		<description>Diagnostic Test</description>
+		<year>1988</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="plus4_cart">
+			<dataarea name="c1l" size="0x4000">
+				<rom name="325062-01" size="0x2000" crc="c3d81a03" sha1="b5997e44f9d6d5b4aaa9f2e607f1532caeb01b08" offset="0" />
 			</dataarea>
 		</part>
 	</software>

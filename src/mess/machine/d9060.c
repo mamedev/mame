@@ -52,7 +52,7 @@ const device_type D9090 = &device_creator<d9090_device>;
 
 ROM_START( d9060 )
 	ROM_REGION( 0x4000, M6502_DOS_TAG, 0 )
-	ROM_LOAD( "300516-001.7c", 0x0000, 0x2000, NO_DUMP ) // Revision A
+	ROM_LOAD( "300516-001.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) ) // Revision A
 	ROM_LOAD( "300517-001.7d", 0x2000, 0x2000, CRC(566df630) SHA1(b1602dfff408b165ee52a6a4ca3e2ec27e689ba9) ) // Revision A
 	ROM_LOAD( "300516-002.7c", 0x0000, 0x2000, CRC(2d758a14) SHA1(c959cc9dde84fc3d64e95e58a0a096a26d8107fd) ) // Revision B
 	ROM_LOAD( "300517-002.7d", 0x2000, 0x2000, CRC(f0382bc3) SHA1(0b0a8dc520f5b41ffa832e4a636b3d226ccbb7f1) ) // Revision B
