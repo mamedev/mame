@@ -28,7 +28,7 @@ Notes:
 - a Blocken PCB shot barely shows a 48 MHz xtal, game is definitely too slow
   at 8 MHz (noticeable thru colour cycling effects)
 - A picture of an undumped full English version of Shanghai 3 clearly shows
-  a 48MHz OSC & TMP68HC000N-16 cpu plus a little blue resonators for the OKI.
+  a 48MHz OSC & TMP68HC000N-16 cpu plus a little blue resonator for the OKI.
 
 ***************************************************************************/
 
