@@ -163,8 +163,11 @@ void psxcd_device::device_reset()
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
+		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
+
+	next_read_event = -1;
 
 	if(cur_res)
 	{
