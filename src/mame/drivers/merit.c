@@ -58,7 +58,7 @@ Merit Riviera Notes - There are several known versions:
   Riviera Super Star (not dumped)
   Riviera Montana Version (with journal printer, not dumped)
   Riviera Tennessee Draw (not dumped)
-  Michigan Superstar (not dumped)
+  Michigan Superstar Draw Poker (not dumped)
 
   There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
   of the various video poker games from Merit. RDI then licensed the games to Michigan Coin Op-Vending
