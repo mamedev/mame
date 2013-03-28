@@ -4306,6 +4306,19 @@
 	</software>
 
 	<software name="bionicms">
+		<description>Bionicle - Maze of Shadows (Euro, Rev. A)</description>
+		<year>2005</year>
+		<publisher>THQ</publisher>
+		<info name="serial" value="AGB-BILP"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="8388608">
+				<rom name="bionicle11.bilp.bin" size="8388608" crc="9d66ec5e" sha1="430c7dac6f7dd989294a8ac1cfdabd9e74b3e682" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bionicmsa" cloneof="bionicms">
 		<description>Bionicle - Maze of Shadows (Euro)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
