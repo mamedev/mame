@@ -38,7 +38,8 @@ public:
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
 
-	DECLARE_MACHINE_START( ms_megadriv );
+	DECLARE_MACHINE_START( md_common );		// setup ioport_port
+	DECLARE_MACHINE_START( ms_megadriv );	// setup ioport_port + install cartslot handlers
 	DECLARE_MACHINE_RESET( ms_megadriv );
 };
 
@@ -320,7 +321,7 @@ UINT16 vdp_get_word_from_68k_mem_console(running_machine &machine, UINT32 source
 	}
 }
 
-MACHINE_START_MEMBER(md_cons_state,ms_megadriv )
+MACHINE_START_MEMBER(md_cons_state, md_common)
 {
 	static const char *const pad6names[2][4] = {
 		{ "PAD1_6B", "PAD2_6B", "UNUSED", "UNUSED" },
@@ -340,9 +341,15 @@ MACHINE_START_MEMBER(md_cons_state,ms_megadriv )
 	// setup timers for 6 button pads	
 	for (int i = 0; i < 3; i++)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+}
 
+MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
+{
+	MACHINE_START_CALL_MEMBER( md_common );
+	
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_console;
 
+	// for now m_cartslot is only in MD and not 32x and SegaCD
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_slotcart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_slotcart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_slotcart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_slotcart));
@@ -543,6 +550,9 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 
 	// we need to remove and re-add the sound system because the balance is different
@@ -574,6 +584,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
 
 	// we need to remove and re-add the sound system because the balance is different
@@ -604,6 +617,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md_32x, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
+
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
 
 	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
 
@@ -674,6 +690,10 @@ struct cdrom_interface scd_cdrom =
 
 static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
@@ -682,6 +702,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( md_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_pal )
+
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
 
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
@@ -691,6 +715,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mdj_scd, md_cons_state )
 	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_MACHINE_START_OVERRIDE( md_cons_state, md_common )
+	MCFG_MACHINE_RESET_OVERRIDE( md_cons_state, ms_megadriv )
+
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
 	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
 
