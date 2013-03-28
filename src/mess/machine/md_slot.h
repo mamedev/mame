@@ -175,6 +175,7 @@ public:
 	void setup_custom_mappers();
 	void setup_nvram();
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
+	void file_logging(UINT8 *ROM, UINT32 rom_len, UINT32 nvram_len);
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);

@@ -347,10 +347,11 @@ bool base_md_cart_slot_device::call_load()
 
 			if (m_cart->get_nvram_size())
 				battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0xff);
+
+			file_logging((UINT8 *)m_cart->get_rom_base(), m_cart->get_rom_size(), m_cart->get_nvram_size());
 		}
 
 		return res;
-
 	}
 
 	return IMAGE_INIT_PASS;
@@ -530,9 +531,9 @@ int base_md_cart_slot_device::load_nonlist()
 		m_cart->rom_map_setup(len);
 
 
+// CPU needs to access ROM as a ROM_REGION16_BE, so we need to compensate on LE machines
 #ifdef LSB_FIRST
 	unsigned char fliptemp;
-	// is this really needed nowadays?
 	for (int ptr = 0; ptr < len; ptr += 2)
 	{
 		fliptemp = ROM[ptr];
@@ -613,6 +614,8 @@ void base_md_cart_slot_device::setup_nvram()
 		case SEGA_SRAM_FALLBACK:
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
+			logerror("No SRAM detected from header, using fallback SRAM in case this is a broken header\n");
+
 			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			if (m_cart->m_rom_size <= m_cart->m_nvram_start)
 				m_cart->m_nvram_active = 1;
@@ -870,13 +873,10 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	if (type == SEGA_STD)
 	{
 		// If the cart is not of a special type, we check the header for SRAM.
-		if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+		if (ROM[0x1b1] == 'A' && ROM[0x1b0] == 'R')
 		{
-			UINT32 start, end;
-			start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-			end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-			logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", start, end - start + 1);
-
+			UINT32 start = (ROM[0x1b4] << 24 | ROM[0x1b5] << 16 | ROM[0x1b6] << 8 | ROM[0x1b7]);
+			UINT32 end = (ROM[0x1b8] << 24 | ROM[0x1b9] << 16 | ROM[0x1ba] << 8 | ROM[0x1bb]);
 			// For some games using serial EEPROM, difference between SRAM end to start is 0 or 1.
 			// Carts with EEPROM should have been already detected above, but better safe than sorry
 			if (end - start < 2)
@@ -886,8 +886,6 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		}
 		else
 		{
-			logerror("No SRAM detected from header, using fallback SRAM in case this is a broken header\n");
-
 			// Unfortunately, there are ROMs without correct info in the header,
 			// Hence, when loading from fullpath we do the SRAM mapping anyway...
 			// but treat it in a custom way
@@ -979,4 +977,124 @@ WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
 {
 	if (m_cart)
 		m_cart->write_a15(space, offset, data, mem_mask);
+}
+
+/*-------------------------------------------------
+ Internal header logging
+ -------------------------------------------------*/
+
+void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 nvram_len)
+{
+	char console[16], copyright[16], domestic_name[48], overseas_name[48];
+	char serial[14], io[16], modem[12], memo[40], country[16];
+	UINT32 rom_start, rom_end, ram_start, ram_end, sram_start = 0, sram_end = 0;
+	UINT16 checksum, csum = 0;
+	bool valid_sram = FALSE, is_pico = FALSE;
+	astring ctrl(""), reg("");
+
+	// LOG FILE DETAILS
+	logerror("FILE DETAILS\n" );
+	logerror("============\n" );
+	logerror("Name: %s\n", basename());
+	logerror("File Size: 0x%llX\n", (software_entry() == NULL) ? length() : get_software_region_length("rom"));
+	logerror("Detected type: %s\n", md_get_slot(m_type));
+	logerror("ROM (Allocated) Size: 0x%X\n", rom_len);
+	logerror("NVRAM: %s\n", nvram_len ? "Yes" : "No");
+	if (nvram_len)
+		logerror("NVRAM (Allocated) Size: 0x%X\n", nvram_len);
+	logerror("\n" );
+
+
+	// LOG HEADER DETAILS
+	if (rom_len < 0x200)
+		return;
+
+	for (int i = 0; i < 16; i++)
+		console[i] = ROM8[0x100 + i ^ 1];
+	if (!strncmp("SEGA PICO", console, 9))
+		is_pico = TRUE;
+	for (int i = 0; i < 16; i++)
+		copyright[i] = ROM8[0x110 + i ^ 1];
+	for (int i = 0; i < 48; i++)
+		domestic_name[i] = ROM8[0x120 + i ^ 1];
+	for (int i = 0; i < 48; i++)
+		overseas_name[i] = ROM8[0x150 + i ^ 1];
+	for (int i = 0; i < 14; i++)
+		serial[i] = ROM8[0x180 + i ^ 1];
+
+	checksum = ROM8[0x18e] | (ROM8[0x18f] << 8);
+
+	for (int i = 0; i < 16; i++)
+	{
+		io[i] = ROM8[0x190 + i ^ 1];
+		if (io[i] == 'J')
+			ctrl.cat(" - Joypad 3 buttons [J]\n");
+		if (io[i] == '6')
+			ctrl.cat(" - Joypad 6 buttons [6]\n");
+	}
+
+	rom_start = (ROM8[0x1a1] << 24 | ROM8[0x1a0] << 16 | ROM8[0x1a3] << 8 | ROM8[0x1a2]);
+	rom_end = (ROM8[0x1a5] << 24 | ROM8[0x1a4] << 16 | ROM8[0x1a7] << 8 | ROM8[0x1a6]);
+	ram_start =  (ROM8[0x1a9] << 24 | ROM8[0x1a8] << 16 | ROM8[0x1ab] << 8 | ROM8[0x1aa]);;
+	ram_end = (ROM8[0x1ad] << 24 | ROM8[0x1ac] << 16 | ROM8[0x1af] << 8 | ROM8[0x1ae]);;
+	if (ROM8[0x1b1] == 'R' && ROM8[0x1b0] == 'A')
+	{
+		valid_sram = TRUE;
+		sram_start = (ROM8[0x1b5] << 24 | ROM8[0x1b4] << 16 | ROM8[0x1b7] << 8 | ROM8[0x1b6]);
+		sram_end = (ROM8[0x1b9] << 24 | ROM8[0x1b8] << 16 | ROM8[0x1bb] << 8 | ROM8[0x1ba]);
+	}
+
+	for (int i = 0; i < 12; i++)
+		modem[i] = ROM8[0x1bc + i ^ 1];
+	for (int i = 0; i < 40; i++)
+		memo[i] = ROM8[0x1c8 + i ^ 1];
+	for (int i = 0; i < 16; i++)
+	{
+		country[i] = ROM8[0x1f0 + i ^ 1];
+		if (country[i] == 'J')
+			reg.cat(" - Japan [J]\n");
+		if (country[i] == 'U')
+			reg.cat(" - USA [U]\n");
+		if (country[i] == 'E')
+			reg.cat(" - Europe [E]\n");
+	}
+
+	// compute cart checksum to compare with expected one
+	for (int i = 0x200; i < (rom_end + 1) && i < rom_len; i += 2)
+	{
+		csum += (ROM8[i] | (ROM8[i + 1] << 8));
+		csum &= 0xffff;
+	}
+	
+	logerror("INTERNAL HEADER\n" );
+	logerror("===============\n" );
+	logerror("Console: %.16s\n", console);
+	logerror("Copyright String: %.16s\n", copyright);
+	logerror(" - Manufacturer: %.4s\n", copyright + 3); // TODO: convert code to manufacturer name!
+	logerror(" - Date: %.8s\n", copyright + 8);
+	logerror("Name (domestic): %.48s\n", domestic_name);
+	logerror("Name (overseas): %.48s\n", overseas_name);
+	logerror("Serial String: %.14s\n", serial);
+	if (!is_pico)
+	{
+		logerror(" - Type: %.2s (%s)\n", serial, !strncmp("GM", serial, 2) ? "Game" : "Unknown");
+		logerror(" - Serial Code: %.8s\n", serial + 3);
+		logerror(" - Revision: %.2s\n", serial + 12);
+	}
+	logerror("Checksum: %X\n", checksum);
+	logerror(" - Calculated Checksum: %X\n", csum);
+	logerror("Supported I/O Devices: %.16s\n%s", io, ctrl.cstr());
+	logerror("Modem: %.12s\n", modem);
+	logerror("Memo: %.40s\n", memo);
+	logerror("Country: %.16s\n%s", country, reg.cstr());
+	logerror("ROM Start:  0x%.8X\n", rom_start);
+	logerror("ROM End:    0x%.8X\n", rom_end);
+	logerror("RAM Start:  0x%.8X\n", ram_start);
+	logerror("RAM End:    0x%.8X\n", ram_end);
+	logerror("SRAM detected from header: %s\n", valid_sram ? "Yes" : "No");
+	if (valid_sram)
+	{
+		logerror("SRAM Start: 0x%.8X\n", sram_start);
+		logerror("SRAM End:   0x%.8X\n", sram_end);
+	}
 }
