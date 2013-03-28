@@ -110,9 +110,9 @@ void ppu2c0x_device::device_config_complete()
 
 	/* reset the callbacks */
 	m_latch = NULL;
-	m_scanline_callback_proc = NULL;
-	m_hblank_callback_proc = NULL;
-	m_vidaccess_callback_proc = NULL;
+	m_scanline_callback_proc = ppu2c0x_scanline_delegate();
+	m_hblank_callback_proc = ppu2c0x_hblank_delegate();
+	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
 
 	m_nmi_callback_proc = config->nmi_handler;
 	m_color_base = config->color_base;
@@ -468,8 +468,8 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 			//update_scanline();
 
-			if (m_hblank_callback_proc)
-				(*m_hblank_callback_proc) (this, m_scanline, vblank, blanked);
+			if (!m_hblank_callback_proc.isnull())
+				m_hblank_callback_proc(m_scanline, vblank, blanked);
 
 			m_hblank_timer->adjust(attotime::never);
 			break;
@@ -488,8 +488,8 @@ void ppu2c0x_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			int next_scanline;
 
 			/* if a callback is available, call it */
-			if (m_scanline_callback_proc)
-				(*m_scanline_callback_proc)(this, m_scanline, vblank, blanked);
+			if (!m_scanline_callback_proc.isnull())
+				m_scanline_callback_proc(m_scanline, vblank, blanked);
 
 			/* update the scanline that just went by */
 			update_scanline();
@@ -1235,8 +1235,8 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 					(*m_latch)(this, tempAddr);
 
 				/* if there's a callback, call it now */
-				if (m_vidaccess_callback_proc)
-					data = (*m_vidaccess_callback_proc)(this, tempAddr, data);
+				if (!m_vidaccess_callback_proc.isnull())
+					data = m_vidaccess_callback_proc(tempAddr, data);
 
 				/* see if it's on the chargen portion */
 				if (tempAddr < 0x2000)

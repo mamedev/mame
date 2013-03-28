@@ -1295,26 +1295,24 @@ static void mmc3_set_chr( running_machine &machine, UINT8 chr, int chr_base, int
 }
 
 /* Here, IRQ counter decrements every scanline. */
-static void mmc3_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::mmc3_irq(int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		int priorCount = state->m_IRQ_count;
-		if ((state->m_IRQ_count == 0) || state->m_IRQ_clear)
-			state->m_IRQ_count = state->m_IRQ_count_latch;
+		int priorCount = m_IRQ_count;
+		if ((m_IRQ_count == 0) || m_IRQ_clear)
+			m_IRQ_count = m_IRQ_count_latch;
 		else
-			state->m_IRQ_count--;
+			m_IRQ_count--;
 
-		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && (priorCount || state->m_IRQ_clear /*|| !state->m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
+		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && (priorCount || m_IRQ_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-						device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+						machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
-	state->m_IRQ_clear = 0;
+	m_IRQ_clear = 0;
 }
 
 WRITE8_MEMBER(nes_carts_state::txrom_w)
@@ -1821,28 +1819,26 @@ static void mmc5_update_render_mode( running_machine &machine )
 {
 }
 
-static void mmc5_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::mmc5_irq(int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 #if 1
 	if (scanline == 0)
-		state->m_IRQ_status |= 0x40;
+		m_IRQ_status |= 0x40;
 	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
-		state->m_IRQ_status &= ~0x40;
+		m_IRQ_status &= ~0x40;
 #endif
 
-	if (scanline == state->m_IRQ_count)
+	if (scanline == m_IRQ_count)
 	{
-		if (state->m_IRQ_enable)
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		if (m_IRQ_enable)
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 
-		state->m_IRQ_status = 0xff;
+		m_IRQ_status = 0xff;
 	}
 
 	/* FIXME: this is ok, but then we would need to update them again when we have the BG Hblank
 	 I leave it commented out until the PPU is updated for this */
-	//  if (ppu2c0x_is_sprite_8x16(state->m_ppu) || state->m_mmc5_last_chr_a)
+	//  if (ppu2c0x_is_sprite_8x16(m_ppu) || m_mmc5_last_chr_a)
 	//      mmc5_update_chr_a(device->machine());
 	//  else
 	//      mmc5_update_chr_b(device->machine());
@@ -2461,27 +2457,25 @@ WRITE8_MEMBER(nes_carts_state::ntbrom_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void jxrom_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::jxrom_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 	/* TODO: change to reflect the actual number of cycles spent */
-	if ((state->m_IRQ_enable & 0x80) && (state->m_IRQ_enable & 0x01))
+	if ((m_IRQ_enable & 0x80) && (m_IRQ_enable & 0x01))
 	{
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_IRQ_count = 0xffff;
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = 0xffff;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
-	else if (state->m_IRQ_enable & 0x01)    // if enable bit 7 is not set, only decrement the counter!
+	else if (m_IRQ_enable & 0x01)    // if enable bit 7 is not set, only decrement the counter!
 	{
-		if (state->m_IRQ_count <= 114)
-			state->m_IRQ_count = 0xffff;
+		if (m_IRQ_count <= 114)
+			m_IRQ_count = 0xffff;
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
 }
 
@@ -2828,20 +2822,18 @@ WRITE8_MEMBER(nes_carts_state::dis_74x161x161x32_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void bandai_lz_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::bandai_lz_irq(int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);   // wrap around the 16 bits counter
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = (0xffff - 114 + m_IRQ_count);   // wrap around the 16 bits counter
 		}
-		state->m_IRQ_count -= 114;
+		m_IRQ_count -= 114;
 	}
 }
 
@@ -3081,17 +3073,16 @@ WRITE8_MEMBER(nes_carts_state::g101_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void h3001_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::h3001_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		state->m_IRQ_count -= 114;
+		m_IRQ_count -= 114;
 
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_IRQ_enable = 0;
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -3161,50 +3152,48 @@ WRITE8_MEMBER(nes_carts_state::h3001_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void ss88006_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::ss88006_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 	/* Increment & check the IRQ scanline counter */
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, state->m_IRQ_count));
-		if (state->m_IRQ_mode & 0x08)
+		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, m_IRQ_count));
+		if (m_IRQ_mode & 0x08)
 		{
-			if ((state->m_IRQ_count & 0x000f) < 114)    // always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
+			if ((m_IRQ_count & 0x000f) < 114)    // always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
-				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				state->m_IRQ_count = (state->m_IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (state->m_IRQ_count & 0x000f)); // sort of wrap around the counter
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_IRQ_count = (m_IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (m_IRQ_count & 0x000f)); // sort of wrap around the counter
 			}
 			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
 		}
-		else if (state->m_IRQ_mode & 0x04)
+		else if (m_IRQ_mode & 0x04)
 		{
-			if ((state->m_IRQ_count & 0x00ff) < 114)
+			if ((m_IRQ_count & 0x00ff) < 114)
 			{
-				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				state->m_IRQ_count = (state->m_IRQ_count & ~0x00ff) | (0xff - 114 + (state->m_IRQ_count & 0x00ff)); // wrap around the 8 bits counter
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_IRQ_count = (m_IRQ_count & ~0x00ff) | (0xff - 114 + (m_IRQ_count & 0x00ff)); // wrap around the 8 bits counter
 			}
 			else
-				state->m_IRQ_count -= 114;
+				m_IRQ_count -= 114;
 		}
-		else if (state->m_IRQ_mode & 0x02)
+		else if (m_IRQ_mode & 0x02)
 		{
-			if ((state->m_IRQ_count & 0x0fff)  < 114)
+			if ((m_IRQ_count & 0x0fff)  < 114)
 			{
-				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				state->m_IRQ_count = (state->m_IRQ_count & ~0x0fff) | (0xfff - 114 + (state->m_IRQ_count & 0x0fff));    // wrap around the 12 bits counter
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_IRQ_count = (m_IRQ_count & ~0x0fff) | (0xfff - 114 + (m_IRQ_count & 0x0fff));    // wrap around the 12 bits counter
 			}
 			else
-				state->m_IRQ_count -= 114;
+				m_IRQ_count -= 114;
 		}
-		else if (state->m_IRQ_count < 114)
+		else if (m_IRQ_count < 114)
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_count = (0xffff - 114 + state->m_IRQ_count);   // wrap around the 16 bits counter
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = (0xffff - 114 + m_IRQ_count);   // wrap around the 16 bits counter
 		}
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
 }
 
@@ -3572,15 +3561,14 @@ static void vrc4_set_prg( running_machine &machine )
 	}
 }
 
-static void konami_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::konami_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
 	/* Increment & check the IRQ scanline counter */
-	if (state->m_IRQ_enable && (++state->m_IRQ_count == 0x100))
+	if (m_IRQ_enable && (++m_IRQ_count == 0x100))
 	{
-		state->m_IRQ_count = state->m_IRQ_count_latch;
-		state->m_IRQ_enable = state->m_IRQ_enable_latch;
-		state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		m_IRQ_count = m_IRQ_count_latch;
+		m_IRQ_enable = m_IRQ_enable_latch;
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -3838,19 +3826,17 @@ WRITE8_MEMBER(nes_carts_state::konami_vrc7_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void namcot_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::namcot_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count >= (0x7fff - 114))
+		if (m_IRQ_count >= (0x7fff - 114))
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_count = 0;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = 0;
 		}
 		else
-			state->m_IRQ_count += 114;
+			m_IRQ_count += 114;
 	}
 }
 
@@ -4003,22 +3989,20 @@ WRITE8_MEMBER(nes_carts_state::sunsoft2_w)
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void sunsoft3_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::sunsoft3_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
 	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
 	 produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_IRQ_enable = 0;
-			state->m_IRQ_count = 0xffff;
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
+			m_IRQ_count = 0xffff;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
 }
 
@@ -5058,16 +5042,15 @@ READ8_MEMBER(nes_carts_state::fukutake_l_r)
 
  *************************************************************/
 
-static void futuremedia_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::futuremedia_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
 	//  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		if (state->m_IRQ_enable && state->m_IRQ_count)
+		if (m_IRQ_enable && m_IRQ_count)
 		{
-			state->m_IRQ_count--;
-			if (!state->m_IRQ_count)
-				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count--;
+			if (!m_IRQ_count)
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -5432,20 +5415,18 @@ static void ks7032_prg_update( running_machine &machine )
 	state->prg8_cd(state->m_mmc_reg[3]);
 }
 
-static void ks7032_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::ks7032_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count >= (0xffff - 114))
+		if (m_IRQ_count >= (0xffff - 114))
 		{
-			state->m_IRQ_enable = 0;
-			state->m_IRQ_count = state->m_IRQ_count_latch;
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
+			m_IRQ_count = m_IRQ_count_latch;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			state->m_IRQ_count += 114;
+			m_IRQ_count += 114;
 	}
 }
 
@@ -5545,20 +5526,18 @@ WRITE8_MEMBER(nes_carts_state::ks202_w)
 
  *************************************************************/
 
-static void mmc_fds_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::mmc_fds_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_enable = 0;
-			state->m_IRQ_status |= 0x01;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
+			m_IRQ_status |= 0x01;
 		}
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
 }
 
@@ -5825,22 +5804,20 @@ WRITE8_MEMBER(nes_carts_state::magics_md_w)
 
  *************************************************************/
 
-static void nanjing_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::nanjing_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (BIT(state->m_mmc_reg[0], 7))
+	if (BIT(m_mmc_reg[0], 7))
 	{
 		if (scanline == 127)
 		{
-			state->chr4_0(1, CHRRAM);
-			state->chr4_4(1, CHRRAM);
+			chr4_0(1, CHRRAM);
+			chr4_4(1, CHRRAM);
 		}
 
 		if (scanline == 239)
 		{
-			state->chr4_0(0, CHRRAM);
-			state->chr4_4(0, CHRRAM);
+			chr4_0(0, CHRRAM);
+			chr4_4(0, CHRRAM);
 		}
 	}
 
@@ -7138,32 +7115,31 @@ WRITE8_MEMBER(nes_carts_state::tengen_800008_w)
 
  *************************************************************/
 
-static void tengen_800032_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::tengen_800032_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-	if (!state->m_IRQ_mode) // we are in scanline mode!
+	if (!m_IRQ_mode) // we are in scanline mode!
 	{
 		if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 		{
-			if (!state->m_IRQ_reset)
+			if (!m_IRQ_reset)
 			{
-				if (!state->m_IRQ_count)
-					state->m_IRQ_count = state->m_IRQ_count_latch;
+				if (!m_IRQ_count)
+					m_IRQ_count = m_IRQ_count_latch;
 				else
 				{
-					state->m_IRQ_count--;
-					if (state->m_IRQ_enable && !blanked && !state->m_IRQ_count)
+					m_IRQ_count--;
+					if (m_IRQ_enable && !blanked && !m_IRQ_count)
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-									device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
-						state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+									machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+						m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
 			}
 			else
 			{
-				state->m_IRQ_reset = 0;
-				state->m_IRQ_count = state->m_IRQ_count_latch + 1;
+				m_IRQ_reset = 0;
+				m_IRQ_count = m_IRQ_count_latch + 1;
 			}
 		}
 	}
@@ -7172,18 +7148,18 @@ static void tengen_800032_irq( device_t *device, int scanline, int vblank, int b
 	 --> Skulls and Crossbones does not show anything!! */
 	else
 	{
-		//      if (!state->m_IRQ_reset)
+		//      if (!m_IRQ_reset)
 		{
-			if (state->m_IRQ_count <= 114)
-				state->m_IRQ_count = state->m_IRQ_count_latch;
+			if (m_IRQ_count <= 114)
+				m_IRQ_count = m_IRQ_count_latch;
 			else
 			{
-				state->m_IRQ_count -= 114;
-				if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count <= 114))
+				m_IRQ_count -= 114;
+				if (m_IRQ_enable && !blanked && (m_IRQ_count <= 114))
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-								device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
-					state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+								machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+					m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
 		}
@@ -8840,20 +8816,18 @@ WRITE8_MEMBER(nes_carts_state::n625092_w)
 
  *************************************************************/
 
-static void sc127_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::sc127_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && state->m_IRQ_enable)
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && m_IRQ_enable)
 	{
-		state->m_IRQ_count--;
+		m_IRQ_count--;
 
-		if (!blanked && (state->m_IRQ_count == 0))
+		if (!blanked && (m_IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-						device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_enable = 0;
+						machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
 		}
 	}
 }
@@ -8981,22 +8955,21 @@ WRITE8_MEMBER(nes_carts_state::smb2j_w)
 
  *************************************************************/
 
-static void smb2jb_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::smb2jb_irq(int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count < 0x1000)
+		if (m_IRQ_count < 0x1000)
 		{
-			if ((0x1000 - state->m_IRQ_count) <= 114)
-				state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			if ((0x1000 - m_IRQ_count) <= 114)
+				m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 			else
-				state->m_IRQ_count += 114;
+				m_IRQ_count += 114;
 		}
 		else
-			state->m_IRQ_count += 114;
+			m_IRQ_count += 114;
 
-		state->m_IRQ_count &= 0xffff;   // according to docs is 16bit counter -> it wraps only after 0xffff
+		m_IRQ_count &= 0xffff;   // according to docs is 16bit counter -> it wraps only after 0xffff
 	}
 }
 
@@ -9260,20 +9233,18 @@ WRITE8_MEMBER(nes_carts_state::btl_mariobaby_w)
 
  *************************************************************/
 
-static void btl_smb2a_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::btl_smb2a_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if ((0xfff - state->m_IRQ_count) <= 114)
+		if ((0xfff - m_IRQ_count) <= 114)
 		{
-			state->m_IRQ_count = (state->m_IRQ_count + 1) & 0xfff;
-			state->m_IRQ_enable = 0;
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = (m_IRQ_count + 1) & 0xfff;
+			m_IRQ_enable = 0;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			state->m_IRQ_count += 114;
+			m_IRQ_count += 114;
 	}
 }
 
@@ -9347,19 +9318,17 @@ WRITE8_MEMBER(nes_carts_state::btl_tobi_l_w)
 
  *************************************************************/
 
-static void btl_smb3_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::btl_smb3_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if ((0xffff - state->m_IRQ_count) < 114)
+		if ((0xffff - m_IRQ_count) < 114)
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_enable = 0;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
 		}
 
-		state->m_IRQ_count = (state->m_IRQ_count + 114) & 0xffff;
+		m_IRQ_count = (m_IRQ_count + 114) & 0xffff;
 	}
 }
 
@@ -9422,18 +9391,17 @@ WRITE8_MEMBER(nes_carts_state::btl_smb3_w)
  *************************************************************/
 
 /* Scanline based IRQ ? */
-static void btl_dn_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::btl_dn_irq(int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		if (!state->m_IRQ_count || ++state->m_IRQ_count < 240)
+		if (!m_IRQ_count || ++m_IRQ_count < 240)
 			return;
 
-		state->m_IRQ_count = 0;
+		m_IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					device->machine().primary_screen->vpos(), device->machine().primary_screen->hpos()));
-		state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().primary_screen->vpos(), machine().primary_screen->hpos()));
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -11273,19 +11241,18 @@ WRITE8_MEMBER(nes_carts_state::h2288_w)
  *************************************************************/
 
 /* I think the IRQ should only get fired if enough CPU cycles have passed, but we don't implement (yet) this part */
-static void shjy3_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::shjy3_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
-	if (state->m_IRQ_enable & 0x02)
+	if (m_IRQ_enable & 0x02)
 	{
-		if (state->m_IRQ_count == 0xff)
+		if (m_IRQ_count == 0xff)
 		{
-			state->m_IRQ_count = state->m_IRQ_count_latch;
-			state->m_IRQ_enable = state->m_IRQ_enable | ((state->m_IRQ_enable & 0x01) << 1);
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_count = m_IRQ_count_latch;
+			m_IRQ_enable = m_IRQ_enable | ((m_IRQ_enable & 0x01) << 1);
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			state->m_IRQ_count++;
+			m_IRQ_count++;
 	}
 }
 
@@ -11761,8 +11728,8 @@ struct nes_pcb_intf
 	nes_memory_accessor     mmc_m;  /* $6000-$7fff read/write routines */
 	nes_memory_accessor     mmc_h;  /* $8000-$ffff read/write routines */
 	nes_ppu_latch           mmc_ppu_latch;
-	ppu2c0x_scanline_cb     mmc_scanline;
-	ppu2c0x_hblank_cb       mmc_hblank;
+	ppu2c0x_scanline_delegate     mmc_scanline;
+	ppu2c0x_hblank_delegate       mmc_hblank;
 };
 
 
@@ -11778,7 +11745,17 @@ struct nes_pcb_intf
 #define NES_READWRITE(a, b) \
 {write8_delegate(FUNC(a),(nes_state *)0), read8_delegate(FUNC(b),(nes_state *)0)}
 
+#define NES_SCANLINE_NULL \
+ ppu2c0x_scanline_delegate()
 
+#define NES_HBLANK_NULL \
+ ppu2c0x_hblank_delegate()
+
+#define NES_HBLANK(a) \
+ ppu2c0x_hblank_delegate(FUNC(a),(nes_state *)0)
+
+
+ 
 WRITE8_MEMBER(nes_carts_state::dummy_l_w)
 {
 	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);
@@ -11814,255 +11791,255 @@ READ8_MEMBER(nes_carts_state::dummy_r)
 
 static const nes_pcb_intf nes_intf_list[] =
 {
-	{ STD_NROM,             NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
-	{ HVC_FAMBASIC,         NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
-	{ GG_NROM,              NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
-	{ STD_UXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_w),               NULL, NULL, NULL },
-	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::un1rom_w),              NULL, NULL, NULL },
-	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cprom_w),               NULL, NULL, NULL },
-	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cnrom_w),               NULL, NULL, NULL },
-	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_pt554_m_w), NES_WRITEONLY(nes_carts_state::cnrom_w), NULL, NULL, NULL },
-	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::axrom_w),               NULL, NULL, NULL },
-	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pxrom_w),               mmc2_latch, NULL, NULL },
-	{ STD_FXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fxrom_w),               mmc2_latch, NULL, NULL },
-	{ STD_BXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bxrom_w),               NULL, NULL, NULL },
-	{ STD_GXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NULL, NULL },
-	{ STD_MXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NULL, NULL },
-	{ STD_NXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NULL, NULL },
-	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NULL, NULL },
-	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jxrom_w),               NULL, NULL, jxrom_irq },
-	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_SOROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NULL, NULL },
-	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TVROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_HKROM,            NES_NOACCESS, NES_READWRITE(nes_carts_state::hkrom_m_w, nes_carts_state::hkrom_m_r), NES_WRITEONLY(nes_carts_state::hkrom_w),     NULL, NULL, mmc3_irq },
-	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tqrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txsrom_w),              NULL, NULL, mmc3_irq },
-	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
-	{ STD_DRROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
-	{ NAMCOT_34X3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NULL, NULL },
-	{ NAMCOT_3425,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3425_w),          NULL, NULL, NULL },
-	{ NAMCOT_3446,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3446_w),          NULL, NULL, NULL },
-	{ NAMCOT_3453,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3453_w),          NULL, NULL, NULL },
-	{ STD_EXROM,            NES_READWRITE(nes_carts_state::exrom_l_w, nes_carts_state::exrom_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, mmc5_irq },
-	{ NES_QJ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::qj_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NULL, mmc3_irq },
-	{ PAL_ZZ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::zz_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NULL, mmc3_irq },
-	{ UXROM_CC,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_cc_w),            NULL, NULL, NULL },
+	{ STD_NROM,             NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ HVC_FAMBASIC,         NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ GG_NROM,              NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_UXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::un1rom_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cprom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cnrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_pt554_m_w), NES_WRITEONLY(nes_carts_state::cnrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::axrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pxrom_w),               mmc2_latch, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_FXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fxrom_w),               mmc2_latch, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_BXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_GXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_MXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_NXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntbrom_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::jxrom_irq) },
+	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_SOROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_TVROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_TKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_HKROM,            NES_NOACCESS, NES_READWRITE(nes_carts_state::hkrom_m_w, nes_carts_state::hkrom_m_r), NES_WRITEONLY(nes_carts_state::hkrom_w),     NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tqrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txsrom_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_DRROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NAMCOT_34X3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dxrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NAMCOT_3425,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3425_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NAMCOT_3446,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3446_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NAMCOT_3453,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot3453_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ STD_EXROM,            NES_READWRITE(nes_carts_state::exrom_l_w, nes_carts_state::exrom_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc5_irq) },
+	{ NES_QJ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::qj_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ PAL_ZZ,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::zz_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UXROM_CC,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::uxrom_cc_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
-	{ DIS_74X139X74,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x139x74_m_w), NES_NOACCESS,     NULL, NULL, NULL },
-	{ DIS_74X377,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x377_w),          NULL, NULL, NULL },
-	{ DIS_74X161X161X32,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x161x32_w),   NULL, NULL, NULL },
-	{ DIS_74X161X138,       NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x138_m_w), NES_NOACCESS,    NULL, NULL, NULL },
-	{ BANDAI_LZ93,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_LZ93EX,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_FCG,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_DATACH,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NULL, bandai_lz_irq },
-	{ BANDAI_JUMP2,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fjump2_w),              NULL, NULL, bandai_lz_irq },
-	{ BANDAI_KARAOKE,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ks_w),           NULL, NULL, NULL },
-	{ BANDAI_OEKAKIDS,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ok_w),           NULL, NULL, NULL },
-	{ IREM_G101,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::g101_w),                NULL, NULL, NULL },
-	{ IREM_LROG017,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lrog017_w),             NULL, NULL, NULL },
-	{ IREM_H3001,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h3001_w),               NULL, NULL, h3001_irq },
-	{ IREM_TAM_S1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tam_s1_w),              NULL, NULL, NULL },
-	{ IREM_HOLYDIV,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::irem_hd_w),             NULL, NULL, NULL },
-	{ JALECO_SS88006,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ss88006_w),             NULL, NULL, ss88006_irq },
-	{ JALECO_JF11,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf11_m_w), NES_NOACCESS,              NULL, NULL, NULL },
-	{ JALECO_JF13,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf13_m_w), NES_NOACCESS,              NULL, NULL, NULL },
-	{ JALECO_JF16,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf16_w),                NULL, NULL, NULL },
-	{ JALECO_JF17,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf17_w),                NULL, NULL, NULL },
-	{ JALECO_JF19,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf19_w),                NULL, NULL, NULL },
-	{ KONAMI_VRC1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc1_w),         NULL, NULL, NULL },
-	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc2_w),         NULL, NULL, NULL },
-	{ KONAMI_VRC3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc3_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc4_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc6_w),         NULL, NULL, konami_irq },
-	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc7_w),         NULL, NULL, konami_irq },
-	{ NAMCOT_163,           NES_READWRITE(nes_carts_state::namcot163_l_w, nes_carts_state::namcot163_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot163_w), NULL, NULL, namcot_irq },
-	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
-	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft2_w),            NULL, NULL, NULL },
-	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft3_w),            NULL, NULL, sunsoft3_irq },
-	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_w),           NULL, NULL, NULL },
-	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_p16_w),       NULL, NULL, mmc3_irq },
-	{ TAITO_X1_005,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,               NULL, NULL, NULL },
-	{ TAITO_X1_005_A,       NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005a_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,              NULL, NULL, NULL },
-	{ TAITO_X1_017,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1017_m_w, nes_carts_state::x1017_m_r), NES_NOACCESS,               NULL, NULL, NULL },
+	{ DIS_74X139X74,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x139x74_m_w), NES_NOACCESS,     NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ DIS_74X377,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x377_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ DIS_74X161X161X32,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x161x32_w),   NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ DIS_74X161X138,       NES_NOACCESS, NES_WRITEONLY(nes_carts_state::dis_74x161x138_m_w), NES_NOACCESS,    NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BANDAI_LZ93,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::bandai_lz_irq) },
+	{ BANDAI_LZ93EX,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::bandai_lz_irq) },
+	{ BANDAI_FCG,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::bandai_lz_irq) },
+	{ BANDAI_DATACH,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lz93d50_m_w), NES_WRITEONLY(nes_carts_state::lz93d50_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::bandai_lz_irq) },
+	{ BANDAI_JUMP2,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fjump2_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::bandai_lz_irq) },
+	{ BANDAI_KARAOKE,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ks_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BANDAI_OEKAKIDS,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bandai_ok_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ IREM_G101,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::g101_w),                NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ IREM_LROG017,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::lrog017_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ IREM_H3001,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h3001_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::h3001_irq) },
+	{ IREM_TAM_S1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tam_s1_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ IREM_HOLYDIV,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::irem_hd_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ JALECO_SS88006,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ss88006_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::ss88006_irq) },
+	{ JALECO_JF11,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf11_m_w), NES_NOACCESS,              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ JALECO_JF13,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf13_m_w), NES_NOACCESS,              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ JALECO_JF16,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf16_w),                NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ JALECO_JF17,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf17_w),                NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ JALECO_JF19,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::jf19_w),                NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ KONAMI_VRC1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc1_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc2_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ KONAMI_VRC3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc3_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc4_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc6_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::konami_vrc7_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ NAMCOT_163,           NES_READWRITE(nes_carts_state::namcot163_l_w, nes_carts_state::namcot163_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::namcot163_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::namcot_irq) },
+	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft1_m_w), NES_NOACCESS,          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft2_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sunsoft3_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::sunsoft3_irq) },
+	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tc0190fmc_p16_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ TAITO_X1_005,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TAITO_X1_005_A,       NES_NOACCESS, NES_READWRITE(nes_carts_state::x1005a_m_w, nes_carts_state::x1005_m_r), NES_NOACCESS,              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TAITO_X1_017,         NES_NOACCESS, NES_READWRITE(nes_carts_state::x1017_m_w, nes_carts_state::x1017_m_r), NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
-	{ AGCI_50282,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::agci_50282_w),          NULL, NULL, NULL },
-	{ ACTENT_ACT52,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ae_act52_w),            NULL, NULL, NULL },
-	{ AVE_NINA01,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nina01_m_w), NES_NOACCESS,            NULL, NULL, NULL },
-	{ AVE_NINA06,           NES_WRITEONLY(nes_carts_state::nina06_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, NULL },
-	{ CNE_DECATHLON,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_decathl_w),         NULL, NULL, NULL },
-	{ CNE_FSB,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_fsb_m_w), NES_NOACCESS,           NULL, NULL, NULL },
-	{ CNE_SHLZ,             NES_WRITEONLY(nes_carts_state::cne_shlz_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
-	{ CALTRON_6IN1,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::caltron6in1_m_w), NES_WRITEONLY(nes_carts_state::caltron6in1_w),      NULL, NULL, NULL },
-	{ CAMERICA_BF9093,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NULL, NULL },
-	{ CAMERICA_BF9097,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NULL, NULL },
-	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9096_w), NES_WRITEONLY(nes_carts_state::bf9096_w),   NULL, NULL, NULL },
-	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::golden5_w),             NULL, NULL, NULL },
-	{ CONY_BOARD,           NES_READWRITE(nes_carts_state::cony_l_w, nes_carts_state::cony_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cony_w),        NULL, NULL, sunsoft3_irq },
-	{ YOKO_BOARD,           NES_READWRITE(nes_carts_state::yoko_l_w, nes_carts_state::yoko_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::yoko_w),        NULL, NULL, sunsoft3_irq },
-	{ DREAMTECH_BOARD,      NES_WRITEONLY(nes_carts_state::dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
-	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::futuremedia_w),         NULL, NULL, futuremedia_irq },
-	{ FUKUTAKE_BOARD,       NES_READWRITE(nes_carts_state::fukutake_l_w, nes_carts_state::fukutake_l_r), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
-	{ GOUDER_37017,         NES_READWRITE(nes_carts_state::gouder_sf4_l_w, nes_carts_state::gouder_sf4_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ HENGEDIANZI_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::henggedianzi_w),        NULL, NULL, NULL },
-	{ HENGEDIANZI_XJZB,     NES_WRITEONLY(nes_carts_state::heng_xjzb_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::heng_xjzb_w), NULL, NULL, NULL },
-	{ HES6IN1_BOARD,        NES_WRITEONLY(nes_carts_state::hes6in1_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ HES_BOARD,            NES_WRITEONLY(nes_carts_state::hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
-	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::hosenkan_w),            NULL, NULL, mmc3_irq },
-	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7058_w),              NULL, NULL, NULL },
-	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::ks7022_w, nes_carts_state::ks7022_r),                 NULL, NULL, NULL },
-	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7032_w),              NULL, NULL, ks7032_irq },
-	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks202_w),               NULL, NULL, ks7032_irq },
-	{ KAISER_KS7017,        NES_WRITEONLY(nes_carts_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
-	{ KAY_PANDAPRINCE,      NES_READWRITE(nes_carts_state::kay_pp_l_w, nes_carts_state::kay_pp_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kay_pp_w),  NULL, NULL, mmc3_irq },
-	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kasing_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NULL, mmc3_irq },
-	{ SACHEN_74LS374,       NES_READWRITE(nes_carts_state::sachen_74x374_l_w, nes_carts_state::sachen_74x374_l_r), NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_74LS374_A,     NES_WRITEONLY(nes_carts_state::sachen_74x374a_l_w), NES_NOACCESS, NES_NOACCESS,    NULL, NULL, NULL },
-	{ SACHEN_8259A,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259B,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259C,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_8259D,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NULL, NULL },
-	{ SACHEN_SA009,         NES_WRITEONLY(nes_carts_state::sa009_l_w), NES_NOACCESS, NES_NOACCESS,             NULL, NULL, NULL },
-	{ SACHEN_SA0036,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0036_w),              NULL, NULL, NULL },
-	{ SACHEN_SA0037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0037_w),              NULL, NULL, NULL },
-	{ SACHEN_SA72007,       NES_WRITEONLY(nes_carts_state::sa72007_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ SACHEN_SA72008,       NES_WRITEONLY(nes_carts_state::sa72008_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ SACHEN_TCA01,         NES_READONLY(nes_carts_state::tca01_l_r), NES_NOACCESS, NES_NOACCESS,              NULL, NULL, NULL },
-	{ SACHEN_TCU01,         NES_WRITEONLY(nes_carts_state::tcu01_l_w), NES_WRITEONLY(nes_carts_state::tcu01_m_w), NES_WRITEONLY(nes_carts_state::tcu01_w), NULL, NULL, NULL },
-	{ SACHEN_TCU02,         NES_READWRITE(nes_carts_state::tcu02_l_w, nes_carts_state::tcu02_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
-	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor0_w),              NULL, NULL, NULL },
-	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor1_w),              NULL, NULL, NULL },
-	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::magics_md_w),           NULL, NULL, NULL },
-	{ NANJING_BOARD,        NES_READWRITE(nes_carts_state::nanjing_l_w, nes_carts_state::nanjing_l_r), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
-	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nitra_w),               NULL, NULL, mmc3_irq },
-	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_asder_w),         NULL, NULL, NULL },
-	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },
-	{ OPENCORP_DAOU306,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::daou306_w),             NULL, NULL, NULL },
-	{ RCM_GS2015,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gs2015_w),              NULL, NULL, NULL },
-	{ RCM_TETRISFAMILY,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rcm_tf_w),              NULL, NULL, NULL },
-	{ REXSOFT_DBZ5,         NES_READWRITE(nes_carts_state::rex_dbz_l_w, nes_carts_state::rex_dbz_l_r), NES_READONLY(nes_carts_state::rex_dbz_l_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rex_sl1632_w),          NULL, NULL, mmc3_irq },
-	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rumblestation_m_w), NES_WRITEONLY(nes_carts_state::rumblestation_w),      NULL, NULL, NULL },
-	{ SOMERI_SL12,          NES_WRITEONLY(nes_carts_state::someri_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::someri_w), NULL, NULL, mmc3_irq },
-	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(nes_carts_state::sgame_boog_l_w), NES_WRITEONLY(nes_carts_state::sgame_boog_m_w), NES_WRITEONLY(nes_carts_state::sgame_boog_w), NULL, NULL, mmc3_irq },
-	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sgame_lion_m_w), NES_WRITEONLY(nes_carts_state::sgame_lion_w), NULL, NULL, mmc3_irq },
-	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800008_w),       NULL, NULL, NULL },
-	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800032_w),       NULL, NULL, tengen_800032_irq },
-	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800037_w),       NULL, NULL, tengen_800032_irq },
-	{ TXC_22211A,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NULL, NULL },
-	{ TXC_22211B,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211b_w), NULL, NULL, NULL },
-	{ TXC_22211C,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211c_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NULL, NULL },
-	{ TXC_TW,               NES_WRITEONLY(nes_carts_state::txc_tw_l_w), NES_WRITEONLY(nes_carts_state::txc_tw_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_strikewolf_w),      NULL, NULL, NULL },
-	{ TXC_MXMDHTWO,         NES_READONLY(nes_carts_state::txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_mxmdhtwo_w), NULL, NULL, NULL },
-	{ WAIXING_TYPE_A,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_A_1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_B,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_C,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_D,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_E,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_F,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_f_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_G,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_g_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_H,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_h_w),           NULL, NULL, mmc3_irq },
-	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_SGZ,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_sgz_w),         NULL, NULL, konami_irq },
-	{ WAIXING_SGZLZ,        NES_WRITEONLY(nes_carts_state::waixing_sgzlz_l_w), NES_NOACCESS, NES_NOACCESS,     NULL, NULL, NULL },
-	{ WAIXING_FFV,          NES_WRITEONLY(nes_carts_state::waixing_ffv_l_w), NES_NOACCESS, NES_NOACCESS,       NULL, NULL, NULL },
-	{ WAIXING_ZS,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_zs_w),          NULL, NULL, NULL },
-	{ WAIXING_DQ8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_dq8_w),         NULL, NULL, NULL },
-	{ WAIXING_SECURITY,     NES_WRITEONLY(nes_carts_state::waixing_sec_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NULL, mmc3_irq },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
-	{ WAIXING_PS2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_ps2_w),         NULL, NULL, NULL },
-	{ UNL_8237,             NES_WRITEONLY(nes_carts_state::unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_8237_w),      NULL, NULL, mmc3_irq },
-	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_ax5705_w),          NULL, NULL, NULL },
-	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_cc21_w),            NULL, NULL, NULL },
-	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_kof97_w),           NULL, NULL, mmc3_irq },
-	{ UNL_KS7057,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7057_w),              NULL, NULL, mmc3_irq },
-	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_t230_w),            NULL, NULL, konami_irq },
-	{ UNL_KOF96,            NES_READWRITE(nes_carts_state::kof96_l_w, nes_carts_state::kof96_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kof96_w),     NULL, NULL, mmc3_irq },
-	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
-	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::n625092_w),             NULL, NULL, NULL },
-	{ UNL_SC127,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sc127_w),               NULL, NULL, sc127_irq },
-	{ UNL_SMB2J,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::smb2j_w),               NULL, NULL, NULL },
-	{ UNL_SUPERFIGHTER3,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_sf3_w),             NULL, NULL, mmc3_irq },
-	{ UNL_XZY,              NES_WRITEONLY(nes_carts_state::unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
-	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_racmate_w),         NULL, NULL, NULL },
-	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sng32_w),               NULL, NULL, NULL },
-	{ UNL_603_5052,         NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::edu2k_w),               NULL, NULL, NULL },
-	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::shjy3_w),               NULL, NULL, shjy3_irq },
-	{ UNL_H2288,            NES_READWRITE(nes_carts_state::h2288_l_w, nes_carts_state::h2288_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h2288_w),     NULL, NULL, mmc3_irq },
-	{ UNL_FS304,            NES_WRITEONLY(nes_carts_state::unl_fs304_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NULL, NULL },
+	{ AGCI_50282,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::agci_50282_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ ACTENT_ACT52,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ae_act52_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ AVE_NINA01,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nina01_m_w), NES_NOACCESS,            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ AVE_NINA06,           NES_WRITEONLY(nes_carts_state::nina06_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CNE_DECATHLON,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_decathl_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CNE_FSB,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cne_fsb_m_w), NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CNE_SHLZ,             NES_WRITEONLY(nes_carts_state::cne_shlz_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CALTRON_6IN1,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::caltron6in1_m_w), NES_WRITEONLY(nes_carts_state::caltron6in1_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CAMERICA_BF9093,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CAMERICA_BF9097,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9093_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CAMERICA_BF9096,      NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bf9096_w), NES_WRITEONLY(nes_carts_state::bf9096_w),   NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CAMERICA_GOLDENFIVE,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::golden5_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ CONY_BOARD,           NES_READWRITE(nes_carts_state::cony_l_w, nes_carts_state::cony_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::cony_w),        NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::sunsoft3_irq) },
+	{ YOKO_BOARD,           NES_READWRITE(nes_carts_state::yoko_l_w, nes_carts_state::yoko_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::yoko_w),        NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::sunsoft3_irq) },
+	{ DREAMTECH_BOARD,      NES_WRITEONLY(nes_carts_state::dreamtech_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ FUTUREMEDIA_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::futuremedia_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::futuremedia_irq) },
+	{ FUKUTAKE_BOARD,       NES_READWRITE(nes_carts_state::fukutake_l_w, nes_carts_state::fukutake_l_r), NES_NOACCESS, NES_NOACCESS,         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ GOUDER_37017,         NES_READWRITE(nes_carts_state::gouder_sf4_l_w, nes_carts_state::gouder_sf4_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ HENGEDIANZI_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::henggedianzi_w),        NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ HENGEDIANZI_XJZB,     NES_WRITEONLY(nes_carts_state::heng_xjzb_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::heng_xjzb_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ HES6IN1_BOARD,        NES_WRITEONLY(nes_carts_state::hes6in1_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ HES_BOARD,            NES_WRITEONLY(nes_carts_state::hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::hosenkan_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7058_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::ks7022_w, nes_carts_state::ks7022_r),                 NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ KAISER_KS7032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7032_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::ks7032_irq) },
+	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks202_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::ks7032_irq) },
+	{ KAISER_KS7017,        NES_WRITEONLY(nes_carts_state::ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc_fds_irq) },
+	{ KAY_PANDAPRINCE,      NES_READWRITE(nes_carts_state::kay_pp_l_w, nes_carts_state::kay_pp_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kay_pp_w),  NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kasing_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ SACHEN_74LS374,       NES_READWRITE(nes_carts_state::sachen_74x374_l_w, nes_carts_state::sachen_74x374_l_r), NES_NOACCESS, NES_NOACCESS, NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_74LS374_A,     NES_WRITEONLY(nes_carts_state::sachen_74x374a_l_w), NES_NOACCESS, NES_NOACCESS,    NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_8259A,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_8259B,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_8259C,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_8259D,         NES_WRITEONLY(nes_carts_state::s8259_l_w), NES_WRITEONLY(nes_carts_state::s8259_m_w), NES_NOACCESS, NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_SA009,         NES_WRITEONLY(nes_carts_state::sa009_l_w), NES_NOACCESS, NES_NOACCESS,             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_SA0036,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0036_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_SA0037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sa0037_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_SA72007,       NES_WRITEONLY(nes_carts_state::sa72007_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_SA72008,       NES_WRITEONLY(nes_carts_state::sa72008_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_TCA01,         NES_READONLY(nes_carts_state::tca01_l_r), NES_NOACCESS, NES_NOACCESS,              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_TCU01,         NES_WRITEONLY(nes_carts_state::tcu01_l_w), NES_WRITEONLY(nes_carts_state::tcu01_m_w), NES_WRITEONLY(nes_carts_state::tcu01_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SACHEN_TCU02,         NES_READWRITE(nes_carts_state::tcu02_l_w, nes_carts_state::tcu02_l_r), NES_NOACCESS, NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor0_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::subor1_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::magics_md_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NANJING_BOARD,        NES_READWRITE(nes_carts_state::nanjing_l_w, nes_carts_state::nanjing_l_r), NES_NOACCESS, NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::nanjing_irq) },
+	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::nitra_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_asder_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ntdec_fh_m_w), NES_NOACCESS,          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ OPENCORP_DAOU306,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::daou306_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ RCM_GS2015,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::gs2015_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ RCM_TETRISFAMILY,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rcm_tf_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ REXSOFT_DBZ5,         NES_READWRITE(nes_carts_state::rex_dbz_l_w, nes_carts_state::rex_dbz_l_r), NES_READONLY(nes_carts_state::rex_dbz_l_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rex_sl1632_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::rumblestation_m_w), NES_WRITEONLY(nes_carts_state::rumblestation_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ SOMERI_SL12,          NES_WRITEONLY(nes_carts_state::someri_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::someri_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(nes_carts_state::sgame_boog_l_w), NES_WRITEONLY(nes_carts_state::sgame_boog_m_w), NES_WRITEONLY(nes_carts_state::sgame_boog_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sgame_lion_m_w), NES_WRITEONLY(nes_carts_state::sgame_lion_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800008_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800032_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::tengen_800032_irq) },
+	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::tengen_800037_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::tengen_800032_irq) },
+	{ TXC_22211A,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TXC_22211B,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211b_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TXC_22211C,           NES_READWRITE(nes_carts_state::txc_22211_l_w, nes_carts_state::txc_22211c_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_22211_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TXC_TW,               NES_WRITEONLY(nes_carts_state::txc_tw_l_w), NES_WRITEONLY(nes_carts_state::txc_tw_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_strikewolf_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ TXC_MXMDHTWO,         NES_READONLY(nes_carts_state::txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txc_mxmdhtwo_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ WAIXING_TYPE_A,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_A_1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_B,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_C,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_D,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_E,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_F,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_f_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_G,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_g_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_H,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_h_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_TYPE_I,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_TYPE_J,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_SGZ,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_sgz_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ WAIXING_SGZLZ,        NES_WRITEONLY(nes_carts_state::waixing_sgzlz_l_w), NES_NOACCESS, NES_NOACCESS,     NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ WAIXING_FFV,          NES_WRITEONLY(nes_carts_state::waixing_ffv_l_w), NES_NOACCESS, NES_NOACCESS,       NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ WAIXING_ZS,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_zs_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ WAIXING_DQ8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_dq8_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ WAIXING_SECURITY,     NES_WRITEONLY(nes_carts_state::waixing_sec_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WAIXING_SH2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },  // this is MMC3 + possibly additional WRAM added in 0x5000-0x5fff
+	{ WAIXING_PS2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::waixing_ps2_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_8237,             NES_WRITEONLY(nes_carts_state::unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_8237_w),      NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_ax5705_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_cc21_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_kof97_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_KS7057,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::ks7057_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_t230_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::konami_irq) },
+	{ UNL_KOF96,            NES_READWRITE(nes_carts_state::kof96_l_w, nes_carts_state::kof96_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::kof96_w),     NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mk2_m_w), NES_NOACCESS,               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::n625092_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_SC127,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sc127_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::sc127_irq) },
+	{ UNL_SMB2J,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::smb2j_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_SUPERFIGHTER3,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_sf3_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_XZY,              NES_WRITEONLY(nes_carts_state::unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::unl_racmate_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::sng32_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_603_5052,         NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_READWRITE(nes_carts_state::unl_6035052_extra_w, nes_carts_state::unl_6035052_extra_r), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::edu2k_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::shjy3_w),               NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::shjy3_irq) },
+	{ UNL_H2288,            NES_READWRITE(nes_carts_state::h2288_l_w, nes_carts_state::h2288_l_r), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::h2288_w),     NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ UNL_FS304,            NES_WRITEONLY(nes_carts_state::unl_fs304_l_w), NES_NOACCESS, NES_NOACCESS,         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
-	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NULL, NULL },
-	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_dn_w),              NULL, NULL, btl_dn_irq },
-	{ BTL_MARIOBABY,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NULL, NULL },
-	{ BTL_SMB2A,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb2a_w),           NULL, NULL, btl_smb2a_irq },
-	{ BTL_SMB2B,            NES_WRITEONLY(nes_carts_state::smb2jb_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, smb2jb_irq },
-	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb3_w),            NULL, NULL, btl_smb3_irq },
-	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb11_w),           NULL, NULL, mmc3_irq },
-	{ BTL_TOBIDASE,         NES_WRITEONLY(nes_carts_state::btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
-	{ BTL_PIKACHUY2K,       NES_NOACCESS, NES_READWRITE(nes_carts_state::btl_pika_y2k_m_w, nes_carts_state::btl_pika_y2k_m_r), NES_WRITEONLY(nes_carts_state::btl_pika_y2k_w),  NULL, NULL, mmc3_irq },
-	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::whirl2706_w),           NULL, NULL, NULL },
+	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_dn_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::btl_dn_irq) },
+	{ BTL_MARIOBABY,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_mariobaby_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BTL_SMB2A,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb2a_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::btl_smb2a_irq) },
+	{ BTL_SMB2B,            NES_WRITEONLY(nes_carts_state::smb2jb_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::smb2jb_irq) },
+	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb3_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::btl_smb3_irq) },
+	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::btl_smb11_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BTL_TOBIDASE,         NES_WRITEONLY(nes_carts_state::btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BTL_PIKACHUY2K,       NES_NOACCESS, NES_READWRITE(nes_carts_state::btl_pika_y2k_m_w, nes_carts_state::btl_pika_y2k_m_r), NES_WRITEONLY(nes_carts_state::btl_pika_y2k_w),  NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::whirl2706_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
-	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_190in1_w),          NULL, NULL, NULL },
-	{ BMC_A65AS,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_a65as_w),           NULL, NULL, NULL },
-	{ BMC_GS2004,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2004_w),          NULL, NULL, NULL },
-	{ BMC_GS2013,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2013_w),          NULL, NULL, NULL },
-	{ BMC_NOVELDIAMOND,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel1_w),              NULL, NULL, NULL },
-	{ BMC_9999999IN1,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel2_w),              NULL, NULL, NULL },
-	{ BMC_T262,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_t262_w),            NULL, NULL, NULL },
-	{ BMC_WS,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ws_m_w), NES_NOACCESS,            NULL, NULL, NULL },
-	{ BMC_GKA,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gka_w),             NULL, NULL, NULL },
-	{ BMC_GKB,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gkb_w),             NULL, NULL, NULL },
-	{ BMC_SUPER_700IN1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_super700in1_w),     NULL, NULL, NULL },
-	{ BMC_36IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_36in1_w),           NULL, NULL, NULL },
-	{ BMC_21IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_21in1_w),           NULL, NULL, NULL },
-	{ BMC_150IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_150in1_w),          NULL, NULL, NULL },
-	{ BMC_35IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_35in1_w),           NULL, NULL, NULL },
-	{ BMC_64IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1_w),           NULL, NULL, NULL },
-	{ BMC_SUPERHIK_300IN1,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik300_w),          NULL, NULL, NULL },
-	{ BMC_SUPERGUN_20IN1,   NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::supergun20in1_w),       NULL, NULL, NULL },
-	{ BMC_72IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_72in1_w),           NULL, NULL, NULL },
-	{ BMC_76IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NULL, NULL },
-	{ BMC_SUPER_42IN1,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NULL, NULL },
-	{ BMC_1200IN1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_1200in1_w),         NULL, NULL, NULL },
-	{ BMC_31IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_31in1_w),           NULL, NULL, NULL },
-	{ BMC_22GAMES,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_22g_w),             NULL, NULL, NULL },
-	{ BMC_20IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_20in1_w),           NULL, NULL, NULL },
-	{ BMC_110IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_110in1_w),          NULL, NULL, NULL },
-	{ BMC_64IN1NR,          NES_WRITEONLY(nes_carts_state::bmc_64in1nr_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1nr_w), NULL, NULL, NULL },
-	{ BMC_S24IN1SC03,       NES_WRITEONLY(nes_carts_state::bmc_s24in1sc03_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_HIK8IN1,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik8_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_SUPERHIK_4IN1,    NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik4in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_SUPERBIG_7IN1,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_sbig7_w),           NULL, NULL, mmc3_irq },
-	{ BMC_MARIOPARTY_7IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_mario7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_GOLD_7IN1,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gold7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_FAMILY_4646B,     NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_family4646_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_15in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NULL, mmc3_irq },
-	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ball11_m_w), NES_WRITEONLY(nes_carts_state::bmc_ball11_w), NULL, NULL, NULL },
-	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(nes_carts_state::bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gc6in1_w), NULL, NULL, mmc3_irq },
-	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_vt5201_w, nes_carts_state::bmc_vt5201_r),         NULL, NULL, NULL },
-	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_bs5_w),             NULL, NULL, NULL },
-	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_810544_w),          NULL, NULL, NULL },
-	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ntd03_w),           NULL, NULL, NULL },
-	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_gb63_w, nes_carts_state::bmc_gb63_r),             NULL, NULL, NULL },
-	{ BMC_FK23C,            NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NULL, mmc3_irq },
-	{ BMC_FK23CA,           NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NULL, mmc3_irq },
-	{ BMC_PJOY84,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pjoy84_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NULL, mmc3_irq },
+	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_190in1_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_A65AS,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_a65as_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_GS2004,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2004_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_GS2013,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gs2013_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_NOVELDIAMOND,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel1_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_9999999IN1,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::novel2_w),              NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_T262,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_t262_w),            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_WS,               NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ws_m_w), NES_NOACCESS,            NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_GKA,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gka_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_GKB,              NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gkb_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_SUPER_700IN1,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_super700in1_w),     NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_36IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_36in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_21IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_21in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_150IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_150in1_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_35IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_35in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_64IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_SUPERHIK_300IN1,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik300_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_SUPERGUN_20IN1,   NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::supergun20in1_w),       NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_72IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_72in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_76IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_SUPER_42IN1,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_76in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_1200IN1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_1200in1_w),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_31IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_31in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_22GAMES,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_22g_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_20IN1,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_20in1_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_110IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_110in1_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_64IN1NR,          NES_WRITEONLY(nes_carts_state::bmc_64in1nr_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_64in1nr_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_S24IN1SC03,       NES_WRITEONLY(nes_carts_state::bmc_s24in1sc03_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_HIK8IN1,          NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik8_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_SUPERHIK_4IN1,    NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_hik4in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_SUPERBIG_7IN1,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_sbig7_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_MARIOPARTY_7IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_mario7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_GOLD_7IN1,        NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gold7in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_FAMILY_4646B,     NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_family4646_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_15in1_m_w), NES_WRITEONLY(nes_carts_state::txrom_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ball11_m_w), NES_WRITEONLY(nes_carts_state::bmc_ball11_w), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(nes_carts_state::bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_gc6in1_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_vt5201_w, nes_carts_state::bmc_vt5201_r),         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_bs5_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_810544_w),          NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::bmc_ntd03_w),           NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, NES_READWRITE(nes_carts_state::bmc_gb63_w, nes_carts_state::bmc_gb63_r),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ BMC_FK23C,            NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_FK23CA,           NES_WRITEONLY(nes_carts_state::fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::fk23c_w),   NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
+	{ BMC_PJOY84,           NES_NOACCESS, NES_WRITEONLY(nes_carts_state::pjoy84_m_w), NES_WRITEONLY(nes_carts_state::txrom_w),  NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::mmc3_irq) },
 	//
-	{ FFE_MAPPER6,          NES_WRITEONLY(nes_carts_state::mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper6_w), NULL, NULL, ffe_irq },
-	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper8_w),             NULL, NULL, NULL },
-	{ FFE_MAPPER17,         NES_WRITEONLY(nes_carts_state::mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
+	{ FFE_MAPPER6,          NES_WRITEONLY(nes_carts_state::mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper6_w), NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::ffe_irq) },
+	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nes_carts_state::mapper8_w),             NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
+	{ FFE_MAPPER17,         NES_WRITEONLY(nes_carts_state::mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NES_SCANLINE_NULL, NES_HBLANK(nes_state::ffe_irq) },
 	// for debug and development
-	{ UNKNOWN_BOARD,        NES_READWRITE(nes_carts_state::dummy_l_w, nes_carts_state::dummy_l_r), NES_READWRITE(nes_carts_state::dummy_m_w, nes_carts_state::dummy_m_r), NES_READWRITE(nes_carts_state::dummy_w, nes_carts_state::dummy_r), NULL, NULL, NULL },
+	{ UNKNOWN_BOARD,        NES_READWRITE(nes_carts_state::dummy_l_w, nes_carts_state::dummy_l_r), NES_READWRITE(nes_carts_state::dummy_m_w, nes_carts_state::dummy_m_r), NES_READWRITE(nes_carts_state::dummy_w, nes_carts_state::dummy_r), NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
-	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
+	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NES_SCANLINE_NULL, NES_HBLANK_NULL },
 	//
 };
 
@@ -13122,8 +13099,8 @@ int nes_state::nes_pcb_reset()
 		fatalerror("Missing PCB interface\n");
 
 	/* Set the mapper irq callback */
-	m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : NULL);
-	m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : NULL);
+	m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : ppu2c0x_scanline_delegate());
+	m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : ppu2c0x_hblank_delegate());
 
 	err = pcb_initialize(m_pcb_id);
 

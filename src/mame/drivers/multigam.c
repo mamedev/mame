@@ -153,6 +153,7 @@ public:
 	void multigam_init_mmc1(UINT8 *prg_base, int prg_size, int chr_bank_base);
 	void supergm3_set_bank();
 	void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble);
+	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
 };
 
 
@@ -404,15 +405,14 @@ ADDRESS_MAP_END
 *******************************************************/
 
 
-static void multigam3_mmc3_scanline_cb( device_t *device, int scanline, int vblank, int blanked )
+void multigam_state::multigam3_mmc3_scanline_cb( int scanline, int vblank, int blanked )
 {
-	multigam_state *state = device->machine().driver_data<multigam_state>();
 	if (!vblank && !blanked)
 	{
-		if (--state->m_multigam3_mmc3_scanline_counter == -1)
+		if (--m_multigam3_mmc3_scanline_counter == -1)
 		{
-			state->m_multigam3_mmc3_scanline_counter = state->m_multigam3_mmc3_scanline_latch;
-			generic_pulse_irq_line(device->machine().device("maincpu"), 0, 1);
+			m_multigam3_mmc3_scanline_counter = m_multigam3_mmc3_scanline_latch;
+			generic_pulse_irq_line(machine().device("maincpu")->execute(), 0, 1);
 		}
 	}
 }
@@ -556,11 +556,11 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 		break;
 
 		case 0x6000: /* disable irqs */
-			ppu->set_scanline_callback(0);
+			ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
 		break;
 
 		case 0x6001: /* enable irqs */
-			ppu->set_scanline_callback(multigam3_mmc3_scanline_cb);
+			ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
 		break;
 	}
 }
@@ -688,7 +688,7 @@ void multigam_state::multigam_init_mapper02(UINT8* prg_base, int prg_size)
 
 	m_mapper02_prg_base = prg_base;
 	m_mapper02_prg_size = prg_size;
-	ppu->set_scanline_callback(0);
+	ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
 }
 
 /******************************************************
@@ -846,7 +846,7 @@ void multigam_state::multigam_init_mmc1(UINT8 *prg_base, int prg_size, int chr_b
 	m_mmc1_prg_size = prg_size;
 	m_mmc1_chr_bank_base = chr_bank_base;
 
-	ppu->set_scanline_callback(0);
+	ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
 };
 
 
@@ -910,7 +910,7 @@ void multigam_state::supergm3_set_bank()
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		membank("bank10")->set_base(mem + 0x6000);
-		ppu->set_scanline_callback(0);
+		ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
 	}
 	else if ((m_supergm3_prg_bank & 0x40) == 0)
 	{

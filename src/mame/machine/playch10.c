@@ -821,21 +821,19 @@ DRIVER_INIT_MEMBER(playch10_state,pcfboard_2)
 /* G Board games (Super Mario Bros. 3) */
 
 
-static void gboard_scanline_cb( device_t *device, int scanline, int vblank, int blanked )
+void playch10_state::gboard_scanline_cb( int scanline, int vblank, int blanked )
 {
-	playch10_state *state = device->machine().driver_data<playch10_state>();
-
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		int priorCount = state->m_IRQ_count;
-		if (state->m_IRQ_count == 0)
-			state->m_IRQ_count = state->m_IRQ_count_latch;
+		int priorCount = m_IRQ_count;
+		if (m_IRQ_count == 0)
+			m_IRQ_count = m_IRQ_count_latch;
 		else
-			state->m_IRQ_count--;
+			m_IRQ_count--;
 
-		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
+		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && priorCount) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
-			device->machine().device("cart")->execute().set_input_line(0, HOLD_LINE);
+			machine().device("cart")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 }
@@ -1001,7 +999,7 @@ DRIVER_INIT_MEMBER(playch10_state,pcgboard)
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
 
-	ppu->set_scanline_callback(gboard_scanline_cb);
+	ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(playch10_state::gboard_scanline_cb),this));
 }
 
 DRIVER_INIT_MEMBER(playch10_state,pcgboard_type2)

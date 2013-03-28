@@ -648,22 +648,21 @@ void vsnes_state::mapper4_set_chr(  )
 #define BOTTOM_VISIBLE_SCANLINE 239     /* The bottommost visible scanline */
 #define NUM_SCANLINE 262
 
-static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked )
+void vsnes_state::mapper4_irq( int scanline, int vblank, int blanked )
 {
-	vsnes_state *state = device->machine().driver_data<vsnes_state>();
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		int priorCount = state->m_IRQ_count;
-		if (state->m_IRQ_count == 0)
+		int priorCount = m_IRQ_count;
+		if (m_IRQ_count == 0)
 		{
-			state->m_IRQ_count = state->m_IRQ_count_latch;
+			m_IRQ_count = m_IRQ_count_latch;
 		}
 		else
-			state->m_IRQ_count--;
+			m_IRQ_count--;
 
-		if (state->m_IRQ_enable && !blanked && (state->m_IRQ_count == 0) && priorCount)
+		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && priorCount)
 		{
-			device->machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 		}
 	}
 }
@@ -735,13 +734,13 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 			m_IRQ_enable = 0;
 			m_IRQ_count = m_IRQ_count_latch;
 
-			ppu1->set_scanline_callback(0);
+			ppu1->set_scanline_callback(ppu2c0x_scanline_delegate());
 
 			break;
 
 		case 0x6001: /* $e001 - Enable IRQs */
 			m_IRQ_enable = 1;
-			ppu1->set_scanline_callback(mapper4_irq);
+			ppu1->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(vsnes_state::mapper4_irq),this));
 
 			break;
 

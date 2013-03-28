@@ -28,13 +28,6 @@
 #define SPLIT_CHR   0
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-
-static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
-
-/***************************************************************************
     FUNCTIONS
 ***************************************************************************/
 
@@ -256,7 +249,7 @@ void nes_state::init_nes_core()
 }
 
 // to be probably removed (it does nothing since a long time)
-int nes_ppu_vidaccess( device_t *device, int address, int data )
+int nes_state::nes_ppu_vidaccess( int address, int data )
 {
 	return data;
 }
@@ -265,7 +258,7 @@ void nes_state::machine_reset()
 {
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (m_disk_expansion && m_pcb_id == NO_BOARD)
-		m_ppu->set_hblank_callback(fds_irq);
+		m_ppu->set_hblank_callback(ppu2c0x_hblank_delegate(FUNC(nes_state::fds_irq),this));
 	else
 		nes_pcb_reset();
 
@@ -737,23 +730,21 @@ void nes_partialhash(hash_collection &dest, const unsigned char *data,
 
 **************************/
 
-static void fds_irq( device_t *device, int scanline, int vblank, int blanked )
+void nes_state::fds_irq( int scanline, int vblank, int blanked )
 {
-	nes_state *state = device->machine().driver_data<nes_state>();
+	if (m_IRQ_enable_latch)
+		m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 
-	if (state->m_IRQ_enable_latch)
-		state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-
-	if (state->m_IRQ_enable)
+	if (m_IRQ_enable)
 	{
-		if (state->m_IRQ_count <= 114)
+		if (m_IRQ_count <= 114)
 		{
-			state->m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			state->m_IRQ_enable = 0;
-			state->m_fds_status0 |= 0x01;
+			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			m_IRQ_enable = 0;
+			m_fds_status0 |= 0x01;
 		}
 		else
-			state->m_IRQ_count -= 114;
+			m_IRQ_count -= 114;
 	}
 }
 

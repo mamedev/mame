@@ -146,6 +146,30 @@ public:
 
 	optional_device<nes_cart_slot_device> m_cartslot;   //mandatory
 
+	void ffe_irq(int scanline, int vblank, int blanked);
+	void mmc3_irq(int scanline, int vblank, int blanked);
+	void mmc5_irq(int scanline, int vblank, int blanked);
+	void jxrom_irq(int scanline, int vblank, int blanked);
+	void h3001_irq(int scanline, int vblank, int blanked);
+	void ss88006_irq(int scanline, int vblank, int blanked);
+	void konami_irq(int scanline, int vblank, int blanked);
+	void sunsoft3_irq(int scanline, int vblank, int blanked);
+	void ks7032_irq(int scanline, int vblank, int blanked);
+	void mmc_fds_irq(int scanline, int vblank, int blanked);
+	void sc127_irq(int scanline, int vblank, int blanked);
+	void smb2jb_irq(int scanline, int vblank, int blanked);
+	void btl_smb2a_irq(int scanline, int vblank, int blanked);
+	void btl_smb3_irq(int scanline, int vblank, int blanked);
+	void btl_dn_irq(int scanline, int vblank, int blanked);
+	void shjy3_irq(int scanline, int vblank, int blanked);	
+	void bandai_lz_irq(int scanline, int vblank, int blanked);
+	void namcot_irq(int scanline, int vblank, int blanked);
+	void futuremedia_irq(int scanline, int vblank, int blanked);
+	void nanjing_irq(int scanline, int vblank, int blanked);
+	void tengen_800032_irq(int scanline, int vblank, int blanked);	
+	
+	int nes_ppu_vidaccess(int address, int data);
+	void fds_irq(int scanline, int vblank, int blanked);
 private:
 	/* devices */
 //  cpu_device        *m_maincpu;
@@ -160,8 +184,6 @@ private:
 
 
 /* protos */
-
-int nes_ppu_vidaccess( device_t *device, int address, int data );
 
 void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 

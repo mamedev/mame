@@ -136,8 +136,6 @@
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
-static void ffe_irq( device_t *device, int scanline, int vblank, int blanked );
-
 /*************************************************************
 
     Base emulation (see drivers/nes.c):

@@ -121,6 +121,7 @@ public:
 	INTERRUPT_GEN_MEMBER(playch10_interrupt);
 	void pc10_set_videorom_bank( int first, int count, int bank, int size );
 	void set_videoram_bank( int first, int count, int bank, int size );
+	void gboard_scanline_cb( int scanline, int vblank, int blanked );
 };
 
 /*----------- defined in video/playch10.c -----------*/

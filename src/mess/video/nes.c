@@ -13,7 +13,7 @@
 
 void nes_state::video_reset()
 {
-	m_ppu->set_vidaccess_callback(nes_ppu_vidaccess);
+	m_ppu->set_vidaccess_callback(ppu2c0x_vidaccess_delegate(FUNC(nes_state::nes_ppu_vidaccess),this));
 }
 
 void nes_state::video_start()

@@ -108,10 +108,12 @@ enum
 ///*************************************************************************
 
 // callback datatypes
-typedef void (*ppu2c0x_scanline_cb)( device_t *device, int scanline, int vblank, int blanked );
-typedef void (*ppu2c0x_hblank_cb)( device_t *device, int scanline, int vblank, int blanked );
 typedef void (*ppu2c0x_nmi_cb)( device_t *device, int *ppu_regs );
-typedef int  (*ppu2c0x_vidaccess_cb)( device_t *device, int address, int data );
+
+typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_scanline_delegate;
+typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_hblank_delegate;
+//typedef device_delegate<void (int *ppu_regs)> ppu2c0x_nmi_delegate;
+typedef device_delegate<int (int address, int data)> ppu2c0x_vidaccess_delegate;
 
 
 // ======================> ppu2c0x_interface
@@ -167,9 +169,9 @@ public:
 	int get_colorbase() { return m_color_base; };
 	int get_current_scanline() { return m_scanline; };
 	int is_sprite_8x16() { return BIT(m_regs[0], 5); }; // MMC5 has to be able to check this
-	void set_scanline_callback( ppu2c0x_scanline_cb cb ) { if (cb != NULL) m_scanline_callback_proc = cb; };
-	void set_hblank_callback( ppu2c0x_scanline_cb cb ) { if (cb != NULL) m_hblank_callback_proc = cb; };
-	void set_vidaccess_callback( ppu2c0x_vidaccess_cb cb ) { if (cb != NULL) m_vidaccess_callback_proc = cb; };
+	void set_scanline_callback( ppu2c0x_scanline_delegate cb ) { m_scanline_callback_proc = cb; m_scanline_callback_proc.bind_relative_to(*owner()); };
+	void set_hblank_callback( ppu2c0x_hblank_delegate cb ) { m_hblank_callback_proc = cb; m_hblank_callback_proc.bind_relative_to(*owner()); };
+	void set_vidaccess_callback( ppu2c0x_vidaccess_delegate cb ) { m_vidaccess_callback_proc = cb; m_vidaccess_callback_proc.bind_relative_to(*owner()); };
 	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; };
 
 	//27/12/2002 (HACK!)
@@ -184,9 +186,9 @@ public:
 	pen_t                       *m_colortable;          /* color table modified at run time */
 	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
-	ppu2c0x_scanline_cb         m_scanline_callback_proc;   /* optional scanline callback */
-	ppu2c0x_hblank_cb           m_hblank_callback_proc; /* optional hblank callback */
-	ppu2c0x_vidaccess_cb        m_vidaccess_callback_proc;  /* optional video access callback */
+	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
+	ppu2c0x_hblank_delegate   	m_hblank_callback_proc; /* optional hblank callback */
+	ppu2c0x_vidaccess_delegate  m_vidaccess_callback_proc;  /* optional video access callback */
 	ppu2c0x_nmi_cb              m_nmi_callback_proc;        /* nmi access callback from interface */
 	int                         m_regs[PPU_MAX_REG];        /* registers */
 	int                         m_refresh_data;         /* refresh-related */
