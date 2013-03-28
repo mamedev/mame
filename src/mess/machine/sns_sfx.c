@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 
 static SUPERFX_CONFIG( snes_sfx_config )
 {
-	DEVCB_LINE_MEMBER(sns_rom_superfx_device,snes_extern_irq_w)  /* IRQ line from cart */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, sns_rom_superfx_device, snes_extern_irq_w)  /* IRQ line from cart */
 };
 
 
