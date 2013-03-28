@@ -23,7 +23,7 @@ const device_type C64_DELA_EP64 = &device_creator<c64_dela_ep64_cartridge_device
 //-------------------------------------------------
 
 ROM_START( c64_dela_ep64 )
-	ROM_REGION( 0x10000, "rom", 0 )
+	ROM_REGION( 0x10000, "eprom", 0 )
 	ROM_CART_LOAD( "rom1", 0x0000, 0x08000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom2", 0x8000, 0x08000, ROM_MIRROR )
 ROM_END
