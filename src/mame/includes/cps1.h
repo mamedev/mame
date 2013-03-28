@@ -199,6 +199,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
 	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
 	DECLARE_WRITE8_MEMBER(cps1_oki_pin7_w);
+	DECLARE_WRITE16_MEMBER(sf2m1_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2m3_layer_w);
 	DECLARE_DRIVER_INIT(sf2rb);
 	DECLARE_DRIVER_INIT(sf2rb2);
@@ -239,6 +240,7 @@ public:
 	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
 	DECLARE_VIDEO_START(cps);
+	DECLARE_MACHINE_START(sf2m1);
 	UINT32 screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
@@ -318,6 +320,7 @@ ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 GFXDECODE_EXTERN( cps1 );
 
 INPUT_PORTS_EXTERN( knights );
+INPUT_PORTS_EXTERN( sf2 );
 
 
 #endif
