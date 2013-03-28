@@ -1557,6 +1557,22 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( c64c_es )
+//-------------------------------------------------
+
+ROM_START( c64c_es )
+	ROM_REGION( 0x4000, "kernal", 0 )
+	ROM_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "325056-03.u5", 0x0000, 0x1000, CRC(c890c175) SHA1(4f57259fff9ef1963a4e87165a6f35ca23864c76) ) // aka 325245-01
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "252715-01.u8", 0x00, 0xf5, BAD_DUMP CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( c64c_se )
 //-------------------------------------------------
 
@@ -1606,6 +1622,7 @@ COMP( 1984, vip64,  c64,    0,      pal_sx,     c64sw,  driver_device,      0,  
 COMP( 1984, dx64,   c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              GAME_SUPPORTS_SAVE )
 COMP( 1986, c64c,   c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      GAME_SUPPORTS_SAVE )
 COMP( 1986, c64cp,  c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       GAME_SUPPORTS_SAVE )
+COMP( 1988, c64c_es,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Spain)",                     GAME_SUPPORTS_SAVE )
 COMP( 1986, c64c_se,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            GAME_SUPPORTS_SAVE )
 COMP( 1986, c64g,   c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64G (PAL)",                       GAME_SUPPORTS_SAVE )
 CONS( 1990, c64gs,  c64,    0,      pal_gs,     c64gs,  driver_device,      0,      "Commodore Business Machines", "Commodore 64 Games System (PAL)",           GAME_SUPPORTS_SAVE )
