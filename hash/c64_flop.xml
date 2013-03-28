@@ -798,46 +798,6 @@
 		</part>
 	</software>
 
-	<software name="cpm">
-		<description>Commodore 64 CP/M Cartridge Boot Disk</description>
-		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<sharedfeat name="requirement" value="c64_cart:cpm"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cpm.d64" size="174848" crc="cc7473e0" sha1="82d8fd45bd4b6e93df7090b325ac6c9b6597fe36" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cpma" cloneof="cpm">
-		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt)</description>
-		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<sharedfeat name="requirement" value="c64_cart:cpm"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cpm2.d64" size="174848" crc="b78211f0" sha1="37d65e4e7d04994c4e69918530aca444bda11f6e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cpmb" cloneof="cpm">
-		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt 2)</description>
-		<year>1982</year>
-		<publisher>Commodore</publisher>
-		<info name="serial" value="D CP2 622-04414" />
-		<sharedfeat name="requirement" value="c64_cart:cpm"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cpm3.d64" size="174848" crc="926d326d" sha1="8d5e6fac79c9f5e463a3514d8b37175e6879cc36" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="swiftlnk">
 		<description>CMD SwiftLink</description>
 		<year>1990</year>
@@ -894,6 +854,100 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="turbo232.d64" size="174848" crc="48874d98" sha1="28b6d25bb0b62df81c4b17d9205c059c6736e817" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Operating Systems -->
+
+	<software name="contiki">
+		<description>Contiki Desktop OS 1.0</description>
+		<year>2003</year>
+		<publisher>Contiki Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="contiki-1.0.d64" size="174848" crc="259c97f7" sha1="7f4ada8f1cf9246b760364d31a9f3bc1493a8b1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.d64" size="174848" crc="cc7473e0" sha1="82d8fd45bd4b6e93df7090b325ac6c9b6597fe36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpma" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm2.d64" size="174848" crc="b78211f0" sha1="37d65e4e7d04994c4e69918530aca444bda11f6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmb" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt 2)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="D CP2 622-04414" />
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm3.d64" size="174848" crc="926d326d" sha1="8d5e6fac79c9f5e463a3514d8b37175e6879cc36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geckos">
+		<description>GeckOS/A65 (v2.0)</description>
+		<year>1999</year>
+		<publisher>André Fachat</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c64.d64" size="174848" crc="103a3ef6" sha1="54f484e7bd78ba65844cc1b3b2a2d43cacbebd0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunix">
+		<description>LUnix Next Generation (v0.21)</description>
+		<year>2004</year>
+		<publisher>LNG-Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lunix-c64.d64" size="174848" crc="d45d5ffa" sha1="1c1d505670035e4a14f0c6446761e59285101767" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lunixreu" cloneof="lunix">
+		<description>LUnix Next Generation (v0.21, REU)</description>
+		<year>2004</year>
+		<publisher>LNG-Project</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lunix-c64-reu.d64" size="174848" crc="47e6bb14" sha1="e4057ff831b19a6a10167e0b6ec0aeaa7be1c436" offset="0" />
 			</dataarea>
 		</part>
 	</software>
