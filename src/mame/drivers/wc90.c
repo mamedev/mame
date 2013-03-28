@@ -302,7 +302,7 @@ static const ym2608_interface ym2608_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_CONFIG_START( wc90, wc90_state )

@@ -588,13 +588,13 @@ static const ym2608_interface ym2608_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 
 static const ym2610_interface ym2610_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

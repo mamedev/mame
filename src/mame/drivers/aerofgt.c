@@ -1283,12 +1283,12 @@ static void irqhandler( device_t *device, int irq )
 
 static const ym2610_interface ym2610_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler  /* IRQ Line */
+	DEVCB_LINE(irqhandler)  /* IRQ Line */
 };
 
 

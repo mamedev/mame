@@ -8,7 +8,7 @@ const device_type ISA8_STEREO_FX = &device_creator<stereo_fx_device>;
 
 static const ym3812_interface pc_ym3812_interface =
 {
-	NULL
+	DEVCB_NULL
 };
 
 READ8_MEMBER( stereo_fx_device::dev_dsp_data_r )

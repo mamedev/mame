@@ -1918,7 +1918,7 @@ static const ym3526_interface ym3526_config =
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const msm5205_interface msm5205_config =

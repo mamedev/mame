@@ -2766,7 +2766,7 @@ static const upd71071_intf towns_dma_config =
 
 static const ym3438_interface ym3438_intf =
 {
-	towns_fm_irq
+	DEVCB_LINE(towns_fm_irq)
 };
 
 static const rf5c68_interface rf5c68_intf =

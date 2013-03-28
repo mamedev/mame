@@ -582,7 +582,7 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 
 static const ymf262_interface fuuki32_ymf262_interface =
 {
-	NULL            /* irq, already hooked up via ymf278b */
+	DEVCB_NULL            /* irq, already hooked up via ymf278b */
 };
 
 static MACHINE_CONFIG_START( fuuki32, fuuki32_state )

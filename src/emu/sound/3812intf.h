@@ -7,7 +7,7 @@
 
 struct ym3812_interface
 {
-	void (*handler)(device_t *device, int linestate);
+	devcb_write_line irqhandler;
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym3812_r );

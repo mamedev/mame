@@ -645,12 +645,12 @@ static const ym2608_interface ym2608_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 static const ym2610_interface ym2610_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 /******************************************************************************/

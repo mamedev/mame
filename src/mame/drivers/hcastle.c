@@ -174,7 +174,7 @@ static const k007232_interface k007232_config =
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 void hcastle_state::machine_start()

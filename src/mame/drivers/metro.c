@@ -1628,7 +1628,7 @@ static void blzntrnd_irqhandler(device_t *device, int irq)
 
 static const ym2610_interface blzntrnd_ym2610_interface =
 {
-	blzntrnd_irqhandler
+	DEVCB_LINE(blzntrnd_irqhandler)
 };
 
 static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )

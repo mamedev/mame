@@ -580,7 +580,7 @@ static void soundirq(device_t *device, int state)
 
 static const ym3812_interface magicbub_ym3812_intf =
 {
-	soundirq    /* IRQ Line */
+	DEVCB_LINE(soundirq)    /* IRQ Line */
 };
 
 static MACHINE_CONFIG_START( magicbub, yunsun16_state )

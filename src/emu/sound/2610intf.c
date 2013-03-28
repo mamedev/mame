@@ -24,6 +24,7 @@ struct ym2610_state
 	void *          psg;
 	const ym2610_interface *intf;
 	device_t *device;
+	devcb_resolved_write_line irqhandler;
 };
 
 
@@ -72,7 +73,8 @@ static const ssg_callbacks psgintf =
 static void IRQHandler(void *param,int irq)
 {
 	ym2610_state *info = (ym2610_state *)param;
-	if(info->intf->handler) info->intf->handler(info->device, irq);
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -133,7 +135,7 @@ static void ym2610_intf_postload(ym2610_state *info)
 
 static DEVICE_START( ym2610 )
 {
-	static const ym2610_interface generic_2610 = { 0 };
+	static const ym2610_interface generic_2610 = { DEVCB_NULL };
 	static const ay8910_interface generic_ay8910 =
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
@@ -150,6 +152,7 @@ static DEVICE_START( ym2610 )
 
 	info->intf = intf;
 	info->device = device;
+	info->irqhandler.resolve(intf->irqhandler, *device);
 	info->psg = ay8910_start_ym(NULL, device->type(), device, device->clock(), &generic_ay8910);
 	assert_always(info->psg != NULL, "Error creating YM2610/AY8910 chip");
 

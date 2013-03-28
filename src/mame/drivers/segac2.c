@@ -1230,7 +1230,7 @@ static void  segac2_irq2_interrupt(device_t *device, int state)
 }
 static const ym3438_interface ym3438_intf =
 {
-	segac2_irq2_interrupt,      /* IRQ handler */
+	DEVCB_LINE(segac2_irq2_interrupt)      /* IRQ handler */
 };
 
 

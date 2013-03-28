@@ -472,7 +472,7 @@ static void irqhandler(device_t *device, int linestate)
 
 static const ym3438_interface ym3438_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

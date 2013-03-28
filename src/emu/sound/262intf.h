@@ -8,7 +8,7 @@
 
 struct ymf262_interface
 {
-	void (*handler)(device_t *device, int irq);
+	devcb_write_line irqhandler;
 };
 
 

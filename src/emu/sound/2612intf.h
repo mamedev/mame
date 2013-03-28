@@ -9,7 +9,7 @@ void ym2612_update_request(void *param);
 
 struct ym2612_interface
 {
-	void (*handler)(device_t *device, int irq);
+	devcb_write_line irqhandler;
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym2612_r );
@@ -56,7 +56,7 @@ extern const device_type YM2612;
 
 struct ym3438_interface
 {
-	void (*handler)(device_t *device, int irq);
+	devcb_write_line irqhandler;
 };
 
 

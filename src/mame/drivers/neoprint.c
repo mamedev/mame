@@ -455,7 +455,7 @@ static void audio_cpu_irq(device_t *device, int assert)
 
 static const ym2610_interface ym2610_config =
 {
-	audio_cpu_irq
+	DEVCB_LINE(audio_cpu_irq)
 };
 
 

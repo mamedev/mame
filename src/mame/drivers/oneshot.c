@@ -335,7 +335,7 @@ static void irq_handler(device_t *device, int irq)
 
 static const ym3812_interface ym3812_config =
 {
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 void oneshot_state::machine_start()

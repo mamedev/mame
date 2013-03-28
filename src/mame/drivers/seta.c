@@ -1494,7 +1494,7 @@ static void utoukond_ym3438_interrupt(device_t *device, int linestate)
 
 static const ym3438_interface utoukond_ym3438_intf =
 {
-	utoukond_ym3438_interrupt   // IRQ handler
+	DEVCB_LINE(utoukond_ym3438_interrupt)   // IRQ handler
 };
 
 /***************************************************************************

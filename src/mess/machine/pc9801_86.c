@@ -53,7 +53,7 @@ static const ym2608_interface pc98_ym2608_intf =
 		DEVCB_NULL,//(pc9801_state,opn_porta_w),
 		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_86_device,opn_portb_w),
 	},
-	pc9801_sound_irq
+	DEVCB_LINE(pc9801_sound_irq)
 };
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )

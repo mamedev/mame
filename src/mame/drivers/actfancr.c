@@ -283,7 +283,7 @@ static void sound_irq(device_t *device, int linestate)
 
 static const ym3812_interface ym3812_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 /******************************************************************************/

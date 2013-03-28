@@ -420,7 +420,7 @@ static void sound_irq( device_t *device, int irq )
 
 static const ym2610_interface mcatadv_ym2610_interface =
 {
-	sound_irq   /* irq */
+	DEVCB_LINE(sound_irq)   /* irq */
 };
 
 

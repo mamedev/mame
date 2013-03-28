@@ -473,7 +473,7 @@ static const ym3526_interface ym3526_config_2 =
 
 static const ym3812_interface ym3812_config_1 =
 {
-	ymirq_callback_1
+	DEVCB_LINE(ymirq_callback_1)
 };
 
 static const y8950_interface y8950_config_2 =

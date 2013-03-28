@@ -399,7 +399,7 @@ static void soundirq( device_t *device, int state )
 
 static const ym3812_interface fuuki16_ym3812_intf =
 {
-	soundirq    /* IRQ Line */
+	DEVCB_LINE(soundirq)    /* IRQ Line */
 };
 
 /*

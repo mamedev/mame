@@ -634,7 +634,7 @@ static void irqhandler( device_t *device, int irq )
 
 static const ym2610_interface airsys_ym2610_interface =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

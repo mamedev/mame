@@ -1659,13 +1659,13 @@ static const ym2608_interface ym2608b_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
 	},
-	generate_sound_irq
+	DEVCB_LINE(generate_sound_irq)
 };
 
 
 static const ym3812_interface ym3812_config =
 {
-	generate_sound_irq
+	DEVCB_LINE(generate_sound_irq)
 };
 
 

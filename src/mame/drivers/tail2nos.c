@@ -192,7 +192,7 @@ static const ym2608_interface ym2608_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(tail2nos_state,sound_bankswitch_w)
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

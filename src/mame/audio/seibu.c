@@ -447,7 +447,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 const ym3812_interface seibu_ym3812_interface =
 {
-	seibu_ym3812_irqhandler
+	DEVCB_LINE(seibu_ym3812_irqhandler)
 };
 
 const ym2203_interface seibu_ym2203_interface =

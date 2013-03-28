@@ -1854,7 +1854,7 @@ static void YM3812_irq( device_t *device, int param )
 
 static const ym3812_interface ym3812_config =
 {
-	YM3812_irq
+	DEVCB_LINE(YM3812_irq)
 };
 
 

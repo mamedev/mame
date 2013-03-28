@@ -1036,7 +1036,7 @@ void psikyo_state::machine_reset()
 
 static const ym2610_interface sngkace_ym2610_interface =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 static MACHINE_CONFIG_START( sngkace, psikyo_state )
@@ -1085,7 +1085,7 @@ MACHINE_CONFIG_END
 
 static const ym2610_interface gunbird_ym2610_interface =
 {
-	sound_irq   /* irq */
+	DEVCB_LINE(sound_irq)   /* irq */
 };
 
 static MACHINE_CONFIG_START( gunbird, psikyo_state )

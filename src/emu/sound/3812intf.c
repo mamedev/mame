@@ -29,6 +29,7 @@ struct ym3812_state
 	void *          chip;
 	const ym3812_interface *intf;
 	device_t *device;
+	devcb_resolved_write_line irqhandler;
 };
 
 
@@ -44,7 +45,8 @@ INLINE ym3812_state *get_safe_token(device_t *device)
 static void IRQHandler(void *param,int irq)
 {
 	ym3812_state *info = (ym3812_state *)param;
-	if (info->intf->handler) (info->intf->handler)(info->device, irq ? ASSERT_LINE : CLEAR_LINE);
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_0 )
 {
@@ -87,12 +89,13 @@ static void _stream_update(void * param, int interval)
 
 static DEVICE_START( ym3812 )
 {
-	static const ym3812_interface dummy = { 0 };
+	static const ym3812_interface dummy = { DEVCB_NULL };
 	ym3812_state *info = get_safe_token(device);
 	int rate = device->clock()/72;
 
 	info->intf = device->static_config() ? (const ym3812_interface *)device->static_config() : &dummy;
 	info->device = device;
+	info->irqhandler.resolve(info->intf->irqhandler, *device);
 
 	/* stream system initialize */
 	info->chip = ym3812_init(device,device->clock(),rate);

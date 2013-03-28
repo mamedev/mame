@@ -23,6 +23,7 @@ struct ym2612_state
 	void *          chip;
 	const ym2612_interface *intf;
 	device_t *device;
+	devcb_resolved_write_line irqhandler;
 };
 
 
@@ -40,7 +41,8 @@ INLINE ym2612_state *get_safe_token(device_t *device)
 static void IRQHandler(void *param,int irq)
 {
 	ym2612_state *info = (ym2612_state *)param;
-	if(info->intf->handler) info->intf->handler(info->device, irq);
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -97,12 +99,13 @@ static void ym2612_intf_postload(ym2612_state *info)
 
 static DEVICE_START( ym2612 )
 {
-	static const ym2612_interface dummy = { 0 };
+	static const ym2612_interface dummy = { DEVCB_NULL };
 	ym2612_state *info = get_safe_token(device);
 	int rate = device->clock()/72;
 
 	info->intf = device->static_config() ? (const ym2612_interface *)device->static_config() : &dummy;
 	info->device = device;
+	info->irqhandler.resolve(info->intf->irqhandler, *device);
 
 	/* FM init */
 	/* Timer Handler set */

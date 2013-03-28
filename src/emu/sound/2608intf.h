@@ -13,7 +13,7 @@ void ym2608_update_request(void *param);
 struct ym2608_interface
 {
 	const ay8910_interface ay8910_intf;
-	void ( *handler )( device_t *device, int irq ); /* IRQ handler for the YM2608 */
+	devcb_write_line irqhandler; /* IRQ handler for the YM2608 */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym2608_r );

@@ -11,7 +11,7 @@ void ym2610_update_request(void *param);
 
 struct ym2610_interface
 {
-	void ( *handler )( device_t *device, int irq ); /* IRQ handler for the YM2610 */
+	devcb_write_line irqhandler; /* IRQ handler for the YM2610 */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ym2610_r );

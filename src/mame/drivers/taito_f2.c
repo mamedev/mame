@@ -2810,7 +2810,7 @@ static void irq_handler( device_t *device, int irq )
 
 static const ym2610_interface ym2610_config =
 {
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 

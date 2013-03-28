@@ -398,7 +398,7 @@ static void irqhandler( device_t *device, int irq )
 
 static const ym2610_interface ym2610_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const k053936_interface f1gp_k053936_intf =

@@ -444,7 +444,7 @@ static void sound_irq(device_t *device, int irq)
 
 static const ymf262_interface tecmosys_ymf262_interface =
 {
-	sound_irq       /* irq */
+	DEVCB_LINE(sound_irq)       /* irq */
 };
 
 void tecmosys_state::machine_start()

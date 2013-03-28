@@ -793,7 +793,7 @@ GFXDECODE_END
 
 static const ym3812_interface ym3812_config =
 {
-	0
+	DEVCB_NULL
 };
 
 

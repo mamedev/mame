@@ -1910,7 +1910,7 @@ MACHINE_CONFIG_END
 
 static const ym3812_interface brickzn_ym3812_interface =
 {
-	soundirq    /* IRQ Line */
+	DEVCB_LINE(soundirq)    /* IRQ Line */
 };
 
 MACHINE_RESET_MEMBER(suna8_state,brickzn)

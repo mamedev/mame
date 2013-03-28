@@ -979,7 +979,7 @@ static void soundirq( device_t *device, int state )
 
 static const ym3812_interface ym3812_intf =
 {
-	soundirq    /* IRQ Line */
+	DEVCB_LINE(soundirq)    /* IRQ Line */
 };
 
 void nmg5_state::machine_start()

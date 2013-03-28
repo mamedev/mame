@@ -17,6 +17,7 @@ struct ymf262_state
 	void *          chip;
 	const ymf262_interface *intf;
 	device_t *device;
+	devcb_resolved_write_line irqhandler;
 };
 
 
@@ -33,7 +34,8 @@ INLINE ymf262_state *get_safe_token(device_t *device)
 static void IRQHandler_262(void *param,int irq)
 {
 	ymf262_state *info = (ymf262_state *)param;
-	if (info->intf->handler) (info->intf->handler)(info->device, irq);
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq);
 }
 
 static TIMER_CALLBACK( timer_callback_262_0 )
@@ -76,12 +78,13 @@ static void _stream_update(void *param, int interval)
 
 static DEVICE_START( ymf262 )
 {
-	static const ymf262_interface dummy = { 0 };
+	static const ymf262_interface dummy = { DEVCB_NULL };
 	ymf262_state *info = get_safe_token(device);
 	int rate = device->clock()/288;
 
 	info->intf = device->static_config() ? (const ymf262_interface *)device->static_config() : &dummy;
 	info->device = device;
+	info->irqhandler.resolve(info->intf->irqhandler, *device);
 
 	/* stream system initialize */
 	info->chip = ymf262_init(device,device->clock(),rate);

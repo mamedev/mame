@@ -2138,7 +2138,7 @@ GFXDECODE_END
 
 static const ym3438_interface ym3438_config =
 {
-	ym3438_irq_handler
+	DEVCB_LINE(ym3438_irq_handler)
 };
 
 

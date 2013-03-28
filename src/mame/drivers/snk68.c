@@ -581,7 +581,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /******************************************************************************/

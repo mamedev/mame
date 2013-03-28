@@ -63,12 +63,12 @@ static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
 
 static const ym3812_interface pc_ym3812_interface =
 {
-	NULL
+	DEVCB_NULL
 };
 
 static const ymf262_interface pc_ymf262_interface =
 {
-	NULL
+	DEVCB_NULL
 };
 
 static SLOT_INTERFACE_START(midiin_slot)

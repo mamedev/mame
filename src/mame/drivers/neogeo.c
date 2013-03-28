@@ -1148,7 +1148,7 @@ ADDRESS_MAP_END
 
 static const ym2610_interface ym2610_config =
 {
-	audio_cpu_irq
+	DEVCB_LINE(audio_cpu_irq)
 };
 
 

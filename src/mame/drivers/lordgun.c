@@ -671,7 +671,7 @@ static void soundirq(device_t *device, int state)
 
 static const ym3812_interface lordgun_ym3812_interface =
 {
-	soundirq
+	DEVCB_LINE(soundirq)
 };
 
 static MACHINE_CONFIG_START( lordgun, lordgun_state )

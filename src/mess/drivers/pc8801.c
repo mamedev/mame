@@ -2609,7 +2609,7 @@ static const ym2608_interface pc88_ym2608_intf =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	pc8801_sound_irq
+	DEVCB_LINE(pc8801_sound_irq)
 };
 
 /* Cassette Configuration */

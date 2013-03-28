@@ -269,7 +269,7 @@ static void gs_ym2610_irq(device_t *device, int irq)
 
 static const ym2610_interface ym2610_config =
 {
-	gs_ym2610_irq
+	DEVCB_LINE(gs_ym2610_irq)
 };
 
 /*** MEMORY LAYOUTS **********************************************************/

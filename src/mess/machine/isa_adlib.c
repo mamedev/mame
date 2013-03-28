@@ -13,7 +13,7 @@
 
 static const ym3812_interface pc_ym3812_interface =
 {
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_FRAGMENT( adlib_config )

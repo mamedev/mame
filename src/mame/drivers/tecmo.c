@@ -611,7 +611,7 @@ static void irqhandler(device_t *device, int linestate)
 
 static const ym3812_interface ym3812_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const msm5205_interface msm5205_config =

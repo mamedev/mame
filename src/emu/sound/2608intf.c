@@ -24,6 +24,7 @@ struct ym2608_state
 	void *          psg;
 	const ym2608_interface *intf;
 	device_t *device;
+	devcb_resolved_write_line irqhandler;
 };
 
 
@@ -72,8 +73,9 @@ static const ssg_callbacks psgintf =
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2608_state *info = (ym2608_state *)param;
-	if(info->intf->handler) info->intf->handler(info->device, irq);
+	ym2608_state *info = (ym2608_state *)param;	
+	if (!info->irqhandler.isnull())
+		info->irqhandler(irq);	
 }
 
 /* Timer overflow callback from timer.c */
@@ -133,7 +135,7 @@ static DEVICE_START( ym2608 )
 			AY8910_DEFAULT_LOADS,
 			DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 		},
-		NULL
+		DEVCB_NULL
 	};
 	const ym2608_interface *intf = device->static_config() ? (const ym2608_interface *)device->static_config() : &generic_2608;
 	int rate = device->clock()/72;
@@ -145,6 +147,8 @@ static DEVICE_START( ym2608 )
 	info->intf = intf;
 	info->device = device;
 
+	info->irqhandler.resolve(intf->irqhandler, *device);
+	
 	/* FIXME: Force to use simgle output */
 	info->psg = ay8910_start_ym(NULL, YM2608, device, device->clock(), &intf->ay8910_intf);
 	assert_always(info->psg != NULL, "Error creating YM2608/AY8910 chip");
