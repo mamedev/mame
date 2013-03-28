@@ -5088,7 +5088,7 @@ ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
 	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 ROM_END
 
-ROM_START( daytonatA )/* Daytona USA (Japan, Turbo hack) */
+ROM_START( daytonata )/* Daytona USA (Japan, Turbo hack) */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD( "dayturbo.12", 0x000000, 0x020000, CRC(aec6857a) SHA1(e29261de4344c99d82c9e494467605593cc776d8) )
 	ROM_LOAD32_WORD( "dayturbo.13", 0x000002, 0x020000, CRC(cb657edc) SHA1(90b8f673a4ef88e7c1f6012b80823d3e756f9743) )
