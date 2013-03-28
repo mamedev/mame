@@ -278,6 +278,21 @@ void device_execute_interface::set_irq_acknowledge_callback(device_irq_acknowled
 	m_driver_irq_legacy = NULL;
 }
 
+
+//-------------------------------------------------
+//  suspend_resume_changed
+//-------------------------------------------------
+
+void device_execute_interface::suspend_resume_changed()
+{
+	// inform the scheduler
+	device().machine().scheduler().suspend_resume_changed();
+
+	// if we're active, synchronize
+	abort_timeslice();
+}
+
+
 //-------------------------------------------------
 //  suspend - set a suspend reason for this device
 //-------------------------------------------------
@@ -288,9 +303,7 @@ if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
 	m_nextsuspend |= reason;
 	m_nexteatcycles = eatcycles;
-
-	// if we're active, synchronize
-	abort_timeslice();
+	suspend_resume_changed();
 }
 
 
@@ -304,9 +317,7 @@ void device_execute_interface::resume(UINT32 reason)
 if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 	// clear the suspend reason and eat cycles flag
 	m_nextsuspend &= ~reason;
-
-	// if we're active, synchronize
-	abort_timeslice();
+	suspend_resume_changed();
 }
 
 

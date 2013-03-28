@@ -348,6 +348,7 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer(NULL),
 	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
+	m_suspend_changes_pending(true),
 	m_quantum_list(machine.respool()),
 	m_quantum_allocator(machine.respool()),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
@@ -413,6 +414,30 @@ bool device_scheduler::can_save() const
 
 
 //-------------------------------------------------
+//  apply_suspend_changes - applies suspend/resume
+//	changes to all device_execute_interfaces
+//-------------------------------------------------
+
+inline void device_scheduler::apply_suspend_changes()
+{
+	UINT32 suspendchanged = 0;
+	for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
+	{
+		suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
+		exec->m_suspend = exec->m_nextsuspend;
+		exec->m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
+		exec->m_eatcycles = exec->m_nexteatcycles;
+	}
+
+	// recompute the execute list if any CPUs changed their suspension state
+	if (suspendchanged != 0)
+		rebuild_execute_list();
+	else
+		m_suspend_changes_pending = false;
+}
+
+
+//-------------------------------------------------
 //  timeslice - execute all devices for a single
 //  timeslice
 //-------------------------------------------------
@@ -441,19 +466,9 @@ void device_scheduler::timeslice()
 		LOG(("------------------\n"));
 		LOG(("cpu_timeslice: target = %s\n", target.as_string()));
 
-		// apply pending suspension changes
-		UINT32 suspendchanged = 0;
-		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
-		{
-			suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
-			exec->m_suspend = exec->m_nextsuspend;
-			exec->m_nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
-			exec->m_eatcycles = exec->m_nexteatcycles;
-		}
-
-		// recompute the execute list if any CPUs changed their suspension state
-		if (suspendchanged != 0)
-			rebuild_execute_list();
+		// do we have pending suspension changes?
+		if (m_suspend_changes_pending)
+			apply_suspend_changes();
 
 		// loop over non-suspended CPUs
 		for (device_execute_interface *exec = m_execute_list; exec != NULL; exec = exec->m_nextexec)
@@ -693,6 +708,8 @@ void device_scheduler::postload()
 	emu_timer *timer;
 	while ((timer = private_list.detach_head()) != NULL)
 		timer_list_insert(*timer);
+
+	m_suspend_changes_pending = true;
 
 	// report the timer state after a log
 	logerror("After resetting/reordering timers:\n");

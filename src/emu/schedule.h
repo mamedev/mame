@@ -164,6 +164,7 @@ public:
 	void abort_timeslice();
 	void trigger(int trigid, attotime after = attotime::zero);
 	void boost_interleave(attotime timeslice_time, attotime boost_duration);
+	void suspend_resume_changed() { m_suspend_changes_pending = true; }
 
 	// timers, specified by callback/name
 	emu_timer *timer_alloc(timer_expired_delegate callback, void *ptr = NULL);
@@ -196,6 +197,7 @@ private:
 	// scheduling helpers
 	void compute_perfect_interleave();
 	void rebuild_execute_list();
+	void apply_suspend_changes();
 	void add_scheduling_quantum(attotime quantum, attotime duration);
 
 	// timer helpers
@@ -217,6 +219,7 @@ private:
 	emu_timer *                 m_callback_timer;           // pointer to the current callback timer
 	bool                        m_callback_timer_modified;  // true if the current callback timer was modified
 	attotime                    m_callback_timer_expire_time; // the original expiration time
+	bool						m_suspend_changes_pending;	// suspend/resume changes are pending
 
 	// scheduling quanta
 	class quantum_slot

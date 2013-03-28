@@ -329,6 +329,7 @@ private:
 
 	static void static_trigger_periodic_interrupt(running_machine &machine, void *ptr, int param);
 	void trigger_periodic_interrupt();
+	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;
 };
