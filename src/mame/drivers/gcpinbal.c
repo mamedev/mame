@@ -202,7 +202,7 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 
 
 /* Controlled through ioc? */
-static void gcp_adpcm_int( device_t *device )
+static void gcp_adpcm_int( device_t *device,int st )
 {
 	gcpinbal_state *state = device->machine().driver_data<gcpinbal_state>();
 
@@ -384,7 +384,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm6585_config =
 {
-	gcp_adpcm_int,      /* VCK function */
+	DEVCB_LINE(gcp_adpcm_int),      /* VCK function */
 	MSM6585_S40         /* 16 kHz */
 };
 

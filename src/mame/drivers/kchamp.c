@@ -345,7 +345,7 @@ INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint( device_t *device )
+static void msmint( device_t *device,int st )
 {
 	kchamp_state *state = device->machine().driver_data<kchamp_state>();
 
@@ -365,7 +365,7 @@ static void msmint( device_t *device )
 
 static const msm5205_interface msm_interface =
 {
-	msmint,         /* interrupt function */
+	DEVCB_LINE(msmint),         /* interrupt function */
 	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback */
 };
 

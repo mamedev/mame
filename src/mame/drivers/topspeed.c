@@ -437,12 +437,12 @@ static void topspeed_msm5205_clock( device_t *device, int chip )
 		state->m_msm_pos[chip] = state->m_msm_start[chip];
 }
 
-static void topspeed_msm5205_vck_1( device_t *device )
+static void topspeed_msm5205_vck_1( device_t *device ,int state)
 {
 	topspeed_msm5205_clock(device, 0);
 }
 
-static void topspeed_msm5205_vck_2( device_t *device )
+static void topspeed_msm5205_vck_2( device_t *device ,int state)
 {
 	topspeed_msm5205_clock(device, 1);
 }
@@ -655,13 +655,13 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config_1 =
 {
-	topspeed_msm5205_vck_1, /* VCK function */
+	DEVCB_LINE(topspeed_msm5205_vck_1), /* VCK function */
 	MSM5205_S48_4B          /* 8 kHz */
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	topspeed_msm5205_vck_2, /* VCK function */
+	DEVCB_LINE(topspeed_msm5205_vck_2), /* VCK function */
 	MSM5205_S48_4B          /* 8 kHz */
 };
 

@@ -263,7 +263,7 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 }
 
 //WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
-static void msm5205_irq_w(device_t* device)
+static void msm5205_irq_w(device_t* device,int st)
 {
 	de_2_state* state = device->machine().driver_data<de_2_state>();
 	msm5205_data_w(state->m_msm5205,state->m_sample_data >> 4);
@@ -547,7 +547,7 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 
 static const msm5205_interface msm5205_intf =
 {
-	msm5205_irq_w,
+	DEVCB_LINE(msm5205_irq_w),
 	MSM5205_S96_4B
 };
 

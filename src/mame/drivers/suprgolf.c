@@ -431,7 +431,7 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static void adpcm_int(device_t *device)
+static void adpcm_int(device_t *device,int st)
 {
 	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
 
@@ -452,7 +452,7 @@ static void adpcm_int(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	adpcm_int,      /* interrupt function */
+	DEVCB_LINE(adpcm_int),      /* interrupt function */
 	MSM5205_S48_4B  /* 4KHz 4-bit */
 };
 

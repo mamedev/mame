@@ -94,7 +94,7 @@ WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
 
-static void tecmo_adpcm_int(device_t *device)
+static void tecmo_adpcm_int(device_t *device,int st)
 {
 	tecmo_state *state = device->machine().driver_data<tecmo_state>();
 	if (state->m_adpcm_pos >= state->m_adpcm_end ||
@@ -616,7 +616,7 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	tecmo_adpcm_int,    /* interrupt function */
+	DEVCB_LINE(tecmo_adpcm_int),    /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz               */
 };
 

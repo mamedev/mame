@@ -549,7 +549,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
 }
 
 
-static void rjammer_adpcm_vck (device_t *device)
+static void rjammer_adpcm_vck (device_t *device,int st)
 {
 	tubep_state *state = device->machine().driver_data<tubep_state>();
 	state->m_ls74 = (state->m_ls74 + 1) & 1;
@@ -870,7 +870,7 @@ static const ay8910_interface ay8910_interface_3 =
 
 static const msm5205_interface msm5205_config =
 {
-	rjammer_adpcm_vck,          /* VCK function */
+	DEVCB_LINE(rjammer_adpcm_vck),          /* VCK function */
 	MSM5205_S48_4B              /* 8 KHz (changes at run time) */
 };
 

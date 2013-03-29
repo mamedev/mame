@@ -117,7 +117,7 @@ WRITE8_MEMBER( cps_state::knightsb_snd_bankswitch_w )
 	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static void m5205_int1( device_t *device )
+static void m5205_int1( device_t *device,int st )
 {
 	cps_state *state = device->machine().driver_data<cps_state>();
 
@@ -128,7 +128,7 @@ static void m5205_int1( device_t *device )
 		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2( device_t *device )
+static void m5205_int2( device_t *device,int st )
 {
 	cps_state *state = device->machine().driver_data<cps_state>();
 
@@ -1141,13 +1141,13 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_interface1 =
 {
-	m5205_int1, /* interrupt function */
+	DEVCB_LINE(m5205_int1), /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz 4-bit */
 };
 
 static const msm5205_interface msm5205_interface2 =
 {
-	m5205_int2, /* interrupt function */
+	DEVCB_LINE(m5205_int2), /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz 4-bit */
 };
 

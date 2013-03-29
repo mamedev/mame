@@ -161,7 +161,7 @@ WRITE8_MEMBER(tbowl_state::tbowl_adpcm_vol_w)
 	msm5205_set_volume(adpcm, (data & 0x7f) * 100 / 0x7f);
 }
 
-static void tbowl_adpcm_int(device_t *device)
+static void tbowl_adpcm_int(device_t *device,int st)
 {
 	tbowl_state *state = device->machine().driver_data<tbowl_state>();
 	int num = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
@@ -431,7 +431,7 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	tbowl_adpcm_int,    /* interrupt function */
+	DEVCB_LINE(tbowl_adpcm_int),    /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz               */
 };
 

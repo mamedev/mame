@@ -54,7 +54,7 @@
 
 struct msm5205_state
 {
-	const msm5205_interface *intf;
+	const msm5205_interface *intf;	
 	device_t *device;
 	sound_stream * stream;    /* number of stream system      */
 	INT32 clock;              /* clock rate                   */
@@ -67,6 +67,7 @@ struct msm5205_state
 	INT32 signal;             /* current ADPCM signal         */
 	INT32 step;               /* current ADPCM step           */
 	int diff_lookup[49*16];
+	devcb_resolved_write_line vclk_callback; 
 };
 
 INLINE msm5205_state *get_safe_token(device_t *device)
@@ -149,7 +150,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 	int new_signal;
 
 	/* callback user handler and latch next data */
-	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(voice->device);
+	if(!voice->vclk_callback.isnull()) voice->vclk_callback(1);
 
 	/* reset check at last hiedge of VCLK */
 	if(voice->reset)
@@ -209,6 +210,7 @@ static DEVICE_START( msm5205 )
 	voice->intf = (const msm5205_interface *)device->static_config();
 	voice->device = device;
 	voice->clock = device->clock();
+	voice->vclk_callback.resolve(voice->intf->vclk_callback,*device);
 
 	/* compute the difference tables */
 	ComputeTables (voice);

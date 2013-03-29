@@ -188,7 +188,7 @@ WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
 }
 
 // adpcm callbacks
-static void kfr_adpcm1_int(device_t *device)
+static void kfr_adpcm1_int(device_t *device, int st)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	UINT8 *ROM = state->memregion("adpcm1")->base();
@@ -199,7 +199,7 @@ static void kfr_adpcm1_int(device_t *device)
 	state->m_adpcm_sel[0] ^= 1;
 }
 
-static void kfr_adpcm2_int(device_t *device)
+static void kfr_adpcm2_int(device_t *device,int st)
 {
 	kungfur_state *state = device->machine().driver_data<kungfur_state>();
 	UINT8 *ROM = state->memregion("adpcm2")->base();
@@ -284,13 +284,13 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 
 static const msm5205_interface msm5205_config_1 =
 {
-	kfr_adpcm1_int,
+	DEVCB_LINE(kfr_adpcm1_int),
 	MSM5205_S48_4B
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	kfr_adpcm2_int,
+	DEVCB_LINE(kfr_adpcm2_int),
 	MSM5205_S48_4B
 };
 

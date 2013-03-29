@@ -667,7 +667,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
 	m_m5205_next = data;
 }
 
-static void mastboy_adpcm_int(device_t *device)
+static void mastboy_adpcm_int(device_t *device,int st)
 {
 	mastboy_state *state = device->machine().driver_data<mastboy_state>();
 	msm5205_data_w(device, state->m_m5205_next);
@@ -681,7 +681,7 @@ static void mastboy_adpcm_int(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	mastboy_adpcm_int,  /* interrupt function */
+	DEVCB_LINE(mastboy_adpcm_int),  /* interrupt function */
 	MSM5205_SEX_4B      /* 4KHz 4-bit */
 };
 

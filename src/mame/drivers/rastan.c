@@ -167,7 +167,7 @@ WRITE8_MEMBER(rastan_state::rastan_bankswitch_w)
 }
 
 
-static void rastan_msm5205_vck( device_t *device )
+static void rastan_msm5205_vck( device_t *device ,int st)
 {
 	rastan_state *state = device->machine().driver_data<rastan_state>();
 	if (state->m_adpcm_data != -1)
@@ -340,7 +340,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	rastan_msm5205_vck, /* VCK function */
+	DEVCB_LINE(rastan_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

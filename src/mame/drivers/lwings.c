@@ -729,7 +729,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	0,              /* interrupt function */
+	DEVCB_NULL,              /* interrupt function */
 	MSM5205_SEX_4B  /* slave mode */
 };
 

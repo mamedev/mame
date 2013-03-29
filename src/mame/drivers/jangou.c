@@ -346,7 +346,7 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 	m_adpcm_byte = data;
 }
 
-static void jngolady_vclk_cb( device_t *device )
+static void jngolady_vclk_cb( device_t *device,int st )
 {
 	jangou_state *state = device->machine().driver_data<jangou_state>();
 
@@ -895,7 +895,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5205_interface msm5205_config =
 {
-	jngolady_vclk_cb,
+	DEVCB_LINE(jngolady_vclk_cb),
 	MSM5205_S96_4B
 };
 

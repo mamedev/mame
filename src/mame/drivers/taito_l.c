@@ -557,7 +557,7 @@ WRITE8_MEMBER(taitol_state::mux_ctrl_w)
 }
 
 
-static void champwr_msm5205_vck( device_t *device )
+static void champwr_msm5205_vck( device_t *device,int st )
 {
 	taitol_state *state = device->machine().driver_data<taitol_state>();
 
@@ -1792,7 +1792,7 @@ static const ym2203_interface ym2203_interface_champwr =
 
 static const msm5205_interface msm5205_config =
 {
-	champwr_msm5205_vck,/* VCK function */
+	DEVCB_LINE(champwr_msm5205_vck),/* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

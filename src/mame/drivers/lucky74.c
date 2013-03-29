@@ -1402,7 +1402,7 @@ static SOUND_START( lucky74 )
 	state->m_adpcm_busy_line = 0x01;    /* free and ready */
 }
 
-static void lucky74_adpcm_int(device_t *device)
+static void lucky74_adpcm_int(device_t *device,int st)
 {
 	lucky74_state *state = device->machine().driver_data<lucky74_state>();
 	if (state->m_adpcm_reg[05] == 0x01) /* register 0x05 (bit 0 activated), trigger the sample */
@@ -1515,7 +1515,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5205_interface msm5205_config =
 {
-	lucky74_adpcm_int,  /* interrupt function */
+	DEVCB_LINE(lucky74_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz */
 };
 

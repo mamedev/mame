@@ -304,7 +304,7 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(ym2203_irq_handler)
 };
 
-static void ashnojoe_vclk_cb( device_t *device )
+static void ashnojoe_vclk_cb( device_t *device, int st )
 {
 	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
 	if (state->m_msm5205_vclk_toggle == 0)
@@ -322,7 +322,7 @@ static void ashnojoe_vclk_cb( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	ashnojoe_vclk_cb,
+	DEVCB_LINE(ashnojoe_vclk_cb),
 	MSM5205_S48_4B
 };
 

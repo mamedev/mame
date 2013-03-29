@@ -280,7 +280,7 @@ WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 	membank("bank1")->set_base(memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
-static void ml_msm5205_vck(device_t *device)
+static void ml_msm5205_vck(device_t *device,int st)
 {
 	mlanding_state *state = device->machine().driver_data<mlanding_state>();
 
@@ -732,7 +732,7 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_config =
 {
-	ml_msm5205_vck, /* VCK function */
+	DEVCB_LINE(ml_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

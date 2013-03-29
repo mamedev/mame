@@ -54,4 +54,4 @@ public:
 };
 
 /*----------- defined in machine/stfight.c -----------*/
-void stfight_adpcm_int(device_t *device);
+void stfight_adpcm_int(device_t *device, int st);

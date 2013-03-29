@@ -160,7 +160,7 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 
 /* Read/Write Handlers */
-static void idsoccer_adpcm_int( device_t *device )
+static void idsoccer_adpcm_int( device_t *device,int st )
 {
 	docastle_state *state = device->machine().driver_data<docastle_state>();
 
@@ -552,7 +552,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	idsoccer_adpcm_int, // interrupt function
+	DEVCB_LINE(idsoccer_adpcm_int), // interrupt function
 	MSM5205_S64_4B      // 6 kHz    ???
 };
 

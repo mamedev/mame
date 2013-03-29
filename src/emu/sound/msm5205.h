@@ -26,7 +26,7 @@
 
 struct msm5205_interface
 {
-	void (*vclk_callback)(device_t *);   /* VCLK callback              */
+	devcb_write_line vclk_callback;   /* VCLK callback              */
 	int select;       /* prescaler / bit width selector        */
 };
 

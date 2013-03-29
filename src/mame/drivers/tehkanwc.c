@@ -188,7 +188,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 	msm5205_reset_w(device,data ? 0 : 1);
 }
 
-static void tehkanwc_adpcm_int(device_t *device)
+static void tehkanwc_adpcm_int(device_t *device,int st)
 {
 	tehkanwc_state *state = device->machine().driver_data<tehkanwc_state>();
 
@@ -633,7 +633,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static const msm5205_interface msm5205_config =
 {
-	tehkanwc_adpcm_int, /* interrupt function */
+	DEVCB_LINE(tehkanwc_adpcm_int), /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz               */
 };
 

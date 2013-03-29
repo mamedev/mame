@@ -1384,7 +1384,7 @@ MACHINE_CONFIG_END
 #define DEC0_VBSTART 256-8
 
 
-static void automat_vclk_cb(device_t *device)
+static void automat_vclk_cb(device_t *device,int st)
 {
 	dec0_automat_state *state = device->machine().driver_data<dec0_automat_state>();
 	if (state->m_automat_msm5205_vclk_toggle == 0)
@@ -1402,7 +1402,7 @@ static void automat_vclk_cb(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	automat_vclk_cb,
+	DEVCB_LINE(automat_vclk_cb),
 	MSM5205_S48_4B
 };
 

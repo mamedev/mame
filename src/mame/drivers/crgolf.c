@@ -198,7 +198,7 @@ READ8_MEMBER(crgolf_state::sound_to_main_r)
  *
  *************************************/
 
-static void vck_callback( device_t *device )
+static void vck_callback( device_t *device, int st )
 {
 	crgolf_state *state = device->machine().driver_data<crgolf_state>();
 
@@ -378,7 +378,7 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_intf =
 {
-	vck_callback,
+	DEVCB_LINE(vck_callback),
 	MSM5205_S64_4B
 };
 

@@ -186,7 +186,7 @@ static const int sampleLimits[] =
 	0x7200      // (end of samples)
 };
 
-void stfight_adpcm_int(device_t *device)
+void stfight_adpcm_int(device_t *device, int st)
 {
 	stfight_state *state = device->machine().driver_data<stfight_state>();
 	UINT8 *SAMPLES = state->memregion("adpcm")->base();

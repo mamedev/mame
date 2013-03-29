@@ -397,7 +397,7 @@ void mermaid_state::machine_reset()
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-static void rougien_adpcm_int( device_t *device )
+static void rougien_adpcm_int( device_t *device ,int st)
 {
 	mermaid_state *state = device->machine().driver_data<mermaid_state>();
 
@@ -428,7 +428,7 @@ static void rougien_adpcm_int( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	rougien_adpcm_int,  /* interrupt function */
+	DEVCB_LINE(rougien_adpcm_int),  /* interrupt function */
 	MSM5205_S96_4B
 };
 

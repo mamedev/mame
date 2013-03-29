@@ -342,7 +342,7 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 
 #define MSM5205_TAG             "msm5205"
 
-void nimbus_msm5205_vck(device_t *device);
+void nimbus_msm5205_vck(device_t *device,int st);
 
 /* Mouse / Joystick */
 

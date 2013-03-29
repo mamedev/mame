@@ -70,7 +70,7 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
 	m_vclk_left = 2;
 }
 
-static void ojankohs_adpcm_int( device_t *device )
+static void ojankohs_adpcm_int( device_t *device ,int st)
 {
 	ojankohs_state *state = device->machine().driver_data<ojankohs_state>();
 
@@ -782,7 +782,7 @@ static const ay8910_interface ojankoc_ay8910_interface =
 
 static const msm5205_interface msm5205_config =
 {
-	ojankohs_adpcm_int,     /* IRQ handler */
+	DEVCB_LINE(ojankohs_adpcm_int),     /* IRQ handler */
 	MSM5205_S48_4B          /* 8 KHz */
 };
 

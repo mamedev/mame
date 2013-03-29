@@ -443,7 +443,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void yunsung8_adpcm_int( device_t *device )
+static void yunsung8_adpcm_int( device_t *device,int st )
 {
 	yunsung8_state *state = device->machine().driver_data<yunsung8_state>();
 
@@ -457,7 +457,7 @@ static void yunsung8_adpcm_int( device_t *device )
 
 static const msm5205_interface yunsung8_msm5205_interface =
 {
-	yunsung8_adpcm_int, /* interrupt function */
+	DEVCB_LINE(yunsung8_adpcm_int), /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz, 4 Bits */
 };
 

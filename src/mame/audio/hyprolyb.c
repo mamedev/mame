@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static void adpcm_vck_callback( device_t *device )
+static void adpcm_vck_callback( device_t *device, int st )
 {
 	device_t *adpcm = device->machine().device("hyprolyb_adpcm");
 	hyprolyb_adpcm_state *state = get_safe_token(adpcm);
@@ -120,7 +120,7 @@ static void adpcm_vck_callback( device_t *device )
 
 static const msm5205_interface hyprolyb_msm5205_config =
 {
-	adpcm_vck_callback, /* VCK function */
+	DEVCB_LINE(adpcm_vck_callback), /* VCK function */
 	MSM5205_S96_4B      /* 4 kHz */
 };
 

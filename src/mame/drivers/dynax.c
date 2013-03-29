@@ -392,7 +392,7 @@ WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 }
 
 
-static void adpcm_int( device_t *device )
+static void adpcm_int( device_t *device,int st )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 	msm5205_data_w(device, state->m_msm5205next >> 4);
@@ -407,7 +407,7 @@ static void adpcm_int( device_t *device )
 	}
 }
 
-static void adpcm_int_cpu1( device_t *device )
+static void adpcm_int_cpu1( device_t *device,int st )
 {
 	dynax_state *state = device->machine().driver_data<dynax_state>();
 	msm5205_data_w(device, state->m_msm5205next >> 4);
@@ -4361,7 +4361,7 @@ static const ym2203_interface hanamai_ym2203_interface =
 
 static const msm5205_interface hanamai_msm5205_interface =
 {
-	adpcm_int,          /* IRQ handler */
+	DEVCB_LINE(adpcm_int),          /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
 };
 
@@ -4700,7 +4700,7 @@ static const ym2203_interface jantouki_ym2203_interface =
 
 static const msm5205_interface jantouki_msm5205_interface =
 {
-	adpcm_int_cpu1,         /* IRQ handler */
+	DEVCB_LINE(adpcm_int_cpu1),         /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
 };
 

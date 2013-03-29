@@ -524,7 +524,7 @@ static const ym2203_interface ym2203_config =
 
 static const msm5205_interface msm5205_config =
 {
-	0,                  /* IRQ handler */
+	DEVCB_NULL,                  /* IRQ handler */
 	MSM5205_SEX_4B
 };
 

@@ -459,7 +459,7 @@ MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 	msm5205_reset_w(machine().device("msm2"), 1);
 }
 
-static void opwolf_msm5205_vck( device_t *device )
+static void opwolf_msm5205_vck( device_t *device ,int st)
 {
 	opwolf_state *state = device->machine().driver_data<opwolf_state>();
 	int chip = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
@@ -686,7 +686,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	opwolf_msm5205_vck, /* VCK function */
+	DEVCB_LINE(opwolf_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

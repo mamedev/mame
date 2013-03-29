@@ -463,13 +463,13 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_interface_1 =
 {
-	0,
+	DEVCB_NULL,
 	MSM5205_SEX_4B
 };
 
 static const msm5205_interface msm5205_interface_2 =
 {
-	0,
+	DEVCB_NULL,
 	MSM5205_SEX_4B
 };
 

@@ -218,7 +218,7 @@ static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(device_t *device)
+static void adpcm_int(device_t *device,int st)
 {
 	device_t *adpcm2 = device->machine().device("msm2");
 
@@ -268,13 +268,13 @@ static const ay8910_interface irem_ay8910_interface_2 =
 
 static const msm5205_interface irem_msm5205_interface_1 =
 {
-	adpcm_int,          /* interrupt function */
+	DEVCB_LINE(adpcm_int),          /* interrupt function */
 	MSM5205_S96_4B      /* default to 4KHz, but can be changed at run time */
 };
 
 static const msm5205_interface irem_msm5205_interface_2 =
 {
-	0,              /* interrupt function */
+	DEVCB_NULL,              /* interrupt function */
 	MSM5205_SEX_4B      /* default to 4KHz, but can be changed at run time, slave */
 };
 

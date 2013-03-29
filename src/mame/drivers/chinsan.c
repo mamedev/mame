@@ -535,7 +535,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static void chin_adpcm_int( device_t *device )
+static void chin_adpcm_int( device_t *device, int st )
 {
 	chinsan_state *state = device->machine().driver_data<chinsan_state>();
 
@@ -563,7 +563,7 @@ static void chin_adpcm_int( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	chin_adpcm_int, /* interrupt function */
+	DEVCB_LINE(chin_adpcm_int), /* interrupt function */
 	MSM5205_S64_4B  /* 8kHz */
 };
 

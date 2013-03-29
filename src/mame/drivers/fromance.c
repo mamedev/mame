@@ -137,7 +137,7 @@ WRITE8_MEMBER(fromance_state::fromance_adpcm_w)
 }
 
 
-static void fromance_adpcm_int( device_t *device )
+static void fromance_adpcm_int( device_t *device, int st )
 {
 	fromance_state *state = device->machine().driver_data<fromance_state>();
 
@@ -937,7 +937,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	fromance_adpcm_int, /* IRQ handler */
+	DEVCB_LINE(fromance_adpcm_int), /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz */
 };
 

@@ -2815,7 +2815,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_portb_w)
 	}
 }
 
-void nimbus_msm5205_vck(device_t *device)
+void nimbus_msm5205_vck(device_t *device, int st)
 {
 	rmnimbus_state *state = device->machine().driver_data<rmnimbus_state>();
 	if(state->m_iou_reg092 & MSM5205_INT_ENABLE)

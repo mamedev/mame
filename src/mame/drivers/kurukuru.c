@@ -283,7 +283,7 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 }
 
 
-static void kurukuru_msm5205_vck(device_t *device)
+static void kurukuru_msm5205_vck(device_t *device,int st)
 {
 	kurukuru_state *state = device->machine().driver_data<kurukuru_state>();
 	state->update_sound_irq(state->m_sound_irq_cause | 2);
@@ -548,7 +548,7 @@ static const ay8910_interface ym2149_intf =
 
 static const msm5205_interface msm5205_config =
 {
-	kurukuru_msm5205_vck,
+	DEVCB_LINE(kurukuru_msm5205_vck),
 	MSM5205_S48_4B      /* changed on the fly */
 };
 

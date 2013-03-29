@@ -557,7 +557,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 	}
 }
 
-static void adpcm_int( device_t *device )
+static void adpcm_int( device_t *device, int st )
 {
 	dacholer_state *state = device->machine().driver_data<dacholer_state>();
 	if (state->m_snd_interrupt_enable == 1 || (state->m_snd_interrupt_enable == 0 && state->m_msm_toggle == 1))
@@ -574,7 +574,7 @@ static void adpcm_int( device_t *device )
 
 static const msm5205_interface msm_interface =
 {
-	adpcm_int,          /* interrupt function */
+	DEVCB_LINE(adpcm_int),          /* interrupt function */
 	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
 };
 

@@ -100,9 +100,9 @@ enum {
 /* CD Unit RAM */
 
 /* MSM5205 ADPCM decoder definition */
-static void pce_cd_msm5205_int(device_t *device);
+static void pce_cd_msm5205_int(device_t *device,int state);
 const msm5205_interface pce_cd_msm5205_interface = {
-	pce_cd_msm5205_int, /* interrupt function */
+	DEVCB_LINE(pce_cd_msm5205_int), /* interrupt function */
 	MSM5205_S48_4B      /* 1/48 prescaler, 4bit data */
 };
 
@@ -424,7 +424,7 @@ static void adpcm_play(running_machine &machine)
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-static void pce_cd_msm5205_int(device_t *device)
+static void pce_cd_msm5205_int(device_t *device, int st)
 {
 	pce_state *state = device->machine().driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;

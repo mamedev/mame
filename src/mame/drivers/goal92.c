@@ -226,7 +226,7 @@ static const ym2203_interface ym2203_config =
 	DEVCB_LINE(irqhandler)
 };
 
-static void goal92_adpcm_int( device_t *device )
+static void goal92_adpcm_int( device_t *device,int st )
 {
 	goal92_state *state = device->machine().driver_data<goal92_state>();
 	msm5205_data_w(device, state->m_msm5205next);
@@ -239,7 +239,7 @@ static void goal92_adpcm_int( device_t *device )
 
 static const msm5205_interface msm5205_config =
 {
-	goal92_adpcm_int,   /* interrupt function */
+	DEVCB_LINE(goal92_adpcm_int),   /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz 4-bit */
 };
 

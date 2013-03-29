@@ -110,7 +110,7 @@ WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
 	m_adpcm_data = data;
 }
 
-static void splash_msm5205_int(device_t *device)
+static void splash_msm5205_int(device_t *device,int st)
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
 
@@ -476,7 +476,7 @@ GFXDECODE_END
 
 static const msm5205_interface splash_msm5205_interface =
 {
-	splash_msm5205_int, /* IRQ handler */
+	DEVCB_LINE(splash_msm5205_int), /* IRQ handler */
 	MSM5205_S48_4B      /* 8KHz */
 };
 
@@ -578,7 +578,7 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static void adpcm_int1( device_t *device )
+static void adpcm_int1( device_t *device,int st)
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
 	if (state->m_snd_interrupt_enable1  || state->m_msm_toggle1 == 1)
@@ -594,7 +594,7 @@ static void adpcm_int1( device_t *device )
 	}
 }
 
-static void adpcm_int2( device_t *device )
+static void adpcm_int2( device_t *device,int st )
 {
 	splash_state *state = device->machine().driver_data<splash_state>();
 	if (state->m_snd_interrupt_enable2 || state->m_msm_toggle2 == 1)
@@ -612,13 +612,13 @@ static void adpcm_int2( device_t *device )
 
 static const msm5205_interface msm_interface1 =
 {
-	adpcm_int1,         /* interrupt function */
+	DEVCB_LINE(adpcm_int1),         /* interrupt function */
 	MSM5205_S64_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
 };
 
 static const msm5205_interface msm_interface2 =
 {
-	adpcm_int2,         /* interrupt function */
+	DEVCB_LINE(adpcm_int2),         /* interrupt function */
 	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
 };
 

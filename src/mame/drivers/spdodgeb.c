@@ -62,7 +62,7 @@ WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 	}
 }
 
-static void spd_adpcm_int(device_t *device)
+static void spd_adpcm_int(device_t *device,int st)
 {
 	spdodgeb_state *state = device->machine().driver_data<spdodgeb_state>();
 	int chip = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
@@ -387,7 +387,7 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	spd_adpcm_int,  /* interrupt function */
+	DEVCB_LINE(spd_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B  /* 8kHz? */
 };
 

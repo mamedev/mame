@@ -169,7 +169,7 @@ Language
 #include "sound/sn76496.h"
 
 
-static void appoooh_adpcm_int(device_t *device)
+static void appoooh_adpcm_int(device_t *device, int st)
 {
 	appoooh_state *state = device->machine().driver_data<appoooh_state>();
 
@@ -387,7 +387,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	appoooh_adpcm_int,/* interrupt function */
+	DEVCB_LINE(appoooh_adpcm_int),/* interrupt function */
 	MSM5205_S64_4B  /* 6KHz               */
 };
 

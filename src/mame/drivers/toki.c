@@ -56,7 +56,7 @@ READ16_MEMBER(toki_state::pip16_r)
 
 
 
-static void toki_adpcm_int (device_t *device)
+static void toki_adpcm_int (device_t *device,int st)
 {
 	toki_state *state = device->machine().driver_data<toki_state>();
 
@@ -408,7 +408,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	toki_adpcm_int, /* interrupt function */
+	DEVCB_LINE(toki_adpcm_int), /* interrupt function */
 	MSM5205_S96_4B  /* 4KHz               */
 };
 

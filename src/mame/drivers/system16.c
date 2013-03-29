@@ -357,7 +357,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
 	m_sample_buffer = data;
 }
 
-static void tturfbl_msm5205_callback( device_t *device )
+static void tturfbl_msm5205_callback( device_t *device,int st )
 {
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, (state->m_sample_buffer >> 4) & 0x0f);
@@ -370,7 +370,7 @@ static void tturfbl_msm5205_callback( device_t *device )
 
 static const msm5205_interface tturfbl_msm5205_interface  =
 {
-	tturfbl_msm5205_callback,
+	DEVCB_LINE(tturfbl_msm5205_callback),
 	MSM5205_S48_4B
 };
 
@@ -1158,7 +1158,7 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
 	m_sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(device_t *device)
+static void shdancbl_msm5205_callback(device_t *device, int st)
 {
 	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
 	msm5205_data_w(device, state->m_sample_buffer & 0x0f);
@@ -1171,7 +1171,7 @@ static void shdancbl_msm5205_callback(device_t *device)
 
 static const msm5205_interface shdancbl_msm5205_interface  =
 {
-	shdancbl_msm5205_callback,
+	DEVCB_LINE(shdancbl_msm5205_callback),
 	MSM5205_S48_4B
 };
 

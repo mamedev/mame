@@ -206,7 +206,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
 }
 
 
-static void srmp2_adpcm_int(device_t *device)
+static void srmp2_adpcm_int(device_t *device,int st)
 {
 	srmp2_state *state = device->machine().driver_data<srmp2_state>();
 	UINT8 *ROM = state->memregion("adpcm")->base();
@@ -1129,7 +1129,7 @@ static const ay8910_interface srmp2_ay8910_interface =
 
 static const msm5205_interface msm5205_config =
 {
-	srmp2_adpcm_int,            /* IRQ handler */
+	DEVCB_LINE(srmp2_adpcm_int),            /* IRQ handler */
 	MSM5205_S48_4B              /* 8 KHz, 4 Bits  */
 };
 

@@ -267,7 +267,7 @@ static const sn76496_config psg_intf =
 #if USE_MSM
 
 
-static void pf_adpcm_int(device_t *device)
+static void pf_adpcm_int(device_t *device,int state)
 {
 	pachifev_state *state = device->machine().driver_data<pachifev_state>();
 
@@ -295,7 +295,7 @@ static void pf_adpcm_int(device_t *device)
 
 static const msm5205_interface msm5205_config =
 {
-	pf_adpcm_int,    /* interrupt function */
+	DEVCB_LINE(pf_adpcm_int),    /* interrupt function */
 	MSM5205_S48_4B    /* 8kHz */
 };
 

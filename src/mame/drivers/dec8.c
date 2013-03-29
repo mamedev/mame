@@ -478,7 +478,7 @@ WRITE8_MEMBER(dec8_state::dec8_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void csilver_adpcm_int( device_t *device )
+static void csilver_adpcm_int( device_t *device ,int st)
 {
 	dec8_state *state = device->machine().driver_data<dec8_state>();
 	state->m_toggle ^= 1;
@@ -1923,7 +1923,7 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	csilver_adpcm_int,  /* interrupt function */
+	DEVCB_LINE(csilver_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz            */
 };
 

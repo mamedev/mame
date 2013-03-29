@@ -258,7 +258,7 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 
 
 
-static void asuka_msm5205_vck( device_t *device )
+static void asuka_msm5205_vck( device_t *device, int st )
 {
 	asuka_state *state = device->machine().driver_data<asuka_state>();
 
@@ -779,7 +779,7 @@ static const ym2610_interface ym2610_config =
 
 static const msm5205_interface msm5205_config =
 {
-	asuka_msm5205_vck,  /* VCK function */
+	DEVCB_LINE(asuka_msm5205_vck),  /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

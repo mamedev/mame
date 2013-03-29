@@ -323,7 +323,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
 	m_v9938->interrupt();
 }
 
-static void adpcm_int(device_t *device)
+static void adpcm_int(device_t *device,int st)
 {
 	sothello_state *state = device->machine().driver_data<sothello_state>();
 	/* only 4 bits are used */
@@ -334,7 +334,7 @@ static void adpcm_int(device_t *device)
 
 static const msm5205_interface msm_interface =
 {
-	adpcm_int,      /* interrupt function */
+	DEVCB_LINE(adpcm_int),      /* interrupt function */
 	MSM5205_S48_4B  /* changed on the fly */
 };
 

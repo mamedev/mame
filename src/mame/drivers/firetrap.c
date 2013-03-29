@@ -318,7 +318,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
 	membank("bank2")->set_entry(data & 0x01);
 }
 
-static void firetrap_adpcm_int( device_t *device )
+static void firetrap_adpcm_int( device_t *device,int st )
 {
 	firetrap_state *state = device->machine().driver_data<firetrap_state>();
 
@@ -576,7 +576,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	firetrap_adpcm_int, /* interrupt function */
+	DEVCB_LINE(firetrap_adpcm_int), /* interrupt function */
 	MSM5205_S48_4B      /* 7.8125kHz          */
 };
 
