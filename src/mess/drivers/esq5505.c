@@ -337,7 +337,7 @@ static void esq5505_otis_irq(device_t *device, int state)
 	esq5505->update_irq_to_maincpu();
 }
 
-static UINT16 esq5505_read_adc(device_t *device)
+static READ16_DEVICE_HANDLER(esq5505_read_adc)
 {
 	esq5505_state *state = device->machine().driver_data<esq5505_state>();
 
@@ -611,8 +611,8 @@ static const es5505_interface es5505_config =
 {
 	"waverom",  /* Bank 0 */
 	"waverom2", /* Bank 1 */
-	esq5505_otis_irq, /* irq */
-		esq5505_read_adc
+	DEVCB_LINE(esq5505_otis_irq), /* irq */
+	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5505_read_adc)
 };
 
 static const esqpanel_interface esqpanel_config =

@@ -790,7 +790,7 @@ static void irqhandler(device_t *device, int linestate)
 
 static const ymf278b_interface ymf278b_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

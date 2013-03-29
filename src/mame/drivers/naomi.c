@@ -1833,7 +1833,7 @@ static const aica_interface aica_config =
 {
 	TRUE,
 	0,
-	aica_irq
+	DEVCB_LINE(aica_irq)
 };
 
 

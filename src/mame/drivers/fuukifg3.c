@@ -577,7 +577,7 @@ static void irqhandler( device_t *device, int irq )
 
 static const ymf278b_interface fuuki32_ymf278b_interface =
 {
-	irqhandler      /* irq */
+	DEVCB_LINE(irqhandler)      /* irq */
 };
 
 static const ymf262_interface fuuki32_ymf262_interface =

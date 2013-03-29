@@ -12,7 +12,7 @@
 struct scsp_interface
 {
 	int roffset;                /* offset in the region */
-	void (*irq_callback)(device_t *device, int state);  /* irq callback */
+	devcb_write_line   irq_callback;  /* irq callback */
 	devcb_write_line   main_irq;
 };
 

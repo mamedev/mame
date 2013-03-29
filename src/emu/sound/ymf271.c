@@ -107,7 +107,7 @@ struct YMF271Chip
 	const UINT8 *rom;
 	devcb_resolved_read8 ext_mem_read;
 	devcb_resolved_write8 ext_mem_write;
-	void (*irq_callback)(device_t *, int);
+	devcb_resolved_write_line irq_callback;
 
 	UINT32 clock;
 	sound_stream * stream;
@@ -1385,7 +1385,7 @@ static TIMER_CALLBACK( ymf271_timer_a_tick )
 	if (chip->enable & 4)
 	{
 		chip->irqstate |= 1;
-		if (chip->irq_callback) chip->irq_callback(chip->device, 1);
+		if (!chip->irq_callback.isnull()) chip->irq_callback(1);
 	}
 }
 
@@ -1398,7 +1398,7 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 	if (chip->enable & 8)
 	{
 		chip->irqstate |= 2;
-		if (chip->irq_callback) chip->irq_callback(chip->device, 1);
+		if (!chip->irq_callback.isnull()) chip->irq_callback(1);
 	}
 }
 
@@ -1484,7 +1484,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->status &= ~1;
 					chip->timerAVal |= 0x300;
 
-					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
+					if (!chip->irq_callback.isnull()) chip->irq_callback(0);
 
 					period = attotime::from_hz(chip->clock) * (384 * 4 * (1024 - chip->timerAVal));
 
@@ -1495,7 +1495,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->irqstate &= ~2;
 					chip->status &= ~2;
 
-					if (chip->irq_callback) chip->irq_callback(chip->device, 0);
+					if (!chip->irq_callback.isnull()) chip->irq_callback(0);
 
 					period = attotime::from_hz(chip->clock) * (384 * 16 * (256 - chip->timerBVal));
 
@@ -1752,13 +1752,13 @@ static void init_state(YMF271Chip *chip, device_t *device)
 	device->save_item(NAME(chip->ext_read));
 }
 
-static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(device_t *,int), const devcb_read8 *ext_read, const devcb_write8 *ext_write)
+static void ymf271_init(device_t *device, YMF271Chip *chip, UINT8 *rom, const devcb_write_line *cb, const devcb_read8 *ext_read, const devcb_write8 *ext_write)
 {
 	chip->timA = device->machine().scheduler().timer_alloc(FUNC(ymf271_timer_a_tick), chip);
 	chip->timB = device->machine().scheduler().timer_alloc(FUNC(ymf271_timer_b_tick), chip);
 
 	chip->rom = rom;
-	chip->irq_callback = cb;
+	chip->irq_callback.resolve(*cb, *device);
 
 	chip->ext_mem_read.resolve(*ext_read, *device);
 	chip->ext_mem_write.resolve(*ext_write, *device);
@@ -1779,7 +1779,7 @@ static DEVICE_START( ymf271 )
 
 	intf = (device->static_config() != NULL) ? (const ymf271_interface *)device->static_config() : &defintrf;
 
-	ymf271_init(device, chip, *device->region(), intf->irq_callback, &intf->ext_read, &intf->ext_write);
+	ymf271_init(device, chip, *device->region(), &intf->irq_callback, &intf->ext_read, &intf->ext_write);
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)

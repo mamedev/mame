@@ -627,7 +627,7 @@ static void bfm_sc4_irqhandler(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_config =
 {
-	bfm_sc4_irqhandler
+	DEVCB_LINE(bfm_sc4_irqhandler)
 };
 
 

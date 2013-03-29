@@ -255,10 +255,10 @@ INPUT_PORTS_END
 
 
 
-static void volume_callback0( device_t *device, int v )
+static WRITE8_DEVICE_HANDLER(volume_callback0)
 {
-	k007232_set_volume(device, 0, (v & 0x0f) * 0x11, 0);
-	k007232_set_volume(device, 1, 0, (v >> 4) * 0x11);
+	k007232_set_volume(device, 0, (data & 0x0f) * 0x11, 0);
+	k007232_set_volume(device, 1, 0, (data >> 4) * 0x11);
 }
 
 WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
@@ -267,19 +267,19 @@ WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 	k007232_set_volume(device, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static void volume_callback1( device_t *device, int v )
+static WRITE8_DEVICE_HANDLER(volume_callback1)
 {
-	k007232_set_volume(device, 0, (v & 0x0f) * 0x11/2, (v >> 4) * 0x11/2);
+	k007232_set_volume(device, 0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =
 {
-	volume_callback0
+	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback0)
 };
 
 static const k007232_interface k007232_interface_2 =
 {
-	volume_callback1
+	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback1)
 };
 
 static const k051960_interface chqflag_k051960_intf =

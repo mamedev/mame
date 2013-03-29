@@ -5301,14 +5301,15 @@ static void scsp_irq(device_t *device, int irq)
 static const scsp_interface scsp_config =
 {
 	0,
-	scsp_irq,
+	DEVCB_LINE(scsp_irq),
 	DEVCB_NULL
 };
 
 static const scsp_interface scsp2_interface =
 {
 	0,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* IRQs */

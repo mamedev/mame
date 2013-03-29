@@ -2995,7 +2995,7 @@ static void bbakraid_irqhandler(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_config =
 {
-	bbakraid_irqhandler
+	DEVCB_LINE(bbakraid_irqhandler)
 };
 
 

@@ -10,7 +10,7 @@
 
 struct ymf278b_interface
 {
-	void (*irq_callback)(device_t *device, int state);  /* irq callback */
+	devcb_write_line irq_callback;  /* irq callback */
 };
 
 DECLARE_READ8_DEVICE_HANDLER( ymf278b_r );

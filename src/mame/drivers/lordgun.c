@@ -712,7 +712,7 @@ MACHINE_CONFIG_END
 
 static const ymf278b_interface ymf278b_config =
 {
-	soundirq
+	DEVCB_LINE(soundirq)
 };
 
 static MACHINE_CONFIG_START( aliencha, lordgun_state )

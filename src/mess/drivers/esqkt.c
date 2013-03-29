@@ -249,7 +249,7 @@ static void esq5506_otto_irq(device_t *device, int state)
 	#endif
 }
 
-static UINT16 esq5506_read_adc(device_t *device)
+static READ16_DEVICE_HANDLER(esq5506_read_adc)
 {
 	esqkt_state *state = device->machine().driver_data<esqkt_state>();
 
@@ -410,8 +410,8 @@ static const es5506_interface es5506_config =
 	"waverom2", /* Bank 1 */
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
-	esq5506_otto_irq, /* irq */
-	esq5506_read_adc
+	DEVCB_LINE(esq5506_otto_irq), /* irq */
+	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
 };
 
 static const es5506_interface es5506_2_config =
@@ -420,8 +420,8 @@ static const es5506_interface es5506_2_config =
 	"waverom2", /* Bank 1 */
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static const esqpanel_interface esqpanel_config =

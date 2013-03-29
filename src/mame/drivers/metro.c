@@ -440,7 +440,7 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 static const ymf278b_interface ymf278b_config =
 {
-	ymf278b_interrupt
+	DEVCB_LINE(ymf278b_interrupt)
 };
 
 

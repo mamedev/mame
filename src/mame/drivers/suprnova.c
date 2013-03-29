@@ -743,7 +743,7 @@ GFXDECODE_END
 
 static const ymz280b_interface ymz280b_intf =
 {
-	0   // irq ?
+	DEVCB_NULL   // irq ?
 };
 
 

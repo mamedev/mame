@@ -48,6 +48,7 @@ struct KDAC_A_PCM
 	sound_stream *  stream;
 	const k007232_interface *intf;
 	UINT32          fncode[0x200];
+	devcb_resolved_write8 portwritehandler;
 };
 
 
@@ -300,7 +301,7 @@ static STREAM_UPDATE( KDAC_A_update )
 /************************************************/
 static DEVICE_START( k007232 )
 {
-	static const k007232_interface defintrf = { 0 };
+	static const k007232_interface defintrf = { DEVCB_NULL };
 	int i;
 	KDAC_A_PCM *info = get_safe_token(device);
 
@@ -314,6 +315,8 @@ static DEVICE_START( k007232 )
 
 	info->clock = device->clock();
 
+	info->portwritehandler.resolve(info->intf->portwritehandler,*device);
+	
 	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
 	{
 		info->start[i] = 0;
@@ -348,7 +351,7 @@ WRITE8_DEVICE_HANDLER( k007232_w )
 
 	if (r == 0x0c){
 	/* external port, usually volume control */
-	if (info->intf->portwritehandler) (*info->intf->portwritehandler)(device,v);
+	if (!info->portwritehandler.isnull()) info->portwritehandler(0,v);
 	return;
 	}
 	else if( r == 0x0d ){

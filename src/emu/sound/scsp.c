@@ -192,7 +192,7 @@ struct scsp_state
 	unsigned char *SCSPRAM;
 	UINT32 SCSPRAM_LENGTH;
 	char Master;
-	void (*Int68kCB)(device_t *device, int irq);
+	devcb_resolved_write_line Int68kCB;
 	sound_stream * stream;
 
 	INT32 *buffertmpl,*buffertmpr;
@@ -286,30 +286,30 @@ static void CheckPendingIRQ(scsp_state *scsp)
 	if(pend&0x40)
 		if(en&0x40)
 		{
-			scsp->Int68kCB(scsp->device, scsp->IrqTimA);
+			scsp->Int68kCB(scsp->IrqTimA);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
-			scsp->Int68kCB(scsp->device, scsp->IrqTimBC);
+			scsp->Int68kCB(scsp->IrqTimBC);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
-			scsp->Int68kCB(scsp->device, scsp->IrqTimBC);
+			scsp->Int68kCB(scsp->IrqTimBC);
 			return;
 		}
 	if(pend&8)
 		if (en&8)
 		{
-			scsp->Int68kCB(scsp->device, scsp->IrqMidi);
+			scsp->Int68kCB(scsp->IrqMidi);
 			scsp->udata.data[0x20/2] &= ~8;
 			return;
 		}
 
-	scsp->Int68kCB(scsp->device, 0);
+	scsp->Int68kCB(0);
 }
 
 static void MainCheckPendingIRQ(scsp_state *scsp, UINT16 irq_type)
@@ -328,15 +328,15 @@ static void ResetInterrupts(scsp_state *scsp)
 
 	if (reset & 0x40)
 	{
-		scsp->Int68kCB(scsp->device, -scsp->IrqTimA);
+		scsp->Int68kCB(-scsp->IrqTimA);
 	}
 	if (reset & 0x180)
 	{
-		scsp->Int68kCB(scsp->device, -scsp->IrqTimBC);
+		scsp->Int68kCB(-scsp->IrqTimBC);
 	}
 	if (reset & 0x8)
 	{
-		scsp->Int68kCB(scsp->device, -scsp->IrqMidi);
+		scsp->Int68kCB(-scsp->IrqMidi);
 	}
 
 	CheckPendingIRQ(scsp);
@@ -899,7 +899,7 @@ static void SCSP_UpdateRegR(scsp_state *scsp, address_space &space, int reg)
 				unsigned short v=scsp->udata.data[0x5/2];
 				v&=0xff00;
 				v|=scsp->MidiStack[scsp->MidiR];
-				scsp->Int68kCB(scsp->device, -scsp->IrqMidi);   // cancel the IRQ
+				scsp->Int68kCB(-scsp->IrqMidi);   // cancel the IRQ
 				logerror("Read %x from SCSP MIDI\n", v);
 				if(scsp->MidiR!=scsp->MidiW)
 				{
@@ -1412,7 +1412,7 @@ static DEVICE_START( scsp )
 
 	// set up the IRQ callbacks
 	{
-		scsp->Int68kCB = intf->irq_callback;
+		scsp->Int68kCB.resolve(intf->irq_callback,*device);
 
 		scsp->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, scsp, SCSP_Update);
 	}

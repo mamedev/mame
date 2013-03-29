@@ -138,7 +138,7 @@ struct YMF278BChip
 	int irq_line;
 
 	UINT8 port_C, port_AB, lastport;
-	void (*irq_callback)(device_t *, int);
+	devcb_resolved_write_line irq_callback;
 	device_t *device;
 
 	const UINT8 *rom;
@@ -422,8 +422,8 @@ static void ymf278b_irq_check(running_machine &machine, YMF278BChip *chip)
 {
 	int prev_line = chip->irq_line;
 	chip->irq_line = chip->current_irq ? ASSERT_LINE : CLEAR_LINE;
-	if(chip->irq_line != prev_line && chip->irq_callback)
-		chip->irq_callback(chip->device, chip->irq_line);
+	if(chip->irq_line != prev_line && !chip->irq_callback.isnull())
+		chip->irq_callback(chip->irq_line);
 }
 
 static TIMER_CALLBACK( ymf278b_timer_a_tick )
@@ -935,14 +935,14 @@ static DEVICE_RESET( ymf278b )
 	chip->irq_line = CLEAR_LINE;
 }
 
-static void ymf278b_init(device_t *device, YMF278BChip *chip, void (*cb)(device_t *, int))
+static void ymf278b_init(device_t *device, YMF278BChip *chip, const devcb_write_line *cb)
 {
 	int i;
 
 	chip->rom = *device->region();
 	chip->romsize = device->region()->bytes();
 	chip->clock = device->clock();
-	chip->irq_callback = cb;
+	chip->irq_callback.resolve(*cb, *device);
 
 	chip->timer_base = attotime::from_hz(chip->clock) * (19*36);
 	chip->timer_a = device->machine().scheduler().timer_alloc(FUNC(ymf278b_timer_a_tick), chip);
@@ -1050,7 +1050,7 @@ static void ymf278b_register_save_state(device_t *device, YMF278BChip *chip)
 
 static DEVICE_START( ymf278b )
 {
-	static const ymf278b_interface defintrf = { 0 };
+	static const ymf278b_interface defintrf = { DEVCB_NULL };
 	const ymf278b_interface *intf;
 	int i;
 	YMF278BChip *chip = get_safe_token(device);
@@ -1058,7 +1058,7 @@ static DEVICE_START( ymf278b )
 	chip->device = device;
 	intf = (device->static_config() != NULL) ? (const ymf278b_interface *)device->static_config() : &defintrf;
 
-	ymf278b_init(device, chip, intf->irq_callback);
+	ymf278b_init(device, chip, &intf->irq_callback);
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
 
 	// rate tables

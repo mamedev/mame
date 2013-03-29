@@ -1817,7 +1817,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 
 static const ymz280b_interface ymz280b_intf =
 {
-	sound_irq_gen
+	DEVCB_LINE(sound_irq_gen)
 };
 
 static void irqhandler(device_t *device, int irq)

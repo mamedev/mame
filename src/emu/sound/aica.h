@@ -12,7 +12,7 @@ struct aica_interface
 {
 	int master;
 	int roffset;                /* offset in the region */
-	void (*irq_callback)(device_t *device, int state);  /* irq callback */
+	devcb_write_line irq_callback; /* irq callback */
 };
 
 void aica_set_ram_base(device_t *device, void *base, int size);

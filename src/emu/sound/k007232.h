@@ -11,7 +11,7 @@
 
 struct k007232_interface
 {
-	void (*portwritehandler)(device_t *, int);
+	devcb_write8 portwritehandler;
 };
 
 DECLARE_WRITE8_DEVICE_HANDLER( k007232_w );

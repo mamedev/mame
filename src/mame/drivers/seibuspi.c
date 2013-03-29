@@ -1112,7 +1112,7 @@ static const ymf271_interface ymf271_config =
 {
 	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_read),
 	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_write),
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /********************************************************************/

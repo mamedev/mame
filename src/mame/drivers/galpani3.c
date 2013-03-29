@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 
 static const ymz280b_interface ymz280b_intf =
 {
-	0   // irq ?
+	DEVCB_NULL   // irq ?
 };
 
 static MACHINE_CONFIG_START( galpani3, galpani3_state )

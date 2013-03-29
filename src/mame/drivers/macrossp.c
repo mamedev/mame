@@ -588,7 +588,7 @@ static const es5506_interface es5506_config =
 	"ensoniq.1",
 	"ensoniq.2",
 	"ensoniq.3",
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

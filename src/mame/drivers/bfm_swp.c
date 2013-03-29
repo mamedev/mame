@@ -109,7 +109,7 @@ static void irqhandler(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 

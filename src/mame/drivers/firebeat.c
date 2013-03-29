@@ -1896,7 +1896,7 @@ static void sound_irq_callback(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_intf =
 {
-	sound_irq_callback,         // irq
+	DEVCB_LINE(sound_irq_callback),         // irq
 	DEVCB_DRIVER_MEMBER(firebeat_state,soundram_r)
 };
 

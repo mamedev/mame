@@ -214,7 +214,7 @@ static const aica_interface dc_aica_interface =
 {
 	0,
 	0,
-	aica_irq
+	DEVCB_LINE(aica_irq)
 };
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };

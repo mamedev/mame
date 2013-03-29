@@ -170,7 +170,7 @@ struct aica_state
 	unsigned char *AICARAM;
 	UINT32 AICARAM_LENGTH, RAM_MASK, RAM_MASK16;
 	char Master;
-	void (*IntARMCB)(device_t *device, int irq);
+	devcb_resolved_write_line IntARMCB;
 	sound_stream * stream;
 
 	INT32 *buffertmpl, *buffertmpr;
@@ -252,7 +252,7 @@ static void CheckPendingIRQ(aica_state *AICA)
 	if(AICA->MidiW!=AICA->MidiR)
 	{
 		AICA->IRQL = AICA->IrqMidi;
-		AICA->IntARMCB(AICA->device, 1);
+		AICA->IntARMCB(1);
 		return;
 	}
 	if(!pend)
@@ -261,21 +261,21 @@ static void CheckPendingIRQ(aica_state *AICA)
 		if(en&0x40)
 		{
 			AICA->IRQL = AICA->IrqTimA;
-			AICA->IntARMCB(AICA->device, 1);
+			AICA->IntARMCB(1);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
 			AICA->IRQL = AICA->IrqTimBC;
-			AICA->IntARMCB(AICA->device, 1);
+			AICA->IntARMCB(1);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
 			AICA->IRQL = AICA->IrqTimBC;
-			AICA->IntARMCB(AICA->device, 1);
+			AICA->IntARMCB(1);
 			return;
 		}
 }
@@ -832,7 +832,7 @@ static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)
 				unsigned short v=AICA->udata.data[0x8/2];
 				v&=0xff00;
 				v|=AICA->MidiStack[AICA->MidiR];
-				AICA->IntARMCB(AICA->device, 0);    // cancel the IRQ
+				AICA->IntARMCB(0);    // cancel the IRQ
 				if(AICA->MidiR!=AICA->MidiW)
 				{
 					++AICA->MidiR;
@@ -930,7 +930,7 @@ static void AICA_w16(aica_state *AICA,address_space &space,unsigned int addr,uns
 
 			if (val)
 			{
-				AICA->IntARMCB(AICA->device, 0);
+				AICA->IntARMCB(0);
 			}
 		}
 	}
@@ -1279,7 +1279,7 @@ static DEVICE_START( aica )
 
 	// set up the IRQ callbacks
 	{
-		AICA->IntARMCB = intf->irq_callback;
+		AICA->IntARMCB.resolve(intf->irq_callback,*device);
 
 		AICA->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, AICA, AICA_Update);
 	}

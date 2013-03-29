@@ -3569,14 +3569,14 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 static const scsp_interface scsp_config =
 {
 	0,
-	scsp_irq,
+	DEVCB_LINE(scsp_irq),
 	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp1_to_sh1_irq)
 };
 
 static const scsp_interface scsp2_interface =
 {
 	0,
-	NULL,
+	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp2_to_sh1_irq)
 };
 

@@ -87,7 +87,7 @@ struct ymz280b_state
 	UINT8 keyon_enable;             /* key on enable */
 	UINT8 ext_mem_enable;           /* external memory enable */
 	double master_clock;            /* master clock frequency */
-	void (*irq_callback)(device_t *, int);  /* IRQ callback */
+	devcb_resolved_write_line irq_callback;  /* IRQ callback */
 	struct YMZ280BVoice voice[8];   /* the 8 voices */
 	UINT32 rom_addr_hi;
 	UINT32 rom_addr_mid;
@@ -174,15 +174,15 @@ INLINE void update_irq_state(ymz280b_state *chip)
 	if (irq_bits && !chip->irq_state)
 	{
 		chip->irq_state = 1;
-		if (chip->irq_callback)
-			(*chip->irq_callback)(chip->device, 1);
+		if (!chip->irq_callback.isnull())
+			chip->irq_callback(1);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 	else if (!irq_bits && chip->irq_state)
 	{
 		chip->irq_state = 0;
-		if (chip->irq_callback)
-			(*chip->irq_callback)(chip->device, 0);
+		if (!chip->irq_callback.isnull())
+			chip->irq_callback(0);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 }
@@ -686,7 +686,7 @@ static STREAM_UPDATE( ymz280b_update )
 
 static DEVICE_START( ymz280b )
 {
-	static const ymz280b_interface defintrf = { 0 };
+	static const ymz280b_interface defintrf = { DEVCB_NULL };
 	const ymz280b_interface *intf = (device->static_config() != NULL) ? (const ymz280b_interface *)device->static_config() : &defintrf;
 	ymz280b_state *chip = get_safe_token(device);
 
@@ -701,7 +701,7 @@ static DEVICE_START( ymz280b )
 	chip->master_clock = (double)device->clock() / 384.0;
 	chip->region_base = *device->region();
 	chip->region_size = device->region()->bytes();
-	chip->irq_callback = intf->irq_callback;
+	chip->irq_callback.resolve(intf->irq_callback, *device);
 
 	/* create the stream */
 	chip->stream = device->machine().sound().stream_alloc(*device, 0, 2, INTERNAL_SAMPLE_RATE, chip, ymz280b_update);
