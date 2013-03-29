@@ -436,6 +436,8 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 /*          DEBUGGER_BREAK; */
 
 			address = cpu->state_int( PSXCPU_PC );
+			cpu->set_state_int( PSXCPU_DELAYR, PSXCPU_DELAYR_PC );
+			cpu->set_state_int( PSXCPU_DELAYV, address );
 		}
 		else
 		{
