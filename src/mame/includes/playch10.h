@@ -123,6 +123,7 @@ public:
 	void set_videoram_bank( int first, int count, int bank, int size );
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
 	void ppu_irq(int *ppu_regs);
+	void mapper9_latch(offs_t offset);
 };
 
 /*----------- defined in video/playch10.c -----------*/

@@ -115,7 +115,7 @@ void ppu2c0x_device::device_config_complete()
 	assert(config);
 
 	/* reset the callbacks */
-	m_latch = NULL;
+	m_latch = ppu2c0x_latch_delegate();
 	m_scanline_callback_proc = ppu2c0x_scanline_delegate();
 	m_hblank_callback_proc = ppu2c0x_hblank_delegate();
 	m_vidaccess_callback_proc = ppu2c0x_vidaccess_delegate();
@@ -455,12 +455,6 @@ static const gfx_layout ppu_charlayout =
  *
  *************************************/
 
-void ppu2c0x_device::set_latch( void (*latch)(device_t *device, offs_t offset) )
-{
-	if (latch)
-		m_latch = latch;
-}
-
 //-------------------------------------------------
 //  device_timer - handle timer events
 //-------------------------------------------------
@@ -630,8 +624,8 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 		page2 = readbyte(index1);
 
 		// 27/12/2002
-		if (m_latch)
-			(*m_latch)(this, (m_tile_page << 10) | (page2 << 4));
+		if (!m_latch.isnull())
+			m_latch((m_tile_page << 10) | (page2 << 4));
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
 		{
@@ -760,8 +754,8 @@ void ppu2c0x_device::draw_sprites( UINT8 *line_priority )
 			}
 		}
 
-		if (m_latch)
-			(*m_latch)(this, (m_sprite_page << 10) | ((tile & 0xff) << 4));
+		if (!m_latch.isnull())
+			m_latch((m_sprite_page << 10) | ((tile & 0xff) << 4));
 
 		/* compute the character's line to draw */
 		sprite_line = m_scanline - sprite_ypos;
@@ -1092,8 +1086,8 @@ READ8_MEMBER( ppu2c0x_device::read )
 			break;
 
 		case PPU_DATA: /* 7 */
-			if (m_latch)
-				(*m_latch)(this, m_videomem_addr & 0x3fff);
+			if (!m_latch.isnull())
+				m_latch( m_videomem_addr & 0x3fff);
 
 			if (m_videomem_addr >= 0x3f00)
 			{
@@ -1241,8 +1235,8 @@ WRITE8_MEMBER( ppu2c0x_device::write )
 			{
 				int tempAddr = m_videomem_addr & 0x3fff;
 
-				if (m_latch)
-					(*m_latch)(this, tempAddr);
+				if (!m_latch.isnull())
+					m_latch(tempAddr);
 
 				/* if there's a callback, call it now */
 				if (!m_vidaccess_callback_proc.isnull())

@@ -685,29 +685,27 @@ DRIVER_INIT_MEMBER(playch10_state,pcdboard_2)
 /* E Board games (Mike Tyson's Punchout) - BROKEN - FIX ME */
 
 /* callback for the ppu_latch */
-static void mapper9_latch( device_t *ppu, offs_t offset )
+void playch10_state::mapper9_latch(offs_t offset )
 {
-	playch10_state *state = ppu->machine().driver_data<playch10_state>();
-
-	if((offset & 0x1ff0) == 0x0fd0 && state->m_MMC2_bank_latch[0] != 0xfd)
+	if((offset & 0x1ff0) == 0x0fd0 && m_MMC2_bank_latch[0] != 0xfd)
 	{
-		state->m_MMC2_bank_latch[0] = 0xfd;
-		state->pc10_set_videorom_bank(0, 4, state->m_MMC2_bank[0], 4);
+		m_MMC2_bank_latch[0] = 0xfd;
+		pc10_set_videorom_bank(0, 4, m_MMC2_bank[0], 4);
 	}
-	else if((offset & 0x1ff0) == 0x0fe0 && state->m_MMC2_bank_latch[0] != 0xfe)
+	else if((offset & 0x1ff0) == 0x0fe0 && m_MMC2_bank_latch[0] != 0xfe)
 	{
-		state->m_MMC2_bank_latch[0] = 0xfe;
-		state->pc10_set_videorom_bank(0, 4, state->m_MMC2_bank[1], 4);
+		m_MMC2_bank_latch[0] = 0xfe;
+		pc10_set_videorom_bank(0, 4, m_MMC2_bank[1], 4);
 	}
-	else if((offset & 0x1ff0) == 0x1fd0 && state->m_MMC2_bank_latch[1] != 0xfd)
+	else if((offset & 0x1ff0) == 0x1fd0 && m_MMC2_bank_latch[1] != 0xfd)
 	{
-		state->m_MMC2_bank_latch[1] = 0xfd;
-		state->pc10_set_videorom_bank(4, 4, state->m_MMC2_bank[2], 4);
+		m_MMC2_bank_latch[1] = 0xfd;
+		pc10_set_videorom_bank(4, 4, m_MMC2_bank[2], 4);
 	}
-	else if((offset & 0x1ff0) == 0x1fe0 && state->m_MMC2_bank_latch[1] != 0xfe)
+	else if((offset & 0x1ff0) == 0x1fe0 && m_MMC2_bank_latch[1] != 0xfe)
 	{
-		state->m_MMC2_bank_latch[1] = 0xfe;
-		state->pc10_set_videorom_bank(4, 4, state->m_MMC2_bank[3], 4);
+		m_MMC2_bank_latch[1] = 0xfe;
+		pc10_set_videorom_bank(4, 4, m_MMC2_bank[3], 4);
 	}
 }
 
@@ -771,7 +769,7 @@ DRIVER_INIT_MEMBER(playch10_state,pceboard)
 	machine().device("cart")->memory().space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(playch10_state::eboard_rom_switch_w),this));
 
 	/* ppu_latch callback */
-	ppu->set_latch(mapper9_latch);
+	ppu->set_latch(ppu2c0x_latch_delegate(FUNC(playch10_state::mapper9_latch),this));
 
 	/* nvram at $6000-$6fff */
 	machine().device("cart")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x6fff);

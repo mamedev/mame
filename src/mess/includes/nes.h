@@ -171,6 +171,7 @@ public:
 	int nes_ppu_vidaccess(int address, int data);
 	void fds_irq(int scanline, int vblank, int blanked);
 	void ppu_nmi(int *ppu_regs);
+	void mmc2_latch(offs_t offset);
 private:
 	/* devices */
 //  cpu_device        *m_maincpu;

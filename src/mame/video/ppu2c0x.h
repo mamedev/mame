@@ -113,6 +113,7 @@ typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_sc
 typedef device_delegate<void (int scanline, int vblank, int blanked)> ppu2c0x_hblank_delegate;
 typedef device_delegate<void (int *ppu_regs)> ppu2c0x_nmi_delegate;
 typedef device_delegate<int (int address, int data)> ppu2c0x_vidaccess_delegate;
+typedef device_delegate<void (offs_t offset)> ppu2c0x_latch_delegate;
 
 
 // ======================> ppu2c0x_interface
@@ -174,7 +175,7 @@ public:
 	void set_scanlines_per_frame( int scanlines ) { m_scanlines_per_frame = scanlines; };
 
 	//27/12/2002 (HACK!)
-	void set_latch( void (*ppu_latch_t)( device_t *device, offs_t offset ) );
+	void set_latch( ppu2c0x_latch_delegate cb ) { m_latch = cb; m_latch.bind_relative_to(*owner()); };
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -206,7 +207,7 @@ public:
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
-	void (*m_latch)( device_t *device, offs_t offset );
+	ppu2c0x_latch_delegate      m_latch;
 
 	// timers
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
