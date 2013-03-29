@@ -127,7 +127,6 @@ void psxcd_device::device_start()
 	secsize = 2048;
 	res_queue = NULL;
 	cur_res = NULL;
-	open = false;
 	streaming = false;
 	sechead = 0;
 	sectail = 0;
@@ -159,13 +158,15 @@ void psxcd_device::device_start()
 void psxcd_device::device_reset()
 {
 	stop_read();
-	open=false;
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		m_timers[i]->adjust(attotime::never, 0, attotime::never);
 		m_timerinuse[i] = false;
 	}
+	open = true;
+	if(m_cdrom_handle)
+		add_system_event(event_change_disk, m_sysclock, NULL);
 
 	next_read_event = -1;
 
