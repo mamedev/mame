@@ -1010,23 +1010,23 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 		return;
 
 	for (int i = 0; i < 16; i++)
-		console[i] = ROM8[0x100 + i ^ 1];
+		console[i] = ROM8[0x100 + (i ^ 1)];
 	if (!strncmp("SEGA PICO", console, 9))
 		is_pico = TRUE;
 	for (int i = 0; i < 16; i++)
-		copyright[i] = ROM8[0x110 + i ^ 1];
+		copyright[i] = ROM8[0x110 + (i ^ 1)];
 	for (int i = 0; i < 48; i++)
-		domestic_name[i] = ROM8[0x120 + i ^ 1];
+		domestic_name[i] = ROM8[0x120 + (i ^ 1)];
 	for (int i = 0; i < 48; i++)
-		overseas_name[i] = ROM8[0x150 + i ^ 1];
+		overseas_name[i] = ROM8[0x150 + (i ^ 1)];
 	for (int i = 0; i < 14; i++)
-		serial[i] = ROM8[0x180 + i ^ 1];
+		serial[i] = ROM8[0x180 + (i ^ 1)];
 
 	checksum = ROM8[0x18e] | (ROM8[0x18f] << 8);
 
 	for (int i = 0; i < 16; i++)
 	{
-		io[i] = ROM8[0x190 + i ^ 1];
+		io[i] = ROM8[0x190 + (i ^ 1)];
 		if (io[i] == 'J')
 			ctrl.cat(" - Joypad 3 buttons [J]\n");
 		if (io[i] == '6')
@@ -1045,12 +1045,12 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 	}
 
 	for (int i = 0; i < 12; i++)
-		modem[i] = ROM8[0x1bc + i ^ 1];
+		modem[i] = ROM8[0x1bc + (i ^ 1)];
 	for (int i = 0; i < 40; i++)
-		memo[i] = ROM8[0x1c8 + i ^ 1];
+		memo[i] = ROM8[0x1c8 + (i ^ 1)];
 	for (int i = 0; i < 16; i++)
 	{
-		country[i] = ROM8[0x1f0 + i ^ 1];
+		country[i] = ROM8[0x1f0 + (i ^ 1)];
 		if (country[i] == 'J')
 			reg.cat(" - Japan [J]\n");
 		if (country[i] == 'U')
