@@ -98,7 +98,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 黄金勇者ゴルドラン ひみつ大百科 - Ougon Yuusha Gorudoran Himitsu Daihyakka (Takara - 19950825 - T-103020)
 * 忍者戦隊カクレンジャー - Ninja Sentai Kakuranger (Bandai - ???? - T-133???)
 * クレヨンしんちゃんのオラといっしょにあそぼうよ! - Crayon Shin-chan no Ora to Issho ni Asobou yo! (Bandai - ???? - T-133020)
-* 美少女戦士セーラームーンS - Bishoujo Senshi Sailor Moon S (Bandai - ???? - T-133040)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
 * クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
 * NHKおかあさんといっしょドレミファど～なっつ! あそびいっぱい うたいっぱい! - NHK Okaasan to Issho Doremifa Donuts! Asobi Ippai Utaippai! (Bandai - ???? - T-133090)
@@ -134,7 +133,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 学研ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
-* シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
 * ドラえもん かぞえて･かんたん かず とけい - Doraemon Kazoete-Kanzan Kazu Tokei (Shogakukan - ???? - T-226050)
 * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
@@ -146,11 +144,8 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 右脳開発シリーズ11 平成教育委員会Jr. - Unou Kaihatsu Series 11 Heisei Kyouikuiinkai Jr. (Imagineer - 19960102 - T-150130)
 * 右脳開発シリーズ5 ハローキティのすてきなたからもの - Unou Kaihatsu Series 5 Hello Kitty no Suteki na Takaramono (Imagineer - 19951104 - T-150???)
 * 右脳開発シリーズ10 ノンタンといっしょ わいわいにっぽん - Unou Kaihatsu Series 10 Nontan to Issho Waiwai Nihon (Imagineer - 19960102 - T-150???)
-* 左脳開発シリーズ1 図形認識 - Sanou Kaihatsu Series 1 Zukei Ninshiki (Imagineer - 19950831 - T-150210)
 * 左脳開発シリーズ2 数量・計算 - Sanou Kaihatsu Series 2 Suuryou - Keisan (Imagineer - 19951002 - T-150230)
 * 左脳開発シリーズ5 迷路・記憶 (CD付き) - Sanou Kaihatsu Series 5 Meiro - Kioku (CD Tsuki) (Imagineer - 19951208 - T-150240)
-* 左脳開発シリーズ4 推理・構成 - Sanou Kaihatsu Series 4 Suiri - Kousei (Imagineer - 19951208 - T-150250)
-* 左脳開発シリーズ6 応用問題 - Sanou Kaihatsu Series 6 Ouyoumondai (Imagineer - 19951208 - T-150260)
 * 平成教育委員会Jr. めざせ優等生 - Heisei Kyouikuiinkai Jr. Mezase Yuutousei (Imagineer - 19951201 - T-150270)
 * 左脳開発シリーズ 探索・感性・記憶 - Sanou Kaihatsu Series Tansaku-Kansei-Kioku (Imagineer - Existence unconfirmed!)
 
@@ -2167,6 +2162,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="sailors">
+		<description>Bishoujo Senshi Sailor Moon S (Jpn)</description>
+		<year>199?</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133040"/>
+		<info name="alt_title" value="美少女戦士セーラームーンS"/>
+		<part name="cart" interface="pico_cart">
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-16916-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-16916-h.ic1" size="524288" crc="44502cc9" sha1="2706bd45dafe7470e5504485877d23864caf7277" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sailortp">
 		<description>Bishoujou Senshi Sailor Moon - Sailor Stars Tokimeki Party (Jpn)</description>
 		<year>199?</year>
@@ -2176,6 +2187,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="sailor stars tokimeki party (japan).bin" size="524288" crc="a503503d" sha1="6737ba2590e6dc48b125ff9725a55430465f707c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk1">
+		<description>Sanou Kaihatsu Series 1 Zukei Ninshiki (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150210"/>
+		<info name="release" value="19950831"/>
+		<info name="alt_title" value="左脳開発シリーズ1 図形認識"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18197A-U" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18197a-u.ic1" size="524288" crc="836f6478" sha1="6194c99ac07ac343dc98fee23a8d77aa7049d779" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2192,6 +2219,38 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18304-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18304-t.ic1" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk4">
+		<description>Sanou Kaihatsu Series 4 Suiri - Kousei (Jpn, Rev. A)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150250"/>
+		<info name="release" value="19951208"/>
+		<info name="alt_title" value="左脳開発シリーズ4 推理・構成"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18457A-U" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18457a-u.ic1" size="524288" crc="2a34282a" sha1="aa0b7e4c9dac198214fcc25d3ee185b63bd1813d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanouk6">
+		<description>Sanou Kaihatsu Series 6 Ouyoumondai (Jpn)</description>
+		<year>1995</year>
+		<publisher>Imagineer</publisher>
+		<info name="serial" value="T-150260"/>
+		<info name="release" value="19951208"/>
+		<info name="alt_title" value="左脳開発シリーズ6 応用問題"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18474-MX" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18474-mx.ic1" size="524288" crc="0444049f" sha1="cbfbbc8aea7116e319582ecd340fabae855881d0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2476,6 +2535,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="soreike! anpanman no ohanashi daisuki anpanman (j).bin" size="524288" crc="6ed63704" sha1="b443d6d5ec4109c3239b860eac5ab024ffb68d1e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sylvan">
+		<description>Silvanian Families - Mori no Nakama to Tanoshii Otanjoubikai (Jpn)</description>
+		<year>2001</year>
+		<publisher>Epoch</publisher>
+		<info name="serial" value="T-198010"/>
+		<info name="alt_title" value="シルバニアファミリー もりのなかまとたのしいおたんじょうびかい"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K0-0036-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0036-rv.ic1" size="2097152" crc="badac589" sha1="e253ef8d3695cd62621451a168818f8ebde69873" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
