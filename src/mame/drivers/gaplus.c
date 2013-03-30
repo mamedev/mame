@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Gaplus (c) 1984 Namco
+Galaga 3 / Gaplus (c) 1984 Namco
 
 driver by Manuel Abadia, Ernesto Corvi, Nicola Salmoria
 
@@ -125,16 +125,16 @@ Notes:
   (c) 1984 NAMCO will appear on the screen
 
 - most sets always say "I/O OK", even if the custom I/O checks fail. Only
-  gapluso and gaplusa stop working; these two also don't do the usual
+  gaplus and gaplusd stop working; these two also don't do the usual
   Namco-trademark RAM test on startup, and use the first I/O chip in "coin" mode,
   while the others use it in "switch/lamp" mode.
 
-- gaplusa has the 58XX and 56XX inverted. Why would they do that?
+- gaplusd has the 58XX and 56XX inverted. Why would they do that?
 
 - To use Round Advance: turn the dip switch on before the start of a level. Push
   joystick up to pick a later level, then set the dip switch back to off.
 
-- The only difference between galaga3a and galaga3m is the bonus life settings.
+- The only difference between galaga3b and galaga3m is the bonus life settings.
 
 TODO:
 - The starfield is wrong.
@@ -619,241 +619,287 @@ MACHINE_CONFIG_END
 
 
 
-ROM_START( gaplus )
+ROM_START( gaplus ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "gp3-4c.8d",    0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
-	ROM_LOAD( "gp3-3c.8c",    0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
-	ROM_LOAD( "gp3-2d.8b",    0xe000, 0x2000, CRC(ecc01bdb) SHA1(b176b46bd6f2501d3a74ed11186be8411fd1105b) )
+	ROM_LOAD( "gp2-4.8d",  0xa000, 0x2000, CRC(e525d75d) SHA1(93fcd8b940491abf6344181811d0b35765d7e45c) )
+	ROM_LOAD( "gp2-3b.8c", 0xc000, 0x2000, CRC(d77840a4) SHA1(81402b28a2d5ac2d1301252534afa0cb65d7e162) )
+	ROM_LOAD( "gp2-2b.8b", 0xe000, 0x2000, CRC(b3cb90db) SHA1(025c2f3978772e1ecbbf36842dc7c2203ee91a1f) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gp3-8b.11d",   0xa000, 0x2000, CRC(f5e056d1) SHA1(bbed2056dc28dc2828e29987c16d89fb16e7059e) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gp3-6b.11b",   0xe000, 0x2000, CRC(026491b6) SHA1(a19f2942dafc899d686a42240fc2f7a7a7d3b1f5) )
+	ROM_LOAD( "gp2-8.11d", 0xa000, 0x2000, CRC(42b9fd7c) SHA1(f230eb0ad757f0714c0ac81c812e950778452947) )
+	ROM_LOAD( "gp2-7.11c", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp2-6.11b", 0xe000, 0x2000, CRC(75b18652) SHA1(398059da967c80321a9ec94d982a6c0b3c970c5f) )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
+	ROM_LOAD( "gp2-5.8s", 0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "gp2-6.6p",     0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "gp2-5.6n",     0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp2-6.6p", 0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp2-5.6n", 0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
-ROM_START( gapluso )
+ROM_START( gaplusa ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "gp2-4.8d",     0xa000, 0x2000, CRC(e525d75d) SHA1(93fcd8b940491abf6344181811d0b35765d7e45c) )
-	ROM_LOAD( "gp2-3b.8c",    0xc000, 0x2000, CRC(d77840a4) SHA1(81402b28a2d5ac2d1301252534afa0cb65d7e162) )
-	ROM_LOAD( "gp2-2b.8b",    0xe000, 0x2000, CRC(b3cb90db) SHA1(025c2f3978772e1ecbbf36842dc7c2203ee91a1f) )
+	ROM_LOAD( "gp2-4.8d",  0xa000, 0x2000, CRC(e525d75d) SHA1(93fcd8b940491abf6344181811d0b35765d7e45c) )
+	ROM_LOAD( "gp2-3b.8c", 0xc000, 0x2000, CRC(d77840a4) SHA1(81402b28a2d5ac2d1301252534afa0cb65d7e162) )
+	ROM_LOAD( "gp2-2.8b",  0xe000, 0x2000, CRC(61f6cc65) SHA1(0f9b30722ba03a63c70ff9f1bd9712aa1a4a6a3d) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gp2-8.11d",    0xa000, 0x2000, CRC(42b9fd7c) SHA1(f230eb0ad757f0714c0ac81c812e950778452947) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gp2-6.11b",    0xe000, 0x2000, CRC(75b18652) SHA1(398059da967c80321a9ec94d982a6c0b3c970c5f) )
+	ROM_LOAD( "gp2-8.11d", 0xa000, 0x2000, CRC(42b9fd7c) SHA1(f230eb0ad757f0714c0ac81c812e950778452947) )
+	ROM_LOAD( "gp2-7.11c", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp2-6.11b", 0xe000, 0x2000, CRC(75b18652) SHA1(398059da967c80321a9ec94d982a6c0b3c970c5f) )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
+	ROM_LOAD( "gp2-5.8s", 0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "gp2-6.6p",     0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "gp2-5.6n",     0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp2-6.6p", 0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp2-5.6n", 0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
-ROM_START( gaplusa )
+ROM_START( gaplusd ) /* Alternate hardware */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "gp2-4b.8d",    0xa000, 0x2000, CRC(484f11e0) SHA1(659756ae183dac3817440c8975f203c7dbe08c6b) )
-	ROM_LOAD( "gp2-3c.8c",    0xc000, 0x2000, CRC(a74b0266) SHA1(a534c6b4af569ed545bf52769c7d5ceb5f2c4935) )
-	ROM_LOAD( "gp2-2d.8b",    0xe000, 0x2000, CRC(69fdfdb7) SHA1(aec611336b8767897ad493d581d70b1f0e75aeba) )
+	ROM_LOAD( "gp2-4b.8d", 0xa000, 0x2000, CRC(484f11e0) SHA1(659756ae183dac3817440c8975f203c7dbe08c6b) )
+	ROM_LOAD( "gp2-3c.8c", 0xc000, 0x2000, CRC(a74b0266) SHA1(a534c6b4af569ed545bf52769c7d5ceb5f2c4935) )
+	ROM_LOAD( "gp2-2d.8b", 0xe000, 0x2000, CRC(69fdfdb7) SHA1(aec611336b8767897ad493d581d70b1f0e75aeba) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gp2-8b.11d",   0xa000, 0x2000, CRC(bff601a6) SHA1(e1a04354d8d0bc0d51d7341a46bd23cbd2158ee9) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gp2-6b.11b",   0xe000, 0x2000, CRC(14cd61ea) SHA1(05605abebcf2791e60b2d810dafcdd8582a87d9b) )
+	ROM_LOAD( "gp2-8b.11d", 0xa000, 0x2000, CRC(bff601a6) SHA1(e1a04354d8d0bc0d51d7341a46bd23cbd2158ee9) ) /* Revised for alternate hardware */
+	ROM_LOAD( "gp2-7.11c",  0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp2-6b.11b", 0xe000, 0x2000, CRC(14cd61ea) SHA1(05605abebcf2791e60b2d810dafcdd8582a87d9b) ) /* Revised for alternate hardware */
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gp2-5.8s",     0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
+	ROM_LOAD( "gp2-5.8s", 0x0000, 0x2000, CRC(f3d19987) SHA1(a0107fa4659597ac42c875ab1c0deb845534268b) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "gp2-6.6p",     0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "gp2-5.6n",     0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp2-6.6p", 0x0400, 0x0200, CRC(6f99c2da) SHA1(955dcef363870ee8e91edc73b9ea3ce489738aad) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp2-5.6n", 0x0600, 0x0200, CRC(c7d31657) SHA1(a93a5bc448dc127e1389d10a9cb06acadfe940cf) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
-	ROM_LOAD( "pal10l8.8n",   0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
-ROM_START( galaga3 )
+ROM_START( galaga3 ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "gp3-4c.8d",    0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
-	ROM_LOAD( "gp3-3c.8c",    0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
-	ROM_LOAD( "gp3-2c.8b",    0xe000, 0x2000, CRC(f72d6fc5) SHA1(7031c4a2c4374fb786fc563cbad3e3de0dbaa8d2) )
+	ROM_LOAD( "gp3-4c.8d", 0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
+	ROM_LOAD( "gp3-3c.8c", 0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
+	ROM_LOAD( "gp3-2d.8b", 0xe000, 0x2000, CRC(ecc01bdb) SHA1(b176b46bd6f2501d3a74ed11186be8411fd1105b) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gp3-8b.11d",   0xa000, 0x2000, CRC(f5e056d1) SHA1(bbed2056dc28dc2828e29987c16d89fb16e7059e) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gp3-6b.11b",   0xe000, 0x2000, CRC(026491b6) SHA1(a19f2942dafc899d686a42240fc2f7a7a7d3b1f5) )
+	ROM_LOAD( "gp3-8b.11d", 0xa000, 0x2000, CRC(f5e056d1) SHA1(bbed2056dc28dc2828e29987c16d89fb16e7059e) )
+	ROM_LOAD( "gp2-7.11c",  0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp3-6b.11b", 0xe000, 0x2000, CRC(026491b6) SHA1(a19f2942dafc899d686a42240fc2f7a7a7d3b1f5) )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
+	ROM_LOAD( "gp3-5.8s", 0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "g3_3f.bin",    0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "g3_3e.bin",    0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp3-6.6p", 0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp3-5.6n", 0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
-ROM_START( galaga3a )
+ROM_START( galaga3a ) /* Version 2 or 3 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "gal3_9e.bin",  0xa000, 0x2000, CRC(f4845e7f) SHA1(7b1377254f594bea4a8ffc7e388d9106e0266b55) )
-	ROM_LOAD( "gal3_9d.bin",  0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
-	ROM_LOAD( "gal3_9c.bin",  0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )
+	ROM_LOAD( "gp3-4c.8d", 0xa000, 0x2000, CRC(10d7f64c) SHA1(e39f77af16016d28170e4ac1c2a784b0a7ec5454) )
+	ROM_LOAD( "gp3-3c.8c", 0xc000, 0x2000, CRC(962411e8) SHA1(2b6bb2a5d77a837810180391ef6c0ce745bfed64) )
+	ROM_LOAD( "gp3-2c.8b", 0xe000, 0x2000, CRC(f72d6fc5) SHA1(7031c4a2c4374fb786fc563cbad3e3de0dbaa8d2) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gal3_6l.bin",  0xa000, 0x2000, CRC(9ec3dce5) SHA1(196a975aff59be19f55041a44b201aafef083ba7) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gal3_6n.bin",  0xe000, 0x2000, CRC(6a2942c5) SHA1(6fb2c4dcb2ad393220917b81f1a42e571d209d76) )
+	ROM_LOAD( "gp3-8b.11d", 0xa000, 0x2000, CRC(f5e056d1) SHA1(bbed2056dc28dc2828e29987c16d89fb16e7059e) )
+	ROM_LOAD( "gp2-7.11c",  0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gp3-6b.11b", 0xe000, 0x2000, CRC(026491b6) SHA1(a19f2942dafc899d686a42240fc2f7a7a7d3b1f5) )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.4b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
+	ROM_LOAD( "gp3-5.8s", 0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.11p", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.11n", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.11r", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.11m",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(               0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "g3_3f.bin",    0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "g3_3e.bin",    0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1p", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1n", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2n", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.6s", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "gp3-6.6p", 0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "gp3-5.6n", 0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "pal10l8.8n", 0x0000, 0x002c, CRC(08e5b2fe) SHA1(1aa7fa1a61795703af84ae427d0d8588ef8c4c3f) )
 ROM_END
 
-ROM_START( galaga3m )
+
+
+ROM_START( galaga3b ) /* Version (AKA Midway) 1 PCB */
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
-	ROM_LOAD( "m1.9e",        0xa000, 0x2000, CRC(e392704e) SHA1(8eebd48dfe8491f491e844d4ad0964e25efb013b) )
-	ROM_LOAD( "gal3_9d.bin",  0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
-	ROM_LOAD( "gal3_9c.bin",  0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )
+	ROM_LOAD( "gal3_9e.9e", 0xa000, 0x2000, CRC(f4845e7f) SHA1(7b1377254f594bea4a8ffc7e388d9106e0266b55) )
+	ROM_LOAD( "gal3_9d.9d", 0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
+	ROM_LOAD( "gal3_9c.9c", 0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
-	ROM_LOAD( "gal3_6l.bin",  0xa000, 0x2000, CRC(9ec3dce5) SHA1(196a975aff59be19f55041a44b201aafef083ba7) )
-	ROM_LOAD( "gp2-7.11c",    0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
-	ROM_LOAD( "gal3_6n.bin",  0xe000, 0x2000, CRC(6a2942c5) SHA1(6fb2c4dcb2ad393220917b81f1a42e571d209d76) )
+	ROM_LOAD( "gal3_6l.6l", 0xa000, 0x2000, CRC(9ec3dce5) SHA1(196a975aff59be19f55041a44b201aafef083ba7) )
+	ROM_LOAD( "gal3_6m.6m", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "gal3_6n.6n", 0xe000, 0x2000, CRC(6a2942c5) SHA1(6fb2c4dcb2ad393220917b81f1a42e571d209d76) )
 
 	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
-	ROM_LOAD( "gp2-1.4b",     0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+	ROM_LOAD( "gp2-1.7b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "gal3_9l.bin",  0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
+	ROM_LOAD( "gal3_9l.bin", 0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
 	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
 
 	ROM_REGION( 0xc000, "gfx2", 0 )
-	ROM_LOAD( "gp2-11.11p",   0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
-	ROM_LOAD( "gp2-10.11n",   0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
-	ROM_LOAD( "gp2-12.11r",   0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
-	ROM_LOAD( "gp2-9.11m",    0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	ROM_LOAD( "gp2-11.5m", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.5l", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.5k", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.5n",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
 	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
-	ROM_FILL(                 0xa000, 0x2000, 0x00 )    // optional ROM, not used
+	ROM_FILL(              0xa000, 0x2000, 0x00 )    // optional ROM, not used
 
 	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "gp2-3.1p",     0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
-	ROM_LOAD( "gp2-1.1n",     0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
-	ROM_LOAD( "gp2-2.2n",     0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
-	ROM_LOAD( "gp2-7.6s",     0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
-	ROM_LOAD( "g3_3f.bin",    0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
-	ROM_LOAD( "g3_3e.bin",    0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
+	ROM_LOAD( "gp2-3.1c", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1d", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2d", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.4f", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "g3_3f.3f", 0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "g3_3e.3e", 0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
 
 	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
-	ROM_LOAD( "gp2-4.3f",     0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
+ROM_END
+
+ROM_START( galaga3m ) /* Version (AKA Midway) 1 PCB */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the MAIN CPU */
+	ROM_LOAD( "m1.9e", 0xa000, 0x2000, CRC(e392704e) SHA1(8eebd48dfe8491f491e844d4ad0964e25efb013b) )
+	ROM_LOAD( "m2.9d", 0xc000, 0x2000, CRC(86fac687) SHA1(07f76af524dbb3e79de41ef4bf32e7380776d9f5) )
+	ROM_LOAD( "m3.9c", 0xe000, 0x2000, CRC(f1b00073) SHA1(5d998d938251f173cedf742b95d02cc0a2b9d3be) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the SUB CPU */
+	ROM_LOAD( "m6.6l", 0xa000, 0x2000, CRC(9ec3dce5) SHA1(196a975aff59be19f55041a44b201aafef083ba7) )
+	ROM_LOAD( "m5.6m", 0xc000, 0x2000, CRC(0621f7df) SHA1(b86020f819fefb134cb57e203f7c90b1b29581c8) )
+	ROM_LOAD( "m4.6n", 0xe000, 0x2000, CRC(6a2942c5) SHA1(6fb2c4dcb2ad393220917b81f1a42e571d209d76) )
+
+	ROM_REGION( 0x10000, "sub2", 0 ) /* 64k for the SOUND CPU */
+	ROM_LOAD( "gp2-1.7b", 0xe000, 0x2000, CRC(ed8aa206) SHA1(4e0a31d84cb7aca497485dbe0240009d58275765) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "gal3_9l.bin", 0x0000, 0x2000, CRC(8d4dcebf) SHA1(0a556b45976bc36eb99048b1512c446b472da1d2) )    /* characters */
+	/* 0x2000-0x3fff  will be unpacked from 0x0000-0x1fff */
+
+	ROM_REGION( 0xc000, "gfx2", 0 )
+	ROM_LOAD( "gp2-11.5m", 0x0000, 0x2000, CRC(57740ff9) SHA1(16873e0ac5f975768d596d7d32af7571f4817f2b) )    /* objects */
+	ROM_LOAD( "gp2-10.5l", 0x2000, 0x2000, CRC(6cd8ce11) SHA1(fc346e98737c9fc20810e32d4c150ae4b4051979) )    /* objects */
+	ROM_LOAD( "gp2-12.5k", 0x4000, 0x2000, CRC(7316a1f1) SHA1(368e4541a5151e906a189712bc05192c2ceec8ae) )    /* objects */
+	ROM_LOAD( "gp2-9.5n",  0x6000, 0x2000, CRC(e6a9ae67) SHA1(99c1e67c3b216aa1b63f199e21c73cdedde80e1b) )    /* objects */
+	/* 0x8000-0x9fff  will be unpacked from 0x6000-0x7fff */
+	ROM_FILL(              0xa000, 0x2000, 0x00 )    // optional ROM, not used
+
+	ROM_REGION( 0x0800, "proms", 0 )
+	ROM_LOAD( "gp2-3.1c", 0x0000, 0x0100, CRC(a5091352) SHA1(dcd6dfbfbd5281ba0c7b7c189d6fde23617ed3e3) )    /* red palette ROM (4 bits) */
+	ROM_LOAD( "gp2-1.1d", 0x0100, 0x0100, CRC(8bc8022a) SHA1(c76f9d9b066e268621d41a703c5280261234709a) )    /* green palette ROM (4 bits) */
+	ROM_LOAD( "gp2-2.2d", 0x0200, 0x0100, CRC(8dabc20b) SHA1(64d7b333f529d3ba66aeefd380fd1cbf9ddf460d) )    /* blue palette ROM (4 bits) */
+	ROM_LOAD( "gp2-7.4f", 0x0300, 0x0100, CRC(2faa3e09) SHA1(781ffe9088476798409cb922350eff881590cf35) )    /* char color ROM */
+	ROM_LOAD( "g3_3f.3f", 0x0400, 0x0200, CRC(d48c0eef) SHA1(6d0512958bc522d22e69336677369507847f8f6f) )    /* sprite color ROM (lower 4 bits) */
+	ROM_LOAD( "g3_3e.3e", 0x0600, 0x0200, CRC(417ba0dc) SHA1(2ba51ccdd0428fc48758ed8fea36c8ce0e752a45) )    /* sprite color ROM (upper 4 bits) */
+
+	ROM_REGION( 0x0100, "namco", 0 ) /* sound prom */
+	ROM_LOAD( "gp2-4.3f", 0x0000, 0x0100, CRC(2d9fbdd8) SHA1(e6a23cd5ce3d3e76de3b70c8ab5a3c45b1147af4) )
 ROM_END
 
 
@@ -871,10 +917,13 @@ DRIVER_INIT_MEMBER(gaplus_state,gaplus)
 		rom[i + 0x2000] = rom[i] << 4;
 }
 
+/* These sets are on revision 2 or 3 PCBs AKA "Namco" PCBs */
+GAME( 1984, gaplus,   0,        gapluso,  gapluso,  gaplus_state, gaplus, ROT90, "Namco", "Gaplus (GP2 rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplusa,  gaplus,   gapluso,  gapluso,  gaplus_state, gaplus, ROT90, "Namco", "Gaplus (GP2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, gaplusd,  gaplus,   gaplusa,  gapluso,  gaplus_state, gaplus, ROT90, "Namco", "Gaplus (GP2 rev D, alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus,   gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (GP3 rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3a, gaplus,   gaplus,   gaplus,   gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (GP3 rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1984, gaplus,   0,        gaplus,   gaplus, gaplus_state,   gaplus, ROT90, "Namco", "Gaplus (rev. D)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3,  gaplus,   gaplus,   gaplus, gaplus_state,   gaplus, ROT90, "Namco", "Galaga 3 (rev. C)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gapluso,  gaplus,   gapluso,  gapluso, gaplus_state,  gaplus, ROT90, "Namco", "Gaplus (rev. B)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, gaplusa,  gaplus,   gaplusa,  gapluso, gaplus_state,  gaplus, ROT90, "Namco", "Gaplus (alternate hardware)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3a, gaplus,   gaplus,   galaga3a, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+/* These sets are on older revision (AKA Midway) 1 PCBs */
+GAME( 1984, galaga3b, gaplus,   gaplus,   galaga3a, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 3)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, galaga3m, gaplus,   gaplus,   galaga3m, gaplus_state, gaplus, ROT90, "Namco", "Galaga 3 (set 4)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
