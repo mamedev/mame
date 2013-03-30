@@ -72,7 +72,7 @@ bbs_bzr
 	}
 	prefetch();
 
-bbc_acc
+bbc_bar
 	TMP = read_pc();
 	read_pc_noinc();
 	if(!(A & (1 << ((IR>>5) & 7)))) {
@@ -80,7 +80,7 @@ bbc_acc
 	}
 	prefetch();
 
-bbs_acc
+bbs_bar
 	TMP = read_pc();
 	read_pc_noinc();
 	if(A & (1 << ((IR>>5) & 7))) {

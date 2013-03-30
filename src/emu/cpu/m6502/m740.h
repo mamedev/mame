@@ -102,8 +102,8 @@ protected:
 	O(reset740);
 	O(seb_biz); O(seb_acc);
 	O(clb_biz); O(clb_acc);
-	O(bbc_bzr); O(bbc_acc);
-	O(bbs_bzr); O(bbs_acc);
+	O(bbc_bzr); O(bbc_bar);
+	O(bbs_bzr); O(bbs_bar);
 	O(rrf_zpg);
 	O(bra_rel);
 	O(jmp_zpi);
