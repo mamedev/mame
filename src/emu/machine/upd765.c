@@ -96,6 +96,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	select_connected = true;
 	external_ready = false;
 	dor_reset = 0x00;
+	mode = MODE_AT;
 }
 
 void upd765_family_device::set_ready_line_connected(bool _ready)
@@ -110,7 +111,7 @@ void upd765_family_device::set_select_lines_connected(bool _select)
 
 void upd765_family_device::set_mode(int _mode)
 {
-	// TODO
+	mode = _mode;
 }
 
 void upd765_family_device::setup_intrq_cb(line_cb cb)
@@ -1944,7 +1945,7 @@ void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
 	cur_irq = data_irq || other_irq || internal_drq;
-	cur_irq = cur_irq && (dor & 4) && (dor & 8);
+	cur_irq = cur_irq && (dor & 4) && (mode != MODE_AT || (dor & 8));
 	if(cur_irq != old_irq && !intrq_cb.isnull()) {
 		logerror("%s: irq = %d\n", tag(), cur_irq);
 		intrq_cb(cur_irq);
