@@ -1,7 +1,7 @@
 /*
  * PlayStation CPU emulator
  *
- * Copyright 2003-2011 smf
+ * Copyright 2003-2013 smf
  *
  * Known chip id's
  *   CXD8530AQ
@@ -44,7 +44,7 @@
  *
  *  MTC0 timing is not emulated, switching to user mode while in kernel space continues
  *  execution for another two instructions before taking an exception. Using RFE to do the same
- *  thing causes the exception straight away, unless the RFE is the first instructio that follows
+ *  thing causes the exception straight away, unless the RFE is the first instruction that follows
  *  an MTC0 instruction.
  *
  *  The PRId register should be 1 on some revisions of the CPU ( there might be other values too ).
