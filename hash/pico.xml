@@ -2169,7 +2169,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-133040"/>
 		<info name="alt_title" value="美少女戦士セーラームーンS"/>
 		<part name="cart" interface="pico_cart">
-		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6434C" />
 			<feature name="ic1" value="MPR-16916-H" />
 			<dataarea name="rom" size="524288">
