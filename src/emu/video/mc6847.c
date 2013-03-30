@@ -221,17 +221,21 @@ void mc6847_friend_device::device_post_load(void)
 //  update_field_sync_timer
 //-------------------------------------------------
 
-void mc6847_friend_device::update_field_sync_timer(void)
+ATTR_FORCE_INLINE void mc6847_friend_device::update_field_sync_timer(void)
 {
-	/* are we expecting field sync? */
+	// are we expecting field sync?
 	bool expected_field_sync = (m_physical_scanline < m_field_sync_falling_edge_scanline)
 		|| (m_logical_scanline_zone == SCANLINE_ZONE_VBLANK);
 
-	/* determine the duration */
-	attotime duration = (expected_field_sync != m_field_sync) ? attotime::from_ticks(160, m_clock) : attotime::never;
+	// do we need to adjust the timer?
+	if (expected_field_sync != m_field_sync)
+	{
+		// if so, determine the duration
+		attotime duration = attotime::from_ticks(160, m_clock);
 
-	/* and reset the timer */
-	m_fsync_timer->adjust(duration, expected_field_sync ? 1 : 0);
+		// and reset the timer
+		m_fsync_timer->adjust(duration, expected_field_sync ? 1 : 0);
+	}
 }
 
 
@@ -297,12 +301,14 @@ const char *mc6847_friend_device::scanline_zone_string(scanline_zone zone)
 ATTR_FORCE_INLINE void mc6847_friend_device::change_horizontal_sync(bool line)
 {
 	g_profiler.start(PROFILER_USER1);
+
+	// are we on a rising edge?
 	if (line && !m_horizontal_sync)
 	{
 		if (LOG_SCANLINE)
 			logerror("%s: change_horizontal_sync():  Recording scanline\n", describe_context());
 
-		/* first store the scanline */
+		// first store the scanline
 		g_profiler.start(PROFILER_USER2);
 		switch((scanline_zone) m_logical_scanline_zone)
 		{
@@ -323,34 +329,35 @@ ATTR_FORCE_INLINE void mc6847_friend_device::change_horizontal_sync(bool line)
 			case SCANLINE_ZONE_RETRACE:
 			case SCANLINE_ZONE_VBLANK:
 			case SCANLINE_ZONE_FRAME_END:
-				/* do nothing */
+				// do nothing
 				break;
 		}
 		g_profiler.stop();
 
-		/* advance to next scanline */
+		// advance to next scanline
 		next_scanline();
+
+		// and update the field sync timer
+		update_field_sync_timer();
 	}
 
-	/* finally output horizontal sync */
+	// finally output horizontal sync
 	if (line != m_horizontal_sync)
 	{
 		m_horizontal_sync = line;
 
-		/* log if apprpriate */
+		// log if apprpriate
 		if (LOG_HSYNC)
 			logerror("%s: change_horizontal_sync(): line=%d\n", describe_context(), line ? 1 : 0);
 
-		/* invoke callback */
+		// invoke callback
 		if (!m_res_out_hsync_func.isnull())
 			m_res_out_hsync_func(line);
 
-		/* call virtual function */
+		// call virtual function
 		horizontal_sync_changed(m_horizontal_sync);
 	}
 
-	/* and update the field sync timer */
-	update_field_sync_timer();
 	g_profiler.stop();
 }
 
