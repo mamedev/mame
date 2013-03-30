@@ -78,6 +78,7 @@ static const struct game_keys keys_table[] =
 	{ "pstone2",         0x000b8dc0 }, // 841-0008    2000
 	{ "capsnk",          0x00000000 }, // 841-0011    2000
 	{ "capsnka",         0x00000000 }, // ^
+	{ "capsnkb",         0x00000000 }, // ^
 	{ "cspike",          0x000e2010 }, // 841-0012    2000
 	{ "ggx",             0x00076110 }, // 841-0013    2000
 	{ "gwing2",          0x000b25d0 }, // 841-0014    2000
