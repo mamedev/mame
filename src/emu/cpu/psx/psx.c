@@ -2870,7 +2870,7 @@ void psxcpu_device::execute_run()
 						break;
 
 					case 1:
-						data = ( data & 0xff000000 ) | ( readword_masked( address, 0x00ffffff ) >> 8 );
+						data = ( data & 0xff000000 ) | ( readword_masked( address, 0xffffff00 ) >> 8 );
 						break;
 
 					case 2:
