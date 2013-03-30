@@ -21055,6 +21055,22 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="ttex" supported="no">
+		<!-- Notes: GBC only -->
+		<description>Tyrannosaurus Tex (Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="maze b.bin" size="2097152" crc="1bd4e588" sha1="e2fcc7fcc643f9d7fc61acce6c5ed1f8abc13fa0" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rpgtsuk2">
 		<!-- Notes: GBC only -->
 		<description>Uchuu Nin Tanaka Tarou de RPG Tsukuru GB2 (Jpn)</description>
