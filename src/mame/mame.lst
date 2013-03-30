@@ -2410,13 +2410,14 @@ landgear        // 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 4.
 landgeara       // 1996.?? E17 (c) 1995 Taito Corporation Japan (World) - Ver 3.1 O
 landgearj       // 1996.?? E17 (c) 1996 Taito Corporation (Japan) - Ver 4.2 J
 landgearja      // 1996.03 E17 (c) 1996 Taito Corporation (Japan) - Ver 3.0 J
-sidebs          // 1996.07 E23 (c) 1996 Taito Corporation (Japan)
-dendego         // 1997.03 E35 (c) 1996 Taito Corporation (Japan)
-sidebs2j        // 1997.07 E38 (c) 1997 Taito Corporation (Japan)
-sidebs2         // 1997.?? E38 (c) 1997 Taito Corporation (Japan)
-dendegox        // 1997.09 E35 (c) 1996 Taito Corporation (Japan)
-dendego2        // 1998.03 E52 (c) 1998 Taito Corporation (Japan)
-dendego23k      // 1998.08 E52 (c) 1998 Taito Corporation (Japan)
+sidebs          // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.7 J
+sidebsja        // 1996.07 E23 (c) 1996 Taito Corporation (Japan) - Ver 2.5 J
+dendego         // 1997.03 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.2 J
+sidebs2         // 1997.?? E38 (c) 1997 Taito Corporation (US) - Ver 2.6 A
+sidebs2j        // 1997.07 E38 (c) 1997 Taito Corporation (Japan) - Ver 2.4 J
+dendegox        // 1997.09 E35 (c) 1996 Taito Corporation (Japan) - Ver 2.4 J
+dendego2        // 1998.03 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.5 J
+dendego23k      // 1998.08 E52 (c) 1998 Taito Corporation (Japan) - Ver 2.20 J
 
 // Taito "Wolf" System
 pf2012          // E59 (c) 1997 Taito
