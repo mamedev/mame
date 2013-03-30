@@ -273,6 +273,11 @@ void s3_vga_device::device_start()
 		s3.cursor_bg[x] = 0x00;
 	}
 	m_8514 = subdevice<ibm8514a_device>("8514a");
+	// set device ID
+	s3.id_high = 0x88;  // CR2D
+	s3.id_low = 0x11;   // CR2E
+	s3.revision = 0x00; // CR2F
+	s3.id_cr30 = 0xc0;  // CR30
 }
 
 void tseng_vga_device::device_start()
@@ -2651,17 +2656,16 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 		switch(index)
 		{
 			case 0x2d:
-				res = 0x88;  // always?
+				res = s3.id_high;
 				break;
 			case 0x2e:
-				res = 0x11;  // Trio64
+				res = s3.id_low;
 				break;
 			case 0x2f:
-				res = 0x00;
+				res = s3.revision;
 				break;
 			case 0x30: // CR30 Chip ID/REV register
-				//res = 0xe1; // BIOS is from a card with the 764 chipset (Trio64), should be 0xe0 or 0xe1, but the Vision 330 driver in win95 doesn't like that
-				res = 0xc0; // But win95 wants this...
+				res = s3.id_cr30;
 				break;
 			case 0x31:
 				res = s3.memory_config;
@@ -2715,6 +2719,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			case 0x51:
 				res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
+				res |= ((svga.bank_w & 0x30) >> 2);
 				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;

@@ -547,6 +547,10 @@ protected:
 		UINT8 enable_8514;
 		UINT8 cr42;
 		UINT8 cr53;
+		UINT8 id_high;
+		UINT8 id_low;
+		UINT8 revision;
+		UINT8 id_cr30;
 
 		// data for memory-mapped I/O
 		UINT16 mmio_9ae8;
