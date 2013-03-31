@@ -1520,12 +1520,12 @@ ROM_START( sidebs2 )
 	*/
 ROM_END
 
-ROM_START( sidebs2j )
+ROM_START( sidebs2j ) /* This version has the sub-title of "Evoluzione" */
 	ROM_REGION(0x200000, "maincpu", 0)      /* 68040 code */
-	ROM_LOAD32_BYTE( "e38-23.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) )
-	ROM_LOAD32_BYTE( "e38-24.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) )
-	ROM_LOAD32_BYTE( "e38-25.ic38", 0x000002, 0x80000, CRC(f1a8a4df) SHA1(e4cf75969fb0503df2290522194b097f5cb983a3) )
-	ROM_LOAD32_BYTE( "e38-26.ic39", 0x000003, 0x80000, CRC(b550fbf2) SHA1(a0a461af7e71c6ad6468cfdee2bc7161ae31bbfb) )
+	ROM_LOAD32_BYTE( "e38-23+.ic36", 0x000000, 0x80000, CRC(b3d8e2d9) SHA1(6de6a51c3d9ace532fa03517bab93101b5a3eaae) ) /* Actual label E38-23* */
+	ROM_LOAD32_BYTE( "e38-24+.ic37", 0x000001, 0x80000, CRC(2a47d80d) SHA1(41b889e4a1397c7f0d4f6ef136ed8abfd7e1ed86) ) /* Actual label E38-24* */
+	ROM_LOAD32_BYTE( "e38-25+.ic38", 0x000002, 0x80000, CRC(f1a8a4df) SHA1(e4cf75969fb0503df2290522194b097f5cb983a3) ) /* Actual label E38-25* */
+	ROM_LOAD32_BYTE( "e38-26+.ic39", 0x000003, 0x80000, CRC(b550fbf2) SHA1(a0a461af7e71c6ad6468cfdee2bc7161ae31bbfb) ) /* Actual label E38-26* */
 
 	ROM_REGION( 0x180000, "audiocpu", 0 )       /* 68000 Code */
 	ROM_LOAD16_BYTE( "e38-19.ic30", 0x100001, 0x040000, CRC(3f50cb7b) SHA1(76af65c9b74ede843a3182f79cecda8c3e3febe6) )
@@ -2059,6 +2059,6 @@ GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs, taitojc_state,   taitojc,  ROT
 GAMEL(1996, dendego,   0,        dendego, dendego, taitojc_state,  taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
 GAMEL(1996, dendegox,  dendego,  dendego, dendego, taitojc_state,  taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
 GAME( 1997, sidebs2,   0,        taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
-GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.4 J)",                           GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
+GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs, taitojc_state,   taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                GAME_IMPERFECT_GRAPHICS )                 // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
 GAMEL(1998, dendego2,  0,        dendego, dendego, taitojc_state,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
 GAMEL(1998, dendego23k,dendego2, dendego, dendego, taitojc_state,  dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", GAME_IMPERFECT_GRAPHICS, layout_dendego ) // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
