@@ -159,6 +159,8 @@ public:
 	bitmap_ind16 *m_legacy_gfx;
 	bool m_is_rom3;
 	UINT8 m_echo_bank;
+	UINT64 m_last_adb_time;
+	int m_adb_dtime;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
 
