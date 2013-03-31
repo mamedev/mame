@@ -1,3 +1,11 @@
+/*************************************************************************
+
+  Taito JC System
+  
+  functions to emulate the video hardware
+
+*************************************************************************/
+
 #include "emu.h"
 #include "video/polynew.h"
 #include "includes/taitojc.h"

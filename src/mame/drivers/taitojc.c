@@ -19,7 +19,6 @@ TODO:
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
 - add idle skips if possible
-- POST has a PCB ID (shown at top of screen) that can't be faked without a proper reference.
 
 --------------------------------------------------------------------------
 
@@ -382,6 +381,21 @@ Notes:
 #include "includes/taitojc.h"
 
 #include "dendego.lh"
+
+
+// hmm, what is the pixel clock? let's assume it's same as the 68040
+// 54MHz(/4) or 16MHz would make HTOTAL unrealistically short
+#define PIXEL_CLOCK         (10000000*2)
+
+// VSync - 55.6795Hz
+// HSync - 24.639kHz / 24.690kHz
+#define HTOTAL              (811)
+#define HBEND               (0)
+#define HBSTART             (512)
+
+#define VTOTAL              (443) /* H/V - 442.51 / 443.43 total lines, interlaced? */
+#define VBEND               (0)
+#define VBSTART             (400)
 
 
 /***************************************************************************
@@ -1250,7 +1264,7 @@ static const hc11_config taitojc_hc11_config =
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, 20000000) // 10MHz*2, source = CY7C991
+	MCFG_CPU_ADD("maincpu", M68040, 10000000*2) // 10MHz*2, source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state,  taitojc_vblank)
 
@@ -1259,7 +1273,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	MCFG_CPU_IO_MAP(hc11_io_map)
 	MCFG_CPU_CONFIG(taitojc_hc11_config)
 
-	MCFG_CPU_ADD("dsp", TMS32051, 40000000) // 10MHz*4, source = CY7C991
+	MCFG_CPU_ADD("dsp", TMS32051, 10000000*4) // 10MHz*4, source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 
@@ -1271,10 +1285,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(512, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 399)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(taitojc_state, screen_update_taitojc)
 
 	MCFG_PALETTE_LENGTH(32768)
