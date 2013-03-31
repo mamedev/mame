@@ -12,6 +12,7 @@ Taito custom chips on this hardware:
 - TC0870HVP      : Vertex processor?
 
 TODO:
+- games are running too slow compared to pcb recordings, easily noticeable on sidebs/sidebs2
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
 - dendego attract mode train doesn't ride
@@ -19,6 +20,9 @@ TODO:
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
 - add idle skips if possible
+
+BTANB:
+- incorrect perspective textures, visible when close to the camera such as sidebs rear-view mirror
 
 --------------------------------------------------------------------------
 
