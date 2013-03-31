@@ -290,8 +290,7 @@ void MainWindow::executeCommand(bool withClear)
 
 	// Refresh
 	m_consoleView->viewport()->update();
-	m_procFrame->view()->update();
-	m_dasmFrame->view()->update();
+	refreshAll();
 }
 
 
