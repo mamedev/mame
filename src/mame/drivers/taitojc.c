@@ -943,7 +943,7 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
-	//assert (m_dsp_rom_pos < 0x800000); // never happens
+	assert (m_dsp_rom_pos < 0x800000); // never happens
 	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
@@ -997,7 +997,7 @@ WRITE16_MEMBER(taitojc_state::dsp_texaddr_w)
 
 WRITE16_MEMBER(taitojc_state::dsp_polygon_fifo_w)
 {
-	//assert (m_polygon_fifo_ptr < TAITOJC_POLYGON_FIFO_SIZE); // never happens
+	assert (m_polygon_fifo_ptr < TAITOJC_POLYGON_FIFO_SIZE); // never happens
 	m_polygon_fifo[m_polygon_fifo_ptr++] = data;
 }
 
@@ -1244,22 +1244,22 @@ static const hc11_config taitojc_hc11_config =
 };
 
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
+
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, 25000000)
+	MCFG_CPU_ADD("maincpu", M68040, 20000000) // 10MHz*2, source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state,  taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, 4000000) // MC68HC11M0
+	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
 	MCFG_CPU_CONFIG(taitojc_hc11_config)
 
-	MCFG_CPU_ADD("dsp", TMS32051, 50000000)
+	MCFG_CPU_ADD("dsp", TMS32051, 40000000) // 10MHz*4, source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -1275,12 +1275,12 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	MCFG_PALETTE_LENGTH(32768)
 
-
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(taito_en_sound)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dendego, taitojc )
+
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dendego_map)
