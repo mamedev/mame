@@ -274,7 +274,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                              MC68040RC25            CXD1178Q    TC0640FIO       |
 |424260     TMS320C51          (PGA TYPE)                         (QFP120)        |
 |           (QFP132)                                                              |
-|           labelled                                              TEST_SW         |
+|           marked                                                TEST_SW         |
 |424260     "Taito E07-11"                                      MB3771   RESET_SW |
 |                                  E23-33.53                                      |
 |                                             CY7B991       MB8421-90             |
@@ -283,31 +283,41 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |           43256        TC0770CMU                          E23-35.110            |
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
-|E23-27.13  TC0780FPA                                                             |
+|E23-27.13  TC0780FPA  D482445                                                    |
 |           (QFP240)                                        ENSONIC               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
-|4218160               D482445                                                    |
+|4218160                                                                          |
 |                                 TC0840GLU                 MC33274   TDA1543     |
-|                      D482445    (QFP144)                                        |
-|4218160                                      16MHz         MB87078               |
-|           TC0780FPA  D482445           30.4761MHz                               |
-|           (QFP240)              ENSONIC                                         |
+|                                 (QFP144)                                        |
+|4218160               D482445                16MHz         MB87078               |
+|           TC0780FPA                    30.4761MHz                               |
+|           (QFP240)   D482445    ENSONIC                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
 |---------------------------------------------------------------------------------|
 
 Notes:
-      All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      CY7B991 : Programmable Skew Clock Buffer (PLCC32)
-      4218160 : 2M x8 / 1M x16 DRAM
-      424210  : 256K x16 DRAM
-      424260  : 256K x16 DRAM
-      43256   : 32K x8 SRAM
-      D482445 : DRAM?
-      LC321664: 64K x16 DRAM
-      TC51832 : 32K x8 SRAM
+      All 3k files are PALs type PALCE 16V8 and saved in Jedec format.
+      CY7B991 - Programmable Skew Clock Buffer (PLCC32)
+      4218160 - 2M x8 / 1M x16 DRAM. Compatible with NEC 4218160 & Toshiba TC5118160
+      424210  - 256k x16 DRAM
+      424260  - 256k x16 DRAM
+      43256   - 32k x8 SRAM
+      D482445 - 256k x16 Video DRAM. Compatible with Toshiba TC524165/TC52V4165 (also used on Namco System 11 CPU boards)
+      LC321664- 64k x16 DRAM
+      TC51832 - 32k x8 SRAM
+      MB8422  - 16k-bit (2kbytes) Dual Port SRAM
 
+      Measurements:
+                   HSync  - 24.639kHz / 24.690kHz (alternates between the two frequencies slowly every ~2 seconds)
+                   VSync  - 55.6795Hz
+                   68040  - 20.000MHz (10MHz*2, source = CY7C991)
+                   68000  - 15.23805MHz (30.4761/2)
+                   320C51 - 40.000MHz (pin96 X2/CLKIN. 10MHz*4, source = CY7C991)
+                   OTISR2 - 3.80950MHz (pin12)
+                   ES5510 - 2.22MHz, 2.666MHz, 3.8095125MHz (30.4761/8), 8.000MHz (16/2)
+                   
 
 Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 |---------------------------------------------------------------------------------|
@@ -345,8 +355,8 @@ Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 |---------------------------------------------------------------------------------|
 
 Notes:
-      All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      6264: 8K x8 SRAM
+      All 3k files are PALs type PALCE 16V8 and saved in Jedec format.
+      6264: 8k x8 SRAM
       SMC_COM20020I: Network communmication IC
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.12, .18-.25 are 16M MASK, graphics.
@@ -354,6 +364,9 @@ Notes:
       ROMs .30-.31 are 27C2001, sound program.
       ROM  .65 is 27C512, linked to 68HC11 MCU
       *    Unpopulated socket.
+      
+      Measurements:
+                   68HC11 - 8.000MHz (16/2 on pin74)
 
 */
 
