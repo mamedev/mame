@@ -725,7 +725,6 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 	{ "DEV=TC0870HVP   SYS=CG  VER=1.0"};
 	// this is from sidebs(2.7j), needs to be verified more thoroughly
 	// - any more data after "VER=1."?
-	// - is it the same on other games?
 	// - can we assume it comes from the TC0870HVP chip?
 
 	return pcb_id[offset];
