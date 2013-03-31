@@ -133,25 +133,18 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 	int width = screen->width();
 	int height = screen->height();
 
+	n_coordx += m_n_displaystartx;
+	n_coordx *= width - 1;
+	n_coordx /= 1023;
+
+	n_coordy += n_displaystarty;
+	n_coordy *= height - 1;
+	n_coordy /= 1023;
+
 	if( m_debug.b_clear )
 	{
 		m_debug.mesh->fill(0x0000);
 		m_debug.b_clear = 0;
-	}
-
-	if( m_debug.n_coord < DEBUG_COORDS )
-	{
-		n_coordx += m_n_displaystartx;
-		n_coordy += n_displaystarty;
-
-		n_coordx *= width - 1;
-		n_coordx /= 1023;
-		n_coordy *= height - 1;
-		n_coordy /= 1023;
-
-		m_debug.n_coordx[ m_debug.n_coord ] = n_coordx;
-		m_debug.n_coordy[ m_debug.n_coord ] = n_coordy;
-		m_debug.n_coord++;
 	}
 
 	n_colour = 0x1f;
@@ -236,6 +229,13 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 			n_y.d += n_dy;
 			n_len--;
 		}
+	}
+
+	if( m_debug.n_coord < DEBUG_COORDS )
+	{
+		m_debug.n_coordx[ m_debug.n_coord ] = n_coordx;
+		m_debug.n_coordy[ m_debug.n_coord ] = n_coordy;
+		m_debug.n_coord++;
 	}
 }
 
