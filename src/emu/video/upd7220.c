@@ -152,9 +152,10 @@ ADDRESS_MAP_END
 
 
 // internal 128x14 control ROM
+// hand-dumped as little-endian from a die shot
 ROM_START( upd7220 )
 	ROM_REGION( 0x100, "upd7220", 0 )
-	ROM_LOAD( "upd7220.bin", 0x000, 0x100, NO_DUMP )
+	ROM_LOAD( "upd7220.bin", 0x000, 0x100, CRC(3c92b218) SHA1(e154b3106a80c9c98d9f2ee18efcd7f4b4aa7d49) )
 ROM_END
 
 
