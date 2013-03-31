@@ -325,7 +325,9 @@ static const struct tms5100_coeffs pat4335277_coeff =
 	{ 3, 3, 3, 2, 2, 1, 1, 0 }
 };
 
-/* The following TMS5200/TMC0285 coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact. However, the chirp table and the interpolation coefficients still come from the patents as there doesn't seem to be an easy way to read those out from the chip without decapping it.
+/* The following TMS5200/TMC0285 coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact.
+The chirp table contents were read from a decap done by digshadow in March 2013
+The interpolation coefficients still come from the patents pending verification of the interpolation counter circuit from the chip decap image vs the patent.
 Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent.
 Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802, above. */
 static const struct tms5100_coeffs tms5200_coeff =
@@ -390,9 +392,9 @@ static const struct tms5100_coeffs tms5200_coeff =
 	  -19,-17,   -9,-10,  -6,  0,  3,  2,
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },*/
-	{   0,127,127,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
+	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
+		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,
+		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
@@ -467,9 +469,9 @@ static const struct tms5100_coeffs tms5220_coeff =
 	  -19,-17,   -9,-10,  -6,  0,  3,  2,
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },*/
-	{   0,127,127,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
+	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
+		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,
+		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
@@ -548,9 +550,9 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	  -19,-17,   -9,-10,  -6,  0,  3,  2,
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0,  0 },*/
-	{   0,127,127,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
+	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
+		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,
+		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
 		0,  0,  0,  0,  0,  0,  0,  0,
@@ -606,7 +608,7 @@ static const struct tms5100_coeffs vlm5030_coeff =
 		/* K2  */
 		{    0,  50, 100, 149, 196, 241, 284, 325,
 			362, 396, 426, 452, 473, 490, 502, 510,
-				0,-510,-502,-490,-473,-452,-426,-396, /* entry 16(0x10) has some special function, purpose unknown */
+				0,-510,-502,-490,-473,-452,-426,-396, /* entry 16(0x10) either has some special function, purpose unknown, or is a manufacturing error and should have been -512 */
 			-362,-325,-284,-241,-196,-149,-100, -50 },
 		/* K3  */
 		/*{    0, 100, 196, 284, 362, 426, 473, 502,

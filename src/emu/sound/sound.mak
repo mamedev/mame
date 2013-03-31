@@ -629,19 +629,25 @@ endif
 
 
 #-------------------------------------------------
-# Texas Instruments TMS5110 speech synthesizers
+# Texas Instruments TMS5100-series speech synthesizers
 #-------------------------------------------------
 
 ifneq ($(filter TMS5110,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5110.o
 endif
 
+$(SOUNDOBJ)/tms5110.o:  $(SOUNDSRC)/tms5110r.c
+
+
+
+#-------------------------------------------------
+# Texas Instruments TMS5200-series speech synthesizers
+#-------------------------------------------------
 ifneq ($(filter TMS5220,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/tms5220.o
 endif
 
-$(SOUNDOBJ)/tms5110.o:  $(SOUNDSRC)/tms5110r.c
-$(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5220r.c
+$(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5110r.c
 
 
 
@@ -672,6 +678,8 @@ endif
 ifneq ($(filter VLM5030,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/vlm5030.o
 endif
+
+$(SOUNDOBJ)/vlm5030.o:  $(SOUNDSRC)/tms5110r.c
 
 
 
