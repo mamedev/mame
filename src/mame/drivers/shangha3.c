@@ -479,7 +479,7 @@ static const ym3438_interface ym3438_config =
 static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(shangha3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
@@ -514,7 +514,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( heberpop, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4) // TMP68HC000N-16 like the others??
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16 like the others??
 	MCFG_CPU_PROGRAM_MAP(heberpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
@@ -554,7 +554,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(blocken_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
