@@ -1267,16 +1267,16 @@ static const hc11_config taitojc_hc11_config =
 static MACHINE_CONFIG_START( taitojc, taitojc_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, 10000000*2) // 10MHz*2, source = CY7C991
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state,  taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // MC68HC11M0
+	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // 8MHz, MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
 	MCFG_CPU_CONFIG(taitojc_hc11_config)
 
-	MCFG_CPU_ADD("dsp", TMS32051, 10000000*4) // 10MHz*4, source = CY7C991
+	MCFG_CPU_ADD("dsp", TMS32051, XTAL_10MHz*4) // 40MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 
