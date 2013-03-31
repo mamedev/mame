@@ -28,12 +28,12 @@ jsr_spg
 	PC = TMP;
 	prefetch();
 
-clb_acc
+clb_bac
 	read_pc_noinc();
 	A = do_clb(A, (IR>>5) & 7);
 	prefetch();
 
-seb_acc
+seb_bac
 	read_pc_noinc();
 	A = do_seb(A, (IR>>5) & 7);
 	prefetch();
