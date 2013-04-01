@@ -236,7 +236,7 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
 		break;
 	case 0x03:
-		m_cps_a_regs[0x10 / 2] = data;
+		m_cps_a_regs[0x10 / 2] = data + 0xffc0;
 		break;
 	case 0x04:
 		m_cps_a_regs[0x16 / 2] = data;
@@ -261,7 +261,7 @@ WRITE16_MEMBER(cps_state::punipic_layer_w)
 				break;
 			}
 
-			m_cps_b_regs[m_layer_enable_reg / 2] = 0x13a6;
+			m_cps_a_regs[0x08 / 2] = m_mainram[0xdb90 / 2]; // fixes split objects
 			break;
 	case 0x07:
 		// unknown
@@ -632,12 +632,12 @@ static ADDRESS_MAP_START( punipic_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")
 	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // same as 98000C
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
-	AM_RANGE(0x980000, 0x98002f) AM_WRITE(punipic_layer_w)
+	AM_RANGE(0x980000, 0x98000f) AM_WRITE(punipic_layer_w)
 	AM_RANGE(0x990000, 0x990001) AM_WRITENOP // unknown
 	AM_RANGE(0x991000, 0x991017) AM_WRITENOP // unknown
 	AM_RANGE(0xf18000, 0xf19fff) AM_RAM
 	AM_RANGE(0xf1c006, 0xf1c007) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sf2m1_map, AS_PROGRAM, 16, cps_state )
@@ -2002,11 +2002,10 @@ MACHINE_START_MEMBER(cps_state, punipic)
 	m_layer_mask_reg[1] = 0x16;
 	m_layer_mask_reg[2] = 0x08;
 	m_layer_mask_reg[3] = 0x0a;
-	m_layer_scroll1x_offset = 0x48;
-	m_layer_scroll2x_offset = 0x48;
-	m_layer_scroll3x_offset = 0x48;
+	m_layer_scroll1x_offset = 0x46; // text
+	m_layer_scroll3x_offset = 0x46; // green patch in the park
 	m_sprite_base = 0x1000;
-	m_sprite_list_end_marker = 0xffff;
+	m_sprite_list_end_marker = 0xffff; // ?
 	m_sprite_x_offset = 0;
 }
 
@@ -2180,8 +2179,23 @@ DRIVER_INIT_MEMBER(cps_state, punipic)
 {
 	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 	mem16[0x5A8/2] = 0x4E71; // set data pointers
+	mem16[0x4DF0/2] = 0x33ED;
+	mem16[0x4DF2/2] = 0xDB2E;
+	mem16[0x4DF4/2] = 0x0080;
+	mem16[0x4DF6/2] = 0x0152;
+	mem16[0x4DF8/2] = 0x4E75;
 
 	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x993000, 0x993fff);
+	DRIVER_INIT_CALL(cps1);
+}
+
+DRIVER_INIT_MEMBER(cps_state, punipic3)
+{
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
+	mem16[0x5A6/2] = 0x4E71; // set data pointers
+	mem16[0x5A8/2] = 0x4E71;
+
+	//m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x993000, 0x993fff);
 	DRIVER_INIT_CALL(cps1);
 }
 
@@ -2262,7 +2276,7 @@ GAME( 1991, kodb,      kod,      kodb,      kodb,     cps_state, kodb,     ROT0,
 GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, knightsb, ROT0,   "bootleg", "Knights of the Round (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )    // 911127 - based on World version
 GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, punipic3, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2mdt,    sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
 GAME( 1992, sf2mdta,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )   // 920313 - based on World version
