@@ -50,6 +50,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(to_term);
+	DECLARE_READ8_MEMBER(from_term);
 };
 
 
@@ -77,17 +79,14 @@ static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
 // won't compile unless these are static
-static void to_term(device_t *device, int data )
+WRITE8_MEMBER( basic52_state::to_term)
 {
-	basic52_state *state = device->machine().driver_data<basic52_state>();
-	address_space &space = device->memory().space(AS_PROGRAM);
-	state->m_terminal->write(space, 0, data);
+	m_terminal->write(space, 0, data);
 }
 
-static int from_term(device_t *device)
+READ8_MEMBER(basic52_state::from_term)
 {
-	basic52_state *state = device->machine().driver_data<basic52_state>();
-	return state->m_term_data;
+	return m_term_data;
 }
 
 READ8_MEMBER( basic52_state::unk_r)
@@ -97,8 +96,8 @@ READ8_MEMBER( basic52_state::unk_r)
 
 void basic52_state::machine_reset()
 {
-	i8051_set_serial_tx_callback(m_maincpu, to_term);
-	i8051_set_serial_rx_callback(m_maincpu, from_term);
+	i8051_set_serial_tx_callback(m_maincpu, write8_delegate(FUNC(basic52_state::to_term),this));
+	i8051_set_serial_rx_callback(m_maincpu, read8_delegate(FUNC(basic52_state::from_term),this));
 }
 
 WRITE8_MEMBER( basic52_state::kbd_put )

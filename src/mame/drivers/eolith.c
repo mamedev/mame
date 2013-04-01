@@ -225,11 +225,10 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
  *
  *************************************/
 
-static void soundcpu_to_qs1000(device_t *device, int data)
+WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
 {
-	eolith_state *state = device->machine().driver_data<eolith_state>();
-	state->m_qs1000->serial_in(data);
-	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	m_qs1000->serial_in(data);
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -1478,7 +1477,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	init_eolith_speedup(machine());
 
 	// Sound CPU -> QS1000 CPU serial link
-	i8051_set_serial_tx_callback(machine().device("soundcpu"), soundcpu_to_qs1000);
+	i8051_set_serial_tx_callback(machine().device("soundcpu"), write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
 
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);

@@ -82,6 +82,7 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
+	DECLARE_READ8_MEMBER( data_to_i8052 );
 public:
 	DECLARE_WRITE8_MEMBER( wave_w );
 

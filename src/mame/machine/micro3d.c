@@ -53,16 +53,14 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
 	}
 };
 
-static int data_to_i8031(device_t *device)
+READ8_MEMBER(micro3d_state::data_to_i8031)
 {
-	micro3d_state *state = device->machine().driver_data<micro3d_state>();
-	return state->m_m68681_tx0;
+	return m_m68681_tx0;
 }
 
-static void data_from_i8031(device_t *device, int data)
+WRITE8_MEMBER(micro3d_state::data_from_i8031)
 {
-	micro3d_state *state = device->machine().driver_data<micro3d_state>();
-	duart68681_rx_data(state->m_duart68681, 1, data);
+	duart68681_rx_data(m_duart68681, 1, data);
 }
 
 /*
@@ -603,8 +601,8 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
 	address_space &space = machine().device("drmath")->memory().space(AS_DATA);
 
-	i8051_set_serial_tx_callback(machine().device("audiocpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(machine().device("audiocpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine().device("audiocpu"), write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
+	i8051_set_serial_rx_callback(machine().device("audiocpu"), read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
 
 	m_duart68681 = machine().device("duart68681");
 

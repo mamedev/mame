@@ -413,8 +413,8 @@ wangpc_keyboard_device::wangpc_keyboard_device(const machine_config &mconfig, co
 void wangpc_keyboard_device::device_start()
 {
 	// set serial callbacks
-	i8051_set_serial_tx_callback(m_maincpu, wangpc_keyboard_device::mcs51_tx_callback);
-	i8051_set_serial_rx_callback(m_maincpu, wangpc_keyboard_device::mcs51_rx_callback);
+	i8051_set_serial_tx_callback(m_maincpu, write8_delegate(FUNC(wangpc_keyboard_device::mcs51_tx_callback),this));
+	i8051_set_serial_rx_callback(m_maincpu, read8_delegate(FUNC(wangpc_keyboard_device::mcs51_rx_callback),this));
 	set_data_frame(8, 2, SERIAL_PARITY_NONE);
 }
 
@@ -457,11 +457,9 @@ void wangpc_keyboard_device::input_callback(UINT8 state)
 //  mcs51_rx_callback -
 //-------------------------------------------------
 
-int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
+READ8_MEMBER(wangpc_keyboard_device::mcs51_rx_callback)
 {
-	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
-
-	return kb->get_received_char();
+	return get_received_char();
 }
 
 
@@ -469,18 +467,16 @@ int wangpc_keyboard_device::mcs51_rx_callback(device_t *device)
 //  mcs51_tx_callback -
 //-------------------------------------------------
 
-void wangpc_keyboard_device::mcs51_tx_callback(device_t *device, int data)
+WRITE8_MEMBER(wangpc_keyboard_device::mcs51_tx_callback)
 {
-	wangpc_keyboard_device *kb = static_cast<wangpc_keyboard_device *>(device->owner());
-
 	if (LOG) logerror("Wang PC keyboard transmit data %02x\n", data);
 
-	kb->transmit_register_setup(data);
+	transmit_register_setup(data);
 
 	// HACK bang the bits out immediately
-	while (!kb->is_transmit_register_empty())
+	while (!is_transmit_register_empty())
 	{
-		kb->transmit_register_send_bit();
+		transmit_register_send_bit();
 	}
 }
 

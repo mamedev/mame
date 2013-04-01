@@ -290,8 +290,8 @@ struct mcs51_state_t
 
 	/* Serial Port TX/RX Callbacks */
 	// TODO: Move to special port r/w
-	mcs51_serial_tx_func serial_tx_callback;    //Call back funciton when sending data out of serial port
-	mcs51_serial_rx_func serial_rx_callback;    //Call back function to retrieve data when receiving serial port data
+	write8_delegate serial_tx_callback;    //Call back funciton when sending data out of serial port
+	read8_delegate serial_rx_callback;    //Call back function to retrieve data when receiving serial port data
 
 	/* DS5002FP */
 	struct {
@@ -925,8 +925,8 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 			mcs51_state->uart.bits_to_send--;
 			if(mcs51_state->uart.bits_to_send == 0) {
 				//Call the callback function
-				if(mcs51_state->serial_tx_callback)
-					mcs51_state->serial_tx_callback(mcs51_state->device, mcs51_state->uart.data_out);
+				if(!mcs51_state->serial_tx_callback.isnull())
+					mcs51_state->serial_tx_callback(*mcs51_state->io, 0, mcs51_state->uart.data_out, 0xff);
 				//Set Interrupt Flag
 				SET_TI(1);
 			}
@@ -944,8 +944,8 @@ INLINE void transmit_receive(mcs51_state_t *mcs51_state, int source)
 			{
 				int data = 0;
 				//Call our callball function to retrieve the data
-				if(mcs51_state->serial_rx_callback)
-					data = mcs51_state->serial_rx_callback(mcs51_state->device);
+				if(!mcs51_state->serial_rx_callback.isnull())
+					data = mcs51_state->serial_rx_callback(*mcs51_state->io, 0, 0xff);
 				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
@@ -1283,13 +1283,13 @@ INLINE void update_irq_prio(mcs51_state_t *mcs51_state, UINT8 ipl, UINT8 iph)
 ***************************************************************************/
 
 
-void i8051_set_serial_tx_callback(device_t *device, mcs51_serial_tx_func tx_func)
+void i8051_set_serial_tx_callback(device_t *device, write8_delegate tx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_tx_callback = tx_func;
 }
 
-void i8051_set_serial_rx_callback(device_t *device, mcs51_serial_rx_func rx_func)
+void i8051_set_serial_rx_callback(device_t *device, read8_delegate rx_func)
 {
 	mcs51_state_t *mcs51_state = get_safe_token(device);
 	mcs51_state->serial_rx_callback = rx_func;

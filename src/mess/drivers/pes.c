@@ -96,24 +96,22 @@ static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
 };
 
 /* Helper Functions */
-static int data_to_i8031(device_t *device)
+READ8_MEMBER( pes_state::data_to_i8031)
 {
-	pes_state *state = device->machine().driver_data<pes_state>();
 	UINT8 data;
-	data = state->m_infifo[state->m_infifo_tail_ptr];
+	data = m_infifo[m_infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	if (state->m_infifo_tail_ptr != state->m_infifo_head_ptr) state->m_infifo_tail_ptr++;
-	state->m_infifo_tail_ptr&=0x1F;
+	if (m_infifo_tail_ptr != m_infifo_head_ptr) m_infifo_tail_ptr++;
+	m_infifo_tail_ptr&=0x1F;
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: input to i8031/pes from pc/terminal: %02X\n",data);
 #endif
 	return data;
 }
 
-static void data_from_i8031(device_t *device, int data)
+WRITE8_MEMBER(pes_state::data_from_i8031)
 {
-	pes_state *state = device->machine().driver_data<pes_state>();
-	state->m_terminal->write(device->machine().driver_data()->generic_space(),0,data);
+	m_terminal->write(space,0,data);
 #ifdef DEBUG_SERIAL_CB
 	fprintf(stderr,"callback: output from i8031/pes to pc/terminal: %02X\n",data);
 #endif
@@ -230,8 +228,8 @@ void pes_state::machine_reset()
 
 DRIVER_INIT_MEMBER(pes_state,pes)
 {
-	i8051_set_serial_tx_callback(machine().device("maincpu"), data_from_i8031);
-	i8051_set_serial_rx_callback(machine().device("maincpu"), data_to_i8031);
+	i8051_set_serial_tx_callback(machine().device("maincpu"), write8_delegate(FUNC(pes_state::data_from_i8031),this));
+	i8051_set_serial_rx_callback(machine().device("maincpu"), read8_delegate(FUNC(pes_state::data_to_i8031),this));
 }
 
 /******************************************************************************
