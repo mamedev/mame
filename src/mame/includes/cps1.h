@@ -252,6 +252,7 @@ public:
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);
 	DECLARE_DRIVER_INIT(cawingbl);
+	DECLARE_DRIVER_INIT(dinopic);
 	DECLARE_DRIVER_INIT(knightsb);
 	DECLARE_DRIVER_INIT(punipic);
 	DECLARE_DRIVER_INIT(punipic3);
@@ -261,14 +262,17 @@ public:
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(knightsb);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_MACHINE_START(sgyxz);
-	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
+	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
+	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
@@ -324,6 +328,7 @@ ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
 GFXDECODE_EXTERN( cps1 );
 
+INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
 INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
