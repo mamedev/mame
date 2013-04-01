@@ -397,7 +397,7 @@ Notes:
 #define HBEND               (0)
 #define HBSTART             (512)
 
-#define VTOTAL              (443) /* H/V - 442.51 / 443.43 total lines, interlaced? */
+#define VTOTAL              (443) /* H/V - 442.51 / 443.43 total lines */
 #define VBEND               (0)
 #define VBSTART             (400)
 
@@ -727,7 +727,6 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 {
 	static const char pcb_id[0x40] =
 	{ "DEV=TC0870HVP   SYS=CG  VER=1.0"};
-	// this is from sidebs(2.7j), needs to be verified more thoroughly
 	// - any more data after "VER=1."?
 	// - can we assume it comes from the TC0870HVP chip?
 
