@@ -205,16 +205,16 @@ MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 	dreamcast_atapi_reset(machine());
 }
 
-static void aica_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const aica_interface dc_aica_interface =
 {
 	0,
 	0,
-	DEVCB_LINE(aica_irq)
+	DEVCB_DRIVER_LINE_MEMBER(dc_cons_state,aica_irq)
 };
 
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };

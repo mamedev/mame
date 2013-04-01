@@ -182,6 +182,7 @@ public:
 	DECLARE_DRIVER_INIT(denib);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -330,11 +331,10 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static void esq5505_otis_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 {
-	esq5505_state *esq5505 = device->machine().driver_data<esq5505_state>();
-	esq5505->otis_irq_state = (state != 0);
-	esq5505->update_irq_to_maincpu();
+	otis_irq_state = (state != 0);
+	update_irq_to_maincpu();
 }
 
 static READ16_DEVICE_HANDLER(esq5505_read_adc)
@@ -611,7 +611,7 @@ static const es5505_interface es5505_config =
 {
 	"waverom",  /* Bank 0 */
 	"waverom2", /* Bank 1 */
-	DEVCB_LINE(esq5505_otis_irq), /* irq */
+	DEVCB_DRIVER_LINE_MEMBER(esq5505_state,esq5505_otis_irq), /* irq */
 	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5505_read_adc)
 };
 

@@ -485,6 +485,7 @@ public:
 	DECLARE_READ8_MEMBER(opn_portb_r);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 	void pc8801_raise_irq(UINT8 irq,UINT8 state);
+	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
 };
 
 
@@ -2319,11 +2320,10 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return vector << 1;
 }
 
-static void pc8801_sound_irq( device_t *device, int irq )
+WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_sound_irq_mask && irq)
-		pc8801_raise_irq(device->machine(),1<<(4),1);
+	if(m_sound_irq_mask && state)
+		pc8801_raise_irq(machine(),1<<(4),1);
 }
 
 /*
@@ -2368,23 +2368,21 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return 4*2; //TODO: mustn't happen
 }
 
-static void pc8801_sound_irq( device_t *device, int irq )
+WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-
-//  printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
+//  printf("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
 	/* TODO: correct i8214 irq level? */
-	if(irq)
+	if(state)
 	{
-		if(state->m_sound_irq_mask)
+		if(m_sound_irq_mask)
 		{
-			state->m_sound_irq_latch = 1;
-			state->m_sound_irq_pending = 0;
+			m_sound_irq_latch = 1;
+			m_sound_irq_pending = 0;
 			//IRQ_LOG(("sound\n"));
-			device->machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+			machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
 		}
 		else
-			state->m_sound_irq_pending = 1;
+			m_sound_irq_pending = 1;
 	}
 }
 
@@ -2596,7 +2594,7 @@ static const ym2203_interface pc88_ym2203_intf =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	DEVCB_LINE(pc8801_sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pc8801_sound_irq)
 };
 
 static const ym2608_interface pc88_ym2608_intf =
@@ -2609,7 +2607,7 @@ static const ym2608_interface pc88_ym2608_intf =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	DEVCB_LINE(pc8801_sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pc8801_sound_irq)
 };
 
 /* Cassette Configuration */

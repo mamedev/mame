@@ -751,28 +751,26 @@ void saturn_state::m68k_reset_callback(device_t *device)
 	printf("m68k RESET opcode triggered\n");
 }
 
-void scsp_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(saturn_state::scsp_irq)
 {
-	saturn_state *state = device->machine().driver_data<saturn_state>();
-
 	// don't bother the 68k if it's off
-	if (!state->m_en_68k)
+	if (!m_en_68k)
 	{
 		return;
 	}
 
-	if (irq > 0)
+	if (state > 0)
 	{
-		state->m_scsp_last_line = irq;
-		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
+		m_scsp_last_line = state;
+		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
 	}
-	else if (irq < 0)
+	else if (state < 0)
 	{
-		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
 	}
 	else
 	{
-		device->machine().device("audiocpu")->execute().set_input_line(state->m_scsp_last_line, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(m_scsp_last_line, CLEAR_LINE);
 	}
 }
 

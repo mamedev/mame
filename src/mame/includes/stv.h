@@ -165,8 +165,8 @@ public:
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
 	TIMER_CALLBACK_MEMBER(stv_rtc_increment);
-	WRITE_LINE_MEMBER(scsp_to_main_irq);
-
+	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 	int m_scsp_last_line;
 
 	UINT8 smpc_direct_mode(UINT8 pad_n);

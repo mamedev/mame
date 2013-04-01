@@ -1349,20 +1349,19 @@ IRQ_CALLBACK_MEMBER(fm7_state::fm7_sub_irq_ack)
 	return -1;
 }
 
-static void fm77av_fmirq(device_t* device,int irq)
+WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
 {
-	fm7_state *state = device->machine().driver_data<fm7_state>();
-	if(irq == 1)
+	if(state == 1)
 	{
 		// cannot be masked
-		main_irq_set_flag(device->machine(),IRQ_FLAG_OTHER);
-		state->m_fm77av_ym_irq = 1;
+		main_irq_set_flag(machine(),IRQ_FLAG_OTHER);
+		m_fm77av_ym_irq = 1;
 		logerror("YM: IRQ on\n");
 	}
 	else
 	{
-		main_irq_clear_flag(device->machine(),IRQ_FLAG_OTHER);
-		state->m_fm77av_ym_irq = 0;
+		main_irq_clear_flag(machine(),IRQ_FLAG_OTHER);
+		m_fm77av_ym_irq = 0;
 		logerror("YM: IRQ off\n");
 	}
 }
@@ -1995,7 +1994,7 @@ static const ym2203_interface fm7_ym_intf =
 		DEVCB_NULL,                 /* portA write */
 		DEVCB_NULL                  /* portB write */
 	},
-	DEVCB_LINE(fm77av_fmirq)
+	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm77av_fmirq)
 };
 
 static const cassette_interface fm7_cassette_interface =

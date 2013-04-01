@@ -19,6 +19,7 @@ public:
 	DECLARE_WRITE64_MEMBER(dc_arm_w);
 	DECLARE_WRITE64_MEMBER(ta_texture_directpath0_w);
 	DECLARE_WRITE64_MEMBER(ta_texture_directpath1_w);
+	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 private:
 	UINT64 PDTRA, PCTRA;
 

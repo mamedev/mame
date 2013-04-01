@@ -603,7 +603,7 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 static const scsp_interface scsp_config =
 {
 	0,
-	DEVCB_LINE(scsp_irq),
+	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scsp_irq),
 	DEVCB_DRIVER_LINE_MEMBER(saturn_state, scsp_to_main_irq)
 };
 

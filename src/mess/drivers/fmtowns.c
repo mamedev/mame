@@ -2067,22 +2067,20 @@ IRQ_CALLBACK_MEMBER(towns_state::towns_irq_callback)
 }
 
 // YM3438 interrupt (IRQ 13)
-static void towns_fm_irq(device_t* device, int irq)
+WRITE_LINE_MEMBER(towns_state::towns_fm_irq)
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
-	device_t* pic = state->m_pic_slave;
-	if(irq)
+	if(state)
 	{
-		state->m_towns_fm_irq_flag = 1;
-		pic8259_ir5_w(pic, 1);
+		m_towns_fm_irq_flag = 1;
+		pic8259_ir5_w(m_pic_slave, 1);
 		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
-		state->m_towns_fm_irq_flag = 0;
-		if(state->m_towns_pcm_irq_flag == 0)
+		m_towns_fm_irq_flag = 0;
+		if(m_towns_pcm_irq_flag == 0)
 		{
-			pic8259_ir5_w(pic, 0);
+			pic8259_ir5_w(m_pic_slave, 0);
 			if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
 		}
 	}
@@ -2766,7 +2764,7 @@ static const upd71071_intf towns_dma_config =
 
 static const ym3438_interface ym3438_intf =
 {
-	DEVCB_LINE(towns_fm_irq)
+	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_fm_irq)
 };
 
 static const rf5c68_interface rf5c68_intf =

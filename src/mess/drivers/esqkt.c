@@ -88,6 +88,7 @@ private:
 public:
 	DECLARE_DRIVER_INIT(kt);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 };
 
 void esqkt_state::machine_reset()
@@ -241,11 +242,10 @@ static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-static void esq5506_otto_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(esqkt_state::esq5506_otto_irq)
 {
 	#if 0   // 5505/06 IRQ generation needs (more) work
-	esqkt_state *esq5505 = device->machine().driver_data<esqkt_state>();
-	esq5505->m_maincpu->set_input_line(1, state);
+	m_maincpu->set_input_line(1, state);
 	#endif
 }
 
@@ -410,7 +410,7 @@ static const es5506_interface es5506_config =
 	"waverom2", /* Bank 1 */
 	"waverom3", /* Bank 0 */
 	"waverom4", /* Bank 1 */
-	DEVCB_LINE(esq5506_otto_irq), /* irq */
+	DEVCB_DRIVER_LINE_MEMBER(esqkt_state,esq5506_otto_irq), /* irq */
 	DEVCB_DEVICE_HANDLER(DEVICE_SELF, esq5506_read_adc)
 };
 
