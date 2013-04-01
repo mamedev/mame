@@ -58,6 +58,16 @@ struct sc61860_state
 	direct_read_data *direct;
 	int icount;
 	UINT8 ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
+	
+	devcb_resolved_read_line reset;
+	devcb_resolved_read_line brk;
+	devcb_resolved_read_line x;
+	devcb_resolved_read8 ina;
+	devcb_resolved_write8 outa;
+	devcb_resolved_read8 inb;
+	devcb_resolved_write8 outb;
+	devcb_resolved_write8 outc;
+	
 };
 
 INLINE sc61860_state *get_safe_token(device_t *device)
@@ -107,6 +117,14 @@ static CPU_INIT( sc61860 )
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
+	cpustate->reset.resolve(cpustate->config->reset,*device);
+	cpustate->brk.resolve(  cpustate->config->brk,*device);
+	cpustate->x.resolve(    cpustate->config->x,*device);
+	cpustate->ina.resolve(  cpustate->config->ina,*device);
+	cpustate->outa.resolve( cpustate->config->outa,*device);
+	cpustate->inb.resolve(  cpustate->config->inb,*device);
+	cpustate->outb.resolve( cpustate->config->outb,*device);
+	cpustate->outc.resolve( cpustate->config->outc,*device);
 }
 
 static CPU_EXECUTE( sc61860 )

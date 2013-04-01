@@ -34,32 +34,28 @@
 #include "includes/pc1403.h"
 
 
-VIDEO_START( pc1403 )
+void pc1403_state::video_start()
 {
-	pc1403_state *state = machine.driver_data<pc1403_state>();
-	if (strcmp(machine.system().name, "pc1403h") == 0)
+	if (strcmp(machine().system().name, "pc1403h") == 0)
 	{
-		state->m_DOWN = 69;
-		state->m_RIGHT = 155;
+		m_DOWN = 69;
+		m_RIGHT = 155;
 	}
 	else
 	{
-		state->m_DOWN = 67;
-		state->m_RIGHT = 152;
+		m_DOWN = 67;
+		m_RIGHT = 152;
 	}
 }
 
-
-READ8_HANDLER(pc1403_lcd_read)
+READ8_MEMBER(pc1403_state::pc1403_lcd_read)
 {
-	pc1403_state *state = space.machine().driver_data<pc1403_state>();
-	return state->m_reg[offset];
+	return m_reg[offset];
 }
 
-WRITE8_HANDLER(pc1403_lcd_write)
+WRITE8_MEMBER(pc1403_state::pc1403_lcd_write)
 {
-	pc1403_state *state = space.machine().driver_data<pc1403_state>();
-	state->m_reg[offset]=data;
+	m_reg[offset]=data;
 }
 
 static const POCKETC_FIGURE line={ /* simple line */
@@ -149,7 +145,6 @@ static const POCKETC_FIGURE busy={
 
 UINT32 pc1403_state::screen_update_pc1403(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	running_machine &machine = screen.machine();
 	int x, y, i, j;
 	int color[3];
 

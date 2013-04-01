@@ -95,26 +95,22 @@ static const POCKETC_FIGURE busy={
 	"1 1 11    1e"
 };
 
-	READ8_HANDLER(pc1350_lcd_read)
+READ8_MEMBER(pc1350_state::pc1350_lcd_read)
 {
-	pc1350_state *state = space.machine().driver_data<pc1350_state>();
-	int data;
-	data = state->m_reg[offset&0xfff];
+	UINT8 data = m_reg[offset&0xfff];
 	logerror("pc1350 read %.3x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_HANDLER(pc1350_lcd_write)
+WRITE8_MEMBER(pc1350_state::pc1350_lcd_write)
 {
-	pc1350_state *state = space.machine().driver_data<pc1350_state>();
 	logerror("pc1350 write %.3x %.2x\n",offset,data);
-	state->m_reg[offset&0xfff] = data;
+	m_reg[offset&0xfff] = data;
 }
 
-int pc1350_keyboard_line_r(running_machine &machine)
+READ8_MEMBER(pc1350_state::pc1350_keyboard_line_r)
 {
-	pc1350_state *state = machine.driver_data<pc1350_state>();
-	return state->m_reg[0xe00];
+	return m_reg[0xe00];
 }
 
 /* pc1350
@@ -133,8 +129,6 @@ UINT32 pc1350_state::screen_update_pc1350(screen_device &screen, bitmap_ind16 &b
 {
 	int x, y=DOWN, i, j, k=0, b;
 	int color[4];
-	running_machine &machine = screen.machine();
-
 	bitmap.fill(11, cliprect);
 
 	/* HJB: we cannot initialize array with values from other arrays, thus... */

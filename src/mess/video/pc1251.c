@@ -95,20 +95,17 @@ static const POCKETC_FIGURE busy={
 	"1 1 11    1e"
 };
 
-	READ8_HANDLER(pc1251_lcd_read)
+READ8_MEMBER(pc1251_state::pc1251_lcd_read)
 {
-	pc1251_state *state = space.machine().driver_data<pc1251_state>();
-	int data;
-	data = state->m_reg[offset&0xff];
+	UINT8 data = m_reg[offset&0xff];
 	logerror("pc1251 read %.3x %.2x\n",offset,data);
 	return data;
 }
 
-WRITE8_HANDLER(pc1251_lcd_write)
+WRITE8_MEMBER(pc1251_state::pc1251_lcd_write)
 {
-	pc1251_state *state = space.machine().driver_data<pc1251_state>();
 	logerror("pc1251 write %.3x %.2x\n",offset,data);
-	state->m_reg[offset&0xff] = data;
+	m_reg[offset&0xff] = data;
 }
 
 #define DOWN 62
@@ -118,7 +115,6 @@ UINT32 pc1251_state::screen_update_pc1251(screen_device &screen, bitmap_ind16 &b
 {
 	int x, y, i, j;
 	int color[2];
-	running_machine &machine = screen.machine();
 
 	bitmap.fill(11, cliprect);
 

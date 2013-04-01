@@ -21,107 +21,102 @@
 
 
 
-void pc1401_outa(device_t *device, int data)
+WRITE8_MEMBER(pc1401_state::pc1401_outa)
 {
-	pc1401_state *state = device->machine().driver_data<pc1401_state>();
-	state->m_outa = data;
+	m_outa = data;
 }
 
-void pc1401_outb(device_t *device, int data)
+WRITE8_MEMBER(pc1401_state::pc1401_outb)
 {
-	pc1401_state *state = device->machine().driver_data<pc1401_state>();
-	state->m_outb = data;
+	m_outb = data;
 }
 
-void pc1401_outc(device_t *device, int data)
+WRITE8_MEMBER(pc1401_state::pc1401_outc)
 {
-	pc1401_state *state = device->machine().driver_data<pc1401_state>();
 	//logerror("%g outc %.2x\n", machine.time().as_double(), data);
-	state->m_portc = data;
+	m_portc = data;
 }
 
-int pc1401_ina(device_t *device)
+READ8_MEMBER(pc1401_state::pc1401_ina)
 {
-	pc1401_state *state = device->machine().driver_data<pc1401_state>();
-	int data = state->m_outa;
+	int data = m_outa;
 
-	if (state->m_outb & 0x01)
-		data |= device->machine().root_device().ioport("KEY0")->read();
+	if (m_outb & 0x01)
+		data |= ioport("KEY0")->read();
 
-	if (state->m_outb & 0x02)
-		data |= device->machine().root_device().ioport("KEY1")->read();
+	if (m_outb & 0x02)
+		data |= ioport("KEY1")->read();
 
-	if (state->m_outb & 0x04)
-		data |= device->machine().root_device().ioport("KEY2")->read();
+	if (m_outb & 0x04)
+		data |= ioport("KEY2")->read();
 
-	if (state->m_outb & 0x08)
-		data |= device->machine().root_device().ioport("KEY3")->read();
+	if (m_outb & 0x08)
+		data |= ioport("KEY3")->read();
 
-	if (state->m_outb & 0x10)
-		data |= device->machine().root_device().ioport("KEY4")->read();
+	if (m_outb & 0x10)
+		data |= ioport("KEY4")->read();
 
-	if (state->m_outb & 0x20)
+	if (m_outb & 0x20)
 	{
-		data |= state->ioport("KEY5")->read();
+		data |= ioport("KEY5")->read();
 
 		/* At Power Up we fake a 'C-CE' pressure */
-		if (state->m_power)
+		if (m_power)
 			data |= 0x01;
 	}
 
-	if (state->m_outa & 0x01)
-		data |= device->machine().root_device().ioport("KEY6")->read();
+	if (m_outa & 0x01)
+		data |= ioport("KEY6")->read();
 
-	if (state->m_outa & 0x02)
-		data |= device->machine().root_device().ioport("KEY7")->read();
+	if (m_outa & 0x02)
+		data |= ioport("KEY7")->read();
 
-	if (state->m_outa & 0x04)
-		data |= device->machine().root_device().ioport("KEY8")->read();
+	if (m_outa & 0x04)
+		data |= ioport("KEY8")->read();
 
-	if (state->m_outa & 0x08)
-		data |= device->machine().root_device().ioport("KEY9")->read();
+	if (m_outa & 0x08)
+		data |= ioport("KEY9")->read();
 
-	if (state->m_outa & 0x10)
-		data |= device->machine().root_device().ioport("KEY10")->read();
+	if (m_outa & 0x10)
+		data |= ioport("KEY10")->read();
 
-	if (state->m_outa & 0x20)
-		data |= device->machine().root_device().ioport("KEY11")->read();
+	if (m_outa & 0x20)
+		data |= ioport("KEY11")->read();
 
-	if (state->m_outa & 0x40)
-		data |= device->machine().root_device().ioport("KEY12")->read();
+	if (m_outa & 0x40)
+		data |= ioport("KEY12")->read();
 
 	return data;
 }
 
-int pc1401_inb(device_t *device)
+READ8_MEMBER(pc1401_state::pc1401_inb)
 {
-	pc1401_state *state = device->machine().driver_data<pc1401_state>();
-	int data=state->m_outb;
+	int data=m_outb;
 
-	if (state->ioport("EXTRA")->read() & 0x04)
+	if (ioport("EXTRA")->read() & 0x04)
 		data |= 0x01;
 
 	return data;
 }
 
-int pc1401_brk(device_t *device)
+READ_LINE_MEMBER(pc1401_state::pc1401_brk)
 {
-	return (device->machine().root_device().ioport("EXTRA")->read() & 0x01);
+	return (ioport("EXTRA")->read() & 0x01);
 }
 
-int pc1401_reset(device_t *device)
+READ_LINE_MEMBER(pc1401_state::pc1401_reset)
 {
-	return (device->machine().root_device().ioport("EXTRA")->read() & 0x02);
+	return (ioport("EXTRA")->read() & 0x02);
 }
 
-MACHINE_START( pc1401 )
+void pc1401_state::machine_start()
 {
-	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x2000;
+	device_t *main_cpu = machine().device("maincpu");
+	UINT8 *ram = memregion("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
-	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
+	machine().device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
+	machine().device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
 }
 
 TIMER_CALLBACK_MEMBER(pc1401_state::pc1401_power_up)

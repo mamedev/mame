@@ -419,15 +419,15 @@ INLINE void sc61860_reset_carry(sc61860_state *cpustate)
 INLINE void sc61860_out_a(sc61860_state *cpustate)
 {
 	cpustate->q=IA;
-	if (cpustate->config&&cpustate->config->outa)
-		cpustate->config->outa(cpustate->device, READ_RAM(cpustate, IA));
+	if (!cpustate->outa.isnull())
+		cpustate->outa(0,READ_RAM(cpustate, IA));
 }
 
 INLINE void sc61860_out_b(sc61860_state *cpustate)
 {
 	cpustate->q=IB;
-	if (cpustate->config&&cpustate->config->outb)
-		cpustate->config->outb(cpustate->device, READ_RAM(cpustate, IB));
+	if (!cpustate->outb.isnull())
+		cpustate->outb(0, READ_RAM(cpustate, IB));
 }
 
 INLINE void sc61860_out_f(sc61860_state *cpustate)
@@ -447,15 +447,15 @@ INLINE void sc61860_out_f(sc61860_state *cpustate)
 INLINE void sc61860_out_c(sc61860_state *cpustate)
 {
 	cpustate->q=C;
-	if (cpustate->config&&cpustate->config->outc)
-		cpustate->config->outc(cpustate->device, READ_RAM(cpustate, C));
+	if (!cpustate->outc.isnull())
+		cpustate->outc(0, READ_RAM(cpustate, C));
 	cpustate->c = READ_RAM(cpustate, C);
 }
 
 INLINE void sc61860_in_a(sc61860_state *cpustate)
 {
 	int data=0;
-	if (cpustate->config&&cpustate->config->ina) data=cpustate->config->ina(cpustate->device);
+	if (!cpustate->ina.isnull()) data=cpustate->ina(0);
 	WRITE_RAM(cpustate, A, data);
 	cpustate->zero=data==0;
 }
@@ -463,7 +463,7 @@ INLINE void sc61860_in_a(sc61860_state *cpustate)
 INLINE void sc61860_in_b(sc61860_state *cpustate)
 {
 	int data=0;
-	if (cpustate->config&&cpustate->config->inb) data=cpustate->config->inb(cpustate->device);
+	if (!cpustate->inb.isnull()) data=cpustate->inb(0);
 	WRITE_RAM(cpustate, A, data);
 	cpustate->zero=data==0;
 }
@@ -481,9 +481,9 @@ INLINE void sc61860_test_special(sc61860_state *cpustate)
 	int t=0;
 	if (cpustate->timer.t512ms) t|=1;
 	if (cpustate->timer.t2ms) t|=2;
-	if (cpustate->config&&cpustate->config->brk&&cpustate->config->brk(cpustate->device)) t|=8;
-	if (cpustate->config&&cpustate->config->reset&&cpustate->config->reset(cpustate->device)) t|=0x40;
-	if (cpustate->config&&cpustate->config->x&&cpustate->config->x(cpustate->device)) t|=0x80;
+	if (!cpustate->brk.isnull()&&cpustate->brk()) t|=8;
+	if (!cpustate->reset.isnull()&&cpustate->reset()) t|=0x40;
+	if (!cpustate->x.isnull()&&cpustate->x()) t|=0x80;
 
 	cpustate->zero=(t&READ_OP(cpustate))==0;
 }
@@ -761,11 +761,11 @@ INLINE void sc61860_wait_x(sc61860_state *cpustate, int level)
 	int c;
 	cpustate->zero=level;
 
-	if (cpustate->config&&cpustate->config->x) {
+	if (!cpustate->x.isnull()) {
 		for (c=READ_RAM(cpustate, I); c>=0; c--) {
 			UINT8 t = (READ_RAM(cpustate, cpustate->p)+1)&0x7f;
 			WRITE_RAM(cpustate, cpustate->p, t);
-			cpustate->zero=cpustate->config->x(cpustate->device);
+			cpustate->zero=cpustate->x();
 			cpustate->icount-=4;
 			if (level != cpustate->zero) break;
 		}

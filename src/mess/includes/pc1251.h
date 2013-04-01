@@ -11,7 +11,7 @@
 
 #include "machine/nvram.h"
 
-#define PC1251_CONTRAST (machine.root_device().ioport("DSW0")->read() & 0x07)
+#define PC1251_CONTRAST (ioport("DSW0")->read() & 0x07)
 
 
 class pc1251_state : public driver_device
@@ -28,28 +28,18 @@ public:
 	DECLARE_DRIVER_INIT(pc1251);
 	UINT32 screen_update_pc1251(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pc1251_power_up);
+	DECLARE_WRITE8_MEMBER(pc1251_outa);
+	DECLARE_WRITE8_MEMBER(pc1251_outb);
+	DECLARE_WRITE8_MEMBER(pc1251_outc);
+
+	DECLARE_READ_LINE_MEMBER(pc1251_reset);
+	DECLARE_READ_LINE_MEMBER(pc1251_brk);
+	DECLARE_READ8_MEMBER(pc1251_ina);
+	DECLARE_READ8_MEMBER(pc1251_inb);
+	DECLARE_READ8_MEMBER(pc1251_lcd_read);
+	DECLARE_WRITE8_MEMBER(pc1251_lcd_write);
+	virtual void machine_start();
+	DECLARE_MACHINE_START(pc1260);
 };
-
-
-/*----------- defined in machine/pc1251.c -----------*/
-
-void pc1251_outa(device_t *device, int data);
-void pc1251_outb(device_t *device, int data);
-void pc1251_outc(device_t *device, int data);
-
-int pc1251_reset(device_t *device);
-int pc1251_brk(device_t *device);
-int pc1251_ina(device_t *device);
-int pc1251_inb(device_t *device);
-
-MACHINE_START( pc1251 );
-
-
-/*----------- defined in video/pc1251.c -----------*/
-
-DECLARE_READ8_HANDLER(pc1251_lcd_read);
-DECLARE_WRITE8_HANDLER(pc1251_lcd_write);
-
-
 
 #endif /* PC1251_H_ */

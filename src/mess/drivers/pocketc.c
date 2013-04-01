@@ -80,76 +80,76 @@
 /* special keys
    red c-ce and reset; warm boot, program NOT lost*/
 
-static ADDRESS_MAP_START( pc1401_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1401_mem , AS_PROGRAM, 8, pc1401_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x3800, 0x47ff) AM_RAM
-	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE_LEGACY(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
+	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1402_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1402_mem , AS_PROGRAM, 8, pc1401_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x2000, 0x47ff) AM_RAM
-	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE_LEGACY(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
+	AM_RANGE( 0x6000, 0x67ff) AM_READWRITE(pc1401_lcd_read, pc1401_lcd_write ) AM_MIRROR(0x1000)
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1250_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1250_mem , AS_PROGRAM, 8, pc1251_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xc000, 0xc7ff) AM_RAM // 2KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1251_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1251_mem , AS_PROGRAM, 8, pc1251_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xb800, 0xc7ff) AM_RAM // 4KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1255_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1255_mem , AS_PROGRAM, 8, pc1251_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff) AM_ROM
 	AM_RANGE( 0xa000, 0xc7ff) AM_RAM // 10KB RAM
-	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0xf800, 0xf8ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1260_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1260_mem , AS_PROGRAM, 8, pc1251_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
-	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 	AM_RANGE( 0x5800, 0x67ff) AM_RAM // 4KB RAM
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc1261_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1261_mem , AS_PROGRAM, 8, pc1251_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
-	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE_LEGACY(pc1251_lcd_read, pc1251_lcd_write)
+	AM_RANGE( 0x2000, 0x20ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
+	//AM_RANGE( 0x2800, 0x28ff) AM_READWRITE(pc1251_lcd_read, pc1251_lcd_write)
 	AM_RANGE( 0x4000, 0x67ff) AM_RAM // 10KB RAM
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pc1350_mem , AS_PROGRAM, 8, pc1403_state )
+static ADDRESS_MAP_START( pc1350_mem , AS_PROGRAM, 8, pc1350_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x7000, 0x7eff) AM_READWRITE_LEGACY(pc1350_lcd_read, pc1350_lcd_write )
+	AM_RANGE( 0x7000, 0x7eff) AM_READWRITE(pc1350_lcd_read, pc1350_lcd_write )
 	AM_RANGE( 0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1403_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE_LEGACY(pc1403_lcd_read, pc1403_lcd_write )
-	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE_LEGACY(pc1403_asic_read, pc1403_asic_write )
+	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE(pc1403_lcd_read, pc1403_lcd_write )
+	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE(pc1403_asic_read, pc1403_asic_write )
 	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE( 0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc1403h_mem , AS_PROGRAM, 8, pc1403_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROM
-	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE_LEGACY(pc1403_lcd_read, pc1403_lcd_write )
-	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE_LEGACY(pc1403_asic_read, pc1403_asic_write )
+	AM_RANGE( 0x3000, 0x30bf) AM_READWRITE(pc1403_lcd_read, pc1403_lcd_write )
+	AM_RANGE( 0x3800, 0x3fff) AM_READWRITE(pc1403_asic_read, pc1403_asic_write )
 	AM_RANGE( 0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE( 0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -709,10 +709,10 @@ GFXDECODE_END
 
 static const sc61860_cpu_core pc1401_config =
 {
-	pc1401_reset, pc1401_brk, NULL,
-	pc1401_ina, pc1401_outa,
-	pc1401_inb, pc1401_outb,
-	pc1401_outc
+	DEVCB_DRIVER_LINE_MEMBER(pc1401_state,pc1401_reset), DEVCB_DRIVER_LINE_MEMBER(pc1401_state,pc1401_brk), DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_ina), DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outa),
+	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_inb), DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outb),
+	DEVCB_DRIVER_MEMBER(pc1401_state,pc1401_outc)
 };
 
 static MACHINE_CONFIG_FRAGMENT( pocketc )
@@ -747,8 +747,6 @@ static MACHINE_CONFIG_START( pc1401, pc1401_state )
 	MCFG_CPU_PROGRAM_MAP(pc1401_mem)
 	MCFG_CPU_CONFIG(pc1401_config)
 
-	MCFG_MACHINE_START( pc1401 )
-
 	MCFG_FRAGMENT_ADD(pocketc)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -762,10 +760,10 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1251_config =
 {
-	NULL, pc1251_brk, NULL,
-	pc1251_ina, pc1251_outa,
-	pc1251_inb, pc1251_outb,
-	pc1251_outc
+	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1251_state,pc1251_brk), DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_ina), DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outa),
+	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_inb), DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outb),
+	DEVCB_DRIVER_MEMBER(pc1251_state,pc1251_outc)
 };
 
 static MACHINE_CONFIG_START( pc1250, pc1251_state )
@@ -774,8 +772,6 @@ static MACHINE_CONFIG_START( pc1250, pc1251_state )
 	MCFG_CPU_CONFIG( pc1251_config )
 
 	MCFG_FRAGMENT_ADD(pocketc)
-
-	MCFG_MACHINE_START( pc1251 )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -795,21 +791,11 @@ static MACHINE_CONFIG_DERIVED( pc1255, pc1250 )
 	MCFG_CPU_PROGRAM_MAP( pc1255_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_START( pc1260 )
-{
-	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x4000;
-	UINT8 *cpu = sc61860_internal_ram(main_cpu);
-
-	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
-	machine.device<nvram_device>("ram_nvram")->set_base(ram, 0x2800);
-}
-
 static MACHINE_CONFIG_DERIVED( pc1260, pc1250 )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( pc1260_mem)
 
-	MCFG_MACHINE_START( pc1260 )
+	MCFG_MACHINE_START_OVERRIDE(pc1251_state, pc1260 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1261, pc1260 )
@@ -819,10 +805,10 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1350_config =
 {
-	NULL, pc1350_brk,NULL,
-	pc1350_ina, pc1350_outa,
-	pc1350_inb, pc1350_outb,
-	pc1350_outc
+	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1350_state,pc1350_brk), DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_ina), DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outa),
+	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_inb), DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outb),
+	DEVCB_DRIVER_MEMBER(pc1350_state,pc1350_outc)
 };
 
 static MACHINE_CONFIG_START( pc1350, pc1350_state )
@@ -831,8 +817,6 @@ static MACHINE_CONFIG_START( pc1350, pc1350_state )
 	MCFG_CPU_CONFIG( pc1350_config )
 
 	MCFG_FRAGMENT_ADD( pocketc )
-
-	MCFG_MACHINE_START( pc1350 )
 
 	/*
 	   aim: show sharp with keyboard
@@ -852,10 +836,10 @@ MACHINE_CONFIG_END
 
 static const sc61860_cpu_core pc1403_config =
 {
-	NULL, pc1403_brk, NULL,
-	pc1403_ina, pc1403_outa,
-	NULL,NULL,
-	pc1403_outc
+	DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(pc1403_state,pc1403_brk), DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_ina), DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_outa),
+	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc1403_state,pc1403_outc)
 };
 
 static MACHINE_CONFIG_START( pc1403, pc1403_state )
@@ -869,8 +853,6 @@ static MACHINE_CONFIG_START( pc1403, pc1403_state )
 	MCFG_CPU_PROGRAM_MAP( pc1403_mem)
 	MCFG_CPU_CONFIG( pc1403_config )
 
-	MCFG_MACHINE_START( pc1403 )
-
 	/*
 	   aim: show sharp with keyboard
 	   resolution depends on the dots of the lcd
@@ -882,8 +864,6 @@ static MACHINE_CONFIG_START( pc1403, pc1403_state )
 //  MCFG_SCREEN_SIZE(848, 361)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 848-1, 0, 361-1)
 	MCFG_SCREEN_UPDATE_DRIVER(pc1403_state, screen_update_pc1403)
-
-	MCFG_VIDEO_START( pc1403 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc1403h, pc1403 )
