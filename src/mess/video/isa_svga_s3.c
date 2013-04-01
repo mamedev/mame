@@ -195,3 +195,80 @@ void isa16_s3virge_device::device_start()
 void isa16_s3virge_device::device_reset()
 {
 }
+
+/*
+ * 	S3 ViRGE/DX
+ */
+
+ROM_START( s3virgedx )
+	ROM_REGION(0x8000,"s3virgedx", 0)
+	ROM_LOAD("s3virgedx.bin", 0x00000, 0x8000, CRC(0da83bd3) SHA1(228a2d644e1732cb5a2eb1291608c7050cf39229) )
+ROM_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type ISA16_S3VIRGEDX = &device_creator<isa16_s3virgedx_device>;
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor isa16_s3virgedx_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vga_s3virge );
+}
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *isa16_s3virgedx_device::device_rom_region() const
+{
+	return ROM_NAME( s3virgedx );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  isa16_vga_device - constructor
+//-------------------------------------------------
+
+isa16_s3virgedx_device::isa16_s3virgedx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, ISA16_S3VIRGEDX, "S3 ViRGE/DX Graphics Card", tag, owner, clock, "s3virgedx", __FILE__),
+		device_isa16_card_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+READ8_MEMBER(isa16_s3virgedx_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+
+void isa16_s3virgedx_device::device_start()
+{
+	set_isa_device();
+
+	m_vga = subdevice<s3virge_vga_device>("vga");
+
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "s3virgedx");
+
+	m_isa->install_device(0x03b0, 0x03bf, 0, 0, read8_delegate(FUNC(s3virge_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(s3virge_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x03c0, 0x03cf, 0, 0, read8_delegate(FUNC(s3virge_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(s3virge_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x03d0, 0x03df, 0, 0, read8_delegate(FUNC(s3virge_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(s3virge_vga_device::port_03d0_w),m_vga));
+
+	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(s3virge_vga_device::mem_r),m_vga), write8_delegate(FUNC(s3virge_vga_device::mem_w),m_vga));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void isa16_s3virgedx_device::device_reset()
+{
+}
