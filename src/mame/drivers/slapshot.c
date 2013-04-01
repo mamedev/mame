@@ -476,15 +476,14 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler( device_t *device, int irq )
+WRITE_LINE_MEMBER(slapshot_state::irqhandler)
 {
-	slapshot_state *state = device->machine().driver_data<slapshot_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(slapshot_state,irqhandler)
 };
 
 

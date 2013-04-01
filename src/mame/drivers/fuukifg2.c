@@ -391,15 +391,14 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq( device_t *device, int state )
+WRITE_LINE_MEMBER(fuuki16_state::soundirq)
 {
-	fuuki16_state *fuuki16 = device->machine().driver_data<fuuki16_state>();
-	fuuki16->m_audiocpu->set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface fuuki16_ym3812_intf =
 {
-	DEVCB_LINE(soundirq)    /* IRQ Line */
+	DEVCB_DRIVER_LINE_MEMBER(fuuki16_state,soundirq)    /* IRQ Line */
 };
 
 /*

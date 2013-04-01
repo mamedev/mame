@@ -766,14 +766,14 @@ GFXDECODE_END
                 SOUND
 **************************************************************/
 
-static void irq_handler(device_t *device, int irq)
+WRITE_LINE_MEMBER(asuka_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(asuka_state,irqhandler)
 };
 
 

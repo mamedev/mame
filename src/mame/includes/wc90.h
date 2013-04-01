@@ -66,4 +66,5 @@ public:
 	void draw_sprite_64x32(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags );
 	void draw_sprite_64x64(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags );
 	void draw_sprite_invalid(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int sx, int sy, int bank, int flags );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

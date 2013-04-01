@@ -44,4 +44,5 @@ public:
 	INTERRUPT_GEN_MEMBER(capbowl_interrupt);
 	TIMER_CALLBACK_MEMBER(capbowl_update);
 	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
+	DECLARE_WRITE_LINE_MEMBER(firqhandler);
 };

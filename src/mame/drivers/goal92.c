@@ -209,11 +209,10 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler( device_t *device, int irq )
+WRITE_LINE_MEMBER(goal92_state::irqhandler)
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//goal92_state *state = device->machine().driver_data<goal92_state>();
-	//state->m_audiocpu->set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -223,7 +222,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(goal92_state,irqhandler)
 };
 
 static void goal92_adpcm_int( device_t *device,int st )

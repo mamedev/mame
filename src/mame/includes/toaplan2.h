@@ -136,4 +136,6 @@ public:
 	void truxton2_create_tx_tilemap();
 	void register_state_save();
 	void toaplan2_vblank_irq(int irq_line);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
 };

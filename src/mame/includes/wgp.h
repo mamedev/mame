@@ -82,4 +82,5 @@ public:
 	void wgp_piv_layer_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
 	void parse_control();
 	void reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */;
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

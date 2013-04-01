@@ -252,13 +252,12 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 
 /* Sailormn: the lower 2 Megabytes of tiles banked */
 
-void sailormn_tilebank_w( running_machine &machine, int bank )
+void cave_state::sailormn_tilebank_w(int bank)
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	if (state->m_sailormn_tilebank != bank)
+	if (m_sailormn_tilebank != bank)
 	{
-		state->m_sailormn_tilebank = bank;
-		state->m_tilemap[2]->mark_all_dirty();
+		m_sailormn_tilebank = bank;
+		m_tilemap[2]->mark_all_dirty();
 	}
 }
 

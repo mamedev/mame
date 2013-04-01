@@ -77,4 +77,5 @@ public:
 	void draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer );
 	void sortlayers(int *layer,int *pri);
 	void update_colors(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

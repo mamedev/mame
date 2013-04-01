@@ -2973,21 +2973,19 @@ static GFXDECODE_START( fixeightbl )
 GFXDECODE_END
 
 
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(toaplan2_state::irqhandler)
 {
-	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
-
-	if (state->m_sub_cpu != NULL)       // wouldn't tekipaki have problem without this? "mcu" is not generally added
-		state->m_sub_cpu->execute().set_input_line(0, linestate);
+	if (m_sub_cpu != NULL)       // wouldn't tekipaki have problem without this? "mcu" is not generally added
+		m_sub_cpu->execute().set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(toaplan2_state,irqhandler)
 };
 
 
-static void bbakraid_irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(toaplan2_state::bbakraid_irqhandler)
 {
 	// Not used ???  Connected to a test pin (TP082)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
@@ -2995,7 +2993,7 @@ static void bbakraid_irqhandler(device_t *device, int state)
 
 static const ymz280b_interface ymz280b_config =
 {
-	DEVCB_LINE(bbakraid_irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(toaplan2_state,bbakraid_irqhandler)
 };
 
 

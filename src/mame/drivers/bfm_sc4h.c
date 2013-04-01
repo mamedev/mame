@@ -620,14 +620,14 @@ MACHINE_START_MEMBER(sc4_state,sc4)
 }
 
 
-static void bfm_sc4_irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(sc4_state::bfm_sc4_irqhandler)
 {
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
 static const ymz280b_interface ymz280b_config =
 {
-	DEVCB_LINE(bfm_sc4_irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(sc4_state,bfm_sc4_irqhandler)
 };
 
 

@@ -119,6 +119,7 @@ public:
 	void toaplan0_control_w(int offset, int data);
 	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
 	void twincobr_driver_savestate();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 

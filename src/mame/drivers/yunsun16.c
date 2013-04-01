@@ -572,15 +572,14 @@ void yunsun16_state::machine_reset()
                                 Magic Bubble
 ***************************************************************************/
 
-static void soundirq(device_t *device, int state)
+WRITE_LINE_MEMBER(yunsun16_state::soundirq)
 {
-	yunsun16_state *yunsun16 = device->machine().driver_data<yunsun16_state>();
-	yunsun16->m_audiocpu->set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface magicbub_ym3812_intf =
 {
-	DEVCB_LINE(soundirq)    /* IRQ Line */
+	DEVCB_DRIVER_LINE_MEMBER(yunsun16_state,soundirq)    /* IRQ Line */
 };
 
 static MACHINE_CONFIG_START( magicbub, yunsun16_state )

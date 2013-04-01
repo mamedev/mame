@@ -103,16 +103,6 @@ TEST.TXT - suggests the content of a prototype version, which was expanded to ma
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
 
-static void irqhandler(device_t *device, int state)
-{
-}
-
-static const ymz280b_interface ymz280b_config =
-{
-	DEVCB_LINE(irqhandler)
-};
-
-
 class bfm_swp_state : public driver_device
 {
 public:
@@ -132,6 +122,7 @@ public:
 	{
 		return 0;
 	}
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 
 protected:
 
@@ -142,6 +133,14 @@ protected:
 };
 
 
+WRITE_LINE_MEMBER(bfm_swp_state::irqhandler)
+{
+}
+
+static const ymz280b_interface ymz280b_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(bfm_swp_state,irqhandler)
+};
 
 
 READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)

@@ -100,4 +100,5 @@ public:
 	void draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void ryujin_patch(void);
 	void sbm_patch(void);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

@@ -65,4 +65,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_bg_page( int page, int value );
 	void set_fg_page( int page, int value );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

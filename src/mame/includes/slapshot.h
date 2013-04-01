@@ -74,4 +74,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
 	void taito_handle_sprite_buffering(  );
 	void taito_update_sprites_active_area(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

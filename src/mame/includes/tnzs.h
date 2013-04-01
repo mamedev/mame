@@ -103,4 +103,5 @@ public:
 	void tnzs_postload();
 	void mcu_reset(  );
 	void mcu_handle_coins( int coin );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

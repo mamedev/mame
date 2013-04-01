@@ -1091,12 +1091,12 @@ WRITE8_MEMBER(seibuspi_state::flashrom_write)
 	}
 }
 
-static void irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(seibuspi_state::irqhandler)
 {
 	if (state)
-		device->machine().device("soundcpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xd7);    // IRQ is RST10
+		machine().device("soundcpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xd7);    // IRQ is RST10
 	else
-		device->machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+		machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
@@ -1112,7 +1112,7 @@ static const ymf271_interface ymf271_config =
 {
 	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_read),
 	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_write),
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(seibuspi_state,irqhandler)
 };
 
 /********************************************************************/

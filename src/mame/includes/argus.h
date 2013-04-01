@@ -96,4 +96,5 @@ public:
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void butasan_log_vram();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

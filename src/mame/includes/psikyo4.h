@@ -57,4 +57,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr );
 	void set_hotgmck_pcm_bank( int n );
 	void install_hotgmck_pcm_bank();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

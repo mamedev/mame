@@ -160,6 +160,7 @@ public:
 	void toaplan1_driver_savestate();
 	void demonwld_driver_savestate();
 	void vimana_driver_savestate();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 

@@ -465,14 +465,14 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(shangha3_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, linestate);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, state);
 }
 
 static const ym3438_interface ym3438_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(shangha3_state,irqhandler)
 };
 
 

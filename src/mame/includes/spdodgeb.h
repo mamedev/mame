@@ -50,4 +50,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(spdodgeb_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu63705_update_inputs();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

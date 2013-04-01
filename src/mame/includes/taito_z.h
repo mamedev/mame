@@ -98,4 +98,6 @@ public:
 	void spacegun_draw_sprites_16x8(bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control(  );
 	void reset_sound_region(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(irqhandlerb);
 };

@@ -193,14 +193,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(prehisle_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(prehisle_state,irqhandler)
 };
 
 /******************************************************************************/

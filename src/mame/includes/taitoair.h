@@ -90,4 +90,5 @@ public:
 	void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m);
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

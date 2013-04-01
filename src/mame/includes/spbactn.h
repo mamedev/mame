@@ -63,5 +63,5 @@ public:
 	{
 		return 0xffff;
 	}
-
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

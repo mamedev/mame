@@ -59,4 +59,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

@@ -375,14 +375,14 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-static void irq_handler(device_t *device, int irq)
+WRITE_LINE_MEMBER(spdodgeb_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,irqhandler)
 };
 
 static const msm5205_interface msm5205_config =

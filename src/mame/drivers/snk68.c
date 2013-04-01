@@ -574,14 +574,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(snk68_state::irqhandler)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(snk68_state,irqhandler)
 };
 
 /******************************************************************************/

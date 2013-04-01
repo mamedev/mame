@@ -40,4 +40,5 @@ public:
 	void common_vh_start( int num_pixmaps );
 	void copy_pixel( int x, int y, int pen );
 	void draw_layer_interleaved( bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

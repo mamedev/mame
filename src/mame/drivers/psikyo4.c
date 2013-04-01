@@ -645,15 +645,14 @@ static INPUT_PORTS_START( hotdebut )
 INPUT_PORTS_END
 
 
-static void irqhandler( device_t *device, int linestate )
+WRITE_LINE_MEMBER(psikyo4_state::irqhandler)
 {
-	psikyo4_state *state = device->machine().driver_data<psikyo4_state>();
-	state->m_maincpu->set_input_line(12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(psikyo4_state,irqhandler)
 };
 
 

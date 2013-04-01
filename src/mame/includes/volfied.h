@@ -48,4 +48,5 @@ public:
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
 	void volfied_cchip_init(  );
 	void volfied_cchip_reset(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

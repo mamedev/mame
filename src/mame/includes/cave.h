@@ -205,7 +205,7 @@ public:
 	TIMER_CALLBACK_MEMBER(cave_vblank_end);
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start);
 	void cave_get_sprite_info();
+	void sailormn_tilebank_w(int bank);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
-/*----------- defined in video/cave.c -----------*/
-void sailormn_tilebank_w(running_machine &machine, int bank);

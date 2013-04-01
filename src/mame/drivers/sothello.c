@@ -72,6 +72,7 @@ public:
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
 	TIMER_DEVICE_CALLBACK_MEMBER(sothello_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -308,9 +309,9 @@ static INPUT_PORTS_START( sothello )
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(sothello_state::irqhandler)
 {
-	device->machine().device("sub")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sothello_vdp_interrupt(device_t *, v99x8_device &device, int i)
@@ -352,7 +353,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL,
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(sothello_state,irqhandler)
 };
 
 static MACHINE_CONFIG_START( sothello, sothello_state )

@@ -147,6 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wardner_ramrom_bank_sw);
 	DECLARE_READ8_MEMBER(wardner_bank_r);
 	DECLARE_DRIVER_INIT(wardner);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -364,14 +365,14 @@ static const gfx_layout spritelayout =
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(wardner_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
+	machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(wardner_state,irqhandler)
 };
 
 

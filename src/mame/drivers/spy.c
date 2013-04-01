@@ -459,15 +459,14 @@ static const k007232_interface spy_k007232_interface =
 };
 
 
-static void irqhandler( device_t *device, int linestate )
+WRITE_LINE_MEMBER(spy_state::irqhandler)
 {
-	spy_state *state = device->machine().driver_data<spy_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, linestate);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(spy_state,irqhandler)
 };
 
 

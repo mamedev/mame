@@ -62,4 +62,5 @@ public:
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ctrl_w );
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_bank_w );
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

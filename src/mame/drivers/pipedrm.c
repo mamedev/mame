@@ -186,6 +186,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
 	DECLARE_READ8_MEMBER( sound_command_r );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -574,10 +575,9 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(device_t *device, int irq )
+WRITE_LINE_MEMBER(pipedrm_state::irqhandler)
 {
-	pipedrm_state *state = device->machine().driver_data<pipedrm_state>();
-	state->m_subcpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -588,13 +588,13 @@ static const ym2608_interface ym2608_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(pipedrm_state,irqhandler)
 };
 
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(pipedrm_state,irqhandler)
 };
 
 

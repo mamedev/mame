@@ -77,6 +77,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -329,15 +330,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(onetwo_state::irqhandler)
 {
-	onetwo_state *state = device->machine().driver_data<onetwo_state>();
-	state->m_audiocpu->set_input_line(0, linestate);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)  /* IRQ Line */
+	DEVCB_DRIVER_LINE_MEMBER(onetwo_state,irqhandler)  /* IRQ Line */
 };
 
 /*************************************

@@ -13,19 +13,6 @@
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 
-
-/* older-Williams routines */
-static void williams_main_irq(device_t *device, int state);
-static void williams_main_firq(device_t *device, int state);
-static void williams_snd_irq(device_t *device, int state);
-static void williams_snd_irq_b(device_t *device, int state);
-
-/* newer-Williams routines */
-static void mysticm_main_irq(device_t *device, int state);
-static void tshoot_main_irq(device_t *device, int state);
-
-
-
 /*************************************
  *
  *  Generic old-Williams PIA interfaces
@@ -71,7 +58,7 @@ const pia6821_interface williams_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
 };
 
 /* Generic PIA 2, maps to DAC data in and sound IRQs */
@@ -79,14 +66,14 @@ const pia6821_interface williams_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
 };
 /* Same as above, but for second sound board */
 const pia6821_interface williams_snd_pia_b_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac_b", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq_b), DEVCB_LINE(williams_snd_irq_b)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq_b), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq_b)
 };
 
 
@@ -110,7 +97,7 @@ const pia6821_interface sinistar_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_NULL, DEVCB_DEVICE_LINE("cvsd", hc55516_digit_w), DEVCB_DEVICE_LINE("cvsd", hc55516_clock_w),
-	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
 };
 
 /* Special PIA 1 for PlayBall, doesn't set the high bits on sound commands */
@@ -118,7 +105,7 @@ const pia6821_interface playball_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,playball_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
 };
 
 /* Special PIA 1 for Blaster, to support two sound boards */
@@ -126,7 +113,7 @@ const pia6821_interface blaster_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,blaster_snd_cmd_w), DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
 };
 
 /* extra PIA 3 for Speed Ball */
@@ -158,7 +145,7 @@ const pia6821_interface williams2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
 };
 
 /* Generic PIA 2, maps to DAC data in and sound IRQs */
@@ -166,7 +153,7 @@ const pia6821_interface williams2_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
 };
 
 
@@ -182,7 +169,7 @@ const pia6821_interface mysticm_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_firq), DEVCB_LINE(mysticm_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_firq), DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq)
 };
 
 /* Mystic Marathon PIA 1 */
@@ -190,7 +177,7 @@ const pia6821_interface mysticm_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_LINE(mysticm_main_irq), DEVCB_LINE(mysticm_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,mysticm_main_irq)
 };
 
 /* Turkey Shoot PIA 0 */
@@ -198,7 +185,7 @@ const pia6821_interface tshoot_pia_0_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_DRIVER_MEMBER(williams_state,tshoot_input_port_0_3_r), DEVCB_INPUT_PORT("IN1"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,tshoot_lamp_w), DEVCB_DRIVER_MEMBER(williams_state,williams_port_select_w), DEVCB_NULL,
-	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq)
 };
 
 /* Turkey Shoot PIA 1 */
@@ -206,7 +193,7 @@ const pia6821_interface tshoot_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(williams_state,williams2_snd_cmd_w), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_LINE(tshoot_main_irq), DEVCB_LINE(tshoot_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,tshoot_main_irq)
 };
 
 /* Turkey Shoot PIA 2 */
@@ -214,7 +201,7 @@ const pia6821_interface tshoot_snd_pia_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_DEVICE_MEMBER("pia_1", pia6821_device, portb_w), DEVCB_DEVICE_MEMBER("wmsdac", dac_device, write_unsigned8), DEVCB_DEVICE_LINE_MEMBER("pia_1", pia6821_device, cb1_w), DEVCB_DRIVER_MEMBER(williams_state,tshoot_maxvol_w),
-	/*irqs   : A/B             */ DEVCB_LINE(williams_snd_irq), DEVCB_LINE(williams_snd_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_snd_irq)
 };
 
 /* Joust 2 PIA 1 */
@@ -222,7 +209,7 @@ const pia6821_interface joust2_pia_1_intf =
 {
 	/*inputs : A/B,CA/B1,CA/B2 */ DEVCB_INPUT_PORT("IN2"), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B,CA/B2       */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(joust2_state,joust2_snd_cmd_w), DEVCB_DRIVER_MEMBER(joust2_state,joust2_pia_3_cb1_w), DEVCB_DEVICE_LINE_MEMBER("pia_2", pia6821_device, ca1_w),
-	/*irqs   : A/B             */ DEVCB_LINE(williams_main_irq), DEVCB_LINE(williams_main_irq)
+	/*irqs   : A/B             */ DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq), DEVCB_DRIVER_LINE_MEMBER(williams_state,williams_main_irq)
 };
 
 
@@ -272,39 +259,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 }
 
 
-static void williams_main_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::williams_main_irq)
 {
-	pia6821_device *pia_1 = device->machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int combined_state = pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_main_firq(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::williams_main_firq)
 {
 	/* FIRQ to the main CPU */
-	device->machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_snd_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 {
-	pia6821_device *pia_2 = device->machine().device<pia6821_device>("pia_2");
+	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	device->machine().device("soundcpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Same as above, but for second sound board */
-static void williams_snd_irq_b(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::williams_snd_irq_b)
 {
-	pia6821_device *pia_2 = device->machine().device<pia6821_device>("pia_2b");
+	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2b");
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	device->machine().device("soundcpu_b")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu_b")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -315,25 +302,25 @@ static void williams_snd_irq_b(device_t *device, int state)
  *
  *************************************/
 
-static void mysticm_main_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::mysticm_main_irq)
 {
-	pia6821_device *pia_0 = device->machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = device->machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int combined_state = pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void tshoot_main_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(williams_state::tshoot_main_irq)
 {
-	pia6821_device *pia_0 = device->machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = device->machine().device<pia6821_device>("pia_1");
+	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
+	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int combined_state = pia_0->irq_a_state() | pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -225,18 +225,16 @@ static GFXDECODE_START( deniam )
 GFXDECODE_END
 
 
-static void irqhandler( device_t *device, int linestate )
+WRITE_LINE_MEMBER(deniam_state::irqhandler)
 {
-	deniam_state *state = device->machine().driver_data<deniam_state>();
-
 	/* system 16c doesn't have the sound CPU */
-	if (state->m_audio_cpu != NULL)
-		state->m_audio_cpu->execute().set_input_line(0, linestate);
+	if (m_audio_cpu != NULL)
+		m_audio_cpu->execute().set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(deniam_state,irqhandler)
 };
 
 

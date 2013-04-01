@@ -212,14 +212,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(stadhero_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
+	machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(stadhero_state,irqhandler)
 };
 
 /******************************************************************************/

@@ -280,6 +280,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
+	DECLARE_WRITE_LINE_MEMBER(soundirq);
 };
 
 
@@ -971,15 +972,14 @@ static GFXDECODE_START( pclubys )
 GFXDECODE_END
 
 
-static void soundirq( device_t *device, int state )
+WRITE_LINE_MEMBER(nmg5_state::soundirq)
 {
-	nmg5_state *driver_state = device->machine().driver_data<nmg5_state>();
-	driver_state->m_soundcpu->set_input_line(0, state);
+	m_soundcpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_intf =
 {
-	DEVCB_LINE(soundirq)    /* IRQ Line */
+	DEVCB_DRIVER_LINE_MEMBER(nmg5_state,soundirq)    /* IRQ Line */
 };
 
 void nmg5_state::machine_start()

@@ -42,4 +42,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_welltris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

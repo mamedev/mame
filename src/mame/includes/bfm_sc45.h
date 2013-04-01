@@ -497,6 +497,7 @@ public:
 	DECLARE_MACHINE_START(sc4);
 	DECLARE_MACHINE_RESET(sc4);
 
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_irqhandler);
 protected:
 	required_ioport m_io1;
 	required_ioport m_io2;

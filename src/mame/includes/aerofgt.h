@@ -118,4 +118,5 @@ public:
 	void spikes91_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void aerfboot_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

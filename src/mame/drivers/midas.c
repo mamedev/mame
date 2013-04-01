@@ -80,6 +80,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
 };
 
 
@@ -686,14 +687,14 @@ static INPUT_PORTS_START( hammer )
 INPUT_PORTS_END
 
 
-static void livequiz_irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)
 {
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
 static const ymz280b_interface ymz280b_config =
 {
-	DEVCB_LINE(livequiz_irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(midas_state,livequiz_irqhandler)
 };
 
 static MACHINE_CONFIG_START( livequiz, midas_state )

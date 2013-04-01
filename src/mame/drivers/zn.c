@@ -131,6 +131,7 @@ public:
 	void atpsx_dma_read(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1156,14 +1157,14 @@ static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
 ADDRESS_MAP_END
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(device_t *device, int irq)
+WRITE_LINE_MEMBER(zn_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(zn_state,irqhandler)
 };
 
 static const tc0140syt_interface coh1000ta_tc0140syt_intf =

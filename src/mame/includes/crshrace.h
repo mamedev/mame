@@ -61,4 +61,5 @@ public:
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void crshrace_patch_code( UINT16 offset );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

@@ -93,4 +93,5 @@ public:
 	void descramble_mastninj_gfx(UINT8* src);
 	void blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
 		int sx,int sy,const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

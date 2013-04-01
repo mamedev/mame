@@ -68,6 +68,7 @@ public:
 	TIMER_CALLBACK_MEMBER(shutter_req);
 	TIMER_CALLBACK_MEMBER(defender_req);
 	void tile_decode();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -408,15 +409,14 @@ INTERRUPT_GEN_MEMBER(_2mindril_state::drill_device_irq)
 #endif
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 {
-//  _2mindril_state *state = machine.driver_data<_2mindril_state>();
-//  state->m_maincpu->set_input_line(5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(_2mindril_state,irqhandler)
 };
 
 

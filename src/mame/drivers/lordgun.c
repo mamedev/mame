@@ -664,14 +664,14 @@ static I8255A_INTERFACE( aliencha_ppi8255_1_intf )
 };
 
 
-static void soundirq(device_t *device, int state)
+WRITE_LINE_MEMBER(lordgun_state::soundirq)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static const ym3812_interface lordgun_ym3812_interface =
 {
-	DEVCB_LINE(soundirq)
+	DEVCB_DRIVER_LINE_MEMBER(lordgun_state,soundirq)
 };
 
 static MACHINE_CONFIG_START( lordgun, lordgun_state )
@@ -712,7 +712,7 @@ MACHINE_CONFIG_END
 
 static const ymf278b_interface ymf278b_config =
 {
-	DEVCB_LINE(soundirq)
+	DEVCB_DRIVER_LINE_MEMBER(lordgun_state,soundirq)
 };
 
 static MACHINE_CONFIG_START( aliencha, lordgun_state )

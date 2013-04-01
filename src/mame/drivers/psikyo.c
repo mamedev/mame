@@ -1162,15 +1162,14 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static void irqhandler( device_t *device, int linestate )
+WRITE_LINE_MEMBER(psikyo_state::irqhandler)
 {
-	psikyo_state *state = device->machine().driver_data<psikyo_state>();
-	state->m_audiocpu->set_input_line(0, linestate ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(psikyo_state,irqhandler)
 };
 
 static MACHINE_CONFIG_START( s1945, psikyo_state )

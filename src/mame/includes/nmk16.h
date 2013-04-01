@@ -172,4 +172,5 @@ public:
 	void decode_gfx();
 	void decode_tdragonb();
 	void decode_ssmissin();
+	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
 };

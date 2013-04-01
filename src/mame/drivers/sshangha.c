@@ -355,9 +355,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(sshangha_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, state);
+	machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =
@@ -367,7 +367,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(sshangha_state,irqhandler)
 };
 
 static int sshangha_bank_callback( int bank )

@@ -1763,9 +1763,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(device_t *device, int state)
+WRITE_LINE_MEMBER(suna8_state::soundirq)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, state);
+	machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used
@@ -1910,7 +1910,7 @@ MACHINE_CONFIG_END
 
 static const ym3812_interface brickzn_ym3812_interface =
 {
-	DEVCB_LINE(soundirq)    /* IRQ Line */
+	DEVCB_DRIVER_LINE_MEMBER(suna8_state,soundirq)    /* IRQ Line */
 };
 
 MACHINE_RESET_MEMBER(suna8_state,brickzn)

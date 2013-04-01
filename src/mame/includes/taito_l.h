@@ -140,4 +140,5 @@ public:
 	void state_register(  );
 	void taito_machine_reset();
 	void bank_w(address_space &space, offs_t offset, UINT8 data, int banknum );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

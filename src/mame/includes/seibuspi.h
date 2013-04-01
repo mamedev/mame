@@ -130,6 +130,7 @@ public:
 	void init_spi();
 	void init_rf2_common();
 	void init_rfjet_common();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

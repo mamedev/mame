@@ -149,4 +149,5 @@ public:
 	void rodlandj_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

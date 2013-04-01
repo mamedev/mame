@@ -50,6 +50,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(maygayep);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 // bp 29e58 in ep_simp reads the 'INITIALISE . . .' string
@@ -100,13 +101,13 @@ DRIVER_INIT_MEMBER(maygayep_state,maygayep)
 
 }
 
-static void irqhandler(device_t *device, int state)
+WRITE_LINE_MEMBER(maygayep_state::irqhandler)
 {
 }
 
 static const ymz280b_interface ymz280b_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(maygayep_state,irqhandler)
 };
 
 

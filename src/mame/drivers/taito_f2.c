@@ -2802,15 +2802,14 @@ GFXDECODE_END
 
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler( device_t *device, int irq )
+WRITE_LINE_MEMBER(taitof2_state::irqhandler)
 {
-	taitof2_state *state = device->machine().driver_data<taitof2_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(taitof2_state,irqhandler)
 };
 
 
@@ -2829,7 +2828,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),   /* portA write - not implemented */
 		DEVCB_NULL,             /* portB write */
 	},
-	DEVCB_LINE(irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(taitof2_state,irqhandler)
 };
 
 

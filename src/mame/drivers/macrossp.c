@@ -572,14 +572,13 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(macrossp_state::irqhandler)
 {
-	// macrossp_state *state = space.machine().driver_data<macrossp_state>();
-	logerror("ES5506 irq %d\n", irq);
+	logerror("ES5506 irq %d\n", state);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
 	but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-	//  state->m_audiocpu->set_input_line(1, irq ? ASSERT_LINE : CLEAR_LINE);
+	//  m_audiocpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -588,7 +587,7 @@ static const es5506_interface es5506_config =
 	"ensoniq.1",
 	"ensoniq.2",
 	"ensoniq.3",
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(macrossp_state,irqhandler)
 };
 
 

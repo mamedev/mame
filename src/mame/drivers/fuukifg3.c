@@ -569,15 +569,14 @@ void fuuki32_state::machine_reset()
 }
 
 
-static void irqhandler( device_t *device, int irq )
+WRITE_LINE_MEMBER(fuuki32_state::irqhandler)
 {
-	fuuki32_state *state = device->machine().driver_data<fuuki32_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface fuuki32_ymf278b_interface =
 {
-	DEVCB_LINE(irqhandler)      /* irq */
+	DEVCB_DRIVER_LINE_MEMBER(fuuki32_state,irqhandler)      /* irq */
 };
 
 static const ymf262_interface fuuki32_ymf262_interface =

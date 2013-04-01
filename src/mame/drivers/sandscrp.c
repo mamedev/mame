@@ -113,6 +113,7 @@ public:
 	void screen_eof_sandscrp(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
 	void update_irq_state();
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -460,9 +461,9 @@ GFXDECODE_END
 
 /* YM3014B + YM2203C */
 
-static void irq_handler(device_t *device, int irq)
+WRITE_LINE_MEMBER(sandscrp_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =
@@ -475,7 +476,7 @@ static const ym2203_interface ym2203_intf_sandscrp =
 		DEVCB_NULL, /* Port A Write */
 		DEVCB_NULL, /* Port B Write */
 	},
-	DEVCB_LINE(irq_handler) /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(sandscrp_state,irqhandler) /* IRQ handler */
 };
 
 

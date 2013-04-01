@@ -389,9 +389,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(thedeep_state::irqhandler)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =
@@ -401,7 +401,7 @@ static const ym2203_interface thedeep_ym2203_intf =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(thedeep_state,irqhandler)
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::thedeep_interrupt)

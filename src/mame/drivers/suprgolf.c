@@ -69,6 +69,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -413,9 +414,9 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_writeB)
 	mame_printf_debug("ymwA\n");
 }
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(suprgolf_state::irqhandler)
 {
-	//device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -428,7 +429,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
 		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(suprgolf_state,irqhandler)
 };
 
 static void adpcm_int(device_t *device,int st)

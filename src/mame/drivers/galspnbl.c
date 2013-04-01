@@ -205,15 +205,14 @@ GFXDECODE_END
 
 
 
-static void irqhandler( device_t *device, int linestate )
+WRITE_LINE_MEMBER(galspnbl_state::irqhandler)
 {
-	galspnbl_state *state = device->machine().driver_data<galspnbl_state>();
-	state->m_audiocpu->set_input_line(0, linestate);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(galspnbl_state,irqhandler)
 };
 
 

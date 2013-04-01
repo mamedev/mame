@@ -1620,15 +1620,14 @@ WRITE8_MEMBER(metro_state::blzntrnd_sh_bankswitch_w)
 	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
-static void blzntrnd_irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(metro_state::blzntrnd_irqhandler)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
 {
-	DEVCB_LINE(blzntrnd_irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(metro_state,blzntrnd_irqhandler)
 };
 
 static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )

@@ -1743,10 +1743,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler( device_t *device, int irq )
+WRITE_LINE_MEMBER(taitol_state::irqhandler)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(taitol_state::portA_w)
@@ -1773,7 +1772,7 @@ static const ym2203_interface ym2203_interface_triple =
 		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
 		DEVCB_NULL,
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(taitol_state,irqhandler)
 };
 
 static const ym2203_interface ym2203_interface_champwr =
@@ -1786,7 +1785,7 @@ static const ym2203_interface ym2203_interface_champwr =
 		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
 		DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(taitol_state,irqhandler)
 };
 
 
@@ -1798,7 +1797,7 @@ static const msm5205_interface msm5205_config =
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(taitol_state,irqhandler)
 };
 
 static const ym2203_interface ym2203_interface_single =

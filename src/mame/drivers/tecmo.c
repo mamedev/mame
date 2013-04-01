@@ -604,14 +604,14 @@ GFXDECODE_END
 
 
 
-static void irqhandler(device_t *device, int linestate)
+WRITE_LINE_MEMBER(tecmo_state::irqhandler)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(0, linestate);
+	machine().device("soundcpu")->execute().set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(tecmo_state,irqhandler)
 };
 
 static const msm5205_interface msm5205_config =

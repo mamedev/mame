@@ -46,6 +46,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -268,11 +269,10 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-static void irqhandler(device_t *device, int irq)
+WRITE_LINE_MEMBER(pkscram_state::irqhandler)
 {
-	pkscram_state *state = device->machine().driver_data<pkscram_state>();
-	if(state->m_out & 0x10)
-		device->machine().device("maincpu")->execute().set_input_line(2, irq ? ASSERT_LINE : CLEAR_LINE);
+	if(m_out & 0x10)
+		machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -282,7 +282,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler)
+	DEVCB_DRIVER_LINE_MEMBER(pkscram_state,irqhandler)
 };
 
 void pkscram_state::machine_start()

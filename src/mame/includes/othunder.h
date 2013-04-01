@@ -70,4 +70,5 @@ public:
 	void reset_sound_region();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs );
 	void update_irq(  );
+	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
