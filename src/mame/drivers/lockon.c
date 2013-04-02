@@ -414,10 +414,9 @@ WRITE8_MEMBER(lockon_state::sound_vol)
 	m_f2203_3r->flt_volume_set_volume(rgain);
 }
 
-static void ym2203_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
 {
-	lockon_state *state = device->machine().driver_data<lockon_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE );
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE8_MEMBER(lockon_state::ym2203_out_b)
@@ -440,7 +439,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(lockon_state,ym2203_out_b),
 	},
-	DEVCB_LINE(ym2203_irq)
+	DEVCB_DRIVER_LINE_MEMBER(lockon_state,ym2203_irq)
 };
 
 

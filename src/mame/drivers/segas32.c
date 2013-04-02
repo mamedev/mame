@@ -1103,12 +1103,12 @@ WRITE8_MEMBER(segas32_state::sound_int_control_hi_w)
 }
 
 
-static void ym3438_irq_handler(device_t *device, int state)
+WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
 {
 	if (state)
-		signal_sound_irq(device->machine(), SOUND_IRQ_YM3438);
+		signal_sound_irq(machine(), SOUND_IRQ_YM3438);
 	else
-		clear_sound_irq(device->machine(), SOUND_IRQ_YM3438);
+		clear_sound_irq(machine(), SOUND_IRQ_YM3438);
 }
 
 
@@ -2138,7 +2138,7 @@ GFXDECODE_END
 
 static const ym3438_interface ym3438_config =
 {
-	DEVCB_LINE(ym3438_irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(segas32_state,ym3438_irq_handler)
 };
 
 

@@ -139,11 +139,10 @@ INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt)
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-static void sound_irq_gen( device_t *device, int state )
+WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
 {
-	cave_state *cave = device->machine().driver_data<cave_state>();
-	cave->m_sound_irq = (state != 0);
-	update_irq_state(device->machine());
+	m_sound_irq = (state != 0);
+	update_irq_state(machine());
 }
 
 
@@ -1817,7 +1816,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 
 static const ymz280b_interface ymz280b_intf =
 {
-	DEVCB_LINE(sound_irq_gen)
+	DEVCB_DRIVER_LINE_MEMBER(cave_state,sound_irq_gen)
 };
 
 WRITE_LINE_MEMBER(cave_state::irqhandler)

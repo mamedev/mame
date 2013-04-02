@@ -358,16 +358,14 @@ static INPUT_PORTS_START( bishi2p )
 INPUT_PORTS_END
 
 
-static void sound_irq_gen(device_t *device, int state)
+WRITE_LINE_MEMBER(bishi_state::sound_irq_gen)
 {
-	bishi_state *bishi = device->machine().driver_data<bishi_state>();
-
-	bishi->m_maincpu->set_input_line(M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =
 {
-	DEVCB_LINE(sound_irq_gen)
+	DEVCB_DRIVER_LINE_MEMBER(bishi_state,sound_irq_gen)
 };
 
 

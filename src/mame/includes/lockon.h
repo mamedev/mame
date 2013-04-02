@@ -114,4 +114,5 @@ public:
 	void objects_draw(  );
 	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(ym2203_irq);
 };

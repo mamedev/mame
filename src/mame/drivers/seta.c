@@ -1487,14 +1487,14 @@ static const x1_010_interface seta_sound_intf2 =
 	0x1000,     /* address */
 };
 
-static void utoukond_ym3438_interrupt(device_t *device, int linestate)
+WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, linestate);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, state);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
 {
-	DEVCB_LINE(utoukond_ym3438_interrupt)   // IRQ handler
+	DEVCB_DRIVER_LINE_MEMBER(seta_state,utoukond_ym3438_interrupt)   // IRQ handler
 };
 
 /***************************************************************************

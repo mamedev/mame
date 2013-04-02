@@ -110,6 +110,7 @@ public:
 	void MB60553_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority);
 	tilemap_t* MB60553_get_tilemap(int numchip);
 	void mcu_init(  );
+	DECLARE_WRITE_LINE_MEMBER(gs_ym2610_irq);
 };
 
 #endif

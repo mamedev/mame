@@ -739,7 +739,7 @@ INPUT_PORTS_END
 
 static const legacy_mos6526_interface cia_0_intf =
 {
-	DEVCB_LINE(amiga_cia_0_irq),                                    /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_0_irq),                                    /* irq_func */
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -751,7 +751,7 @@ static const legacy_mos6526_interface cia_0_intf =
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_LINE(amiga_cia_1_irq),                                    /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state,amiga_cia_1_irq),                                    /* irq_func */
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,

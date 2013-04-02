@@ -204,6 +204,7 @@ public:
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
+	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 };
 
 

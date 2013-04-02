@@ -177,4 +177,5 @@ public:
 	int hardflags_check8(int num);
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
+	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
 };

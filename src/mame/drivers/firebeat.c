@@ -259,6 +259,7 @@ public:
 	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
 };
 
 
@@ -1890,13 +1891,13 @@ READ8_MEMBER(firebeat_state::soundram_r)
 	return 0;
 }
 
-static void sound_irq_callback(device_t *device, int state)
+WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 {
 }
 
 static const ymz280b_interface ymz280b_intf =
 {
-	DEVCB_LINE(sound_irq_callback),         // irq
+	DEVCB_DRIVER_LINE_MEMBER(firebeat_state,sound_irq_callback),         // irq
 	DEVCB_DRIVER_MEMBER(firebeat_state,soundram_r)
 };
 

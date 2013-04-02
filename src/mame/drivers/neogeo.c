@@ -317,10 +317,9 @@ void neogeo_state::start_interrupt_timers()
  *
  *************************************/
 
-static void audio_cpu_irq(device_t *device, int assert)
+WRITE_LINE_MEMBER(neogeo_state::audio_cpu_irq)
 {
-	neogeo_state *state = device->machine().driver_data<neogeo_state>();
-	state->m_audiocpu->set_input_line(0, assert ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1148,7 +1147,7 @@ ADDRESS_MAP_END
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(audio_cpu_irq)
+	DEVCB_DRIVER_LINE_MEMBER(neogeo_state,audio_cpu_irq)
 };
 
 

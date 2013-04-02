@@ -5286,22 +5286,21 @@ static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
 ADDRESS_MAP_END
 
 
-static void scsp_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(model3_state::scsp_irq)
 {
-	model3_state *state = device->machine().driver_data<model3_state>();
-	if (irq > 0)
+	if (state > 0)
 	{
-		state->m_scsp_last_line = irq;
-		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
+		m_scsp_last_line = state;
+		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
 	}
 	else
-		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
 {
 	0,
-	DEVCB_LINE(scsp_irq),
+	DEVCB_DRIVER_LINE_MEMBER(model3_state,scsp_irq),
 	DEVCB_NULL
 };
 

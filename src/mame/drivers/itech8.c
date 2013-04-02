@@ -626,9 +626,9 @@ WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 }
 
 
-static void generate_sound_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(itech8_state::generate_sound_irq)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1645,7 +1645,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out)
 	},
-	DEVCB_LINE(generate_sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(itech8_state,generate_sound_irq)
 };
 
 
@@ -1659,13 +1659,13 @@ static const ym2608_interface ym2608b_config =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
 	},
-	DEVCB_LINE(generate_sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(itech8_state,generate_sound_irq)
 };
 
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(generate_sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(itech8_state,generate_sound_irq)
 };
 
 

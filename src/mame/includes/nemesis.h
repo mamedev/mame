@@ -91,4 +91,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gx400_interrupt);
 	void nemesis_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };

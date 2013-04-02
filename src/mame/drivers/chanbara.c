@@ -94,6 +94,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 
@@ -361,10 +362,9 @@ WRITE8_MEMBER(chanbara_state::chanbara_ay_out_1_w)
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
 
-static void sound_irq( device_t *device, int linestate )
+WRITE_LINE_MEMBER(chanbara_state::sound_irq)
 {
-	chanbara_state *state = device->machine().driver_data<chanbara_state>();
-	state->m_maincpu->set_input_line(0, linestate);
+	m_maincpu->set_input_line(0, state);
 }
 
 
@@ -378,7 +378,7 @@ static const ym2203_interface ym2203_config =
 			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_0_w),
 			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_1_w),
 	},
-	DEVCB_LINE(sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(chanbara_state,sound_irq)
 };
 
 

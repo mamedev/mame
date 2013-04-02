@@ -250,6 +250,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
 	void neogeo_postload();
 	void regenerate_pens();
+	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
 
 	bool m_has_audio_banking; // does the system use Audio Banking (the NeoCD doesn't?)
 	bool m_is_mvs; // is the system an MVS (watchdog, SRAM etc.)

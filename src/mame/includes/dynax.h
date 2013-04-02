@@ -496,6 +496,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
+	DECLARE_WRITE_LINE_MEMBER(quizchq_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(mmpanic_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(hanakanz_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(mjchuuka_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(hginga_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
+	DECLARE_WRITE_LINE_MEMBER(mjmyster_rtc_irq);
 };
 
 //----------- defined in drivers/dynax.c -----------

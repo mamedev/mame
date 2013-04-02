@@ -259,17 +259,17 @@ GFXDECODE_END
 
 /*** MORE SOUND RELATED ******************************************************/
 
-static void gs_ym2610_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(gstriker_state::gs_ym2610_irq)
 {
-	if (irq)
-		device->machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	if (state)
+		machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
 	else
-		device->machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(gs_ym2610_irq)
+	DEVCB_DRIVER_LINE_MEMBER(gstriker_state,gs_ym2610_irq)
 };
 
 /*** MEMORY LAYOUTS **********************************************************/

@@ -207,5 +207,6 @@ public:
 	void cave_get_sprite_info();
 	void sailormn_tilebank_w(int bank);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 

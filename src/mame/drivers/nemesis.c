@@ -1480,7 +1480,7 @@ static const ay8910_interface ay8910_interface_2 =
 	DEVCB_DEVICE_MEMBER("k007232", k005289_device, k005289_control_B_w)
 };
 
-static void sound_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(nemesis_state::sound_irq)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
 // nemesis_state *driver_state = device->machine().driver_data<nemesis_state>();
@@ -1489,7 +1489,7 @@ static void sound_irq(device_t *device, int state)
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(nemesis_state,sound_irq)
 };
 
 static WRITE8_DEVICE_HANDLER(volume_callback)

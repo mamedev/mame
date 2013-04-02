@@ -1091,19 +1091,15 @@ WRITE16_HANDLER( amiga_cia_w )
  *
  *************************************/
 
-void amiga_cia_0_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(amiga_state::amiga_cia_0_irq)
 {
-	amiga_state *sta = device->machine().driver_data<amiga_state>();
-
-	amiga_custom_w(sta->m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
-void amiga_cia_1_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(amiga_state::amiga_cia_1_irq)
 {
-	amiga_state *sta = device->machine().driver_data<amiga_state>();
-
-	amiga_custom_w(sta->m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(m_maincpu->space(AS_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 

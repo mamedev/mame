@@ -60,6 +60,7 @@ public:
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 
 
@@ -308,14 +309,14 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq_gen(device_t *device, int state)
+WRITE_LINE_MEMBER(deco156_state::sound_irq_gen)
 {
 	logerror("sound irq\n");
 }
 
 static const ymz280b_interface ymz280b_intf =
 {
-	DEVCB_LINE(sound_irq_gen)
+	DEVCB_DRIVER_LINE_MEMBER(deco156_state,sound_irq_gen)
 };
 
 INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)

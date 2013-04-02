@@ -412,15 +412,14 @@ GFXDECODE_END
 
 
 /* Stolen from Psikyo.c */
-static void sound_irq( device_t *device, int irq )
+WRITE_LINE_MEMBER(mcatadv_state::sound_irq)
 {
-	mcatadv_state *state = device->machine().driver_data<mcatadv_state>();
-	state->m_soundcpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface mcatadv_ym2610_interface =
 {
-	DEVCB_LINE(sound_irq)   /* irq */
+	DEVCB_DRIVER_LINE_MEMBER(mcatadv_state,sound_irq)   /* irq */
 };
 
 

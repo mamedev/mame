@@ -436,15 +436,15 @@ GFXDECODE_END
 
 
 
-static void sound_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
 {
 	/* IRQ */
-	device->machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =
 {
-	DEVCB_LINE(sound_irq)       /* irq */
+	DEVCB_DRIVER_LINE_MEMBER(tecmosys_state,sound_irq)       /* irq */
 };
 
 void tecmosys_state::machine_start()

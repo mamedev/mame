@@ -87,4 +87,5 @@ public:
 	void tecmosys_tilemap_copy_to_compose(UINT16 pri);
 	void tecmosys_do_final_mix(bitmap_rgb32 &bitmap);
 	void tecmosys_descramble();
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };

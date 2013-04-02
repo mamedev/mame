@@ -229,14 +229,14 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
-static void shootout_snd_irq(device_t *device, int linestate)
+WRITE_LINE_MEMBER(shootout_state::shootout_snd_irq)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
+	machine().device("audiocpu")->execute().set_input_line(0, state);
 }
 
-static void shootout_snd2_irq(device_t *device, int linestate)
+WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, linestate);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =
@@ -246,7 +246,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(shootout_snd_irq)
+	DEVCB_DRIVER_LINE_MEMBER(shootout_state,shootout_snd_irq)
 };
 
 static const ym2203_interface ym2203_interface2 =
@@ -259,7 +259,7 @@ static const ym2203_interface ym2203_interface2 =
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 	},
-	DEVCB_LINE(shootout_snd2_irq)
+	DEVCB_DRIVER_LINE_MEMBER(shootout_state,shootout_snd2_irq)
 };
 
 static MACHINE_CONFIG_START( shootout, shootout_state )

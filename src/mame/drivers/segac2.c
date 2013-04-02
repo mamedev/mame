@@ -1223,14 +1223,14 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static void  segac2_irq2_interrupt(device_t *device, int state)
+WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
 {
 	//printf("sound irq %d\n", state);
-	device->machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
-	DEVCB_LINE(segac2_irq2_interrupt)      /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(segac2_state,segac2_irq2_interrupt)      /* IRQ handler */
 };
 
 

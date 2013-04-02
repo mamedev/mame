@@ -244,10 +244,9 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
-static void ymf278b_interrupt( device_t *device, int active )
+WRITE_LINE_MEMBER(metro_state::ymf278b_interrupt)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
-	state->m_maincpu->set_input_line(2, active);
+	m_maincpu->set_input_line(2, state);
 }
 
 
@@ -440,7 +439,7 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 static const ymf278b_interface ymf278b_config =
 {
-	DEVCB_LINE(ymf278b_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(metro_state,ymf278b_interrupt)
 };
 
 

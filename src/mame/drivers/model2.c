@@ -1872,22 +1872,21 @@ static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
 ADDRESS_MAP_END
 
 
-static void scsp_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(model2_state::scsp_irq)
 {
-	model2_state *state = device->machine().driver_data<model2_state>();
-	if (irq > 0)
+	if (state > 0)
 	{
-		state->m_scsp_last_line = irq;
-		device->machine().device("audiocpu")->execute().set_input_line(irq, ASSERT_LINE);
+		m_scsp_last_line = state;
+		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
 	}
 	else
-		device->machine().device("audiocpu")->execute().set_input_line(-irq, CLEAR_LINE);
+		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
 {
 	0,
-	DEVCB_LINE(scsp_irq),
+	DEVCB_DRIVER_LINE_MEMBER(model2_state,scsp_irq),
 	DEVCB_NULL
 };
 

@@ -1823,9 +1823,9 @@ ADDRESS_MAP_END
 /*
  * Aica
  */
-static void aica_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(dc_state::aica_irq)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1833,7 +1833,7 @@ static const aica_interface aica_config =
 {
 	TRUE,
 	0,
-	DEVCB_LINE(aica_irq)
+	DEVCB_DRIVER_LINE_MEMBER(dc_state,aica_irq)
 };
 
 

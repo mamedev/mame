@@ -472,6 +472,8 @@ public:
 	TIMER_CALLBACK_MEMBER(amiga_irq_proc);
 	TIMER_CALLBACK_MEMBER(amiga_blitter_proc);
 	TIMER_CALLBACK_MEMBER(finish_serial_write);
+	DECLARE_WRITE_LINE_MEMBER(amiga_cia_0_irq);
+	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
 };
 
 
@@ -497,9 +499,6 @@ attotime amiga_get_serial_char_period(running_machine &machine);
 void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device);
 DECLARE_READ16_HANDLER( amiga_autoconfig_r );
 DECLARE_WRITE16_HANDLER( amiga_autoconfig_w );
-
-void amiga_cia_0_irq(device_t *device, int state);
-void amiga_cia_1_irq(device_t *device, int state);
 
 const amiga_machine_interface *amiga_get_interface(running_machine &machine);
 

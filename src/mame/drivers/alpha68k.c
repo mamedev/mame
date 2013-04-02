@@ -1846,15 +1846,14 @@ static const ym2203_interface ym2203_config =
 	DEVCB_NULL
 };
 
-static void YM3812_irq( device_t *device, int param )
+WRITE_LINE_MEMBER(alpha68k_state::ym3812_irq)
 {
-	alpha68k_state *state = device->machine().driver_data<alpha68k_state>();
-	state->m_audiocpu->set_input_line(0, (param) ? HOLD_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (state) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(YM3812_irq)
+	DEVCB_DRIVER_LINE_MEMBER(alpha68k_state,ym3812_irq)
 };
 
 

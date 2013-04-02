@@ -169,6 +169,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 	void model2_exit();
+	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 };
 
 /*----------- defined in video/model2.c -----------*/

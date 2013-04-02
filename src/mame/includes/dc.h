@@ -114,6 +114,7 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
+	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 };
 
 /*----------- defined in machine/dc.c -----------*/

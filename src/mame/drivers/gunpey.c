@@ -257,6 +257,8 @@ public:
 
 	int write_dest_byte(UINT8 usedata);
 	//UINT16 main_m_vram[0x800][0x800];
+	
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 
 
@@ -1309,14 +1311,14 @@ ADDRESS_MAP_END
 /***************************************************************************************/
 
 
-static void sound_irq_gen(device_t *device, int state)
+WRITE_LINE_MEMBER(gunpey_state::sound_irq_gen)
 {
 	logerror("sound irq\n");
 }
 
 static const ymz280b_interface ymz280b_intf =
 {
-	DEVCB_LINE(sound_irq_gen)
+	DEVCB_DRIVER_LINE_MEMBER(gunpey_state,sound_irq_gen)
 };
 
 

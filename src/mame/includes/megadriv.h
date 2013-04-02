@@ -267,6 +267,7 @@ public:
 	DECLARE_READ16_MEMBER( printer_r );
 	DECLARE_WRITE16_MEMBER( print_club_camera_w );	
 	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
+	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
 };
 
 class mplay_state : public md_base_state

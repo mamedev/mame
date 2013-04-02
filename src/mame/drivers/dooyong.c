@@ -772,18 +772,16 @@ READ8_MEMBER(dooyong_state::unk_r)
 	return 0;
 }
 
-static void irqhandler_2203_1(device_t *device, int irq)
+WRITE_LINE_MEMBER(dooyong_state::irqhandler_2203_1)
 {
-	dooyong_state *state = device->machine().driver_data<dooyong_state>();
-	state->m_interrupt_line_1=irq;
-	device->machine().device("audiocpu")->execute().set_input_line(0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	m_interrupt_line_1=state;
+	machine().device("audiocpu")->execute().set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void irqhandler_2203_2(device_t *device, int irq)
+WRITE_LINE_MEMBER(dooyong_state::irqhandler_2203_2)
 {
-	dooyong_state *state = device->machine().driver_data<dooyong_state>();
-	state->m_interrupt_line_2=irq;
-	device->machine().device("audiocpu")->execute().set_input_line(0, (state->m_interrupt_line_1 | state->m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	m_interrupt_line_2=state;
+	machine().device("audiocpu")->execute().set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =
@@ -793,7 +791,7 @@ static const ym2203_interface ym2203_interface_1 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler_2203_1)
+	DEVCB_DRIVER_LINE_MEMBER(dooyong_state,irqhandler_2203_1)
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -803,7 +801,7 @@ static const ym2203_interface ym2203_interface_2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(dooyong_state,unk_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(irqhandler_2203_2)
+	DEVCB_DRIVER_LINE_MEMBER(dooyong_state,irqhandler_2203_2)
 };
 
 /***************************************************************************

@@ -197,9 +197,9 @@ GFXDECODE_END
  *
  *************************************/
 
-static void sound_irq(device_t *device, int linestate)
+WRITE_LINE_MEMBER(compgolf_state::sound_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, linestate);
+	machine().device("maincpu")->execute().set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =
@@ -212,7 +212,7 @@ static const ym2203_interface ym2203_config =
 			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrollx_lo_w),
 			DEVCB_DRIVER_MEMBER(compgolf_state,compgolf_scrolly_lo_w),
 	},
-	DEVCB_LINE(sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(compgolf_state,sound_irq)
 };
 
 

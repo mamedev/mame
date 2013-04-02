@@ -99,6 +99,7 @@ public:
 	int tilemap_width( int size );
 	void s1945_mcu_init(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 };
 
 /*----------- defined in video/psikyo.c -----------*/

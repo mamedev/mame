@@ -59,6 +59,7 @@ public:
 	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
+	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
 };
 
 
@@ -448,14 +449,14 @@ static GFXDECODE_START( neoprint )
 	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 0x1000 )
 GFXDECODE_END
 
-static void audio_cpu_irq(device_t *device, int assert)
+WRITE_LINE_MEMBER(neoprint_state::audio_cpu_irq)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, assert ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
 {
-	DEVCB_LINE(audio_cpu_irq)
+	DEVCB_DRIVER_LINE_MEMBER(neoprint_state,audio_cpu_irq)
 };
 
 

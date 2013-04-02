@@ -508,7 +508,7 @@ MACHINE_RESET_MEMBER(cdtv_state,cdtv)
 
 static const legacy_mos6526_interface cia_0_ntsc_intf =
 {
-	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),                            /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -520,7 +520,7 @@ static const legacy_mos6526_interface cia_0_ntsc_intf =
 
 static const legacy_mos6526_interface cia_0_pal_intf =
 {
-	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),                            /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -532,7 +532,7 @@ static const legacy_mos6526_interface cia_0_pal_intf =
 
 static const legacy_mos6526_interface cia_1_intf =
 {
-	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),                            /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_1_irq),                            /* irq_func */
 	DEVCB_NULL,                                             /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -544,7 +544,7 @@ static const legacy_mos6526_interface cia_1_intf =
 
 static const legacy_mos6526_interface cia_0_cdtv_intf =
 {
-	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),                            /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                            /* irq_func */
 	DEVCB_DEVICE_LINE_MEMBER("centronics", centronics_device, strobe_w),    /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -556,7 +556,7 @@ static const legacy_mos6526_interface cia_0_cdtv_intf =
 
 static const legacy_mos6526_interface cia_1_cdtv_intf =
 {
-	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),                            /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_1_irq),                            /* irq_func */
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -589,7 +589,7 @@ READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)
 
 static const legacy_mos6526_interface a1200_cia_0_intf =
 {
-	DEVCB_DEVICE_LINE("cia_0", amiga_cia_0_irq),                                    /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_0_irq),                                    /* irq_func */
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -601,7 +601,7 @@ static const legacy_mos6526_interface a1200_cia_0_intf =
 
 static const legacy_mos6526_interface a1200_cia_1_intf =
 {
-	DEVCB_DEVICE_LINE("cia_1", amiga_cia_1_irq),                                    /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(amiga_state, amiga_cia_1_irq),                                    /* irq_func */
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
