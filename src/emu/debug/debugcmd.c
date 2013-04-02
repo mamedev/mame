@@ -554,16 +554,19 @@ int debug_command_parameter_cpu(running_machine &machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
+    const UINT64 original_cpunum = cpunum;
 	execute_interface_iterator iter(machine.root_device());
 	for (device_execute_interface *exec = iter.first(); exec != NULL; exec = iter.next())
+	{
 		if (cpunum-- == 0)
 		{
 			*result = &exec->device();
 			return TRUE;
 		}
+	}
 
 	/* if out of range, complain */
-	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
+	debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)original_cpunum);
 	return FALSE;
 }
 

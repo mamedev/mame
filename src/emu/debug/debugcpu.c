@@ -2767,33 +2767,27 @@ void device_debug::comment_dump(offs_t addr)
 
 UINT32 device_debug::compute_opcode_crc32(offs_t address) const
 {
-	// no memory interface, just fail
+	// no memory interface?  just fail
 	if (m_memory == NULL)
 		return 0;
 
-	// no program interface, just fail
+	// get the crc bytes from program memory
 	address_space &space = m_memory->space(AS_PROGRAM);
 
-	// zero out the buffers
-	UINT8 opbuf[64], argbuf[64];
-	memset(opbuf, 0x00, sizeof(opbuf));
-	memset(argbuf, 0x00, sizeof(argbuf));
-
-	// fetch the bytes up to the maximum
+	// ask the interface how many bytes to get
 	int maxbytes = m_disasm->max_opcode_bytes();
+
+	// fetch the arg and op bytes & mash 'em into a single buffer
+	UINT8 buff[maxbytes*2];
+	memset(buff, 0x00, sizeof(buff));
 	for (int index = 0; index < maxbytes; index++)
 	{
-		opbuf[index] = debug_read_opcode(space, address + index, 1, false);
-		argbuf[index] = debug_read_opcode(space, address + index, 1, true);
+		buff[index]          = debug_read_opcode(space, address + index, 1, false);
+		buff[index+maxbytes] = debug_read_opcode(space, address + index, 1, true);
 	}
 
-	// disassemble and then convert to bytes
-	char buff[256];
-	int numbytes = disassemble(buff, address & space.logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-	numbytes = space.address_to_byte(numbytes);
-
 	// return a CRC of the resulting bytes
-	return crc32(0, argbuf, numbytes);
+	return crc32(0, buff, maxbytes*2);
 }
 
 

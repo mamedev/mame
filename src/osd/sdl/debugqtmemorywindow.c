@@ -38,12 +38,6 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 									m_machine,
 									this);
 
-	// Populate the combo box
-	populateComboBox();
-
-	// Set to the current CPU's memory view
-    setToCurrentCpu();
-
 	// Layout
 	QHBoxLayout* subLayout = new QHBoxLayout(topSubFrame);
 	subLayout->addWidget(m_inputEdit);
@@ -65,8 +59,11 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	// Create a byte-chunk group
 	QActionGroup* chunkGroup = new QActionGroup(this);
 	QAction* chunkActOne  = new QAction("1-byte chunks", this);
+	chunkActOne->setObjectName("chunkActOne");
 	QAction* chunkActTwo  = new QAction("2-byte chunks", this);
+	chunkActTwo->setObjectName("chunkActTwo");
 	QAction* chunkActFour = new QAction("4-byte chunks", this);
+	chunkActFour->setObjectName("chunkActFour");
 	chunkActOne->setCheckable(true);
 	chunkActTwo->setCheckable(true);
 	chunkActFour->setCheckable(true);
@@ -116,6 +113,15 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(increaseBplAct);
 	optionsMenu->addAction(decreaseBplAct);
+
+
+	//
+	// Initialize
+	//
+	populateComboBox();
+
+	// Set to the current CPU's memory view
+	setToCurrentCpu();
 }
 
 
@@ -123,6 +129,16 @@ void MemoryWindow::memoryRegionChanged(int index)
 {
 	m_memTable->view()->set_source(*m_memTable->view()->source_list().by_index(index));
 	m_memTable->viewport()->update();
+
+	// Update the chunk size radio buttons to the memory region's default
+	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
+	switch(memView->bytes_per_chunk())
+	{
+	    case 1: chunkSizeMenuItem("chunkActOne")->setChecked(true); break;
+	    case 2: chunkSizeMenuItem("chunkActTwo")->setChecked(true); break;
+	    case 4: chunkSizeMenuItem("chunkActFour")->setChecked(true); break;
+	    default: break;
+	}
 }
 
 
@@ -221,6 +237,24 @@ void MemoryWindow::setToCurrentCpu()
 {
 	device_t* curCpu = debug_cpu_get_visible_cpu(*m_machine);
 	const debug_view_source *source = m_memTable->view()->source_list().match_device(curCpu);
-    const int listIndex = m_memTable->view()->source_list().index(*source);
-    m_memoryComboBox->setCurrentIndex(listIndex);
+	const int listIndex = m_memTable->view()->source_list().index(*source);
+	m_memoryComboBox->setCurrentIndex(listIndex);
+}
+
+
+// I have a hard time storing QActions as class members.  This is a substitute.
+QAction* MemoryWindow::chunkSizeMenuItem(const QString& itemName)
+{
+	QList<QMenu*> menus = menuBar()->findChildren<QMenu*>();
+	for (int i = 0; i < menus.length(); i++)
+	{
+		if (menus[i]->title() != "&Options") continue;
+		QList<QAction*> actions = menus[i]->actions();
+		for (int j = 0; j < actions.length(); j++)
+		{
+			if (actions[j]->objectName() == itemName)
+				return actions[j];
+		}
+	}
+	return NULL;
 }
