@@ -357,6 +357,8 @@ The first screen that comes up reports:
 
 This show corresponding version number and checksums as listed on the labels.
 
+Versions 18.3 and 18.6 confirmed to exist, just not currently dumped.
+
 */
 
 ROM_START( usgames ) /* Version 25.4x */
