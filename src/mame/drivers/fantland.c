@@ -307,20 +307,18 @@ ADDRESS_MAP_END
                            Born To Fight
 ***************************************************************************/
 
-static void borntofi_adpcm_start( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_start( device_t *device, int voice )
 {
-	fantland_state *state = device->machine().driver_data<fantland_state>();
 	msm5205_reset_w(device, 0);
-	state->m_adpcm_playing[voice] = 1;
-	state->m_adpcm_nibble[voice] = 0;
-//  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine().describe_context(), state->m_adpcm_addr[0][voice], state->m_adpcm_addr[1][voice]);
+	m_adpcm_playing[voice] = 1;
+	m_adpcm_nibble[voice] = 0;
+//  logerror("%s: adpcm start = %06x, stop = %06x\n", device->machine().describe_context(), m_adpcm_addr[0][voice], m_adpcm_addr[1][voice]);
 }
 
-static void borntofi_adpcm_stop( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_stop( device_t *device, int voice )
 {
-	fantland_state *state = device->machine().driver_data<fantland_state>();
 	msm5205_reset_w(device, 1);
-	state->m_adpcm_playing[voice] = 0;
+	m_adpcm_playing[voice] = 0;
 }
 
 WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
@@ -358,21 +356,20 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 	}
 }
 
-static void borntofi_adpcm_int( device_t *device, int voice )
+void fantland_state::borntofi_adpcm_int( device_t *device, int voice )
 {
-	fantland_state *state = device->machine().driver_data<fantland_state>();
 	UINT8 *rom;
 	size_t len;
 	int start, stop;
 
-	if (!state->m_adpcm_playing[voice])
+	if (!m_adpcm_playing[voice])
 		return;
 
-	rom = state->memregion("adpcm")->base();
-	len = state->memregion("adpcm")->bytes() * 2;
+	rom = memregion("adpcm")->base();
+	len = memregion("adpcm")->bytes() * 2;
 
-	start = state->m_adpcm_addr[0][voice] + state->m_adpcm_nibble[voice];
-	stop = state->m_adpcm_addr[1][voice];
+	start = m_adpcm_addr[0][voice] + m_adpcm_nibble[voice];
+	stop = m_adpcm_addr[1][voice];
 
 	if (start >= len)
 	{
@@ -388,7 +385,7 @@ static void borntofi_adpcm_int( device_t *device, int voice )
 	else
 	{
 		msm5205_data_w(device, rom[start / 2] >> ((start & 1) * 4));
-		state->m_adpcm_nibble[voice]++;
+		m_adpcm_nibble[voice]++;
 	}
 }
 
