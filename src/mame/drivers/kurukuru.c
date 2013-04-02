@@ -229,6 +229,7 @@ public:
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	DECLARE_WRITE_LINE_MEMBER(kurukuru_vdp_interrupt);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -252,9 +253,9 @@ public:
 *                  Interrupts                    *
 *************************************************/
 
-static void kurukuru_vdp_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(kurukuru_state::kurukuru_vdp_interrupt)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? ASSERT_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 
@@ -287,7 +288,7 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
 	update_sound_irq(m_sound_irq_cause | 2);
-	msm5205_data_w(machine().device("msm"), m_adpcm_data);
+	msm5205_data_w(machine().device("adpcm"), m_adpcm_data);
 }
 
 
@@ -575,7 +576,7 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(kurukuru_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kurukuru_state,kurukuru_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

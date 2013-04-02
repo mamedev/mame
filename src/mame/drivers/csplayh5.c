@@ -81,6 +81,7 @@ public:
 	DECLARE_DRIVER_INIT(junai2);
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
+	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 };
 
 
@@ -95,7 +96,7 @@ public:
 #define MSX2_VISIBLE_XBORDER_PIXELS 8 * 2
 #define MSX2_VISIBLE_YBORDER_PIXELS 14 * 2
 
-static void csplayh5_vdp0_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
@@ -645,7 +646,7 @@ static MACHINE_CONFIG_START( csplayh5, csplayh5_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(csplayh5_vdp0_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -23,12 +23,9 @@
 	MCFG_DEVICE_ADD(_tag, V9958, 0) \
 	v9938_device::static_set_screen(*device, _screen); \
 	v9938_device::static_set_vram_size(*device, _vramsize);
-#define MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(_func) \
-	v9938_device::static_set_interrupt_callback(*device, v99x8_interrupt_delegate(_func, #_func, (device_t *)0), device->tag());
 
-#define MCFG_V99X8_INTERRUPT_CALLBACK_DEVICE(_devname, _class, _func) \
-	v9938_device::static_set_interrupt_callback(*device, v99x8_interrupt_delegate(&_class::_func, #_class "::" #_func, (_class *)0), _devname);
-
+#define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
+	downcast<v9938_device *>(device)->set_interrupt_callback(DEVCB2_##_irq);
 
 // init functions
 
@@ -56,10 +53,6 @@ extern const device_type V9958;
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class v99x8_device;
-typedef delegate<void (v99x8_device &, int)> v99x8_interrupt_delegate;
-
-
 // ======================> v99x8_device
 
 class v99x8_device : public device_t, public device_memory_interface
@@ -71,6 +64,9 @@ protected:
 	v99x8_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock);
 
 public:
+	template<class _irq> void set_interrupt_callback(_irq irq) {
+		m_int_callback.set_callback(irq);
+	}	
 	int interrupt ();
 	void set_resolution (int);
 	int get_transpen();
@@ -91,7 +87,6 @@ public:
 
 	static void static_set_screen(device_t &device, const char *screen_name);
 	static void static_set_vram_size(device_t &device, UINT32 vram_size);
-	static void static_set_interrupt_callback(device_t &device, v99x8_interrupt_delegate callback, const char *device_name);
 
 	/* RESET pin */
 	void reset_line(int state) { if (state==ASSERT_LINE) device_reset(); }
@@ -196,8 +191,7 @@ private:
 
 	// interrupt
 	UINT8 m_int_state;
-	v99x8_interrupt_delegate m_int_callback;
-	const char *m_int_callback_device_name;
+	devcb2_write_line   m_int_callback;
 	int m_scanline;
 	// blinking
 	int m_blink, m_blink_count;

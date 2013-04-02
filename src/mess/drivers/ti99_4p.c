@@ -97,7 +97,7 @@ public:
 	DECLARE_MACHINE_RESET(ti99_4p);
 	TIMER_DEVICE_CALLBACK_MEMBER(sgcpu_hblank_interrupt);
 
-	void set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
+	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
 	tms9900_device*         m_cpu;
 	tms9901_device*         m_tms9901;
@@ -840,7 +840,7 @@ void ti99_4p_state::machine_start()
 /*
     set the state of int2 (called by the v9938)
 */
-void ti99_4p_state::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+WRITE_LINE_MEMBER(ti99_4p_state::set_tms9901_INT2_from_v9938)
 {
 	m_tms9901->set_single_int(2, state);
 }
@@ -886,7 +886,7 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 	// interlace mode, but in non-interlace modes only half of the lines are
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, ti99_4p_state, set_tms9901_INT2_from_v9938)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, ti99_4p_state, set_tms9901_INT2_from_v9938)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ti99_4p_state, sgcpu_hblank_interrupt, SCREEN_TAG, 0, 1)
 
 	// tms9901

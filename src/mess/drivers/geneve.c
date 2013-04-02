@@ -262,7 +262,7 @@ public:
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(geneve_hblank_interrupt);
 
-	void    set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);
+	DECLARE_WRITE_LINE_MEMBER(set_tms9901_INT2_from_v9938);
 
 	line_state  m_inta;
 	line_state  m_intb;
@@ -617,7 +617,7 @@ WRITE_LINE_MEMBER( geneve_state::mapper_ready )
 /*
     set the state of int2 (called by the v9938 core)
 */
-void geneve_state::set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state)
+WRITE_LINE_MEMBER(geneve_state::set_tms9901_INT2_from_v9938)
 {
 	m_int2 = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 	m_tms9901->set_single_int(2, state);
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( geneve_60hz, geneve_state )
 	// interlace mode, but in non-interlace modes only half of the lines are
 	// painted. Accordingly, the full set of lines is refreshed at 30 Hz,
 	// not 60 Hz. This should be fixed in the v9938 emulation.
-	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, DEVICE_SELF, geneve_state, set_tms9901_INT2_from_v9938)
+	MCFG_TI_V9938_ADD(VIDEO_SYSTEM_TAG, 30, SCREEN_TAG, 2500, 512+32, (212+28)*2, geneve_state, set_tms9901_INT2_from_v9938)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", geneve_state, geneve_hblank_interrupt, SCREEN_TAG, 0, 1) /* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	// Main board components

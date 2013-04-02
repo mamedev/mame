@@ -42,6 +42,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(tonton_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(tonton_vdp0_interrupt);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -65,9 +66,9 @@ public:
 *                Video Hardware                  *
 *************************************************/
 
-static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(tonton_state::tonton_vdp0_interrupt)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 
@@ -268,7 +269,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(tonton_vdp0_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(tonton_state,tonton_vdp0_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -70,6 +70,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(sangho_interrupt);
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
+	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 };
 
 
@@ -401,9 +402,9 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 	sexyboom_map_bank(3);
 }
 
-static void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
-{
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+WRITE_LINE_MEMBER(sangho_state::msx_vdp_interrupt)
+{	
+	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(sangho_state::sangho_interrupt)
@@ -428,7 +429,7 @@ static MACHINE_CONFIG_START( pzlestar, sangho_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -460,7 +461,7 @@ static MACHINE_CONFIG_START( sexyboom, sangho_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9958_ADD("v9958", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sangho_state,msx_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

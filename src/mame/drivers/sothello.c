@@ -74,6 +74,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(sothello_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
 };
 
 
@@ -315,9 +316,9 @@ WRITE_LINE_MEMBER(sothello_state::irqhandler)
 	machine().device("sub")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void sothello_vdp_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(sothello_state::sothello_vdp_interrupt)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
@@ -375,7 +376,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(sothello_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(sothello_state,sothello_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

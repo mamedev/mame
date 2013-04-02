@@ -355,11 +355,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER(msx_state, msx_cart)
 		msx_slot_list[m_cart_state[id]->m_type].savesram (machine(), m_cart_state[id]);
 }
 
-void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(msx_state::msx_vdp_interrupt)
 {
-	msx_state *state = device.machine().driver_data<msx_state>();
-
-	state->m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 void msx_state::msx_ch_reset_core ()

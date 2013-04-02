@@ -1159,7 +1159,7 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(msx_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(msx_state,msx_vdp_interrupt))
 
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_ADD("screen", RASTER)

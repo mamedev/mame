@@ -231,6 +231,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	DECLARE_WRITE_LINE_MEMBER(kas89_vdp_interrupt);
 };
 
 #define VDP_MEM             0x40000
@@ -240,9 +241,9 @@ public:
 *      Interrupt handling & Video      *
 ***************************************/
 
-static void kas89_vdp_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(kas89_state::kas89_vdp_interrupt)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? ASSERT_LINE : CLEAR_LINE));
+	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_interrupt)
@@ -789,7 +790,7 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(kas89_vdp_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kas89_state,kas89_vdp_interrupt))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

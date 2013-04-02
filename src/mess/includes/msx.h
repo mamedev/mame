@@ -168,6 +168,7 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( msx_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( msx_cart );
+	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
 
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -201,8 +202,6 @@ protected:
 extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
-
-void msx_vdp_interrupt(device_t *, v99x8_device &device, int i);
 
 /* I/O functions */
 

@@ -158,10 +158,10 @@ protected:
 	MCFG_TMS9928A_SCREEN_ADD_PAL( SCREEN_TAG )                              \
 	MCFG_SCREEN_UPDATE_DEVICE( VDP_TAG, tms9928a_device, screen_update )
 
-#define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _devtag, _class, _int)      \
+#define MCFG_TI_V9938_ADD(_tag, _rate, _screen, _blank, _x, _y, _class, _int)      \
 	MCFG_DEVICE_ADD(_tag, V9938VIDEO, 0)                                        \
 	MCFG_V9938_ADD(VDP_TAG, _screen, 0x20000)                           \
-	MCFG_V99X8_INTERRUPT_CALLBACK_DEVICE(_devtag, _class, _int)         \
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(_class, _int))         \
 	MCFG_SCREEN_ADD(_screen, RASTER)                                        \
 	MCFG_SCREEN_REFRESH_RATE(_rate)                                         \
 	MCFG_SCREEN_UPDATE_DEVICE(VDP_TAG, v9938_device, screen_update) \

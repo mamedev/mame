@@ -78,7 +78,7 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_address_latch(0),
 	m_vram_size(0),
 	m_int_state(0),
-	m_int_callback_device_name(NULL),
+	m_int_callback(*this),
 	m_scanline(0),
 	m_blink(0),
 	m_blink_count(0),
@@ -577,14 +577,6 @@ void v99x8_device::static_set_vram_size(device_t &device, UINT32 vram_size)
 	downcast<v99x8_device &>(device).m_vram_size = vram_size;
 }
 
-void v99x8_device::static_set_interrupt_callback(device_t &device, v99x8_interrupt_delegate callback, const char *device_name)
-{
-	v99x8_device &v99x8 = downcast<v99x8_device &>(device);
-	v99x8.m_int_callback = callback;
-	v99x8.m_int_callback_device_name = device_name;
-}
-
-
 /***************************************************************************
 
     Init/stop/reset/Interrupt functions
@@ -599,13 +591,7 @@ void v99x8_device::device_start()
 	if (!m_screen->started())
 		throw device_missing_dependencies();
 
-	if (!m_int_callback.isnull())
-	{
-		device_t *device = (m_int_callback_device_name != NULL) ? machine().device(m_int_callback_device_name) : NULL;
-		if (device != NULL)
-			m_int_callback.late_bind(*device);
-	}
-
+	m_int_callback.resolve_safe();
 	m_vdp_ops_count = 1;
 	m_vdp_engine = NULL;
 
@@ -805,7 +791,7 @@ void v99x8_device::check_int()
 	** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
 	** run. As a patch it's called every scanline
 	*/
-	m_int_callback (*this, n);
+	m_int_callback(n);
 }
 
 /***************************************************************************

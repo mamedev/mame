@@ -251,6 +251,8 @@ public:
 	void meritm_crt250_switch_banks(  );
 	void meritm_switch_banks(  );
 	UINT8 binary_to_BCD(UINT8 data);
+	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
 };
 
 
@@ -446,13 +448,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
 	}
 }
 
-static void meritm_vdp0_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(meritm_state::meritm_vdp0_interrupt)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
 }
 
-static void meritm_vdp1_interrupt(device_t *, v99x8_device &device, int i)
+WRITE_LINE_MEMBER(meritm_state::meritm_vdp1_interrupt)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
@@ -1189,10 +1191,10 @@ static MACHINE_CONFIG_START( meritm_crt250, meritm_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9938_ADD("v9938_0", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(meritm_vdp0_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp0_interrupt))
 
 	MCFG_V9938_ADD("v9938_1", "screen", 0x20000)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(meritm_vdp1_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(meritm_state,meritm_vdp1_interrupt))
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
