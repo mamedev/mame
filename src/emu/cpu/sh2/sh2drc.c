@@ -2016,29 +2016,20 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 		return TRUE;
 
 	case 0x1b: // SLEEP();
-		{
-			int skip = compiler->labelnum+1;
-			compiler->labelnum += 3;
+		UML_MOV(block, I0, mem(&sh2->sleep_mode));                          // mov i0, sleep_mode
+		UML_CMP(block, I0, 0x2);                                            // cmp i0, #2
+		UML_JMPc(block, COND_E, compiler->labelnum);                        // beq labelnum
+		// sleep mode != 2
+		UML_MOV(block, mem(&sh2->sleep_mode), 0x1);                         // mov sleep_mode, #1
+		generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);       // repeat this insn
+		UML_JMP(block, compiler->labelnum+1);                               // jmp labelnum+1
 
-			UML_MOV(block, I0, mem(&sh2->sleep_mode));                          // mov i0, sleep_mode
-			UML_CMP(block, I0, 0x2);                                            // cmp i0, #2
-			UML_JMPc(block, COND_E, skip+1);                                    // beq skip + 1
-			// sleep mode != 2
-			UML_CMP(block, I0, 0x0);                                            // cmp i0, #0
-			UML_JMPc(block, COND_NE, skip);                                     // bne skip
-			UML_MOV(block, mem(&sh2->sleep_mode), 0x1);                         // mov sleep_mode, #1
+		UML_LABEL(block, compiler->labelnum++);                             // labelnum:
+		// sleep_mode == 2
+		UML_MOV(block, mem(&sh2->sleep_mode), 0x0);                         // sleep_mode = 0
+		generate_update_cycles(sh2, block, compiler, desc->pc+2, TRUE);     // go to next insn
 
-			UML_LABEL(block, skip);                                             // skip:
-			generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);       // repeat this insn
-			UML_JMP(block, skip+2);                                             // jmp skip+2
-
-			UML_LABEL(block, skip+1);                                           // skip + 1:
-			// sleep_mode == 2
-			UML_MOV(block, mem(&sh2->sleep_mode), 0x0);                         // sleep_mode = 0
-			generate_update_cycles(sh2, block, compiler, desc->pc+2, TRUE);     // go to next insn
-
-			UML_LABEL(block, skip+2);                                           // skip + 2:
-		}
+		UML_LABEL(block, compiler->labelnum++);                             // labelnum+1:
 		return TRUE;
 
 	case 0x22: // STCVBR(Rn);
