@@ -2777,7 +2777,8 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	/* don't need this, game just does a simple check at boot then the DSP stalls into a tight loop. */
+//	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	/* video hardware */
