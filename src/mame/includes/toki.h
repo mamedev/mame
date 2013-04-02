@@ -42,4 +42,5 @@ public:
 	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(toki_adpcm_int);
 };

@@ -225,20 +225,19 @@ static const ym2203_interface ym2203_config =
 	DEVCB_DRIVER_LINE_MEMBER(goal92_state,irqhandler)
 };
 
-static void goal92_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	goal92_state *state = device->machine().driver_data<goal92_state>();
-	msm5205_data_w(device, state->m_msm5205next);
-	state->m_msm5205next >>= 4;
-	state->m_adpcm_toggle^= 1;
+	msm5205_data_w(machine().device("msm"), m_msm5205next);
+	m_msm5205next >>= 4;
+	m_adpcm_toggle^= 1;
 
-	if (state->m_adpcm_toggle)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_adpcm_toggle)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(goal92_adpcm_int),   /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(goal92_state,goal92_adpcm_int),   /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz 4-bit */
 };
 

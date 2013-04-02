@@ -345,27 +345,25 @@ INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint( device_t *device,int st )
+WRITE_LINE_MEMBER(kchamp_state::msmint)
 {
-	kchamp_state *state = device->machine().driver_data<kchamp_state>();
-
-	if (state->m_msm_play_lo_nibble)
-		msm5205_data_w(device, state->m_msm_data & 0x0f);
+	if (m_msm_play_lo_nibble)
+		msm5205_data_w(machine().device("msm"), m_msm_data & 0x0f);
 	else
-		msm5205_data_w(device, (state->m_msm_data >> 4) & 0x0f);
+		msm5205_data_w(machine().device("msm"), (m_msm_data >> 4) & 0x0f);
 
-	state->m_msm_play_lo_nibble ^= 1;
+	m_msm_play_lo_nibble ^= 1;
 
-	if (!(state->m_counter ^= 1))
+	if (!(m_counter ^= 1))
 	{
-		if (state->m_sound_nmi_enable)
-			state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_sound_nmi_enable)
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static const msm5205_interface msm_interface =
 {
-	DEVCB_LINE(msmint),         /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(kchamp_state,msmint),         /* interrupt function */
 	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback */
 };
 

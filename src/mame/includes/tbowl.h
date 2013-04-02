@@ -55,4 +55,7 @@ public:
 	UINT32 screen_update_tbowl_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll, UINT8* spriteram);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void tbowl_adpcm_int(device_t *device, int chip);
+	DECLARE_WRITE_LINE_MEMBER(tbowl_adpcm_int_1);
+	DECLARE_WRITE_LINE_MEMBER(tbowl_adpcm_int_2);	
 };

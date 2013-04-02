@@ -82,4 +82,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 collision_check( rectangle& rect );
+	DECLARE_WRITE_LINE_MEMBER(rougien_adpcm_int);
 };

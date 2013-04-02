@@ -340,23 +340,21 @@ static const ym2203_interface ym2203_config =
 	DEVCB_DRIVER_LINE_MEMBER(wc90b_state,irqhandler)
 };
 
-static void adpcm_int(device_t *device,int st)
+WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 {
-	wc90b_state *state = device->machine().driver_data<wc90b_state>();
-
-	state->m_toggle ^= 1;
-	if(state->m_toggle)
+	m_toggle ^= 1;
+	if(m_toggle)
 	{
-		msm5205_data_w(device, (state->m_msm5205next & 0xf0) >> 4);
-		device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		msm5205_data_w(device, (state->m_msm5205next & 0x0f) >> 0);
+		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0x0f) >> 0);
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(adpcm_int),      /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(wc90b_state,adpcm_int),      /* interrupt function */
 	MSM5205_S96_4B  /* 4KHz 4-bit */
 };
 

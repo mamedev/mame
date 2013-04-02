@@ -92,6 +92,7 @@ public:
 	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -557,24 +558,23 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 	}
 }
 
-static void adpcm_int( device_t *device, int st )
+WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
-	dacholer_state *state = device->machine().driver_data<dacholer_state>();
-	if (state->m_snd_interrupt_enable == 1 || (state->m_snd_interrupt_enable == 0 && state->m_msm_toggle == 1))
+	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		msm5205_data_w(device, state->m_msm_data >> 4);
-		state->m_msm_data <<= 4;
-		state->m_msm_toggle ^= 1;
-		if (state->m_msm_toggle == 0)
+		msm5205_data_w(machine().device("msm"), m_msm_data >> 4);
+		m_msm_data <<= 4;
+		m_msm_toggle ^= 1;
+		if (m_msm_toggle == 0)
 		{
-			state->m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38);
 		}
 	}
 }
 
 static const msm5205_interface msm_interface =
 {
-	DEVCB_LINE(adpcm_int),          /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(dacholer_state,adpcm_int),          /* interrupt function */
 	MSM5205_S96_4B  /* 1 / 96 = 3906.25Hz playback  - guess */
 };
 

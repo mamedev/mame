@@ -69,4 +69,8 @@ public:
 	void splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void roldfrog_update_irq(  );
+	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	DECLARE_WRITE_LINE_MEMBER(ym_irq);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int1);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
 };

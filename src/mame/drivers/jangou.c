@@ -93,6 +93,7 @@ public:
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
 	UINT8 jangou_gfx_nibble( UINT16 niboffset );
 	void plot_jangou_gfx_pixel( UINT8 pix, int x, int y );
+	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 };
 
 
@@ -346,19 +347,17 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 	m_adpcm_byte = data;
 }
 
-static void jngolady_vclk_cb( device_t *device,int st )
+WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
-	jangou_state *state = device->machine().driver_data<jangou_state>();
-
-	if (state->m_msm5205_vclk_toggle == 0)
-		msm5205_data_w(device, state->m_adpcm_byte >> 4);
+	if (m_msm5205_vclk_toggle == 0)
+		msm5205_data_w(machine().device("msm"), m_adpcm_byte >> 4);
 	else
 	{
-		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
-		state->m_cpu_1->execute().set_input_line(0, HOLD_LINE);
+		msm5205_data_w(machine().device("msm"), m_adpcm_byte & 0xf);
+		m_cpu_1->execute().set_input_line(0, HOLD_LINE);
 	}
 
-	state->m_msm5205_vclk_toggle ^= 1;
+	m_msm5205_vclk_toggle ^= 1;
 }
 
 
@@ -895,7 +894,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(jngolady_vclk_cb),
+	DEVCB_DRIVER_LINE_MEMBER(jangou_state,jngolady_vclk_cb),
 	MSM5205_S96_4B
 };
 

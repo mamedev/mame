@@ -228,6 +228,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
+	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -283,11 +284,10 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 }
 
 
-static void kurukuru_msm5205_vck(device_t *device,int st)
+WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
 {
-	kurukuru_state *state = device->machine().driver_data<kurukuru_state>();
-	state->update_sound_irq(state->m_sound_irq_cause | 2);
-	msm5205_data_w(device, state->m_adpcm_data);
+	update_sound_irq(m_sound_irq_cause | 2);
+	msm5205_data_w(machine().device("msm"), m_adpcm_data);
 }
 
 
@@ -548,7 +548,7 @@ static const ay8910_interface ym2149_intf =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(kurukuru_msm5205_vck),
+	DEVCB_DRIVER_LINE_MEMBER(kurukuru_state,kurukuru_msm5205_vck),
 	MSM5205_S48_4B      /* changed on the fly */
 };
 

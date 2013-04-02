@@ -124,11 +124,10 @@ INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
 	sprtmtch_update_irq(machine());
 }
 
-static void sprtmtch_sound_callback( device_t *device, int state )
+WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
 {
-	dynax_state *driver_state = device->machine().driver_data<dynax_state>();
-	driver_state->m_sound_irq = state;
-	sprtmtch_update_irq(device->machine());
+	m_sound_irq = state;
+	sprtmtch_update_irq(machine());
 }
 
 
@@ -192,11 +191,10 @@ WRITE8_MEMBER(dynax_state::jantouki_sound_vblank_ack_w)
 	jantouki_sound_update_irq(machine());
 }
 
-static void jantouki_sound_callback(device_t *device, int state)
+WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
 {
-	dynax_state *driver_state = device->machine().driver_data<dynax_state>();
-	driver_state->m_sound_irq = state;
-	jantouki_sound_update_irq(device->machine());
+	m_sound_irq = state;
+	jantouki_sound_update_irq(machine());
 }
 
 
@@ -392,32 +390,30 @@ WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 }
 
 
-static void adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	msm5205_data_w(device, state->m_msm5205next >> 4);
-	state->m_msm5205next <<= 4;
+	msm5205_data_w(machine().device("msm"), m_msm5205next >> 4);
+	m_msm5205next <<= 4;
 
-	state->m_toggle = 1 - state->m_toggle;
+	m_toggle = 1 - m_toggle;
 
-	if (state->m_toggle)
+	if (m_toggle)
 	{
-		if (state->m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static void adpcm_int_cpu1( device_t *device,int st )
+WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 {
-	dynax_state *state = device->machine().driver_data<dynax_state>();
-	msm5205_data_w(device, state->m_msm5205next >> 4);
-	state->m_msm5205next <<= 4;
+	msm5205_data_w(machine().device("msm"), m_msm5205next >> 4);
+	m_msm5205next <<= 4;
 
-	state->m_toggle_cpu1 = 1 - state->m_toggle_cpu1;
-	if (state->m_toggle_cpu1)
+	m_toggle_cpu1 = 1 - m_toggle_cpu1;
+	if (m_toggle_cpu1)
 	{
-		if (state->m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);  // cpu1
+		if (m_resetkludge)   // don't know what's wrong, but NMIs when the 5205 is reset make the game crash
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);  // cpu1
 	}
 }
 
@@ -4356,12 +4352,12 @@ static const ym2203_interface hanamai_ym2203_interface =
 		DEVCB_NULL,                         /* Port A Write */
 		DEVCB_NULL,                         /* Port B Write */
 	},
-	DEVCB_LINE(sprtmtch_sound_callback)     /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,sprtmtch_sound_callback)     /* IRQ handler */
 };
 
 static const msm5205_interface hanamai_msm5205_interface =
 {
-	DEVCB_LINE(adpcm_int),          /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,adpcm_int),          /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
 };
 
@@ -4524,7 +4520,7 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 		DEVCB_NULL,                 /* Port A Write */
 		DEVCB_NULL,                 /* Port B Write */
 	},
-	DEVCB_LINE(sprtmtch_sound_callback),    /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,sprtmtch_sound_callback),    /* IRQ handler */
 };
 
 static MACHINE_CONFIG_START( sprtmtch, dynax_state )
@@ -4695,12 +4691,12 @@ static const ym2203_interface jantouki_ym2203_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(jantouki_sound_callback)     /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,jantouki_sound_callback)     /* IRQ handler */
 };
 
 static const msm5205_interface jantouki_msm5205_interface =
 {
-	DEVCB_LINE(adpcm_int_cpu1),         /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(dynax_state,adpcm_int_cpu1),         /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz, 4 Bits  */
 };
 

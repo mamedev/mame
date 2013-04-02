@@ -484,17 +484,15 @@ static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8, darius_state )
 ADDRESS_MAP_END
 
 
-static void darius_adpcm_int( device_t *device, int st )
+WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 {
-	darius_state *state = device->machine().driver_data<darius_state>();
-
-	if (state->m_nmi_enable)
-		state->m_adpcm->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (m_nmi_enable)
+		m_adpcm->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(darius_adpcm_int),   /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(darius_state,darius_adpcm_int),   /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz   */
 };
 

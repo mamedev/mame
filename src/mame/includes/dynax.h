@@ -492,6 +492,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mjmyster_irq);
 	void tenkai_update_rombank();
 	void gekisha_bank_postload();
+	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
+	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
 };
 
 //----------- defined in drivers/dynax.c -----------

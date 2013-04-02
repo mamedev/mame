@@ -89,6 +89,8 @@ public:
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
 	void slyspy_set_protection_map( int type);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
 };
 
 
@@ -114,4 +116,5 @@ public:
 	DECLARE_VIDEO_START(automat);
 	UINT32 screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
 };

@@ -198,27 +198,25 @@ READ8_MEMBER(crgolf_state::sound_to_main_r)
  *
  *************************************/
 
-static void vck_callback( device_t *device, int st )
+WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 {
-	crgolf_state *state = device->machine().driver_data<crgolf_state>();
-
 	/* only play back if we have data remaining */
-	if (state->m_sample_count != 0xff)
+	if (m_sample_count != 0xff)
 	{
-		UINT8 data = state->memregion("adpcm")->base()[state->m_sample_offset >> 1];
+		UINT8 data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		msm5205_data_w(device, (data >> (4 * (~state->m_sample_offset & 1))) & 0x0f);
-		state->m_sample_offset++;
+		msm5205_data_w(machine().device("msm"), (data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
-		if (!(state->m_sample_offset & 0xff))
+		if (!(m_sample_offset & 0xff))
 		{
-			state->m_sample_count--;
+			m_sample_count--;
 
 			/* if we hit 0xff, automatically turn off playback */
-			if (state->m_sample_count == 0xff)
-				msm5205_reset_w(device, 1);
+			if (m_sample_count == 0xff)
+				msm5205_reset_w(machine().device("msm"), 1);
 		}
 	}
 }
@@ -378,7 +376,7 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_intf =
 {
-	DEVCB_LINE(vck_callback),
+	DEVCB_DRIVER_LINE_MEMBER(crgolf_state,vck_callback),
 	MSM5205_S64_4B
 };
 

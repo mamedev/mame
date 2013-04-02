@@ -270,10 +270,9 @@ static GFXDECODE_START( ashnojoe )
 GFXDECODE_END
 
 
-static void ym2203_irq_handler( device_t *device, int irq )
+WRITE_LINE_MEMBER(ashnojoe_state::ym2203_irq_handler)
 {
-	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
-	state->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
@@ -301,28 +300,27 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
 		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
 	},
-	DEVCB_LINE(ym2203_irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(ashnojoe_state,ym2203_irq_handler)
 };
 
-static void ashnojoe_vclk_cb( device_t *device, int st )
+WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
-	ashnojoe_state *state = device->machine().driver_data<ashnojoe_state>();
-	if (state->m_msm5205_vclk_toggle == 0)
+	if (m_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(device, state->m_adpcm_byte >> 4);
+		msm5205_data_w(machine().device("msm"), m_adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(device, state->m_adpcm_byte & 0xf);
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		msm5205_data_w(machine().device("msm"), m_adpcm_byte & 0xf);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
-	state->m_msm5205_vclk_toggle ^= 1;
+	m_msm5205_vclk_toggle ^= 1;
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(ashnojoe_vclk_cb),
+	DEVCB_DRIVER_LINE_MEMBER(ashnojoe_state,ashnojoe_vclk_cb),
 	MSM5205_S48_4B
 };
 

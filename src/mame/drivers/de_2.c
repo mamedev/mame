@@ -262,21 +262,19 @@ WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
 }
 
-//WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
-static void msm5205_irq_w(device_t* device,int st)
+WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
 {
-	de_2_state* state = device->machine().driver_data<de_2_state>();
-	msm5205_data_w(state->m_msm5205,state->m_sample_data >> 4);
-	if(state->m_more_data)
+	msm5205_data_w(m_msm5205,m_sample_data >> 4);
+	if(m_more_data)
 	{
-		if(state->m_nmi_enable)
-			state->m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // generate NMI when we need more data
-		state->m_more_data = false;
+		if(m_nmi_enable)
+			m_audiocpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);  // generate NMI when we need more data
+		m_more_data = false;
 	}
 	else
 	{
-		state->m_more_data = true;
-		state->m_sample_data <<= 4;
+		m_more_data = true;
+		m_sample_data <<= 4;
 	}
 }
 
@@ -547,7 +545,7 @@ WRITE8_MEMBER( de_2_state::sample_bank_w )
 
 static const msm5205_interface msm5205_intf =
 {
-	DEVCB_LINE(msm5205_irq_w),
+	DEVCB_DRIVER_LINE_MEMBER(de_2_state,msm5205_irq_w),
 	MSM5205_S96_4B
 };
 

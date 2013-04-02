@@ -74,4 +74,5 @@ public:
 	INTERRUPT_GEN_MEMBER(firetrap_irq);
 	inline void get_bg_tile_info(tile_data &tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	DECLARE_WRITE_LINE_MEMBER(firetrap_adpcm_int);
 };

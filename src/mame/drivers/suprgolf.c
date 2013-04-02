@@ -70,6 +70,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_suprgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -432,28 +433,24 @@ static const ym2203_interface ym2203_config =
 	DEVCB_DRIVER_LINE_MEMBER(suprgolf_state,irqhandler)
 };
 
-static void adpcm_int(device_t *device,int st)
+WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 {
-	suprgolf_state *state = device->machine().driver_data<suprgolf_state>();
-
+	msm5205_reset_w(machine().device("msm"),0);
+	m_toggle ^= 1;
+	if(m_toggle)
 	{
-		msm5205_reset_w(device,0);
-		state->m_toggle ^= 1;
-		if(state->m_toggle)
-		{
-			msm5205_data_w(device, (state->m_msm5205next & 0xf0) >> 4);
-			if(state->m_msm_nmi_mask) { device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
-		}
-		else
-		{
-			msm5205_data_w(device, (state->m_msm5205next & 0x0f) >> 0);
-		}
+		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
+		if(m_msm_nmi_mask) { machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	}
+	else
+	{
+		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0x0f) >> 0);
 	}
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(adpcm_int),      /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(suprgolf_state,adpcm_int),      /* interrupt function */
 	MSM5205_S48_4B  /* 4KHz 4-bit */
 };
 

@@ -392,10 +392,10 @@ static void borntofi_adpcm_int( device_t *device, int voice )
 	}
 }
 
-static void borntofi_adpcm_int_0(device_t *device,int state) { borntofi_adpcm_int(device, 0); }
-static void borntofi_adpcm_int_1(device_t *device,int state) { borntofi_adpcm_int(device, 1); }
-static void borntofi_adpcm_int_2(device_t *device,int state) { borntofi_adpcm_int(device, 2); }
-static void borntofi_adpcm_int_3(device_t *device,int state) { borntofi_adpcm_int(device, 3); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(machine().device("msm1"), 0); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(machine().device("msm2"), 1); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(machine().device("msm3"), 2); }
+WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(machine().device("msm4"), 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
@@ -925,22 +925,22 @@ MACHINE_CONFIG_END
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 static const msm5205_interface msm5205_config_0 =
 {
-	DEVCB_LINE(borntofi_adpcm_int_0),   /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_0),   /* IRQ handler */
 	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_1 =
 {
-	DEVCB_LINE(borntofi_adpcm_int_1),   /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_1),   /* IRQ handler */
 	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_2 =
 {
-	DEVCB_LINE(borntofi_adpcm_int_2),   /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_2),   /* IRQ handler */
 	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 static const msm5205_interface msm5205_config_3 =
 {
-	DEVCB_LINE(borntofi_adpcm_int_3),   /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(fantland_state,borntofi_adpcm_int_3),   /* IRQ handler */
 	MSM5205_S48_4B      /* 8 kHz, 4 Bits  */
 };
 

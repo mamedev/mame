@@ -397,30 +397,28 @@ void mermaid_state::machine_reset()
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-static void rougien_adpcm_int( device_t *device ,int st)
+WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 {
-	mermaid_state *state = device->machine().driver_data<mermaid_state>();
+//  popmessage("%08x",m_adpcm_pos);
 
-//  popmessage("%08x",state->m_adpcm_pos);
-
-	if (state->m_adpcm_pos >= state->m_adpcm_end || state->m_adpcm_idle)
+	if (m_adpcm_pos >= m_adpcm_end || m_adpcm_idle)
 	{
-		//state->m_adpcm_idle = 1;
-		msm5205_reset_w(device, 1);
-		state->m_adpcm_trigger = 0;
+		//m_adpcm_idle = 1;
+		msm5205_reset_w(machine().device("msm"), 1);
+		m_adpcm_trigger = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
-		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(device, state->m_adpcm_data & 0xf);
-		state->m_adpcm_trigger ^= 1;
-		if (state->m_adpcm_trigger == 0)
+		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0xf);
+		m_adpcm_trigger ^= 1;
+		if (m_adpcm_trigger == 0)
 		{
-			state->m_adpcm_pos++;
-			//if ((ROM[state->m_adpcm_pos] & 0xff) == 0x70)
-			//  state->m_adpcm_idle = 1;
+			m_adpcm_pos++;
+			//if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
+			//  m_adpcm_idle = 1;
 		}
 	}
 }
@@ -428,7 +426,7 @@ static void rougien_adpcm_int( device_t *device ,int st)
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(rougien_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(mermaid_state,rougien_adpcm_int),  /* interrupt function */
 	MSM5205_S96_4B
 };
 

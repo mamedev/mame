@@ -108,4 +108,5 @@ public:
 	void update_psg1( int port );
 	void update_da(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
 };

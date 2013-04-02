@@ -137,25 +137,23 @@ WRITE8_MEMBER(fromance_state::fromance_adpcm_w)
 }
 
 
-static void fromance_adpcm_int( device_t *device, int st )
+WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 {
-	fromance_state *state = device->machine().driver_data<fromance_state>();
-
 	/* skip if we're reset */
-	if (!state->m_adpcm_reset)
+	if (!m_adpcm_reset)
 		return;
 
 	/* clock the data through */
-	if (state->m_vclk_left)
+	if (m_vclk_left)
 	{
-		msm5205_data_w(device, (state->m_adpcm_data >> 4));
-		state->m_adpcm_data <<= 4;
-		state->m_vclk_left--;
+		msm5205_data_w(machine().device("msm"), (m_adpcm_data >> 4));
+		m_adpcm_data <<= 4;
+		m_vclk_left--;
 	}
 
 	/* generate an NMI if we're out of data */
-	if (!state->m_vclk_left)
-		state->m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_vclk_left)
+		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -937,7 +935,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(fromance_adpcm_int), /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(fromance_state,fromance_adpcm_int), /* IRQ handler */
 	MSM5205_S48_4B      /* 8 KHz */
 };
 

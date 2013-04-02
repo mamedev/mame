@@ -84,6 +84,7 @@ public:
 	void draw_sprite();
 	void tubep_vblank_end();
 	void tubep_setup_save_state();
+	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
 };
 
 

@@ -270,10 +270,10 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-static void gladiator_ym_irq(device_t *device, int irq)
+WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	device->machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -649,7 +649,7 @@ static const ym2203_interface gladiatr_ym2203_interface =
 		DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
 		DEVCB_NULL,
 	},
-	DEVCB_LINE(gladiator_ym_irq)          /* NMI request for 2nd cpu */
+	DEVCB_DRIVER_LINE_MEMBER(gladiatr_state,gladiator_ym_irq)          /* NMI request for 2nd cpu */
 };
 
 static const msm5205_interface msm5205_config =

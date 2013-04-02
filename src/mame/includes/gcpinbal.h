@@ -64,4 +64,5 @@ public:
 	TIMER_CALLBACK_MEMBER(gcpinbal_interrupt3);
 	void gcpinbal_core_vh_start(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
 };

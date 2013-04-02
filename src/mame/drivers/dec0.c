@@ -1294,24 +1294,24 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(device_t *device, int linestate)
+WRITE_LINE_MEMBER(dec0_state::sound_irq)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(0, linestate); /* IRQ */
+	machine().device("audiocpu")->execute().set_input_line(0, state); /* IRQ */
 }
 
-static void sound_irq2(device_t *device, int linestate)
+WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 {
-	device->machine().device("audiocpu")->execute().set_input_line(1, linestate); /* IRQ2 */
+	machine().device("audiocpu")->execute().set_input_line(1, state); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =
 {
-	DEVCB_LINE(sound_irq)
+	DEVCB_DRIVER_LINE_MEMBER(dec0_state,sound_irq)
 };
 
 static const ym3812_interface ym3812b_interface =
 {
-	DEVCB_LINE(sound_irq2)
+	DEVCB_DRIVER_LINE_MEMBER(dec0_state,sound_irq2)
 };
 
 /******************************************************************************/
@@ -1384,25 +1384,24 @@ MACHINE_CONFIG_END
 #define DEC0_VBSTART 256-8
 
 
-static void automat_vclk_cb(device_t *device,int st)
+WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
 {
-	dec0_automat_state *state = device->machine().driver_data<dec0_automat_state>();
-	if (state->m_automat_msm5205_vclk_toggle == 0)
+	if (m_automat_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(device, state->m_automat_adpcm_byte & 0xf);
+		msm5205_data_w(machine().device("msm"), m_automat_adpcm_byte & 0xf);
 	}
 	else
 	{
-		msm5205_data_w(device, state->m_automat_adpcm_byte >> 4);
+		msm5205_data_w(machine().device("msm"), m_automat_adpcm_byte >> 4);
 		//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
 	}
 
-	state->m_automat_msm5205_vclk_toggle ^= 1;
+	m_automat_msm5205_vclk_toggle ^= 1;
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(automat_vclk_cb),
+	DEVCB_DRIVER_LINE_MEMBER(dec0_automat_state,automat_vclk_cb),
 	MSM5205_S48_4B
 };
 

@@ -107,4 +107,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void bootleg_decode(  );
 	void configure_banks(  );
+	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
 };

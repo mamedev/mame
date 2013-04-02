@@ -83,16 +83,14 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 
-static void battlera_adpcm_int(device_t *device, int st)
+WRITE_LINE_MEMBER(battlera_state::battlera_adpcm_int)
 {
-	battlera_state *state = device->machine().driver_data<battlera_state>();
+	msm5205_data_w(machine().device("msm"),m_msm5205next >> 4);
+	m_msm5205next <<= 4;
 
-	msm5205_data_w(device,state->m_msm5205next >> 4);
-	state->m_msm5205next <<= 4;
-
-	state->m_toggle = 1 - state->m_toggle;
-	if (state->m_toggle)
-		device->machine().device("audiocpu")->execute().set_input_line(1, HOLD_LINE);
+	m_toggle = 1 - m_toggle;
+	if (m_toggle)
+		machine().device("audiocpu")->execute().set_input_line(1, HOLD_LINE);
 }
 
 WRITE8_MEMBER(battlera_state::battlera_adpcm_data_w)
@@ -217,7 +215,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(battlera_adpcm_int),/* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(battlera_state,battlera_adpcm_int),/* interrupt function */
 	MSM5205_S48_4B      /* 8KHz            */
 };
 

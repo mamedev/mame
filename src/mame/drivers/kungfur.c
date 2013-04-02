@@ -84,6 +84,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
+	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
+	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
 };
 
 
@@ -188,26 +190,24 @@ WRITE8_MEMBER(kungfur_state::kungfur_adpcm2_w)
 }
 
 // adpcm callbacks
-static void kfr_adpcm1_int(device_t *device, int st)
+WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	UINT8 *ROM = state->memregion("adpcm1")->base();
-	UINT8 data = ROM[state->m_adpcm_pos[0] & 0x1ffff];
+	UINT8 *ROM = memregion("adpcm1")->base();
+	UINT8 data = ROM[m_adpcm_pos[0] & 0x1ffff];
 
-	msm5205_data_w(device, state->m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
-	state->m_adpcm_pos[0] += state->m_adpcm_sel[0];
-	state->m_adpcm_sel[0] ^= 1;
+	msm5205_data_w(machine().device("adpcm1"), m_adpcm_sel[0] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm_pos[0] += m_adpcm_sel[0];
+	m_adpcm_sel[0] ^= 1;
 }
 
-static void kfr_adpcm2_int(device_t *device,int st)
+WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
 {
-	kungfur_state *state = device->machine().driver_data<kungfur_state>();
-	UINT8 *ROM = state->memregion("adpcm2")->base();
-	UINT8 data = ROM[state->m_adpcm_pos[1] & 0x3ffff];
+	UINT8 *ROM = memregion("adpcm2")->base();
+	UINT8 data = ROM[m_adpcm_pos[1] & 0x3ffff];
 
-	msm5205_data_w(device, state->m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
-	state->m_adpcm_pos[1] += state->m_adpcm_sel[1];
-	state->m_adpcm_sel[1] ^= 1;
+	msm5205_data_w(machine().device("adpcm2"), m_adpcm_sel[1] ? data & 0xf : data >> 4 & 0xf);
+	m_adpcm_pos[1] += m_adpcm_sel[1];
+	m_adpcm_sel[1] ^= 1;
 }
 
 
@@ -284,13 +284,13 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 
 static const msm5205_interface msm5205_config_1 =
 {
-	DEVCB_LINE(kfr_adpcm1_int),
+	DEVCB_DRIVER_LINE_MEMBER(kungfur_state,kfr_adpcm1_int),
 	MSM5205_S48_4B
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	DEVCB_LINE(kfr_adpcm2_int),
+	DEVCB_DRIVER_LINE_MEMBER(kungfur_state,kfr_adpcm2_int),
 	MSM5205_S48_4B
 };
 

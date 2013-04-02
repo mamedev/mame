@@ -438,29 +438,35 @@ WRITE8_MEMBER(ddragon_state::dd_adpcm_w)
 	}
 }
 
-
-static void dd_adpcm_int( device_t *device, int st )
+void ddragon_state::dd_adpcm_int( device_t *device, int chip )
 {
-	ddragon_state *state = device->machine().driver_data<ddragon_state>();
-	int chip = (device == state->m_adpcm_1) ? 0 : 1;
-
-	if (state->m_adpcm_pos[chip] >= state->m_adpcm_end[chip] || state->m_adpcm_pos[chip] >= 0x10000)
+	if (m_adpcm_pos[chip] >= m_adpcm_end[chip] || m_adpcm_pos[chip] >= 0x10000)
 	{
-		state->m_adpcm_idle[chip] = 1;
+		m_adpcm_idle[chip] = 1;
 		msm5205_reset_w(device, 1);
 	}
-	else if (state->m_adpcm_data[chip] != -1)
+	else if (m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device, state->m_adpcm_data[chip] & 0x0f);
-		state->m_adpcm_data[chip] = -1;
+		msm5205_data_w(device, m_adpcm_data[chip] & 0x0f);
+		m_adpcm_data[chip] = -1;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
 
-		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
-		msm5205_data_w(device, state->m_adpcm_data[chip] >> 4);
+		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
+		msm5205_data_w(device, m_adpcm_data[chip] >> 4);
 	}
+}
+
+WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
+{
+	dd_adpcm_int(m_adpcm_1,0);
+}
+
+WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
+{
+	dd_adpcm_int(m_adpcm_2,0);
 }
 
 
@@ -935,12 +941,17 @@ GFXDECODE_END
  *
  *************************************/
 
-static const msm5205_interface msm5205_config =
+static const msm5205_interface msm5205_config_1 =
 {
-	DEVCB_LINE(dd_adpcm_int),   /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(ddragon_state,dd_adpcm_int_1),   /* interrupt function */
 	MSM5205_S48_4B  /* 8kHz */
 };
 
+static const msm5205_interface msm5205_config_2 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(ddragon_state,dd_adpcm_int_2),   /* interrupt function */
+	MSM5205_S48_4B  /* 8kHz */
+};
 
 
 /*************************************
@@ -986,11 +997,11 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -1049,11 +1060,11 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
 	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

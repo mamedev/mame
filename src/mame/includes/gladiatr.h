@@ -68,4 +68,5 @@ public:
 	UINT32 screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void swap_block(UINT8 *src1,UINT8 *src2,int len);
+	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 };

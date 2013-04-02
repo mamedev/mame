@@ -80,6 +80,7 @@ public:
 	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	int start_dma();
+	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
 };
 
 
@@ -280,35 +281,33 @@ WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 	membank("bank1")->set_base(memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
-static void ml_msm5205_vck(device_t *device,int st)
+WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 {
-	mlanding_state *state = device->machine().driver_data<mlanding_state>();
+//  popmessage("%08x",m_adpcm_pos);
 
-//  popmessage("%08x",state->m_adpcm_pos);
-
-	if (state->m_adpcm_pos >= 0x50000  || state->m_adpcm_idle)
+	if (m_adpcm_pos >= 0x50000  || m_adpcm_idle)
 	{
-		//state->m_adpcm_idle = 1;
-		msm5205_reset_w(device,1);
-		state->m_trigger = 0;
+		//m_adpcm_idle = 1;
+		msm5205_reset_w(machine().device("msm"),1);
+		m_trigger = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
-		state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(device,state->m_adpcm_data & 0xf);
-		state->m_trigger^=1;
-		if(state->m_trigger == 0)
+		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
+		msm5205_data_w(machine().device("msm"),m_adpcm_data & 0xf);
+		m_trigger^=1;
+		if(m_trigger == 0)
 		{
-			state->m_adpcm_pos++;
-			//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_adpcm_pos++;
+			//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			/*TODO: simplify this */
-			if(ROM[state->m_adpcm_pos] == 0x00 && ROM[state->m_adpcm_pos+1] == 0x00 && ROM[state->m_adpcm_pos+2] == 0x00 && ROM[state->m_adpcm_pos+3] == 0x00
-				&& ROM[state->m_adpcm_pos+4] == 0x00 && ROM[state->m_adpcm_pos+5] == 0x00 && ROM[state->m_adpcm_pos+6] == 0x00 && ROM[state->m_adpcm_pos+7] == 0x00
-				&& ROM[state->m_adpcm_pos+8] == 0x00 && ROM[state->m_adpcm_pos+9] == 0x00 && ROM[state->m_adpcm_pos+10] == 0x00 && ROM[state->m_adpcm_pos+11] == 0x00
-				&& ROM[state->m_adpcm_pos+12] == 0x00 && ROM[state->m_adpcm_pos+13] == 0x00 && ROM[state->m_adpcm_pos+14] == 0x00 && ROM[state->m_adpcm_pos+15] == 0x00)
-				state->m_adpcm_idle = 1;
+			if(ROM[m_adpcm_pos] == 0x00 && ROM[m_adpcm_pos+1] == 0x00 && ROM[m_adpcm_pos+2] == 0x00 && ROM[m_adpcm_pos+3] == 0x00
+				&& ROM[m_adpcm_pos+4] == 0x00 && ROM[m_adpcm_pos+5] == 0x00 && ROM[m_adpcm_pos+6] == 0x00 && ROM[m_adpcm_pos+7] == 0x00
+				&& ROM[m_adpcm_pos+8] == 0x00 && ROM[m_adpcm_pos+9] == 0x00 && ROM[m_adpcm_pos+10] == 0x00 && ROM[m_adpcm_pos+11] == 0x00
+				&& ROM[m_adpcm_pos+12] == 0x00 && ROM[m_adpcm_pos+13] == 0x00 && ROM[m_adpcm_pos+14] == 0x00 && ROM[m_adpcm_pos+15] == 0x00)
+				m_adpcm_idle = 1;
 		}
 	}
 }
@@ -732,7 +731,7 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(ml_msm5205_vck), /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(mlanding_state,ml_msm5205_vck), /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

@@ -62,29 +62,36 @@ WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 	}
 }
 
-static void spd_adpcm_int(device_t *device,int st)
+void spdodgeb_state::spd_adpcm_int( device_t *device, int chip )
 {
-	spdodgeb_state *state = device->machine().driver_data<spdodgeb_state>();
-	int chip = (strcmp(device->tag(), ":msm1") == 0) ? 0 : 1;
-	if (state->m_adpcm_pos[chip] >= state->m_adpcm_end[chip] || state->m_adpcm_pos[chip] >= 0x10000)
+	if (m_adpcm_pos[chip] >= m_adpcm_end[chip] || m_adpcm_pos[chip] >= 0x10000)
 	{
-		state->m_adpcm_idle[chip] = 1;
+		m_adpcm_idle[chip] = 1;
 		msm5205_reset_w(device,1);
 	}
-	else if (state->m_adpcm_data[chip] != -1)
+	else if (m_adpcm_data[chip] != -1)
 	{
-		msm5205_data_w(device,state->m_adpcm_data[chip] & 0x0f);
-		state->m_adpcm_data[chip] = -1;
+		msm5205_data_w(device,m_adpcm_data[chip] & 0x0f);
+		m_adpcm_data[chip] = -1;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
 
-		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
-		msm5205_data_w(device,state->m_adpcm_data[chip] >> 4);
+		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
+		msm5205_data_w(device,m_adpcm_data[chip] >> 4);
 	}
 }
 
+WRITE_LINE_MEMBER(spdodgeb_state::spd_adpcm_int_1)
+{
+	spd_adpcm_int(machine().device("msm1"), 0);
+}
+
+WRITE_LINE_MEMBER(spdodgeb_state::spd_adpcm_int_2)
+{
+	spd_adpcm_int(machine().device("msm2"), 1);
+}
 
 #if 0   // default - more sensitive (state change and timing measured on real board?)
 void spdodgeb_state::mcu63705_update_inputs()
@@ -385,12 +392,17 @@ static const ym3812_interface ym3812_config =
 	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,irqhandler)
 };
 
-static const msm5205_interface msm5205_config =
+static const msm5205_interface msm5205_config_1 =
 {
-	DEVCB_LINE(spd_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,spd_adpcm_int_1),  /* interrupt function */
 	MSM5205_S48_4B  /* 8kHz? */
 };
 
+static const msm5205_interface msm5205_config_2 =
+{
+	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,spd_adpcm_int_2),  /* interrupt function */
+	MSM5205_S48_4B  /* 8kHz? */
+};
 
 void spdodgeb_state::machine_reset()
 {
@@ -435,12 +447,12 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_CONFIG(msm5205_config_2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

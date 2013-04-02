@@ -73,6 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
 	TIMER_DEVICE_CALLBACK_MEMBER(sothello_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
 
 
@@ -324,18 +325,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
 	m_v9938->interrupt();
 }
 
-static void adpcm_int(device_t *device,int st)
+WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
-	sothello_state *state = device->machine().driver_data<sothello_state>();
 	/* only 4 bits are used */
-	msm5205_data_w( device, state->m_msm_data & 0x0f );
-	device->machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE );
+	msm5205_data_w(machine().device("msm"), m_msm_data & 0x0f );
+	machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE );
 }
 
 
 static const msm5205_interface msm_interface =
 {
-	DEVCB_LINE(adpcm_int),      /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(sothello_state,adpcm_int),      /* interrupt function */
 	MSM5205_S48_4B  /* changed on the fly */
 };
 

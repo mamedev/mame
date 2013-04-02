@@ -52,4 +52,8 @@ public:
 	INTERRUPT_GEN_MEMBER(fantland_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_0);
+	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_1);
+	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_2);
+	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_3);
 };

@@ -427,7 +427,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(stfight_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(stfight_state,stfight_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz               */
 };
 

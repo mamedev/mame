@@ -76,6 +76,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_chinsan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(chin_adpcm_int);
 };
 
 
@@ -535,35 +536,33 @@ GFXDECODE_END
  *
  *************************************/
 
-static void chin_adpcm_int( device_t *device, int st )
+WRITE_LINE_MEMBER(chinsan_state::chin_adpcm_int)
 {
-	chinsan_state *state = device->machine().driver_data<chinsan_state>();
-
-	if (state->m_adpcm_pos >= 0x10000 || state->m_adpcm_idle)
+	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
-		//state->m_adpcm_idle = 1;
-		msm5205_reset_w(device, 1);
-		state->m_trigger = 0;
+		//m_adpcm_idle = 1;
+		msm5205_reset_w(machine().device("msm"), 1);
+		m_trigger = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
-		state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(device, state->m_adpcm_data & 0xf);
-		state->m_trigger ^= 1;
-		if(state->m_trigger == 0)
+		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0xf);
+		m_trigger ^= 1;
+		if(m_trigger == 0)
 		{
-			state->m_adpcm_pos++;
-			if ((ROM[state->m_adpcm_pos] & 0xff) == 0x70)
-				state->m_adpcm_idle = 1;
+			m_adpcm_pos++;
+			if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
+				m_adpcm_idle = 1;
 		}
 	}
 }
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(chin_adpcm_int), /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(chinsan_state,chin_adpcm_int), /* interrupt function */
 	MSM5205_S64_4B  /* 8kHz */
 };
 

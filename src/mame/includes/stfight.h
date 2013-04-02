@@ -51,7 +51,6 @@ public:
 	DECLARE_WRITE8_MEMBER(stfight_adpcm_control_w);
 	void set_pens();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 };
 
-/*----------- defined in machine/stfight.c -----------*/
-void stfight_adpcm_int(device_t *device, int st);

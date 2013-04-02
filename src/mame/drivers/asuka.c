@@ -258,20 +258,18 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 
 
 
-static void asuka_msm5205_vck( device_t *device, int st )
+WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 {
-	asuka_state *state = device->machine().driver_data<asuka_state>();
-
-	if (state->m_adpcm_data != -1)
+	if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
-		state->m_adpcm_data = -1;
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+		m_adpcm_data = -1;
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().root_device().memregion("ymsnd")->base()[state->m_adpcm_pos];
-		state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
-		msm5205_data_w(device, state->m_adpcm_data >> 4);
+		m_adpcm_data = machine().root_device().memregion("ymsnd")->base()[m_adpcm_pos];
+		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
+		msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
 	}
 }
 
@@ -779,7 +777,7 @@ static const ym2610_interface ym2610_config =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(asuka_msm5205_vck),  /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(asuka_state,asuka_msm5205_vck),  /* VCK function */
 	MSM5205_S48_4B      /* 8 kHz */
 };
 

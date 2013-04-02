@@ -94,23 +94,22 @@ WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
 	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
 }
 
-static void tecmo_adpcm_int(device_t *device,int st)
+WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 {
-	tecmo_state *state = device->machine().driver_data<tecmo_state>();
-	if (state->m_adpcm_pos >= state->m_adpcm_end ||
-				state->m_adpcm_pos >= state->memregion("adpcm")->bytes())
-		msm5205_reset_w(device,1);
-	else if (state->m_adpcm_data != -1)
+	if (m_adpcm_pos >= m_adpcm_end ||
+				m_adpcm_pos >= memregion("adpcm")->bytes())
+		msm5205_reset_w(machine().device("msm"),1);
+	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(device,state->m_adpcm_data & 0x0f);
-		state->m_adpcm_data = -1;
+		msm5205_data_w(machine().device("msm"),m_adpcm_data & 0x0f);
+		m_adpcm_data = -1;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
-		state->m_adpcm_data = ROM[state->m_adpcm_pos++];
-		msm5205_data_w(device,state->m_adpcm_data >> 4);
+		m_adpcm_data = ROM[m_adpcm_pos++];
+		msm5205_data_w(machine().device("msm"),m_adpcm_data >> 4);
 	}
 }
 
@@ -616,7 +615,7 @@ static const ym3812_interface ym3812_config =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(tecmo_adpcm_int),    /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(tecmo_state,tecmo_adpcm_int),    /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz               */
 };
 

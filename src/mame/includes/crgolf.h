@@ -57,6 +57,7 @@ public:
 	TIMER_CALLBACK_MEMBER(main_to_sound_callback);
 	TIMER_CALLBACK_MEMBER(sound_to_main_callback);
 	void get_pens( pen_t *pens );
+	DECLARE_WRITE_LINE_MEMBER(vck_callback);
 };
 
 /*----------- defined in video/crgolf.c -----------*/

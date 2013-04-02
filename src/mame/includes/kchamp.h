@@ -55,4 +55,5 @@ public:
 	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 *decrypt_code();
+	DECLARE_WRITE_LINE_MEMBER(msmint);
 };

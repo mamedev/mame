@@ -357,20 +357,19 @@ WRITE8_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_data_w)
 	m_sample_buffer = data;
 }
 
-static void tturfbl_msm5205_callback( device_t *device,int st )
+WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
 {
-	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-	msm5205_data_w(device, (state->m_sample_buffer >> 4) & 0x0f);
+	msm5205_data_w(machine().device("msm"), (m_sample_buffer >> 4) & 0x0f);
 
-	state->m_sample_buffer <<=  4;
-	state->m_sample_select ^=  1;
-	if(state->m_sample_select == 0)
-		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_sample_buffer <<=  4;
+	m_sample_select ^=  1;
+	if(m_sample_select == 0)
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface  =
 {
-	DEVCB_LINE(tturfbl_msm5205_callback),
+	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,tturfbl_msm5205_callback),
 	MSM5205_S48_4B
 };
 
@@ -1158,20 +1157,19 @@ WRITE8_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_data_w)
 	m_sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(device_t *device, int st)
+WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
 {
-	segas1x_bootleg_state *state = device->machine().driver_data<segas1x_bootleg_state>();
-	msm5205_data_w(device, state->m_sample_buffer & 0x0f);
+	msm5205_data_w(machine().device("msm"), m_sample_buffer & 0x0f);
 
-	state->m_sample_buffer >>=  4;
-	state->m_sample_select ^=  1;
-	if (state->m_sample_select == 0)
-		state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_sample_buffer >>=  4;
+	m_sample_select ^=  1;
+	if (m_sample_select == 0)
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface  =
 {
-	DEVCB_LINE(shdancbl_msm5205_callback),
+	DEVCB_DRIVER_LINE_MEMBER(segas1x_bootleg_state,shdancbl_msm5205_callback),
 	MSM5205_S48_4B
 };
 

@@ -443,21 +443,19 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static void yunsung8_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(yunsung8_state::yunsung8_adpcm_int)
 {
-	yunsung8_state *state = device->machine().driver_data<yunsung8_state>();
+	msm5205_data_w(machine().device("msm"), m_adpcm >> 4);
+	m_adpcm <<= 4;
 
-	msm5205_data_w(device, state->m_adpcm >> 4);
-	state->m_adpcm <<= 4;
-
-	state->m_toggle ^= 1;
-	if (state->m_toggle)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_toggle ^= 1;
+	if (m_toggle)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =
 {
-	DEVCB_LINE(yunsung8_adpcm_int), /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(yunsung8_state,yunsung8_adpcm_int), /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz, 4 Bits */
 };
 

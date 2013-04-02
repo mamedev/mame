@@ -186,28 +186,27 @@ static const int sampleLimits[] =
 	0x7200      // (end of samples)
 };
 
-void stfight_adpcm_int(device_t *device, int st)
+WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 {
-	stfight_state *state = device->machine().driver_data<stfight_state>();
-	UINT8 *SAMPLES = state->memregion("adpcm")->base();
-	int adpcm_data = SAMPLES[state->m_adpcm_data_offs & 0x7fff];
+	UINT8 *SAMPLES = memregion("adpcm")->base();
+	int adpcm_data = SAMPLES[m_adpcm_data_offs & 0x7fff];
 
 	// finished playing sample?
-	if( state->m_adpcm_data_offs == state->m_adpcm_data_end )
+	if( m_adpcm_data_offs == m_adpcm_data_end )
 	{
-		msm5205_reset_w( device, 1 );
+		msm5205_reset_w(machine().device("msm"), 1 );
 		return;
 	}
 
-	if( state->m_toggle == 0 )
-		msm5205_data_w( device, ( adpcm_data >> 4 ) & 0x0f );
+	if( m_toggle == 0 )
+		msm5205_data_w(machine().device("msm"), ( adpcm_data >> 4 ) & 0x0f );
 	else
 	{
-		msm5205_data_w( device, adpcm_data & 0x0f );
-		state->m_adpcm_data_offs++;
+		msm5205_data_w(machine().device("msm"), adpcm_data & 0x0f );
+		m_adpcm_data_offs++;
 	}
 
-	state->m_toggle ^= 1;
+	m_toggle ^= 1;
 }
 
 WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)

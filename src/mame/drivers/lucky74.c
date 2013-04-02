@@ -1402,46 +1402,45 @@ static SOUND_START( lucky74 )
 	state->m_adpcm_busy_line = 0x01;    /* free and ready */
 }
 
-static void lucky74_adpcm_int(device_t *device,int st)
+WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 {
-	lucky74_state *state = device->machine().driver_data<lucky74_state>();
-	if (state->m_adpcm_reg[05] == 0x01) /* register 0x05 (bit 0 activated), trigger the sample */
+	if (m_adpcm_reg[05] == 0x01) /* register 0x05 (bit 0 activated), trigger the sample */
 	{
 		/* conditional zone for samples reproduction */
 
-		if (state->m_adpcm_busy_line)     /* still not started */
+		if (m_adpcm_busy_line)     /* still not started */
 		{
 			/* init all 09R81P registers */
 			logerror("init ADPCM registers\n");
-			state->m_adpcm_end = (state->m_adpcm_reg[04] << 8) + state->m_adpcm_reg[03];
-			state->m_adpcm_pos = (state->m_adpcm_reg[01] << 8) + state->m_adpcm_reg[00];
-			state->m_adpcm_busy_line = 0;
-			state->m_adpcm_data = -1;
+			m_adpcm_end = (m_adpcm_reg[04] << 8) + m_adpcm_reg[03];
+			m_adpcm_pos = (m_adpcm_reg[01] << 8) + m_adpcm_reg[00];
+			m_adpcm_busy_line = 0;
+			m_adpcm_data = -1;
 
-			logerror("sample pos:%4X\n", state->m_adpcm_pos);
-			logerror("sample end:%4X\n", state->m_adpcm_end);
+			logerror("sample pos:%4X\n", m_adpcm_pos);
+			logerror("sample end:%4X\n", m_adpcm_end);
 		}
 
-		if (state->m_adpcm_data == -1)
+		if (m_adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos];
-			state->m_adpcm_pos = (state->m_adpcm_pos + 1) & 0xffff;
-			msm5205_data_w(device, state->m_adpcm_data >> 4);
+			m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos];
+			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
+			msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
 
-			if (state->m_adpcm_pos == state->m_adpcm_end)
+			if (m_adpcm_pos == m_adpcm_end)
 			{
-				msm5205_reset_w(device, 0);         /* reset the M5205 */
-				state->m_adpcm_reg[05] = 0;     /* clean trigger register */
-				state->m_adpcm_busy_line = 0x01;    /* deactivate busy flag */
+				msm5205_reset_w(machine().device("msm"), 0);         /* reset the M5205 */
+				m_adpcm_reg[05] = 0;     /* clean trigger register */
+				m_adpcm_busy_line = 0x01;    /* deactivate busy flag */
 				logerror("end of sample.\n");
 			}
 		}
 		else
 		{
 			/* transferring 2nd nibble */
-			msm5205_data_w(device, state->m_adpcm_data & 0x0f);
-			state->m_adpcm_data = -1;
+			msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+			m_adpcm_data = -1;
 		}
 	}
 
@@ -1515,7 +1514,7 @@ static const ay8910_interface ay8910_config =
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(lucky74_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(lucky74_state,lucky74_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B      /* 8KHz */
 };
 

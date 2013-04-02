@@ -202,27 +202,25 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 
 
 /* Controlled through ioc? */
-static void gcp_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
-	gcpinbal_state *state = device->machine().driver_data<gcpinbal_state>();
-
-	if (state->m_adpcm_idle)
-		msm5205_reset_w(device, 1);
-	if (state->m_adpcm_start >= 0x200000 || state->m_adpcm_start > state->m_adpcm_end)
+	if (m_adpcm_idle)
+		msm5205_reset_w(machine().device("msm"), 1);
+	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
 	{
-		//msm5205_reset_w(device,1);
-		state->m_adpcm_start = state->m_msm_start + state->m_msm_bank;
-		state->m_adpcm_trigger = 0;
+		//msm5205_reset_w(machine().device("msm"),1);
+		m_adpcm_start = m_msm_start + m_msm_bank;
+		m_adpcm_trigger = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("msm")->base();
+		UINT8 *ROM = machine().root_device().memregion("msm")->base();
 
-		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_start] & 0x0f) : (ROM[state->m_adpcm_start] & 0xf0) >> 4));
-		msm5205_data_w(device, state->m_adpcm_data & 0xf);
-		state->m_adpcm_trigger ^= 1;
-		if (state->m_adpcm_trigger == 0)
-			state->m_adpcm_start++;
+		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0xf);
+		m_adpcm_trigger ^= 1;
+		if (m_adpcm_trigger == 0)
+			m_adpcm_start++;
 	}
 }
 
@@ -384,7 +382,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm6585_config =
 {
-	DEVCB_LINE(gcp_adpcm_int),      /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(gcpinbal_state,gcp_adpcm_int),      /* VCK function */
 	MSM6585_S40         /* 16 kHz */
 };
 

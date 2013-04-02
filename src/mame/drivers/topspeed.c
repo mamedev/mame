@@ -424,27 +424,26 @@ WRITE8_MEMBER(topspeed_state::topspeed_tc0140syt_comm_w)
 	device->tc0140syt_comm_w(space, 0, data);
 }
 
-static void topspeed_msm5205_clock( device_t *device, int chip )
+void topspeed_state::topspeed_msm5205_clock( device_t *device, int chip )
 {
-	topspeed_state *state = device->machine().driver_data<topspeed_state>();
-	UINT8 data = state->m_msm_rom[chip][state->m_msm_pos[chip]];
+	UINT8 data = m_msm_rom[chip][m_msm_pos[chip]];
 
-	msm5205_data_w(device, state->m_msm_sel[chip] ? data & 0xf : data >> 4 & 0xf);
-	state->m_msm_pos[chip] += state->m_msm_sel[chip];
-	state->m_msm_sel[chip] ^= 1;
+	msm5205_data_w(device, m_msm_sel[chip] ? data & 0xf : data >> 4 & 0xf);
+    m_msm_pos[chip] += m_msm_sel[chip];
+	m_msm_sel[chip] ^= 1;
 
-	if ((state->m_msm_pos[chip]) == state->m_msm_loop[chip])
-		state->m_msm_pos[chip] = state->m_msm_start[chip];
+	if ((m_msm_pos[chip]) == m_msm_loop[chip])
+		m_msm_pos[chip] = m_msm_start[chip];
 }
 
-static void topspeed_msm5205_vck_1( device_t *device ,int state)
+WRITE_LINE_MEMBER(topspeed_state::topspeed_msm5205_vck_1)
 {
-	topspeed_msm5205_clock(device, 0);
+	topspeed_msm5205_clock(m_msm_chip[0], 0);
 }
 
-static void topspeed_msm5205_vck_2( device_t *device ,int state)
+WRITE_LINE_MEMBER(topspeed_state::topspeed_msm5205_vck_2)
 {
-	topspeed_msm5205_clock(device, 1);
+	topspeed_msm5205_clock(m_msm_chip[1], 1);
 }
 
 
@@ -655,13 +654,13 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config_1 =
 {
-	DEVCB_LINE(topspeed_msm5205_vck_1), /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(topspeed_state,topspeed_msm5205_vck_1), /* VCK function */
 	MSM5205_S48_4B          /* 8 kHz */
 };
 
 static const msm5205_interface msm5205_config_2 =
 {
-	DEVCB_LINE(topspeed_msm5205_vck_2), /* VCK function */
+	DEVCB_DRIVER_LINE_MEMBER(topspeed_state,topspeed_msm5205_vck_2), /* VCK function */
 	MSM5205_S48_4B          /* 8 kHz */
 };
 

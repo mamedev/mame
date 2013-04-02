@@ -319,7 +319,8 @@ public:
 	DECLARE_READ16_MEMBER(cps2_qsound_volume_r);
 	DECLARE_READ16_MEMBER(kludge_r);
 	DECLARE_READ16_MEMBER(joy_or_paddle_r);
-
+	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
+	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

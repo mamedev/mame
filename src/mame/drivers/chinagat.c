@@ -104,6 +104,8 @@ public:
 	DECLARE_WRITE8_MEMBER( saiyugoub1_adpcm_control_w );
 	DECLARE_WRITE8_MEMBER( saiyugoub1_m5205_clk_w );
 	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
+	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(chinagat_irq_handler);
 };
 
 
@@ -311,10 +313,9 @@ READ8_MEMBER(chinagat_state::saiyugoub1_m5205_irq_r )
 	return 0;
 }
 
-static void saiyugoub1_m5205_irq_w( device_t *device, int st )
+WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
 {
-	chinagat_state *state = device->machine().driver_data<chinagat_state>();
-	state->m_adpcm_sound_irq = 1;
+	m_adpcm_sound_irq = 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, chinagat_state )
@@ -504,16 +505,15 @@ static GFXDECODE_START( chinagat )
 GFXDECODE_END
 
 
-static void chinagat_irq_handler(device_t *device, int irq )
+WRITE_LINE_MEMBER(chinagat_state::chinagat_irq_handler)
 {
-	chinagat_state *state = device->machine().driver_data<chinagat_state>();
-	state->m_snd_cpu->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE );
+	m_snd_cpu->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 /* This on the bootleg board, instead of the m6295 */
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(saiyugoub1_m5205_irq_w), /* Interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(chinagat_state,saiyugoub1_m5205_irq_w), /* Interrupt function */
 	MSM5205_S64_4B          /* vclk input mode (6030Hz, 4-bit) */
 };
 
@@ -525,7 +525,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	DEVCB_LINE(chinagat_irq_handler)
+	DEVCB_DRIVER_LINE_MEMBER(chinagat_state,chinagat_irq_handler)
 };
 
 

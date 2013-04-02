@@ -131,6 +131,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
 };
 
 
@@ -290,28 +291,26 @@ WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
 	}
 }
 
-static void jan_adpcm_int( device_t *device ,int st)
+WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 {
-	jantotsu_state *state = device->machine().driver_data<jantotsu_state>();
-
-	if (state->m_adpcm_pos >= 0x10000 || state->m_adpcm_idle)
+	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
-		//state->m_adpcm_idle = 1;
-		msm5205_reset_w(device, 1);
-		state->m_adpcm_trigger = 0;
+		//m_adpcm_idle = 1;
+		msm5205_reset_w(machine().device("msm"), 1);
+		m_adpcm_trigger = 0;
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
-		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(device, state->m_adpcm_data & 0xf);
-		state->m_adpcm_trigger ^= 1;
-		if (state->m_adpcm_trigger == 0)
+		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0xf);
+		m_adpcm_trigger ^= 1;
+		if (m_adpcm_trigger == 0)
 		{
-			state->m_adpcm_pos++;
-			if ((ROM[state->m_adpcm_pos] & 0xff) == 0x70)
-				state->m_adpcm_idle = 1;
+			m_adpcm_pos++;
+			if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
+				m_adpcm_idle = 1;
 		}
 	}
 }
@@ -465,7 +464,7 @@ INPUT_PORTS_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(jan_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(jantotsu_state,jan_adpcm_int),  /* interrupt function */
 	MSM5205_S64_4B  /* 6 KHz */
 };
 

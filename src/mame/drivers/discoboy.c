@@ -89,6 +89,7 @@ public:
 	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void discoboy_setrombank( UINT8 data );
+	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);	
 };
 
 
@@ -469,19 +470,17 @@ void discoboy_state::machine_reset()
 	m_toggle = 0;
 }
 
-static void yunsung8_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 {
-	discoboy_state *state = device->machine().driver_data<discoboy_state>();
+	msm5205_data_w(machine().device("msm"), m_adpcm >> 4);
+	m_adpcm <<= 4;
 
-	msm5205_data_w(device, state->m_adpcm >> 4);
-	state->m_adpcm <<= 4;
-
-	state->m_toggle ^= 1;
+	m_toggle ^= 1;
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =
 {
-	DEVCB_LINE(yunsung8_adpcm_int), /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(discoboy_state,yunsung8_adpcm_int), /* interrupt function */
 	MSM5205_S96_4B      /* 4KHz, 4 Bits */
 };
 

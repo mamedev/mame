@@ -200,4 +200,6 @@ public:
 	void set_fg_page( int data );
 	void set_bg_page( int data );
 	void datsu_set_pages(  );
+	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
+	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 };

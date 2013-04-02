@@ -39,31 +39,30 @@ WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 }
 
 
-static void pcm_w(device_t *device,int st)
+WRITE_LINE_MEMBER(drmicro_state::pcm_w)
 {
-	drmicro_state *state = device->machine().driver_data<drmicro_state>();
-	UINT8 *PCM = state->memregion("adpcm")->base();
+	UINT8 *PCM = memregion("adpcm")->base();
 
-	int data = PCM[state->m_pcm_adr / 2];
+	int data = PCM[m_pcm_adr / 2];
 
 	if (data != 0x70) // ??
 	{
-		if (~state->m_pcm_adr & 1)
+		if (~m_pcm_adr & 1)
 			data >>= 4;
 
-		msm5205_data_w(device, data & 0x0f);
-		msm5205_reset_w(device, 0);
+		msm5205_data_w(m_msm, data & 0x0f);
+		msm5205_reset_w(m_msm, 0);
 
-		state->m_pcm_adr = (state->m_pcm_adr + 1) & 0x7fff;
+		m_pcm_adr = (m_pcm_adr + 1) & 0x7fff;
 	}
 	else
-		msm5205_reset_w(device, 1);
+		msm5205_reset_w(m_msm, 1);
 }
 
 WRITE8_MEMBER(drmicro_state::pcm_set_w)
 {
 	m_pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(m_msm,1);
+	pcm_w(1);
 }
 
 /*************************************
@@ -214,7 +213,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(pcm_w),          /* IRQ handler */
+	DEVCB_DRIVER_LINE_MEMBER(drmicro_state,pcm_w),          /* IRQ handler */
 	MSM5205_S64_4B  /* 6 KHz */
 };
 

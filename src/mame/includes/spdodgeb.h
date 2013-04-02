@@ -51,4 +51,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcu63705_update_inputs();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void spd_adpcm_int(device_t *device, int chip);
+	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
+	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);	
 };

@@ -160,24 +160,22 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 
 
 /* Read/Write Handlers */
-static void idsoccer_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 {
-	docastle_state *state = device->machine().driver_data<docastle_state>();
-
-	if (state->m_adpcm_pos >= state->memregion("adpcm")->bytes())
+	if (m_adpcm_pos >= memregion("adpcm")->bytes())
 	{
-		state->m_adpcm_idle = 1;
-		msm5205_reset_w(device, 1);
+		m_adpcm_idle = 1;
+		msm5205_reset_w(machine().device("msm"), 1);
 	}
-	else if (state->m_adpcm_data != -1)
+	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(device, state->m_adpcm_data & 0x0f);
-		state->m_adpcm_data = -1;
+		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+		m_adpcm_data = -1;
 	}
 	else
 	{
-		state->m_adpcm_data = device->machine().root_device().memregion("adpcm")->base()[state->m_adpcm_pos++];
-		msm5205_data_w(device, state->m_adpcm_data >> 4);
+		m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos++];
+		msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
 	}
 }
 
@@ -552,7 +550,7 @@ GFXDECODE_END
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(idsoccer_adpcm_int), // interrupt function
+	DEVCB_DRIVER_LINE_MEMBER(docastle_state,idsoccer_adpcm_int), // interrupt function
 	MSM5205_S64_4B      // 6 kHz    ???
 };
 

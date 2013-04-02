@@ -50,4 +50,5 @@ public:
 	TIMER_CALLBACK_MEMBER(reset_callback);
 	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(tehkanwc_adpcm_int);	
 };

@@ -1182,20 +1182,19 @@ GFXDECODE_END
 
 
 
-static void spangbl_adpcm_int( device_t *device,int st )
+WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 {
-	mitchell_state *state = device->machine().driver_data<mitchell_state>();
-	msm5205_data_w(device, state->m_sample_buffer & 0x0f);
-	state->m_sample_buffer >>= 4;
-	state->m_sample_select ^= 1;
-	if(state->m_sample_select == 0)
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	msm5205_data_w(machine().device("msm"), m_sample_buffer & 0x0f);
+	m_sample_buffer >>= 4;
+	m_sample_select ^= 1;
+	if(m_sample_select == 0)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static const msm5205_interface msm5205_config =
 {
-	DEVCB_LINE(spangbl_adpcm_int),  /* interrupt function */
+	DEVCB_DRIVER_LINE_MEMBER(mitchell_state,spangbl_adpcm_int),  /* interrupt function */
 	MSM5205_S48_4B      /* 4KHz 4-bit */
 };
 
