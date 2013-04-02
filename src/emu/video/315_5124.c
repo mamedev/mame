@@ -97,7 +97,7 @@ PALETTE_INIT( sega315_5124 )
 		int r = i & 0x03;
 		int g = (i & 0x0c) >> 2;
 		int b = (i & 0x30) >> 4;
-		palette_set_color_rgb(machine, i, r << 6, g << 6, b << 6);
+		palette_set_color_rgb(machine, i, pal2bit(r), pal2bit(g), pal2bit(b));
 	}
 	/* TMS9918 palette */
 	palette_set_color_rgb(machine, 64+ 0,   0,   0,   0);
@@ -127,7 +127,7 @@ PALETTE_INIT( sega315_5378 )
 		int r = i & 0x000f;
 		int g = (i & 0x00f0) >> 4;
 		int b = (i & 0x0f00) >> 8;
-		palette_set_color_rgb(machine, i, r << 4, g << 4, b << 4);
+		palette_set_color_rgb(machine, i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
