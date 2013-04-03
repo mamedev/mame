@@ -67,6 +67,7 @@ static const struct game_keys keys_table[] =
 	{ "samba2k",         0x001702cf }, // 840-0047    2000
 	{ "alienfnt",        0x00174343 }, // 840-0048    2001
 	{ "alienfnta",       0x00174343 }, // ^
+	{ "crakndj2",		 0x00428247 }, // 
 	{ "ringout",         0x000b1e40 }, // 840-004C    1999
 	{ "vf4cart",         0x02ef2f96 }, // 840-0080    2002
 	{ "pstone",          0x000e69c1 }, // 841-0001    1999
