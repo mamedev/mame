@@ -11731,13 +11731,13 @@ struct nes_pcb_intf
 {write8_delegate(), read8_delegate()}
 
 #define NES_READONLY(a) \
-{write8_delegate(), read8_delegate(FUNC(a),(nes_state *)0)}
+{write8_delegate(), read8_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0)}
 
 #define NES_WRITEONLY(a) \
-{write8_delegate(FUNC(a),(nes_state *)0), read8_delegate()}
+{write8_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0), read8_delegate()}
 
 #define NES_READWRITE(a, b) \
-{write8_delegate(FUNC(a),(nes_state *)0), read8_delegate(FUNC(b),(nes_state *)0)}
+{write8_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0), read8_delegate(FUNC(b), DEVICE_SELF, (nes_state *)0)}
 
 #define NES_SCANLINE_NULL \
  ppu2c0x_scanline_delegate()
@@ -11746,13 +11746,13 @@ struct nes_pcb_intf
  ppu2c0x_hblank_delegate()
 
 #define NES_HBLANK(a) \
- ppu2c0x_hblank_delegate(FUNC(a),(nes_state *)0)
+ ppu2c0x_hblank_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0)
 
 #define NES_LATCH_NULL \
  ppu2c0x_latch_delegate()
 
  #define NES_LATCH(a) \
- ppu2c0x_latch_delegate(FUNC(a),(nes_state *)0)
+ ppu2c0x_latch_delegate(FUNC(a),DEVICE_SELF, (nes_state *)0)
 
  
 WRITE8_MEMBER(nes_carts_state::dummy_l_w)
@@ -12074,7 +12074,9 @@ void nes_state::pcb_handlers_setup()
 		if (!m_mmc_read_mid.isnull()) m_mmc_read_mid.late_bind(*this);
 		m_mmc_read = intf->mmc_h.read;  // in progress
 		if (!m_mmc_read.isnull()) m_mmc_read.late_bind(*this);
-		m_ppu->set_latch(intf->mmc_ppu_latch);
+		ppu2c0x_latch_delegate latch = intf->mmc_ppu_latch;
+		if (!latch.isnull()) latch.late_bind(*this);
+		m_ppu->set_latch(latch);
 	}
 	else
 	{
@@ -13098,9 +13100,19 @@ int nes_state::nes_pcb_reset()
 		fatalerror("Missing PCB interface\n");
 
 	/* Set the mapper irq callback */
-	m_ppu->set_scanline_callback(intf ? intf->mmc_scanline : ppu2c0x_scanline_delegate());
-	m_ppu->set_hblank_callback(intf ? intf->mmc_hblank : ppu2c0x_hblank_delegate());
-
+	ppu2c0x_scanline_delegate del_scanline;
+	ppu2c0x_hblank_delegate del_hblank;
+	if (intf) {
+		del_scanline = intf->mmc_scanline;
+		del_hblank =  intf->mmc_hblank;
+		if (!del_scanline.isnull()) del_scanline.late_bind(*this);
+		if (!del_hblank.isnull()) del_hblank.late_bind(*this);
+	} else {
+		del_scanline = ppu2c0x_scanline_delegate();
+		del_hblank = ppu2c0x_hblank_delegate();
+	}
+	m_ppu->set_scanline_callback(del_scanline);
+	m_ppu->set_hblank_callback(del_hblank);
 	err = pcb_initialize(m_pcb_id);
 
 	return err;
