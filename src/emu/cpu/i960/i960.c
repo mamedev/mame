@@ -1391,6 +1391,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				set_rif(i960, opcode, (double)(INT32)t1);
 				break;
 
+			case 0x5: // cvtilr
+				i960->icount -= 30;
+				t1 = get_1_ri(i960, opcode);
+				set_rifl(i960, opcode, (double)(INT32)t1);
+				break;
+
 			case 0x6: // scalerl
 				i960->icount -= 30;
 				t1 = get_1_ri(i960, opcode);
