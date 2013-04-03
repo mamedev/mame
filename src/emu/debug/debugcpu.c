@@ -2778,8 +2778,8 @@ UINT32 device_debug::compute_opcode_crc32(offs_t address) const
 	int maxbytes = m_disasm->max_opcode_bytes();
 
 	// fetch the arg and op bytes & mash 'em into a single buffer
-	UINT8 buff[maxbytes*2];
-	memset(buff, 0x00, sizeof(buff));
+	UINT8* buff = new UINT8(maxbytes*2);
+	memset(buff, 0x00, sizeof(UINT8)*maxbytes*2);
 	for (int index = 0; index < maxbytes; index++)
 	{
 		buff[index]          = debug_read_opcode(space, address + index, 1, false);
@@ -2787,7 +2787,9 @@ UINT32 device_debug::compute_opcode_crc32(offs_t address) const
 	}
 
 	// return a CRC of the resulting bytes
-	return crc32(0, buff, maxbytes*2);
+	UINT32 crc = crc32(0, buff, maxbytes*2);
+	delete[] buff;
+	return crc;
 }
 
 
