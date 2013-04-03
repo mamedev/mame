@@ -311,7 +311,17 @@ public:
 	DECLARE_VIDEO_START(mcnpshnt);
 	DECLARE_PALETTE_INIT(janyuki);
 	DECLARE_VIDEO_START(neruton);
+	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );
+	int blitter_drawgfx( int layer, int mask, const char *gfx, int src, int pen, int x, int y, int wrap, int flags );
+	void dynax_blitter_start( int flags );
+	void jantouki_blitter_start( int flags );
+	void jantouki_blitter2_start( int flags );
+	void jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y );
+	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );		
+	int debug_mask();
+	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void dynax_common_reset();
 };
 
 //----------- defined in drivers/dynax.c -----------
