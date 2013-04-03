@@ -4020,6 +4020,39 @@ ROM_START( crackndj )
 	ROM_LOAD( "crackndj-key.bin", 0, 4, CRC(6269265a) SHA1(e2ab31b0058eb130d8f54d30e86d569687f9a068) )
 ROM_END
 
+ROM_START( crakndj2 )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0xa800000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-23674.ic22", 0x000000, 0x400000, CRC(54faff5c) SHA1(cd2efcd33f33497e421d319750d2616472f919a4) ) 
+	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(a6c2f6e7) SHA1(454d3711bf5b7a43c0bc77cd766045394dae9126) ) 
+	ROM_LOAD( "rom2.ic2s",    0x1000000, 0x800000, CRC(f22e29c4) SHA1(d32b4851a314327047f06133b643ce5d5cae5571) ) 
+	ROM_LOAD( "rom3.ic3s",    0x1800000, 0x800000, CRC(6c78efb3) SHA1(37804e444f8077fcfa56135ebfeb3c0ddabad0fa) ) 
+	ROM_LOAD( "rom4.ic4s",    0x2000000, 0x800000, CRC(e9f35177) SHA1(9f8c13e005737f87ef0a0a32f7f0ec436f7aca3b) ) 
+	ROM_LOAD( "rom5.ic5s",    0x2800000, 0x800000, CRC(40f3321d) SHA1(a29b532e2acb9c8d27ae3c857ada48b1a7199d77) ) 
+	ROM_LOAD( "rom6.ic6s",    0x3000000, 0x800000, CRC(6832dd9f) SHA1(753c1fc998ef4522fae3e93b64f8c442d94e3e97) ) 
+	// note: this fails the ROM test on hardware with the same CRC, so it's not a "bad dump" in the traditional sense.
+	// we need someone with a second cartridge to verify if this is a Sega screwup or simply a damaged chip on this cart.
+	ROM_LOAD( "rom7.ic7s",    0x3800000, 0x800000, BAD_DUMP CRC(9b59e856) SHA1(7da728695cac132bb0ac59116ca400fff913f966) ) 
+	ROM_LOAD( "rom8.ic8s",    0x4000000, 0x800000, CRC(9bea71f4) SHA1(fa3734b072404612e29ed96b3bcb8d416fbe86e3) ) 
+	ROM_LOAD( "rom9.ic9s",    0x4800000, 0x800000, CRC(6029839d) SHA1(04c078e9422bf34a02f0b618a54981cd615da47d) ) 
+	ROM_LOAD( "rom10.ic10s",  0x5000000, 0x800000, CRC(1ad23110) SHA1(1589f6ca1f82c5397c0daef8563efc550d5eb862) ) 
+	ROM_LOAD( "rom11.ic11s",  0x5800000, 0x800000, CRC(e398ee08) SHA1(5a8c48a57127adb9c48ba985d49f169fe2d154a7) ) 
+	ROM_LOAD( "rom12.ic12s",  0x6000000, 0x800000, CRC(5df68891) SHA1(0fc365bd3adab00b132e254847c2804206f0ba3e) ) 
+	ROM_LOAD( "rom13.ic13s",  0x6800000, 0x800000, CRC(2f8e4a60) SHA1(0dc05a77008f18acf9dc5ff51bdc04034de11f5b) ) 
+	ROM_LOAD( "rom14.ic14s",  0x7000000, 0x800000, CRC(83e9dd31) SHA1(7da0092d4b5d1ef3a364e0dfcd611b29f6301d43) ) 
+	ROM_LOAD( "rom15.ic15s",  0x7800000, 0x800000, CRC(1346af29) SHA1(874a5e4e5158405dd8fecc745168f9bfe40154e1) ) 
+	ROM_LOAD( "rom16.ic16s",  0x8000000, 0x800000, CRC(bc63a06a) SHA1(72b06fbba83d291b9b0209741b61f4fdaaef2e2b) ) 
+	ROM_LOAD( "rom17.ic17s",  0x8800000, 0x800000, CRC(512d3ac0) SHA1(a96f17af274336f579f33ec8f474f28073b29286) ) 
+	ROM_LOAD( "rom18.ic18s",  0x9000000, 0x800000, CRC(7007c27e) SHA1(a6bfe89421d34542e780c5eae1c9c6d76f93d252) ) 
+	ROM_LOAD( "rom19.ic19s",  0x9800000, 0x800000, CRC(31f816ba) SHA1(354f8271eef20eb131f83fb9641002cfcd31c8cd) ) 
+	ROM_LOAD( "rom20.ic20s",  0xa000000, 0x800000, CRC(aabcd580) SHA1(9455e218ab381c7ad5adb2884da39ca7948169d5) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )	// 317-0311-COM
+	ROM_LOAD( "crackndj2-key.bin", 0x000000, 0x000004, CRC(b357a848) SHA1(15b5f89583ec2bc65298387a2b8d8e60e71f1617) ) 
+ROM_END
+
 ROM_START( samba2k )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8065,6 +8098,7 @@ ROM_END
 /* 0048 */ GAME( 2001, alienfnta, alienfnt,naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Alien Front (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0052 */ GAME( 2000, derbyo2k, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0068 */ GAME( 2001, crakndj2, naomi,    naomim2, crackndj, dc_state, naomi,    ROT0, "Sega", "Crackin' DJ Part 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0083 */ GAME( 2001, derbyoc2, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Derby Owners Club II (JPN, USA, EXP, KOR, AUS) (Rev B)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0084 */ GAME( 2001, vtenis2c, naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (JPN) (USA, EXP, KOR, AUS) (Cart, Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8082,7 +8116,6 @@ ROM_END
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
-// 00?? Crackin' DJ Part 2
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,   naomi2,   naomi, dc_state,    naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
