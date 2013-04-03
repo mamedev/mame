@@ -1095,136 +1095,6 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-                            Hanafuda Hana Tengoku
-***************************************************************************/
-
-WRITE8_MEMBER(dynax_state::htengoku_select_w)
-{
-	m_input_sel = data;
-	m_keyb = 0;
-}
-
-WRITE8_MEMBER(dynax_state::htengoku_dsw_w)
-{
-	m_dsw_sel = data;
-}
-
-READ8_MEMBER(dynax_state::htengoku_dsw_r)
-{
-	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
-	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
-	if (!BIT(m_dsw_sel, 2)) return ioport("DSW2")->read();
-	if (!BIT(m_dsw_sel, 3)) return ioport("DSW3")->read();
-	if (!BIT(m_dsw_sel, 4)) return ioport("DSW4")->read();
-	logerror("%s: warning, unknown bits read, dsw_sel = %02x\n", machine().describe_context(), m_dsw_sel);
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(dynax_state::htengoku_coin_w)
-{
-	switch (m_input_sel)
-	{
-		case 0x0c:
-			// bit 0 = coin counter
-			// bit 1 = out counter
-			// bit 2 = hopper
-			coin_counter_w(machine(), 0, data & 1);
-			m_hopper = data & 0x04;
-#ifdef MAME_DEBUG
-//          popmessage("COINS %02x",data);
-#endif
-			m_coins = data;
-
-		case 0x0d:  break;  // ff resets input port sequence?
-
-		case 0xff:  break;  // CRT controller?
-		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", space.device().safe_pc(), m_input_sel, data);
-	}
-}
-
-READ8_MEMBER(dynax_state::htengoku_input_r)
-{
-	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
-
-	switch (m_input_sel)
-	{
-		case 0x81:  return ioport(keynames1[m_keyb++])->read();
-		case 0x82:  return ioport(keynames0[m_keyb++])->read();
-		case 0x0d:  return 0xff;    // unused
-	}
-	logerror("%04x: input_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
-	return 0xff;
-}
-
-READ8_MEMBER(dynax_state::htengoku_coin_r)
-{
-	switch (m_input_sel)
-	{
-		case 0x00:  return ioport("COINS")->read();
-		case 0x01:  return 0xff;    //?
-		case 0x02:  return 0xbf | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));  // bit 7 = blitter busy, bit 6 = hopper
-		case 0x03:  return m_coins;
-	}
-	logerror("%04x: coin_r with select = %02x\n", space.device().safe_pc(), m_input_sel);
-	return 0xff;
-}
-
-WRITE8_MEMBER(dynax_state::htengoku_rombank_w)
-{
-	membank("bank1")->set_entry(data & 0x07);
-	m_hnoridur_bank = data;
-}
-
-WRITE8_MEMBER(dynax_state::htengoku_blit_romregion_w)
-{
-	switch (data)
-	{
-		case 0x80:  dynax_blit_romregion_w(space, 0, 0);    return;
-		case 0x81:  dynax_blit_romregion_w(space, 0, 1);    return;
-		case 0x00:  dynax_blit_romregion_w(space, 0, 2);    return;
-	}
-	logerror("%04x: unmapped romregion=%02X\n", space.device().safe_pc(), data);
-}
-
-static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x20, 0x20 ) AM_WRITE(htengoku_select_w)      // Controls
-	AM_RANGE( 0x21, 0x21 ) AM_WRITE(htengoku_coin_w)        //
-	AM_RANGE( 0x22, 0x22 ) AM_READ(htengoku_coin_r)         //
-	AM_RANGE( 0x23, 0x23 ) AM_READ(htengoku_input_r)        //
-	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    // AY8910
-	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)     //
-	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   //
-	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE(ddenlovr_palette_base_w)    // ddenlovr mixer chip
-	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE( 0xa8, 0xab ) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE( 0xac, 0xaf ) AM_WRITE(ddenlovr_transparency_mask_w)
-	// b0-b3 ?
-	AM_RANGE( 0xb4, 0xb4 ) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE( 0xb5, 0xb5 ) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE( 0xb6, 0xb6 ) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE( 0xb8, 0xb8 ) AM_READ(unk_r)               // ? must be 78 on startup
-	AM_RANGE( 0xc2, 0xc2 ) AM_WRITE(htengoku_rombank_w)     // BANK ROM Select
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
-	AM_RANGE( 0xc1, 0xc1 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
-	AM_RANGE( 0xc3, 0xc3 ) AM_WRITE(dynax_vblank_ack_w)     // VBlank IRQ Ack
-	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
-	AM_RANGE( 0xc5, 0xc5 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE(htengoku_blit_romregion_w)  // Blitter ROM bank
-	AM_RANGE( 0xe0, 0xe0 ) AM_WRITE(yarunara_flipscreen_w)
-	AM_RANGE( 0xe1, 0xe1 ) AM_WRITE(yarunara_layer_half_w)  // half of the interleaved layer to write to
-	AM_RANGE( 0xe2, 0xe2 ) AM_WRITE(yarunara_layer_half2_w) //
-	AM_RANGE( 0xe5, 0xe5 ) AM_WRITE(dynax_blitter_ack_w)        // Blitter IRQ Ack
-ADDRESS_MAP_END
-
-
-/***************************************************************************
                                Mahjong Tenkaigen
 ***************************************************************************/
 
@@ -1895,7 +1765,7 @@ static INPUT_PORTS_START( HANAFUDA_KEYS )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( HANAFUDA_KEYS_BET )
+INPUT_PORTS_START( HANAFUDA_KEYS_BET )
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(1)
@@ -3967,141 +3837,6 @@ static INPUT_PORTS_START( mjreach )
 	PORT_INCLUDE( MAHJONG_KEYS_BET )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( htengoku )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE4 )   // medal out
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   // analyzer
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )   // data clear
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  // note
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_INCLUDE( HANAFUDA_KEYS_BET )
-
-	PORT_START("DSW0")  /* IN11 - DSW1 */
-	PORT_DIPNAME( 0x01, 0x01, "Show Girls" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Select Stage" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "Secret Trick" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "Secret Character" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "In Game Sounds" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Guide" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW1")  /* IN12 - DSW2 */
-	PORT_DIPNAME( 0x07, 0x05, "Payout Rate" )
-	PORT_DIPSETTING(    0x00, "Lowest" )
-	PORT_DIPSETTING(    0x01, "Lower" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Low ) )
-	PORT_DIPSETTING(    0x03, "Bit Low" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( High ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Higher ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( Highest ) )
-	PORT_DIPNAME( 0x08, 0x08, "Payout Wave" )
-	PORT_DIPSETTING(    0x00, "Small" )
-	PORT_DIPSETTING(    0x08, "Big" )
-	PORT_DIPNAME( 0x10, 0x10, "Goko Yaku" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x60, 0x60, "Double-Up Win Rate" )
-	PORT_DIPSETTING(    0x00, "65%" )
-	PORT_DIPSETTING(    0x20, "70%" )
-	PORT_DIPSETTING(    0x40, "75%" )
-	PORT_DIPSETTING(    0x60, "80%" )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")  /* IN13 - DSW3 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x04, 0x04, "Credits Per Note" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPSETTING(    0x04, "10" )
-	PORT_DIPNAME( 0x08, 0x08, "Max Bet" )
-	PORT_DIPSETTING(    0x08, "5" )
-	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x30, 0x30, "Min Rate To Start" )
-	PORT_DIPSETTING(    0x30, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x10, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Credits Limit" )
-	PORT_DIPSETTING(    0xc0, "1000" )
-	PORT_DIPSETTING(    0x80, "2000" )
-	PORT_DIPSETTING(    0x40, "3000" )
-	PORT_DIPSETTING(    0x00, "5000" )
-
-	PORT_START("DSW3")  /* IN14 - DSW4 */
-	PORT_DIPNAME( 0x03, 0x03, "Odds For Goko" )
-	PORT_DIPSETTING(    0x03, "100" )
-	PORT_DIPSETTING(    0x02, "200" )
-	PORT_DIPSETTING(    0x01, "250" )
-	PORT_DIPSETTING(    0x00, "300" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Odds For Shiko" )
-	PORT_DIPSETTING(    0x0c, "50" )
-	PORT_DIPSETTING(    0x08, "60" )
-	PORT_DIPSETTING(    0x04, "70" )
-	PORT_DIPSETTING(    0x00, "80" )
-	PORT_DIPNAME( 0x30, 0x30, "Odds For Ameshiko" )
-	PORT_DIPSETTING(    0x30, "20" )
-	PORT_DIPSETTING(    0x20, "30" )
-	PORT_DIPSETTING(    0x10, "40" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW4")  /* IN15 - DSWs top bits */
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "Set Clock" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-8" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Pay Out Type" )
-	PORT_DIPSETTING(    0x10, "Credit" )
-	PORT_DIPSETTING(    0x00, "Hopper" )
-	PORT_DIPNAME( 0x20, 0x20, "Hopper Switch" )
-	PORT_DIPSETTING(    0x20, "Active Low" )
-	PORT_DIPSETTING(    0x00, "Active High" )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 4-8" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 4-9" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( gekisha )
 	PORT_START("DSW1") // $7C20
 	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate" )
@@ -4325,15 +4060,6 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
 	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
-
-	MACHINE_START_CALL_MEMBER(dynax);
-}
-
-MACHINE_START_MEMBER(dynax_state,htengoku)
-{
-	UINT8 *ROM = memregion("maincpu")->base();
-
-	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(dynax);
 }
@@ -4880,66 +4606,6 @@ static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
 	MCFG_TIMER_DRIVER_CALLBACK(dynax_state, majxtal7_vblank_interrupt)
 MACHINE_CONFIG_END
 
-
-/***************************************************************************
-                           Hanafuda Hana Tengoku
-***************************************************************************/
-
-static const ay8910_interface htengoku_ay8910_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	// A            B
-	DEVCB_DRIVER_MEMBER(dynax_state,htengoku_dsw_r),    DEVCB_NULL,                         // R
-	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(dynax_state,htengoku_dsw_w)     // W
-};
-
-static MSM6242_INTERFACE( htengoku_rtc_intf )
-{
-	DEVCB_NULL
-};
-
-
-static MACHINE_CONFIG_START( htengoku, dynax_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,20000000 / 4)
-	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
-	MCFG_CPU_IO_MAP(htengoku_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state,  sprtmtch_vblank_interrupt)   /* IM 0 needs an opcode on the data bus */
-	MCFG_CPU_PERIODIC_INT_DRIVER(dynax_state, yarunara_clock_interrupt,  60)    // RTC
-
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,htengoku)
-	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,dynax)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
-	MCFG_SCREEN_UPDATE_DRIVER(dynax_state, screen_update_htengoku)
-
-	MCFG_PALETTE_LENGTH(16*256)
-
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_VIDEO_START_OVERRIDE(dynax_state,htengoku)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("aysnd", AY8910, 20000000 / 16)
-	MCFG_SOUND_CONFIG(htengoku_ay8910_interface)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-
-	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	/* devices */
-	MCFG_MSM6242_ADD("rtc", htengoku_rtc_intf)
-MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7202,79 +6868,6 @@ ROM_END
 
 /***************************************************************************
 
-Hanafuda Hana Tengoku
-(c)1992 Dynax
-
-D6502208L1
-CPU   : TMP91P640? (surface scratched)
-Sound : AY38910A/P(YM2149F version exists), YM2413
-OSC   : 20.00000MHz, 14.31818MHz, ?(near 6242)
-Others: M6242B(RTC), battery
-DIPs  : 10 position (x4), 4 position (x1)
-ROMs  : 6501.4B
-        6509.10B
-        6510.11B
-
-D6107068L-1
-ROMs  : 6502.1A
-        6503.2A
-        6504.1B
-        6505.2B
-        6506.4C
-        6507.5C
-        6508.6C
-
-dumped by sayu
---- Team Japump!!! ---
-
-
-Daughterboard number - D6107068L-1
-Top daughterboard has most of the ROMs
-Mainboard has roms labelled 6501, 6509, 6510
-The main board is almost like a few other Dynax Mahjong PCB's I've
-documented, so most of the details should be the same. The layout is
-similar to Mysterious World.
-
-Mainboard number - D6502208L1
-Mainboard main parts include.....
-AY3-8910
-YM2413
-RAM TC5563 x1
-RAM 2018 x1
-RAM HM53461 x6 (plus 2 empty spaces for 2 more)
-RAM TC524256 x2
-M6242 RTC + BATTERY
-Two scratched SDIP64 chips (possibly NL-001 and NL-002 or similar)
-Another scratched chip QFP64.... should be another known Dynax IC.
-DIP40 chip near ROM 6501... surface scratched too. Probably Z80
-XTALs - 20Mz, 14.31818MHz
-DSWs - 4x 10-position, 1x 4-position
-
-***************************************************************************/
-
-ROM_START( htengoku )
-	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
-	ROM_LOAD( "6501.4b", 0x00000, 0x40000, CRC(29a7fc83) SHA1(5d3cf0a72918e58b5b60f7c978e559c7c1306bce) )
-	ROM_RELOAD(          0x10000, 0x40000 )
-
-	ROM_REGION( 0x80000, "gfx1", 0 )    // blitter data
-	ROM_LOAD( "6506.4c",  0x00000, 0x80000, CRC(7de17b26) SHA1(326667063ab045ac50e850f2f7821a65317879ad) )
-
-	ROM_REGION( 0xc0000, "gfx2", 0 )    // blitter data
-	ROM_LOAD( "6507.5c", 0x00000, 0x20000, CRC(ced3155b) SHA1(658e3947781f1be2ee87b43952999281c66683a6) )
-	ROM_LOAD( "6508.6c", 0x20000, 0x20000, CRC(ca46ed48) SHA1(0769ac0b211181b7b57033f09f72828c885186cc) )
-	ROM_LOAD( "6505.2b", 0x40000, 0x20000, CRC(161058fd) SHA1(cfc21abdc036e874d34bfa3c60486a5ab87cf9cd) )
-	ROM_LOAD( "6504.1b", 0x60000, 0x20000, CRC(b2ca9838) SHA1(7104697802a0466fab40414a467146a224eb6a74) )
-	ROM_LOAD( "6503.2a", 0x80000, 0x20000, CRC(6ac42304) SHA1(ce822da6d61e68578c08c9f1d0af1557c64ac5ae) )
-	ROM_LOAD( "6502.1a", 0xa0000, 0x20000, CRC(9276a10a) SHA1(5a68fff20631a2002509d6cace06b5a9fa0e75d2) )
-
-	ROM_REGION( 0xa0000, "gfx3", 0 )    // blitter data
-	ROM_LOAD( "6509.10b", 0x00000, 0x80000, CRC(f8524c28) SHA1(d50b99664c9f0735838adb55aa7db53e58a43f99) )
-	ROM_LOAD( "6510.11b", 0x80000, 0x20000, CRC(0fdd6edf) SHA1(c6870ab538987110337e6e154cba98391c68fb98) )
-ROM_END
-
-/***************************************************************************
-
 Mahjong Gekisha
 1989 Dynax
 
@@ -7387,7 +6980,6 @@ GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
-GAME( 1992, htengoku, 0,        htengoku, htengoku, driver_device, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                 GAME_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_NO_COCKTAIL | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
 GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

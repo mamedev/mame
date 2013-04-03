@@ -966,36 +966,35 @@ VIDEO_START_MEMBER(dynax_state,neruton)
 
 ***************************************************************************/
 
-static void hanamai_copylayer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
+void dynax_state::hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i )
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
 	int color;
 	int scrollx, scrolly;
 
 	switch (i)
 	{
-		case 0: color = (state->m_blit_palettes >>  0) & 0x0f;  break;
-		case 1: color = (state->m_blit_palettes >>  4) & 0x0f;  break;
-		case 2: color = (state->m_blit_palettes >>  8) & 0x0f;  break;
-		case 3: color = (state->m_blit_palettes >> 12) & 0x0f;  break;
+		case 0: color = (m_blit_palettes >>  0) & 0x0f;  break;
+		case 1: color = (m_blit_palettes >>  4) & 0x0f;  break;
+		case 2: color = (m_blit_palettes >>  8) & 0x0f;  break;
+		case 3: color = (m_blit_palettes >> 12) & 0x0f;  break;
 		default:    return;
 	}
 
-	color += (state->m_blit_palbank & 0x0f) * 16;
+	color += (m_blit_palbank & 0x0f) * 16;
 
-	scrollx = state->m_blit_scroll_x;
-	scrolly = state->m_blit_scroll_y;
+	scrollx = m_blit_scroll_x;
+	scrolly = m_blit_scroll_y;
 
-	if (i == 1 && (state->m_layer_layout == LAYOUT_HANAMAI  || state->m_layer_layout == LAYOUT_HNORIDUR))
+	if (i == 1 && (m_layer_layout == LAYOUT_HANAMAI  || m_layer_layout == LAYOUT_HNORIDUR))
 	{
-		scrollx = state->m_extra_scroll_x;
-		scrolly = state->m_extra_scroll_y;
+		scrollx = m_extra_scroll_x;
+		scrolly = m_extra_scroll_y;
 	}
 
 	{
 		int dy, length, pen;
-		UINT8 *src1 = state->m_pixmap[i][1];
-		UINT8 *src2 = state->m_pixmap[i][0];
+		UINT8 *src1 = m_pixmap[i][1];
+		UINT8 *src2 = m_pixmap[i][0];
 
 		int palbase = 16 * color;
 
@@ -1268,10 +1267,10 @@ UINT32 dynax_state::screen_update_hanamai(screen_device &screen, bitmap_ind16 &b
 		case 0x15:  lay[0] = 0; lay[1] = 2; lay[2] = 3; lay[3] = 1; break;
 	}
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(bitmap, cliprect, lay[3]);
 	return 0;
 }
 
@@ -1303,10 +1302,10 @@ UINT32 dynax_state::screen_update_hnoridur(screen_device &screen, bitmap_ind16 &
 	lay[2] = (pri >>  4) & 3;
 	lay[3] = (pri >>  0) & 3;
 
-	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[0]);
-	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[1]);
-	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[2]);
-	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(machine(), bitmap, cliprect, lay[3]);
+	if (BIT(layers_ctrl, lay[0]))   hanamai_copylayer(bitmap, cliprect, lay[0]);
+	if (BIT(layers_ctrl, lay[1]))   hanamai_copylayer(bitmap, cliprect, lay[1]);
+	if (BIT(layers_ctrl, lay[2]))   hanamai_copylayer(bitmap, cliprect, lay[2]);
+	if (BIT(layers_ctrl, lay[3]))   hanamai_copylayer(bitmap, cliprect, lay[3]);
 
 	return 0;
 }
@@ -1323,9 +1322,9 @@ UINT32 dynax_state::screen_update_sprtmtch(screen_device &screen, bitmap_ind16 &
 
 	bitmap.fill((m_blit_backpen & 0xff) + (m_blit_palbank & 1) * 256, cliprect);
 
-	if (BIT(layers_ctrl, 0))   hanamai_copylayer(machine(), bitmap, cliprect, 0);
-	if (BIT(layers_ctrl, 1))   hanamai_copylayer(machine(), bitmap, cliprect, 1);
-	if (BIT(layers_ctrl, 2))   hanamai_copylayer(machine(), bitmap, cliprect, 2);
+	if (BIT(layers_ctrl, 0))   hanamai_copylayer(bitmap, cliprect, 0);
+	if (BIT(layers_ctrl, 1))   hanamai_copylayer(bitmap, cliprect, 1);
+	if (BIT(layers_ctrl, 2))   hanamai_copylayer(bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -1381,31 +1380,4 @@ UINT32 dynax_state::screen_update_mjdialq2(screen_device &screen, bitmap_ind16 &
 	if (BIT(layers_ctrl, 0))   mjdialq2_copylayer(machine(), bitmap, cliprect, 0);
 	if (BIT(layers_ctrl, 1))   mjdialq2_copylayer(machine(), bitmap, cliprect, 1);
 	return 0;
-}
-
-// htengoku uses the mixer chip from ddenlovr
-
-VIDEO_START_MEMBER(dynax_state,htengoku)
-{
-	VIDEO_START_CALL_MEMBER(ddenlovr);
-	VIDEO_START_CALL_MEMBER(hnoridur);
-}
-
-UINT32 dynax_state::screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int layer, x, y;
-
-	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let SCREEN_UPDATE_IND16(ddenlovr) do the final compositing (priorities + palettes)
-	for (layer = 0; layer < 4; layer++)
-	{
-		bitmap.fill(0, cliprect);
-		hanamai_copylayer(machine(), bitmap, cliprect, layer);
-
-		for (y = 0; y < 256; y++)
-			for (x = 0; x < 512; x++)
-				m_ddenlovr_pixmap[3 - layer][y * 512 + x] = (UINT8)(bitmap.pix16(y, x));
-	}
-
-	return screen_update_ddenlovr(screen, bitmap, cliprect);
 }
