@@ -49,6 +49,7 @@ public:
 	INTERRUPT_GEN_MEMBER(dv_interrupt);
 	INTERRUPT_GEN_MEMBER(mainevt_sound_timer_irq);
 	INTERRUPT_GEN_MEMBER(devstors_sound_timer_irq);
+	DECLARE_WRITE8_MEMBER(volume_callback);
 };
 
 /*----------- defined in video/mainevt.c -----------*/

@@ -255,31 +255,30 @@ INPUT_PORTS_END
 
 
 
-static WRITE8_DEVICE_HANDLER(volume_callback0)
+WRITE8_MEMBER(chqflag_state::volume_callback0)
 {
-	k007232_set_volume(device, 0, (data & 0x0f) * 0x11, 0);
-	k007232_set_volume(device, 1, 0, (data >> 4) * 0x11);
+	k007232_set_volume(m_k007232_1, 0, (data & 0x0f) * 0x11, 0);
+	k007232_set_volume(m_k007232_1, 1, 0, (data >> 4) * 0x11);
 }
 
 WRITE8_MEMBER(chqflag_state::k007232_extvolume_w)
 {
-	device_t *device = machine().device("k007232_2");
-	k007232_set_volume(device, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	k007232_set_volume(m_k007232_2, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
-static WRITE8_DEVICE_HANDLER(volume_callback1)
+WRITE8_MEMBER(chqflag_state::volume_callback1)
 {
-	k007232_set_volume(device, 0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	k007232_set_volume(m_k007232_2, 0, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =
 {
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback0)
+	DEVCB_DRIVER_MEMBER(chqflag_state,volume_callback0)
 };
 
 static const k007232_interface k007232_interface_2 =
 {
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback1)
+	DEVCB_DRIVER_MEMBER(chqflag_state,volume_callback1)
 };
 
 static const k051960_interface chqflag_k051960_intf =

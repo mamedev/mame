@@ -55,6 +55,7 @@ public:
 	TIMER_CALLBACK_MEMBER(thunderx_firq_callback);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
 	void calculate_collisions(  );
+	DECLARE_WRITE8_MEMBER(volume_callback);
 };
 
 

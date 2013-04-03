@@ -40,6 +40,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(aliens_interrupt);
+	DECLARE_WRITE8_MEMBER(volume_callback);
 };
 
 /*----------- defined in video/aliens.c -----------*/

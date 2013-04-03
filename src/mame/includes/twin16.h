@@ -72,10 +72,5 @@ public:
 	void draw_layer( bitmap_ind16 &bitmap, int opaque );
 	int twin16_spriteram_process_enable(  );
 	void gfx_untangle(  );
+	DECLARE_WRITE8_MEMBER(volume_callback);
 };
-
-/*----------- defined in drivers/twin16.c -----------*/
-int twin16_spriteram_process_enable( running_machine &machine );
-
-/*----------- defined in video/twin16.c -----------*/
-void twin16_spriteram_process( running_machine &machine );

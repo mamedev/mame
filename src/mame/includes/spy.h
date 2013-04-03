@@ -48,6 +48,8 @@ public:
 	INTERRUPT_GEN_MEMBER(spy_interrupt);
 	void spy_collision(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	DECLARE_WRITE8_MEMBER(volume_callback0);
+	DECLARE_WRITE8_MEMBER(volume_callback1);
 };
 
 /*----------- defined in video/spy.c -----------*/

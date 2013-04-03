@@ -52,6 +52,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
 	void gradius3_postload();
+	DECLARE_WRITE8_MEMBER(volume_callback);
 };
 
 /*----------- defined in video/gradius3.c -----------*/

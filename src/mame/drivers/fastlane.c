@@ -179,26 +179,26 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER(volume_callback0)
+WRITE8_MEMBER(fastlane_state::volume_callback0)
 {
-	k007232_set_volume(device, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(device, 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(machine().device("konami1"), 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(machine().device("konami1"), 1, 0, (data & 0x0f) * 0x11);
 }
 
-static WRITE8_DEVICE_HANDLER(volume_callback1)
+WRITE8_MEMBER(fastlane_state::volume_callback1)
 {
-	k007232_set_volume(device, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(device, 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_konami2, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_konami2, 1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =
 {
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback0)
+	DEVCB_DRIVER_MEMBER(fastlane_state,volume_callback0)
 };
 
 static const k007232_interface k007232_interface_2 =
 {
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback1)
+	DEVCB_DRIVER_MEMBER(fastlane_state,volume_callback1)
 };
 
 void fastlane_state::machine_start()

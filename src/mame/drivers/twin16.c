@@ -671,15 +671,15 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static WRITE8_DEVICE_HANDLER(volume_callback)
+WRITE8_MEMBER(twin16_state::volume_callback)
 {
-	k007232_set_volume(device,0,(data >> 4) * 0x11,0);
-	k007232_set_volume(device,1,0,(data & 0x0f) * 0x11);
+	k007232_set_volume(machine().device("konami"),0,(data >> 4) * 0x11,0);
+	k007232_set_volume(machine().device("konami"),1,0,(data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
 {
-	DEVCB_DEVICE_HANDLER(DEVICE_SELF,volume_callback) /* external port callback */
+	DEVCB_DRIVER_MEMBER(twin16_state,volume_callback) /* external port callback */
 };
 
 /* Interrupt Generators */
