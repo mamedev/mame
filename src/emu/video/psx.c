@@ -1559,11 +1559,6 @@ void psxgpu_device::FlatTexturedPolygon( int n_points )
 
 	for( ;; )
 	{
-		if( n_y >= 1024 )
-		{
-			return;
-		}
-
 		if( n_y == COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_leftpoint ].n_coord ) )
 		{
 			while( n_y == COORD_Y( m_packet.FlatTexturedPolygon.vertex[ p_n_leftpointlist[ n_leftpoint ] ].n_coord ) )
@@ -1772,11 +1767,6 @@ void psxgpu_device::GouraudPolygon( int n_points )
 
 	for( ;; )
 	{
-		if( n_y >= 1024 )
-		{
-			return;
-		}
-
 		if( n_y == COORD_Y( m_packet.GouraudPolygon.vertex[ n_leftpoint ].n_coord ) )
 		{
 			while( n_y == COORD_Y( m_packet.GouraudPolygon.vertex[ p_n_leftpointlist[ n_leftpoint ] ].n_coord ) )
@@ -2026,11 +2016,6 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 
 	for( ;; )
 	{
-		if( n_y >= 1024 )
-		{
-			return;
-		}
-
 		if( n_y == COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_leftpoint ].n_coord ) )
 		{
 			while( n_y == COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ p_n_leftpointlist[ n_leftpoint ] ].n_coord ) )
