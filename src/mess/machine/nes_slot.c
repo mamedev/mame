@@ -1147,7 +1147,7 @@ bool nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_en
 
 const char * nes_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
-	return software_get_default_slot(config, options, this, "rom");
+	return "rom";
 }
 
 
