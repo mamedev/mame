@@ -11068,22 +11068,22 @@ mfish_13        // (c) 2002
 
 // Crazy Monkey
 //crzmon        // (c) 2003
-//crzmon_2      // (c) 2003
-//crzmon_3      // (c) 2003
-//crzmon_4      // (c) 2003
-//crzmon_5      // (c) 2003
-//crzmon_6      // (c) 2003
-crzmon_5        // (c) 2003
-crzmon_7        // (c) 2003
-crzmon_8        // (c) 2003
-crzmon_9        // (c) 2003
-//crzmon_10     // (c) 2003
-//crzmon_11     // (c) 2003
-//crzmon_12     // (c) 2003
-crzmon13        // (c) 2003
-//crzmon_14     // (c) 2003
-crzmon_15       // (c) 2003
-crzmon_16       // (c) 2003
+//czmon_2      // (c) 2003
+//czmon_3      // (c) 2003
+//czmon_4      // (c) 2003
+//czmon_5      // (c) 2003
+//czmon_6      // (c) 2003
+czmon_5        // (c) 2003
+czmon_7        // (c) 2003
+czmon_8        // (c) 2003
+czmon_9        // (c) 2003
+//czmon_10     // (c) 2003
+//czmon_11     // (c) 2003
+//czmon_12     // (c) 2003
+czmon_13       // (c) 2003
+//czmon_14     // (c) 2003
+czmon_15       // (c) 2003
+czmon_16       // (c) 2003
 
 // Fruit Cocktail
 //fcockt        // (c) 2003
@@ -11224,17 +11224,17 @@ crzmon2_3   // (c) 2010
 
 mfish_3a        // bootleg - Multifish
 mfish_12a       // bootleg
-crzmon_7a       // bootleg - Crazy Monkey
-crzmon_7b       // bootleg
-crzmon_8a       // bootleg
-crzmon_8b       // bootleg
-crzmon_8c       // bootleg
-crzmon_8d       // bootleg
-crzmon_8e       // bootleg
-crzmon_8f       // bootleg
-crzmon_9a       // bootleg
-crzmon_9b       // bootleg
-crzmon_9c       // bootleg
+czmon_7a       // bootleg - Crazy Monkey
+czmon_7b       // bootleg
+czmon_8a       // bootleg
+czmon_8b       // bootleg
+czmon_8c       // bootleg
+czmon_8d       // bootleg
+czmon_8e       // bootleg
+czmon_8f       // bootleg
+czmon_9a       // bootleg
+czmon_9b       // bootleg
+czmon_9c       // bootleg
 fcockt_6a       // bootleg - Fruit Cocktail
 fcockt_6b       // bootleg
 fcockt_6c       // bootleg
