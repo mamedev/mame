@@ -18,11 +18,11 @@
 #include "machine/ram.h"
 
 
-class pk8000_state : public driver_device
+class pk8000_state : public pk8000_base_state
 {
 public:
 	pk8000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: pk8000_base_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, CASSETTE_TAG)
 		, m_ram(*this, RAM_TAG)
@@ -51,9 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
 	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
 	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
-	DECLARE_READ8_MEMBER(pk8000_84_porta_r);
-	DECLARE_WRITE8_MEMBER(pk8000_84_porta_w);
-	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
+
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
 
 protected:
@@ -171,28 +169,14 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
 	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_80_portc_w)
 };
 
-READ8_MEMBER(pk8000_state::pk8000_84_porta_r)
-{
-	return pk8000_video_mode;
-}
-
-WRITE8_MEMBER(pk8000_state::pk8000_84_porta_w)
-{
-	pk8000_video_mode = data;
-}
-
-WRITE8_MEMBER(pk8000_state::pk8000_84_portc_w)
-{
-	pk8000_video_enable = BIT(data,4);
-}
 static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 {
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_84_porta_r),
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_84_porta_w),
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_r),
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pk8000_state,pk8000_84_portc_w)
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_portc_w)
 };
 
 READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
@@ -220,14 +204,14 @@ static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, pk8000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE_LEGACY(pk8000_video_color_r,pk8000_video_color_w)
+	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
 	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
 	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
-	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(pk8000_text_start_r,pk8000_text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE_LEGACY(pk8000_chargen_start_r,pk8000_chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE_LEGACY(pk8000_video_start_r,pk8000_video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE_LEGACY(pk8000_color_start_r,pk8000_color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE_LEGACY(pk8000_color_r,pk8000_color_w)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
+	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
+	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE(pk8000_color_start_r,pk8000_color_start_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE(pk8000_color_r,pk8000_color_w)
 ADDRESS_MAP_END
 
 /*   Input ports */
@@ -405,7 +389,6 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update_pk8000)
 
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(pk8000)
 
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )

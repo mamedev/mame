@@ -22,30 +22,28 @@
 #include "sound/speaker.h"
 
 
-class photon_state : public driver_device
+class photon_state : public pk8000_base_state
 {
 public:
 	photon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: pk8000_base_state(mconfig, type, tag) { }
 
 	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
 	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
 	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
-	DECLARE_READ8_MEMBER(pk8000_84_porta_r);
-	DECLARE_WRITE8_MEMBER(pk8000_84_porta_w);
-	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
+	void pk8000_set_bank(UINT8 data);
 };
 
 
-static void pk8000_set_bank(running_machine &machine,UINT8 data)
+void photon_state::pk8000_set_bank(UINT8 data)
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
 	UINT8 block3 = (data >> 4) & 3;
@@ -53,57 +51,57 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 
 	switch(block1) {
 		case 0:
-				machine.root_device().membank("bank1")->set_base(rom + 0x10000);
-				machine.root_device().membank("bank5")->set_base(ram);
+				membank("bank1")->set_base(rom + 0x10000);
+				membank("bank5")->set_base(ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				machine.root_device().membank("bank1")->set_base(ram);
-				machine.root_device().membank("bank5")->set_base(ram);
+				membank("bank1")->set_base(ram);
+				membank("bank5")->set_base(ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				machine.root_device().membank("bank2")->set_base(rom + 0x14000);
-				machine.root_device().membank("bank6")->set_base(ram + 0x4000);
+				membank("bank2")->set_base(rom + 0x14000);
+				membank("bank6")->set_base(ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				machine.root_device().membank("bank2")->set_base(ram + 0x4000);
-				machine.root_device().membank("bank6")->set_base(ram + 0x4000);
+				membank("bank2")->set_base(ram + 0x4000);
+				membank("bank6")->set_base(ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				machine.root_device().membank("bank3")->set_base(rom + 0x18000);
-				machine.root_device().membank("bank7")->set_base(ram + 0x8000);
+				membank("bank3")->set_base(rom + 0x18000);
+				membank("bank7")->set_base(ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				machine.root_device().membank("bank3")->set_base(ram + 0x8000);
-				machine.root_device().membank("bank7")->set_base(ram + 0x8000);
+				membank("bank3")->set_base(ram + 0x8000);
+				membank("bank7")->set_base(ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				machine.root_device().membank("bank4")->set_base(rom + 0x1c000);
-				machine.root_device().membank("bank8")->set_base(ram + 0xc000);
+				membank("bank4")->set_base(rom + 0x1c000);
+				membank("bank8")->set_base(ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				machine.root_device().membank("bank4")->set_base(ram + 0xc000);
-				machine.root_device().membank("bank8")->set_base(ram + 0xc000);
+				membank("bank4")->set_base(ram + 0xc000);
+				membank("bank8")->set_base(ram + 0xc000);
 				break;
 	}
 }
 WRITE8_MEMBER(photon_state::pk8000_80_porta_w)
 {
-	pk8000_set_bank(machine(),data);
+	pk8000_set_bank(data);
 }
 
 READ8_MEMBER(photon_state::pk8000_80_portb_r)
@@ -126,28 +124,14 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_1 )
 	DEVCB_DRIVER_MEMBER(photon_state,pk8000_80_portc_w)
 };
 
-READ8_MEMBER(photon_state::pk8000_84_porta_r)
-{
-	return pk8000_video_mode;
-}
-
-WRITE8_MEMBER(photon_state::pk8000_84_porta_w)
-{
-	pk8000_video_mode = data;
-}
-
-WRITE8_MEMBER(photon_state::pk8000_84_portc_w)
-{
-	pk8000_video_enable = BIT(data,4);
-}
 static I8255A_INTERFACE( pk8000_ppi8255_interface_2 )
 {
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_porta_r),
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_porta_w),
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_r),
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_porta_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(photon_state,pk8000_84_portc_w)
+	DEVCB_DRIVER_MEMBER(pk8000_base_state,pk8000_84_portc_w)
 };
 
 static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, photon_state )
@@ -162,14 +146,14 @@ static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, photon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE_LEGACY(pk8000_video_color_r,pk8000_video_color_w)
+	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
 	AM_RANGE(0x8c, 0x8c) AM_READ_PORT("JOY1")
 	AM_RANGE(0x8d, 0x8d) AM_READ_PORT("JOY2")
-	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(pk8000_text_start_r,pk8000_text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE_LEGACY(pk8000_chargen_start_r,pk8000_chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE_LEGACY(pk8000_video_start_r,pk8000_video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE_LEGACY(pk8000_color_start_r,pk8000_color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE_LEGACY(pk8000_color_r,pk8000_color_w)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
+	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
+	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE(pk8000_color_start_r,pk8000_color_start_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE(pk8000_color_r,pk8000_color_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( photon )
@@ -200,7 +184,7 @@ IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
 
 void photon_state::machine_reset()
 {
-	pk8000_set_bank(machine(),0);
+	pk8000_set_bank(0);
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photon_state::pk8000_irq_callback),this));
 }
 
@@ -230,7 +214,6 @@ static MACHINE_CONFIG_START( photon, photon_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
 	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update_photon)
 	MCFG_PALETTE_LENGTH(16)
-	MCFG_PALETTE_INIT(pk8000)
 
 
 	MCFG_I8255_ADD( "ppi8255_1", pk8000_ppi8255_interface_1 )
