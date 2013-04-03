@@ -130,6 +130,9 @@ public:
 		, m_dac_l( *this, "dac_l" )
 		, m_dac_r( *this, "dac_r" )
 		, m_mainram( *this, "mainram" )
+		, m_k1ge( *this, "k1ge" )
+		, m_io_controls( *this, "Controls" )
+		, m_io_power( *this, "Power" )
 	{
 		m_flash_chip[0].present = 0;
 		m_flash_chip[0].state = F_READ;
@@ -165,7 +168,7 @@ public:
 	required_device<dac_device> m_dac_l;
 	required_device<dac_device> m_dac_r;
 	required_shared_ptr<UINT8> m_mainram;
-	device_t *m_k1ge;
+	required_device<device_t> m_k1ge;
 
 	DECLARE_READ8_MEMBER( ngp_io_r );
 	DECLARE_WRITE8_MEMBER( ngp_io_w );
@@ -192,6 +195,8 @@ public:
 
 protected:
 	bool m_nvram_loaded;
+	required_ioport m_io_controls;
+	required_ioport m_io_power;
 
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
@@ -239,10 +244,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:  /* Read controls */
-		data = ioport( "Controls" )->read();
+		data = m_io_controls->read();
 		break;
 	case 0x31:
-		data = ioport( "Power" )->read() & 0x01;
+		data = m_io_power->read() & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -587,7 +592,7 @@ INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
 	if ( m_io_reg[0x33] & 0x04 )
 	{
-		m_tlcs900->set_input_line(TLCS900_NMI, (machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+		m_tlcs900->set_input_line(TLCS900_NMI, (m_io_power->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -677,7 +682,6 @@ void ngp_state::machine_start()
 void ngp_state::machine_reset()
 {
 	m_old_to3 = 0;
-	m_k1ge = machine().device( "k1ge" );
 
 	m_z80->suspend(SUSPEND_REASON_HALT, 1 );
 	m_z80->set_input_line(0, CLEAR_LINE );
