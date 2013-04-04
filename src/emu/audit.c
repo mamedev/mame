@@ -218,6 +218,10 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, soft
 	m_validation = validation;
 
 	astring combinedpath(swinfo->shortname, ";", list_name, PATH_SEPARATOR, swinfo->shortname);
+	if ( swinfo->parentname )
+	{
+		combinedpath.cat(";").cat(swinfo->parentname).cat(";").cat(list_name).cat(PATH_SEPARATOR).cat(swinfo->parentname);
+	}
 	m_searchpath = combinedpath;
 
 	int found = 0;
