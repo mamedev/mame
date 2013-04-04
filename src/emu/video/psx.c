@@ -133,13 +133,8 @@ void psxgpu_device::DebugMesh( int n_coordx, int n_coordy )
 	int width = screen->width();
 	int height = screen->height();
 
-	n_coordx = SINT11( n_coordx + m_n_displaystartx );
-	n_coordx *= width - 1;
-	n_coordx /= 1023;
-
-	n_coordy = SINT11( n_coordy + n_displaystarty );
-	n_coordy *= height - 1;
-	n_coordy /= 1023;
+	n_coordx += m_n_displaystartx;
+	n_coordy += n_displaystarty;
 
 	if( m_debug.b_clear )
 	{
@@ -247,20 +242,16 @@ void psxgpu_device::DebugMeshEnd( void )
 void psxgpu_device::DebugCheckKeys( void )
 {
 	if( machine().input().code_pressed_once( KEYCODE_M ) )
+	{
 		m_debug.b_mesh = !m_debug.b_mesh;
+		updatevisiblearea();
+	}
 
 	if( machine().input().code_pressed_once( KEYCODE_V ) )
-		m_debug.b_texture = !m_debug.b_texture;
-
-	if( m_debug.b_mesh || m_debug.b_texture )
 	{
-		screen_device *screen = machine().primary_screen;
-		int width = screen->width();
-		int height = screen->height();
-		machine().primary_screen->set_visible_area( 0, width - 1, 0, height - 1 );
+		m_debug.b_texture = !m_debug.b_texture;
+		updatevisiblearea();
 	}
-	else
-		machine().primary_screen->set_visible_area( 0, n_screenwidth - 1, 0, n_screenheight - 1 );
 
 	if( machine().input().code_pressed_once( KEYCODE_I ) )
 	{
@@ -439,6 +430,13 @@ void psxgpu_device::updatevisiblearea()
 		n_screenwidth = 640;
 		break;
 	}
+
+	if( m_debug.b_mesh || m_debug.b_texture )
+	{
+		n_screenheight = 1024;
+		n_screenwidth = 1024;
+	}
+
 	visarea.set(0, n_screenwidth - 1, 0, n_screenheight - 1);
 	machine().primary_screen->configure(n_screenwidth, n_screenheight, visarea, HZ_TO_ATTOSECONDS(refresh));
 }
@@ -1304,7 +1302,7 @@ void psxgpu_device::FlatPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_y );
+		DebugMesh( SINT11( COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1483,7 +1481,7 @@ void psxgpu_device::FlatTexturedPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_y );
+		DebugMesh( SINT11( COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1708,7 +1706,7 @@ void psxgpu_device::GouraudPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_y );
+		DebugMesh( SINT11( COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1945,7 +1943,7 @@ void psxgpu_device::GouraudTexturedPolygon( int n_points )
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + n_drawoffset_y );
+		DebugMesh( SINT11( COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) ) + n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2206,8 +2204,8 @@ void psxgpu_device::MonochromeLine( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) ) + n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2310,8 +2308,8 @@ void psxgpu_device::GouraudLine( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) ) + n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2410,10 +2408,10 @@ void psxgpu_device::FrameBufferRectangleDraw( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + SIZE_W( m_packet.FlatRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + SIZE_W( m_packet.FlatRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2472,10 +2470,10 @@ void psxgpu_device::FlatRectangle( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatRectangle.n_coord ) ) + n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2542,10 +2540,10 @@ void psxgpu_device::FlatRectangle8x8( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_y + 8 );
-	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + n_drawoffset_y + 8 );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_x + 8, SINT11( COORD_Y( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_y + 8 );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_x + 8, SINT11( COORD_Y( m_packet.FlatRectangle8x8.n_coord ) ) + n_drawoffset_y + 8 );
 	DebugMeshEnd();
 #endif
 
@@ -2612,10 +2610,10 @@ void psxgpu_device::FlatRectangle16x16( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_y + 16 );
-	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + n_drawoffset_y + 16 );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_x + 16, SINT11( COORD_Y( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_y + 16 );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_x + 16, SINT11( COORD_Y( m_packet.FlatRectangle16x16.n_coord ) ) + n_drawoffset_y + 16 );
 	DebugMeshEnd();
 #endif
 
@@ -2693,10 +2691,10 @@ void psxgpu_device::FlatTexturedRectangle( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
-	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), SINT11( COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) ) + n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2796,10 +2794,10 @@ void psxgpu_device::Sprite8x8( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + n_drawoffset_y + 7 );
-	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + n_drawoffset_y + 7 );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_x + 7, SINT11( COORD_Y( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_y + 7 );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_x + 7, SINT11( COORD_Y( m_packet.Sprite8x8.n_coord ) ) + n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -2899,10 +2897,10 @@ void psxgpu_device::Sprite16x16( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + n_drawoffset_y );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + n_drawoffset_y + 7 );
-	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + n_drawoffset_y + 7 );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_x + 7, SINT11( COORD_Y( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_y + 7 );
+	DebugMesh( SINT11( COORD_X( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_x + 7, SINT11( COORD_Y( m_packet.Sprite16x16.n_coord ) ) + n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -2977,7 +2975,7 @@ void psxgpu_device::Dot( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.Dot.vertex.n_coord ) + n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + n_drawoffset_y );
+	DebugMesh( SINT11( COORD_X( m_packet.Dot.vertex.n_coord ) ) + n_drawoffset_x, SINT11( COORD_Y( m_packet.Dot.vertex.n_coord ) ) + n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -3016,10 +3014,10 @@ void psxgpu_device::MoveImage( void )
 	{
 		return;
 	}
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
-	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) ), SINT11( COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) );
+	DebugMesh( SINT11( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) + SIZE_W( m_packet.MoveImage.n_size ), SINT11( COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) );
+	DebugMesh( SINT11( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) ), SINT11( COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( SINT11( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) + SIZE_W( m_packet.MoveImage.n_size ), SINT11( COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMeshEnd();
 #endif
 
