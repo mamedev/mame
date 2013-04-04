@@ -3008,7 +3008,7 @@ USA, Export and Korea versions as well as the Japan version.
 
 */
 
-ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A */
+ROM_START( dynamcop ) /* Dynamite Cop (Export), Model 2A, Sega Game ID# 833-11341, ROM board ID# 834-11342 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-20930.12", 0x000000, 0x080000, CRC(b8fc8ff7) SHA1(53b0f9dc8494effa077170ddced2d95f43a5f134) )
 	ROM_LOAD32_WORD("epr-20931.13", 0x000002, 0x080000, CRC(89d13f88) SHA1(5e266b5e153a0d9a57360cfd1af81e3a58a2fb7d) )
