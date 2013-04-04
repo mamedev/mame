@@ -532,6 +532,7 @@ static MACHINE_CONFIG_DERIVED( nespal, nes )
 
 	MCFG_DEVICE_REMOVE( "ppu" )
 	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -554,6 +555,7 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 
 	MCFG_DEVICE_REMOVE( "ppu" )
 	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
