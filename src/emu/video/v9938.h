@@ -25,7 +25,7 @@
 	v9938_device::static_set_vram_size(*device, _vramsize);
 
 #define MCFG_V99X8_INTERRUPT_CALLBACK(_irq) \
-	downcast<v9938_device *>(device)->set_interrupt_callback(DEVCB2_##_irq);
+	downcast<v99x8_device *>(device)->set_interrupt_callback(DEVCB2_##_irq);
 
 // init functions
 
