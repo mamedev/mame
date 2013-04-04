@@ -259,6 +259,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2m1);
 	DECLARE_DRIVER_INIT(sf2mdt);
 	DECLARE_DRIVER_INIT(sf2mdta);
+	DECLARE_DRIVER_INIT(slampic);
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -267,6 +268,7 @@ public:
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(sf2mdt);
+	DECLARE_MACHINE_START(slampic);
 	DECLARE_MACHINE_START(sgyxz);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
@@ -276,6 +278,7 @@ public:
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sf2mdt_snd_bankswitch_w);
@@ -333,6 +336,7 @@ INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
 INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
+INPUT_PORTS_EXTERN( slammast );
 
 
 #endif

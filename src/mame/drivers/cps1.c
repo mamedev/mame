@@ -2511,7 +2511,7 @@ static INPUT_PORTS_START( punisherbz )
 INPUT_PORTS_END
 
 /* Needs further checking */
-static INPUT_PORTS_START( slammast )
+INPUT_PORTS_START( slammast )
 	PORT_INCLUDE( cps1_4players )
 
 	PORT_MODIFY("IN0")

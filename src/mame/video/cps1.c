@@ -1423,6 +1423,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"punisherbz",  CPS_B_21_DEF, mapper_PS63B },   /* Chinese bootleg */
 	{"slammast",    CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",   CPS_B_21_QS4, mapper_MB63B },
+	{"slampic",     CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj",    CPS_B_21_QS4, mapper_MB63B },
 	{"mbombrd",     CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj",    CPS_B_21_QS5, mapper_MB63B },
