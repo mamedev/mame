@@ -167,7 +167,7 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
     x101xxxx: SPEAK (SPK) Begins speaking, pulling spech data from the current address pointer location of the VSM modules.
 
     x110xxxx: SPEAK EXTERNAL (SPKEXT) Clears the FIFO using SPKEE line, then sets TALKD (TALKST remains zero) until 8 bytes have been written to the FIFO, at which point it begins speaking, pulling data from the 16 byte fifo.
-    TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP.
+    The patent implies TALK STATUS must be CLEAR for this command to work; otherwise it is treated as a NOP, but the decap shows that this is not true, and is an error on the patent diagram.
 
     x111xxxx: RESET (RST) Resets the speech synthesis core immediately, and clears the FIFO.
 
@@ -945,7 +945,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			 * Old frame was unvoiced, new is voiced
 			 */
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) /* this line needs further investigation, starwars tie fighters may sound better without it */
 				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
 				tms->inhibit = 1;
 			else // normal frame, normal interpolation
@@ -1366,13 +1366,10 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			break;
 
 		case 0x60 : /* speak external */
-			if (tms->talk_status == 0) /* TALKST must be clear for SPKEXT */
-			{
-				//SPKEXT going active activates SPKEE which clears the fifo
-				tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
-				tms->speak_external = 1;
-				tms->RDB_flag = FALSE;
-			}
+			//SPKEXT going active activates SPKEE which clears the fifo
+			tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
+			tms->speak_external = 1;
+			tms->RDB_flag = FALSE;
 			break;
 
 		case 0x70 : /* reset */
@@ -2376,7 +2373,7 @@ void tms52xx_device::process(INT16 *buffer, unsigned int size)
 			// * Old frame was unvoiced, new is voiced
 
 			if ( ((M_OLD_FRAME_UNVOICED_FLAG == false) && (M_NEW_FRAME_UNVOICED_FLAG == true))
-				|| ((M_OLD_FRAME_UNVOICED_FLAG == true) && (M_NEW_FRAME_UNVOICED_FLAG == false))
+				|| ((M_OLD_FRAME_UNVOICED_FLAG == true) && (M_NEW_FRAME_UNVOICED_FLAG == false)) /* this line needs further investigation, starwars tie fighters may sound better without it */
 				|| ((M_OLD_FRAME_SILENCE_FLAG == true) && (M_NEW_FRAME_SILENCE_FLAG == false)) )
 				m_inhibit = true;
 			else // normal frame, normal interpolation
@@ -2808,14 +2805,11 @@ void tms52xx_device::process_command(unsigned char cmd)
 		break;
 
 	case 0x60: // speak external
-		if (!m_talk_status) // TALKST must be clear for SPKEXT
-		{
-			//SPKEXT going active activates SPKEE which clears the fifo
-			m_fifo_head = m_fifo_tail = 0;
-			m_fifo_count = m_fifo_bits_taken = 0;
-			m_speak_external = true;
-			m_RDB_flag = false;
-		}
+		//SPKEXT going active activates SPKEE which clears the fifo
+		m_fifo_head = m_fifo_tail = 0;
+		m_fifo_count = m_fifo_bits_taken = 0;
+		m_speak_external = true;
+		m_RDB_flag = false;
 		break;
 
 	case 0x70: // reset
