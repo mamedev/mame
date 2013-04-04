@@ -1294,16 +1294,16 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 	machine().primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
-//  popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-
+	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
 	m_vblank_timer->adjust( machine().primary_screen->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::recompute_params()
 {
-	recompute_params_clock(1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
 	if(vga.miscellaneous_output & 8)
 		logerror("Warning: VGA external clock latch selected\n");
+	else
+		recompute_params_clock(1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
 }
 
 void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
@@ -1311,7 +1311,6 @@ void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
 	/* Doom does this */
 //  if(vga.crtc.protect_enable && index <= 0x07)
 //      printf("write to protected address %02x\n",index);
-
 	switch(index)
 	{
 		case 0x00:
@@ -1488,16 +1487,16 @@ UINT8 vga_device::vga_vblank()
 	if(vblank_end > vga.crtc.vert_total)
 	{
 		vblank_end -= vga.crtc.vert_total;
-		if(vpos >= vblank_start || vpos < vblank_end)
+		if(vpos >= vblank_start || vpos <= vblank_end)
 			res = 1;
 	}
 	else
 	{
-		if(vpos >= vblank_start && vpos < vblank_end)
+		if(vpos >= vblank_start && vpos <= vblank_end)
 			res = 1;
 	}
 
-//  popmessage("%d %d %d",vblank_start,vblank_end,vga.crtc.vert_total);
+	//popmessage("%d %d %d - SR1=%02x",vblank_start,vblank_end,vga.crtc.vert_total,vga.sequencer.data[1]);
 
 	return res;
 }
@@ -5443,7 +5442,7 @@ void cirrus_vga_device::cirrus_define_video_mode()
 	}
 }
 
-	UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
+UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 {
 	UINT8 res;
 
@@ -5541,7 +5540,7 @@ void s3virge_vga_device::device_start()
 
 	// copy over interfaces
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
-	vga.svga_intf.seq_regcount = 0x08;
+	vga.svga_intf.seq_regcount = 0x1c;
 	vga.svga_intf.crtc_regcount = 0x19;
 	vga.svga_intf.vram_size = 0x400000;
 	vga.memory  = auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
@@ -5598,6 +5597,9 @@ UINT8 s3virge_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			case 0x42: // CR42 Mode Control
 				res = s3.cr42 & 0x0f;  // bit 5 set if interlaced, leave it unset for now.
+				break;
+			case 0x43:
+				res = s3.cr43;
 				break;
 			case 0x45:
 				res = s3.cursor_mode;
@@ -5672,62 +5674,17 @@ void s3virge_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
 	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+	double m,n;
+	int r;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
-		switch(s3.cr42 & 0x0f)  // TODO: confirm clock settings
-		{
-		case 0:
-			xtal = XTAL_25_1748MHz;
-			break;
-		case 1:
-			xtal = XTAL_28_63636MHz;
-			break;
-		case 2:
-			xtal = 40000000;
-			break;
-		case 3:
-			xtal = 3000000;
-			break;
-		case 4:
-			xtal = 50000000;
-			break;
-		case 5:
-			xtal = 77000000;
-			break;
-		case 6:
-			xtal = 36000000;
-			break;
-		case 7:
-			xtal = 45000000;
-			break;
-		case 8:
-			xtal = 1000000;
-			break;
-		case 9:
-			xtal = 1000000;
-			break;
-		case 10:
-			xtal = 79000000;
-			break;
-		case 11:
-			xtal = 31000000;
-			break;
-		case 12:
-			xtal = 94000000;
-			break;
-		case 13:
-			xtal = 65000000;
-			break;
-		case 14:
-			xtal = 75000000;
-			break;
-		case 15:
-			xtal = 71000000;
-			break;
-		default:
-			xtal = 1000000;
-		}
+		// Dot clock is set via SR12 and SR13
+		m = vga.sequencer.data[0x13] & 0x7f;
+		n = vga.sequencer.data[0x12] & 0x1f;
+		r = (vga.sequencer.data[0x12] & 0x60) >> 5;
+		xtal = (double)((m+2.0f) / ((n+2.0f)*(double)(1<<r))) * 16000000;
+		//printf("DCLK set to %dHz M=%f N=%f R=%i\n",xtal,m,n,r);
 	}
 
 	if((s3.ext_misc_ctrl_2) >> 4)
@@ -5738,6 +5695,7 @@ void s3virge_vga_device::s3_define_video_mode()
 		svga.rgb32_en = 0;
 		switch((s3.ext_misc_ctrl_2) >> 4)
 		{
+			case 0x01: svga.rgb8_en = 1; divisor = 2; break;
 			case 0x03: svga.rgb15_en = 1; divisor = 2; break;
 			case 0x05: svga.rgb16_en = 1; divisor = 2; break;
 			case 0x0d: svga.rgb32_en = 1; divisor = 2; break;
@@ -5746,18 +5704,23 @@ void s3virge_vga_device::s3_define_video_mode()
 	}
 	else
 	{
-		svga.rgb8_en = (s3.memory_config & 8) >> 3;
+		svga.rgb8_en = (s3.cr3a & 0x10) >> 4;
 		svga.rgb15_en = 0;
 		svga.rgb16_en = 0;
 		svga.rgb32_en = 0;
 	}
+	if(s3.cr43 & 0x80)  // Horizontal clock doubling (techincally, doubles horizontal CRT parameters)
+		divisor *= 2;
 	recompute_params_clock(divisor, xtal);
 }
 
 void s3virge_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 {
 	if(index <= 0x18)
+	{
 		crtc_reg_write(index,data);
+		s3_define_video_mode();
+	}
 	else
 	{
 		switch(index)
@@ -5782,11 +5745,17 @@ void s3virge_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				/* TODO: reg lock mechanism */
 				s3.reg_lock2 = data;
 				break;
+			case 0x3a:
+				s3.cr3a = data;
+				break;
 			case 0x40:
-				s3.enable_s3d = data & 0x01;  // enable S3D registers at 0x100A
+				s3.enable_s3d = data & 0x01;  // enable S3D registers
 				break;
 			case 0x42:
 				s3.cr42 = data;  // bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
+				break;
+			case 0x43:
+				s3.cr43 = data;
 				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
@@ -6015,7 +5984,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				svga.bank_r = svga.bank_w;
 				break;
 			default:
-				if(LOG_8514) logerror("S3: 3D4 index %02x write %02x\n",index,data);
+				if(LOG_8514) logerror("S3: CR%02X write %02x\n",index,data);
 				break;
 		}
 	}

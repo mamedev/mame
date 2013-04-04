@@ -547,7 +547,9 @@ protected:
 		UINT8 reg_lock2;
 		UINT8 enable_8514;
 		UINT8 enable_s3d;
+		UINT8 cr3a;
 		UINT8 cr42;
+		UINT8 cr43;
 		UINT8 cr53;
 		UINT8 id_high;
 		UINT8 id_low;
