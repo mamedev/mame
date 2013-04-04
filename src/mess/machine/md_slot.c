@@ -980,7 +980,7 @@ WRITE16_MEMBER(base_md_cart_slot_device::write_a15)
 }
 
 /*-------------------------------------------------
- Internal header logging
+ Image loading logging
  -------------------------------------------------*/
 
 void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 nvram_len)

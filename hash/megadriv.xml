@@ -1206,6 +1206,25 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+<!-- 
+	dump confirmed by sunbeam
+	compared to cliffh: 
+	1 word at 0xcf14e removed (FC08), 1 word at 0xcf1fe (D011) 
+-->
+	<software name="cliffh1" cloneof="cliffh">
+		<description>Cliffhanger (Euro, Alt)</description>
+		<year>1993</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="u1" value="MPR-16262 W11" /> <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16262 w11.u1" size="1048576" crc="eb5e0b28" sha1="35fe2182de07e324255dd147686cc5798133ba3b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="collslam">
 		<description>College Slam (USA)</description>
 		<year>1996</year>
@@ -1358,7 +1377,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13578 S85" />
 			<dataarea name="rom" size="524288">
@@ -2226,6 +2244,20 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+	<software name="fatalrew" supported="no">
+		<description>Fatal Rewind (Euro)</description>
+		<year>1991</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="?? (Electronic Arts)" />
+			<feature name="u1" value="KILLING GAME SHOW KIL03" />  <!-- location not really marked on PCB, using u1 for consistency -->
+			<dataarea name="rom" size="524288">
+				<rom name="killing game show kil03.u1" size="524288" crc="21dbb69d" sha1="cabd42d2edd333871269a7bc03a68f6765d254ce" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="ferrari">
 		<description>Ferrari Grand Prix Challenge (Euro, Rev. A)</description>
 		<year>1992</year>
@@ -2399,8 +2431,26 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Jpn is confirmed -->
+<!-- Only Euro is confirmed -->
 	<software name="gground">
+		<description>Gain Ground (World, Rev. A)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher> <!-- This was published by Renovation in the USA, in fact -->
+		<info name="serial" value="G-4036 (JPN)"/>
+		<info name="release" value="19910103 (JPN)"/>
+		<info name="alt_title" value="ゲイングランド"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-13642A-F" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-13642a-f.ic1" size="524288" crc="aee20a64" sha1="148d166d594535c6526cb450c461cfb003b59f93" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only Jpn is confirmed -->
+	<software name="gground1" cloneof="gground">
 		<description>Gain Ground (World)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher> <!-- This was published by Renovation in the USA, in fact -->
@@ -2408,7 +2458,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19910103 (JPN)"/>
 		<info name="alt_title" value="ゲイングランド"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13642 S87" />
 			<dataarea name="rom" size="524288">
@@ -2521,7 +2570,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19900630 (JPN)"/>
 		<info name="alt_title" value="ゴーストバスターズ"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-13191 S48" />
 			<dataarea name="rom" size="524288">
@@ -2532,6 +2580,14 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro is confirmed -->
+<!-- 
+	Note from Sunbeam:
+	    On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
+	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
+	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
+	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+-->
 	<software name="ghouls">
 		<description>Ghouls'n Ghosts (Euro, USA, Kor, Rev. A)</description>
 		<year>1989</year>
@@ -2543,13 +2599,22 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic3" value="HD74HC139P" />
 			<dataarea name="rom" size="655360">
 				<rom name="mpr-12605a t04.ic1" size="131072" crc="d367c3cc" sha1="4c2c8fcf0219c6129650cf59a47d8edeb844e2df" offset="000000" />
-				<rom name="mpr-12606a w57.ic2" size="524288" crc="f56444c6" sha1="3b76a8cdca4019f6c9aed3a3c3fe723ed245f069" offset="0x020000" />
+				<rom name="mpr-12606a w57.ic2" size="131072" crc="5291d097" sha1="7a5293bcce5fc159d5df642edd5ec1261503b6de" offset="0x080000"/>
+				<rom size="393216" offset="0x020000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
 
 
 <!-- Only USA is confirmed -->
+<!-- 
+	Note from Sunbeam:
+	    On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
+	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
+	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
+	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+-->
 	<software name="ghouls1" cloneof="ghouls">
 		<description>Ghouls'n Ghosts (Euro, USA)</description>
 		<year>1989</year>
@@ -2561,7 +2626,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic3" value="74HC139AP" />
 			<dataarea name="rom" size="655360">
 				<rom name="mpr-12605 t02.ic1" size="131072" crc="1066c6ab" sha1="c30e4442732bdb38c96d780542f8550a94d127b0" offset="000000" />
-				<rom name="mpr-12606 r32.ic2" size="524288" crc="ceebc56f" sha1="6611329dffc3d798a5fa837d5c727f370b31ed25" offset="0x020000" />
+				<rom name="mpr-12606 r32.ic2" size="131072" crc="d0be7777" sha1="a44b2a3d427f6973b5c1a3dcd8d1776366acb9f7" offset="0x080000" />
+				<rom size="393216" offset="0x020000" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>
@@ -2729,7 +2795,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- Only Euro is confirmed? -->
+<!-- Both Euro & Jpn are confirmed -->
 	<software name="harddriv">
 		<description>Hard Drivin' (World)</description>
 		<year>1991</year>
@@ -2739,7 +2805,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="alt_title" value="ハードドライビン"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
-			<feature name="ic1" value="MPR-14393-SM" />
+			<feature name="ic1" value="MPR-14393-SM (Euro), MPR-14389-S (Jpn)" />
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14393-sm.ic1" size="262144" crc="3225baaf" sha1="e15a3e704900b9736bc274bcb49d4421f4a3605b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4877,7 +4943,8 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro and Jpn confirmed -->
-	<!-- According to Elbarto:
+	<!-- 
+	Note from Elbarto:
 	    On the Quackshot PCB there is a 512Kb rom.
 	    Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
 	    But here we have the megadrive A18 line tied to the A20 pin of the rom.
@@ -4898,6 +4965,24 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<dataarea name="rom" size="1310720">
 				<rom name="mpr-14371-f.ic1" size="262144" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" loadflag="load16_word_swap" />
 				<rom size="262144" offset="0x100000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only USA is confirmed -->
+	<software name="quacksht1" cloneof="quacksht">
+		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Alt PCB)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4054 (JPN)"/>
+		<info name="release" value="19911220 (JPN)"/>
+		<info name="alt_title" value="アイラブ ドナルドダック グルジア王の秘宝"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5703" />
+			<feature name="ic1" value="MPR-14354 W44" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-14354 w44.ic1" size="524288" crc="88c8dd94" sha1="3acacac6c20d9b5f9ddeacb82b82b3039c4e2485" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6214,7 +6299,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19900302"/>
 		<info name="alt_title" value="スーパーリアル バスケットボール"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12904F" />
 			<dataarea name="rom" size="524288">
@@ -6285,6 +6369,39 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="u1" value="MPR-15327-T" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-15327-t.u1" size="1048576" crc="7db434ba" sha1="c956730af44b737ee3d0c1e83c147f32e3504383" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Only USA is confirmed -->
+<!-- 
+	Note from Sunbeam:
+	    On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
+	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
+	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
+	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+-->
+	<software name="vermil">
+		<description>Sword of Vermilion (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="?? (Sega)" />
+			<feature name="ic1" value="MPR-13430-T" />
+			<feature name="ic2" value="MPR-13431-H" />
+			<feature name="ic3" value="MB8464A-15LL-SK" />
+			<feature name="ic4" value="067-1026B" />
+			<feature name="ic5" value="PC74HC139P" />
+			<feature name="batt?" value="(Lithium Cell)" />
+			<dataarea name="rom" size="655360">
+				<rom name="mpr-13430-t.ic1" size="131072" crc="9a6d1110" sha1="acadd3cf6c1eb346db4f9746134fb8a957e3b147" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13431-h.ic2" size="131072" crc="793fd7a3" sha1="5a4425727463992fabd0ff3422d1894aaf686b5f" offset="0x080000" loadflag="load16_word_swap" />
+				<rom size="393216" offset="0x020000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -6580,7 +6697,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19920313 (JPN)"/>
 		<info name="alt_title" value="トージャム&amp;アール"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="u1" value="MPR-14236A-H" />  <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
@@ -6687,6 +6803,32 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
+<!-- 
+	Note from Sunbeam:
+	   On the 171-5841A board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
+	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
+	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
+	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+-->
+	<software name="twincobr">
+		<description>Twin Cobra (USA)</description>
+		<year>1991</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5841A" />
+			<feature name="ic1" value="MPR-13935-T" />
+			<feature name="ic2" value="MPR-13936-F" />
+			<feature name="ic3" value="PC74HC139P" />
+			<dataarea name="rom" size="655360">
+				<rom name="mpr-13935-t.ic1" size="131072" crc="04d94498" sha1="43e3483715d8a5af4241863f4559df417c6f61ad" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-13936-f.ic2" size="131072" crc="cf88666e" sha1="8e04c17a720e917bf4ca12c44f637822efcfe979" offset="0x080000" loadflag="load16_word_swap" />
+				<rom size="393216" offset="0x020000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Only Euro is confirmed -->
 	<software name="twinhawk">
 		<description>Twin Hawk (Euro) ~ Daisenpuu (Jpn)</description>
@@ -6731,6 +6873,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="twotribe">
 		<description>Two Tribes - Populous II (Euro)</description>
@@ -6784,6 +6927,41 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic1" value="MPR-18330-U" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-18330-u.ic1" size="2097152" crc="d38b3354" sha1="57a64d08028b539dc236a693d383f2e1269a5dd4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- 
+	Note from Sunbeam:
+	    On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
+	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
+	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
+	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+-->
+	<software name="vermilj" cloneof="vermil">
+		<description>Vermilion (Jpn)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-5502"/>
+		<info name="release" value="19891216"/>
+		<info name="alt_title" value="ヴァーミリオン"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="?? (Sega)" />
+			<feature name="ic1" value="MPR-12708-T" />
+			<feature name="ic2" value="MPR-12709-S" />
+			<feature name="ic3" value="MB8464A-15LL-SK" />
+			<feature name="ic4" value="??" />
+			<feature name="ic5" value="D74HC139C" />
+			<feature name="batt?" value="(Lithium Cell)" />
+			<dataarea name="rom" size="655360">
+				<rom name="mpr-12708-t.ic1" size="131072" crc="5ae36ea5" sha1="1b7defa4f69d199fffe025b804390cef304b200d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12709-s.ic2" size="131072" crc="3abb96be" sha1="d1b02aaa03776ae9426591f7d0cb1476d2d012c5" offset="0x080000" loadflag="load16_word_swap" />
+				<rom size="393216" offset="0x020000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
 			</dataarea>
 		</part>
 	</software>
@@ -7015,7 +7193,6 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<info name="release" value="19890729 (JPN)"/>
 		<info name="alt_title" value="ワールドカップサッカー"/>
 		<part name="cart" interface="megadriv_cart">
-			<!-- Japanese cart -->
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-12589 W89" />
 			<dataarea name="rom" size="262144">
@@ -13162,8 +13339,8 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="fatalrew" supported="no">
-		<description>Fatal Rewind (Euro, USA)</description>
+	<software name="fatalrewu" cloneof="fatalrew" supported="no">
+		<description>Fatal Rewind (Euro?, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -13647,7 +13824,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="gground1" cloneof="gground">
+	<software name="gground1a" cloneof="gground">
 		<description>Gain Ground (World, Alt)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
@@ -20552,20 +20729,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="quacksht1" cloneof="quacksht">
-		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World, Alt)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-4054 (JPN)"/>
-		<info name="release" value="19911220 (JPN)"/>
-		<info name="alt_title" value="アイラブ ドナルドダック グルジア王の秘宝"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="quackshot starring donald duck -- quackshot - guruzia ou no hihou (world) (alt).bin" size="524288" crc="88c8dd94" sha1="3acacac6c20d9b5f9ddeacb82b82b3039c4e2485" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="quadchal">
 		<description>Quad Challenge (USA)</description>
 		<year>1991</year>
@@ -24551,37 +24714,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="vermil">
-		<description>Sword of Vermilion (Euro, USA)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" size="655360">
-				<rom name="mpr-13430+mpr-13431.bin" size="655360" crc="ea1bc9ab" sha1="c18fc75e0c5fa0e98c8664903e978ec4f73ef5d2" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="vermilj" cloneof="vermil">
-		<description>Vermilion (Jpn)</description>
-		<year>1989</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="G-5502"/>
-		<info name="release" value="19891216"/>
-		<info name="alt_title" value="ヴァーミリオン"/>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" size="655360">
-				<rom name="vermilion (jpn).bin" size="655360" crc="e400dfc3" sha1="697fb165051179a2bbca77c8cfd0c929e334f8c1" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="16384">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sylvestr">
 		<description>Sylvester &amp; Tweety in Cagey Capers (Euro)</description>
 		<year>1994</year>
@@ -25682,17 +25814,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="u3" value="SN74LS374N" />
 			<dataarea name="rom" size="524288">
 				<rom name="actusg591.u1" size="524288" crc="634d67a6" sha1="5a471a276909dcc428cd66c51047aa8a142c76a8" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="twincobr">
-		<description>Twin Cobra (USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="655360">
-				<rom name="twin cobra (usa).bin" size="655360" crc="2c708248" sha1="c386c617703a3f5278d24b310c6bc15e3e180bdf" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
