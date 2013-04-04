@@ -206,7 +206,7 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 
 				if (m_atapi_xferlen != -1)
 				{
-					logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
+					logerror("ATAPI: SCSI command %02x %s %d bytes from the device\n", atapi_data[0]&0xff, (phase == SCSI_PHASE_DATAOUT) ? "requested" : "returned", m_atapi_xferlen);
 					// store the returned command length in the ATAPI regs, splitting into
 					// multiple transfers if necessary
 					m_atapi_xfermod = 0;
@@ -229,7 +229,10 @@ WRITE16_MEMBER( isa16_ide_cd_device::atapi_w )
 					{
 						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
-						atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+						if(phase != SCSI_PHASE_DATAOUT)
+							atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
+						else
+							atapi_regs[ATAPI_REG_INTREASON] = 0;
 					}
 
 					switch( phase )
