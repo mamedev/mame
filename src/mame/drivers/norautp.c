@@ -703,12 +703,12 @@ WRITE8_MEMBER(norautp_state::counterlamps_w)
    PC0-PC2 could be set as input or output.
 */
 
-//static READ8_DEVICE_HANDLER( ppi2_portc_r )
+//READ8_MEMBER(norautp_state::ppi2_portc_r )
 //{
 //  return;
 //}
 
-//static WRITE8_DEVICE_HANDLER( ppi2_portc_w )
+//WRITE8_MEMBER(norautp_state::ppi2_portc_w )
 //{
 //  /* PC0-PC2 don't seems to be connected to any output */
 //}
@@ -721,24 +721,21 @@ READ8_MEMBER(norautp_state::test_r)
 }
 
 READ8_MEMBER(norautp_state::vram_data_r)
-//static READ8_DEVICE_HANDLER( vram_data_r )
 {
 	return m_np_vram[m_np_addr];
 }
 
 WRITE8_MEMBER(norautp_state::vram_data_w)
-//static WRITE8_DEVICE_HANDLER( vram_data_w )
 {
 	m_np_vram[m_np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
-//  i8255a_pc7_w(device->machine().device("ppi8255_2"), 0);
-//  i8255a_pc7_w(device->machine().device("ppi8255_2"), 1);
+//  i8255a_pc7_w(machine().device("ppi8255_2"), 0);
+//  i8255a_pc7_w(machine().device("ppi8255_2"), 1);
 
 }
 
 WRITE8_MEMBER(norautp_state::vram_addr_w)
-//static WRITE8_DEVICE_HANDLER( vram_addr_w )
 {
 	m_np_addr = data;
 }
@@ -1226,12 +1223,12 @@ static I8255_INTERFACE (ppi8255_intf_1)
 //{
 	/* (c0-c3) Group A Mode 2 (5-lines handshacked bidirectional port)
 	           Group B Mode 0, output;  (see below for lines PC0-PC2) */
-//  DEVCB_HANDLER(vram_data_r),     /* Port A read (VRAM data read)*/
-//  DEVCB_HANDLER(vram_data_w),     /* Port A write (VRAM data write) */
+//  DEVCB_DRIVER_MEMBER(norautp_state,vram_data_r),     /* Port A read (VRAM data read)*/
+//  DEVCB_DRIVER_MEMBER(norautp_state,vram_data_w),     /* Port A write (VRAM data write) */
 //  DEVCB_NULL,                     /* Port B read */
-//  DEVCB_HANDLER(vram_addr_w),     /* Port B write (VRAM address write) */
-//  DEVCB_HANDLER(ppi2_portc_r),    /* Port C read */
-//  DEVCB_HANDLER(ppi2_portc_w)     /* Port C write */
+//  DEVCB_DRIVER_MEMBER(norautp_state,vram_addr_w),     /* Port B write (VRAM address write) */
+//  DEVCB_DRIVER_MEMBER(norautp_state,ppi2_portc_r),    /* Port C read */
+//  DEVCB_DRIVER_MEMBER(norautp_state,ppi2_portc_w)     /* Port C write */
 
 	/*  PPI-2 is configured as mixed mode2 and mode0 output.
 	    It means that port A should be bidirectional and port B just as output.

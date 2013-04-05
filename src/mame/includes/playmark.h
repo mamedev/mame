@@ -40,10 +40,6 @@ public:
 	int         m_pri_masks[3];
 	UINT16      m_scroll[7];
 
-	/* powerbal-specific */
-	int         m_tilebank;
-	int         m_bg_yoffset;
-
 	/* misc */
 	UINT16      m_snd_command;
 	UINT16      m_snd_flag;
@@ -77,8 +73,6 @@ public:
 	DECLARE_WRITE16_MEMBER(hrdtimes_scroll_w);
 	DECLARE_WRITE8_MEMBER(playmark_oki_banking_w);
 	DECLARE_DRIVER_INIT(bigtwin);
-	DECLARE_DRIVER_INIT(powerbal);
-	DECLARE_DRIVER_INIT(magicstk);
 	TILE_GET_INFO_MEMBER(bigtwin_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(bigtwin_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(wbeachvl_get_tx_tile_info);
@@ -88,7 +82,6 @@ public:
 	TILE_GET_INFO_MEMBER(bigtwinb_get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(hrdtimes_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
 	DECLARE_MACHINE_START(playmark);
 	DECLARE_MACHINE_RESET(playmark);
 	DECLARE_VIDEO_START(bigtwin);
@@ -98,18 +91,13 @@ public:
 	DECLARE_VIDEO_START(hotmind);
 	DECLARE_VIDEO_START(hrdtimes);
 	DECLARE_VIDEO_START(luckboomh);
-	DECLARE_MACHINE_START(powerbal);
-	DECLARE_MACHINE_RESET(powerbal);
-	DECLARE_VIDEO_START(powerbal);
 	UINT32 screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
 	void bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
 	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 playmark_asciitohex(UINT8 data);
-	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

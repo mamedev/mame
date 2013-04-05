@@ -9,7 +9,6 @@
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "includes/naomi.h"
 #include "machine/mie.h"
 
 #define DEBUG_REGISTERS (1)

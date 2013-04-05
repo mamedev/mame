@@ -15,10 +15,7 @@ class dc_state : public driver_device
 		dc_framebuffer_ram(*this, "frameram"),
 		dc_texture_ram(*this, "dc_texture_ram"),
 		dc_sound_ram(*this, "dc_sound_ram"),
-		dc_ram(*this, "dc_ram"),
-		pvr2_texture_ram(*this, "textureram2"),
-		pvr2_framebuffer_ram(*this, "frameram2"),
-		elan_ram(*this, "elan_ram") { }
+		dc_ram(*this, "dc_ram"){ }
 
 	required_shared_ptr<UINT64> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
@@ -69,30 +66,9 @@ class dc_state : public driver_device
 	int scanline;
 	int next_y;
 
-	/* Naomi 2 specific (To be moved) */
-	optional_shared_ptr<UINT64> pvr2_texture_ram;
-	optional_shared_ptr<UINT64> pvr2_framebuffer_ram;
-	optional_shared_ptr<UINT64> elan_ram;
-	DECLARE_DRIVER_INIT(atomiswave);
-	DECLARE_DRIVER_INIT(naomigd);
-	DECLARE_DRIVER_INIT(ggxx);
-	DECLARE_DRIVER_INIT(ggxxrl);
-	DECLARE_DRIVER_INIT(ggxxsla);
-	DECLARE_DRIVER_INIT(naomi2);
-	DECLARE_DRIVER_INIT(naomi);
-	DECLARE_DRIVER_INIT(naomigd_mp);
-	DECLARE_DRIVER_INIT(sfz3ugd);
-	DECLARE_DRIVER_INIT(hotd2);
-	DECLARE_DRIVER_INIT(qmegamis);
-	DECLARE_DRIVER_INIT(gram2000);
-	DECLARE_DRIVER_INIT(kick4csh);
-	DECLARE_DRIVER_INIT(vf4evoct);
-	DECLARE_DRIVER_INIT(naomi_mp);
-	DECLARE_DRIVER_INIT(mvsc2);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_MACHINE_RESET(naomi);
 	UINT32 screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(aica_dma_irq);
 	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
@@ -114,7 +90,6 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 };
 
 /*----------- defined in machine/dc.c -----------*/
