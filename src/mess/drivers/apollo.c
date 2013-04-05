@@ -1154,38 +1154,38 @@ static INPUT_PORTS_START( dsp3500 )
 	PORT_INCLUDE(apollo_config)
 INPUT_PORTS_END
 
-static WRITE8_DEVICE_HANDLER( apollo_kbd_putchar ) {
+WRITE8_MEMBER( apollo_state::apollo_kbd_putchar ) {
 	// put keyboard character to the keyboard sio
 //  DLOG1(("apollo_kbd_putchar: 0x%02x", data));
-	apollo_sio_rx_data(space.machine().device(APOLLO_SIO_TAG), 0, data);
+	apollo_sio_rx_data(machine().device(APOLLO_SIO_TAG), 0, data);
 }
 
-static READ8_DEVICE_HANDLER( apollo_kbd_has_beeper ) {
+READ8_MEMBER( apollo_state::apollo_kbd_has_beeper ) {
 	return 1; // apollo_config(APOLLO_CONF_KBD_BEEPER);
 }
 
-static READ8_DEVICE_HANDLER( apollo_kbd_is_german ) {
+READ8_MEMBER( apollo_state::apollo_kbd_is_german ) {
 	return apollo_config(APOLLO_CONF_GERMAN_KBD);
 }
 
 static APOLLO_KBD_INTERFACE( apollo_kbd_config ) = {
-	DEVCB_HANDLER(apollo_kbd_putchar),
-	DEVCB_HANDLER(apollo_kbd_has_beeper),
-	DEVCB_HANDLER(apollo_kbd_is_german)
+	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_putchar),
+	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_has_beeper),
+	DEVCB_DRIVER_MEMBER(apollo_state, apollo_kbd_is_german)
 };
 
-static WRITE8_DEVICE_HANDLER( terminal_kbd_putchar ) {
+WRITE8_MEMBER( apollo_state::terminal_kbd_putchar ) {
 	// put input character from terminal to the RS232 sio (i.e. sio1)
-	DLOG1(("terminal_kbd_putchar: 0x%02x", data));
+	//DLOG1(("terminal_kbd_putchar: 0x%02x", data));
 	// FIXME: as of mess0145u1, terminal.c will append a null character after each input character
 	if (data != 0)
 	{
-		apollo_sio_rx_data(space.machine().device(APOLLO_SIO_TAG), 1, data);
+		apollo_sio_rx_data(machine().device(APOLLO_SIO_TAG), 1, data);
 	}
 }
 
 static GENERIC_TERMINAL_INTERFACE( apollo_terminal_config ) {
-	DEVCB_HANDLER(terminal_kbd_putchar)
+	DEVCB_DRIVER_MEMBER(apollo_state, terminal_kbd_putchar)
 };
 
 void apollo_terminal_write(UINT8 data) {

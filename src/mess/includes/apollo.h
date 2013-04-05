@@ -193,6 +193,19 @@ public:
 	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
 	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
 	void apollo_bus_error();
+	DECLARE_WRITE8_MEMBER( apollo_kbd_putchar );
+	DECLARE_READ8_MEMBER( apollo_kbd_has_beeper );
+	DECLARE_READ8_MEMBER( apollo_kbd_is_german );
+	DECLARE_WRITE8_MEMBER( terminal_kbd_putchar );	
+	DECLARE_READ8_MEMBER( apollo_dma8237_ctape_dack_r );
+	DECLARE_WRITE8_MEMBER( apollo_dma8237_ctape_dack_w );
+	DECLARE_READ8_MEMBER( apollo_dma8237_fdc_dack_r );
+	DECLARE_WRITE8_MEMBER( apollo_dma8237_fdc_dack_w );
+	DECLARE_READ8_MEMBER( apollo_dma8237_wdc_dack_r );
+	DECLARE_WRITE8_MEMBER( apollo_dma8237_wdc_dack_w );
+	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
+	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
+	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );	
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
