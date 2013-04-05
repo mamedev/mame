@@ -62,8 +62,8 @@ static const floppy_interface apple3_floppy_interface =
 static const struct a2bus_interface a2bus_intf =
 {
 	// interrupt lines
-//  DEVCB_HANDLER(a2bus_irq_w),
-//  DEVCB_HANDLER(a2bus_nmi_w)
+//  DEVCB_DRIVER_MEMBER(apple3_state,a2bus_irq_w),
+//  DEVCB_DRIVER_MEMBER(apple3_state,a2bus_nmi_w)
 	DEVCB_NULL,
 	DEVCB_NULL
 };
