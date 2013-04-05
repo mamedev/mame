@@ -197,7 +197,7 @@ adct_idx
 adct_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -287,7 +287,7 @@ andt_idx
 andt_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -367,7 +367,7 @@ cmpt_idx
 cmpt_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -460,7 +460,7 @@ eort_idx
 eort_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -552,7 +552,7 @@ ldt_idx
 ldt_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -639,7 +639,7 @@ ort_idx
 ort_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -715,7 +715,7 @@ sbct_idx
 sbct_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}

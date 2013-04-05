@@ -40,7 +40,7 @@ adc_nd_idx
 adc_nd_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -120,7 +120,7 @@ rra_nd_idx
 rra_nd_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);
@@ -191,7 +191,7 @@ sbc_nd_idx
 sbc_nd_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -266,7 +266,7 @@ isb_nd_idx
 isb_nd_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	read(set_l(TMP, TMP+Y));
 	TMP += Y;
 	TMP2 = read(TMP);

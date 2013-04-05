@@ -57,7 +57,7 @@ adc_c_idx
 adc_c_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
@@ -428,7 +428,7 @@ sbc_c_idx
 sbc_c_idy
 	TMP2 = read_pc();
 	TMP = read(TMP2);
-	TMP = set_h(TMP, read(TMP2+1));
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
 	if(page_changing(TMP, Y)) {
 		read(set_l(TMP, TMP+Y));
 	}
