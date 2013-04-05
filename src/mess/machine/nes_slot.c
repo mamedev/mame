@@ -296,13 +296,14 @@ bool nes_cart_slot_device::call_load()
 					if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 					{
 						/* image is present in nes.hsi: overwrite the header settings with these */
+						ines20 = FALSE;
 						mapper = mapint1;
 						local_options = mapint2 & 0x0f;
 						m_crc_hack = (mapint2 & 0xf0) >> 4; // this is used to differentiate among variants of the same Mapper (see below)
-						prg_size = mapint3 * 0x4000;
+						prg16k = (mapint3 == 1);
+						prg_size = prg16k ? 2 * 0x4000 : mapint3 * 0x4000;
 						vrom_size = mapint4 * 0x2000;
 						logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
-//                  mame_printf_error("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
 					}
 					else
 					{
