@@ -1396,8 +1396,6 @@ Sushi Bar
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
-#include "machine/intelfsh.h"
 #include "machine/x76f100.h"
 #include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
@@ -1408,42 +1406,36 @@ Sushi Bar
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
 #include "machine/awboard.h"
-#include "includes/dc.h"
-#include "includes/naomi.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
+#include "includes/dc.h"
+#include "includes/naomi.h"
 
 #define CPU_CLOCK (200000000)
-static macronix_29l001mc_device *awflash;
-
 												/* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
-static READ64_HANDLER( naomi_arm_r )
+READ64_MEMBER(naomi_state::naomi_arm_r )
 {
-	naomi_state *state = space.machine().driver_data<naomi_state>();
-
-	return *(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target())+offset);
+	return *(reinterpret_cast<UINT64 *>(dc_sound_ram.target())+offset);
 }
 
-static WRITE64_HANDLER( naomi_arm_w )
+WRITE64_MEMBER(naomi_state::naomi_arm_w )
 {
-	naomi_state *state = space.machine().driver_data<naomi_state>();
-
-	COMBINE_DATA(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target()) + offset);
+	COMBINE_DATA(reinterpret_cast<UINT64 *>(dc_sound_ram.target()) + offset);
 }
 
-static READ64_HANDLER( naomi_unknown1_r )
+READ64_MEMBER(naomi_state::naomi_unknown1_r )
 {
 	if ((offset * 8) == 0xc0) // trick so that it does not "wait for multiboard sync"
 		return -1;
 	return 0;
 }
 
-static WRITE64_HANDLER( naomi_unknown1_w )
+WRITE64_MEMBER(naomi_state::naomi_unknown1_w )
 {
 }
 
@@ -1452,24 +1444,23 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 */
 
 
-static READ64_DEVICE_HANDLER( eeprom_93c46a_r )
+READ64_MEMBER(naomi_state::eeprom_93c46a_r )
 {
 	int res;
 
 	/* bit 3 is EEPROM data */
-	res = downcast<eeprom_device *>(device)->read_bit() << 4;
+	res = m_eeprom->read_bit() << 4;
 	return res;
 }
 
-static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
+WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
 {
 	/* bit 4 is data */
 	/* bit 2 is clock */
 	/* bit 5 is cs */
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x8);
-	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit(data & 0x8);
+	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Dreamcast MAP
@@ -1522,39 +1513,35 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-	// SB_LMMODE0
-	static WRITE64_HANDLER( ta_texture_directpath0_w )
-	{
-	naomi_state *state = space.machine().driver_data<naomi_state>();
-
-	int mode = state->pvrctrl_regs[SB_LMMODE0]&1;
+// SB_LMMODE0
+WRITE64_MEMBER(naomi_state::ta_texture_directpath0_w )
+{
+	int mode = pvrctrl_regs[SB_LMMODE0]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");
-		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&state->dc_texture_ram[offset]);
+		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
-	}
+}
 
-	// SB_LMMODE1
-	static WRITE64_HANDLER( ta_texture_directpath1_w )
-	{
-	naomi_state *state = space.machine().driver_data<naomi_state>();
-
-	int mode = state->pvrctrl_regs[SB_LMMODE1]&1;
+// SB_LMMODE1
+WRITE64_MEMBER(naomi_state::ta_texture_directpath1_w )
+{
+	int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath1_w 32-bit access!\n");
-		COMBINE_DATA(&state->dc_framebuffer_ram[offset]);
+		COMBINE_DATA(&dc_framebuffer_ram[offset]);
 	}
 	else
 	{
-		COMBINE_DATA(&state->dc_texture_ram[offset]);
+		COMBINE_DATA(&dc_texture_ram[offset]);
 	}
-	}
+}
 
 
 /*
@@ -1566,21 +1553,21 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
 	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -1595,9 +1582,9 @@ static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1618,24 +1605,24 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM   // Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 //  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE_LEGACY(pvr2_ta_r, pvr2_ta_w )
 
 	/* Area 1 */
@@ -1645,7 +1632,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_SHARE("frameram2")// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE_LEGACY(dc_sysctrl_w ) // writes to BOTH PVRs
+	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE(dc_sysctrl_w ) // writes to BOTH PVRs
 	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE_LEGACY(pvrs_ta_w ) // writes to BOTH PVRs
 	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32_LEGACY(elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
@@ -1657,9 +1644,9 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1673,20 +1660,20 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( naomi_port, AS_IO, 64, naomi_state )
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE_LEGACY("main_eeprom", eeprom_93c46a_r, eeprom_93c46a_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
 /*
  * Atomiswave address map, almost identical to Dreamcast
  */
 
-static READ64_HANDLER( aw_flash_r )
+READ64_MEMBER(naomi_state::aw_flash_r )
 {
-	return (UINT64)awflash->read(offset*8) | (UINT64)awflash->read((offset*8)+1)<<8 | (UINT64)awflash->read((offset*8)+2)<<16 | (UINT64)awflash->read((offset*8)+3)<<24 |
-			(UINT64)awflash->read((offset*8)+4)<<32 | (UINT64)awflash->read((offset*8)+5)<<40 | (UINT64)awflash->read((offset*8)+6)<<48 | (UINT64)awflash->read((offset*8)+7)<<56;
+	return (UINT64)m_awflash->read(offset*8) | (UINT64)m_awflash->read((offset*8)+1)<<8 | (UINT64)m_awflash->read((offset*8)+2)<<16 | (UINT64)m_awflash->read((offset*8)+3)<<24 |
+			(UINT64)m_awflash->read((offset*8)+4)<<32 | (UINT64)m_awflash->read((offset*8)+5)<<40 | (UINT64)m_awflash->read((offset*8)+6)<<48 | (UINT64)m_awflash->read((offset*8)+7)<<56;
 }
 
-static WRITE64_HANDLER( aw_flash_w )
+WRITE64_MEMBER(naomi_state::aw_flash_w )
 {
 	int i;
 	UINT32 addr = offset * 8;
@@ -1702,10 +1689,10 @@ static WRITE64_HANDLER( aw_flash_w )
 
 	data >>= (i*8);
 
-	awflash->write(addr, data);
+	m_awflash->write(addr, data);
 }
 
-INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+inline int naomi_state::decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 {
 	int reg = offset * 2;
 
@@ -1714,7 +1701,7 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine.describe_context());
+		mame_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 //      debugger_break(machine);
 	}
 
@@ -1727,16 +1714,16 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 	return reg;
 }
 
-static READ64_HANDLER( aw_modem_r )
+READ64_MEMBER(naomi_state::aw_modem_r )
 {
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(offset, mem_mask, &shift);
 
 	if (reg == 0x280/4)
 	{
-		UINT32 coins = space.machine().root_device().ioport("COINS")->read();
+		UINT32 coins = ioport("COINS")->read();
 
 		if (coins & 0x01)
 		{
@@ -1754,37 +1741,37 @@ static READ64_HANDLER( aw_modem_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( aw_modem_w )
+WRITE64_MEMBER(naomi_state::aw_modem_w )
 {
 	int reg;
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
 static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
-	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM     // battery backed up RAM
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", aw_rom_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(aw_modem_r, aw_modem_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(aw_modem_r, aw_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
@@ -1805,9 +1792,9 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, naomi_state )
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
 	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 
 	/* Area 5 */
@@ -7582,8 +7569,6 @@ DRIVER_INIT_MEMBER(naomi_state,atomiswave)
 
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
-
-	awflash = machine().device<macronix_29l001mc_device>("awflash");
 }
 
 ROM_START( fotns )

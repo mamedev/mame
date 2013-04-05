@@ -19,9 +19,7 @@
 #include "includes/dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
-#include "includes/naomi.h"
-#include "machine/gdrom.h"
-#include "imagedev/chd_cd.h"
+#include "includes/dccons.h"
 
 #define ATAPI_CYCLES_PER_SECTOR (5000)  // TBD for Dreamcast
 
@@ -56,27 +54,16 @@
 
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
 
-static UINT8 *atapi_regs;
-static emu_timer *atapi_timer;
-static gdrom_device *gdrom;
-static UINT8 *atapi_data;
-static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
-static UINT32 gdrom_alt_status;
-static UINT8 xfer_mode = ATAPI_XFER_PIO;
-
 #define MAX_TRANSFER_SIZE ( 63488 )
 
-static void gdrom_raise_irq(running_machine &machine)
+void dc_cons_state::gdrom_raise_irq()
 {
-	dc_state *state = machine.driver_data<dc_state>();
-
-	state->dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
-	dc_update_interrupt_status(machine);
+	dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
+	dc_update_interrupt_status();
 }
 
-static TIMER_CALLBACK( atapi_xfer_end )
+TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 {
-	dc_state *state = machine.driver_data<dc_state>();
 
 	UINT8 sector_buffer[ 4096 ];
 
@@ -104,7 +91,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		ddtdata.channel= -1;    // not used
 		ddtdata.mode= -1;       // copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
-		sh4_dma_ddt(machine.device("maincpu"), &ddtdata);
+		sh4_dma_ddt(machine().device("maincpu"), &ddtdata);
 
 		atapi_xferbase += 2048;
 	}
@@ -126,7 +113,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		atapi_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+		atapi_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 	}
 	else
 	{
@@ -135,19 +122,18 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		gdrom_alt_status = ATAPI_STAT_DRDY;
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 
-		state->g1bus_regs[SB_GDST]=0;
-		state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
-		dc_update_interrupt_status(machine);
+		g1bus_regs[SB_GDST]=0;
+		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
+		dc_update_interrupt_status();
 	}
 
-	gdrom_raise_irq(machine);
+	gdrom_raise_irq();
 
 	printf( "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 }
 
-static READ32_HANDLER( atapi_r )
+READ32_MEMBER(dc_cons_state::atapi_r )
 {
-	running_machine &machine = space.machine();
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff) // word-wide command read
@@ -193,7 +179,7 @@ static READ32_HANDLER( atapi_r )
 			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-			gdrom_raise_irq(machine);
+			gdrom_raise_irq();
 		}
 
 		if( atapi_data_ptr < atapi_data_len )
@@ -211,7 +197,7 @@ static READ32_HANDLER( atapi_r )
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					gdrom_alt_status = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					gdrom_raise_irq(machine);
+					gdrom_raise_irq();
 				}
 			}
 		}
@@ -268,9 +254,8 @@ static READ32_HANDLER( atapi_r )
 	return data;
 }
 
-static WRITE32_HANDLER( atapi_w )
+WRITE32_MEMBER(dc_cons_state::atapi_w )
 {
-	running_machine &machine = space.machine();
 	int reg;
 
 //  printf( "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
@@ -292,7 +277,7 @@ static WRITE32_HANDLER( atapi_w )
 				gdrom->WriteData( atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
-				gdrom_raise_irq(machine);
+				gdrom_raise_irq();
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -374,7 +359,7 @@ static WRITE32_HANDLER( atapi_w )
 				}
 
 				// assert IRQ
-				gdrom_raise_irq(machine);
+				gdrom_raise_irq();
 			}
 			else
 			{
@@ -491,7 +476,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					gdrom_raise_irq(space.machine());
+					gdrom_raise_irq();
 					break;
 
 				case 0xef:  // SET FEATURES
@@ -512,7 +497,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					gdrom_raise_irq(space.machine());
+					gdrom_raise_irq();
 					break;
 
 				default:
@@ -523,9 +508,11 @@ static WRITE32_HANDLER( atapi_w )
 	}
 }
 
-void dreamcast_atapi_init(running_machine &machine)
+void dc_cons_state::dreamcast_atapi_init()
 {
-	atapi_regs = auto_alloc_array_clear(machine, UINT8, ATAPI_REG_MAX);
+	xfer_mode = ATAPI_XFER_PIO;
+	
+	atapi_regs = auto_alloc_array_clear(machine(), UINT8, ATAPI_REG_MAX);
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	atapi_regs[ATAPI_REG_ERROR] = 1;
@@ -536,26 +523,26 @@ void dreamcast_atapi_init(running_machine &machine)
 	atapi_data_len = 0;
 	atapi_cdata_wait = 0;
 
-	atapi_timer = machine.scheduler().timer_alloc(FUNC(atapi_xfer_end));
+	atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_cons_state::atapi_xfer_end),this));
 	atapi_timer->adjust(attotime::never);
 
 	gdrom = NULL;
 
-	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
+	atapi_data = auto_alloc_array(machine(), UINT8,  ATAPI_DATA_SIZE );
 
-	state_save_register_global_pointer(machine,  atapi_regs, ATAPI_REG_MAX );
-	state_save_register_global_pointer(machine,  atapi_data, ATAPI_DATA_SIZE / 2 );
-	state_save_register_global(machine,  atapi_data_ptr );
-	state_save_register_global(machine,  atapi_data_len );
-	state_save_register_global(machine,  atapi_xferlen );
-	state_save_register_global(machine,  atapi_xferbase );
-	state_save_register_global(machine,  atapi_cdata_wait );
-	state_save_register_global(machine,  atapi_xfermod );
+	state_save_register_global_pointer(machine(),  atapi_regs, ATAPI_REG_MAX );
+	state_save_register_global_pointer(machine(),  atapi_data, ATAPI_DATA_SIZE / 2 );
+	state_save_register_global(machine(),  atapi_data_ptr );
+	state_save_register_global(machine(),  atapi_data_len );
+	state_save_register_global(machine(),  atapi_xferlen );
+	state_save_register_global(machine(),  atapi_xferbase );
+	state_save_register_global(machine(),  atapi_cdata_wait );
+	state_save_register_global(machine(),  atapi_xfermod );
 
-	gdrom = machine.device<gdrom_device>( "cdrom" );
+	gdrom = machine().device<gdrom_device>( "cdrom" );
 }
 
-void dreamcast_atapi_reset(running_machine &machine)
+void dc_cons_state::dreamcast_atapi_reset()
 {
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	atapi_regs[ATAPI_REG_ERROR] = 1;
@@ -590,7 +577,7 @@ c000776 - DMA triggered to c008000
 
 */
 
-READ64_HANDLER( dc_mess_gdrom_r )
+READ64_MEMBER(dc_cons_state::dc_mess_gdrom_r )
 {
 	UINT32 off;
 
@@ -617,7 +604,7 @@ READ64_HANDLER( dc_mess_gdrom_r )
 	return 0;
 }
 
-WRITE64_HANDLER( dc_mess_gdrom_w )
+WRITE64_MEMBER(dc_cons_state::dc_mess_gdrom_w )
 {
 	UINT32 dat,off;
 
@@ -643,7 +630,7 @@ WRITE64_HANDLER( dc_mess_gdrom_w )
 // register decode helpers
 
 // this accepts only 32-bit accesses
-INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
+int dc_cons_state::decode_reg32_64( UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 {
 	int reg = offset * 2;
 
@@ -652,7 +639,7 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
-		mame_printf_verbose("%s:Wrong mask!\n", machine.describe_context());
+		mame_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 //      debugger_break(machine);
 	}
 
@@ -665,43 +652,41 @@ INLINE int decode_reg32_64(running_machine &machine, UINT32 offset, UINT64 mem_m
 	return reg;
 }
 
-READ64_HANDLER( dc_mess_g1_ctrl_r )
+READ64_MEMBER(dc_cons_state::dc_mess_g1_ctrl_r )
 {
-	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
-	return (UINT64)state->g1bus_regs[reg] << shift;
+	return (UINT64)g1bus_regs[reg] << shift;
 }
 
-WRITE64_HANDLER( dc_mess_g1_ctrl_w )
+WRITE64_MEMBER(dc_cons_state::dc_mess_g1_ctrl_w )
 {
-	dc_state *state = space.machine().driver_data<dc_state>();
 	int reg;
 	UINT64 shift;
 	UINT32 dat; //, old
 
-	reg = decode_reg32_64(space.machine(), offset, mem_mask, &shift);
+	reg = decode_reg32_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
-//  old = state->g1bus_regs[reg];
+//  old = g1bus_regs[reg];
 
-	state->g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
+	g1bus_regs[reg] = dat; // 5f7400+reg*4=dat
 	mame_printf_verbose("G1CTRL: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (reg)
 	{
 	case SB_GDST:
-		if (dat & 1 && state->g1bus_regs[SB_GDEN] == 1) // 0 -> 1
+		if (dat & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 		{
-			if (state->g1bus_regs[SB_GDDIR] == 0)
+			if (g1bus_regs[SB_GDDIR] == 0)
 			{
 				printf("G1CTRL: unsupported transfer\n");
 				return;
 			}
 
-			atapi_xferbase = state->g1bus_regs[SB_GDSTAR];
-			atapi_timer->adjust(space.machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+			atapi_xferbase = g1bus_regs[SB_GDSTAR];
+			atapi_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
 		}
 		break;
 	}

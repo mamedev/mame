@@ -33,14 +33,6 @@
 
 #define CPU_CLOCK (200000000)
 
-// things from mess/machine/dc.c
-void dreamcast_atapi_init(running_machine &machine);
-void dreamcast_atapi_reset(running_machine &machine);
-extern DECLARE_READ64_HANDLER( dc_mess_gdrom_r );
-extern DECLARE_WRITE64_HANDLER( dc_mess_gdrom_w );
-extern DECLARE_READ64_HANDLER( dc_mess_g1_ctrl_r );
-extern DECLARE_WRITE64_HANDLER( dc_mess_g1_ctrl_w );
-
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
 	if (space.device().safe_pc()==0xc0ba52a)
@@ -61,7 +53,7 @@ READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 
 DRIVER_INIT_MEMBER(dc_cons_state,dc)
 {
-	dreamcast_atapi_init(machine());
+	dreamcast_atapi_init();
 }
 
 DRIVER_INIT_MEMBER(dc_cons_state,dcus)
@@ -152,16 +144,16 @@ WRITE64_MEMBER(dc_cons_state::ta_texture_directpath1_w )
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)  // flash
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE_LEGACY(dc_mess_gdrom_r, dc_mess_gdrom_w )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE_LEGACY(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE(dc_mess_gdrom_r, dc_mess_gdrom_w )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE(pvr_ctrl_r, pvr_ctrl_w )
 	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
 	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE(dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE(dc_rtc_r, dc_rtc_w )
 	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
@@ -202,7 +194,7 @@ MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 	device_t *aica = machine().device("aica");
 	dc_state::machine_reset();
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
-	dreamcast_atapi_reset(machine());
+	dreamcast_atapi_reset();
 }
 
 WRITE_LINE_MEMBER(dc_cons_state::aica_irq)

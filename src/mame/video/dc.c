@@ -1293,31 +1293,31 @@ WRITE64_HANDLER( pvr_ta_w )
 TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_list_irq)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_modifier_volume_list_irq)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_list_irq)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_modifier_volume_list_irq)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_punch_through_list_irq)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 }
 
 static void process_ta_fifo(running_machine& machine)
@@ -2489,7 +2489,7 @@ TIMER_CALLBACK_MEMBER(dc_state::vbin)
 	dc_state *state = machine().driver_data<dc_state>();
 
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 
 	vbin_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_in_irq_line_num));
 }
@@ -2499,7 +2499,7 @@ TIMER_CALLBACK_MEMBER(dc_state::vbout)
 	dc_state *state = machine().driver_data<dc_state>();
 
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 
 	vbout_timer->adjust(machine().primary_screen->time_until_pos(spg_vblank_out_irq_line_num));
 }
@@ -2513,14 +2513,14 @@ TIMER_CALLBACK_MEMBER(dc_state::hbin)
 		if(scanline == next_y)
 		{
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-			dc_update_interrupt_status(machine());
+			dc_update_interrupt_status();
 			next_y+=spg_line_comp_val;
 		}
 	}
 	else if((scanline == spg_line_comp_val) || (spg_hblank_int_mode & 2))
 	{
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN; // H Blank-in interrupt
-		dc_update_interrupt_status(machine());
+		dc_update_interrupt_status();
 	}
 
 //  printf("hbin on scanline %d\n",scanline);
@@ -2541,14 +2541,14 @@ TIMER_CALLBACK_MEMBER(dc_state::hbin)
 TIMER_CALLBACK_MEMBER(dc_state::endofrender_video)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;// VIDEO end of render
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 	endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::endofrender_tsp)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;  // TSP end of render
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 
 	endofrender_timer_tsp->adjust(attotime::never);
 	endofrender_timer_video->adjust(attotime::from_usec(500) );
@@ -2557,7 +2557,7 @@ TIMER_CALLBACK_MEMBER(dc_state::endofrender_tsp)
 TIMER_CALLBACK_MEMBER(dc_state::endofrender_isp)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;  // ISP end of render
-	dc_update_interrupt_status(machine());
+	dc_update_interrupt_status();
 
 	endofrender_timer_isp->adjust(attotime::never);
 	endofrender_timer_tsp->adjust(attotime::from_usec(500) );

@@ -90,29 +90,28 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER(dc_aica_reg_w);
 	DECLARE_READ32_MEMBER(dc_arm_aica_r);
 	DECLARE_WRITE32_MEMBER(dc_arm_aica_w);
+	void wave_dma_execute(address_space &space);
+	void pvr_dma_execute(address_space &space);
+	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	inline int decode_reg3216_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	int dc_compute_interrupt_level();
+	void dc_update_interrupt_status();
+	inline int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
+	void rtc_initial_setup();
+	DECLARE_READ64_MEMBER( dc_sysctrl_r );
+	DECLARE_WRITE64_MEMBER( dc_sysctrl_w );
+	DECLARE_READ64_MEMBER( dc_gdrom_r );
+	DECLARE_WRITE64_MEMBER( dc_gdrom_w );
+	DECLARE_READ64_MEMBER( dc_g2_ctrl_r );
+	DECLARE_WRITE64_MEMBER( dc_g2_ctrl_w );
+	DECLARE_READ64_MEMBER( pvr_ctrl_r );
+	DECLARE_WRITE64_MEMBER( pvr_ctrl_w );
+	DECLARE_READ64_MEMBER( dc_modem_r );
+	DECLARE_WRITE64_MEMBER( dc_modem_w );
+	DECLARE_READ64_MEMBER( dc_rtc_r );
+	DECLARE_WRITE64_MEMBER( dc_rtc_w );
+	
 };
-
-/*----------- defined in machine/dc.c -----------*/
-
-DECLARE_READ64_HANDLER( pvr_ctrl_r );
-DECLARE_WRITE64_HANDLER( pvr_ctrl_w );
-
-DECLARE_READ64_HANDLER( dc_sysctrl_r );
-DECLARE_WRITE64_HANDLER( dc_sysctrl_w );
-DECLARE_READ64_HANDLER( dc_gdrom_r );
-DECLARE_WRITE64_HANDLER( dc_gdrom_w );
-DECLARE_READ64_HANDLER( dc_g1_ctrl_r );
-DECLARE_WRITE64_HANDLER( dc_g1_ctrl_w );
-DECLARE_READ64_HANDLER( dc_g2_ctrl_r );
-DECLARE_WRITE64_HANDLER( dc_g2_ctrl_w );
-DECLARE_READ64_HANDLER( dc_modem_r );
-DECLARE_WRITE64_HANDLER( dc_modem_w );
-DECLARE_READ64_HANDLER( dc_rtc_r );
-DECLARE_WRITE64_HANDLER( dc_rtc_w );
-
-
-int dc_compute_interrupt_level(running_machine &machine);
-void dc_update_interrupt_status(running_machine &machine);
 
 /*--------- Ch2-DMA Control Registers ----------*/
 #define SB_C2DSTAT  ((0x005f6800-0x005f6800)/4)
