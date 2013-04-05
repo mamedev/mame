@@ -4489,6 +4489,32 @@ ROM_START( 18wheels )
 	ROM_LOAD( "epr-23000.ic8", 0x000000, 0x010000, CRC(e3b162f7) SHA1(52c7ad759c3c4a3148764e14d77ba5006bc8af48) )
 ROM_END
 
+ROM_START( marstv )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "epr-22993.ic22",  0x0000000, 0x200000, CRC(6f4acc31) SHA1(22d8dc1526ead0bb18d56b6b2a54840d87838cc5) ) 
+	ROM_LOAD( "mpr-22978.ic1",   0x0800000, 0x800000, CRC(aa8778da) SHA1(d9781e903d4221cf14ffa3f61b05cce7eb453a0f) ) 
+	ROM_LOAD( "mpr-22979.ic2",   0x1000000, 0x800000, CRC(9e6a0b10) SHA1(fd4eed1b2ccc3c0134cf9f64b4a20ad201898fa4) ) 
+	ROM_LOAD( "mpr-22980.ic3",   0x1800000, 0x800000, CRC(82151ac3) SHA1(0bdcac05f7e36aea92ee15519406d6b4efef2a93) ) 
+	ROM_LOAD( "mpr-22981.ic4",   0x2000000, 0x800000, CRC(3832e88a) SHA1(c917ddc96b8078acfb671024f8787b4302b279df) ) 
+	ROM_LOAD( "mpr-22982.ic5",   0x2800000, 0x800000, CRC(dcbee0aa) SHA1(c073a6736c993c30346ef03f0019997e7ae48ef9) ) 
+	ROM_LOAD( "mpr-22983.ic6",   0x3000000, 0x800000, CRC(9abf4bd8) SHA1(845cf6deda3be33aea683ed8b9026f02ad79771b) ) 
+	ROM_LOAD( "mpr-22984.ic7",   0x3800000, 0x800000, CRC(9e0b73a0) SHA1(43bdbea3f7ebc48922db9b374e9f3bfbffd3d9c4) ) 
+	ROM_LOAD( "mpr-22985.ic8",   0x4000000, 0x800000, CRC(886b6255) SHA1(9b5592a95d5da2efaecd8153925d3772a5a4cce9) ) 
+	ROM_LOAD( "mpr-22986.ic9",   0x4800000, 0x800000, CRC(3b28e1d5) SHA1(c7dbd9a30ddf3b2b9e1cde904614d64ed46e6b53) ) 
+	ROM_LOAD( "mpr-22987.ic10",  0x5000000, 0x800000, CRC(62cbad4b) SHA1(08de209618ca5d2df852488ddce5d41ee34d309d) ) 
+	ROM_LOAD( "mpr-22988.ic11",  0x5800000, 0x800000, CRC(72b40a0e) SHA1(f78f96f43546fdc1f42163d2632cea194666f71f) ) 
+	ROM_LOAD( "mpr-22989.ic12s", 0x6000000, 0x800000, CRC(b2cc74e7) SHA1(4f2181923be17dc18233c9a6ef8bedc147ecd89f) ) 
+	ROM_LOAD( "mpr-22990.ic13s", 0x6800000, 0x800000, CRC(653dc7ad) SHA1(337a3363502e9326ca412df4b939fa4d0d897e7a) ) 
+	ROM_LOAD( "mpr-22991.ic14s", 0x7000000, 0x800000, CRC(0c20f313) SHA1(ac335d3015ef348c91319ae0e98b79a60e92f452) ) 
+	ROM_LOAD( "mpr-22992.ic15s", 0x7800000, 0x800000, CRC(5eb6c4c6) SHA1(5dc1bced7ebd7d7e01f74d03706ec4a96585628d) ) 
+
+	ROM_REGION( 4, "rom_key", 0 ) // 317-0274-JPN
+	ROM_LOAD( "marstv-key.bin", 0x000000, 0x000004, CRC(76614f8a) SHA1(cb007ec0baab25f35090a62adf8bfd72b1ce4bfb) ) 
+ROM_END
+
 /* Sega Strike Fighter */
 ROM_START( sstrkfgt )
 	NAOMI_BIOS
@@ -8064,7 +8090,7 @@ ROM_END
 /* 0021-01 */ GAME( 2000,virnba, naomi,    naomi,   naomi, naomi_state,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0022 */ GAME( 2000, tduno2,   naomi,    naomim2, naomi, naomi_state,    naomi,    ROT0, "Sega", "Touch de Uno! 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0023 */ GAME( 2000, 18wheelr, naomi,    naomim2, 18wheelr, naomi_state, naomi,    ROT0, "Sega", "18 Wheeler Deluxe (Rev A) (JPN)", GAME_FLAGS )
-// 0025 Mars TV
+/* 0025 */ GAME( 2000, marstv,   naomi,    naomim2, naomi, naomi_state,    naomi,    ROT0, "Sega", "Mars TV (JPN)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS ) 
 /* 0026 */ GAME( 2000, totd,     naomi,    naomi,   naomi, naomi_state,    naomi,    ROT0, "Sega", "The Typing of the Dead (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomi,   naomi, naomi_state,    naomi,    ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomim2, naomi, naomi_state,    naomi,    ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
