@@ -2,6 +2,11 @@
 #define S674VERBOSE 0
 #define LOG2674(x) do { if (S674VERBOSE) logerror x; } while (0)
 
+
+#define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
+	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \
+	downcast<scn2674_device *>(device)->set_callbacks(DEVCB2_##_irq);
+	
 typedef void (*s2574_interrupt_callback_func)(running_machine &machine);
 
 static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related
@@ -11,9 +16,9 @@ class scn2674_device : public device_t
 public:
 	scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void set_irq_update_callback(device_t &device, s2574_interrupt_callback_func callback);
-
-
+	template<class _irq> void set_callbacks(_irq irq) {
+		m_interrupt_callback.set_callback(irq);
+	}
 //  int m_gfx_index;
 
 	DECLARE_READ16_MEMBER( mpu4_vid_scn2674_r );
@@ -36,7 +41,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
-	s2574_interrupt_callback_func m_interrupt_callback;
+	devcb2_write_line m_interrupt_callback;
 
 	UINT8 m_scn2674_IR_pointer;
 	UINT8 m_scn2674_screen1_l;

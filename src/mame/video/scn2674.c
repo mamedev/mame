@@ -33,16 +33,10 @@
 const device_type SCN2674_VIDEO = &device_creator<scn2674_device>;
 
 
-static void default_scn2674_callback(running_machine &machine)
-{
-//  logerror("no scn2674_callback\n");
-}
-
-
 scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SCN2674_VIDEO, "scn2674_device", tag, owner, clock)
+	: device_t(mconfig, SCN2674_VIDEO, "scn2674_device", tag, owner, clock),
+	  m_interrupt_callback(*this)
 {
-	m_interrupt_callback = default_scn2674_callback;
 }
 
 
@@ -50,6 +44,8 @@ scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, d
 
 void scn2674_device::device_start()
 {
+	// resolve callbacks
+	m_interrupt_callback.resolve_safe();
 }
 
 void scn2674_device::device_reset()
@@ -110,13 +106,6 @@ void scn2674_device::device_reset()
 	m_rowcounter= 0;
 	m_linecounter= 0;
 	m_scn2674_irq_state= 0;
-}
-
-
-void scn2674_device::set_irq_update_callback(device_t &device, s2574_interrupt_callback_func callback)
-{
-	scn2674_device &dev = downcast<scn2674_device &>(device);
-	dev.m_interrupt_callback = callback;
 }
 
 // 15 Initialization Registers (8-bit each)
@@ -397,7 +386,7 @@ void scn2674_device::scn2674_write_command(running_machine &machine, UINT8 data)
 				m_scn2674_irq_state = 1;
 			}
 		}
-		m_interrupt_callback(machine);
+		m_interrupt_callback(1);
 
 	}
 	if ((data&0xe0)==0x80)
@@ -599,7 +588,7 @@ void scn2674_device::scn2674_line(running_machine &machine)
 			LOG2674(("SCN2674 Ready\n"));
 			m_scn2674_irq_state = 1;
 			m_scn2674_irq_register |= 0x02;
-			m_interrupt_callback(machine);
+			m_interrupt_callback(1);
 		}
 	}
 
@@ -612,7 +601,7 @@ void scn2674_device::scn2674_line(running_machine &machine)
 			LOG2674(("SCN2674 Line Zero\n"));
 			m_scn2674_irq_state = 1;
 			m_scn2674_irq_register |= 0x08;
-			m_interrupt_callback(machine);
+			m_interrupt_callback(1);
 		}
 			m_rowcounter = ((m_rowcounter+1)% 37);//Not currently used
 	}
@@ -632,7 +621,7 @@ void scn2674_device::scn2674_line(running_machine &machine)
 			m_scn2674_irq_register |= 0x04;
 			LOG2674(("SCN2674 Split Screen 1\n"));
 			m_scn2674_irq_state = 1;
-			m_interrupt_callback(machine);
+			m_interrupt_callback(1);
 //          machine.primary_screen->update_partial(m_linecounter);
 		}
 	}
@@ -652,7 +641,7 @@ void scn2674_device::scn2674_line(running_machine &machine)
 			LOG2674(("SCN2674 Split Screen 2 irq\n"));
 			m_scn2674_irq_state = 1;
 			m_scn2674_irq_register |= 0x01;
-			m_interrupt_callback(machine);
+			m_interrupt_callback(1);
 			//machine.primary_screen->update_partial(m_linecounter);
 		}
 	}
@@ -665,7 +654,7 @@ void scn2674_device::scn2674_line(running_machine &machine)
 			LOG2674(("vblank irq\n"));
 			m_scn2674_irq_state = 1;
 			m_scn2674_irq_register |= 0x10;
-			m_interrupt_callback(machine);
+			m_interrupt_callback(1);
 		}
 
 	}
