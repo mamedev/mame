@@ -108,10 +108,9 @@ static void c65_irq( running_machine &machine, int level )
 }
 
 /* is this correct for c65 as well as c64? */
-static void c65_cia0_interrupt( device_t *device, int level )
+WRITE_LINE_MEMBER(c65_state::c65_cia0_interrupt)
 {
-	c65_state *state = device->machine().driver_data<c65_state>();
-	c65_irq (device->machine(), level || state->m_vicirq);
+	c65_irq (machine(), state || m_vicirq);
 }
 
 /* is this correct for c65 as well as c64? */
@@ -130,7 +129,7 @@ void c65_vic_interrupt( running_machine &machine, int level )
 
 const legacy_mos6526_interface c65_cia0 =
 {
-	DEVCB_LINE(c65_cia0_interrupt),
+	DEVCB_DRIVER_LINE_MEMBER(c65_state, c65_cia0_interrupt),
 	DEVCB_NULL, /* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,

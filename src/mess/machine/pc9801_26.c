@@ -35,12 +35,10 @@ READ8_MEMBER(pc9801_26_device::opn_porta_r)
 
 WRITE8_MEMBER(pc9801_26_device::opn_portb_w){ m_joy_sel = data; }
 
-static void pc9801_sound_irq( device_t *device, int irq )
+WRITE_LINE_MEMBER(pc9801_26_device::pc9801_sound_irq)
 {
-//  pc9801_state *state = device->machine().driver_data<pc9801_state>();
-
 	/* TODO: seems to die very often */
-	pic8259_ir4_w(device->machine().device("pic8259_slave"), irq);
+	pic8259_ir4_w(machine().device("pic8259_slave"), state);
 }
 
 static const ym2203_interface pc98_ym2203_intf =
@@ -53,7 +51,7 @@ static const ym2203_interface pc98_ym2203_intf =
 		DEVCB_NULL,//(pc9801_state,opn_porta_w),
 		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_26_device,opn_portb_w),
 	},
-	DEVCB_LINE(pc9801_sound_irq)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc9801_26_device,pc9801_sound_irq)
 };
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_26_config )

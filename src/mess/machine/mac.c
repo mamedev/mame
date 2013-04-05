@@ -133,8 +133,6 @@ static int scan_keyboard(running_machine &machine);
 
 static void keyboard_receive(running_machine &machine, int val);
 
-static void mac_via_irq(device_t *device, int state);
-static void mac_via2_irq(device_t *device, int state);
 static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 const via6522_interface mac_via6522_intf =
@@ -145,7 +143,7 @@ const via6522_interface mac_via6522_intf =
 	DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_cb2),
-	DEVCB_LINE(mac_via_irq)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via_irq)
 };
 
 const via6522_interface mac_via6522_adb_intf =
@@ -156,7 +154,7 @@ const via6522_interface mac_via6522_adb_intf =
 	DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_DRIVER_MEMBER(mac_state,mac_adb_via_out_cb2),
-	DEVCB_LINE(mac_via_irq)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via_irq)
 };
 
 const via6522_interface mac_via6522_2_intf =
@@ -167,7 +165,7 @@ const via6522_interface mac_via6522_2_intf =
 	DEVCB_DRIVER_MEMBER(mac_state,mac_via2_out_a), DEVCB_DRIVER_MEMBER(mac_state,mac_via2_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_LINE(mac_via2_irq)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_via2_irq)
 };
 
 // returns non-zero if this Mac has ADB
@@ -1535,12 +1533,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b)
 	}
 }
 
-static void mac_via_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(mac_state::mac_via_irq)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
-
 	/* interrupt the 68k (level 1) */
-	mac->set_via_interrupt(state);
+	set_via_interrupt(state);
 }
 
 READ16_MEMBER ( mac_state::mac_via_r )
@@ -1579,10 +1575,9 @@ WRITE16_MEMBER ( mac_state::mac_via_w )
  * VIA 2 (on Mac IIs and PowerMacs)
  * *************************************************************************/
 
-static void mac_via2_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
 {
-	mac_state *mac = device->machine().driver_data<mac_state>();
-	mac->set_via2_interrupt(state);
+	set_via2_interrupt(state);
 }
 
 READ16_MEMBER ( mac_state::mac_via2_r )

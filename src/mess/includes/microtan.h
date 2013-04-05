@@ -75,6 +75,8 @@ public:
 	DECLARE_WRITE8_MEMBER(via_1_out_b);
 	DECLARE_WRITE8_MEMBER(via_1_out_ca2);
 	DECLARE_WRITE8_MEMBER(via_1_out_cb2);
+	DECLARE_WRITE_LINE_MEMBER(via_0_irq);
+	DECLARE_WRITE_LINE_MEMBER(via_1_irq);	
 };
 
 

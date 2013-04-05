@@ -225,12 +225,11 @@ WRITE8_MEMBER(microtan_state::via_0_out_cb2)
 	LOG(("microtan_via_0_out_cb2 %d\n", data));
 }
 
-static void via_0_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(microtan_state::via_0_irq)
 {
-	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
 	LOG(("microtan_via_0_irq %d\n", state));
-	drvstate->m_via_0_irq_line = state;
-	microtan_set_irq_line(device->machine());
+	m_via_0_irq_line = state;
+	microtan_set_irq_line(machine());
 }
 
 /**************************************************************
@@ -298,12 +297,11 @@ WRITE8_MEMBER(microtan_state::via_1_out_cb2)
 	LOG(("microtan_via_1_out_cb2 %d\n", data));
 }
 
-static void via_1_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(microtan_state::via_1_irq)
 {
-	microtan_state *drvstate = device->machine().driver_data<microtan_state>();
 	LOG(("microtan_via_1_irq %d\n", state));
-	drvstate->m_via_1_irq_line = state;
-	microtan_set_irq_line(device->machine());
+	m_via_1_irq_line = state;
+	microtan_set_irq_line(machine());
 }
 
 /**************************************************************
@@ -318,7 +316,7 @@ const via6522_interface microtan_via6522_0 =
 	DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_a),  DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_ca2),DEVCB_DRIVER_MEMBER(microtan_state,via_0_out_cb2),
-	DEVCB_LINE(via_0_irq)
+	DEVCB_DRIVER_LINE_MEMBER(microtan_state,via_0_irq)
 };
 
 const via6522_interface microtan_via6522_1 =
@@ -330,7 +328,7 @@ const via6522_interface microtan_via6522_1 =
 	DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_a),  DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_ca2),DEVCB_DRIVER_MEMBER(microtan_state,via_1_out_cb2),
-	DEVCB_LINE(via_1_irq)
+	DEVCB_DRIVER_LINE_MEMBER(microtan_state,via_1_irq)
 };
 
 TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)

@@ -481,8 +481,8 @@ static Z80STI_INTERFACE( sti_intf )
 	DEVCB_NULL,                                             // serial output
 	DEVCB_NULL,                                             // timer A output
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, grip_device, speaker_w),    // timer B output
-	DEVCB_LINE(z80sti_tc_w),                                // timer C output
-	DEVCB_LINE(z80sti_rc_w)                                 // timer D output
+	DEVCB_DEVICE_LINE(DEVICE_SELF, z80sti_tc_w),                                // timer C output
+	DEVCB_DEVICE_LINE(DEVICE_SELF, z80sti_rc_w)                                 // timer D output
 };
 
 

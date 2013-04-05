@@ -510,6 +510,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mac_via2_out_b);
 	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 	void mac_state_load();
+	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
+	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
 };
 
 #endif /* MAC_H_ */

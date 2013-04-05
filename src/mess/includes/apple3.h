@@ -67,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_via_0_out_b);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
+	DECLARE_WRITE_LINE_MEMBER(apple2_via_1_irq_func);
 };
 
 

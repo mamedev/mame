@@ -141,6 +141,7 @@ public:
 	void c64_legacy_driver_init();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( c64_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( c64_cart );
+	DECLARE_WRITE_LINE_MEMBER(c65_cia0_interrupt);
 };
 
 

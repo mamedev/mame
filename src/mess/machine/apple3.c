@@ -491,15 +491,14 @@ WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 	apple3_via_out(machine(), &m_via_1_b, data);
 }
 
-static void apple2_via_1_irq_func(device_t *device, int state)
+WRITE_LINE_MEMBER(apple3_state::apple2_via_1_irq_func)
 {
-	apple3_state *drvstate = device->machine().driver_data<apple3_state>();
-	if (!drvstate->m_via_1_irq && state)
+	if (!m_via_1_irq && state)
 	{
-		device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
-	drvstate->m_via_1_irq = state;
+	m_via_1_irq = state;
 }
 
 const via6522_interface apple3_via_0_intf =
@@ -533,7 +532,7 @@ const via6522_interface apple3_via_1_intf =
 	DEVCB_NULL,                 /* out_cb1_func */
 	DEVCB_NULL,                 /* out_ca2_func */
 	DEVCB_NULL,                 /* out_cb2_func */
-	DEVCB_LINE(apple2_via_1_irq_func)   /* irq_func */
+	DEVCB_DRIVER_LINE_MEMBER(apple3_state,apple2_via_1_irq_func)   /* irq_func */
 };
 
 

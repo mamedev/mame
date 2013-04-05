@@ -26,8 +26,6 @@
 
 /* VIA1 Handlers */
 
-static void mac_via_irq(device_t *device, int state);
-
 const via6522_interface pcimac_via6522_intf =
 {
 	DEVCB_DRIVER_MEMBER(macpci_state,mac_via_in_a), DEVCB_DRIVER_MEMBER(macpci_state,mac_via_in_b),
@@ -36,10 +34,10 @@ const via6522_interface pcimac_via6522_intf =
 	DEVCB_DRIVER_MEMBER(macpci_state,mac_via_out_a), DEVCB_DRIVER_MEMBER(macpci_state,mac_via_out_b),
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_DRIVER_MEMBER(macpci_state,mac_adb_via_out_cb2),
-	DEVCB_LINE(mac_via_irq)
+	DEVCB_DRIVER_LINE_MEMBER(macpci_state,mac_via_irq)
 };
 
-static void mac_via_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(macpci_state::mac_via_irq)
 {
 }
 
