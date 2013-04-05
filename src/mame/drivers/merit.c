@@ -628,8 +628,8 @@ static INPUT_PORTS_START( bigappg )
 	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )       PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0xc0, "20" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x80, "50" ) /* Duplicate setting */
+	PORT_DIPSETTING(    0x00, "50" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "99" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x08)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( riviera )
@@ -657,8 +657,18 @@ static INPUT_PORTS_START( riviera )
 	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0xc0, "20" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPSETTING(    0x80, "50" ) /* Duplicate setting */
+	PORT_DIPSETTING(    0x80, "50" )
+	PORT_DIPSETTING(    0x00, "50" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "99" ) PORT_CONDITION("DSW", 0x08, EQUALS, 0x08)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rivierab )
+	PORT_INCLUDE( riviera )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1") /* No Auto Hold feature for this set */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dodge ) /* Same as "meritpoker" but not verified correct. Will correct / verify when these clones work */
@@ -735,6 +745,19 @@ static INPUT_PORTS_START( pitbossa )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x30, "2 Coins" )
 	PORT_DIPSETTING(    0x20, "10 Coins" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pitbossa1 )
+	PORT_INCLUDE( pitboss )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x30, 0x30, "Coin Lockout" )      PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x30, "2 Coins" )
+	PORT_DIPSETTING(    0x20, "10 Coins" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown) )       PORT_DIPLOCATION("SW:8") /* No Free Hand Bonus for this set */
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitbossb )
@@ -1300,6 +1323,21 @@ ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 
 	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
+ROM_START( pitbossa1 ) /* Specific build for localized region, with no Free Hand Bonus */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2214-03.u5-1c", 0x0000, 0x2000, CRC(cf985f96) SHA1(d0e1c3887fe87b92c52410215b5eec600a793c50) ) /* Internal designation: M4A4REV0 */
+	ROM_LOAD( "2214-03.u6-0",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Games included in this set are: */
+	ROM_LOAD( "2214-03.u7-0",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+ROM_END
+
 ROM_START( pitbossb ) /* Roms also found labeled simply as "PSB1" U5 through U7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
@@ -1363,6 +1401,19 @@ ROM_END
 ROM_START( rivieraa ) /* PAL16L8ANC labeled DEC-003 at U13 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-08_u5-4.u5", 0x0000, 0x8000, CRC(ce0b00f2) SHA1(c467c2c08d0bbadf80d67f41e17127e08ce3b3ff) ) /* 08 U5-4 111786 2131-84, label shows (c) 1987 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "hisc_u39.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "hisc_u38.u38", 0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "hisc_u37.u37", 0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hisc_u40.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+ROM_END
+
+ROM_START( rivierab ) /* PAL16L8ANC labeled DEC-003 at U13 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-08_u5-2d.u5", 0x0000, 0x8000, CRC(64c6892b) SHA1(d245d4a9933e3b21279542da0cb6ee641569ef6c) ) /* 08 U5-2D 022086 2131-82d, label shows (c) 1985 */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "hisc_u39.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
@@ -2078,7 +2129,8 @@ DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 /* Gambling type games */
 
 GAME( 1983, pitboss,  0,       casino5,  pitboss,  driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-04)",           GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossa, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03)",           GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossa, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-0C)",    GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossa1,pitboss, pitboss,  pitbossa1,driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",    GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossb, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-02?)",          GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossc, pitboss, pitboss,  pitbossb, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-?)",            GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
@@ -2086,6 +2138,7 @@ GAME( 1984, casino5,  0,       casino5,  casino5,  driver_device,  0,   ROT0,  "
 
 GAME( 1987, riviera,  0,       dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Merit", "Big Apple Games (2131-13, U5-0)",   GAME_SUPPORTS_SAVE )
 
