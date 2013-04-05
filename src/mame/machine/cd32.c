@@ -99,8 +99,10 @@ static DEVICE_STOP( akiko )
 
 static DEVICE_RESET( akiko )
 {
+	amiga_state *amiga = device->machine().driver_data<amiga_state>();
 	running_machine &machine = device->machine();
 	akiko_state *state = get_safe_token(device);
+	state->m_space = amiga->m_maincpu_program_space;
 
 	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
 	if (cddevice!=NULL)
@@ -174,7 +176,6 @@ static DEVICE_START( akiko )
 	akiko_state *state = get_safe_token(device);
 
 	state->set_machine(machine);
-	state->m_space = &machine.device("maincpu")->memory().space(AS_PROGRAM);
 	state->m_c2p_input_index = 0;
 	state->m_c2p_output_index = 0;
 
@@ -394,12 +395,14 @@ static UINT8 akiko_cdda_getstatus(akiko_state *state, UINT32 *lba)
 
 static void akiko_set_cd_status(akiko_state *state, UINT32 status)
 {
+	amiga_state *amiga = state->machine().driver_data<amiga_state>();
+
 	state->m_cdrom_status[0] |= status;
 
 	if ( state->m_cdrom_status[0] & state->m_cdrom_status[1] )
 	{
 		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga_custom_w(*state->m_space, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga->amiga_custom_w(*state->m_space, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 

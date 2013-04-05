@@ -90,9 +90,10 @@ void amiga_fdc::device_reset()
 
 void amiga_fdc::dma_done()
 {
+	amiga_state *state = machine().driver_data<amiga_state>();
 	dma_state = DMA_IDLE;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
+	address_space &space = *state->m_maincpu_program_space;
+	state->amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKBLK, 0xffff);
 }
 
 void amiga_fdc::dma_write(UINT16 value)
@@ -167,6 +168,8 @@ void amiga_fdc::live_abort()
 
 void amiga_fdc::live_run(attotime limit)
 {
+	amiga_state *state = machine().driver_data<amiga_state>();
+
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
@@ -228,8 +231,8 @@ void amiga_fdc::live_run(attotime limit)
 						cur_live.bit_counter = 0;
 				}
 				dskbyt |= 0x1000;
-				address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-				amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
+				address_space &space = *state->m_maincpu_program_space;
+				state->amiga_custom_w(space, REG_INTREQ, 0x8000 | INTENA_DSKSYN, 0xffff);
 			} else
 				dskbyt &= ~0x1000;
 

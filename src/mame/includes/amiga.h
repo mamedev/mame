@@ -410,7 +410,7 @@ public:
 	optional_ioport m_p2joy_port;
 	optional_memory_bank m_bank1;
 
-
+	address_space* m_maincpu_program_space;
 
 	const amiga_machine_interface *m_intf;
 	autoconfig_device *m_autoconfig_list;
@@ -462,6 +462,7 @@ public:
 	DECLARE_DRIVER_INIT(amiga);
 	DECLARE_DRIVER_INIT(cdtv);
 	DECLARE_DRIVER_INIT(a3000);
+	DECLARE_MACHINE_START(amiga);
 	DECLARE_MACHINE_RESET(amiga);
 	DECLARE_VIDEO_START(amiga);
 	DECLARE_PALETTE_INIT(amiga);
@@ -474,6 +475,23 @@ public:
 	TIMER_CALLBACK_MEMBER(finish_serial_write);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(amiga_cia_1_irq);
+
+
+
+	DECLARE_READ16_MEMBER( amiga_custom_r );
+	DECLARE_WRITE16_MEMBER( amiga_custom_w );
+
+	DECLARE_READ16_MEMBER( amiga_autoconfig_r );
+	DECLARE_WRITE16_MEMBER( amiga_autoconfig_w );
+
+	DECLARE_READ16_MEMBER( amiga_cia_r );
+	DECLARE_WRITE16_MEMBER( amiga_cia_w );
+	// action replay
+	DECLARE_READ16_MEMBER( amiga_ar23_cia_r );
+	DECLARE_READ16_MEMBER( amiga_ar23_mode_r );
+	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
+	void amiga_ar23_init( running_machine &machine, int ar3 );
+	
 };
 
 
@@ -487,18 +505,13 @@ void amiga_machine_config(running_machine &machine, const amiga_machine_interfac
 
 
 
-DECLARE_READ16_HANDLER( amiga_cia_r );
-DECLARE_WRITE16_HANDLER( amiga_cia_w );
 
-DECLARE_READ16_HANDLER( amiga_custom_r );
-DECLARE_WRITE16_HANDLER( amiga_custom_w );
+
 
 void amiga_serial_in_w(running_machine &machine, UINT16 data);
 attotime amiga_get_serial_char_period(running_machine &machine);
 
 void amiga_add_autoconfig(running_machine &machine, const amiga_autoconfig_device *device);
-DECLARE_READ16_HANDLER( amiga_autoconfig_r );
-DECLARE_WRITE16_HANDLER( amiga_autoconfig_w );
 
 const amiga_machine_interface *amiga_get_interface(running_machine &machine);
 

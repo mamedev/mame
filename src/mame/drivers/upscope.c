@@ -246,9 +246,9 @@ WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, upscope_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)           /* System ROM */
 
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
@@ -313,6 +313,7 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	MCFG_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_MACHINE_START_OVERRIDE(amiga_state, amiga )
 	MCFG_MACHINE_RESET_OVERRIDE(upscope_state,amiga)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
