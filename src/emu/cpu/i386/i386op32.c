@@ -3298,7 +3298,8 @@ static void I386OP(lar_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x02
 				SetZF(0);
 				return;
 			}
-			if((((seg.flags >> 5) & 3) < cpustate->CPL) && ((seg.flags & 0x1c) != 0x1c))
+			UINT8 DPL = (seg.flags >> 5) & 3;
+			if((DPL < cpustate->CPL) && (DPL < (seg.selector & 3)) && ((seg.flags & 0x1c) != 0x1c))
 			{
 				SetZF(0);
 				return;
@@ -3362,7 +3363,8 @@ static void I386OP(lsl_r32_rm32)(i386_state *cpustate)  // Opcode 0x0f 0x03
 				SetZF(0);
 				return;
 			}
-			if((((seg.flags >> 5) & 3) < cpustate->CPL) && ((seg.flags & 0x1c) != 0x1c))
+			UINT8 DPL = (seg.flags >> 5) & 3;
+			if((DPL < cpustate->CPL) && (DPL < (seg.selector & 3)) && ((seg.flags & 0x1c) != 0x1c))
 			{
 				SetZF(0);
 				return;
