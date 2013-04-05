@@ -694,7 +694,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="assembler editor computing language.rom" size="8192" crc="ee72eeea" sha1="b9f0efedd8486d8034b25c5eedac4946bc70aa8d" offset="0" />
+				<rom name="assembler editor computing language.rom" size="8192" crc="ee72eeea" sha1="b9f0efedd8486d8034b25c5eedac4946bc70aa8d" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -707,7 +707,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
-				<rom name="editor assembler computing language.rom" size="8192" crc="7dd6196c" sha1="42cb5fc35c76fde8cdf0c67db96a1c8a97af57ee" offset="0" />
+				<rom name="editor assembler computing language.rom" size="8192" crc="7dd6196c" sha1="42cb5fc35c76fde8cdf0c67db96a1c8a97af57ee" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -2006,6 +2006,19 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 8k" />
 			<dataarea name="rom" size="8192">
 				<rom name="droids.rom" size="8192" crc="5bb0c159" sha1="d9e67e21e777598c5e18587ba9d6f2beecec0f4f" offset="0" /> <!-- Verified -->
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="dropzone">
+		<description>Dropzone</description>
+		<year>20??</year>
+		<publisher>Video 61</publisher>
+		<info name="developer" value="Williams" />
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="williams 64k" />
+			<dataarea name="rom" size="65536">
+				<rom name="drop zone.rom" size="65536" crc="4870ed52" sha1="4393f93b1fcff7dfb34bb5cf4f745a70b56159e2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -5664,6 +5677,18 @@ Compiled by K1W1
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
 				<rom name="trion.rom" size="16384" crc="2c42362f" sha1="10e5c565deff279b907755d015d2b1e499993482" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinpack">
+		<description>Twin Pack</description>
+		<year>1998</year>
+		<publisher>Video 61</publisher>
+		<part name="cart" interface="a800_cart">
+			<feature name="cart_type" value="standard 8k" />
+			<dataarea name="rom" size="8192">
+				<rom name="twin pack.rom" size="8192" crc="cd9f91cb" sha1="47c486eec10923f5c9190614da4118665b6c9973" offset="0" />
 			</dataarea>
 		</part>
 	</software>
