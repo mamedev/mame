@@ -296,7 +296,6 @@ bool nes_cart_slot_device::call_load()
 					if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 					{
 						/* image is present in nes.hsi: overwrite the header settings with these */
-						ines20 = FALSE;
 						mapper = mapint1;
 						local_options = mapint2 & 0x0f;
 						m_crc_hack = (mapint2 & 0xf0) >> 4; // this is used to differentiate among variants of the same Mapper (see below)
