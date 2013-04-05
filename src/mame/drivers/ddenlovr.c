@@ -351,6 +351,37 @@ public:
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
 	
+	void ddenlovr_flipscreen_w( UINT8 data );
+	void ddenlovr_blit_flip_w( UINT8 data );
+	void do_plot( int x, int y, int pen );
+	inline void log_draw_error( int src, int cmd );
+	int blit_draw( int src, int sx );
+	void blit_rect_xywh();
+	void blit_rect_yh();
+	void blit_fill_xy(int x, int y );
+	void blit_horiz_line();
+	void blit_vert_line();
+	inline void log_blit(int data );
+	void blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector );
+	void blitter_w_funkyfig(int blitter, offs_t offset, UINT8 data, int irq_vector );
+	void copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
+	void mmpanic_update_leds();
+	void mjchuuka_get_romdata();
+	UINT8 hgokou_player_r( int player );
+	DECLARE_WRITE8_MEMBER( quizchq_oki_bank_w );
+	DECLARE_WRITE16_MEMBER( ddenlovr_oki_bank_w );
+	DECLARE_WRITE16_MEMBER( quiz365_oki_bank1_w );
+	DECLARE_WRITE16_MEMBER( quiz365_oki_bank2_w );
+	DECLARE_WRITE8_MEMBER( ddenlovr_select_w );
+	DECLARE_READ8_MEMBER( quiz365_input_r );
+	DECLARE_WRITE16_MEMBER( nettoqc_oki_bank_w );
+	DECLARE_WRITE8_MEMBER( hanakanz_oki_bank_w );
+	DECLARE_WRITE8_MEMBER( mjchuuka_oki_bank_w );
+	DECLARE_READ8_MEMBER( hginga_dsw_r );
+	DECLARE_WRITE8_MEMBER( mjflove_okibank_w );
+	DECLARE_WRITE8_MEMBER( jongtei_okibank_w );
+	DECLARE_READ8_MEMBER( seljan2_dsw_r );
+	DECLARE_WRITE8_MEMBER( daimyojn_okibank_w );
 };
 
 VIDEO_START_MEMBER(ddenlovr_state,ddenlovr)
@@ -472,16 +503,14 @@ VIDEO_START_MEMBER(ddenlovr_state,mjflove)
 	m_ddenlovr_blit_commands = mjflove_commands;
 }
 
-static void ddenlovr_flipscreen_w( UINT8 data )
+void ddenlovr_state::ddenlovr_flipscreen_w( UINT8 data )
 {
 	logerror("flipscreen = %02x (%s)\n", data, (data & 1) ? "off" : "on");
 }
 
-static void ddenlovr_blit_flip_w( running_machine &machine, UINT8 data )
+void ddenlovr_state::ddenlovr_blit_flip_w( UINT8 data )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
-
-	if ((data ^ state->m_ddenlovr_blit_flip) & 0xec)
+	if ((data ^ m_ddenlovr_blit_flip) & 0xec)
 	{
 #ifdef MAME_DEBUG
 		popmessage("warning ddenlovr_blit_flip = %02x", data);
@@ -489,7 +518,7 @@ static void ddenlovr_blit_flip_w( running_machine &machine, UINT8 data )
 		logerror("warning ddenlovr_blit_flip = %02x\n", data);
 	}
 
-	state->m_ddenlovr_blit_flip = data;
+	m_ddenlovr_blit_flip = data;
 }
 
 WRITE8_MEMBER(ddenlovr_state::ddenlovr_bgcolor_w)
@@ -545,9 +574,8 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr16_layer_enable_w)
 
 
 
-static void do_plot( running_machine &machine, int x, int y, int pen )
+void ddenlovr_state::do_plot( int x, int y, int pen )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int addr, temp;
 	int xclip, yclip;
 
@@ -555,35 +583,35 @@ static void do_plot( running_machine &machine, int x, int y, int pen )
 	x &= 0x1ff;
 
 	// swap x & y (see hanakanz gal check)
-	if (state->m_ddenlovr_blit_flip & 0x10) {  temp = x;   x = y;   y = temp;  }
+	if (m_ddenlovr_blit_flip & 0x10) {  temp = x;   x = y;   y = temp;  }
 
 	// clipping rectangle (see hanakanz / hkagerou gal check)
 #if 0
-	xclip   =   (x < state->m_ddenlovr_clip_x) || (x > state->m_ddenlovr_clip_x + state->m_ddenlovr_clip_width);
-	yclip   =   (y < state->m_ddenlovr_clip_y) || (y > state->m_ddenlovr_clip_y + state->m_ddenlovr_clip_height);
+	xclip   =   (x < m_ddenlovr_clip_x) || (x > m_ddenlovr_clip_x + m_ddenlovr_clip_width);
+	yclip   =   (y < m_ddenlovr_clip_y) || (y > m_ddenlovr_clip_y + m_ddenlovr_clip_height);
 #else
-	xclip   =   (x < state->m_ddenlovr_clip_x) || (x > state->m_ddenlovr_clip_width);
-	yclip   =   (y < state->m_ddenlovr_clip_y) || (y > state->m_ddenlovr_clip_height);
+	xclip   =   (x < m_ddenlovr_clip_x) || (x > m_ddenlovr_clip_width);
+	yclip   =   (y < m_ddenlovr_clip_y) || (y > m_ddenlovr_clip_height);
 #endif
 
-	if (!(state->m_ddenlovr_clip_ctrl & 1) &&  xclip) return;
-	if (!(state->m_ddenlovr_clip_ctrl & 2) && !xclip) return;
-	if (!(state->m_ddenlovr_clip_ctrl & 4) &&  yclip) return;
-	if (!(state->m_ddenlovr_clip_ctrl & 8) && !yclip) return;
+	if (!(m_ddenlovr_clip_ctrl & 1) &&  xclip) return;
+	if (!(m_ddenlovr_clip_ctrl & 2) && !xclip) return;
+	if (!(m_ddenlovr_clip_ctrl & 4) &&  yclip) return;
+	if (!(m_ddenlovr_clip_ctrl & 8) && !yclip) return;
 
 	addr = 512 * y + x;
 
-	if (state->m_ddenlovr_dest_layer & 0x0001) state->m_ddenlovr_pixmap[0][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0002) state->m_ddenlovr_pixmap[1][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0004) state->m_ddenlovr_pixmap[2][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0008) state->m_ddenlovr_pixmap[3][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0001) m_ddenlovr_pixmap[0][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0002) m_ddenlovr_pixmap[1][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0004) m_ddenlovr_pixmap[2][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0008) m_ddenlovr_pixmap[3][addr] = pen;
 
-	if (!state->m_extra_layers) return;
+	if (!m_extra_layers) return;
 
-	if (state->m_ddenlovr_dest_layer & 0x0100) state->m_ddenlovr_pixmap[4][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0200) state->m_ddenlovr_pixmap[5][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0400) state->m_ddenlovr_pixmap[6][addr] = pen;
-	if (state->m_ddenlovr_dest_layer & 0x0800) state->m_ddenlovr_pixmap[7][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0100) m_ddenlovr_pixmap[4][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0200) m_ddenlovr_pixmap[5][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0400) m_ddenlovr_pixmap[6][addr] = pen;
+	if (m_ddenlovr_dest_layer & 0x0800) m_ddenlovr_pixmap[7][addr] = pen;
 }
 
 
@@ -619,7 +647,7 @@ INLINE int fetch_word( UINT8 *src_data, int src_len, int *bit_addr, int word_len
 
 
 
-INLINE void log_draw_error( int src, int cmd )
+inline void ddenlovr_state::log_draw_error( int src, int cmd )
 {
 #ifdef MAME_DEBUG
 	popmessage("%06x: warning unknown pixel command %02x", src, cmd);
@@ -638,16 +666,15 @@ INLINE void log_draw_error( int src, int cmd )
     06 blit_pen_mode (replace values stored in ROM)
 */
 
-static int blit_draw( running_machine &machine, int src, int sx )
+int ddenlovr_state::blit_draw( int src, int sx )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
-	UINT8 *src_data = state->memregion("blitter")->base();
-	int src_len = state->memregion("blitter")->bytes();
-	int bit_addr = (src & 0xffffff) * state->m_ddenlovr_blit_rom_bits;  /* convert to bit address */
+	UINT8 *src_data = memregion("blitter")->base();
+	int src_len = memregion("blitter")->bytes();
+	int bit_addr = (src & 0xffffff) * m_ddenlovr_blit_rom_bits;  /* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
-	int xinc = (state->m_ddenlovr_blit_flip & 1) ? -1 : 1;
-	int yinc = (state->m_ddenlovr_blit_flip & 2) ? -1 : 1;
+	int xinc = (m_ddenlovr_blit_flip & 1) ? -1 : 1;
+	int yinc = (m_ddenlovr_blit_flip & 2) ? -1 : 1;
 
 	pen_size = fetch_word(src_data, src_len, &bit_addr, 4) + 1;
 	arg_size = fetch_word(src_data, src_len, &bit_addr, 4) + 1;
@@ -666,11 +693,11 @@ static int blit_draw( running_machine &machine, int src, int sx )
 	for (;;)
 	{
 		cmd = fetch_word(src_data, src_len, &bit_addr, 3);
-		switch (state->m_ddenlovr_blit_commands[cmd])
+		switch (m_ddenlovr_blit_commands[cmd])
 		{
 			case BLIT_NEXT:
 				/* next line */
-				state->m_ddenlovr_blit_y += yinc;
+				m_ddenlovr_blit_y += yinc;
 				x = sx;
 				break;
 
@@ -679,13 +706,13 @@ static int blit_draw( running_machine &machine, int src, int sx )
 					int length = fetch_word(src_data, src_len, &bit_addr, arg_size);
 					int pen    = fetch_word(src_data, src_len, &bit_addr, pen_size);
 
-					if (state->m_ddenlovr_blit_pen_mode)
-						pen = (state->m_ddenlovr_blit_pen & 0x0f);
-					pen |= state->m_ddenlovr_blit_pen & 0xf0;
+					if (m_ddenlovr_blit_pen_mode)
+						pen = (m_ddenlovr_blit_pen & 0x0f);
+					pen |= m_ddenlovr_blit_pen & 0xf0;
 
 					while (length-- >= 0)
 					{
-						do_plot(machine, x, state->m_ddenlovr_blit_y, pen);
+						do_plot(x, m_ddenlovr_blit_y, pen);
 						x += xinc;
 					}
 				}
@@ -698,11 +725,11 @@ static int blit_draw( running_machine &machine, int src, int sx )
 					while (length-- >= 0)
 					{
 						int pen = fetch_word(src_data, src_len, &bit_addr, pen_size);
-						if (state->m_ddenlovr_blit_pen_mode)
-							pen = (state->m_ddenlovr_blit_pen & 0x0f);
-						pen |= state->m_ddenlovr_blit_pen & 0xf0;
+						if (m_ddenlovr_blit_pen_mode)
+							pen = (m_ddenlovr_blit_pen & 0x0f);
+						pen |= m_ddenlovr_blit_pen & 0xf0;
 
-						do_plot(machine, x, state->m_ddenlovr_blit_y, pen);
+						do_plot(x, m_ddenlovr_blit_y, pen);
 						x += xinc;
 					}
 				}
@@ -724,7 +751,7 @@ static int blit_draw( running_machine &machine, int src, int sx )
 				log_draw_error(src, cmd);
 			// fall through
 			case BLIT_STOP:
-				return ((bit_addr + state->m_ddenlovr_blit_rom_bits - 1) / state->m_ddenlovr_blit_rom_bits) & 0xffffff;
+				return ((bit_addr + m_ddenlovr_blit_rom_bits - 1) / m_ddenlovr_blit_rom_bits) & 0xffffff;
 		}
 	}
 }
@@ -733,19 +760,18 @@ static int blit_draw( running_machine &machine, int src, int sx )
 
 /*  Draw a simple rectangle
 */
-static void blit_rect_xywh( running_machine &machine )
+void ddenlovr_state::blit_rect_xywh()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int x, y;
 
 #ifdef MAME_DEBUG
-//  if (state->m_ddenlovr_clip_ctrl != 0x0f)
-//      popmessage("RECT clipx=%03x clipy=%03x ctrl=%x", state->m_ddenlovr_clip_x, state->m_ddenlovr_clip_y, state->m_ddenlovr_clip_ctrl);
+//  if (m_ddenlovr_clip_ctrl != 0x0f)
+//      popmessage("RECT clipx=%03x clipy=%03x ctrl=%x", m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_ctrl);
 #endif
 
-	for (y = 0; y <= state->m_ddenlovr_rect_height; y++)
-		for (x = 0; x <= state->m_ddenlovr_rect_width; x++)
-			do_plot(machine, x + state->m_ddenlovr_blit_x, y + state->m_ddenlovr_blit_y, state->m_ddenlovr_blit_pen);
+	for (y = 0; y <= m_ddenlovr_rect_height; y++)
+		for (x = 0; x <= m_ddenlovr_rect_width; x++)
+			do_plot(x + m_ddenlovr_blit_x, y + m_ddenlovr_blit_y, m_ddenlovr_blit_pen);
 }
 
 
@@ -760,15 +786,14 @@ static void blit_rect_xywh( running_machine &machine )
     04 blit_pen
     0c line_length - always 0?
 */
-static void blit_rect_yh( running_machine &machine )
+void ddenlovr_state::blit_rect_yh()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
-	int start = 512 * state->m_ddenlovr_blit_y;
-	int length = 512 * (state->m_ddenlovr_rect_height + 1);
+	int start = 512 * m_ddenlovr_blit_y;
+	int length = 512 * (m_ddenlovr_rect_height + 1);
 
 #ifdef MAME_DEBUG
-//  if (state->m_ddenlovr_clip_ctrl != 0x0f)
-//      popmessage("UNK8C clipx=%03x clipy=%03x ctrl=%x", state->m_ddenlovr_clip_x, state->m_ddenlovr_clip_y, state->m_ddenlovr_clip_ctrl);
+//  if (m_ddenlovr_clip_ctrl != 0x0f)
+//      popmessage("UNK8C clipx=%03x clipy=%03x ctrl=%x", m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_ctrl);
 #endif
 
 	if (start < 512 * 512)
@@ -776,17 +801,17 @@ static void blit_rect_yh( running_machine &machine )
 		if (start + length > 512 * 512)
 			length = 512 * 512 - start;
 
-		if (state->m_ddenlovr_dest_layer & 0x0001) memset(state->m_ddenlovr_pixmap[0] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0002) memset(state->m_ddenlovr_pixmap[1] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0004) memset(state->m_ddenlovr_pixmap[2] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0008) memset(state->m_ddenlovr_pixmap[3] + start, state->m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, length);
 
-		if (!state->m_extra_layers) return;
+		if (!m_extra_layers) return;
 
-		if (state->m_ddenlovr_dest_layer & 0x0100) memset(state->m_ddenlovr_pixmap[4] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0200) memset(state->m_ddenlovr_pixmap[5] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0400) memset(state->m_ddenlovr_pixmap[6] + start, state->m_ddenlovr_blit_pen, length);
-		if (state->m_ddenlovr_dest_layer & 0x0800) memset(state->m_ddenlovr_pixmap[7] + start, state->m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, length);
+		if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, length);
 	}
 }
 
@@ -800,9 +825,8 @@ static void blit_rect_yh( running_machine &machine )
     02 Y
     04 blit_pen
 */
-static void blit_fill_xy( running_machine &machine, int x, int y )
+void ddenlovr_state::blit_fill_xy( int x, int y )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int start = 512 * y + x;
 
 #ifdef MAME_DEBUG
@@ -810,17 +834,17 @@ static void blit_fill_xy( running_machine &machine, int x, int y )
 //      popmessage("FILL command X %03x Y %03x", x, y);
 #endif
 
-	if (state->m_ddenlovr_dest_layer & 0x0001) memset(state->m_ddenlovr_pixmap[0] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0002) memset(state->m_ddenlovr_pixmap[1] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0004) memset(state->m_ddenlovr_pixmap[2] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0008) memset(state->m_ddenlovr_pixmap[3] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0001) memset(m_ddenlovr_pixmap[0] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0002) memset(m_ddenlovr_pixmap[1] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0004) memset(m_ddenlovr_pixmap[2] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0008) memset(m_ddenlovr_pixmap[3] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 
-	if (!state->m_extra_layers) return;
+	if (!m_extra_layers) return;
 
-	if (state->m_ddenlovr_dest_layer & 0x0100) memset(state->m_ddenlovr_pixmap[4] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0200) memset(state->m_ddenlovr_pixmap[5] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0400) memset(state->m_ddenlovr_pixmap[6] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
-	if (state->m_ddenlovr_dest_layer & 0x0800) memset(state->m_ddenlovr_pixmap[7] + start, state->m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0100) memset(m_ddenlovr_pixmap[4] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0200) memset(m_ddenlovr_pixmap[5] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0400) memset(m_ddenlovr_pixmap[6] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
+	if (m_ddenlovr_dest_layer & 0x0800) memset(m_ddenlovr_pixmap[7] + start, m_ddenlovr_blit_pen, 512 * 512 - start);
 }
 
 
@@ -835,23 +859,22 @@ static void blit_fill_xy( running_machine &machine, int x, int y )
     04 blit_pen
     ddenlovr_blit_x and ddenlovr_blit_y are left pointing to the last pixel at the end of the command
 */
-static void blit_horiz_line( running_machine &machine )
+void ddenlovr_state::blit_horiz_line()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int i;
 
 #ifdef MAME_DEBUG
 	popmessage("LINE X");
 
-	if (state->m_ddenlovr_clip_ctrl != 0x0f)
-		popmessage("LINE X clipx=%03x clipy=%03x ctrl=%x", state->m_ddenlovr_clip_x, state->m_ddenlovr_clip_y, state->m_ddenlovr_clip_ctrl);
+	if (m_ddenlovr_clip_ctrl != 0x0f)
+		popmessage("LINE X clipx=%03x clipy=%03x ctrl=%x", m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_ctrl);
 
-	if (state->m_ddenlovr_blit_flip)
-		popmessage("LINE X flip=%x", state->m_ddenlovr_blit_flip);
+	if (m_ddenlovr_blit_flip)
+		popmessage("LINE X flip=%x", m_ddenlovr_blit_flip);
 #endif
 
-	for (i = 0; i <= state->m_ddenlovr_line_length; i++)
-		do_plot(machine, state->m_ddenlovr_blit_x++, state->m_ddenlovr_blit_y, state->m_ddenlovr_blit_pen);
+	for (i = 0; i <= m_ddenlovr_line_length; i++)
+		do_plot(m_ddenlovr_blit_x++, m_ddenlovr_blit_y, m_ddenlovr_blit_pen);
 }
 
 
@@ -866,41 +889,38 @@ static void blit_horiz_line( running_machine &machine )
     04 blit_pen
     ddenlovr_blit_x and ddenlovr_blit_y are left pointing to the last pixel at the end of the command
 */
-static void blit_vert_line( running_machine &machine )
+void ddenlovr_state::blit_vert_line()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int i;
 
 #ifdef MAME_DEBUG
 	popmessage("LINE Y");
 
-	if (state->m_ddenlovr_clip_ctrl != 0x0f)
-		popmessage("LINE Y clipx=%03x clipy=%03x ctrl=%x", state->m_ddenlovr_clip_x, state->m_ddenlovr_clip_y, state->m_ddenlovr_clip_ctrl);
+	if (m_ddenlovr_clip_ctrl != 0x0f)
+		popmessage("LINE Y clipx=%03x clipy=%03x ctrl=%x", m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_ctrl);
 #endif
 
-	for (i = 0; i <= state->m_ddenlovr_line_length; i++)
-		do_plot(machine, state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y++, state->m_ddenlovr_blit_pen);
+	for (i = 0; i <= m_ddenlovr_line_length; i++)
+		do_plot(m_ddenlovr_blit_x, m_ddenlovr_blit_y++, m_ddenlovr_blit_pen);
 }
 
 
 
 
-INLINE void log_blit( running_machine &machine, int data )
+inline void ddenlovr_state::log_blit( int data )
 {
 #if 0
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 
 	logerror("%s: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x flip %02x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
-			machine.describe_context(),
-			state->m_ddenlovr_blit_address, state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y, data,
-			state->m_ddenlovr_dest_layer, state->m_ddenlovr_blit_pen, state->m_ddenlovr_blit_pen_mode, state->m_ddenlovr_rect_width, state->m_ddenlovr_rect_height, state->m_ddenlovr_line_length, state->m_ddenlovr_blit_flip,
-			state->m_ddenlovr_clip_ctrl, state->m_ddenlovr_clip_x, state->m_ddenlovr_clip_y, state->m_ddenlovr_clip_width, state->m_ddenlovr_clip_height);
+			machine().describe_context(),
+			m_ddenlovr_blit_address, m_ddenlovr_blit_x, m_ddenlovr_blit_y, data,
+			m_ddenlovr_dest_layer, m_ddenlovr_blit_pen, m_ddenlovr_blit_pen_mode, m_ddenlovr_rect_width, m_ddenlovr_rect_height, m_ddenlovr_line_length, m_ddenlovr_blit_flip,
+			m_ddenlovr_clip_ctrl, m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_width, m_ddenlovr_clip_height);
 #endif
 }
 
-static void blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector )
+void ddenlovr_state::blitter_w( address_space &space, int blitter, offs_t offset, UINT8 data, int irq_vector )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
 	int hi_bits;
 
 g_profiler.start(PROFILER_VIDEO);
@@ -908,17 +928,17 @@ g_profiler.start(PROFILER_VIDEO);
 	switch (offset)
 	{
 	case 0:
-		state->m_ddenlovr_blit_regs[blitter] = data;
+		m_ddenlovr_blit_regs[blitter] = data;
 		break;
 
 	case 1:
-		hi_bits = (state->m_ddenlovr_blit_regs[blitter] & 0xc0) << 2;
+		hi_bits = (m_ddenlovr_blit_regs[blitter] & 0xc0) << 2;
 
-		switch (state->m_ddenlovr_blit_regs[blitter] & 0x3f)
+		switch (m_ddenlovr_blit_regs[blitter] & 0x3f)
 		{
 		case 0x00:
-			if (blitter)    state->m_ddenlovr_dest_layer = (state->m_ddenlovr_dest_layer & 0x00ff) | (data << 8);
-			else            state->m_ddenlovr_dest_layer = (state->m_ddenlovr_dest_layer & 0xff00) | (data << 0);
+			if (blitter)    m_ddenlovr_dest_layer = (m_ddenlovr_dest_layer & 0x00ff) | (data << 8);
+			else            m_ddenlovr_dest_layer = (m_ddenlovr_dest_layer & 0xff00) | (data << 0);
 			break;
 
 		case 0x01:
@@ -926,60 +946,60 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		case 0x02:
-			state->m_ddenlovr_blit_y = data | hi_bits;
+			m_ddenlovr_blit_y = data | hi_bits;
 			break;
 
 		case 0x03:
-			ddenlovr_blit_flip_w(space.machine(), data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x04:
-			state->m_ddenlovr_blit_pen = data;
+			m_ddenlovr_blit_pen = data;
 			break;
 
 		case 0x05:
-			state->m_ddenlovr_blit_pen_mask = data;
+			m_ddenlovr_blit_pen_mask = data;
 			break;
 
 		case 0x06:
 			// related to pen, can be 0 or 1 for 0x10 blitter command
 			// 0 = only bits 7-4 of ddenlovr_blit_pen contain data
 			// 1 = bits 3-0 contain data as well
-			state->m_ddenlovr_blit_pen_mode = data;
+			m_ddenlovr_blit_pen_mode = data;
 			break;
 
 		case 0x0a:
-			state->m_ddenlovr_rect_width = data | hi_bits;
+			m_ddenlovr_rect_width = data | hi_bits;
 			break;
 
 		case 0x0b:
-			state->m_ddenlovr_rect_height = data | hi_bits;
+			m_ddenlovr_rect_height = data | hi_bits;
 			break;
 
 		case 0x0c:
-			state->m_ddenlovr_line_length = data | hi_bits;
+			m_ddenlovr_line_length = data | hi_bits;
 			break;
 
 		case 0x0d:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0xffff00) | (data <<0);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data <<0);
 			break;
 		case 0x0e:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0xff00ff) | (data <<8);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data <<8);
 			break;
 		case 0x0f:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0x00ffff) | (data<<16);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data<<16);
 			break;
 
 		case 0x14:
-			state->m_ddenlovr_blit_x = data | hi_bits;
+			m_ddenlovr_blit_x = data | hi_bits;
 			break;
 
 		case 0x16:
-			state->m_ddenlovr_clip_x = data | hi_bits;
+			m_ddenlovr_clip_x = data | hi_bits;
 			break;
 
 		case 0x17:
-			state->m_ddenlovr_clip_y = data | hi_bits;
+			m_ddenlovr_clip_y = data | hi_bits;
 			break;
 
 		case 0x18:
@@ -990,40 +1010,40 @@ g_profiler.start(PROFILER_VIDEO);
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			state->m_ddenlovr_scroll[blitter * 8 + (state->m_ddenlovr_blit_regs[blitter] & 7)] = data | hi_bits;
+			m_ddenlovr_scroll[blitter * 8 + (m_ddenlovr_blit_regs[blitter] & 7)] = data | hi_bits;
 			break;
 
 		case 0x20:
-			state->m_ddenlovr_clip_ctrl = data;
+			m_ddenlovr_clip_ctrl = data;
 			break;
 
 		case 0x24:
 
-			log_blit(space.machine(), data);
+			log_blit(data);
 
 			switch (data)
 			{
-				case 0x04:  blit_fill_xy(space.machine(), 0, 0);
+				case 0x04:  blit_fill_xy(0, 0);
 							break;
-				case 0x14:  blit_fill_xy(space.machine(), state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y);
-							break;
-
-				case 0x10:  state->m_ddenlovr_blit_address = blit_draw(space.machine(), state->m_ddenlovr_blit_address, state->m_ddenlovr_blit_x);
+				case 0x14:  blit_fill_xy(m_ddenlovr_blit_x, m_ddenlovr_blit_y);
 							break;
 
-				case 0x13:  blit_horiz_line(space.machine());
-							break;
-				case 0x1b:  blit_vert_line(space.machine());
+				case 0x10:  m_ddenlovr_blit_address = blit_draw(m_ddenlovr_blit_address, m_ddenlovr_blit_x);
 							break;
 
-				case 0x1c:  blit_rect_xywh(space.machine());
+				case 0x13:  blit_horiz_line();
+							break;
+				case 0x1b:  blit_vert_line();
+							break;
+
+				case 0x1c:  blit_rect_xywh();
 							break;
 
 				// These two are issued one after the other (43 then 8c)
 				// 8c is issued immediately after 43 has finished, without
 				// changing any argument
 				case 0x43:  break;
-				case 0x8c:  blit_rect_yh(space.machine());
+				case 0x8c:  blit_rect_yh();
 							break;
 
 				default:
@@ -1040,16 +1060,16 @@ g_profiler.start(PROFILER_VIDEO);
 			else
 			{
 				/* ddenlovr */
-				if (state->m_ddenlovr_blitter_irq_enable)
+				if (m_ddenlovr_blitter_irq_enable)
 				{
-					state->m_ddenlovr_blitter_irq_flag = 1;
+					m_ddenlovr_blitter_irq_flag = 1;
 					space.device().execute().set_input_line(1, HOLD_LINE);
 				}
 			}
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", space.device().safe_pc(), blitter, state->m_ddenlovr_blit_regs[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", space.device().safe_pc(), blitter, m_ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -1061,9 +1081,8 @@ g_profiler.stop();
 
 
 // differences wrt blitter_data_w: slightly different blitter commands
-static void blitter_w_funkyfig( running_machine &machine, int blitter, offs_t offset, UINT8 data, int irq_vector )
+void ddenlovr_state::blitter_w_funkyfig( int blitter, offs_t offset, UINT8 data, int irq_vector )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int hi_bits;
 
 g_profiler.start(PROFILER_VIDEO);
@@ -1071,17 +1090,17 @@ g_profiler.start(PROFILER_VIDEO);
 	switch(offset)
 	{
 	case 0:
-		state->m_ddenlovr_blit_regs[blitter] = data;
+		m_ddenlovr_blit_regs[blitter] = data;
 		break;
 
 	case 1:
-		hi_bits = (state->m_ddenlovr_blit_regs[blitter] & 0xc0) << 2;
+		hi_bits = (m_ddenlovr_blit_regs[blitter] & 0xc0) << 2;
 
-		switch (state->m_ddenlovr_blit_regs[blitter] & 0x3f)
+		switch (m_ddenlovr_blit_regs[blitter] & 0x3f)
 		{
 		case 0x00:
-			if (blitter)    state->m_ddenlovr_dest_layer = (state->m_ddenlovr_dest_layer & 0x00ff) | (data << 8);
-			else            state->m_ddenlovr_dest_layer = (state->m_ddenlovr_dest_layer & 0xff00) | (data << 0);
+			if (blitter)    m_ddenlovr_dest_layer = (m_ddenlovr_dest_layer & 0x00ff) | (data << 8);
+			else            m_ddenlovr_dest_layer = (m_ddenlovr_dest_layer & 0xff00) | (data << 0);
 			break;
 
 		case 0x01:
@@ -1089,60 +1108,60 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		case 0x02:
-			state->m_ddenlovr_blit_y = data | hi_bits;
+			m_ddenlovr_blit_y = data | hi_bits;
 			break;
 
 		case 0x03:
-			ddenlovr_blit_flip_w(machine, data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x04:
-			state->m_ddenlovr_blit_pen = data;
+			m_ddenlovr_blit_pen = data;
 			break;
 
 		case 0x05:
-			state->m_ddenlovr_blit_pen_mask = data;
+			m_ddenlovr_blit_pen_mask = data;
 			break;
 
 		case 0x06:
 			// related to pen, can be 0 or 1 for 0x10 blitter command
 			// 0 = only bits 7-4 of ddenlovr_blit_pen contain data
 			// 1 = bits 3-0 contain data as well
-			state->m_ddenlovr_blit_pen_mode = data;
+			m_ddenlovr_blit_pen_mode = data;
 			break;
 
 		case 0x0a:
-			state->m_ddenlovr_rect_width = data | hi_bits;
+			m_ddenlovr_rect_width = data | hi_bits;
 			break;
 
 		case 0x0b:
-			state->m_ddenlovr_rect_height = data | hi_bits;
+			m_ddenlovr_rect_height = data | hi_bits;
 			break;
 
 		case 0x0c:
-			state->m_ddenlovr_line_length = data | hi_bits;
+			m_ddenlovr_line_length = data | hi_bits;
 			break;
 
 		case 0x0d:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0xffff00) | (data <<  0);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xffff00) | (data <<  0);
 			break;
 		case 0x0e:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0xff00ff) | (data <<  8);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0xff00ff) | (data <<  8);
 			break;
 		case 0x0f:
-			state->m_ddenlovr_blit_address = (state->m_ddenlovr_blit_address & 0x00ffff) | (data << 16);
+			m_ddenlovr_blit_address = (m_ddenlovr_blit_address & 0x00ffff) | (data << 16);
 			break;
 
 		case 0x14:
-			state->m_ddenlovr_blit_x = data | hi_bits;
+			m_ddenlovr_blit_x = data | hi_bits;
 			break;
 
 		case 0x16:
-			state->m_ddenlovr_clip_x = data | hi_bits;
+			m_ddenlovr_clip_x = data | hi_bits;
 			break;
 
 		case 0x17:
-			state->m_ddenlovr_clip_y = data | hi_bits;
+			m_ddenlovr_clip_y = data | hi_bits;
 			break;
 
 		case 0x18:
@@ -1153,60 +1172,60 @@ g_profiler.start(PROFILER_VIDEO);
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:
-			state->m_ddenlovr_scroll[blitter * 8 + (state->m_ddenlovr_blit_regs[blitter] & 7)] = data | hi_bits;
+			m_ddenlovr_scroll[blitter * 8 + (m_ddenlovr_blit_regs[blitter] & 7)] = data | hi_bits;
 			break;
 
 		case 0x20:
-			state->m_ddenlovr_clip_ctrl = data;
+			m_ddenlovr_clip_ctrl = data;
 			break;
 
 		case 0x24:
 
-			log_blit(machine, data);
+			log_blit(data);
 
 			switch (data)
 			{
 				case 0x84:  // same as 04?
-				case 0x04:  blit_fill_xy(machine, 0, 0);
+				case 0x04:  blit_fill_xy(0, 0);
 							break;
 
 //              unused?
-//              case 0x14:  blit_fill_xy(machine, state->m_ddenlovr_blit_x, state->m_ddenlovr_blit_y);
+//              case 0x14:  blit_fill_xy(m_ddenlovr_blit_x, m_ddenlovr_blit_y);
 //                          break;
 
-				case 0x00/*0x10*/:  state->m_ddenlovr_blit_address = blit_draw(machine, state->m_ddenlovr_blit_address, state->m_ddenlovr_blit_x);
+				case 0x00/*0x10*/:  m_ddenlovr_blit_address = blit_draw(m_ddenlovr_blit_address, m_ddenlovr_blit_x);
 							break;
 
 				case 0x0b:  // same as 03? see the drawing of the R in "cRoss hatch" (key test)
-				case 0x03/*0x13*/:  blit_horiz_line(machine);
+				case 0x03/*0x13*/:  blit_horiz_line();
 							break;
 //              unused?
-//              case 0x1b:  blit_vert_line(machine);
+//              case 0x1b:  blit_vert_line();
 //                          break;
 
-				case 0x0c/*0x1c*/:  blit_rect_xywh(machine);
+				case 0x0c/*0x1c*/:  blit_rect_xywh();
 							break;
 
 				// These two are issued one after the other (43 then 8c)
 				// 8c is issued immediately after 43 has finished, without
 				// changing any argument
 				case 0x43:  break;
-				case 0x8c:  blit_rect_yh(machine);
+				case 0x8c:  blit_rect_yh();
 							break;
 
 				default:
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x", data);
-					logerror("%s: unknown blitter command %02x\n", machine.describe_context(), data);
+					logerror("%s: unknown blitter command %02x\n", machine().describe_context(), data);
 				#endif
 			}
 
-			state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, irq_vector);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
-			logerror("%s: Blitter %d reg %02x = %02x\n", machine.describe_context(), blitter, state->m_ddenlovr_blit_regs[blitter], data);
+			logerror("%s: Blitter %d reg %02x = %02x\n", machine().describe_context(), blitter, m_ddenlovr_blit_regs[blitter], data);
 			break;
 		}
 	}
@@ -1246,7 +1265,7 @@ g_profiler.start(PROFILER_VIDEO);
 			break;
 
 		case 0x0c:
-			ddenlovr_blit_flip_w(machine(), data);
+			ddenlovr_blit_flip_w(data);
 			break;
 
 		case 0x10:
@@ -1365,31 +1384,31 @@ g_profiler.start(PROFILER_VIDEO);
 
 		case 0x90:
 
-			log_blit(machine(), data);
+			log_blit(data);
 
 			switch (data)
 			{
-				case 0x04:  blit_fill_xy(machine(), 0, 0);
+				case 0x04:  blit_fill_xy(0, 0);
 							break;
-				case 0x14:  blit_fill_xy(machine(), m_ddenlovr_blit_x, m_ddenlovr_blit_y);
-							break;
-
-				case 0x10:  m_ddenlovr_blit_address = blit_draw(machine(), m_ddenlovr_blit_address, m_ddenlovr_blit_x);
+				case 0x14:  blit_fill_xy(m_ddenlovr_blit_x, m_ddenlovr_blit_y);
 							break;
 
-				case 0x13:  blit_horiz_line(machine());
-							break;
-				case 0x1b:  blit_vert_line(machine());
+				case 0x10:  m_ddenlovr_blit_address = blit_draw(m_ddenlovr_blit_address, m_ddenlovr_blit_x);
 							break;
 
-				case 0x1c:  blit_rect_xywh(machine());
+				case 0x13:  blit_horiz_line();
+							break;
+				case 0x1b:  blit_vert_line();
+							break;
+
+				case 0x1c:  blit_rect_xywh();
 							break;
 
 				// These two are issued one after the other (43 then 8c)
 				// 8c is issued immediately after 43 has finished, without
 				// changing any argument
 				case 0x43:  break;
-				case 0x8c:  blit_rect_yh(machine());
+				case 0x8c:  blit_rect_yh();
 							break;
 
 				default:
@@ -1465,29 +1484,28 @@ READ16_MEMBER(ddenlovr_state::ddenlovr_gfxrom_r)
 }
 
 
-static void copylayer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void ddenlovr_state::copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
 	int x,y;
-	int scrollx = state->m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 0];
-	int scrolly = state->m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 4];
+	int scrollx = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 0];
+	int scrolly = m_ddenlovr_scroll[layer / 4 * 8 + (layer % 4) + 4];
 
-	int palbase = state->m_ddenlovr_palette_base[layer];
-	int penmask = state->m_ddenlovr_palette_mask[layer];
+	int palbase = m_ddenlovr_palette_base[layer];
+	int penmask = m_ddenlovr_palette_mask[layer];
 
-	int transpen = state->m_ddenlovr_transparency_pen[layer];
-	int transmask = state->m_ddenlovr_transparency_mask[layer];
+	int transpen = m_ddenlovr_transparency_pen[layer];
+	int transmask = m_ddenlovr_transparency_mask[layer];
 
 	palbase  &= ~penmask;
 	transpen &= transmask;
 
-	if (((state->m_ddenlovr_layer_enable2 << 4) | state->m_ddenlovr_layer_enable) & (1 << layer))
+	if (((m_ddenlovr_layer_enable2 << 4) | m_ddenlovr_layer_enable) & (1 << layer))
 	{
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				int pen = state->m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
+				int pen = m_ddenlovr_pixmap[layer][512 * ((y + scrolly) & 0x1ff) + ((x + scrollx) & 0x1ff)];
 				if ((pen & transmask) != transpen)
 				{
 					pen &= penmask;
@@ -1577,10 +1595,10 @@ UINT32 ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind1
 		pri = 0;
 	}
 
-	copylayer(machine(), bitmap, cliprect, order[pri][0]);
-	copylayer(machine(), bitmap, cliprect, order[pri][1]);
-	copylayer(machine(), bitmap, cliprect, order[pri][2]);
-	copylayer(machine(), bitmap, cliprect, order[pri][3]);
+	copylayer(bitmap, cliprect, order[pri][0]);
+	copylayer(bitmap, cliprect, order[pri][1]);
+	copylayer(bitmap, cliprect, order[pri][2]);
+	copylayer(bitmap, cliprect, order[pri][3]);
 
 	if (m_extra_layers)
 	{
@@ -1592,10 +1610,10 @@ UINT32 ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind1
 			pri = 0;
 		}
 
-		copylayer(machine(), bitmap, cliprect, order[pri][0] + 4);
-		copylayer(machine(), bitmap, cliprect, order[pri][1] + 4);
-		copylayer(machine(), bitmap, cliprect, order[pri][2] + 4);
-		copylayer(machine(), bitmap, cliprect, order[pri][3] + 4);
+		copylayer(bitmap, cliprect, order[pri][0] + 4);
+		copylayer(bitmap, cliprect, order[pri][1] + 4);
+		copylayer(bitmap, cliprect, order[pri][2] + 4);
+		copylayer(bitmap, cliprect, order[pri][3] + 4);
 	}
 
 	m_ddenlovr_layer_enable = enab;
@@ -1714,44 +1732,36 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr16_transparency_mask_w)
 }
 
 
-static WRITE8_DEVICE_HANDLER( quizchq_oki_bank_w )
-{
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 1) * 0x40000);
+WRITE8_MEMBER(ddenlovr_state::quizchq_oki_bank_w )
+{	
+	m_oki->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_DEVICE_HANDLER( ddenlovr_oki_bank_w )
+WRITE16_MEMBER(ddenlovr_state::ddenlovr_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((data & 7) * 0x40000);
+		m_oki->set_bank_base((data & 7) * 0x40000);
 	}
 }
 
 
 
-static WRITE16_DEVICE_HANDLER( quiz365_oki_bank1_w )
+WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank1_w )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
-
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_okibank = (state->m_okibank & 2) | (data & 1);
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(state->m_okibank * 0x40000);
+		m_okibank = (m_okibank & 2) | (data & 1);
+		m_oki->set_bank_base(m_okibank * 0x40000);
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( quiz365_oki_bank2_w )
+WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank2_w )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
-
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_okibank = (state->m_okibank & 1) | ((data & 1) << 1);
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(state->m_okibank * 0x40000);
+		m_okibank = (m_okibank & 1) | ((data & 1) << 1);		
+		m_oki->set_bank_base(m_okibank * 0x40000);
 	}
 }
 
@@ -1768,10 +1778,9 @@ READ16_MEMBER(ddenlovr_state::unk16_r)
 }
 
 
-static WRITE8_DEVICE_HANDLER( ddenlovr_select_w )
+WRITE8_MEMBER(ddenlovr_state::ddenlovr_select_w )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
-	state->m_dsw_sel = data;
+	m_dsw_sel = data;
 }
 
 WRITE16_MEMBER(ddenlovr_state::ddenlovr_select_16_w)
@@ -1805,15 +1814,13 @@ READ8_MEMBER(ddenlovr_state::rongrong_input2_r)
 }
 
 
-static READ8_DEVICE_HANDLER( quiz365_input_r )
+READ8_MEMBER(ddenlovr_state::quiz365_input_r )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
-
-	if (!BIT(state->m_dsw_sel, 0))  return state->ioport("DSW1")->read();
-	if (!BIT(state->m_dsw_sel, 1))  return state->ioport("DSW2")->read();
-	if (!BIT(state->m_dsw_sel, 2))  return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 3))  return 0xff;//space.machine().rand();
-	if (!BIT(state->m_dsw_sel, 4))  return 0xff;//space.machine().rand();
+	if (!BIT(m_dsw_sel, 0))  return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))  return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 2))  return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 3))  return 0xff;//space.machine().rand();
+	if (!BIT(m_dsw_sel, 4))  return 0xff;//space.machine().rand();
 	return 0xff;
 }
 
@@ -1913,9 +1920,9 @@ static ADDRESS_MAP_START( quiz365_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
 	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0x3003c2, 0x3003c3) AM_DEVWRITE_LEGACY("oki", quiz365_oki_bank1_w)
+	AM_RANGE(0x3003c2, 0x3003c3) AM_WRITE(quiz365_oki_bank1_w)
 	AM_RANGE(0x3003ca, 0x3003cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)                   // Blitter irq acknowledge
-	AM_RANGE(0x3003cc, 0x3003cd) AM_DEVWRITE_LEGACY("oki", quiz365_oki_bank2_w)
+	AM_RANGE(0x3003cc, 0x3003cd) AM_WRITE(quiz365_oki_bank2_w)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                 // RAM
 ADDRESS_MAP_END
@@ -1970,7 +1977,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlovj_dsw_r)                                // DSW
 	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlovj_coincounter_w)                       // Coin Counters
 	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_SHARE("dsw_sel16")         // DSW select
-	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE_LEGACY("oki", ddenlovr_oki_bank_w)
+	AM_RANGE(0x30018c, 0x30018d) AM_WRITE(ddenlovr_oki_bank_w)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)                   // Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                 // RAM
@@ -2042,7 +2049,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddenlovr_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                     // ROM
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE_LEGACY("oki", ddenlovr_oki_bank_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE( ddenlovr_oki_bank_w)
 
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)                               // Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
@@ -2114,12 +2121,11 @@ WRITE16_MEMBER(ddenlovr_state::nettoqc_coincounter_w)
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( nettoqc_oki_bank_w )
+WRITE16_MEMBER(ddenlovr_state::nettoqc_oki_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((data & 3) * 0x40000);
+		m_oki->set_bank_base((data & 3) * 0x40000);
 	}
 }
 
@@ -2150,7 +2156,7 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300186, 0x300187) AM_READ(nettoqc_input_r)                                   // DSW's
 	AM_RANGE(0x300188, 0x300189) AM_WRITE(nettoqc_coincounter_w)                            // Coin Counters
 	AM_RANGE(0x30018a, 0x30018b) AM_WRITE(ddenlovr_select_16_w)                             //
-	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE_LEGACY("oki", nettoqc_oki_bank_w)
+	AM_RANGE(0x30018c, 0x30018d) AM_WRITE(nettoqc_oki_bank_w)
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)                       // Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                     // RAM
@@ -2272,7 +2278,7 @@ static ADDRESS_MAP_START( quizchq_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x98, 0x98) AM_READ(unk_r)                         // ? must be 78 on startup
 
 	AM_RANGE(0xa0, 0xaf) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizchq_oki_bank_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP                        // enables palette RAM at 8000
 ADDRESS_MAP_END
 
@@ -2351,23 +2357,22 @@ WRITE8_MEMBER(ddenlovr_state::mmpanic_blitter2_w)
 	blitter_w(space, 1, offset, data, 0xdf);    // RST 18
 }
 
-static void mmpanic_update_leds(running_machine &machine)
+void ddenlovr_state::mmpanic_update_leds()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
-	set_led_status(machine, 0, state->m_mmpanic_leds);
+	set_led_status(machine(), 0, m_mmpanic_leds);
 }
 
 /* leds 1-8 */
 WRITE8_MEMBER(ddenlovr_state::mmpanic_leds_w)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xff00) | data;
-	mmpanic_update_leds(machine());
+	mmpanic_update_leds();
 }
 /* led 9 */
 WRITE8_MEMBER(ddenlovr_state::mmpanic_leds2_w)
 {
 	m_mmpanic_leds = (m_mmpanic_leds & 0xfeff) | (data ? 0x0100 : 0);
-	mmpanic_update_leds(machine());
+	mmpanic_update_leds();
 }
 
 
@@ -2421,7 +2426,7 @@ static ADDRESS_MAP_START( mmpanic_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x60, 0x61) AM_WRITE(mmpanic_blitter_w)
 	AM_RANGE(0x63, 0x63) AM_READ(rongrong_gfxrom_r) // Video Chip
 	AM_RANGE(0x64, 0x65) AM_WRITE(mmpanic_blitter2_w)
-	AM_RANGE(0x68, 0x68) AM_DEVWRITE_LEGACY("aysnd", ddenlovr_select_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE(ddenlovr_select_w)
 	AM_RANGE(0x69, 0x69) AM_WRITE(mmpanic_lockout_w)
 	AM_RANGE(0x6a, 0x6a) AM_READ_PORT("IN0")
 	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("IN1")
@@ -2484,7 +2489,7 @@ READ8_MEMBER(ddenlovr_state::funkyfig_busy_r)
 
 WRITE8_MEMBER(ddenlovr_state::funkyfig_blitter_w)
 {
-	blitter_w_funkyfig(machine(), 0, offset, data, 0xe0);
+	blitter_w_funkyfig(0, offset, data, 0xe0);
 }
 
 WRITE8_MEMBER(ddenlovr_state::funkyfig_rombank_w)
@@ -2710,10 +2715,9 @@ WRITE8_MEMBER(ddenlovr_state::hanakanz_palette_w)
 	}
 }
 
-static WRITE8_DEVICE_HANDLER( hanakanz_oki_bank_w )
+WRITE8_MEMBER(ddenlovr_state::hanakanz_oki_bank_w )
 {
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
+	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 }
 
 READ8_MEMBER(ddenlovr_state::hanakanz_rand_r)
@@ -2723,7 +2727,7 @@ READ8_MEMBER(ddenlovr_state::hanakanz_rand_r)
 
 static ADDRESS_MAP_START( hanakanz_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(hanakanz_busy_r, hanakanz_oki_bank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
@@ -2744,7 +2748,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hkagerou_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(hanakanz_busy_r, hanakanz_oki_bank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
@@ -2766,7 +2770,7 @@ ADDRESS_MAP_END
 // same as hkagerou, different inputs, no RTC
 static ADDRESS_MAP_START( kotbinyo_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(hanakanz_busy_r, hanakanz_oki_bank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
@@ -2790,7 +2794,7 @@ ADDRESS_MAP_END
 // same as hkagerou, different inputs, no RTC
 static ADDRESS_MAP_START( kotbinsp_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(hanakanz_busy_r, hanakanz_oki_bank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
@@ -2823,7 +2827,7 @@ READ8_MEMBER(ddenlovr_state::mjreach1_protection_r)
 
 static ADDRESS_MAP_START( mjreach1_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(hanakanz_busy_r, hanakanz_oki_bank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
@@ -2871,26 +2875,25 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_blitter_w)
 	hanakanz_blitter_data_w(space, 0, data);
 }
 
-static void mjchuuka_get_romdata(running_machine &machine)
+void ddenlovr_state::mjchuuka_get_romdata()
 {
-	ddenlovr_state *state = machine.driver_data<ddenlovr_state>();
-	UINT8 *rom = state->memregion("blitter")->base();
-	size_t size = state->memregion("blitter")->bytes();
-	int address = (state->m_ddenlovr_blit_address & 0xffffff) * 2;
+	UINT8 *rom = memregion("blitter")->base();
+	size_t size = memregion("blitter")->bytes();
+	int address = (m_ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
 	{
-		logerror("%s: Error, Blitter address %06X out of range\n", machine.describe_context(), address);
+		logerror("%s: Error, Blitter address %06X out of range\n", machine().describe_context(), address);
 		address %= size;
 	}
 
-	state->m_romdata[0] = rom[address + 0];
-	state->m_romdata[1] = rom[address + 1];
+	m_romdata[0] = rom[address + 0];
+	m_romdata[1] = rom[address + 1];
 }
 
 READ8_MEMBER(ddenlovr_state::mjchuuka_gfxrom_0_r)
 {
-	mjchuuka_get_romdata(machine());
+	mjchuuka_get_romdata();
 	m_ddenlovr_blit_address++;
 	return m_romdata[0];
 }
@@ -2938,11 +2941,10 @@ WRITE8_MEMBER(ddenlovr_state::mjchuuka_coincounter_w)
 #endif
 }
 
-static WRITE8_DEVICE_HANDLER( mjchuuka_oki_bank_w )
+WRITE8_MEMBER(ddenlovr_state::mjchuuka_oki_bank_w )
 {
 	// data & 0x08 ?
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
+	m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
 #ifdef MAME_DEBUG
 //    popmessage("1e = %02x",data);
@@ -2952,7 +2954,7 @@ static WRITE8_DEVICE_HANDLER( mjchuuka_oki_bank_w )
 static ADDRESS_MAP_START( mjchuuka_portmap, AS_IO, 8, ddenlovr_state )     // 16 bit I/O
 	AM_RANGE(0x13, 0x13) AM_MIRROR(0xff00) AM_READ(hanakanz_rand_r)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x1e, 0x1e) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("oki", mjchuuka_oki_bank_w    )
+	AM_RANGE(0x1e, 0x1e) AM_MIRROR(0xff00) AM_WRITE(mjchuuka_oki_bank_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(mjchuuka_blitter_w)
 	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(mjchuuka_palette_w)
 	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_READ(mjchuuka_gfxrom_0_r)
@@ -3123,17 +3125,15 @@ static ADDRESS_MAP_START( hginga_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0xf700, 0xf706) AM_WRITENOP
 ADDRESS_MAP_END
 
-static READ8_DEVICE_HANDLER( hginga_dsw_r )
+READ8_MEMBER(ddenlovr_state::hginga_dsw_r )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
+	if (!BIT(m_dsw_sel, 0))   return ioport("DSW4")->read();
+	if (!BIT(m_dsw_sel, 1))   return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 2))   return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 3))   return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 4))   return ioport("DSW5")->read();
 
-	if (!BIT(state->m_dsw_sel, 0))   return state->ioport("DSW4")->read();
-	if (!BIT(state->m_dsw_sel, 1))   return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 2))   return state->ioport("DSW2")->read();
-	if (!BIT(state->m_dsw_sel, 3))   return state->ioport("DSW1")->read();
-	if (!BIT(state->m_dsw_sel, 4))   return state->ioport("DSW5")->read();
-
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), state->m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -3268,16 +3268,15 @@ ADDRESS_MAP_END
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-static UINT8 hgokou_player_r( address_space &space, int player )
+UINT8 ddenlovr_state::hgokou_player_r(int player )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
-	UINT8 hopper_bit = ((state->m_hopper && !(space.machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
+	UINT8 hopper_bit = ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : (1 << 6));
 
-	if (!BIT(state->m_input_sel, 0))   return state->ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
-	if (!BIT(state->m_input_sel, 1))   return state->ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
-	if (!BIT(state->m_input_sel, 2))   return state->ioport(player ? "KEY7" : "KEY2")->read() | hopper_bit;
-	if (!BIT(state->m_input_sel, 3))   return state->ioport(player ? "KEY8" : "KEY3")->read() | hopper_bit;
-	if (!BIT(state->m_input_sel, 4))   return state->ioport(player ? "KEY9" : "KEY4")->read() | hopper_bit;
+	if (!BIT(m_input_sel, 0))   return ioport(player ? "KEY5" : "KEY0")->read() | hopper_bit;
+	if (!BIT(m_input_sel, 1))   return ioport(player ? "KEY6" : "KEY1")->read() | hopper_bit;
+	if (!BIT(m_input_sel, 2))   return ioport(player ? "KEY7" : "KEY2")->read() | hopper_bit;
+	if (!BIT(m_input_sel, 3))   return ioport(player ? "KEY8" : "KEY3")->read() | hopper_bit;
+	if (!BIT(m_input_sel, 4))   return ioport(player ? "KEY9" : "KEY4")->read() | hopper_bit;
 
 	return 0x7f;    // bit 7 = blitter busy, bit 6 = hopper
 }
@@ -3292,8 +3291,8 @@ READ8_MEMBER(ddenlovr_state::hgokou_input_r)
 	switch (m_dsw_sel)
 	{
 		case 0x20:  return ioport("SYSTEM")->read();
-		case 0x21:  return hgokou_player_r(space, 1);
-		case 0x22:  return hgokou_player_r(space, 0);
+		case 0x21:  return hgokou_player_r(1);
+		case 0x22:  return hgokou_player_r(0);
 		case 0x23:  return m_coins;
 	}
 	logerror("%06x: warning, unknown bits read, dsw_sel = %02x\n", space.device().safe_pc(), m_dsw_sel);
@@ -3389,12 +3388,12 @@ READ8_MEMBER(ddenlovr_state::hgokbang_input_r)
 				m_input_sel = 0xfe;
 			return 0;   // discarded
 		case 0xa1:
-			ret = hgokou_player_r(space, 1);
+			ret = hgokou_player_r(1);
 			m_input_sel <<= 1;      // auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
 		case 0xa2:
-			ret = hgokou_player_r(space, 0);
+			ret = hgokou_player_r(0);
 			m_input_sel <<= 1;      // auto-increment input_sel
 			m_input_sel |= 1;
 			return ret;
@@ -3666,10 +3665,9 @@ WRITE8_MEMBER(ddenlovr_state::mjflove_rombank_w)
 	// bit 4 enables palette ram
 }
 
-static WRITE8_DEVICE_HANDLER( mjflove_okibank_w )
+WRITE8_MEMBER(ddenlovr_state::mjflove_okibank_w )
 {
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 0x07) * 0x40000);
+	m_oki->set_bank_base((data & 0x07) * 0x40000);
 	//popmessage("SOUND = %02x", data);
 }
 
@@ -3735,7 +3733,7 @@ static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, ddenlovr_state )  // 16 bit
 	AM_RANGE(0x00da, 0x00da) AM_READ(mjflove_protection_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(mjmyster_rambank_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00f8, 0x00f8) AM_WRITE(mjflove_rombank_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fa, 0x00fa) AM_DEVWRITE_LEGACY("oki", mjflove_okibank_w)
+	AM_RANGE(0x00fa, 0x00fa) AM_WRITE(mjflove_okibank_w)
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0181, 0x0181) AM_WRITENOP                        // ? int. enable
 	AM_RANGE(0x0184, 0x0184) AM_WRITE(mjflove_coincounter_w)
@@ -3750,10 +3748,9 @@ ADDRESS_MAP_END
                           Mahjong Jong-Tei
 ***************************************************************************/
 
-static WRITE8_DEVICE_HANDLER( jongtei_okibank_w )
+WRITE8_MEMBER(ddenlovr_state::jongtei_okibank_w )
 {
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base(((data >> 4) & 0x07) * 0x40000);
+	m_oki->set_bank_base(((data >> 4) & 0x07) * 0x40000);
 }
 
 WRITE8_MEMBER(ddenlovr_state::jongtei_dsw_keyb_w)
@@ -3769,7 +3766,7 @@ READ8_MEMBER(ddenlovr_state::jongtei_busy_r)
 
 static ADDRESS_MAP_START( jongtei_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(jongtei_busy_r) AM_DEVWRITE_LEGACY("oki", jongtei_okibank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(jongtei_busy_r, jongtei_okibank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(jongtei_dsw_keyb_w)
@@ -3859,7 +3856,7 @@ static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x40, 0x41) AM_WRITE(mjflove_blitter_w)
 	AM_RANGE(0x43, 0x43) AM_READ(rongrong_gfxrom_r)
 	AM_RANGE(0x50, 0x50) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(quizchq_oki_bank_w)
 	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW1")
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("DSW2")
@@ -3928,7 +3925,7 @@ static ADDRESS_MAP_START( janshinp_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x43, 0x43) AM_READ(rongrong_gfxrom_r)
 	AM_RANGE(0x50, 0x5f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(quizchq_oki_bank_w)
 	AM_RANGE(0x80, 0x80) AM_RAM
 	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x92, 0x93) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
@@ -3968,17 +3965,15 @@ WRITE8_MEMBER(ddenlovr_state::seljan2_palette_w)
 		logerror("%s: warning, palette_w with palette disabled, %04x <- %02x\n", machine().describe_context(), offset, data);
 }
 
-static READ8_DEVICE_HANDLER( seljan2_dsw_r )
+READ8_MEMBER(ddenlovr_state::seljan2_dsw_r )
 {
-	ddenlovr_state *state = space.machine().driver_data<ddenlovr_state>();
+	if (!BIT(m_dsw_sel, 0))   return ioport("DSW1")->read();
+	if (!BIT(m_dsw_sel, 1))   return ioport("DSW2")->read();
+	if (!BIT(m_dsw_sel, 2))   return ioport("DSW3")->read();
+	if (!BIT(m_dsw_sel, 3))   return ioport("DSW4")->read();
+	if (!BIT(m_dsw_sel, 4))   return ioport("DSWTOP")->read();
 
-	if (!BIT(state->m_dsw_sel, 0))   return state->ioport("DSW1")->read();
-	if (!BIT(state->m_dsw_sel, 1))   return state->ioport("DSW2")->read();
-	if (!BIT(state->m_dsw_sel, 2))   return state->ioport("DSW3")->read();
-	if (!BIT(state->m_dsw_sel, 3))   return state->ioport("DSW4")->read();
-	if (!BIT(state->m_dsw_sel, 4))   return state->ioport("DSWTOP")->read();
-
-	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), state->m_dsw_sel);
+	logerror("%s: warning, unknown bits read, ddenlovr_select = %02x\n", space.machine().describe_context(), m_dsw_sel);
 	return 0xff;
 }
 
@@ -4014,7 +4009,7 @@ static ADDRESS_MAP_START( seljan2_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM") AM_WRITE(seljan2_palette_enab_w)    // writes: 1 = palette RAM at b000, 0 = ROM
 	AM_RANGE(0x84, 0x84) AM_READ(daimyojn_keyb1_r)
 	AM_RANGE(0x88, 0x88) AM_READ(daimyojn_keyb2_r)
-	AM_RANGE(0x90, 0x90) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
+	AM_RANGE(0x90, 0x90) AM_WRITE(quizchq_oki_bank_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ(hanakanz_rand_r)
 ADDRESS_MAP_END
 
@@ -4323,10 +4318,9 @@ READ8_MEMBER(ddenlovr_state::momotaro_protection_r)
 	return 0xff;
 }
 
-static WRITE8_DEVICE_HANDLER( daimyojn_okibank_w )
+WRITE8_MEMBER(ddenlovr_state::daimyojn_okibank_w )
 {
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base(((data >> 4) & 0x01) * 0x40000);
+	m_oki->set_bank_base(((data >> 4) & 0x01) * 0x40000);
 }
 
 WRITE8_MEMBER(ddenlovr_state::daimyojn_palette_sel_w)
@@ -4350,7 +4344,7 @@ READ8_MEMBER(ddenlovr_state::daimyojn_year_hack_r)
 
 static ADDRESS_MAP_START( daimyojn_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(jongtei_busy_r) AM_DEVWRITE_LEGACY("oki", daimyojn_okibank_w)
+	AM_RANGE(0x2c, 0x2c) AM_READWRITE(jongtei_busy_r, daimyojn_okibank_w)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE(daimyojn_palette_sel_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_blitter_reg_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(jongtei_dsw_keyb_w)
@@ -9499,8 +9493,8 @@ static const ay8910_interface quiz365_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	// A                            B
-	DEVCB_HANDLER(quiz365_input_r), DEVCB_NULL,                         // R
-	DEVCB_NULL,                     DEVCB_HANDLER(ddenlovr_select_w)    // W
+	DEVCB_DRIVER_MEMBER(ddenlovr_state,quiz365_input_r), DEVCB_NULL,                         // R
+	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)    // W
 };
 
 static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
@@ -9549,7 +9543,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::quizchq_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-//  if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
+//  if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 //      return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
@@ -9630,7 +9624,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::mmpanic_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // RST 08, vblank
@@ -9710,7 +9704,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::hanakanz_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);
@@ -9721,7 +9715,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hanakanz_rtc_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe2);
@@ -9843,7 +9837,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::mjchuuka_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
@@ -9854,7 +9848,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjchuuka_rtc_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
@@ -9938,7 +9932,7 @@ static const ay8910_interface mjmyster_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	// A            B
 	DEVCB_NULL,     DEVCB_NULL,                         // R
-	DEVCB_NULL,     DEVCB_HANDLER(ddenlovr_select_w)    // W
+	DEVCB_NULL,     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)    // W
 };
 
 WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_rtc_irq)
@@ -9946,7 +9940,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::mjmyster_rtc_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -9995,7 +9989,7 @@ INTERRUPT_GEN_MEMBER(ddenlovr_state::hginga_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise hginga would lock up. */
-//  if (downcast<cpu_device *>(state->m_maincpu)->input_state(0))
+//  if (downcast<cpu_device *>(m_maincpu)->input_state(0))
 //      return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);
@@ -10006,8 +10000,8 @@ static const ay8910_interface hginga_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	// A                            B
-	DEVCB_HANDLER(hginga_dsw_r),    DEVCB_NULL,                             // R
-	DEVCB_NULL,                     DEVCB_HANDLER(ddenlovr_select_w)        // W
+	DEVCB_DRIVER_MEMBER(ddenlovr_state,hginga_dsw_r),    DEVCB_NULL,                             // R
+	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)        // W
 };
 
 WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
@@ -10015,7 +10009,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::hginga_rtc_irq)
 	/* I haven't found a irq ack register, so I need this kludge to
 	   make sure I don't lose any interrupt generated by the blitter,
 	   otherwise quizchq would lock up. */
-	//if (downcast<cpu_device *>(drvstate->m_maincpu)->input_state(0))
+	//if (downcast<cpu_device *>(drvm_maincpu)->input_state(0))
 	//  return;
 
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xee);
@@ -10319,8 +10313,8 @@ static const ay8910_interface seljan2_ay8910_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	// A                            B
-	DEVCB_HANDLER(seljan2_dsw_r),   DEVCB_NULL,                             // R
-	DEVCB_NULL,                     DEVCB_HANDLER(ddenlovr_select_w)        // W
+	DEVCB_DRIVER_MEMBER(ddenlovr_state,seljan2_dsw_r),   DEVCB_NULL,                             // R
+	DEVCB_NULL,                     DEVCB_DRIVER_MEMBER(ddenlovr_state,ddenlovr_select_w)        // W
 };
 
 MACHINE_START_MEMBER(ddenlovr_state,seljan2)
