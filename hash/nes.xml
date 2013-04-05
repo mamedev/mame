@@ -57279,14 +57279,13 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-<!-- is this bad?!? -->
-	<software name="weilaixz" cloneof="metalfgt" supported="no">
+	<software name="weilaixz" cloneof="metalfgt">
 		<description>Wei Lai Xiao Zi (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Metal Fighter"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="NES-CNROM" />
+			<feature name="pcb" value="UNL-SA-002" />
 			<dataarea name="chr" size="32768">
 				<rom name="wei lai xiao zi (asia) (unl).chr" size="32768" crc="4aa2e845" sha1="0cf9a1514487431a923ee61467af30c65c7ee38d" offset="00000" status="baddump" />
 			</dataarea>
