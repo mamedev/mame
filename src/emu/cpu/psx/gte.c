@@ -2367,9 +2367,9 @@ INLINE UINT32 gte_divide( INT16 numerator, UINT16 denominator )
 
 /* Setting bits 12 & 19-22 in FLAG does not set bit 31 */
 
-#define A1( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 30 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 27 ) )
-#define A2( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 29 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 26 ) )
-#define A3( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 28 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 25 ) )
+#define A1( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 31 ) | ( 1 << 30 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 27 ) )
+#define A2( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 31 ) | ( 1 << 29 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 26 ) )
+#define A3( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 31 ) | ( 1 << 28 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 25 ) )
 #define Lm_B1( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 24 ) )
 #define Lm_B2( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 23 ) )
 #define Lm_B3( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 22 ) )
@@ -2578,19 +2578,19 @@ int gte::docop2( UINT32 pc, int gteop )
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
-			CD0 = CD1;
-			CD1 = CD2;
-			CD2 = CODE;
-			R0 = R1;
-			R1 = R2;
-			R2 = Lm_C1( MAC1 >> 4 );
-			G0 = G1;
-			G1 = G2;
-			G2 = Lm_C2( MAC2 >> 4 );
-			B0 = B1;
-			B1 = B2;
-			B2 = Lm_C3( MAC3 >> 4 );
-			return 1;
+		CD0 = CD1;
+		CD1 = CD2;
+		CD2 = CODE;
+		R0 = R1;
+		R1 = R2;
+		R2 = Lm_C1( MAC1 >> 4 );
+		G0 = G1;
+		G1 = G2;
+		G2 = Lm_C2( MAC2 >> 4 );
+		B0 = B1;
+		B1 = B2;
+		B2 = Lm_C3( MAC3 >> 4 );
+		return 1;
 		}
 		break;
 
@@ -2826,35 +2826,28 @@ int gte::docop2( UINT32 pc, int gteop )
 		break;
 
 	case 0x2a:
-		if( gteop == 0x0f8002a )
-		{
-			GTELOG( pc, "%08x DPCT", gteop );
-			FLAG = 0;
+		GTELOG( pc, "%08x DPCT", gteop );
+		FLAG = 0;
 
-			for( v = 0; v < 3; v++ )
-			{
-				MAC1 = A1( ( ( (INT64) R0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( RFC - ( R0 << 4 ), 0 ) ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64) G0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( GFC - ( G0 << 4 ), 0 ) ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64) B0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( BFC - ( B0 << 4 ), 0 ) ) ) ) >> 12 );
-				IR1 = Lm_B1( MAC1, 0 );
-				IR2 = Lm_B2( MAC2, 0 );
-				IR3 = Lm_B3( MAC3, 0 );
-				CD0 = CD1;
-				CD1 = CD2;
-				CD2 = CODE;
-				R0 = R1;
-				R1 = R2;
-				R2 = Lm_C1( MAC1 >> 4 );
-				G0 = G1;
-				G1 = G2;
-				G2 = Lm_C2( MAC2 >> 4 );
-				B0 = B1;
-				B1 = B2;
-				B2 = Lm_C3( MAC3 >> 4 );
-			}
-			return 1;
+		shift = 12 * GTE_SF( gteop );
+		lm = GTE_LM( gteop );
+
+		for( v = 0; v < 3; v++ )
+		{
+			MAC1 = ( ( R0 << 16 ) + ( IR0 * Lm_B1( A1( (INT64) RFC - ( R0 << 4 ) ) << ( 12 - shift ), 0 ) ) ) >> shift;
+			MAC2 = ( ( G0 << 16 ) + ( IR0 * Lm_B2( A2( (INT64) GFC - ( G0 << 4 ) ) << ( 12 - shift ), 0 ) ) ) >> shift;
+			MAC3 = ( ( B0 << 16 ) + ( IR0 * Lm_B3( A3( (INT64) BFC - ( B0 << 4 ) ) << ( 12 - shift ), 0 ) ) ) >> shift;
+			IR1 = Lm_B1( MAC1, lm );
+			IR2 = Lm_B2( MAC2, lm );
+			IR3 = Lm_B3( MAC3, lm );
+			RGB0 = RGB1;
+			RGB1 = RGB2;
+			CD2 = CODE;
+			R2 = Lm_C1( MAC1 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 		}
-		break;
+		return 1;
 
 	case 0x2d:
 		GTELOG( pc, "%08x AVSZ3", gteop );
@@ -2907,34 +2900,25 @@ int gte::docop2( UINT32 pc, int gteop )
 		break;
 
 	case 0x3d:
-		if( GTE_OP( gteop ) == 0x09 ||
-			GTE_OP( gteop ) == 0x19 )
-		{
-			GTELOG( pc, "%08x GPF", gteop );
-			shift = 12 * GTE_SF( gteop );
-			FLAG = 0;
+		GTELOG( pc, "%08x GPF", gteop );
+		FLAG = 0;
 
-			MAC1 = A1( ( (INT64) IR0 * IR1 ) >> shift );
-			MAC2 = A2( ( (INT64) IR0 * IR2 ) >> shift );
-			MAC3 = A3( ( (INT64) IR0 * IR3 ) >> shift );
-			IR1 = Lm_B1( MAC1, 0 );
-			IR2 = Lm_B2( MAC2, 0 );
-			IR3 = Lm_B3( MAC3, 0 );
-			CD0 = CD1;
-			CD1 = CD2;
-			CD2 = CODE;
-			R0 = R1;
-			R1 = R2;
-			R2 = Lm_C1( MAC1 >> 4 );
-			G0 = G1;
-			G1 = G2;
-			G2 = Lm_C2( MAC2 >> 4 );
-			B0 = B1;
-			B1 = B2;
-			B2 = Lm_C3( MAC3 >> 4 );
-			return 1;
-		}
-		break;
+		shift = 12 * GTE_SF( gteop );
+		lm = GTE_LM( gteop );
+
+		MAC1 = A1( IR0 * IR1 ) >> shift;
+		MAC2 = A2( IR0 * IR2 ) >> shift;
+		MAC3 = A3( IR0 * IR3 ) >> shift;
+		IR1 = Lm_B1( MAC1, lm );
+		IR2 = Lm_B2( MAC2, lm );
+		IR3 = Lm_B3( MAC3, lm );
+		RGB0 = RGB1;
+		RGB1 = RGB2;
+		CD2 = CODE;
+		R2 = Lm_C1( MAC1 >> 4 );
+		G2 = Lm_C2( MAC2 >> 4 );
+		B2 = Lm_C3( MAC3 >> 4 );
+		return 1;
 
 	case 0x3e:
 		if( GTE_OP( gteop ) == 0x1a )
