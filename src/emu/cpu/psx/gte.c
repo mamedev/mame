@@ -2578,19 +2578,19 @@ int gte::docop2( UINT32 pc, int gteop )
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
-		CD0 = CD1;
-		CD1 = CD2;
-		CD2 = CODE;
-		R0 = R1;
-		R1 = R2;
-		R2 = Lm_C1( MAC1 >> 4 );
-		G0 = G1;
-		G1 = G2;
-		G2 = Lm_C2( MAC2 >> 4 );
-		B0 = B1;
-		B1 = B2;
-		B2 = Lm_C3( MAC3 >> 4 );
-		return 1;
+			CD0 = CD1;
+			CD1 = CD2;
+			CD2 = CODE;
+			R0 = R1;
+			R1 = R2;
+			R2 = Lm_C1( MAC1 >> 4 );
+			G0 = G1;
+			G1 = G2;
+			G2 = Lm_C2( MAC2 >> 4 );
+			B0 = B1;
+			B1 = B2;
+			B2 = Lm_C3( MAC3 >> 4 );
+			return 1;
 		}
 		break;
 
