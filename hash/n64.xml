@@ -2439,6 +2439,17 @@ Canceled games (possibly never got to the proto stage)
 	</software>
 
 	<software name="excitbiku" cloneof="excitbik">
+		<description>Excitebike 64 (USA, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="excitebike 64 (usa) (v1.1).bin" size="16777216" crc="820a12db" sha1="88214240204ab3c01f31c0a19d74a4eafe53c027" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excitbiku1" cloneof="excitbik">
 		<description>Excitebike 64 (USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
