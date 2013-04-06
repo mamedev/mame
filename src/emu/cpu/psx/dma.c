@@ -152,7 +152,9 @@ void psxdma_device::dma_finished( int index )
 				if( n_address == 0xffffff )
 				{
 					dma->n_base = n_address;
-					dma_start_timer( index, 19000 );
+					//HACK: fixes pse bios 2.x & other texture uploading issues.
+					//dma_start_timer( index, 19000 );
+					dma_start_timer( index, 500 );
 					return;
 				}
 				if( n_total > 65535 )
