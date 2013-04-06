@@ -6,6 +6,20 @@
         G65SC51
         M65C22P2 x 2
 
+random notes:
+irq handler
+
+fa80
+fc00
+
+
+
+fa00: make sure monitor is banked in at c000
+
+fb00/fa80 lda/sta called from ram/fixed?
+fb00/fa00 lda/sta called from rom/fixed?
+fa80/fa00 lda     called from rom/fixed?
+
 ****************************************************************************/
 
 
@@ -236,9 +250,13 @@ private:
 };
 
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bankedroms") AM_WRITE(ramwrite_w)
+	AM_RANGE(0x8000, 0xf6ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("via0", via6522_device, read, write)
 	AM_RANGE(0xf880, 0xf88f) AM_DEVREADWRITE("via1", via6522_device, read, write)
 	AM_RANGE(0xf980, 0xf981) AM_DEVREADWRITE("acia", mos6551_device, read, write)
+	AM_RANGE(0xfa00, 0xffff) AM_ROM AM_REGION("maincpu", 0x7a00)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(fa00_w)
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(fa80_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(fb00_w)
@@ -251,9 +269,6 @@ static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0xfe80, 0xfe80) AM_WRITE(fe80_w)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(rombank_w)
 	AM_RANGE(0xff80, 0xff83) AM_WRITE(ff80_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bankedroms") AM_WRITE(ramwrite_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 /* Input ports */
