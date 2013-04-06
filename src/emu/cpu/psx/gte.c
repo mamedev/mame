@@ -2800,7 +2800,7 @@ int gte::docop2( UINT32 pc, int gteop )
 	case 0x29:
 		if( gteop == 0x0680029 )
 		{
-			GTELOG( pc, "%08x DCPL", gteop );
+			GTELOG( pc, "%08x DPCL", gteop );
 			FLAG = 0;
 
 			MAC1 = A1( ( ( ( (INT64) R << 4 ) * IR1 ) + ( IR0 * Lm_B1( RFC - ( ( R * IR1 ) >> 8 ), 0 ) ) ) >> 12 );
