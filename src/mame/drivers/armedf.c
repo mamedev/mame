@@ -327,7 +327,7 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	flip_screen_set(m_vreg & 0x1000);
 }
 
-WRITE16_MEMBER(armedf_state::terrafb_io_w)
+WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		machine().device("extra")->execute().set_input_line(0, HOLD_LINE);
@@ -728,13 +728,13 @@ WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 }
 
 
-static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8, armedf_state )
+static ADDRESS_MAP_START( terrafjb_extraz80_map, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8, armedf_state )
+static ADDRESS_MAP_START( terrafjb_extraz80_portmap, AS_IO, 8, armedf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
 	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
@@ -1206,7 +1206,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( terrafb, armedf_state )
+static MACHINE_CONFIG_START( terrafjb, armedf_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
@@ -1219,8 +1219,8 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
 	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)         // 4mhz?
-	MCFG_CPU_PROGRAM_MAP(terrafb_extraz80_map)
-	MCFG_CPU_IO_MAP(terrafb_extraz80_portmap)
+	MCFG_CPU_PROGRAM_MAP(terrafjb_extraz80_map)
+	MCFG_CPU_IO_MAP(terrafjb_extraz80_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1692,6 +1692,7 @@ ROM_START( terrafj )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
+
 /*
 
 CPU
@@ -1720,7 +1721,6 @@ This romset comes from a bootleg/hacked pcb.Game differences from original are:
 Company logo and copyright string removed.
 
 */
-
 
 ROM_START( terrafjb )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
@@ -1756,38 +1756,48 @@ ROM_START( terrafjb )
 	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
 ROM_END
 
-ROM_START( terrafb ) /* Seems to be a bootleg of the Japanese version with the region warning screen hacked to just say "WAIT" */
+
+/*
+
+xtals are 16MHz and 24MHz
+68000 @ 8.0MHz (16/2)
+Z80 @ 4.0MHz (16/4)
+YM3812 @ 4.0MHz (16/4)
+hsync 15.0540khz
+vsync 59.0702Hz
+
+Note the blit data ROM is not present
+
+This seems to be a bootleg of the Japanese version with the region warning screen hacked to just say "WAIT"
+
+*/
+
+ROM_START( terrafb )
 	ROM_REGION( 0x60000, "maincpu", ROMREGION_ERASEFF ) /* 64K*8 for 68000 code */
-	ROM_LOAD16_BYTE( "tf-014.6e", 0x00000, 0x10000, CRC(8e5f557f) SHA1(3462a58146c3f33bf8686adbd2ead25dae3804a8) )
-	ROM_LOAD16_BYTE( "tf-011.6h", 0x00001, 0x10000, CRC(5320162a) SHA1(eaffafcaf146cdddb03f40f92ce23dfd096eb89e) )
-	ROM_LOAD16_BYTE( "tf-013.4e", 0x20000, 0x10000, CRC(a86951e0) SHA1(804cc6f143993f5a9d5f3798e971d7abfe94c3a8) )
-	ROM_LOAD16_BYTE( "tf-010.4h", 0x20001, 0x10000, CRC(58b5f43b) SHA1(9df77235c0b7ac5af4258c04bd90d0a86ccc86b0) )
-	ROM_LOAD16_BYTE( "tf-012.3e", 0x40000, 0x08000, CRC(4f0e1d76) SHA1(b8636acde7547358663b94bdc8d49b5cc6b596eb) )
-	ROM_LOAD16_BYTE( "tf-009.3h", 0x40001, 0x08000, CRC(d1014280) SHA1(5ee8d71d77b31b25cce2bf1953c0a5166313a857) )
+	ROM_LOAD16_BYTE( "f-14.4s", 0x00000, 0x10000, CRC(8e5f557f) SHA1(3462a58146c3f33bf8686adbd2ead25dae3804a8) )
+	ROM_LOAD16_BYTE( "f-11.3s", 0x00001, 0x10000, CRC(5320162a) SHA1(eaffafcaf146cdddb03f40f92ce23dfd096eb89e) )
+	ROM_LOAD16_BYTE( "f-13.4p", 0x20000, 0x10000, CRC(a86951e0) SHA1(804cc6f143993f5a9d5f3798e971d7abfe94c3a8) )
+	ROM_LOAD16_BYTE( "f-9.3p",  0x20001, 0x10000, CRC(58b5f43b) SHA1(9df77235c0b7ac5af4258c04bd90d0a86ccc86b0) )
+	ROM_LOAD16_BYTE( "f-12.4m", 0x40000, 0x08000, CRC(4f0e1d76) SHA1(b8636acde7547358663b94bdc8d49b5cc6b596eb) )
+	ROM_LOAD16_BYTE( "f-8.3m",  0x40001, 0x08000, CRC(d1014280) SHA1(5ee8d71d77b31b25cce2bf1953c0a5166313a857) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code (sound) */
-	ROM_LOAD( "tf-001.17k", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
+	ROM_LOAD( "f-1.1a", 0x00000, 0x10000, CRC(eb6b4138) SHA1(04c53bf46d87a156d3fad86f051985d0df79bd20) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "9.11e", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
+	ROM_LOAD( "f-11.4g", 0x00000, 0x08000, CRC(bc6f7cbc) SHA1(20b8a34de4bfa0c2fdcd2f7743a0ab35141f4bf9) ) /* characters */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "5.15h", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
-	ROM_LOAD( "4.13h", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
+	ROM_LOAD( "f-6.3c", 0x00000, 0x10000, CRC(25d23dfd) SHA1(da32895c1aca403209b7fb181fa4fa23a8e74d32) ) /* foreground tiles */
+	ROM_LOAD( "f-7.3e", 0x10000, 0x10000, CRC(b9b0fe27) SHA1(983c48239ba1524b517f89f281f2b70564bea1e9) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )
-	ROM_LOAD( "15.8a", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
-	ROM_LOAD( "14.6a", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
+	ROM_LOAD( "f-4.9k", 0x00000, 0x10000, CRC(2144d8e0) SHA1(ed89da11abf3d79753b478603009970c2600ab60) ) /* background tiles */
+	ROM_LOAD( "f-5.9m", 0x10000, 0x10000, CRC(744f5c9e) SHA1(696223a087bb575c7cfaba11e682b221ada461e4) )
 
 	ROM_REGION( 0x20000, "gfx4", 0 )
-	ROM_LOAD( "tfj-12.7d", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
-	ROM_LOAD( "tfj-13.9d", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
-
-	ROM_REGION( 0x4000, "blit_data", 0 )    /* data for mcu/blitter, shouldn't be loaded? */
-	ROM_LOAD( "tf-10.11c", 0x0000, 0x4000, CRC(ac705812) SHA1(65be46ee959d8478cb6dffb25e61f7742276997b) )
-
-	ROM_REGION( 0x0100, "proms", 0 )    /* Unknown use */
-	ROM_LOAD( "n82s129an.11j", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* N82S129AN or compatible labled "TF" */
+	ROM_LOAD( "f-3.6l", 0x00000, 0x10000, CRC(d74085a1) SHA1(3f6ba85dbd6e48a502c115b2d322a586fc4f56c9) ) /* sprites */
+	ROM_LOAD( "f-2.6j", 0x10000, 0x10000, CRC(148aa0c5) SHA1(8d8a565540e91b384a9c154522501921b7da4d4e) )
 ROM_END
 
 ROM_START( kozure )
@@ -2034,11 +2044,11 @@ DRIVER_INIT_MEMBER(armedf_state,terrafu)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
-DRIVER_INIT_MEMBER(armedf_state,terrafb)
+DRIVER_INIT_MEMBER(armedf_state,terrafjb)
 {
 	m_scroll_type = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafb_io_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
 DRIVER_INIT_MEMBER(armedf_state,armedf)
@@ -2104,18 +2114,18 @@ DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
  *
  *************************************/
 
-/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,                        FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion, armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
-GAME( 1987, legiono,  legion,   legiono,  legion, armedf_state,   legiono,  ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
-GAME( 1987, terraf,   0,        terraf,   terraf, armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafu,  terraf,   terraf,   terraf, armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafj,  terraf,   terraf,   terraf, armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafjb, terraf,   terrafb,  terraf, armedf_state,   terrafb,  ROT0,   "bootleg",                       "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
-GAME( 1987, terrafb,  terraf,   terraf,   terraf, armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (bootleg)", GAME_SUPPORTS_SAVE ) //bootleg of Japan with warning screen hacked
-GAME( 1987, kozure,   0,        kozure,   kozure, armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state, cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state, cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
-GAME( 1988, armedf,   0,        armedf,   armedf, armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )
-GAME( 1988, armedff,  armedf,   armedf,   armedf, armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
+/*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,                     MONITOR, COMPANY,                        FULLNAME, FLAGS */
+GAME( 1987, legion,   0,        legion,   legion,   armedf_state,   legion,   ROT270, "Nichibutsu",                    "Legion - Spinner-87 (World ver 2.03)", GAME_SUPPORTS_SAVE )
+GAME( 1987, legiono,  legion,   legiono,  legion,   armedf_state,   legiono,  ROT270, "Nichibutsu",                    "Chouji Meikyuu Legion (Japan bootleg ver 1.05)", GAME_SUPPORTS_SAVE ) /* bootleg? */
+GAME( 1987, terraf,   0,        terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu",                    "Terra Force", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafu,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu USA",                "Terra Force (US)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafj,  terraf,   terraf,   terraf,   armedf_state,   terrafu,  ROT0,   "Nichibutsu Japan",              "Terra Force (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafjb, terraf,   terrafjb, terraf,   armedf_state,   terrafjb, ROT0,   "bootleg",                       "Terra Force (Japan bootleg with additional Z80)", GAME_SUPPORTS_SAVE )
+GAME( 1987, terrafb,  terraf,   terraf,   terraf,   armedf_state,   terraf,   ROT0,   "bootleg",                       "Terra Force (Japan bootleg set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, kozure,   0,        kozure,   kozure,   armedf_state,   kozure,   ROT0,   "Nichibutsu",                    "Kozure Ookami (Japan)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1988, cclimbr2, 0,        cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", GAME_SUPPORTS_SAVE  )
+GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", GAME_SUPPORTS_SAVE )
+GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", GAME_SUPPORTS_SAVE )
 GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
 GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
