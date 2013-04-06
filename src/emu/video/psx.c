@@ -665,8 +665,11 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		else
 		{
-			/* todo: draw top border */
 			n_y = 0;
+
+			/* draw top border */
+			rectangle clip(cliprect.left(), cliprect.right(), cliprect.top(), n_top);
+			bitmap.fill(0, clip);
 		}
 		if( ( n_gpustatus & ( 1 << 0x16 ) ) != 0 )
 		{
@@ -679,7 +682,9 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		else
 		{
-			/* todo: draw bottom border */
+			/* draw bottom border */
+			rectangle clip(cliprect.left(), cliprect.right(), n_y + n_top + n_lines, cliprect.bottom());
+			bitmap.fill(0, clip);
 		}
 
 		n_left = ( ( (INT32)n_horiz_disstart - n_overscanleft ) * (INT32)n_screenwidth ) / 2560;
@@ -691,8 +696,11 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		else
 		{
-			/* todo: draw left border */
 			n_x = 0;
+
+			/* draw left border */
+			rectangle clip(cliprect.left(), n_x + n_left, cliprect.top(), cliprect.bottom());
+			bitmap.fill(0, clip);
 		}
 		if( n_columns > n_screenwidth - ( n_x + n_left ) )
 		{
@@ -700,7 +708,9 @@ UINT32 psxgpu_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap,
 		}
 		else
 		{
-			/* todo: draw right border */
+			/* draw right border */
+			rectangle clip(n_x + n_left + n_columns, cliprect.right(), cliprect.top(), cliprect.bottom());
+			bitmap.fill(0, clip);
 		}
 
 		if( ( n_gpustatus & ( 1 << 0x15 ) ) != 0 )
