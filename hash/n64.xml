@@ -2427,7 +2427,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="excitbiku1" cloneof="excitbik">
+	<software name="excitbikud" cloneof="excitbik">
 		<description>Excitebike 64 (USA, Demo Kiosk)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
