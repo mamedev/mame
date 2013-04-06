@@ -2865,7 +2865,7 @@ bool d3d_render_target::init(d3d_info *d3d, d3d_base *d3dintf, int width, int he
 
 	if (!bloom)
 	{
-		result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[3]);
+		result = (*d3dintf->device.create_texture)(d3d->device, width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[3]);
 		if (result != D3D_OK)
 			return false;
 		(*d3dintf->texture.get_surface_level)(texture[3], 0, &target[3]);
