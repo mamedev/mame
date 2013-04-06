@@ -1,7 +1,7 @@
 /*
  * PlayStation GPU emulator
  *
- * Copyright 2003-2011 smf
+ * Copyright 2003-2013 smf
  *
  */
 
@@ -314,7 +314,7 @@ void psxgpu_device::DebugCheckKeys( void )
 
 int psxgpu_device::DebugMeshDisplay( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	if( m_debug.mesh )
+	if( m_debug.b_mesh )
 	{
 		copybitmap( bitmap, *m_debug.mesh, 0, 0, 0, 0, cliprect );
 	}
