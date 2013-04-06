@@ -79,7 +79,7 @@
 
 /*
 
-Namco System 23 and Super System 23 Hardware Overview (last updated 12th December 2010 at 2.56pm)
+Namco System 23 and Super System 23 Hardware Overview (last updated 7th April 2013 at 12.49am)
 Namco, 1997 - 2000
 
 Note! This document is a Work-In-Progress and will be updated from time to time when more games are available.
@@ -91,7 +91,7 @@ Motocross Go!     Namco, 1997    System 23
 Time Crisis II    Namco, 1997    System 23 and Super System 23
 Downhill Bikers   Namco, 1997    System 23
 Panic Park        Namco, 1998    System 23
-*Angler King      Namco, 1999    System 23
+Angler King       Namco, 1998    Super System 23
 Gunmen Wars       Namco, 1998    Super System 23
 Race On!          Namco, 1998    Super System 23
 500 GP            Namco, 1998    Super System 23
@@ -99,8 +99,7 @@ Final Furlong 2   Namco, 1999    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
 Crisis Zone       Namco, 2000    System 23 Evolution 2
 
-* - denotes not dumped yet (and hardware type not confirmed, they might not be on System 23 hardware).
-If you can help with the remaining undumped S22.5/S23/SS23 games, please contact me at http://guru.mameworld.info/
+* - Guitar Jam is not dumped yet and the hardware type is not confirmed. It might not be on System 23 hardware.
 
 A System 23 unit is comprised of some of the following pieces....
 - V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
@@ -647,6 +646,7 @@ Notes:
 
       Game             Code and revision
       ----------------------------------
+      Angler King      AG1  Ver.A (for Super System 23)
       GP500            5GP3 Ver.C (for Super System 23)
       Time Crisis 2    TSS4 Ver.A (for Super System 23)
       Final Furlong 2  FFS1 Ver.? (for Super System 23)
@@ -686,6 +686,8 @@ Sticker (500GP)           - 8672961100
 Sticker (Time Crisis 2)   - 8660962302
 Sticker (Crisis Zone)     - 8672961100 .... same as 500GP
 Sticker (Race On!)        - 8672961100 .... same as 500GP
+Sticker (Angler King)     - 8672961100 .... same as 500GP
+
 |----------------------------------------------------------------------------|
 | KEYCUS    MTBH.2M      CGLL.4M        CGLL.5M         CCRL.7M       PAL(3) |
 |                                                                            |
@@ -742,6 +744,7 @@ Notes:
             Game            Code     Keycus    Notes
             -----------------------------------------------------------------------
             500GP           5GP1     KC029     -
+            Angler King     AG1      KC028     -
             Crisis Zone     CSZ1     KC039     -
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
             Final Furlong 2 FFS1     KC???     -
@@ -755,7 +758,7 @@ I/O PCBs
 --------
 
 FCA PCB  8662969102 (8662979102)
-(Used with 500GP so far. Another identical board is used with Ridge Racer V on System 246)
+(Used with 500GP and Angler King. Another identical board is used with Ridge Racer V on System 246)
 |---------------------------------------------------|
 | J101                J106                          |
 |            4.9152MHz                              |
@@ -776,10 +779,10 @@ Notes:
       JP1      - 3 pin jumper, set to 'NORM'. Alt setting 'WR'
       3771     - Fujitsu MB3771 System Reset IC (SOIC8)
       PIC16F84 - Microchip PIC16F84 PIC (SOIC20)
-                  - For 500GP stamped 'CAP10'
+                  - For 500GP and Angler King stamped 'CAP10'
                   - For Ridge Racer V (on System 246) stamped 'CAP11'
       MCU      - Fujitsu MB90F574 Microcontroller (QFP120)
-                  - For 500 GP stamped 'FCAF10'
+                  - For 500 GP and Angler King stamped 'FCAF10'
                   - For Ridge Racer V (on System 246) stamped 'FCAF11'
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 
