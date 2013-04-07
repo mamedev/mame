@@ -1526,6 +1526,7 @@ $(MESSOBJ)/pcshare.a:           \
 	$(MESS_VIDEO)/isa_vga_ati.o \
 	$(MESS_VIDEO)/isa_svga_tseng.o      \
 	$(MESS_VIDEO)/isa_svga_s3.o \
+	$(MESS_VIDEO)/s3virge.o \
 	$(MESS_VIDEO)/isa_svga_cirrus.o \
 	$(MESS_MACHINE)/i82371ab.o  \
 	$(MESS_MACHINE)/i82371sb.o  \

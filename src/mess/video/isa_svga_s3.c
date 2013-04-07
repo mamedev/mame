@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "isa_svga_s3.h"
-#include "video/pc_vga.h"
 
 ROM_START( s3_764 )
 	ROM_REGION(0x8000,"s3_764", 0)

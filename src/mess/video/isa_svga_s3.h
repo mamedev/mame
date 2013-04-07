@@ -6,6 +6,7 @@
 #include "emu.h"
 #include "machine/isa.h"
 #include "video/pc_vga.h"
+#include "video/s3virge.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
