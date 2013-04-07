@@ -4512,7 +4512,7 @@ ROM_START( marstv )
 	ROM_LOAD( "mpr-22992.ic15s", 0x7800000, 0x800000, CRC(5eb6c4c6) SHA1(5dc1bced7ebd7d7e01f74d03706ec4a96585628d) ) 
 
 	ROM_REGION( 4, "rom_key", 0 ) // 317-0274-JPN
-	ROM_LOAD( "marstv-key.bin", 0x000000, 0x000004, CRC(76614f8a) SHA1(cb007ec0baab25f35090a62adf8bfd72b1ce4bfb) ) 
+	ROM_LOAD( "marstv-key.bin", 0x000000, 0x000004, CRC(45c683ab) SHA1(1af2a582b54459eb1db56f5d3502917bb012d313) )
 ROM_END
 
 /* Sega Strike Fighter */
