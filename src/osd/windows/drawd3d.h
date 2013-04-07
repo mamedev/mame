@@ -145,7 +145,7 @@ struct d3d_info
 
 	bool                    restarting;                 // if we're restarting
 
-	d3d_texture_info *      texlist;                    // list of active textures
+	d3d::texture_info *     texlist;                    // list of active textures
 	int                     dynamic_supported;          // are dynamic textures supported?
 	int                     stretch_supported;          // is StretchRect with point filtering supported?
 	int                     mod2x_supported;            // is D3DTOP_MODULATE2X supported?
@@ -158,7 +158,7 @@ struct d3d_info
 	DWORD                   texture_max_width;          // texture maximum width
 	DWORD                   texture_max_height;         // texture maximum height
 
-	d3d_texture_info *      last_texture;               // previous texture
+	d3d::texture_info *     last_texture;               // previous texture
 	UINT32                  last_texture_flags;         // previous texture flags
 	int                     last_blendenable;           // previous blendmode
 	int                     last_blendop;               // previous blendmode
@@ -169,22 +169,13 @@ struct d3d_info
 	DWORD                   last_modmode;               // previous texture modulation
 
 	bitmap_argb32           vector_bitmap;              // experimental: bitmap for vectors
-	d3d_texture_info *      vector_texture;             // experimental: texture for vectors
+	d3d::texture_info *     vector_texture;             // experimental: texture for vectors
 
 	bitmap_rgb32            default_bitmap;             // experimental: default bitmap
-	d3d_texture_info *      default_texture;            // experimental: default texture
+	d3d::texture_info *     default_texture;            // experimental: default texture
 
 	void *                  hlsl_buf;                   // HLSL vertex data
 	hlsl_info *             hlsl;                       // HLSL interface
 };
-
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource, UINT32 flags);
-void texture_destroy(d3d_info *d3d, d3d_texture_info *info);
 
 #endif
