@@ -39,7 +39,22 @@ public:
 protected:
 	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
 	INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag );
+	INT64 A1( INT64 a );
+	INT64 A2( INT64 a );
+	INT64 A3( INT64 a );
+	INT32 Lm_B1( INT32 a, int lm );
+	INT32 Lm_B2( INT32 a, int lm );
+	INT32 Lm_B3( INT32 a, int lm );
+	INT32 Lm_B3_sf( INT64 value, int sf, int lm );
+	INT32 Lm_C1( INT32 a );
+	INT32 Lm_C2( INT32 a );
+	INT32 Lm_C3( INT32 a );
+	INT32 Lm_D( INT32 a );
 	UINT32 Lm_E( UINT32 result );
+	INT64 F( INT64 a );
+	INT32 Lm_G1( INT32 a );
+	INT32 Lm_G2( INT32 a );
+	INT32 Lm_H( INT64 value, int sf );
 };
 
 #endif
