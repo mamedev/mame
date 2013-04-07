@@ -1190,6 +1190,58 @@ ROM_END
 
 ROM_START( cyclwarr )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
+	ROM_LOAD16_BYTE( "cw16c",   0x000000, 0x20000, CRC(4d88892b) SHA1(dc85231a3c4f83118922c13615381f185bcee832) )
+	ROM_LOAD16_BYTE( "cw18c",   0x000001, 0x20000, CRC(4ff56209) SHA1(d628dc3fdc3e9de568ba8dbabf8e13a62e20a215) )
+	ROM_LOAD16_BYTE( "cw17b",   0x040000, 0x20000, CRC(da998afc) SHA1(dd9377ce079df5c66bdb29dfd333428cce817656) )
+	ROM_LOAD16_BYTE( "cw19b",   0x040001, 0x20000, CRC(c15a8413) SHA1(647b2a994a4912b5d7dc71b875f5d08c14412c6a) )
+
+	ROM_REGION( 0x80000, "sub", 0 ) /* 68000 sub cpu */
+	ROM_LOAD16_BYTE( "cw20b",   0x000000, 0x20000, CRC(4d75292a) SHA1(71d59c1d03b323d4021209a7f0506b4a855a73af) )
+	ROM_LOAD16_BYTE( "cw22b",   0x000001, 0x20000, CRC(0aec0ba4) SHA1(d559e54d303afac4a981c4a933a05278044ac068) )
+	ROM_LOAD16_BYTE( "cw21",    0x040000, 0x20000, CRC(ed90d956) SHA1(f533f93da31ac6eb631fb506357717e7cac8e186) )
+	ROM_LOAD16_BYTE( "cw23",    0x040001, 0x20000, CRC(009cdc78) SHA1(a77933a7736546397e8c69226703d6f9be7b55e5) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "cw26a",   0x000000, 0x10000, CRC(f7a70e3a) SHA1(5581633bf1f15d7f5c1e03de897d65d60f9f1e33) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	/* Filled in by both regions below */
+
+	ROM_REGION( 0x100000, "gfx2", 0)
+	ROM_LOAD32_BYTE( "cw00a",   0x000000, 0x20000, CRC(058a77f1) SHA1(93f99fcf6ce6714d76af6f6e930115516f0379d3) )
+	ROM_LOAD32_BYTE( "cw08a",   0x000001, 0x20000, CRC(f53993e7) SHA1(ef2d502ab180d2bc0bdb698c2878fdee9a2c33a8) )
+	ROM_LOAD32_BYTE( "cw02a",   0x000002, 0x20000, CRC(4dadf3cb) SHA1(e42c56e295a443cb605d48eba23a16fab3c86525) )
+	ROM_LOAD32_BYTE( "cw10a",   0x000003, 0x20000, CRC(3b7cd251) SHA1(52b9637404fa193421294dfb52c1a7bba0d94c9b) )
+	ROM_LOAD32_BYTE( "cw01a",   0x080000, 0x20000, CRC(7c639948) SHA1(d58ff5735cd3179ffafead385a625baa7962e1d0) )
+	ROM_LOAD32_BYTE( "cw09a",   0x080001, 0x20000, CRC(4ba24af5) SHA1(9203c2639e04aaa09996339f11259750ff8129b9) )
+	ROM_LOAD32_BYTE( "cw03a",   0x080002, 0x20000, CRC(3ca6f98e) SHA1(8526fe38d3b4c66e09049ba18651a9e7255d85d6) )
+	ROM_LOAD32_BYTE( "cw11a",   0x080003, 0x20000, CRC(5d760392) SHA1(7bbda2880af4659c267193ce10ed887a1b54a981) )
+
+	ROM_REGION( 0x100000, "gfx3", 0)
+	ROM_LOAD32_BYTE( "cw04a",   0x000000, 0x20000, CRC(f05f594d) SHA1(80effaa517b2154c013419e0bc05fd0797b74c8d) )
+	ROM_LOAD32_BYTE( "cw12a",   0x000001, 0x20000, CRC(4ac07e8b) SHA1(f9de96fba39d5752d61b8f6be87fb605694624ed) )
+	ROM_LOAD32_BYTE( "cw06a",   0x000002, 0x20000, CRC(f628edc9) SHA1(473f7ec28000e6bf72782c1c3f4afb5e021bd430) )
+	ROM_LOAD32_BYTE( "cw14a",   0x000003, 0x20000, CRC(a9131f5f) SHA1(3a2059946984733e6939f3298f0db676e6a3301b) )
+	ROM_LOAD32_BYTE( "cw05a",   0x080000, 0x20000, CRC(c8f5faa9) SHA1(f374531ffd645597eeb1440fd2cadb426fcd3d79) )
+	ROM_LOAD32_BYTE( "cw13a",   0x080001, 0x20000, CRC(8091d381) SHA1(7faf068ce20b2877559f0335df55d61be13146b4) )
+	ROM_LOAD32_BYTE( "cw07a",   0x080002, 0x20000, CRC(314579b5) SHA1(3c10ec490f7821a5b5412295232bbb104d0e4b83) )
+	ROM_LOAD32_BYTE( "cw15a",   0x080003, 0x20000, CRC(7ed4b721) SHA1(b87865effeff77a9ea74354ef2b5911a5102a647) )
+
+	ROM_REGION( 0x20000, "gfx4", 0 )
+	ROM_LOAD( "cw27",   0x000000, 0x20000, CRC(2db48a9e) SHA1(16c307340d17cd3b5455ebcee681fbe0335dec58) )
+
+	ROM_REGION( 0x60000, "gfx5", 0 )
+	ROM_LOAD( "cw30",   0x000000, 0x20000, CRC(331d0711) SHA1(82251fe1f1d36f079080943ab1fd04a60077c353) )
+	ROM_LOAD( "cw29",   0x020000, 0x20000, CRC(64dd519c) SHA1(e23611fc2be896861997063546c3eb03527eaf8e) )
+	ROM_LOAD( "cw28",   0x040000, 0x20000, CRC(3fc568ed) SHA1(91125c9deddc659449ca6791a847fe908c2818b2) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "cw24a",   0x000000, 0x20000, CRC(22600cba) SHA1(a1514fbe037942f1493a17eb0b7986949470cb22) )
+	ROM_LOAD( "cw25a",   0x020000, 0x20000, CRC(372c6bc8) SHA1(d4875bf3bffecf338bebba3b8d6a791585556a06) )
+ROM_END
+
+ROM_START( cyclwarra )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 main cpu */
 	ROM_LOAD16_BYTE( "cw16b",   0x000000, 0x20000, CRC(cb1a737a) SHA1(a603ee1256be5641d00a72f64efaaacb65ed9d7d) )
 	ROM_LOAD16_BYTE( "cw18b",   0x000001, 0x20000, CRC(0633ddcb) SHA1(1196ab17065352ec5b37f2f6b383a43a2d0fa3a6) )
 	ROM_LOAD16_BYTE( "cw17a",   0x040000, 0x20000, CRC(2ad6f836) SHA1(5fa4275b433013943ba1d1b64a3c725097f946f9) )
@@ -1372,8 +1424,9 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 /* http://www.tatsu-mi.co.jp/game/trace/index.html */
 
 /* 1987 Gray Out */
-GAME( 1988, apache3,  0,       apache3,   apache3, tatsumi_state,  apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, apache3a, apache3, apache3,   apache3, tatsumi_state,  apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", GAME_IMPERFECT_GRAPHICS )
-GAMEL(1989, roundup5, 0,       roundup5,  roundup5, tatsumi_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS, layout_roundup5 )
-GAME( 1991, cyclwarr, 0,       cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors", GAME_IMPERFECT_GRAPHICS)
-GAME( 1992, bigfight, 0,       bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)
+GAME( 1988, apache3,   0,        apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi", "Apache 3", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, apache3a,  apache3,  apache3,   apache3,  tatsumi_state, apache3,  ROT0, "Tatsumi (Kana Corporation license)", "Apache 3 (Kana Corporation license)", GAME_IMPERFECT_GRAPHICS )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, tatsumi_state, roundup5, ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", GAME_IMPERFECT_GRAPHICS, layout_roundup5 )
+GAME( 1991, cyclwarr,  0,        cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors, set 1", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING)
+GAME( 1991, cyclwarra, cyclwarr, cyclwarr,  cyclwarr, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Cycle Warriors, set 2", GAME_IMPERFECT_GRAPHICS)
+GAME( 1992, bigfight,  0,        bigfight,  bigfight, tatsumi_state, cyclwarr, ROT0, "Tatsumi", "Big Fight - Big Trouble In The Atlantic Ocean", GAME_IMPERFECT_GRAPHICS)
