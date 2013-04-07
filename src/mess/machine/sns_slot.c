@@ -281,6 +281,8 @@ static const sns_slot slot_list[] =
 	{ SNES_BSMEMPAK,    "bsmempak"},
 	// Sufami Turbo carts
 	{ SNES_STROM,       "strom"},
+	// Event carts
+	{ SNES_PFEST94,     "pfest94" },
 	// pirate carts
 	{ SNES_POKEMON,      "lorom_poke"},
 	{ SNES_TEKKEN2,      "lorom_tekken2"},

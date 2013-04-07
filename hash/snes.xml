@@ -4511,7 +4511,7 @@ Known bad dumps, redump needed
 		</part>
 	</software>
 
-	<software name="powerf94" supported="no"> <!-- unemulated additional hardware (EVENT) -->
+	<software name="pfest94">
 		<!-- Notes: contains corrupt data -->
 		<description>Nintendo PowerFest 94 (USA, Not for sale)</description>
 		<year>1994</year>
@@ -4538,13 +4538,13 @@ Known bad dumps, redump needed
 			<feature name="u16" value="" /> <!-- DSP -->
 			<feature name="lockout" value="D411A" />
 			<feature name="dipswitch" value="S1" /> <!-- (....'...) -->
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="pfest94" />
 			<dataarea name="rom" size="2359296">
-				<rom name="m-cart pwr-fst 94.u7"      size="524288"  crc="9974b593" sha1="1c53c806d0dd5bad4b8b9337c0051ddaa0d3355f" offset="0x000000" status="baddump" />
-				<rom name="griff jr power fest 94.u8" size="1048576" crc="c7b5e8c6" sha1="092a7146c8204019e1b760fd70e422d32cd11b70" offset="0x080000" status="baddump" />
-				<rom name="mario-lost pwr-fst 94.u9"  size="524288"  crc="38be3e18" sha1="072bb7de400b16a811b9066b5d5813600be3d9c0" offset="0x180000" status="baddump" />
 				<!-- the following label is handwritten, could got it wrong -->
-				<rom name="i m pts - hr 11-2-94.u10"  size="262144"  crc="143a1c2f" sha1="523ffc9f3e78f5f26fa003a906b26609dec33dd6" offset="0x200000" status="baddump" />
+				<rom name="i m pts - hr 11-2-94.u10"  size="262144"  crc="143a1c2f" sha1="523ffc9f3e78f5f26fa003a906b26609dec33dd6" offset="0x000000" status="baddump" />
+				<rom name="mario-lost pwr-fst 94.u9"  size="524288"  crc="38be3e18" sha1="072bb7de400b16a811b9066b5d5813600be3d9c0" offset="0x040000" status="baddump" />
+				<rom name="m-cart pwr-fst 94.u7"      size="524288"  crc="9974b593" sha1="1c53c806d0dd5bad4b8b9337c0051ddaa0d3355f" offset="0x0c0000" status="baddump" />
+				<rom name="griff jr power fest 94.u8" size="1048576" crc="c7b5e8c6" sha1="092a7146c8204019e1b760fd70e422d32cd11b70" offset="0x140000" status="baddump" />
 			</dataarea>
 			<dataarea name="addon" size="10240">
 				<rom name="dsp1.bin" size="10240" crc="2838f9f5" sha1="0a03ccb1fd2bea91151c745a4d1f217ae784f889" offset="0x000000" />

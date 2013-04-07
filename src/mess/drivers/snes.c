@@ -42,6 +42,7 @@
 #include "machine/sns_spc7110.h"
 #include "machine/sns_sufami.h"
 #include "machine/sns_upd.h"
+#include "machine/sns_event.h"
 
 
 class snes_console_state : public snes_state
@@ -76,7 +77,11 @@ public:
 	DECLARE_WRITE8_MEMBER( snesbsx_hi_w );
 	DECLARE_READ8_MEMBER( snesbsx_lo_r );
 	DECLARE_WRITE8_MEMBER( snesbsx_lo_w );
-
+	DECLARE_READ8_MEMBER( pfest94_hi_r );
+	DECLARE_WRITE8_MEMBER( pfest94_hi_w );
+	DECLARE_READ8_MEMBER( pfest94_lo_r );
+	DECLARE_WRITE8_MEMBER( pfest94_lo_w );
+	
 	DECLARE_READ8_MEMBER( spc_ram_100_r );
 	DECLARE_WRITE8_MEMBER( spc_ram_100_w );
 	CUSTOM_INPUT_MEMBER( snes_mouse_speed_input );
@@ -767,6 +772,91 @@ WRITE8_MEMBER( snes_console_state::snesbsx_lo_w )
 }
 
 
+//---------------------------------------------------------------------------------
+// Powerfest '94 event cart
+//---------------------------------------------------------------------------------
+
+READ8_MEMBER( snes_console_state::pfest94_hi_r )
+{
+	UINT16 address = offset & 0xffff;
+	
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			return space.read_byte(0x7e0000 + address);
+		else if (address < 0x6000)
+			return snes_r_io(space, address);
+		else if (address < 0x8000)
+		{
+			if (offset < 0x100000)    // DSP access
+				return m_cartslot->chip_read(space, offset);
+			else if (offset == 0x106000)    // menu access
+				return m_cartslot->chip_read(space, offset + 0x8000);
+			else if (offset >= 0x300000 && m_cartslot->m_cart->get_nvram_size())    // NVRAM access
+				return m_cartslot->read_ram(space, offset);
+			else
+				return snes_open_bus_r(space, 0);
+		}
+		else
+			return m_cartslot->read_h(space, offset);
+	}
+	return m_cartslot->read_h(space, offset);
+}
+
+WRITE8_MEMBER( snes_console_state::pfest94_hi_w )
+{
+	UINT16 address = offset & 0xffff;
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			space.write_byte(0x7e0000 + address, data);
+		else if (address < 0x6000)
+			snes_w_io(space, address, data);
+		else if (address < 0x8000)
+		{
+			if (offset < 0x100000)    // DSP access
+				m_cartslot->chip_write(space, offset, data);
+			else if (offset == 0x206000)    // menu access
+				m_cartslot->chip_write(space, offset + 0x8000, data);
+			else if (offset >= 0x300000 && m_cartslot->m_cart->get_nvram_size())    // NVRAM access
+				m_cartslot->write_ram(space, offset, data);
+		}
+	}
+}
+
+READ8_MEMBER( snes_console_state::pfest94_lo_r )
+{
+	UINT16 address = offset & 0xffff;
+	
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			return space.read_byte(0x7e0000 + address);
+		else if (address < 0x6000)
+			return snes_r_io(space, address);
+		else if (address < 0x8000)
+		{
+			if (offset < 0x100000)    // DSP access
+				return m_cartslot->chip_read(space, offset);
+			else if (offset == 0x106000)    // menu access
+				return m_cartslot->chip_read(space, offset + 0x8000);
+			else if (offset >= 0x300000 && m_cartslot->m_cart->get_nvram_size())    // NVRAM access
+				return m_cartslot->read_ram(space, offset);
+			else
+				return snes_open_bus_r(space, 0);
+		}
+		else
+			return m_cartslot->read_l(space, offset);
+	}
+	return 0xff;	// or open_bus?
+}
+
+WRITE8_MEMBER( snes_console_state::pfest94_lo_w )
+{
+	pfest94_hi_w(space, offset, data, 0xff);
+}
+
+
 /*************************************
  *
  *  Address maps
@@ -1386,6 +1476,7 @@ static SLOT_INTERFACE_START(snes_cart)
 	SLOT_INTERFACE_INTERNAL("hirom_spcrtc",  SNS_HIROM_SPC7110_RTC)
 	SLOT_INTERFACE_INTERNAL("hirom_srtc",    SNS_HIROM_SRTC)
 	SLOT_INTERFACE_INTERNAL("bsxrom",        SNS_ROM_BSX)   // BS-X base cart - partial support only
+	SLOT_INTERFACE_INTERNAL("pfest94",       SNS_PFEST94)
 	// pirate carts
 	SLOT_INTERFACE_INTERNAL("lorom_poke",    SNS_LOROM_POKEMON)
 	SLOT_INTERFACE_INTERNAL("lorom_tekken2", SNS_LOROM_TEKKEN2)
@@ -1485,7 +1576,12 @@ static MACHINE_START( snes_console )
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snes_console_state::snes7110_hi_r),state), write8_delegate(FUNC(snes_console_state::snes7110_hi_w),state));
 			set_5a22_map(*state->m_maincpu);
 			break;
-		// pirate 'mappers'
+		case SNES_PFEST94:
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7dffff, read8_delegate(FUNC(snes_console_state::pfest94_lo_r),state), write8_delegate(FUNC(snes_console_state::pfest94_lo_w),state));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0xffffff, read8_delegate(FUNC(snes_console_state::pfest94_hi_r),state), write8_delegate(FUNC(snes_console_state::pfest94_hi_w),state));
+			set_5a22_map(*state->m_maincpu);
+			break;
+			// pirate 'mappers'
 		case SNES_POKEMON:
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800000, 0x80ffff, 0, 0x780000, read8_delegate(FUNC(base_sns_cart_slot_device::chip_read),(base_sns_cart_slot_device*)state->m_cartslot));
 			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800000, 0x80ffff, 0, 0x780000, write8_delegate(FUNC(base_sns_cart_slot_device::chip_write),(base_sns_cart_slot_device*)state->m_cartslot));
