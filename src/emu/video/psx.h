@@ -1,7 +1,7 @@
 /*
  * PlayStation GPU emulator
  *
- * Copyright 2003-2011 smf
+ * Copyright 2003-2013 smf
  *
  */
 
