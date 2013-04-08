@@ -49,12 +49,18 @@ protected:
 	INT32 Lm_C1( INT32 a );
 	INT32 Lm_C2( INT32 a );
 	INT32 Lm_C3( INT32 a );
-	INT32 Lm_D( INT32 a );
+	INT32 Lm_D( INT64 a, int sf );
 	UINT32 Lm_E( UINT32 result );
 	INT64 F( INT64 a );
 	INT32 Lm_G1( INT32 a );
 	INT32 Lm_G2( INT32 a );
 	INT32 Lm_H( INT64 value, int sf );
+
+	int m_sf;
+	INT64 m_mac0;
+	INT64 m_mac1;
+	INT64 m_mac2;
+	INT64 m_mac3;
 };
 
 #endif
