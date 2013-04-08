@@ -14,7 +14,7 @@
 
 #include "emu.h"
 
-#define GTE_OP( op ) ( ( op >> 20 ) & 31 )
+#define GTE_OP( op ) ( ( op >> 20 ) & 31 ) /* not used */
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )
 #define GTE_MX( op ) ( ( op >> 17 ) & 3 )
 #define GTE_V( op ) ( ( op >> 15 ) & 3 )
