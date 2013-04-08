@@ -346,6 +346,7 @@ d110
 acrnsys1  // 1979 Acorn System 1 (Microcomputer Kit)
 atom      // 1979 Acorn Atom
 atomeb  // 1979 Acorn Atom
+atombb	// 1979 Acorn Atom
 bbca      // 1981 BBC Micro Model A
 bbcb      // 1981 BBC Micro Model B
 bbcbp    // 198? BBC Micro Model B+ 64K

@@ -266,6 +266,20 @@ static ADDRESS_MAP_START( atomeb_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0xbfff, 0xbfff) AM_READWRITE(eprom_r, eprom_w)
 ADDRESS_MAP_END
 
+/*-------------------------------------------------
+    ADDRESS_MAP( atombb_mem )
+-------------------------------------------------*/
+
+static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
+	
+	AM_RANGE(0x7000, 0x7003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
+	AM_RANGE(0x7800, 0x780f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION(EXTROM_TAG, 0)
+	AM_RANGE(0xF000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
+ADDRESS_MAP_END
+
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
@@ -908,6 +922,38 @@ static MACHINE_CONFIG_DERIVED_CLASS( atomeb, atom, atomeb_state )
 	MCFG_ATOM_CARTSLOT_ADD("e1")
 MACHINE_CONFIG_END
 
+/*-------------------------------------------------
+    MACHINE_DRIVER( atombb )
+-------------------------------------------------*/
+
+static MACHINE_CONFIG_START( atombb, atom_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD(SY6502_TAG, M6502, X2/4)
+	MCFG_CPU_PROGRAM_MAP(atombb_mem)
+
+	/* video hardware */
+	MCFG_SCREEN_MC6847_PAL_ADD(SCREEN_TAG, MC6847_TAG)
+	MCFG_MC6847_ADD(MC6847_TAG, MC6847_PAL, XTAL_4_433619MHz, vdg_intf)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* devices */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("hz2400", atom_state, cassette_output_tick, attotime::from_hz(4806))
+	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
+	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
+	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
+	
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("16K")
+	MCFG_RAM_EXTRA_OPTIONS("8K,12K")
+
+MACHINE_CONFIG_END
+
 /***************************************************************************
     ROMS
 ***************************************************************************/
@@ -942,6 +988,17 @@ ROM_START( atomeb )
 	ROM_REGION( 0x2000, DOSROM_TAG, ROMREGION_ERASEFF )
 ROM_END
 
+/*-------------------------------------------------
+    ROM( atombb )
+-------------------------------------------------*/
+
+ROM_START( atombb )
+	ROM_REGION( 0x4000, "a000", 0)
+	ROM_LOAD( "bbcbasic.rom", 0x0000, 0x4000, CRC(79434781) SHA1(4a7393f3a45ea309f744441c16723e2ef447a281) )
+	ROM_REGION( 0x1000, SY6502_TAG, 0 )
+	ROM_LOAD( "mos.rom",0x0000, 0x1000, CRC(20158bd8) SHA1(5ee4c0d2b65be72646e17d69b76fb00a0e5298df) )
+ROM_END
+
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
@@ -949,4 +1006,5 @@ ROM_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
 COMP( 1979, atom,     0,        0,      atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
 COMP( 1979, atomeb,   atom,     0,      atomeb,   atom, driver_device,     0,        "Acorn",  "Atom with Eprom Box" , 0)
+COMP( 1979, atombb,   atom,     0,      atombb,   atom, driver_device,     0,        "Acorn",  "Atom with BBC Basic" , 0)
 //COMP( 1983, prophet2, atom,     0,        atom,     atom, driver_device,     0,        "Busicomputers",  "Prophet 2" , 0)
