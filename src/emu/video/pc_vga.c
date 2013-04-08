@@ -334,7 +334,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			ch   = vga.memory[(pos<<1) + 0];
 			attr = vga.memory[(pos<<1) + 1];
 			font_base = 0x20000+(ch<<5);
-			font_base += ((attr & 8) ? vga.sequencer.char_sel.B : vga.sequencer.char_sel.A)*0x2000;
+			font_base += ((attr & 8) ? vga.sequencer.char_sel.A : vga.sequencer.char_sel.B)*0x2000;
 			blink_en = (vga.attribute.data[0x10]&8&&machine().primary_screen->frame_number() & 0x20) ? attr & 0x80 : 0;
 
 			fore_col = attr & 0xf;
