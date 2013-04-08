@@ -249,7 +249,6 @@ struct render_texinfo
 	const rgb_t *       palette;            // palette for PALETTE16 textures, LUTs for RGB15/RGB32
 	UINT32              seqid;              // sequence ID
 	UINT64              osddata;            // aux data to pass to osd
-	void *				osdhandle;			// handle to OSD-side representation;
 };
 
 

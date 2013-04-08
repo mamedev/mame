@@ -138,10 +138,10 @@ public:
 	void init_effect_info(d3d_poly_info *poly);
 	void render_quad(d3d_poly_info *poly, int vertnum);
 
-	bool register_texture(d3d::texture_info *texture);
-	bool register_prescaled_texture(d3d::texture_info *texture);
-	bool add_render_target(d3d_info* d3d, d3d::texture_info* info, int width, int height, int xprescale, int yprescale, bool bloom = false);
-	bool add_cache_target(d3d_info* d3d, d3d::texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
+	bool register_texture(d3d_texture_info *texture);
+	bool register_prescaled_texture(d3d_texture_info *texture);
+	bool add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, bool bloom = false);
+	bool add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -152,9 +152,9 @@ public:
 	void record_texture();
 	void init_fsfx_quad(void *vertbuf);
 
-	void                    set_texture(d3d::texture_info *texture);
-	d3d_render_target *     find_render_target(d3d::texture_info *info);
-	void                    remove_render_target(d3d::texture_info *texture);
+	void                    set_texture(d3d_texture_info *texture);
+	d3d_render_target *     find_render_target(d3d_texture_info *info);
+	void                    remove_render_target(d3d_texture_info *texture);
 	void                    remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	void                    remove_render_target(d3d_render_target *rt);
 
@@ -175,7 +175,7 @@ private:
 	void                    end_avi_recording();
 	void                    begin_avi_recording(const char *name);
 
-	bool                    register_texture(d3d::texture_info *texture, int width, int height, int xscale, int yscale);
+	bool                    register_texture(d3d_texture_info *texture, int width, int height, int xscale, int yscale);
 
 	d3d_render_target*      find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	d3d_cache_target *      find_cache_target(UINT32 screen_index, int width, int height);
@@ -199,7 +199,7 @@ private:
 	int                     prescale_size_y;            // prescale size y
 	int                     preset;                     // preset, if relevant
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
-	d3d::texture_info *     shadow_texture;             // shadow mask texture for post-processing shader
+	d3d_texture_info *      shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current uniform state
 	D3DPRIMITIVETYPE        vecbuf_type;
 	UINT32                  vecbuf_index;

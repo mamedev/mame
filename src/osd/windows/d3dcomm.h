@@ -42,67 +42,39 @@
 #ifndef __WIN_D3DCOMM__
 #define __WIN_D3DCOMM__
 
-struct d3d_info;
-
 //============================================================
 //  CONSTANTS
 //============================================================
 
-namespace d3d
-{
 
-//============================================================
-//  FORWARD DECLARATIONS
-//============================================================
-
-class texture_info;
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
-/* d3d::texture_info holds information about a texture */
-class texture_info
+/* d3d_texture_info holds information about a texture */
+struct d3d_texture_info
 {
-public:
-	texture_info(d3d_info *d3d, render_texinfo *texsource, UINT32 flags);
-	~texture_info();
-
-	render_texinfo *		get_texinfo() { return m_texinfo; }
-
-	int						get_width() { return m_rawwidth; }
-	int						get_height() { return m_rawheight; }
-	int						get_xscale() { return m_xprescale; }
-	int						get_yscale() { return m_yprescale; }
-
-	void					set_data(const render_texinfo *texsource, UINT32 flags);
-
-public:
-	void prescale();
-	void compute_size(int texwidth, int texheight);
-
-	d3d_info *				m_d3d;						// d3d info pointer
-	texture_info *			m_next;						// next texture in the list
-	texture_info *			m_prev;						// prev texture in the list
-
-	UINT32					m_hash;						// hash value for the texture
-	UINT32					m_flags;					// rendering flags
-	render_texinfo *		m_texinfo;					// copy of the texture info
-	float					m_ustart, m_ustop;			// beginning/ending U coordinates
-	float					m_vstart, m_vstop;			// beginning/ending V coordinates
-	int						m_rawwidth, m_rawheight;	// raw width/height of the texture
-	int						m_type;						// what type of texture are we?
-	int						m_xborderpix, m_yborderpix;	// number of border pixels on X/Y
-	int						m_xprescale, m_yprescale;	// X/Y prescale factor
-	int						m_cur_frame;				// what is our current frame?
-	int						m_prev_frame;				// what was our last frame? (used to determine pause state)
-	d3d_texture *			m_d3dtex;					// Direct3D texture pointer
-	d3d_surface *			m_d3dsurface;				// Direct3D offscreen plain surface pointer
-	d3d_texture *           m_d3dfinaltex;              // Direct3D final (post-scaled) texture
-	int                     m_target_index;             // Direct3D target index
+	d3d_texture_info *      next;                       // next texture in the list
+	d3d_texture_info *      prev;                       // prev texture in the list
+	UINT32                  hash;                       // hash value for the texture
+	UINT32                  flags;                      // rendering flags
+	render_texinfo          texinfo;                    // copy of the texture info
+	float                   ustart, ustop;              // beginning/ending U coordinates
+	float                   vstart, vstop;              // beginning/ending V coordinates
+	int                     rawwidth, rawheight;        // raw width/height of the texture
+	int                     type;                       // what type of texture are we?
+	int                     xborderpix;                 // number of border pixels in X
+	int                     yborderpix;                 // number of border pixels in Y
+	int                     xprescale;                  // what is our X prescale factor?
+	int                     yprescale;                  // what is our Y prescale factor?
+	int                     cur_frame;                  // what is our current frame?
+	int                     prev_frame;                 // what was our last frame? (used to determine pause state)
+	d3d_texture *           d3dtex;                     // Direct3D texture pointer
+	d3d_surface *           d3dsurface;                 // Direct3D offscreen plain surface pointer
+	d3d_texture *           d3dfinaltex;                // Direct3D final (post-scaled) texture
+	int                     target_index;               // Direct3D target index
 };
-
-}; // d3d
 
 
 /* d3d_poly_info holds information about a single polygon/d3d primitive */
@@ -113,7 +85,7 @@ struct d3d_poly_info
 		UINT32                  numverts;                   // total number of vertices
 		UINT32                  flags;                      // rendering flags
 		DWORD                   modmode;                    // texture modulation mode
-		d3d::texture_info *     texture;                    // pointer to texture info
+		d3d_texture_info *      texture;                    // pointer to texture info
 		float                   line_time;                  // used by vectors
 		float                   line_length;                // used by vectors
 };
@@ -135,5 +107,6 @@ struct line_aa_step
 	float                   xoffs, yoffs;               // X/Y deltas
 	float                   weight;                     // weight contribution
 };
+
 
 #endif

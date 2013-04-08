@@ -621,7 +621,7 @@ void hlsl_info::remove_cache_target(d3d_cache_target *cache)
 //  remove_render_target - remove an active target
 //============================================================
 
-void hlsl_info::remove_render_target(d3d::texture_info *texture)
+void hlsl_info::remove_render_target(d3d_texture_info *texture)
 {
 	remove_render_target(find_render_target(texture));
 }
@@ -677,7 +677,7 @@ void hlsl_info::remove_render_target(d3d_render_target *rt)
 //  hlsl_info::set_texture
 //============================================================
 
-void hlsl_info::set_texture(d3d::texture_info *texture)
+void hlsl_info::set_texture(d3d_texture_info *texture)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
@@ -686,7 +686,7 @@ void hlsl_info::set_texture(d3d::texture_info *texture)
 
 	if(texture != NULL)
 	{
-		if(texture->m_prev_frame == texture->m_cur_frame)
+		if(texture->prev_frame == texture->cur_frame)
 		{
 			paused = true;
 		}
@@ -695,15 +695,15 @@ void hlsl_info::set_texture(d3d::texture_info *texture)
 			paused = false;
 		}
 
-		texture->m_prev_frame = texture->m_cur_frame;
+		texture->prev_frame = texture->cur_frame;
 	}
 
-	(*d3dintf->effect.set_texture)(effect, "Diffuse", (texture == NULL) ? d3d->default_texture->m_d3dfinaltex : texture->m_d3dfinaltex);
+	(*d3dintf->effect.set_texture)(effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 	if (options->yiq_enable)
-		(*d3dintf->effect.set_texture)(yiq_encode_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->m_d3dfinaltex : texture->m_d3dfinaltex);
+		(*d3dintf->effect.set_texture)(yiq_encode_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 	else
-		(*d3dintf->effect.set_texture)(color_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->m_d3dfinaltex : texture->m_d3dfinaltex);
-	(*d3dintf->effect.set_texture)(pincushion_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->m_d3dfinaltex : texture->m_d3dfinaltex);
+		(*d3dintf->effect.set_texture)(color_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
+	(*d3dintf->effect.set_texture)(pincushion_effect, "Diffuse", (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 }
 
 
@@ -1115,7 +1115,7 @@ int hlsl_info::create_resources(bool reset)
 		texture.seqid = 0;
 
 		// now create it
-		shadow_texture = new d3d::texture_info(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
 	const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
@@ -1526,14 +1526,14 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 		// just post-processing.
 		curr_effect = post_effect;
 
-		(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->m_cur_frame == 0) ? 0.0f : options->scanline_offset);
+		(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
 
 		if(options->params_dirty)
 		{
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", d3d->height);
 			(*d3dintf->effect.set_vector)(curr_effect, "Floor", 3, options->floor);
@@ -1542,20 +1542,20 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 			(*d3dintf->effect.set_float)(curr_effect, "PincushionAmount", options->pincushion);
 			(*d3dintf->effect.set_float)(curr_effect, "CurvatureAmount", options->curvature);
 			(*d3dintf->effect.set_float)(curr_effect, "UseShadow", shadow_texture == NULL ? 0.0f : 1.0f);
-			(*d3dintf->effect.set_texture)(curr_effect, "Shadow", shadow_texture == NULL ? NULL : shadow_texture->m_d3dfinaltex);
+			(*d3dintf->effect.set_texture)(curr_effect, "Shadow", shadow_texture == NULL ? NULL : shadow_texture->d3dfinaltex);
 			(*d3dintf->effect.set_float)(curr_effect, "ShadowBrightness", options->shadow_mask_alpha);
 			(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeX", (float)options->shadow_mask_count_x);
 			(*d3dintf->effect.set_float)(curr_effect, "ShadowMaskSizeY", (float)options->shadow_mask_count_y);
 			(*d3dintf->effect.set_float)(curr_effect, "ShadowU", options->shadow_mask_u_size);
 			(*d3dintf->effect.set_float)(curr_effect, "ShadowV", options->shadow_mask_v_size);
-			(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", shadow_texture == NULL ? 1.0f : (float)shadow_texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", shadow_texture == NULL ? 1.0f : (float)shadow_texture->m_rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowWidth", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "ShadowHeight", shadow_texture == NULL ? 1.0f : (float)shadow_texture->rawheight);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineAmount", options->scanline_alpha);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineScale", options->scanline_scale);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineHeight", options->scanline_height);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightScale", options->scanline_bright_scale);
 			(*d3dintf->effect.set_float)(curr_effect, "ScanlineBrightOffset", options->scanline_bright_offset);
-			//(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->m_cur_frame == 0) ? 0.0f : options->scanline_offset);
+			//(*d3dintf->effect.set_float)(curr_effect, "ScanlineOffset", (poly->texture->cur_frame == 0) ? 0.0f : options->scanline_offset);
 			(*d3dintf->effect.set_vector)(curr_effect, "Power", 3, options->power);
 		}
 	}
@@ -1572,15 +1572,15 @@ void hlsl_info::init_effect_info(d3d_poly_info *poly)
 //  hlsl_info::find_render_target
 //============================================================
 
-d3d_render_target* hlsl_info::find_render_target(d3d::texture_info *info)
+d3d_render_target* hlsl_info::find_render_target(d3d_texture_info *info)
 {
 	d3d_render_target *curr = targethead;
-	render_texinfo *texinfo = info->get_texinfo();
-	UINT32 screen_index_data = (UINT32)texinfo->osddata;
+
+	UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
 	UINT32 screen_index = screen_index_data >> 1;
 	UINT32 page_index = screen_index_data & 1;
 
-	while (curr != NULL && (curr->screen_index != screen_index || curr->page_index != page_index || curr->width != texinfo->width || curr->height != texinfo->height))
+	while (curr != NULL && (curr->screen_index != screen_index || curr->page_index != page_index || curr->width != info->texinfo.width || curr->height != info->texinfo.height))
 	{
 		curr = curr->next;
 	}
@@ -1642,7 +1642,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			return;
 		}
-		d3d_cache_target *ct = find_cache_target(rt->screen_index, poly->texture->get_texinfo()->width, poly->texture->get_texinfo()->height);
+		d3d_cache_target *ct = find_cache_target(rt->screen_index, poly->texture->texinfo.width, poly->texture->texinfo.height);
 
 		if(options->yiq_enable)
 		{
@@ -1651,15 +1651,15 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			if(options->params_dirty)
 			{
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
 				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
-				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->m_cur_frame == 2) ? 0.0f : ((float)poly->texture->m_cur_frame * options->yiq_b));
+				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * options->yiq_b));
 				(*d3dintf->effect.set_float)(curr_effect, "PValue", options->yiq_p);
 				(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", options->yiq_n);
 				(*d3dintf->effect.set_float)(curr_effect, "YFreqResponse", options->yiq_y);
@@ -1691,18 +1691,18 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 			curr_effect = yiq_decode_effect;
 
 			(*d3dintf->effect.set_texture)(curr_effect, "Composite", rt->texture[4]);
-			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->m_d3dfinaltex);
+			(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", poly->texture->d3dfinaltex);
 			if(options->params_dirty)
 			{
-				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+				(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+				(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+				(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+				(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 				(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 				(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 				(*d3dintf->effect.set_float)(curr_effect, "CCValue", options->yiq_cc);
 				(*d3dintf->effect.set_float)(curr_effect, "AValue", options->yiq_a);
-				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->m_cur_frame == 2) ? 0.0f : ((float)poly->texture->m_cur_frame * options->yiq_b));
+				(*d3dintf->effect.set_float)(curr_effect, "BValue", (poly->texture->cur_frame == 2) ? 0.0f : ((float)poly->texture->cur_frame * options->yiq_b));
 				(*d3dintf->effect.set_float)(curr_effect, "OValue", options->yiq_o);
 				(*d3dintf->effect.set_float)(curr_effect, "PValue", options->yiq_p);
 				(*d3dintf->effect.set_float)(curr_effect, "NotchHalfWidth", options->yiq_n);
@@ -1741,10 +1741,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		/* Render the initial color-convolution pass */
 		if(options->params_dirty)
 		{
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->m_ustop - poly->texture->m_ustart)));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->m_vstop - poly->texture->m_vstart)));
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->ustop - poly->texture->ustart)));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", options->yiq_enable ? 1.0f : (1.0f / (poly->texture->vstop - poly->texture->vstart)));
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 			(*d3dintf->effect.set_float)(curr_effect, "YIQEnable", options->yiq_enable ? 1.0f : 0.0f);
@@ -1783,10 +1783,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 		}
 
 		(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -1815,10 +1815,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 			(*d3dintf->effect.set_vector)(curr_effect, "ConvergeX", 3, options->converge_x);
 			(*d3dintf->effect.set_vector)(curr_effect, "ConvergeY", 3, options->converge_y);
 			(*d3dintf->effect.set_vector)(curr_effect, "RadialConvergeX", 3, options->radial_converge_x);
@@ -1855,10 +1855,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_ustop - poly->texture->m_ustart)) : 0.0f);
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_vstop - poly->texture->m_vstart)) : 0.0f);
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
 			(*d3dintf->effect.set_vector)(curr_effect, "Defocus", 2, &options->defocus[0]);
 
 			(*d3dintf->effect.begin)(curr_effect, &num_passes, 0);
@@ -1885,8 +1885,8 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
 			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f);
 			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f);
 			(*d3dintf->effect.set_vector)(curr_effect, "Defocus", 2, &options->defocus[1]);
@@ -1917,10 +1917,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 			(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+			(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+			(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+			(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+			(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 			(*d3dintf->effect.set_vector)(curr_effect, "Phosphor", 3, options->phosphor);
 		}
 		(*d3dintf->effect.set_float)(curr_effect, "TextureWidth", (float)rt->target_width);
@@ -2151,10 +2151,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.set_texture)(curr_effect, "Diffuse", rt->texture[2]);
 
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->m_rawwidth : 8.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->m_rawheight : 8.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_ustop - poly->texture->m_ustart)) : 0.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_vstop - poly->texture->m_vstart)) : 0.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 		(*d3dintf->effect.set_float)(curr_effect, "PostPass", 0.0f);
@@ -2174,8 +2174,8 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		(*d3dintf->effect.end)(curr_effect);
 #endif
 
-		poly->texture->m_cur_frame++;
-		poly->texture->m_cur_frame %= options->yiq_phase_count;
+		poly->texture->cur_frame++;
+		poly->texture->cur_frame %= options->yiq_phase_count;
 
 		options->params_dirty = false;
 	}
@@ -2379,10 +2379,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->m_rawwidth);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->m_rawheight);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->m_ustop - poly->texture->m_ustart));
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->m_vstop - poly->texture->m_vstart));
+		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", (float)poly->texture->rawwidth);
+		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", (float)poly->texture->rawheight);
+		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", 1.0f / (poly->texture->ustop - poly->texture->ustart));
+		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", 1.0f / (poly->texture->vstop - poly->texture->vstart));
 
 		result = (*d3dintf->device.set_render_target)(d3d->device, 0, rt->target[1]);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call\n", (int)result);
@@ -2407,10 +2407,10 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 #endif
 	else
 	{
-		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->m_rawwidth : 8.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->m_rawheight : 8.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_ustop - poly->texture->m_ustart)) : 0.0f);
-		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->m_vstop - poly->texture->m_vstart)) : 0.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "RawHeight", poly->texture != NULL ? (float)poly->texture->rawheight : 8.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "WidthRatio", poly->texture != NULL ? (1.0f / (poly->texture->ustop - poly->texture->ustart)) : 0.0f);
+		(*d3dintf->effect.set_float)(curr_effect, "HeightRatio", poly->texture != NULL ? (1.0f / (poly->texture->vstop - poly->texture->vstart)) : 0.0f);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetWidth", (float)d3d->width);
 		(*d3dintf->effect.set_float)(curr_effect, "TargetHeight", (float)d3d->height);
 		(*d3dintf->effect.set_float)(curr_effect, "PostPass", 0.0f);
@@ -2450,16 +2450,16 @@ void hlsl_info::end_draw()
 //  hlsl_info::register_prescaled_texture
 //============================================================
 
-bool hlsl_info::register_prescaled_texture(d3d::texture_info *texture)
+bool hlsl_info::register_prescaled_texture(d3d_texture_info *texture)
 {
-	return register_texture(texture);
+	return register_texture(texture, texture->rawwidth, texture->rawheight, texture->xprescale, texture->yprescale);
 }
 
 
 //============================================================
 //  hlsl_info::add_cache_target - register a cache target
 //============================================================
-bool hlsl_info::add_cache_target(d3d_info* d3d, d3d::texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
+bool hlsl_info::add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
 	d3d_cache_target* target = (d3d_cache_target*)global_alloc_clear(d3d_cache_target);
 
@@ -2471,8 +2471,8 @@ bool hlsl_info::add_cache_target(d3d_info* d3d, d3d::texture_info* info, int wid
 
 	if (info != NULL)
 	{
-		target->width = info->get_texinfo()->width;
-		target->height = info->get_texinfo()->height;
+		target->width = info->texinfo.width;
+		target->height = info->texinfo.height;
 	}
 	else
 	{
@@ -2524,7 +2524,7 @@ void hlsl_info::create_vector_target(render_primitive *prim)
 //  hlsl_info::add_render_target - register a render target
 //============================================================
 
-bool hlsl_info::add_render_target(d3d_info* d3d, d3d::texture_info* info, int width, int height, int xprescale, int yprescale, bool bloom)
+bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, bool bloom)
 {
 	UINT32 screen_index = 0;
 	UINT32 page_index = 0;
@@ -2536,7 +2536,7 @@ bool hlsl_info::add_render_target(d3d_info* d3d, d3d::texture_info* info, int wi
 			remove_render_target(existing_target);
 		}
 
-		UINT32 screen_index_data = (UINT32)info->get_texinfo()->osddata;
+		UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
 		screen_index = screen_index_data >> 1;
 		page_index = screen_index_data & 1;
 	}
@@ -2559,8 +2559,8 @@ bool hlsl_info::add_render_target(d3d_info* d3d, d3d::texture_info* info, int wi
 
 	if (info != NULL)
 	{
-		target->width = info->get_texinfo()->width;
-		target->height = info->get_texinfo()->height;
+		target->width = info->texinfo.width;
+		target->height = info->texinfo.height;
 	}
 	else
 	{
@@ -2611,20 +2611,23 @@ void hlsl_info::enumerate_screens()
 
 
 //============================================================
-//  hlsl_info::register_texture(d3d_texture::info)
+//  hlsl_info::register_texture
 //============================================================
 
-bool hlsl_info::register_texture(d3d::texture_info *texture)
+bool hlsl_info::register_texture(d3d_texture_info *texture)
 {
-	int width = texture->get_width();
-	int height = texture->get_height();
-	int xscale = texture->get_xscale();
-	int yscale = texture->get_yscale();
+	return register_texture(texture, texture->rawwidth, texture->rawheight, 1, 1);
+}
 
+
+//============================================================
+//  hlsl_info::register_texture(d3d_texture_info, int, int, int, int)
+//============================================================
+
+bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int height, int xscale, int yscale)
+{
 	if (!master_enable || !d3dintf->post_fx_available)
-	{
-		return false;
-	}
+		return 0;
 
 	enumerate_screens();
 

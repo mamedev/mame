@@ -209,14 +209,14 @@ INLINE UINT32 texture_compute_hash(const render_texinfo *texture, UINT32 flags)
 }
 
 
-INLINE void set_texture(d3d_info *d3d, d3d::texture_info *texture)
+INLINE void set_texture(d3d_info *d3d, d3d_texture_info *texture)
 {
 	HRESULT result;
 	if (texture != d3d->last_texture)
 	{
 		d3d->last_texture = texture;
-		d3d->last_texture_flags = (texture == NULL ? 0 : texture->m_flags);
-		result = (*d3dintf->device.set_texture)(d3d->device, 0, (texture == NULL) ? d3d->default_texture->m_d3dfinaltex : texture->m_d3dfinaltex);
+		d3d->last_texture_flags = (texture == NULL ? 0 : texture->flags);
+		result = (*d3dintf->device.set_texture)(d3d->device, 0, (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
 		d3d->hlsl->set_texture(texture);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 	}
@@ -325,7 +325,7 @@ INLINE void set_blendmode(d3d_info *d3d, int blendmode)
 INLINE void reset_render_states(d3d_info *d3d)
 {
 	// this ensures subsequent calls to the above setters will force-update the data
-	d3d->last_texture = (d3d::texture_info *)~0;
+	d3d->last_texture = (d3d_texture_info *)~0;
 	d3d->last_filter = -1;
 	d3d->last_blendenable = -1;
 	d3d->last_blendop = -1;
@@ -371,6 +371,13 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim);
 // primitives
 static d3d_vertex *primitive_alloc(d3d_info *d3d, int numverts);
 static void primitive_flush_pending(d3d_info *d3d);
+
+// textures
+static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, d3d_texture_info *texture);
+static void texture_set_data(d3d_info *d3d, d3d_texture_info *texture, const render_texinfo *texsource, UINT32 flags);
+static void texture_prescale(d3d_info *d3d, d3d_texture_info *texture);
+static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *prim);
+static void texture_update(d3d_info *d3d, const render_primitive *prim);
 
 //============================================================
 //  drawd3d_init
@@ -600,21 +607,7 @@ mtlog_add("drawd3d_window_draw: begin");
 	{
 		if (prim->texture.base != NULL)
 		{
-			if (prim->texture.osdhandle == NULL)
-			{
-				// if there isn't one, create a new texture
-				prim->texture.osdhandle = (void*)(new d3d::texture_info(d3d, &prim->texture, prim->flags));
-			}
-			else
-			{
-				// if there is one, but with a different seqid, copy the data
-				d3d::texture_info *texture = (d3d::texture_info *)prim->texture.osdhandle;
-				if (texture->get_texinfo()->seqid != prim->texture.seqid)
-				{
-					texture->set_data(&prim->texture, prim->flags);
-					texture->get_texinfo()->seqid = prim->texture.seqid;
-				}
-			}
+			texture_update(d3d, prim);
 		}
 		else if(d3d->hlsl->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
 		{
@@ -928,7 +921,7 @@ static int device_create_resources(d3d_info *d3d)
 		texture.seqid = 0;
 
 		// now create it
-		d3d->default_texture = new d3d::texture_info(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
 	// experimental: if we have a vector bitmap, create a texture for it
@@ -945,7 +938,7 @@ static int device_create_resources(d3d_info *d3d)
 		texture.seqid = 0;
 
 		// now create it
-		d3d->vector_texture = new d3d::texture_info(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+		d3d->vector_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
 	return 0;
@@ -985,9 +978,25 @@ static void device_delete_resources(d3d_info *d3d)
 	// free all textures
 	while (d3d->texlist != NULL)
 	{
-		d3d::texture_info *tex = d3d->texlist;
-		d3d->texlist = tex->m_next;
-		delete tex;
+		d3d_texture_info *tex = d3d->texlist;
+		d3d->texlist = tex->next;
+		if (tex->d3dfinaltex != NULL)
+		{
+			if (tex->d3dtex == tex->d3dfinaltex) tex->d3dtex = NULL;
+			(*d3dintf->texture.release)(tex->d3dfinaltex);
+			tex->d3dfinaltex = NULL;
+		}
+		if (tex->d3dtex != NULL)
+		{
+			(*d3dintf->texture.release)(tex->d3dtex);
+			tex->d3dtex = NULL;
+		}
+		if (tex->d3dsurface != NULL)
+		{
+			(*d3dintf->surface.release)(tex->d3dsurface);
+			tex->d3dsurface = NULL;
+		}
+		global_free(tex);
 	}
 
 	// free the vertex buffer
@@ -1528,31 +1537,31 @@ static void draw_line(d3d_info *d3d, const render_primitive *prim, float line_ti
 		// if we have a texture to use for the vectors, use it here
 		if (d3d->vector_texture != NULL)
 		{
-			vertex[0].u0 = d3d->vector_texture->m_ustart;
-			vertex[0].v0 = d3d->vector_texture->m_vstart;
+			vertex[0].u0 = d3d->vector_texture->ustart;
+			vertex[0].v0 = d3d->vector_texture->vstart;
 
-			vertex[2].u0 = d3d->vector_texture->m_ustop;
-			vertex[2].v0 = d3d->vector_texture->m_vstart;
+			vertex[2].u0 = d3d->vector_texture->ustop;
+			vertex[2].v0 = d3d->vector_texture->vstart;
 
-			vertex[1].u0 = d3d->vector_texture->m_ustart;
-			vertex[1].v0 = d3d->vector_texture->m_vstop;
+			vertex[1].u0 = d3d->vector_texture->ustart;
+			vertex[1].v0 = d3d->vector_texture->vstop;
 
-			vertex[3].u0 = d3d->vector_texture->m_ustop;
-			vertex[3].v0 = d3d->vector_texture->m_vstop;
+			vertex[3].u0 = d3d->vector_texture->ustop;
+			vertex[3].v0 = d3d->vector_texture->vstop;
 		}
 		else if(d3d->default_texture != NULL)
 		{
-			vertex[0].u0 = d3d->default_texture->m_ustart;
-			vertex[0].v0 = d3d->default_texture->m_vstart;
+			vertex[0].u0 = d3d->default_texture->ustart;
+			vertex[0].v0 = d3d->default_texture->vstart;
 
-			vertex[2].u0 = d3d->default_texture->m_ustart;
-			vertex[2].v0 = d3d->default_texture->m_vstart;
+			vertex[2].u0 = d3d->default_texture->ustart;
+			vertex[2].v0 = d3d->default_texture->vstart;
 
-			vertex[1].u0 = d3d->default_texture->m_ustart;
-			vertex[1].v0 = d3d->default_texture->m_vstart;
+			vertex[1].u0 = d3d->default_texture->ustart;
+			vertex[1].v0 = d3d->default_texture->vstart;
 
-			vertex[3].u0 = d3d->default_texture->m_ustart;
-			vertex[3].v0 = d3d->default_texture->m_vstart;
+			vertex[3].u0 = d3d->default_texture->ustart;
+			vertex[3].v0 = d3d->default_texture->vstart;
 		}
 
 		// set the color, Z parameters to standard values
@@ -1598,15 +1607,17 @@ static void draw_line(d3d_info *d3d, const render_primitive *prim, float line_ti
 
 static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 {
-	d3d::texture_info *texture = (d3d::texture_info *)prim->texture.osdhandle;
+	d3d_texture_info *texture = texture_find(d3d, prim);
+	DWORD color, modmode;
+	d3d_vertex *vertex;
+	INT32 r, g, b, a;
+	d3d_poly_info *poly;
+	int i;
 
-	if (texture == NULL)
-	{
-		texture = d3d->default_texture;
-	}
+	texture = texture != NULL ? texture : d3d->default_texture;
 
 	// get a pointer to the vertex buffer
-	d3d_vertex *vertex = primitive_alloc(d3d, 4);
+	vertex = primitive_alloc(d3d, 4);
 	if (vertex == NULL)
 		return;
 
@@ -1623,24 +1634,24 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	// set the texture coordinates
 	if(texture != NULL)
 	{
-		float du = texture->m_ustop - texture->m_ustart;
-		float dv = texture->m_vstop - texture->m_vstart;
-		vertex[0].u0 = texture->m_ustart + du * prim->texcoords.tl.u;
-		vertex[0].v0 = texture->m_vstart + dv * prim->texcoords.tl.v;
-		vertex[1].u0 = texture->m_ustart + du * prim->texcoords.tr.u;
-		vertex[1].v0 = texture->m_vstart + dv * prim->texcoords.tr.v;
-		vertex[2].u0 = texture->m_ustart + du * prim->texcoords.bl.u;
-		vertex[2].v0 = texture->m_vstart + dv * prim->texcoords.bl.v;
-		vertex[3].u0 = texture->m_ustart + du * prim->texcoords.br.u;
-		vertex[3].v0 = texture->m_vstart + dv * prim->texcoords.br.v;
+		float du = texture->ustop - texture->ustart;
+		float dv = texture->vstop - texture->vstart;
+		vertex[0].u0 = texture->ustart + du * prim->texcoords.tl.u;
+		vertex[0].v0 = texture->vstart + dv * prim->texcoords.tl.v;
+		vertex[1].u0 = texture->ustart + du * prim->texcoords.tr.u;
+		vertex[1].v0 = texture->vstart + dv * prim->texcoords.tr.v;
+		vertex[2].u0 = texture->ustart + du * prim->texcoords.bl.u;
+		vertex[2].v0 = texture->vstart + dv * prim->texcoords.bl.v;
+		vertex[3].u0 = texture->ustart + du * prim->texcoords.br.u;
+		vertex[3].v0 = texture->vstart + dv * prim->texcoords.br.v;
 	}
 
 	// determine the color, allowing for over modulation
-	INT32 r = (INT32)(prim->color.r * 255.0f);
-	INT32 g = (INT32)(prim->color.g * 255.0f);
-	INT32 b = (INT32)(prim->color.b * 255.0f);
-	INT32 a = (INT32)(prim->color.a * 255.0f);
-	DWORD modmode = D3DTOP_MODULATE;
+	r = (INT32)(prim->color.r * 255.0f);
+	g = (INT32)(prim->color.g * 255.0f);
+	b = (INT32)(prim->color.b * 255.0f);
+	a = (INT32)(prim->color.a * 255.0f);
+	modmode = D3DTOP_MODULATE;
 	if (texture != NULL)
 	{
 		if (d3d->mod2x_supported && (r > 255 || g > 255 || b > 255))
@@ -1661,10 +1672,10 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	if (g > 255) g = 255;
 	if (b > 255) b = 255;
 	if (a > 255) a = 255;
-	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
+	color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		vertex[i].z = 0.0f;
 		vertex[i].rhw = 1.0f;
@@ -1672,7 +1683,7 @@ static void draw_quad(d3d_info *d3d, const render_primitive *prim)
 	}
 
 	// now add a polygon entry
-	d3d_poly_info *poly = &d3d->poly[d3d->numpolys++];
+	poly = &d3d->poly[d3d->numpolys++];
 	poly->type = D3DPT_TRIANGLESTRIP;
 	poly->count = 2;
 	poly->numverts = 4;
@@ -1807,65 +1818,42 @@ static void primitive_flush_pending(d3d_info *d3d)
 	d3d->numpolys = 0;
 }
 
-//============================================================
-//  texture_info destructor
-//============================================================
 
-d3d::texture_info::~texture_info()
+void texture_destroy(d3d_info *d3d, d3d_texture_info *info)
 {
-	if (m_d3dfinaltex != NULL)
-	{
-		if (m_d3dtex == m_d3dfinaltex)
-		{
-			m_d3dtex = NULL;
-		}
-		(*d3dintf->texture.release)(m_d3dfinaltex);
-		m_d3dfinaltex = NULL;
-	}
-	if (m_d3dtex != NULL)
-	{
-		(*d3dintf->texture.release)(m_d3dtex);
-		m_d3dtex = NULL;
-	}
-	if (m_d3dsurface != NULL)
-	{
-		(*d3dintf->surface.release)(m_d3dsurface);
-		m_d3dsurface = NULL;
-	}
 }
 
 //============================================================
-//  texture_info constructor
+//  texture_create
 //============================================================
 
-d3d::texture_info::texture_info(d3d_info *d3d, render_texinfo* texsource, UINT32 flags)
+d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource, UINT32 flags)
 {
+	d3d_texture_info *texture;
 	HRESULT result;
 
-	// fill in the core data
-	m_d3d = d3d;
-	m_hash = texture_compute_hash(texsource, flags);
-	m_flags = flags;
-	m_texinfo = texsource;
-	m_xprescale = video_config.prescale;
-	m_yprescale = video_config.prescale;
+	// allocate a new texture
+	texture = global_alloc_clear(d3d_texture_info);
 
-	m_d3dtex = NULL;
-	m_d3dsurface = NULL;
-	m_d3dfinaltex = NULL;
+	// fill in the core data
+	texture->hash = texture_compute_hash(texsource, flags);
+	texture->flags = flags;
+	texture->texinfo = *texsource;
+	texture->xprescale = video_config.prescale;
+	texture->yprescale = video_config.prescale;
 
 	// compute the size
-	compute_size(texsource->width, texsource->height);
+	texture_compute_size(d3d, texsource->width, texsource->height, texture);
 
 	// non-screen textures are easy
 	if (!PRIMFLAG_GET_SCREENTEX(flags))
 	{
 		assert(PRIMFLAG_TEXFORMAT(flags) != TEXFORMAT_YUY16);
-		result = (*d3dintf->device.create_texture)(d3d->device, m_rawwidth, m_rawheight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_d3dtex);
+		result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &texture->d3dtex);
 		if (result != D3D_OK)
 			goto error;
-		m_d3dfinaltex = m_d3dtex;
-		m_type = TEXTURE_TYPE_PLAIN;
+		texture->d3dfinaltex = texture->d3dtex;
+		texture->type = TEXTURE_TYPE_PLAIN;
 	}
 
 	// screen textures are allocated differently
@@ -1875,62 +1863,45 @@ d3d::texture_info::texture_info(d3d_info *d3d, render_texinfo* texsource, UINT32
 		DWORD usage = d3d->dynamic_supported ? D3DUSAGE_DYNAMIC : 0;
 		D3DPOOL pool = d3d->dynamic_supported ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		int maxdim = MAX(d3d->presentation.BackBufferWidth, d3d->presentation.BackBufferHeight);
+		int attempt;
 
 		// pick the format
 		if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_YUY16)
-		{
 			format = d3d->yuv_format;
-		}
 		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_PALETTEA16)
-		{
 			format = D3DFMT_A8R8G8B8;
-		}
 		else
-		{
 			format = d3d->screen_format;
-		}
 
 		// don't prescale above screen size
-		while (m_xprescale > 1 && m_rawwidth * m_xprescale >= 2 * maxdim)
-		{
-			m_xprescale--;
-		}
-		while (m_xprescale > 1 && m_rawwidth * m_xprescale > d3d->texture_max_width)
-		{
-			m_xprescale--;
-		}
-		while (m_yprescale > 1 && m_rawheight * m_yprescale >= 2 * maxdim)
-		{
-			m_yprescale--;
-		}
-		while (m_yprescale > 1 && m_rawheight * m_yprescale > d3d->texture_max_height)
-		{
-			m_yprescale--;
-		}
-		if (m_xprescale != video_config.prescale || m_yprescale != video_config.prescale)
-		{
-			mame_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, m_xprescale, m_yprescale);
-		}
+		while (texture->xprescale > 1 && texture->rawwidth * texture->xprescale >= 2 * maxdim)
+			texture->xprescale--;
+		while (texture->xprescale > 1 && texture->rawwidth * texture->xprescale > d3d->texture_max_width)
+			texture->xprescale--;
+		while (texture->yprescale > 1 && texture->rawheight * texture->yprescale >= 2 * maxdim)
+			texture->yprescale--;
+		while (texture->yprescale > 1 && texture->rawheight * texture->yprescale > d3d->texture_max_height)
+			texture->yprescale--;
+		if (texture->xprescale != video_config.prescale || texture->yprescale != video_config.prescale)
+			mame_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
 
 		// loop until we allocate something or error
-		for (int attempt = 0; attempt < 2; attempt++)
+		for (attempt = 0; attempt < 2; attempt++)
 		{
 			// second attempt is always 1:1
 			if (attempt == 1)
-			{
-				m_xprescale = m_yprescale = 1;
-			}
+				texture->xprescale = texture->yprescale = 1;
 
 			// screen textures with no prescaling are pretty easy
-			if (m_xprescale == 1 && m_yprescale == 1)
+			if (texture->xprescale == 1 && texture->yprescale == 1)
 			{
-				result = (*d3dintf->device.create_texture)(d3d->device, m_rawwidth, m_rawheight, 1, usage, format, pool, &m_d3dtex);
+				result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, usage, format, pool, &texture->d3dtex);
 				if (result == D3D_OK)
 				{
-					m_d3dfinaltex = m_d3dtex;
-					m_type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+					texture->d3dfinaltex = texture->d3dtex;
+					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
 
-					if (d3d->hlsl->enabled() && !d3d->hlsl->register_texture(this))
+					if (d3d->hlsl->enabled() && !d3d->hlsl->register_texture(texture))
 					{
 						goto error;
 					}
@@ -1942,98 +1913,98 @@ d3d::texture_info::texture_info(d3d_info *d3d, render_texinfo* texsource, UINT32
 			// screen textures with prescaling require two allocations
 			else
 			{
+				int scwidth, scheight;
+				D3DFORMAT finalfmt;
+
 				// use an offscreen plain surface for stretching if supported
 				// (won't work for YUY textures)
 				if (d3d->stretch_supported && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
 				{
-					result = (*d3dintf->device.create_offscreen_plain_surface)(d3d->device, m_rawwidth, m_rawheight, format, D3DPOOL_DEFAULT, &m_d3dsurface);
+					result = (*d3dintf->device.create_offscreen_plain_surface)(d3d->device, texture->rawwidth, texture->rawheight, format, D3DPOOL_DEFAULT, &texture->d3dsurface);
 					if (result != D3D_OK)
-					{
 						continue;
-					}
-					m_type = TEXTURE_TYPE_SURFACE;
+					texture->type = TEXTURE_TYPE_SURFACE;
 				}
 
 				// otherwise, we allocate a dynamic texture for the source
 				else
 				{
-					result = (*d3dintf->device.create_texture)(d3d->device, m_rawwidth, m_rawheight, 1, usage, format, pool, &m_d3dtex);
+					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, usage, format, pool, &texture->d3dtex);
 					if (result != D3D_OK)
-					{
 						continue;
-					}
-					m_type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
 				}
 
 				// for the target surface, we allocate a render target texture
-				int scwidth = m_rawwidth * m_xprescale;
-				int scheight = m_rawheight * m_yprescale;
+				scwidth = texture->rawwidth * texture->xprescale;
+				scheight = texture->rawheight * texture->yprescale;
 
 				// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
-				D3DFORMAT finalfmt = (format != d3d->yuv_format) ? format : D3DFMT_A8R8G8B8;
-				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &m_d3dfinaltex);
+				finalfmt = (format != d3d->yuv_format) ? format : D3DFMT_A8R8G8B8;
+				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &texture->d3dfinaltex);
 				if (result == D3D_OK)
 				{
-					if (d3d->hlsl->enabled() && !d3d->hlsl->register_prescaled_texture(this))
+					if (d3d->hlsl->enabled() && !d3d->hlsl->register_prescaled_texture(texture))
 					{
 						goto error;
 					}
 					break;
 				}
-				(*d3dintf->texture.release)(m_d3dtex);
-				m_d3dtex = NULL;
+				(*d3dintf->texture.release)(texture->d3dtex);
+				texture->d3dtex = NULL;
 			}
 		}
 	}
 
 	// copy the data to the texture
-	set_data(texsource, flags);
+	texture_set_data(d3d, texture, texsource, flags);
 
-	texsource->osdhandle = (void*)this;
 	// add us to the texture list
 	if(d3d->texlist != NULL)
-		d3d->texlist->m_prev = this;
-	m_prev = NULL;
-	m_next = d3d->texlist;
-	d3d->texlist = this;
-	return;
+		d3d->texlist->prev = texture;
+	texture->prev = NULL;
+	texture->next = d3d->texlist;
+	d3d->texlist = texture;
+	return texture;
 
 error:
 	d3dintf->post_fx_available = false;
 	printf("Direct3D: Critical warning: A texture failed to allocate. Expect things to get bad quickly.\n");
-	if (m_d3dsurface != NULL)
-		(*d3dintf->surface.release)(m_d3dsurface);
-	if (m_d3dtex != NULL)
-		(*d3dintf->texture.release)(m_d3dtex);
+	if (texture->d3dsurface != NULL)
+		(*d3dintf->surface.release)(texture->d3dsurface);
+	if (texture->d3dtex != NULL)
+		(*d3dintf->texture.release)(texture->d3dtex);
+	global_free(texture);
+	return NULL;
 }
 
 
 
 //============================================================
-//  texture_info::compute_size
+//  texture_compute_size
 //============================================================
 
-void d3d::texture_info::compute_size(int texwidth, int texheight)
+static void texture_compute_size(d3d_info *d3d, int texwidth, int texheight, d3d_texture_info *texture)
 {
 	int finalheight = texheight;
 	int finalwidth = texwidth;
 
 	// if we're not wrapping, add a 1-2 pixel border on all sides
-	m_xborderpix = 0;
-	m_yborderpix = 0;
-	if (ENABLE_BORDER_PIX && !(m_flags & PRIMFLAG_TEXWRAP_MASK))
+	texture->xborderpix = 0;
+	texture->yborderpix = 0;
+	if (ENABLE_BORDER_PIX && !(texture->flags & PRIMFLAG_TEXWRAP_MASK))
 	{
 		// note we need 2 pixels in X for YUY textures
-		m_xborderpix = (PRIMFLAG_GET_TEXFORMAT(m_flags) == TEXFORMAT_YUY16) ? 2 : 1;
-		m_yborderpix = 1;
+		texture->xborderpix = (PRIMFLAG_GET_TEXFORMAT(texture->flags) == TEXFORMAT_YUY16) ? 2 : 1;
+		texture->yborderpix = 1;
 	}
 
 	// compute final texture size
-	finalwidth += 2 * m_xborderpix;
-	finalheight += 2 * m_yborderpix;
+	finalwidth += 2 * texture->xborderpix;
+	finalheight += 2 * texture->yborderpix;
 
 	// round width/height up to nearest power of 2 if we need to
-	if (!(m_d3d->texture_caps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
+	if (!(d3d->texture_caps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL))
 	{
 		// first the width
 		if (finalwidth & (finalwidth - 1))
@@ -2057,7 +2028,7 @@ void d3d::texture_info::compute_size(int texwidth, int texheight)
 	}
 
 	// round up to square if we need to
-	if (m_d3d->texture_caps & D3DPTEXTURECAPS_SQUAREONLY)
+	if (d3d->texture_caps & D3DPTEXTURECAPS_SQUAREONLY)
 	{
 		if (finalwidth < finalheight)
 			finalwidth = finalheight;
@@ -2066,42 +2037,38 @@ void d3d::texture_info::compute_size(int texwidth, int texheight)
 	}
 
 	// adjust the aspect ratio if we need to
-	while (finalwidth < finalheight && finalheight / finalwidth > m_d3d->texture_max_aspect)
-	{
+	while (finalwidth < finalheight && finalheight / finalwidth > d3d->texture_max_aspect)
 		finalwidth *= 2;
-	}
-	while (finalheight < finalwidth && finalwidth / finalheight > m_d3d->texture_max_aspect)
-	{
+	while (finalheight < finalwidth && finalwidth / finalheight > d3d->texture_max_aspect)
 		finalheight *= 2;
-	}
 
 	// if we added pixels for the border, and that just barely pushed us over, take it back
-	if ((finalwidth > m_d3d->texture_max_width && finalwidth - 2 * m_xborderpix <= m_d3d->texture_max_width) ||
-		(finalheight > m_d3d->texture_max_height && finalheight - 2 * m_yborderpix <= m_d3d->texture_max_height))
+	if ((finalwidth > d3d->texture_max_width && finalwidth - 2 * texture->xborderpix <= d3d->texture_max_width) ||
+		(finalheight > d3d->texture_max_height && finalheight - 2 * texture->yborderpix <= d3d->texture_max_height))
 	{
-		finalwidth -= 2 * m_xborderpix;
-		finalheight -= 2 * m_yborderpix;
-		m_xborderpix = 0;
-		m_yborderpix = 0;
+		finalwidth -= 2 * texture->xborderpix;
+		finalheight -= 2 * texture->yborderpix;
+		texture->xborderpix = 0;
+		texture->yborderpix = 0;
 	}
 
 	// if we're above the max width/height, do what?
-	if (finalwidth > m_d3d->texture_max_width || finalheight > m_d3d->texture_max_height)
+	if (finalwidth > d3d->texture_max_width || finalheight > d3d->texture_max_height)
 	{
 		static int printed = FALSE;
-		if (!printed) mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth, finalheight, (int)m_d3d->texture_max_width, (int)m_d3d->texture_max_height);
+		if (!printed) mame_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth, finalheight, (int)d3d->texture_max_width, (int)d3d->texture_max_height);
 		printed = TRUE;
 	}
 
 	// compute the U/V scale factors
-	m_ustart = (float)m_xborderpix / (float)finalwidth;
-	m_ustop = (float)(texwidth + m_xborderpix) / (float)finalwidth;
-	m_vstart = (float)m_yborderpix / (float)finalheight;
-	m_vstop = (float)(texheight + m_yborderpix) / (float)finalheight;
+	texture->ustart = (float)texture->xborderpix / (float)finalwidth;
+	texture->ustop = (float)(texwidth + texture->xborderpix) / (float)finalwidth;
+	texture->vstart = (float)texture->yborderpix / (float)finalheight;
+	texture->vstop = (float)(texheight + texture->yborderpix) / (float)finalheight;
 
 	// set the final values
-	m_rawwidth = finalwidth;
-	m_rawheight = finalheight;
+	texture->rawwidth = finalwidth;
+	texture->rawheight = finalheight;
 }
 
 
@@ -2444,58 +2411,58 @@ INLINE void copyline_yuy16_to_argb(UINT32 *dst, const UINT16 *src, int width, co
 //  texture_set_data
 //============================================================
 
-void d3d::texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
+static void texture_set_data(d3d_info *d3d, d3d_texture_info *texture, const render_texinfo *texsource, UINT32 flags)
 {
 	D3DLOCKED_RECT rect;
 	HRESULT result;
+	int miny, maxy;
+	int dsty;
 
 	// lock the texture
-	switch (m_type)
+	switch (texture->type)
 	{
 		default:
-		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, NULL, 0);                 break;
-		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.lock_rect)(m_d3dtex, 0, &rect, NULL, D3DLOCK_DISCARD);   break;
-		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.lock_rect)(m_d3dsurface, &rect, NULL, D3DLOCK_DISCARD);  break;
+		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, 0);                 break;
+		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.lock_rect)(texture->d3dtex, 0, &rect, NULL, D3DLOCK_DISCARD);   break;
+		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.lock_rect)(texture->d3dsurface, &rect, NULL, D3DLOCK_DISCARD);  break;
 	}
 	if (result != D3D_OK)
-	{
 		return;
-	}
 
 	// loop over Y
-	int miny = 0 - m_yborderpix;
-	int maxy = texsource->height + m_yborderpix;
-	for (int dsty = miny; dsty < maxy; dsty++)
+	miny = 0 - texture->yborderpix;
+	maxy = texsource->height + texture->yborderpix;
+	for (dsty = miny; dsty < maxy; dsty++)
 	{
 		int srcy = (dsty < 0) ? 0 : (dsty >= texsource->height) ? texsource->height - 1 : dsty;
-		void *dst = (BYTE *)rect.pBits + (dsty + m_yborderpix) * rect.Pitch;
+		void *dst = (BYTE *)rect.pBits + (dsty + texture->yborderpix) * rect.Pitch;
 
 		// switch off of the format and
 		switch (PRIMFLAG_GET_TEXFORMAT(flags))
 		{
 			case TEXFORMAT_PALETTE16:
-				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_palette16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_PALETTEA16:
-				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_palettea16((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_RGB32:
-				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_rgb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_ARGB32:
-				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				copyline_argb32((UINT32 *)dst, (UINT32 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			case TEXFORMAT_YUY16:
-				if (m_d3d->yuv_format == D3DFMT_YUY2)
-					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
-				else if (m_d3d->yuv_format == D3DFMT_UYVY)
-					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+				if (d3d->yuv_format == D3DFMT_YUY2)
+					copyline_yuy16_to_yuy2((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
+				else if (d3d->yuv_format == D3DFMT_UYVY)
+					copyline_yuy16_to_uyvy((UINT16 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				else
-					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, m_xborderpix);
+					copyline_yuy16_to_argb((UINT32 *)dst, (UINT16 *)texsource->base + srcy * texsource->rowpixels, texsource->width, texsource->palette, texture->xborderpix);
 				break;
 
 			default:
@@ -2505,61 +2472,58 @@ void d3d::texture_info::set_data(const render_texinfo *texsource, UINT32 flags)
 	}
 
 	// unlock
-	switch (m_type)
+	switch (texture->type)
 	{
 		default:
-		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.unlock_rect)(m_d3dtex, 0);   break;
-		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.unlock_rect)(m_d3dtex, 0);   break;
-		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.unlock_rect)(m_d3dsurface);  break;
+		case TEXTURE_TYPE_PLAIN:    result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);   break;
+		case TEXTURE_TYPE_DYNAMIC:  result = (*d3dintf->texture.unlock_rect)(texture->d3dtex, 0);   break;
+		case TEXTURE_TYPE_SURFACE:  result = (*d3dintf->surface.unlock_rect)(texture->d3dsurface);  break;
 	}
-	if (result != D3D_OK)
-	{
-		mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
-	}
+	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture unlock_rect call\n", (int)result);
 
 	// prescale
-	prescale();
+	texture_prescale(d3d, texture);
 }
 
 
 
 //============================================================
-//  texture_info::prescale
+//  texture_prescale
 //============================================================
 
-void d3d::texture_info::prescale()
+static void texture_prescale(d3d_info *d3d, d3d_texture_info *texture)
 {
 	d3d_surface *surface;
 	HRESULT result;
 	int i;
 
 	// if we don't need to, just skip it
-	if (m_d3dtex == m_d3dfinaltex)
+	if (texture->d3dtex == texture->d3dfinaltex)
 		return;
 
 	// for all cases, we need to get the surface of the render target
-	result = (*d3dintf->texture.get_surface_level)(m_d3dfinaltex, 0, &surface);
+	result = (*d3dintf->texture.get_surface_level)(texture->d3dfinaltex, 0, &surface);
 	if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during texture get_surface_level call\n", (int)result);
 
 	// if we have an offscreen plain surface, we can just StretchRect to it
-	if (m_type == TEXTURE_TYPE_SURFACE)
+	if (texture->type == TEXTURE_TYPE_SURFACE)
 	{
-		assert(m_d3dsurface != NULL);
+		RECT source, dest;
+
+		assert(texture->d3dsurface != NULL);
 
 		// set the source bounds
-		RECT source;
 		source.left = source.top = 0;
-		source.right = m_texinfo->width + 2 * m_xborderpix;
-		source.bottom = m_texinfo->height + 2 * m_yborderpix;
+		source.right = texture->texinfo.width + 2 * texture->xborderpix;
+		source.bottom = texture->texinfo.height + 2 * texture->yborderpix;
 
 		// set the target bounds
-		RECT dest;
 		dest = source;
-		dest.right *= m_xprescale;
-		dest.bottom *= m_yprescale;
+		dest.right *= texture->xprescale;
+		dest.bottom *= texture->yprescale;
 
 		// do the stretchrect
-		result = (*d3dintf->device.stretch_rect)(m_d3d->device, m_d3dsurface, &source, surface, &dest, D3DTEXF_POINT);
+		result = (*d3dintf->device.stretch_rect)(d3d->device, texture->d3dsurface, &source, surface, &dest, D3DTEXF_POINT);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device stretct_rect call\n", (int)result);
 	}
 
@@ -2568,81 +2532,183 @@ void d3d::texture_info::prescale()
 	{
 		d3d_surface *backbuffer;
 
-		assert(m_d3dtex != NULL);
+		assert(texture->d3dtex != NULL);
 
 		// first remember the original render target and set the new one
-		result = (*d3dintf->device.get_render_target)(m_d3d->device, 0, &backbuffer);
+		result = (*d3dintf->device.get_render_target)(d3d->device, 0, &backbuffer);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device get_render_target call\n", (int)result);
-		result = (*d3dintf->device.set_render_target)(m_d3d->device, 0, surface);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, surface);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 1\n", (int)result);
-		reset_render_states(m_d3d);
+		reset_render_states(d3d);
 
 		// start the scene
-		result = (*d3dintf->device.begin_scene)(m_d3d->device);
+		result = (*d3dintf->device.begin_scene)(d3d->device);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device begin_scene call\n", (int)result);
 
 		// configure the rendering pipeline
-		set_filter(m_d3d, FALSE);
-		set_blendmode(m_d3d, BLENDMODE_NONE);
-		result = (*d3dintf->device.set_texture)(m_d3d->device, 0, m_d3dtex);
+		set_filter(d3d, FALSE);
+		set_blendmode(d3d, BLENDMODE_NONE);
+		result = (*d3dintf->device.set_texture)(d3d->device, 0, texture->d3dtex);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 
 		// lock the vertex buffer
-		result = (*d3dintf->vertexbuf.lock)(m_d3d->vertexbuf, 0, 0, (VOID **)&m_d3d->lockedbuf, D3DLOCK_DISCARD);
+		result = (*d3dintf->vertexbuf.lock)(d3d->vertexbuf, 0, 0, (VOID **)&d3d->lockedbuf, D3DLOCK_DISCARD);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during vertex buffer lock call\n", (int)result);
 
 		// configure the X/Y coordinates on the target surface
-		m_d3d->lockedbuf[0].x = -0.5f;
-		m_d3d->lockedbuf[0].y = -0.5f;
-		m_d3d->lockedbuf[1].x = (float)((m_texinfo->width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
-		m_d3d->lockedbuf[1].y = -0.5f;
-		m_d3d->lockedbuf[2].x = -0.5f;
-		m_d3d->lockedbuf[2].y = (float)((m_texinfo->height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
-		m_d3d->lockedbuf[3].x = (float)((m_texinfo->width + 2 * m_xborderpix) * m_xprescale) - 0.5f;
-		m_d3d->lockedbuf[3].y = (float)((m_texinfo->height + 2 * m_yborderpix) * m_yprescale) - 0.5f;
+		d3d->lockedbuf[0].x = -0.5f;
+		d3d->lockedbuf[0].y = -0.5f;
+		d3d->lockedbuf[1].x = (float)((texture->texinfo.width + 2 * texture->xborderpix) * texture->xprescale) - 0.5f;
+		d3d->lockedbuf[1].y = -0.5f;
+		d3d->lockedbuf[2].x = -0.5f;
+		d3d->lockedbuf[2].y = (float)((texture->texinfo.height + 2 * texture->yborderpix) * texture->yprescale) - 0.5f;
+		d3d->lockedbuf[3].x = (float)((texture->texinfo.width + 2 * texture->xborderpix) * texture->xprescale) - 0.5f;
+		d3d->lockedbuf[3].y = (float)((texture->texinfo.height + 2 * texture->yborderpix) * texture->yprescale) - 0.5f;
 
 		// configure the U/V coordintes on the source texture
-		m_d3d->lockedbuf[0].u0 = 0.0f;
-		m_d3d->lockedbuf[0].v0 = 0.0f;
-		m_d3d->lockedbuf[1].u0 = (float)(m_texinfo->width + 2 * m_xborderpix) / (float)m_rawwidth;
-		m_d3d->lockedbuf[1].v0 = 0.0f;
-		m_d3d->lockedbuf[2].u0 = 0.0f;
-		m_d3d->lockedbuf[2].v0 = (float)(m_texinfo->height + 2 * m_yborderpix) / (float)m_rawheight;
-		m_d3d->lockedbuf[3].u0 = (float)(m_texinfo->width + 2 * m_xborderpix) / (float)m_rawwidth;
-		m_d3d->lockedbuf[3].v0 = (float)(m_texinfo->height + 2 * m_yborderpix) / (float)m_rawheight;
+		d3d->lockedbuf[0].u0 = 0.0f;
+		d3d->lockedbuf[0].v0 = 0.0f;
+		d3d->lockedbuf[1].u0 = (float)(texture->texinfo.width + 2 * texture->xborderpix) / (float)texture->rawwidth;
+		d3d->lockedbuf[1].v0 = 0.0f;
+		d3d->lockedbuf[2].u0 = 0.0f;
+		d3d->lockedbuf[2].v0 = (float)(texture->texinfo.height + 2 * texture->yborderpix) / (float)texture->rawheight;
+		d3d->lockedbuf[3].u0 = (float)(texture->texinfo.width + 2 * texture->xborderpix) / (float)texture->rawwidth;
+		d3d->lockedbuf[3].v0 = (float)(texture->texinfo.height + 2 * texture->yborderpix) / (float)texture->rawheight;
 
 		// reset the remaining vertex parameters
 		for (i = 0; i < 4; i++)
 		{
-			m_d3d->lockedbuf[i].z = 0.0f;
-			m_d3d->lockedbuf[i].rhw = 1.0f;
-			m_d3d->lockedbuf[i].color = D3DCOLOR_ARGB(0xff,0xff,0xff,0xff);
+			d3d->lockedbuf[i].z = 0.0f;
+			d3d->lockedbuf[i].rhw = 1.0f;
+			d3d->lockedbuf[i].color = D3DCOLOR_ARGB(0xff,0xff,0xff,0xff);
 		}
 
 		// unlock the vertex buffer
-		result = (*d3dintf->vertexbuf.unlock)(m_d3d->vertexbuf);
+		result = (*d3dintf->vertexbuf.unlock)(d3d->vertexbuf);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during vertex buffer unlock call\n", (int)result);
-		m_d3d->lockedbuf = NULL;
+		d3d->lockedbuf = NULL;
 
 		// set the stream and draw the triangle strip
-		result = (*d3dintf->device.set_stream_source)(m_d3d->device, 0, m_d3d->vertexbuf, sizeof(d3d_vertex));
+		result = (*d3dintf->device.set_stream_source)(d3d->device, 0, d3d->vertexbuf, sizeof(d3d_vertex));
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_stream_source call\n", (int)result);
-		result = (*d3dintf->device.draw_primitive)(m_d3d->device, D3DPT_TRIANGLESTRIP, 0, 2);
+		result = (*d3dintf->device.draw_primitive)(d3d->device, D3DPT_TRIANGLESTRIP, 0, 2);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device draw_primitive call\n", (int)result);
 
 		// end the scene
-		result = (*d3dintf->device.end_scene)(m_d3d->device);
+		result = (*d3dintf->device.end_scene)(d3d->device);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device end_scene call\n", (int)result);
 
 		// reset the render target and release our reference to the backbuffer
-		result = (*d3dintf->device.set_render_target)(m_d3d->device, 0, backbuffer);
+		result = (*d3dintf->device.set_render_target)(d3d->device, 0, backbuffer);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_render_target call 2\n", (int)result);
 		(*d3dintf->surface.release)(backbuffer);
-		reset_render_states(m_d3d);
+		reset_render_states(d3d);
 	}
 
 	// release our reference to the target surface
 	(*d3dintf->surface.release)(surface);
+}
+
+
+
+//============================================================
+//  texture_find
+//============================================================
+
+static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *prim)
+{
+	UINT32 texhash = texture_compute_hash(&prim->texture, prim->flags);
+	d3d_texture_info *texture;
+
+	// find a match
+	for (texture = d3d->texlist; texture != NULL; texture = texture->next)
+	{
+		UINT32 test_screen = (UINT32)texture->texinfo.osddata >> 1;
+		UINT32 test_page = (UINT32)texture->texinfo.osddata & 1;
+		UINT32 prim_screen = (UINT32)prim->texture.osddata >> 1;
+		UINT32 prim_page = (UINT32)prim->texture.osddata & 1;
+		if (test_screen != prim_screen || test_page != prim_page)
+		{
+			continue;
+		}
+
+		if (texture->hash == texhash &&
+			texture->texinfo.base == prim->texture.base &&
+			texture->texinfo.width == prim->texture.width &&
+			texture->texinfo.height == prim->texture.height &&
+			((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
+		{
+			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
+			if (d3d->hlsl->enabled() && prim->texture.width != 0 && prim->texture.height != 0 && (prim->flags & PRIMFLAG_SCREENTEX_MASK) != 0)
+			{
+				if (d3d->hlsl->find_render_target(texture) != NULL)
+				{
+					return texture;
+				}
+			}
+			else
+			{
+				return texture;
+			}
+		}
+	}
+
+	// nothing found, check if we need to unregister something with hlsl
+	if (d3d->hlsl->enabled())
+	{
+		if (prim->texture.width == 0 || prim->texture.height == 0)
+		{
+			return NULL;
+		}
+
+		UINT32 prim_screen = (UINT32)prim->texture.osddata >> 1;
+		UINT32 prim_page = (UINT32)prim->texture.osddata & 1;
+
+		for (texture = d3d->texlist; texture != NULL; texture = texture->next)
+		{
+			UINT32 test_screen = (UINT32)texture->texinfo.osddata >> 1;
+			UINT32 test_page = (UINT32)texture->texinfo.osddata & 1;
+			if (test_screen != prim_screen || test_page != prim_page)
+			{
+				continue;
+			}
+
+			// Clear our old texture reference
+			if (texture->hash == texhash &&
+				texture->texinfo.base == prim->texture.base &&
+				((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
+				(texture->texinfo.width != prim->texture.width ||
+					texture->texinfo.height != prim->texture.height))
+			{
+				d3d->hlsl->remove_render_target(texture);
+				break;
+			}
+		}
+	}
+	return NULL;
+}
+
+
+//============================================================
+//  texture_update
+//============================================================
+
+static void texture_update(d3d_info *d3d, const render_primitive *prim)
+{
+	d3d_texture_info *texture = texture_find(d3d, prim);
+
+	// if we didn't find one, create a new texture
+	if (texture == NULL)
+	{
+		texture = texture_create(d3d, &prim->texture, prim->flags);
+	}
+
+	// if we found it, but with a different seqid, copy the data
+	if (texture->texinfo.seqid != prim->texture.seqid)
+	{
+		texture_set_data(d3d, texture, &prim->texture, prim->flags);
+		texture->texinfo.seqid = prim->texture.seqid;
+	}
 }
 
 
