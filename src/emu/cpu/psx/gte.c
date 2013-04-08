@@ -2471,12 +2471,13 @@ int gte::docop2( UINT32 pc, int gteop )
 	lm = GTE_LM( gteop );
 	m_sf = GTE_SF( gteop );
 
+	FLAG = 0;
+
 	switch( GTE_FUNCT( gteop ) )
 	{
 	case 0x00:
 	case 0x01:
 		GTELOG( pc, "%08x RTPS", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( (INT64) TRX << 12 ) + ( R11 * VX0 ) + ( R12 * VY0 ) + ( R13 * VZ0 ) );
 		MAC2 = A2( ( (INT64) TRY << 12 ) + ( R21 * VX0 ) + ( R22 * VY0 ) + ( R23 * VZ0 ) );
@@ -2499,14 +2500,12 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x06:
 		GTELOG( pc, "%08x NCLIP", gteop );
-		FLAG = 0;
 
 		MAC0 = F( (INT64) ( SX0 * SY1 ) + ( SX1 * SY2 ) + ( SX2 * SY0 ) - ( SX0 * SY2 ) - ( SX1 * SY0 ) - ( SX2 * SY1 ) );
 		return 1;
 
 	case 0x0c:
 		GTELOG( pc, "%08x OP", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( (INT64) ( R22 * IR3 ) - ( R33 * IR2 ) );
 		MAC2 = A2( (INT64) ( R33 * IR1 ) - ( R11 * IR3 ) );
@@ -2518,7 +2517,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x10:
 		GTELOG( pc, "%08x DPCS", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( R << 16 ) + ( IR0 * Lm_B1( A1( ( (INT64) RFC << 12 ) - ( R << 16 ) ), 0 ) ) );
 		MAC2 = A2( ( G << 16 ) + ( IR0 * Lm_B2( A2( ( (INT64) GFC << 12 ) - ( G << 16 ) ), 0 ) ) );
@@ -2536,7 +2534,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x11:
 		GTELOG( pc, "%08x INTPL", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( IR1 << 12 ) + ( IR0 * Lm_B1( A1( ( (INT64) RFC << 12 ) - ( IR1 << 12 ) ), 0 ) ) );
 		MAC2 = A2( ( IR2 << 12 ) + ( IR0 * Lm_B2( A2( ( (INT64) GFC << 12 ) - ( IR2 << 12 ) ), 0 ) ) );
@@ -2554,7 +2551,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x12:
 		GTELOG( pc, "%08x MVMVA", gteop );
-		FLAG = 0;
 
 		mx = GTE_MX( gteop );
 		v = GTE_V( gteop );
@@ -2570,7 +2566,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x13:
 		GTELOG( pc, "%08x NCDS", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( (INT64) ( L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) );
 		MAC2 = A2( (INT64) ( L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) );
@@ -2600,7 +2595,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x14:
 		GTELOG( pc, "%08x CDP", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
 		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
@@ -2624,7 +2618,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x16:
 		GTELOG( pc, "%08x NCDT", gteop );
-		FLAG = 0;
 
 		for( v = 0; v < 3; v++ )
 		{
@@ -2657,7 +2650,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x1b:
 		GTELOG( pc, "%08x NCCS", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( (INT64) ( L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) );
 		MAC2 = A2( (INT64) ( L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) );
@@ -2687,7 +2679,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x1c:
 		GTELOG( pc, "%08x CC", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
 		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
@@ -2711,7 +2702,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x1e:
 		GTELOG( pc, "%08x NCS", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( (INT64) ( L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) );
 		MAC2 = A2( (INT64) ( L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) );
@@ -2735,7 +2725,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x20:
 		GTELOG( pc, "%08x NCT", gteop );
-		FLAG = 0;
 
 		for( v = 0; v < 3; v++ )
 		{
@@ -2762,7 +2751,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x28:
 		GTELOG( pc, "%08x SQR", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( IR1 * IR1 );
 		MAC2 = A2( IR2 * IR2 );
@@ -2774,7 +2762,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x29:
 		GTELOG( pc, "%08x DPCL", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( ( ( R << 4 ) * IR1 ) + ( IR0 * Lm_B1( A1( ( (INT64) RFC << 12 ) - ( ( R << 4 ) * IR1 ) ), 0 ) ) );
 		MAC2 = A2( ( ( G << 4 ) * IR2 ) + ( IR0 * Lm_B2( A2( ( (INT64) GFC << 12 ) - ( ( G << 4 ) * IR2 ) ), 0 ) ) );
@@ -2792,7 +2779,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x2a:
 		GTELOG( pc, "%08x DPCT", gteop );
-		FLAG = 0;
 
 		for( v = 0; v < 3; v++ )
 		{
@@ -2813,7 +2799,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x2d:
 		GTELOG( pc, "%08x AVSZ3", gteop );
-		FLAG = 0;
 
 		MAC0 = F( (INT64) ( ZSF3 * SZ1 ) + ( ZSF3 * SZ2 ) + ( ZSF3 * SZ3 ) );
 		OTZ = Lm_D( m_mac0, 1 );
@@ -2821,7 +2806,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x2e:
 		GTELOG( pc, "%08x AVSZ4", gteop );
-		FLAG = 0;
 
 		MAC0 = F( (INT64) ( ZSF4 * SZ0 ) + ( ZSF4 * SZ1 ) + ( ZSF4 * SZ2 ) + ( ZSF4 * SZ3 ) );
 		OTZ = Lm_D( m_mac0, 1 );
@@ -2829,7 +2813,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x30:
 		GTELOG( pc, "%08x RTPT", gteop );
-		FLAG = 0;
 
 		for( v = 0; v < 3; v++ )
 		{
@@ -2855,7 +2838,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x3d:
 		GTELOG( pc, "%08x GPF", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( IR0 * IR1 );
 		MAC2 = A2( IR0 * IR2 );
@@ -2873,7 +2855,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x3e:
 		GTELOG( pc, "%08x GPL", gteop );
-		FLAG = 0;
 
 		MAC1 = A1( gte_shift( MAC1, -m_sf ) + ( IR0 * IR1 ) );
 		MAC2 = A2( gte_shift( MAC2, -m_sf ) + ( IR0 * IR2 ) );
@@ -2891,7 +2872,6 @@ int gte::docop2( UINT32 pc, int gteop )
 
 	case 0x3f:
 		GTELOG( pc, "%08x NCCT", gteop );
-		FLAG = 0;
 
 		for( v = 0; v < 3; v++ )
 		{
