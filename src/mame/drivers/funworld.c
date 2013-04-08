@@ -5406,7 +5406,7 @@ GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,       
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
 
 // MCU based games...
-GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Mongolfier New (Italian)",                        0 )
+GAME(  199?, mongolnw,  0,        royalcd1, royalcrd,  driver_device,  0,        ROT0, "bootleg",         "Mongolfier New (Italian)",                        GAME_NOT_WORKING )
 GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw, ROT0, "bootleg",         "Soccer New (Italian)",                            GAME_NOT_WORKING )
 
 // Other games...
