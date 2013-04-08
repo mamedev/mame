@@ -24,13 +24,13 @@ public:
 	m_maincpu(*this, "maincpu")
 	{ }
 
-	DECLARE_WRITE8_HANDLER(sound0_w) { };
-	DECLARE_WRITE8_HANDLER(sound1_w) { };
-	DECLARE_WRITE8_HANDLER(lamp_w) { };
-	DECLARE_WRITE8_HANDLER(sol0_w);
-	DECLARE_WRITE8_HANDLER(sol1_w) { };
-	DECLARE_WRITE8_HANDLER(intack_w);
-	DECLARE_WRITE8_HANDLER(display_w);
+	DECLARE_WRITE8_MEMBER(sound0_w) { };
+	DECLARE_WRITE8_MEMBER(sound1_w) { };
+	DECLARE_WRITE8_MEMBER(lamp_w) { };
+	DECLARE_WRITE8_MEMBER(sol0_w);
+	DECLARE_WRITE8_MEMBER(sol1_w) { };
+	DECLARE_WRITE8_MEMBER(intack_w);
+	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_READ8_MEMBER(switch_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
@@ -292,7 +292,7 @@ INPUT_PORTS_END
         14  = total plays counter
 */
 
-WRITE8_HANDLER( atari_s2_state::sol0_w )
+WRITE8_MEMBER( atari_s2_state::sol0_w )
 {
 	switch (data)
 	{

@@ -185,9 +185,9 @@ public:
 	// video helpers
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	void halt_until_hblank_0(device_t &device, screen_device &screen);
-	DECLARE_WRITE16_HANDLER( paletteram_666_w );
-	DECLARE_WRITE16_HANDLER( expanded_paletteram_666_w );
-	DECLARE_WRITE32_HANDLER( paletteram32_666_w );
+	DECLARE_WRITE16_MEMBER( paletteram_666_w );
+	DECLARE_WRITE16_MEMBER( expanded_paletteram_666_w );
+	DECLARE_WRITE32_MEMBER( paletteram32_666_w );
 
 	// misc helpers
 	void blend_gfx(int gfx0, int gfx1, int mask0, int mask1);

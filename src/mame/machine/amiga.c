@@ -1058,7 +1058,7 @@ READ16_MEMBER( amiga_state::amiga_cia_r )
  *
  *************************************/
 
-WRITE16_HANDLER( amiga_state::amiga_cia_w )
+WRITE16_MEMBER( amiga_state::amiga_cia_w )
 {
 	amiga_state *state = space.machine().driver_data<amiga_state>();
 	device_t *cia;
