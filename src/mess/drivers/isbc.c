@@ -74,6 +74,7 @@ static ADDRESS_MAP_START(isbc286_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc286_io, AS_IO, 16, isbc_state)
@@ -84,6 +85,7 @@ static ADDRESS_MAP_START(isbc2861_mem, AS_PROGRAM, 16, isbc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xeffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc2861_io, AS_IO, 16, isbc_state)
