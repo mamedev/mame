@@ -524,6 +524,12 @@
   - Added Drews Revenge (v.2.89, set 2). Based on 8080 CPU.
 
 
+  [2013-04-09]
+
+  - Added GTI Poker? (SMS hardware). Based on 8080 CPU.
+  - Added PCB description and sound hardware schematics.
+
+
   TODO:
 
   - Analize and hook the 3rd PPI device at 0xc0-0xc3.
@@ -798,6 +804,8 @@ READ8_MEMBER(norautp_state::test2_r)
   | dphlunka |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
   | dphlunkb |  8080?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
+  +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
+  | pkii_dm  |   Z80?  |  0x7C-0x7F   |  0x90  |  0xBC-0xBF   |  0x92  |  0xDC-0xDF   |          0xC0          |
   +----------+---------+--------------+--------+--------------+--------+--------------+------------------------+
 
 */
@@ -2912,6 +2920,74 @@ ROM_END
 
 /*
 
+  PCB is almost identical to SMS HI-LO.
+  "Copyright GTI 1983" found in rom at U12
+
+  Uses P8080A-1 cpu
+  clock crystal is 18.000 MHz
+
+  Need proper memory map.
+
+  Sound circuitry
+  ---------------
+                                 R13    C27
+  .---------------------------+--ZZZZ---||---> GND
+  |                           |
+  |               .--------.  |
+  |  R12          |  U50   |  |
+  '--ZZZZ--.      | NE555  |  |
+           |      |        |  |
+           +---+--| 2    7 |--'                              .--> Audio Out
+       C9  |   |  |        |       R14         Q2            |
+  .---||---+   +--| 6    3 |-------ZZZZ------> B             |    .-----------.
+  |        |      |        |                 E/=\C--> +5VDC  |    |    U20    |
+  |        |      |      4 |--------------.  |               |    | D8255AC-5 |
+  |        |      |        |   C10        |  '---------------'    |           |
+  |        |      |      5 |---||--> GND  '-----------------------| 10        |
+  |        |      '--------'                                      |           |
+  |        |                    .---------------------------------| 11        |
+  |        |                    |                                 |           |
+  |        |      .---------.   |  .------------------------------| 13        |
+  |        |      |   U34   |   |  |                              |           |
+  |        |      | ULN2003 |   |  |                              |           |
+  |        |  C7  |         |   |  |                              |           |
+  |        '--||--| 14    3 |---'  |                              |           |
+  |               '---------'      |                              |           |
+  |                                |                              |           |
+  |               .---------.      |                              |           |
+  |               |   U48   |      |                              '-----------'
+  |               | ULN2003 |      |
+  |               |         |      |
+  '---------------| 15    2 |------'
+                  '---------'
+
+  R12 - 120,000 ; Tolerance +/- 5%
+  R13 - 42.0 ; Tolerance +/- 20%
+  R14 - 42.0 ; Tolerance +/- 20%
+
+  C7  - 401M 50V (Ceramic Disc)
+  C9  - 503M 100V (Ceramic Disc)
+  C10 - .01M 50V (Ceramic Disc)
+  C27 - 104
+
+  Q2 - 2N2222A
+
+*/
+
+ROM_START( gtipokra )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.u12",    0x0000, 0x1000, CRC(cee5b03c) SHA1(38a5885b4a95d7b3fa0dd099c160a5e4d854e00a) )
+	ROM_LOAD( "2732_db.u18", 0x1000, 0x1000, CRC(f44cce3a) SHA1(f3e2a2a164d05a7ef121a7f0e872841553b6b2fe) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "2732.u31", 0x0000, 0x1000, CRC(ba037f69) SHA1(8f9c325d2a250ee02ac42ffeccbe7af1fc2da6a9) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129an.u51", 0x0000, 0x0100, CRC(c64f5b20) SHA1(ffbd46c59516f2f69cceb0bf423c489bdbe5d46d) )
+ROM_END
+
+/*
+
   HI-LO Double Up Joker Poker
   SMS Manufacturing Corp., 1983.
   ------------------------------
@@ -3369,6 +3445,32 @@ ROM_START( dphlunkb )
 	ROM_LOAD( "n82s129n_2",  0x0100, 0x0100, CRC(ee452994) SHA1(315913ce4a92fe0ea7b76e862507c933d6104616) )
 ROM_END
 
+/*
+  Unknown board silkscreened PKII/DM (made in Japan)
+
+  1x Sharp LH0080A (Z80A)
+  3x 8255 (2x Mitsubishi M5L8255AP, 1x Toshiba TMP8255AP)
+
+  2x 2732 (program ROMs U12 & U18)
+  1x 2716 (GFX ROM U31)
+  1x 63S141N (bipolar PROM U51)
+
+  Xtal 18.000 MHz.
+
+*/
+
+ROM_START( pkii_dm )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* no stack, call's RET go to PC=0 */
+	ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
+	ROM_LOAD( "13.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_FILL(                 0x0000, 0x0800, 0xff )
+	ROM_LOAD( "cgw-f506.u31", 0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "63s141n.u51",  0x0000, 0x0100, CRC(88302127) SHA1(aed1273974917673405f1234ab64e6f8b3856c34) )
+ROM_END
 
 
 /**************************
@@ -3508,42 +3610,43 @@ DRIVER_INIT_MEMBER(norautp_state,ssa)
 /*  The following ones are 'Draw Poker HI-LO' type, running in a Z80 based hardware   */
 /**************************************************************************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE   INPUT     STATE          INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
-GAMEL( 1988, norautp,  0,       norautp,  norautp, driver_device,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                layout_noraut11 )
+GAMEL( 1988, norautp,  0,       norautp,  norautp,  driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Poker",                        0,                layout_noraut11 )
 GAMEL( 198?, norautdx, 0,       norautp,  norautpn, driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
 GAMEL( 198?, norautpn, norautp, norautp,  norautpn, driver_device, 0,   ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
 GAMEL( 198?, norautjo, 0,       norautp,  mainline, driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                layout_noraut12 )
 GAMEL( 198?, norautpl, 0,       norautpl, mainline, driver_device, 0,   ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
-GAMEL( 1988, norautjp, norautp, norautp,  norautp, driver_device,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
+GAMEL( 1988, norautjp, norautp, norautp,  norautp,  driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
 GAMEL( 198?, norautra, 0,       norautp,  norautrh, driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...
-GAME(  1988, norautu,  0,       norautxp, norautp, driver_device,  0,   ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               GAME_NOT_WORKING )
-GAME(  2002, noraut3a, 0,       norautxp, norautp, driver_device,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        GAME_NOT_WORKING )
-GAME(  2003, noraut3b, 0,       norautxp, norautp, driver_device,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        GAME_NOT_WORKING )
-GAMEL( 198?, norautua, 0,       norautp,  norautp, norautp_state,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 1 (console)",      GAME_NOT_WORKING, layout_noraut12 )
-GAMEL( 198?, norautub, 0,       norautp,  norautp, norautp_state,  enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 2 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAME(  1988, norautu,  0,       norautxp, norautp,  driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Poker (NTX10A)",               GAME_NOT_WORKING )
+GAME(  2002, noraut3a, 0,       norautxp, norautp,  driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.010a)",        GAME_NOT_WORKING )
+GAME(  2003, noraut3b, 0,       norautxp, norautp,  driver_device, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (V3.011a)",        GAME_NOT_WORKING )
+GAMEL( 198?, norautua, 0,       norautp,  norautp,  norautp_state, enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 1 (console)",      GAME_NOT_WORKING, layout_noraut12 )
+GAMEL( 198?, norautub, 0,       norautp,  norautp,  norautp_state, enc, ROT0, "Noraut Ltd.",              "Noraut unknown set 2 (console)",      GAME_NOT_WORKING, layout_noraut12 )
 GAMEL( 198?, mainline, 0,       norautp,  mainline, driver_device, 0,   ROT0, "Mainline London",          "Mainline Double Joker Poker",         0,                layout_noraut12 )
 GAMEL( 199?, df_djpkr, 0,       norautp,  mainline, driver_device, 0,   ROT0, "DellFern Ltd.",            "Double Joker Poker (45%-75% payout)", 0,                layout_noraut12 )
 GAMEL( 2005, ndxron10, 0,       norautp,  ndxron10, driver_device, 0,   ROT0, "<unknown>",                "Royal on Ten (Noraut Deluxe hack)",   0,                layout_noraut12 )
 GAMEL( 1999, cgip30cs, 0,       norautx4, norautkl, norautp_state, deb, ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",    0,                layout_noraut12 )
-GAME(  198?, kimblz80, 0,       kimble,   norautp, driver_device,  0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   GAME_NOT_WORKING )
-GAME(  1983, pma,      0,       nortest1, norautp, driver_device,  0,   ROT0, "PMA",                      "PMA Poker",                           GAME_NOT_WORKING )
+GAME(  198?, kimblz80, 0,       kimble,   norautp,  driver_device, 0,   ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",   GAME_NOT_WORKING )
+GAME(  1983, pma,      0,       nortest1, norautp,  driver_device, 0,   ROT0, "PMA",                      "PMA Poker",                           GAME_NOT_WORKING )
 GAMEL( 198?, bjpoker,  0,       norautxp, norautrh, driver_device, 0,   ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",     GAME_NOT_WORKING, layout_noraut12 )
-GAME(  19??, newhilop, 0,       newhilop, norautp, driver_device,  0,   ROT0, "Song Won?",                "New Hi-Low Poker",                    GAME_NOT_WORKING )
+GAME(  19??, newhilop, 0,       newhilop, norautp,  driver_device, 0,   ROT0, "Song Won?",                "New Hi-Low Poker",                    GAME_NOT_WORKING )
 
 
 /************************************* 8080 sets **************************************/
 /*  The following ones are 'Draw Poker HI-LO' type, running in a 8080 based hardware  */
 /**************************************************************************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                        FULLNAME                           FLAGS             LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT ROT    COMPANY                        FULLNAME                           FLAGS             LAYOUT */
 
 GAME(  1983, dphl,     0,       dphl,     norautp, driver_device,  0,   ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      GAME_NOT_WORKING )
 GAME(  1983, dphla,    0,       dphla,    norautp, driver_device,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Alt)",           GAME_NOT_WORKING )
 GAME(  1983, dphljp,   0,       dphl,     norautp, driver_device,  0,   ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      GAME_NOT_WORKING )
 GAME(  198?, kimbldhl, 0,       kimbldhl, norautp, driver_device,  0,   ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              GAME_NOT_WORKING )
 GAME(  1983, gtipoker, 0,       dphl,     norautp, driver_device,  0,   ROT0, "GTI Inc",                     "GTI Poker",                        GAME_NOT_WORKING )
+GAME(  1983, gtipokra, 0,       dphla,    norautp, driver_device,  0,   ROT0, "GTI Inc",                     "GTI Poker? (SMS hardware)",        GAME_NOT_WORKING )
 GAME(  1983, smshilo,  0,       dphla,    norautp, driver_device,  0,   ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      GAME_NOT_WORKING )
 GAME(  1986, drhl,     0,       drhl,     norautp, driver_device,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    GAME_NOT_WORKING )
 GAME(  1986, drhla,    0,       drhl,     norautp, driver_device,  0,   ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    GAME_NOT_WORKING )
@@ -3557,8 +3660,11 @@ GAME(  1993, tpoker2,  0,       dphltest, norautp, driver_device,  0,   ROT0, "M
 /* The following ones are still unknown. No info about name, CPU, manufacturer, or HW */
 /**************************************************************************************/
 
-/*     YEAR  NAME      PARENT   MACHINE   INPUT     INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
+/*     YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT ROT    COMPANY                     FULLNAME                              FLAGS             LAYOUT */
 
 GAME(  198?, fastdrwp, 0,       dphl,     norautp, driver_device,  0,   ROT0, "Stern Electronics?",       "Fast Draw (poker conversion kit)?",   GAME_NOT_WORKING )
 GAME(  198?, dphlunka, 0,       dphl,     norautp, driver_device,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 1)",   GAME_NOT_WORKING )
 GAME(  198?, dphlunkb, 0,       dphl,     norautp, driver_device,  0,   ROT0, "SMS Manufacturing Corp.",  "Draw Poker HI-LO (unknown, rev 2)",   GAME_NOT_WORKING )
+
+GAME(  198?, pkii_dm,  0,       nortest1, norautp, driver_device,  0,   ROT0, "<unknown>",                "Unknown Poker PKII/DM",               GAME_NOT_WORKING )
+
