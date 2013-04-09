@@ -358,6 +358,7 @@ MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 
 MACHINE_RESET_MEMBER(md_cons_state,ms_megadriv )
 {
+	machine().device("maincpu")->reset();
 	MACHINE_RESET_CALL_MEMBER( megadriv );
 }
 
