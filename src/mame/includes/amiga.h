@@ -491,7 +491,7 @@ public:
 	DECLARE_READ16_MEMBER( amiga_ar23_mode_r );
 	DECLARE_WRITE16_MEMBER( amiga_ar23_mode_w );
 	void amiga_ar23_init( running_machine &machine, int ar3 );
-	
+
 };
 
 

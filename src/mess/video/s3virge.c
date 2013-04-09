@@ -620,7 +620,7 @@ WRITE8_MEMBER(s3virge_vga_device::mem_w)
 
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
 	{
-	//	printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
+	//  printf("%08x %02x (%02x %02x) %02X\n",offset,data,vga.sequencer.map_mask,svga.bank_w,(vga.sequencer.data[4] & 0x08));
 		if(offset & 0x10000)
 			return;
 		if(vga.sequencer.data[4] & 0x8)

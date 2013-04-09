@@ -93,5 +93,5 @@ public:
 	inline void get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer );
 	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
 	void init_common(  );
-	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);	
+	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
 };

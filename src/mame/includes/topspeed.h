@@ -66,5 +66,5 @@ public:
 	void reset_sound_region(  );
 	void topspeed_msm5205_clock(device_t *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_1);
-	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_2);	
+	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_2);
 };

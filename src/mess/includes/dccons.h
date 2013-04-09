@@ -34,10 +34,10 @@ public:
 	WRITE64_MEMBER( dc_mess_gdrom_w );
 	READ64_MEMBER( dc_mess_g1_ctrl_r );
 	WRITE64_MEMBER( dc_mess_g1_ctrl_w );
-	
+
 private:
 	UINT64 PDTRA, PCTRA;
-	
+
 	UINT8 *atapi_regs;
 	emu_timer *atapi_timer;
 	gdrom_device *gdrom;

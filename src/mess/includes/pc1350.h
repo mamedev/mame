@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1350_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1350_lcd_write);
 	DECLARE_READ8_MEMBER(pc1350_keyboard_line_r);
-	
+
 	virtual void machine_start();
 };
 

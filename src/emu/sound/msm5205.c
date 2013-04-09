@@ -54,7 +54,7 @@
 
 struct msm5205_state
 {
-	const msm5205_interface *intf;	
+	const msm5205_interface *intf;
 	device_t *device;
 	sound_stream * stream;    /* number of stream system      */
 	INT32 clock;              /* clock rate                   */
@@ -67,7 +67,7 @@ struct msm5205_state
 	INT32 signal;             /* current ADPCM signal         */
 	INT32 step;               /* current ADPCM step           */
 	int diff_lookup[49*16];
-	devcb_resolved_write_line vclk_callback; 
+	devcb_resolved_write_line vclk_callback;
 };
 
 INLINE msm5205_state *get_safe_token(device_t *device)

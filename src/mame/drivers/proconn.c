@@ -1421,5 +1421,5 @@ GAME( 199?, pr_gnuc         ,0          ,proconn    ,proconn    , proconn_state,
 GAME( 199?, pr_gnuca        ,pr_gnuc    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_magln        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_maglna       ,pr_magln   ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_wnstk        ,0		    ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Winning Streak (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_wnstk        ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Coinworld", "Winning Streak (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_swop         ,0          ,proconn    ,proconn    , proconn_state,proconn ,ROT0   ,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )

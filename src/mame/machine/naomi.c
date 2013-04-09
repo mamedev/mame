@@ -346,4 +346,3 @@ DRIVER_INIT_MEMBER(naomi_state,hotd2)
 }
 
 // f355 PC=0xc065f7c RAM=0xc26dafc
-

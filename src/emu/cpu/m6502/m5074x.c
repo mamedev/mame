@@ -9,14 +9,14 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define IRQ_CNTRREQ	(0x80)
-#define IRQ_CNTRENA	(0x40)
-#define IRQ_TMR1REQ	(0x20)
-#define IRQ_TMR1ENA	(0x10)
-#define IRQ_TMR2REQ	(0x08)
-#define IRQ_TMR2ENA	(0x04)
-#define IRQ_INTREQ	(0x02)
-#define IRQ_INTENA	(0x01)
+#define IRQ_CNTRREQ (0x80)
+#define IRQ_CNTRENA (0x40)
+#define IRQ_TMR1REQ (0x20)
+#define IRQ_TMR1ENA (0x10)
+#define IRQ_TMR2REQ (0x08)
+#define IRQ_TMR2ENA (0x04)
+#define IRQ_INTREQ  (0x02)
+#define IRQ_INTENA  (0x01)
 
 #define TMRC_TMRXREQ (0x80)
 #define TMRC_TMRXENA (0x40)
@@ -64,7 +64,7 @@ void m5074x_device::device_start()
 	write_p0.resolve_safe();
 	write_p1.resolve_safe();
 	write_p2.resolve_safe();
-    write_p3.resolve_safe();
+	write_p3.resolve_safe();
 
 	for (int i = 0; i < NUM_TIMERS; i++)
 	{
@@ -243,7 +243,7 @@ void m5074x_device::recalc_timer(int timer)
 			break;
 
 		case 2:
-			// Timer X modes: 00 = free run countdown, 01 = invert CNTR pin each time expires, 
+			// Timer X modes: 00 = free run countdown, 01 = invert CNTR pin each time expires,
 			// 10 = count each time CNTR pin inverts, 11 = count when CNTR pin low
 			if ((m_tmrctrl & TMRC_TMRXMDE) == 0)
 			{
@@ -291,111 +291,111 @@ void m5074x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
 UINT8 m5074x_device::read_port(UINT8 offset)
 {
-   UINT8 incoming = 0;
+	UINT8 incoming = 0;
 
-   switch (offset)
-   {
-	   case 0:
-		   incoming = read_p0();
-		   break;
+	switch (offset)
+	{
+		case 0:
+			incoming = read_p0();
+			break;
 
-	   case 1:
-		   incoming = read_p1();
-		   break;
+		case 1:
+			incoming = read_p1();
+			break;
 
-	   case 2:
-		   incoming = read_p2();
-		   break;
+		case 2:
+			incoming = read_p2();
+			break;
 
-	   case 3:
-		   incoming = read_p3();
-		   break;
-   }
+		case 3:
+			incoming = read_p3();
+			break;
+	}
 
-   // apply data direction registers
-   incoming &= (m_ddrs[offset] ^ 0xff);
-   // OR in ddr-masked version of port writes
-   incoming |= (m_ports[offset] & m_ddrs[offset]);
+	// apply data direction registers
+	incoming &= (m_ddrs[offset] ^ 0xff);
+	// OR in ddr-masked version of port writes
+	incoming |= (m_ports[offset] & m_ddrs[offset]);
 
-   return incoming;
+	return incoming;
 }
 
 READ8_MEMBER(m5074x_device::ports_r)
 {
-   switch (offset)
-   {
-      case 0:
-		  return read_port(0);
+	switch (offset)
+	{
+		case 0:
+			return read_port(0);
 
-      case 1:
-		  return m_ddrs[0];
+		case 1:
+			return m_ddrs[0];
 
-      case 2:
-		  return read_port(1);
+		case 2:
+			return read_port(1);
 
-      case 3:
-		  return m_ddrs[1];
+		case 3:
+			return m_ddrs[1];
 
-      case 4:
-		  return read_port(2);
+		case 4:
+			return read_port(2);
 
-      case 5:
-		  return m_ddrs[2];
+		case 5:
+			return m_ddrs[2];
 
-      case 8:
-		  return read_port(3);
+		case 8:
+			return read_port(3);
 
-      case 9:
-		  return m_ddrs[3];
-   }
+		case 9:
+			return m_ddrs[3];
+	}
 
-   return 0xff;
+	return 0xff;
 }
 
 WRITE8_MEMBER(m5074x_device::ports_w)
 {
-   switch (offset)
-   {
-      case 0:	// p0
-		  send_port(space, 0, data & m_ddrs[0]);
-		  m_ports[0] = data;
-		  break;
+	switch (offset)
+	{
+		case 0: // p0
+			send_port(space, 0, data & m_ddrs[0]);
+			m_ports[0] = data;
+			break;
 
-      case 1: // p0 ddr
-		  send_port(space, 0, m_ports[0] & data);
-		  m_ddrs[0] = data;
-		  break;
+		case 1: // p0 ddr
+			send_port(space, 0, m_ports[0] & data);
+			m_ddrs[0] = data;
+			break;
 
-      case 2:	// p1
-		  send_port(space, 1, data & m_ddrs[1]);
-		  m_ports[1] = data;
-		  break;
+		case 2: // p1
+			send_port(space, 1, data & m_ddrs[1]);
+			m_ports[1] = data;
+			break;
 
-      case 3: // p1 ddr
-		  send_port(space, 1, m_ports[1] & data);
-		  m_ddrs[1] = data;
-		  break;
+		case 3: // p1 ddr
+			send_port(space, 1, m_ports[1] & data);
+			m_ddrs[1] = data;
+			break;
 
-      case 4:	// p2
-		  send_port(space, 2, data & m_ddrs[2]);
-		  m_ports[2] = data;
-		  break;
+		case 4: // p2
+			send_port(space, 2, data & m_ddrs[2]);
+			m_ports[2] = data;
+			break;
 
-      case 5: // p2 ddr
-		  send_port(space, 2, m_ports[2] & data);
-		  m_ddrs[2] = data;
-		  break;
+		case 5: // p2 ddr
+			send_port(space, 2, m_ports[2] & data);
+			m_ddrs[2] = data;
+			break;
 
-      case 8:	// p3
-		  send_port(space, 3, data & m_ddrs[3]);
-		  m_ports[3] = data;
-		  break;
+		case 8: // p3
+			send_port(space, 3, data & m_ddrs[3]);
+			m_ports[3] = data;
+			break;
 
-      case 9: // p3 ddr
-		  send_port(space, 3, m_ports[3] & data);
-		  m_ddrs[3] = data;
-		  break;
-   }
+		case 9: // p3 ddr
+			send_port(space, 3, m_ports[3] & data);
+			m_ddrs[3] = data;
+			break;
+	}
 }
 
 READ8_MEMBER(m5074x_device::tmrirq_r)
@@ -429,7 +429,7 @@ READ8_MEMBER(m5074x_device::tmrirq_r)
 
 WRITE8_MEMBER(m5074x_device::tmrirq_w)
 {
-//	printf("%02x to tmrirq @ %d\n", data, offset);
+//  printf("%02x to tmrirq @ %d\n", data, offset);
 
 	switch (offset)
 	{
@@ -505,4 +505,3 @@ m50741_device::m50741_device(const machine_config &mconfig, device_type type, co
 	m5074x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m50741_map), shortname, source)
 {
 }
-

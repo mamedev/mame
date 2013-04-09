@@ -81,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pfest94_hi_w );
 	DECLARE_READ8_MEMBER( pfest94_lo_r );
 	DECLARE_WRITE8_MEMBER( pfest94_lo_w );
-	
+
 	DECLARE_READ8_MEMBER( spc_ram_100_r );
 	DECLARE_WRITE8_MEMBER( spc_ram_100_w );
 	CUSTOM_INPUT_MEMBER( snes_mouse_speed_input );
@@ -779,7 +779,7 @@ WRITE8_MEMBER( snes_console_state::snesbsx_lo_w )
 READ8_MEMBER( snes_console_state::pfest94_hi_r )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -827,7 +827,7 @@ WRITE8_MEMBER( snes_console_state::pfest94_hi_w )
 READ8_MEMBER( snes_console_state::pfest94_lo_r )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
@@ -848,7 +848,7 @@ READ8_MEMBER( snes_console_state::pfest94_lo_r )
 		else
 			return m_cartslot->read_l(space, offset);
 	}
-	return 0xff;	// or open_bus?
+	return 0xff;    // or open_bus?
 }
 
 WRITE8_MEMBER( snes_console_state::pfest94_lo_w )

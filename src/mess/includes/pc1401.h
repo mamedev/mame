@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1401_inb);
 	DECLARE_READ8_MEMBER(pc1401_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1401_lcd_write);
-	
+
 	virtual void machine_start();
 };
 

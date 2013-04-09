@@ -2724,7 +2724,7 @@
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="??" />
-			<feature name="ic1" value="MPR-13144" /> 
+			<feature name="ic1" value="MPR-13144" />
 			<!-- MB8464A SRAM -->
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-13144.ic1" size="262144" crc="48651325" sha1="d0b964dd7cd8ccdd730de4d8e4bb2e87bea7686e" offset="000000" />
@@ -4473,7 +4473,7 @@
 			<feature name="pcb" value="??" />
 			<feature name="ic1" value="315-5235" /> <!-- Sega Memory Controller -->
 			<feature name="ic2" value="MPR-11190" />
-            <!-- Also RAM present -->
+			<!-- Also RAM present -->
 			<dataarea name="rom" size="131072">
 				<rom name="mpr-11190.ic1" size="131072" crc="f97e9875" sha1="8762239c339a084dfb8443cc38515301476bde28" offset="000000" />
 			</dataarea>
@@ -5434,8 +5434,8 @@
 		<info name="release" value="19861221 (JPN)"/>
 		<info name="alt_title" value="スペースハリアー" />
 		<part name="cart" interface="sms_cart">
-			<!-- PCB info based on SMS Power, dump to be split! 
-            Jpn version also found on a 171-5440 PCB with single chip MPR-10412, to check the cart with MPR-11076 -->
+			<!-- PCB info based on SMS Power, dump to be split!
+			Jpn version also found on a 171-5440 PCB with single chip MPR-10412, to check the cart with MPR-11076 -->
 			<feature name="pcb" value="171-5559-01D" />
 			<feature name="ic1?" value="315-5235" /> <!-- Sega Memory Controller -->
 			<feature name="ic2?" value="MPR-10410" />
@@ -6620,7 +6620,7 @@
 		<part name="cart" interface="sms_cart">
 			<!-- PCB info based on SMS Power -->
 			<feature name="pcb" value="??" />
-			<feature name="ic1" value="MPR-13135" /> 
+			<feature name="ic1" value="MPR-13135" />
 			<!-- MB8464A SRAM -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-13135.ic1" size="524288" crc="b52d60c8" sha1="a90e21e5961bcf2e10b715a009c04e7c2017a3b1" offset="000000" />

@@ -35,14 +35,14 @@
     2013/02/27 Robert Tuccitto  Palette rebuild due to misaligned
                data references.  Corrected PAL color sequence order.
 
-    2013/03/19 Robert Tuccitto  Stripped palette to raw video output 
+    2013/03/19 Robert Tuccitto  Stripped palette to raw video output
                values removing YIQ/YUV infer data.
 
-    2013/04/02 Robert Tuccitto  Corrected rotation values and errors 
-	       including duplicate entries for palette.
+    2013/04/02 Robert Tuccitto  Corrected rotation values and errors
+           including duplicate entries for palette.
 
     2013/04/07 Robert Tuccitto  Address map locations for the XBOARD
-	       added.
+           added.
 
 ***************************************************************************/
 
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( a7800_mem, AS_PROGRAM, 8, a7800_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")                        /* sc + ac */
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")                        /* ac */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w)	/* XBOARD SRAM */
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(a7800_cart_w) /* XBOARD SRAM */
 ADDRESS_MAP_END
 
 

@@ -10843,7 +10843,7 @@ DRIVER_INIT_MEMBER(cps_state,sf2dongb)
 DRIVER_INIT_MEMBER( cps_state, sf2m8 )
 {
 	// unscramble gfx
-	UINT8 *grom = memregion("gfx")->base();	
+	UINT8 *grom = memregion("gfx")->base();
 	UINT8 *urom = memregion("user2")->base();
 	int i = 0x480000, j = 0;
 

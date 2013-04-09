@@ -136,7 +136,7 @@ public:
 	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
 	inline void update_blaster_banking();
 	void defender_install_io_space(address_space &space);
-	
+
 	/* older-Williams routines */
 	DECLARE_WRITE_LINE_MEMBER(williams_main_irq);
 	DECLARE_WRITE_LINE_MEMBER(williams_main_firq);

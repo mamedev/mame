@@ -376,7 +376,7 @@ WRITE32_MEMBER(ghosteo_state::sound_w)
 }
 
 READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
-{	
+{
 	UINT32 port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
 	UINT32 data = 0xFFFFFFFF;
 	switch (port_g)

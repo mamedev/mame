@@ -28,13 +28,13 @@ const device_type K053260 = &device_creator<k053260_device>;
 
 k053260_device::k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053260, "K053260", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_channel(NULL),
-	  m_mode(0),
-	  m_rom(NULL),
-	  m_rom_size(0),
-	  m_delta_table(NULL),
-	  m_intf(NULL)
+		device_sound_interface(mconfig, *this),
+		m_channel(NULL),
+		m_mode(0),
+		m_rom(NULL),
+		m_rom_size(0),
+		m_delta_table(NULL),
+		m_intf(NULL)
 {
 	memset(m_regs, 0, sizeof(int)*0x30);
 }

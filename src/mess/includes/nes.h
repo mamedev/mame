@@ -161,13 +161,13 @@ public:
 	void btl_smb2a_irq(int scanline, int vblank, int blanked);
 	void btl_smb3_irq(int scanline, int vblank, int blanked);
 	void btl_dn_irq(int scanline, int vblank, int blanked);
-	void shjy3_irq(int scanline, int vblank, int blanked);	
+	void shjy3_irq(int scanline, int vblank, int blanked);
 	void bandai_lz_irq(int scanline, int vblank, int blanked);
 	void namcot_irq(int scanline, int vblank, int blanked);
 	void futuremedia_irq(int scanline, int vblank, int blanked);
 	void nanjing_irq(int scanline, int vblank, int blanked);
-	void tengen_800032_irq(int scanline, int vblank, int blanked);	
-	
+	void tengen_800032_irq(int scanline, int vblank, int blanked);
+
 	int nes_ppu_vidaccess(int address, int data);
 	void fds_irq(int scanline, int vblank, int blanked);
 	void ppu_nmi(int *ppu_regs);

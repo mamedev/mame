@@ -209,7 +209,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 		state->amiga_custom_w(*state->m_maincpu_program_space, state->m_copper_pending_offset, state->m_copper_pending_data, 0xffff);
 		state->m_copper_pending_offset = 0;
 	}
-	
+
 	/* if we're waiting, check for a breakthrough */
 	if (state->m_copper_waiting)
 	{

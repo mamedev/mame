@@ -155,7 +155,7 @@ public:
 	ddenlovr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dynax_state(mconfig, type, tag)
 		{ }
-	
+
 	DECLARE_MACHINE_START(ddenlovr);
 	DECLARE_MACHINE_RESET(ddenlovr);
 	DECLARE_VIDEO_START(ddenlovr);
@@ -173,7 +173,7 @@ public:
 	DECLARE_MACHINE_START(hparadis);
 	UINT32 screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_htengoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(quizchq_irq);
 	INTERRUPT_GEN_MEMBER(mmpanic_irq);
 	DECLARE_WRITE_LINE_MEMBER(quizchq_rtc_irq);
@@ -189,7 +189,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mjflove_rtc_irq);
 	DECLARE_WRITE_LINE_MEMBER(mjmyster_rtc_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(mjmyster_irq);
-	
+
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
@@ -350,7 +350,7 @@ public:
 	DECLARE_VIDEO_START(htengoku);
 	DECLARE_WRITE8_MEMBER(htengoku_dsw_w);
 	DECLARE_READ8_MEMBER(htengoku_dsw_r);
-	
+
 	void ddenlovr_flipscreen_w( UINT8 data );
 	void ddenlovr_blit_flip_w( UINT8 data );
 	void do_plot( int x, int y, int pen );
@@ -1733,7 +1733,7 @@ WRITE16_MEMBER(ddenlovr_state::ddenlovr16_transparency_mask_w)
 
 
 WRITE8_MEMBER(ddenlovr_state::quizchq_oki_bank_w )
-{	
+{
 	m_oki->set_bank_base((data & 1) * 0x40000);
 }
 
@@ -1760,7 +1760,7 @@ WRITE16_MEMBER(ddenlovr_state::quiz365_oki_bank2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_okibank = (m_okibank & 1) | ((data & 1) << 1);		
+		m_okibank = (m_okibank & 1) | ((data & 1) << 1);
 		m_oki->set_bank_base(m_okibank * 0x40000);
 	}
 }

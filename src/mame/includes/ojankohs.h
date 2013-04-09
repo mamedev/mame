@@ -73,5 +73,5 @@ public:
 	UINT32 screen_update_ojankohs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ojankoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ojankoc_flipscreen( address_space &space, int data );
-	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);	
+	DECLARE_WRITE_LINE_MEMBER(ojankohs_adpcm_int);
 };

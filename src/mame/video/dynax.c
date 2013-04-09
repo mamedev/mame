@@ -529,7 +529,7 @@ void dynax_state::dynax_blitter_start(int flags )
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
 
-	blit_newsrc = blitter_drawgfx(			
+	blit_newsrc = blitter_drawgfx(
 			0,                      // layer
 			m_blit_dest,     // layer mask
 			gfxregions[m_blit_romregion],    // rom region
@@ -556,7 +556,7 @@ void dynax_state::jantouki_blitter_start( int flags )
 
 	LOG(("XY=%X,%X SRC=%X BLIT=%X\n", m_blit_x, m_blit_y, m_blit_src, flags));
 
-	blit_newsrc = blitter_drawgfx(			
+	blit_newsrc = blitter_drawgfx(
 			0,                      // layer
 			m_blit_dest,     // layer mask
 			gfxregions[m_blit_romregion],    // rom region
@@ -733,7 +733,6 @@ static const int priority_mjelctrn[8] = { 0x0231, 0x0321, 0x2031, 0x2301, 0x3021
 
 void dynax_state::dynax_common_reset()
 {
-
 	m_blit_romregion = 0;
 	m_blit2_romregion = 0;
 	m_blit_dest = -1;

@@ -3,7 +3,7 @@ class pk8000_base_state : public driver_device
 public:
 	pk8000_base_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-		
+
 	DECLARE_READ8_MEMBER(pk8000_video_color_r);
 	DECLARE_WRITE8_MEMBER(pk8000_video_color_w);
 	DECLARE_READ8_MEMBER(pk8000_text_start_r);
@@ -23,7 +23,7 @@ public:
 	virtual void palette_init();
 
 	UINT32 pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *videomem);
-protected:	
+protected:
 	UINT8 m_pk8000_text_start;
 	UINT8 m_pk8000_chargen_start;
 	UINT8 m_pk8000_video_start;
@@ -32,5 +32,5 @@ protected:
 	UINT8 m_pk8000_video_mode;
 	UINT8 m_pk8000_video_color;
 	UINT8 m_pk8000_color[32];
-	UINT8 m_pk8000_video_enable;	
+	UINT8 m_pk8000_video_enable;
 };

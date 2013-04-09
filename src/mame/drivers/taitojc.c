@@ -320,7 +320,7 @@ Notes:
                    320C51 - 40.000MHz (pin96 X2/CLKIN. 10MHz*4, source = CY7C991)
                    OTISR2 - 3.80950MHz (pin12)
                    ES5510 - 2.22MHz, 2.666MHz, 3.8095125MHz (30.4761/8), 8.000MHz (16/2)
-                   
+
 
 Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 |---------------------------------------------------------------------------------|
@@ -367,7 +367,7 @@ Notes:
       ROMs .30-.31 are 27C2001, sound program.
       ROM  .65 is 27C512, linked to 68HC11 MCU
       *    Unpopulated socket.
-      
+
       Measurements:
                    68HC11 - 8.000MHz (16/2 on pin74)
 

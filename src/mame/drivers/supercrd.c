@@ -526,9 +526,9 @@ ROM_END
 */
 ROM_START( fruitstr )
 	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) )	// 1st half: empty; 2nd half: program (1st half)
+	ROM_LOAD( "fruitstar_t10s-i-1.ic37", 0x0000, 0x8000, CRC(cd458e9f) SHA1(3fdf59360704ae1550c108c59907067fc7c8424c) ) // 1st half: empty; 2nd half: program (1st half)
 	ROM_CONTINUE(                        0x0000, 0x8000)
-	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) )	// 1st half: program (2nd half); 2nd half: empty
+	ROM_LOAD( "fruitstar_t10s-i-2.ic51", 0x8000, 0x8000, CRC(4536976b) SHA1(9a0ef6245e5aedfdb690df4c6d7a32ebf1b22590) ) // 1st half: program (2nd half); 2nd half: empty
 	ROM_IGNORE(                                  0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )

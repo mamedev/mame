@@ -429,7 +429,7 @@ void topspeed_state::topspeed_msm5205_clock( device_t *device, int chip )
 	UINT8 data = m_msm_rom[chip][m_msm_pos[chip]];
 
 	msm5205_data_w(device, m_msm_sel[chip] ? data & 0xf : data >> 4 & 0xf);
-    m_msm_pos[chip] += m_msm_sel[chip];
+	m_msm_pos[chip] += m_msm_sel[chip];
 	m_msm_sel[chip] ^= 1;
 
 	if ((m_msm_pos[chip]) == m_msm_loop[chip])

@@ -2080,7 +2080,7 @@ UINT8 apple2gs_state::keyglu_mcu_read(UINT8 offset)
 {
 	UINT8 rv = m_glu_regs[offset];
 
-//	printf("MCU reads reg %x\n", offset);
+//  printf("MCU reads reg %x\n", offset);
 
 	// the command full flag is cleared by the MCU reading
 	// first the KGS register and then the command register
@@ -2088,7 +2088,7 @@ UINT8 apple2gs_state::keyglu_mcu_read(UINT8 offset)
 	{
 		m_glu_regs[GLU_KG_STATUS] &= ~KGS_COMMAND_FULL;
 		m_glu_mcu_read_kgs = false;
-//		printf("MCU reads COMMAND = %02x (drop command full)\n", rv);
+//      printf("MCU reads COMMAND = %02x (drop command full)\n", rv);
 	}
 
 	// prime for the next command register read to clear the command full flag
@@ -2104,7 +2104,7 @@ void  apple2gs_state::keyglu_mcu_write(UINT8 offset, UINT8 data)
 {
 	m_glu_regs[offset] = data;
 
-//	printf("MCU writes %02x to reg %x\n", data, offset);
+//  printf("MCU writes %02x to reg %x\n", data, offset);
 
 	switch (offset)
 	{
@@ -2114,8 +2114,8 @@ void  apple2gs_state::keyglu_mcu_write(UINT8 offset, UINT8 data)
 			m_glu_mouse_read_stat = false;  // signal next read will be mouse X
 			break;
 
-		case GLU_ANY_KEY_DOWN:	// bit 7 is the actual flag here; both MCU programs write either 0x7f or 0xff
-//			printf("%d to ANY_KEY_DOWN (PC=%x)\n", data, m_adbmicro->pc());
+		case GLU_ANY_KEY_DOWN:  // bit 7 is the actual flag here; both MCU programs write either 0x7f or 0xff
+//          printf("%d to ANY_KEY_DOWN (PC=%x)\n", data, m_adbmicro->pc());
 			if (data & 0x80)
 			{
 				m_glu_regs[GLU_KG_STATUS] |= KGS_ANY_KEY_DOWN | KGS_KEYSTROBE;
@@ -2125,7 +2125,7 @@ void  apple2gs_state::keyglu_mcu_write(UINT8 offset, UINT8 data)
 		case GLU_DATA:
 			m_glu_regs[GLU_KG_STATUS] |= KGS_DATA_FULL;
 			m_glu_816_read_dstat = false;
-//			printf("MCU writes %02x to DATA\n", data);
+//          printf("MCU writes %02x to DATA\n", data);
 			break;
 	}
 }
@@ -2212,7 +2212,7 @@ UINT8 apple2gs_state::keyglu_816_read(UINT8 offset)
 			{
 				m_glu_816_read_dstat = false;
 				m_glu_regs[GLU_KG_STATUS] &= ~KGS_DATA_FULL;
-//				printf("816 reads %02x from DATA\n", m_glu_regs[GLU_DATA]);
+//              printf("816 reads %02x from DATA\n", m_glu_regs[GLU_DATA]);
 			}
 			return m_glu_regs[GLU_DATA];
 
@@ -2238,7 +2238,7 @@ void  apple2gs_state::keyglu_816_write(UINT8 offset, UINT8 data)
 			break;
 
 		case GLU_COMMAND:
-//			printf("816 sets COMMAND to %02x (raise command full)\n", data);
+//          printf("816 sets COMMAND to %02x (raise command full)\n", data);
 			m_glu_regs[GLU_KG_STATUS] |= KGS_COMMAND_FULL;
 			break;
 

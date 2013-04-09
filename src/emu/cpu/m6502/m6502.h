@@ -129,8 +129,8 @@ protected:
 		DASM_spg,    /* "special page": implied FF00 OR immediate value (M740)*/
 		DASM_biz,    /* bit, zero page (M740) */
 		DASM_bzr,    /* bit, zero page, relative offset (M740) */
-		DASM_bar,	 /* bit, accumulator, relative offset (M740) */
-		DASM_bac	 /* bit, accumulator (M740) */
+		DASM_bar,    /* bit, accumulator, relative offset (M740) */
+		DASM_bac     /* bit, accumulator (M740) */
 	};
 
 	enum {

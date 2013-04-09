@@ -23,23 +23,23 @@ public:
 	: md_base_state(mconfig, type, tag),
 	m_slotcart(*this, "mdslot")
 	{ }
-	
+
 	ioport_port *m_io_ctrlr;
 	ioport_port *m_io_pad3b[4];
 	ioport_port *m_io_pad6b[2][4];
-	
+
 	optional_device<md_cart_slot_device> m_slotcart;
-	
+
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(genesis);
 	DECLARE_DRIVER_INIT(md_eur);
 	DECLARE_DRIVER_INIT(md_jpn);
-	
+
 	READ8_MEMBER(mess_md_io_read_data_port);
 	WRITE16_MEMBER(mess_md_io_write_data_port);
 
-	DECLARE_MACHINE_START( md_common );		// setup ioport_port
-	DECLARE_MACHINE_START( ms_megadriv );	// setup ioport_port + install cartslot handlers
+	DECLARE_MACHINE_START( md_common );     // setup ioport_port
+	DECLARE_MACHINE_START( ms_megadriv );   // setup ioport_port + install cartslot handlers
 	DECLARE_MACHINE_RESET( ms_megadriv );
 };
 
@@ -57,7 +57,7 @@ public:
 
 	optional_device<pico_cart_slot_device> m_picocart;
 	UINT8 m_page_register;
-	
+
 	UINT16 pico_read_penpos(int pen);
 	DECLARE_READ16_HANDLER(pico_68k_io_read);
 	DECLARE_WRITE16_MEMBER(pico_68k_io_write);
@@ -303,7 +303,7 @@ INPUT_PORTS_END
 UINT16 vdp_get_word_from_68k_mem_console(running_machine &machine, UINT32 source, address_space & space68k)
 {
 	md_cons_state *state = machine.driver_data<md_cons_state>();
-	
+
 	if (source <= 0x3fffff)
 	{
 		if (state->m_slotcart->get_type() == SEGA_SVP)
@@ -338,7 +338,7 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 		m_io_pad6b[1][i] = ioport(pad6names[1][i]);
 	}
 
-	// setup timers for 6 button pads	
+	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
 		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
 }
@@ -346,7 +346,7 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 MACHINE_START_MEMBER(md_cons_state, ms_megadriv)
 {
 	MACHINE_START_CALL_MEMBER( md_common );
-	
+
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_console;
 
 	// for now m_cartslot is only in MD and not 32x and SegaCD
@@ -1070,7 +1070,7 @@ MACHINE_START_MEMBER(pico_state,pico)
 	m_io_pad = ioport("PAD");
 	m_io_penx = ioport("PENX");
 	m_io_peny = ioport("PENY");
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000000, 0x7fffff, read16_delegate(FUNC(base_md_cart_slot_device::read),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write),(base_md_cart_slot_device*)m_picocart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa13000, 0xa130ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a13),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a13),(base_md_cart_slot_device*)m_picocart));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa15000, 0xa150ff, read16_delegate(FUNC(base_md_cart_slot_device::read_a15),(base_md_cart_slot_device*)m_picocart), write16_delegate(FUNC(base_md_cart_slot_device::write_a15),(base_md_cart_slot_device*)m_picocart));

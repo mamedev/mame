@@ -10,7 +10,7 @@
 
     TODO:
 
-	- slotify cartridges
+    - slotify cartridges
     - microdrive
     - ZX8301 memory access slowdown
     - use resnet.h to create palette

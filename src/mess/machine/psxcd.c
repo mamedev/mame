@@ -463,7 +463,7 @@ void psxcd_device::cdcmd_setloc()
 void psxcd_device::cdcmd_play()
 {
 	if(cmdbuf[0] && m_param_count)
-		 loc.w = lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, bcd_to_decimal(cmdbuf[0]) - 1));
+			loc.w = lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, bcd_to_decimal(cmdbuf[0]) - 1));
 
 	curpos.w = loc.w;
 	if (!curpos.w)

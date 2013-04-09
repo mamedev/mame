@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atombb_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM AM_SHARE("video_ram")
-	
+
 	AM_RANGE(0x7000, 0x7003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
 	AM_RANGE(0x7800, 0x780f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION(EXTROM_TAG, 0)
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
-	
+
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")

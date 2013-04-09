@@ -153,7 +153,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 
 	/* usually, no security value... */
 	m_security_value = 0;
-	
+
 	m_nmi_callback_proc = ppu2c0x_nmi_delegate();
 }
 
@@ -212,7 +212,7 @@ void ppu2c0x_device::device_start()
 	m_cpu = machine().device<cpu_device>( m_cpu_tag );
 
 	assert(m_screen && m_cpu);
-	
+
 	// bind our handler
 	m_nmi_callback_proc.bind_relative_to(*owner());
 

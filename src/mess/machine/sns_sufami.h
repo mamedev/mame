@@ -38,7 +38,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// additional reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 };

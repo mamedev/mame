@@ -5026,8 +5026,8 @@ ROM_END
 
 ROM_START( daytonat )/* Daytona USA (Japan, Turbo hack) */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
-//	ROM_LOAD32_WORD( "turbo1.12", 0x000000, 0x080000, CRC(0b3d5d4e) SHA1(1660959cb383e22f0d6204547c30cf5fe9272b03) ) /* 4x overdump?, 0x20000 bytes repeat 4 times */
-//	ROM_LOAD32_WORD( "turbo2.13", 0x000002, 0x080000, CRC(f7d4e866) SHA1(c8c43904257f718665f9f7a89838eba14bde9465) ) /* 4x overdump?, 0x20000 bytes repeat 4 times */
+//  ROM_LOAD32_WORD( "turbo1.12", 0x000000, 0x080000, CRC(0b3d5d4e) SHA1(1660959cb383e22f0d6204547c30cf5fe9272b03) ) /* 4x overdump?, 0x20000 bytes repeat 4 times */
+//  ROM_LOAD32_WORD( "turbo2.13", 0x000002, 0x080000, CRC(f7d4e866) SHA1(c8c43904257f718665f9f7a89838eba14bde9465) ) /* 4x overdump?, 0x20000 bytes repeat 4 times */
 	ROM_LOAD32_WORD( "turbo1.12", 0x000000, 0x020000, CRC(4b41a341) SHA1(daa75f38a11eb16b04550edf53e11f0eaf55cd3e) )
 	ROM_LOAD32_WORD( "turbo2.13", 0x000002, 0x020000, CRC(6ca580fa) SHA1(102ad6bf5fed4c9c407a9e82d85cff9f15db31c8) )
 

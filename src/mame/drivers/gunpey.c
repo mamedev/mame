@@ -257,7 +257,7 @@ public:
 
 	int write_dest_byte(UINT8 usedata);
 	//UINT16 main_m_vram[0x800][0x800];
-	
+
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
 };
 

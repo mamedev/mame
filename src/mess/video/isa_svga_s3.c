@@ -108,7 +108,7 @@ void isa16_svga_s3_device::device_reset()
 
 
 /*
- * 	S3 Virge 2D/3D accelerator
+ *  S3 Virge 2D/3D accelerator
  */
 
 ROM_START( s3virge )
@@ -196,7 +196,7 @@ void isa16_s3virge_device::device_reset()
 }
 
 /*
- * 	S3 ViRGE/DX
+ *  S3 ViRGE/DX
  */
 
 ROM_START( s3virgedx )

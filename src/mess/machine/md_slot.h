@@ -99,8 +99,8 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_a13) {}
 	virtual DECLARE_READ16_MEMBER(read_a15) { return 0xffff; }
 	virtual DECLARE_WRITE16_MEMBER(write_a15) {}
-	
-	virtual int read_test() { return 0; }	// used by Virtua Racing test
+
+	virtual int read_test() { return 0; }   // used by Virtua Racing test
 
 	/* this probably should do more, like make Genesis V2 'die' if the SEGA string is not written promptly */
 	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { logerror("Write to TMSS bank: offset %x data %x\n", 0xa14000 + (offset << 1), data); };
@@ -186,7 +186,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write_a15);
 	virtual DECLARE_WRITE16_MEMBER(write_tmss_bank) { if (m_cart) m_cart->write_tmss_bank(space, offset, data, mem_mask); };
 
-	virtual int read_test() { if (m_cart) return m_cart->read_test(); else return 0; }	// used by Virtua Racing test
+	virtual int read_test() { if (m_cart) return m_cart->read_test(); else return 0; }  // used by Virtua Racing test
 
 // TODO: this only needs to be public because megasvp copies rom into memory region, so we need to rework that code...
 //private:

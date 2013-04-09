@@ -91,7 +91,7 @@ public:
 	DECLARE_WRITE8_MEMBER( i8257_w );
 
 	/* hold acknowledge */
-	WRITE_LINE_MEMBER( i8257_hlda_w ) { } 
+	WRITE_LINE_MEMBER( i8257_hlda_w ) { }
 
 	/* ready */
 	WRITE_LINE_MEMBER( i8257_ready_w ) { }

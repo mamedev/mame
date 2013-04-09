@@ -554,7 +554,7 @@ int debug_command_parameter_cpu(running_machine &machine, const char *param, dev
 	}
 
 	/* if we got a valid one, return */
-    const UINT64 original_cpunum = cpunum;
+	const UINT64 original_cpunum = cpunum;
 	execute_interface_iterator iter(machine.root_device());
 	for (device_execute_interface *exec = iter.first(); exec != NULL; exec = iter.next())
 	{

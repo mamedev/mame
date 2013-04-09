@@ -53,4 +53,3 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 };
-

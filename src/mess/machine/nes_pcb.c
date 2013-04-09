@@ -11740,21 +11740,21 @@ struct nes_pcb_intf
 {write8_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0), read8_delegate(FUNC(b), DEVICE_SELF, (nes_state *)0)}
 
 #define NES_SCANLINE_NULL \
- ppu2c0x_scanline_delegate()
+	ppu2c0x_scanline_delegate()
 
 #define NES_HBLANK_NULL \
- ppu2c0x_hblank_delegate()
+	ppu2c0x_hblank_delegate()
 
 #define NES_HBLANK(a) \
- ppu2c0x_hblank_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0)
+	ppu2c0x_hblank_delegate(FUNC(a), DEVICE_SELF, (nes_state *)0)
 
 #define NES_LATCH_NULL \
- ppu2c0x_latch_delegate()
+	ppu2c0x_latch_delegate()
 
- #define NES_LATCH(a) \
- ppu2c0x_latch_delegate(FUNC(a),DEVICE_SELF, (nes_state *)0)
+	#define NES_LATCH(a) \
+	ppu2c0x_latch_delegate(FUNC(a),DEVICE_SELF, (nes_state *)0)
 
- 
+
 WRITE8_MEMBER(nes_carts_state::dummy_l_w)
 {
 	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);

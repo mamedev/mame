@@ -219,7 +219,7 @@ private:
 	emu_timer *                 m_callback_timer;           // pointer to the current callback timer
 	bool                        m_callback_timer_modified;  // true if the current callback timer was modified
 	attotime                    m_callback_timer_expire_time; // the original expiration time
-	bool						m_suspend_changes_pending;	// suspend/resume changes are pending
+	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
 
 	// scheduling quanta
 	class quantum_slot

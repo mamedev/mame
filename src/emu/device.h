@@ -298,7 +298,7 @@ protected:
 	astring                 m_name;                 // name of the device
 	astring                 m_shortname;            // short name of the device
 	astring                 m_searchpath;           // search path, used for media loading
-	astring					m_source;				// device source file name
+	astring                 m_source;               // device source file name
 
 	// device relationships
 	device_t *              m_owner;                // device that owns us

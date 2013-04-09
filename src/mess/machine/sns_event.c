@@ -3,10 +3,10 @@
  Super NES/Famicom Event cartridges emulation (for SNES/SFC)
 
  Copyright MESS Team.
- Visit http://mamedev.org for licensing and usage restrictions. 
+ Visit http://mamedev.org for licensing and usage restrictions.
 
  TODO: figure out how the Test Mode switch works...
- 
+
  ***********************************************************************************************************/
 
 
@@ -62,7 +62,7 @@ READ8_MEMBER(sns_pfest94_device::read_l)
 	if ((offset & 0x208000) == 0x208000)
 	{
 		int bank = ((offset - 0x200000) / 0x10000) & 7;
-		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];		
+		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	else
 	{
@@ -79,7 +79,7 @@ READ8_MEMBER(sns_pfest94_device::read_h)
 	if ((offset & 0x208000) == 0x208000)
 	{
 		int bank = ((offset - 0x200000) / 0x8000) & 7;
-		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];		
+		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 
 	// called beyond 0x400000!
@@ -93,7 +93,7 @@ READ8_MEMBER(sns_pfest94_device::read_h)
 	{
 		offset &= 0x3fffff;
 		int bank = offset / 0x8000;
-		return m_rom[rom_bank_map[m_base_bank + (bank & m_mask)] * 0x8000 + (offset & 0x7fff)];		
+		return m_rom[rom_bank_map[m_base_bank + (bank & m_mask)] * 0x8000 + (offset & 0x7fff)];
 	}
 }
 
@@ -279,10 +279,8 @@ void sns_pfest94_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		if (!m_count)
 		{
 			m_status |= 2;
-			pfest94_timer->reset();			
+			pfest94_timer->reset();
 		}
 		m_count--;
 	}
 }
-
-

@@ -73,9 +73,9 @@ static const ssg_callbacks psgintf =
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2608_state *info = (ym2608_state *)param;	
+	ym2608_state *info = (ym2608_state *)param;
 	if (!info->irqhandler.isnull())
-		info->irqhandler(irq);	
+		info->irqhandler(irq);
 }
 
 /* Timer overflow callback from timer.c */
@@ -148,7 +148,7 @@ static DEVICE_START( ym2608 )
 	info->device = device;
 
 	info->irqhandler.resolve(intf->irqhandler, *device);
-	
+
 	/* FIXME: Force to use simgle output */
 	info->psg = ay8910_start_ym(NULL, YM2608, device, device->clock(), &intf->ay8910_intf);
 	assert_always(info->psg != NULL, "Error creating YM2608/AY8910 chip");

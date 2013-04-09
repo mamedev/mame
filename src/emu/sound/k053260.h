@@ -33,19 +33,19 @@ struct k053260_interface
 
 struct k053260_channel
 {
-    k053260_channel() :
-	  rate(0),
-	  size(0),
-	  start(0),
-	  bank(0),
-	  volume(0),
-	  play(0),
-	  pan(0),
-	  pos(0),
-	  loop(0),
-	  ppcm(0),
-	  ppcm_data(0) {}
-    
+	k053260_channel() :
+		rate(0),
+		size(0),
+		start(0),
+		bank(0),
+		volume(0),
+		play(0),
+		pan(0),
+		pos(0),
+		loop(0),
+		ppcm(0),
+		ppcm_data(0) {}
+
 	UINT32      rate;
 	UINT32      size;
 	UINT32      start;
@@ -63,7 +63,7 @@ struct k053260_channel
 // ======================> k053260_device
 
 class k053260_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	k053260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -78,12 +78,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( k053260_w );
-    DECLARE_READ8_MEMBER( k053260_r );
+	DECLARE_WRITE8_MEMBER( k053260_w );
+	DECLARE_READ8_MEMBER( k053260_r );
 
 private:
-    void InitDeltaTable( int rate, int clock );
-    void check_bounds( int channel );
+	void InitDeltaTable( int rate, int clock );
+	void check_bounds( int channel );
 
 private:
 	sound_stream *              m_channel;

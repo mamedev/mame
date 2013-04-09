@@ -188,7 +188,7 @@ void ncr53c7xx_device::device_config_complete()
 	else
 	{
 		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-	}	
+	}
 }
 
 

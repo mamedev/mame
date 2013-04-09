@@ -624,7 +624,7 @@
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="lunix-c128.d64" size="174848" crc="253218c3" sha1="2169f2666bdf39cbd7bfb3811f58761c9bfa6020" offset="0" />
@@ -637,7 +637,7 @@
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" offset="0" />

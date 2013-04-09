@@ -1065,7 +1065,7 @@ void base_md_cart_slot_device::file_logging(UINT8 *ROM8, UINT32 rom_len, UINT32 
 		csum += (ROM8[i] | (ROM8[i + 1] << 8));
 		csum &= 0xffff;
 	}
-	
+
 	logerror("INTERNAL HEADER\n" );
 	logerror("===============\n" );
 	logerror("Console: %.16s\n", console);

@@ -382,8 +382,8 @@ WRITE16_MEMBER(ssv_state::ssv_scroll_w)
 	COMBINE_DATA(m_scroll + offset);
 
 /*  offsets 60-7f: CRT Controller   */
-//	if(((offset*2) & 0x70) == 0x60)
-//		printf("%04x %04x\n",data,offset*2);
+//  if(((offset*2) & 0x70) == 0x60)
+//      printf("%04x %04x\n",data,offset*2);
 }
 
 WRITE16_MEMBER(ssv_state::paletteram16_xrgb_swap_word_w)

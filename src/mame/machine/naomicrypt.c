@@ -57,7 +57,7 @@ static const struct game_keys keys_table[] =
 	{ "tduno2",          0x2f6f0f8d }, // 840-0022    2000
 	{ "18wheelr",        0x0007cf54 }, // 840-0023    2000
 	{ "18wheels",        0x0007cf54 }, // ^
-	{ "marstv",			 0x000b8ef5 }, // 840-0025    2000
+	{ "marstv",          0x000b8ef5 }, // 840-0025    2000
 	{ "vonot",           0x00010715 }, // 840-0028    2000
 	{ "sstrkfgt",        0x00132303 }, // 840-0035    2000
 	{ "wwfroyal",        0x001627c3 }, // 840-0040    2000
@@ -68,7 +68,7 @@ static const struct game_keys keys_table[] =
 	{ "samba2k",         0x001702cf }, // 840-0047    2000
 	{ "alienfnt",        0x00174343 }, // 840-0048    2001
 	{ "alienfnta",       0x00174343 }, // ^
-	{ "crakndj2",		 0x00428247 }, // 
+	{ "crakndj2",        0x00428247 }, //
 	{ "ringout",         0x000b1e40 }, // 840-004C    1999
 	{ "vf4cart",         0x02ef2f96 }, // 840-0080    2002
 	{ "pstone",          0x000e69c1 }, // 841-0001    1999

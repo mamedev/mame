@@ -30,7 +30,7 @@ there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per sca
 
 void nes_state::ffe_irq( int scanline, int vblank, int blanked )
 {
-	// 114 is the number of cycles per scanline 
+	// 114 is the number of cycles per scanline
 	// TODO: change to reflect the actual number of cycles spent
 	if (m_IRQ_enable)
 	{

@@ -314,8 +314,8 @@ GAME(198?, j80supbk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM
 GAME(198?, j80topsp ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Sprint (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80topup ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Top Up (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80tumbl ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Tumble (JPM) (SYSTEM80)",                        GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j80wsprt, 0   		,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V4, 5x20p) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j80wsprt3, j80wsprt	,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt, 0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V4, 5x20p) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
+GAME(198?, j80wsprt3, j80wsprt  ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V3, 50p, 5 credits) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80wsprt2,j80wsprt   ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "JPM","Winsprint (JPM) (V2, 10x10p) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )
 
 GAME(198?, j80blbnk ,0          ,jpms80,jpms80, jpms80_state,jpms80,ROT0,   "PCP","Blankity Bank (PCP) (SYSTEM80)",                     GAME_IS_SKELETON_MECHANICAL )

@@ -176,12 +176,12 @@ class aleck64_state : public n64_state
 public:
 	aleck64_state(const machine_config &mconfig, device_type type, const char *tag)
 		: n64_state(mconfig, type, tag),
-		  m_dip_read_offset(0) { }
+			m_dip_read_offset(0) { }
 
 	DECLARE_DRIVER_INIT(aleck64);
 	DECLARE_WRITE32_MEMBER(aleck_dips_w);
 	DECLARE_READ32_MEMBER(aleck_dips_r);
-private:	
+private:
 	UINT32 m_dip_read_offset;
 };
 

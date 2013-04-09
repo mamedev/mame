@@ -245,7 +245,7 @@ public:
 	void screen_eof_maygayv1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);	
+	DECLARE_READ8_MEMBER(data_to_i8031);
 };
 
 

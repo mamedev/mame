@@ -6,7 +6,7 @@
 #define MCFG_SCN2674_VIDEO_ADD(_tag, _clock, _irq) \
 	MCFG_DEVICE_ADD(_tag, SCN2674_VIDEO, _clock) \
 	downcast<scn2674_device *>(device)->set_callbacks(DEVCB2_##_irq);
-	
+
 typedef void (*s2574_interrupt_callback_func)(running_machine &machine);
 
 static const UINT8 vsync_table[4] = {3,1,5,7}; //Video related

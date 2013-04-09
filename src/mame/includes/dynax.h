@@ -277,7 +277,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
-	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);	
+	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
@@ -287,7 +287,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
-	
+
 	DECLARE_MACHINE_RESET(adpcm);
 	DECLARE_WRITE8_MEMBER(adpcm_reset_w);
 	DECLARE_MACHINE_START(gekisha);
@@ -318,7 +318,7 @@ public:
 	void jantouki_blitter2_start( int flags );
 	void jantouki_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int y );
 	void mjdialq2_copylayer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
-	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );		
+	void hanamai_copylayer(bitmap_ind16 &bitmap, const rectangle &cliprect, int i );
 	int debug_mask();
 	int debug_viewer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void dynax_common_reset();

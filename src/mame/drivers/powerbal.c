@@ -24,14 +24,14 @@ class powerbal_state : public playmark_state
 public:
 	powerbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: playmark_state(mconfig, type, tag),
-		  m_eeprom(*this, "eeprom") { }
-		
+			m_eeprom(*this, "eeprom") { }
+
 	/* powerbal-specific */
 	int         m_tilebank;
 	int         m_bg_yoffset;
 
 	optional_device<eeprom_device> m_eeprom;
-	
+
 	DECLARE_DRIVER_INIT(powerbal);
 	DECLARE_DRIVER_INIT(magicstk);
 	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
@@ -39,14 +39,14 @@ public:
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);
 	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );	
+	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE16_MEMBER(magicstk_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(magicstk_bgvideoram_w);
 	DECLARE_WRITE16_MEMBER(tile_banking_w);
-	DECLARE_WRITE16_MEMBER(oki_banking);	
+	DECLARE_WRITE16_MEMBER(oki_banking);
 };
-		
-		
+
+
 static const eeprom_interface eeprom_intf =
 {
 	6,              /* address bits */

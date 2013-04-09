@@ -309,7 +309,7 @@ public:
 	DECLARE_WRITE16_MEMBER( characteriser16_w );
 	DECLARE_READ16_MEMBER( characteriser16_r );
 	DECLARE_WRITE16_MEMBER( bwb_characteriser16_w );
-	DECLARE_READ16_MEMBER( bwb_characteriser16_r );	
+	DECLARE_READ16_MEMBER( bwb_characteriser16_r );
 };
 
 /*************************************

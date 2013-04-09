@@ -78,7 +78,7 @@
 
 static const gfx_layout apple2gs_text_layout =
 {
-        14,8,       /* 14*8 characters */
+		14,8,       /* 14*8 characters */
 	512,        /* 256 characters */
 	1,          /* 1 bits per pixel */
 	{ 0 },      /* no bitplanes; 1 bit per pixel */
@@ -223,7 +223,7 @@ READ8_MEMBER(apple2gs_state::adbmicro_p2_in)
 
 READ8_MEMBER(apple2gs_state::adbmicro_p3_in)
 {
-	return 0x7;		// don't press IIE capslock/ctrl/shift
+	return 0x7;     // don't press IIE capslock/ctrl/shift
 }
 
 WRITE8_MEMBER(apple2gs_state::adbmicro_p0_out)
@@ -255,7 +255,7 @@ WRITE8_MEMBER(apple2gs_state::adbmicro_p3_out)
 	if (((data & 0x08) == 0x08) != m_adb_line)
 	{
 		m_adb_dtime = (int)(machine().time().as_ticks(XTAL_3_579545MHz*2) - m_last_adb_time);
-//		printf("ADB change to %d (dtime %d)\n", (data>>3) & 1, m_adb_dtime);
+//      printf("ADB change to %d (dtime %d)\n", (data>>3) & 1, m_adb_dtime);
 		m_last_adb_time = machine().time().as_ticks(XTAL_3_579545MHz*2);
 		m_adb_line = (data & 0x8) ? true : false;
 	}
@@ -323,10 +323,10 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
 	#if RUN_ADB_MICRO
 	MCFG_CPU_ADD(ADBMICRO_TAG, M50741, XTAL_3_579545MHz)
-	MCFG_M5074X_PORT0_CALLBACKS(READ8(apple2gs_state, adbmicro_p0_in), WRITE8(apple2gs_state, adbmicro_p0_out)) 
-	MCFG_M5074X_PORT1_CALLBACKS(READ8(apple2gs_state, adbmicro_p1_in), WRITE8(apple2gs_state, adbmicro_p1_out)) 
-	MCFG_M5074X_PORT2_CALLBACKS(READ8(apple2gs_state, adbmicro_p2_in), WRITE8(apple2gs_state, adbmicro_p2_out)) 
-	MCFG_M5074X_PORT3_CALLBACKS(READ8(apple2gs_state, adbmicro_p3_in), WRITE8(apple2gs_state, adbmicro_p3_out)) 
+	MCFG_M5074X_PORT0_CALLBACKS(READ8(apple2gs_state, adbmicro_p0_in), WRITE8(apple2gs_state, adbmicro_p0_out))
+	MCFG_M5074X_PORT1_CALLBACKS(READ8(apple2gs_state, adbmicro_p1_in), WRITE8(apple2gs_state, adbmicro_p1_out))
+	MCFG_M5074X_PORT2_CALLBACKS(READ8(apple2gs_state, adbmicro_p2_in), WRITE8(apple2gs_state, adbmicro_p2_out))
+	MCFG_M5074X_PORT3_CALLBACKS(READ8(apple2gs_state, adbmicro_p3_in), WRITE8(apple2gs_state, adbmicro_p3_out))
 	#endif
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2gs_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -393,10 +393,10 @@ static MACHINE_CONFIG_DERIVED( apple2gsr1, apple2gs )
 
 	#if RUN_ADB_MICRO
 	MCFG_CPU_REPLACE(ADBMICRO_TAG, M50740, XTAL_3_579545MHz)
-        MCFG_M5074X_PORT0_CALLBACKS(READ8(apple2gs_state, adbmicro_p0_in), WRITE8(apple2gs_state, adbmicro_p0_out)) 
-        MCFG_M5074X_PORT1_CALLBACKS(READ8(apple2gs_state, adbmicro_p1_in), WRITE8(apple2gs_state, adbmicro_p1_out)) 
-        MCFG_M5074X_PORT2_CALLBACKS(READ8(apple2gs_state, adbmicro_p2_in), WRITE8(apple2gs_state, adbmicro_p2_out)) 
-        MCFG_M5074X_PORT3_CALLBACKS(READ8(apple2gs_state, adbmicro_p3_in), WRITE8(apple2gs_state, adbmicro_p3_out)) 
+		MCFG_M5074X_PORT0_CALLBACKS(READ8(apple2gs_state, adbmicro_p0_in), WRITE8(apple2gs_state, adbmicro_p0_out))
+		MCFG_M5074X_PORT1_CALLBACKS(READ8(apple2gs_state, adbmicro_p1_in), WRITE8(apple2gs_state, adbmicro_p1_out))
+		MCFG_M5074X_PORT2_CALLBACKS(READ8(apple2gs_state, adbmicro_p2_in), WRITE8(apple2gs_state, adbmicro_p2_out))
+		MCFG_M5074X_PORT3_CALLBACKS(READ8(apple2gs_state, adbmicro_p3_in), WRITE8(apple2gs_state, adbmicro_p3_out))
 	#endif
 
 	MCFG_RAM_MODIFY(RAM_TAG)

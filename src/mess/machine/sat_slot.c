@@ -143,7 +143,7 @@ bool sat_cart_slot_device::call_load()
 			fread(ROM, len);
 
 		// fix endianness....
-      	for (int i = 0; i < len/4; i ++)
+		for (int i = 0; i < len/4; i ++)
 			ROM[i] = BITSWAP32(ROM[i],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 //          UINT8 tempa = ROM[i+0];
 //          UINT8 tempb = ROM[i+1];

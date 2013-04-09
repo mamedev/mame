@@ -507,7 +507,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 
 READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 	UINT8 data = sc499_dack_r(&space.machine());
-//	DLOG2(("dma ctape dack read %02x",data));
+//  DLOG2(("dma ctape dack read %02x",data));
 
 	// hack for DN3000: select appropriate DMA channel No.
 	dn3000_dma_channel1 = 1; // 1 = ctape, 2 = floppy dma channel
@@ -516,7 +516,7 @@ READ8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_r ) {
 }
 
 WRITE8_MEMBER(apollo_state::apollo_dma8237_ctape_dack_w ) {
-//	DLOG2(("dma ctape dack write %02x", data));
+//  DLOG2(("dma ctape dack write %02x", data));
 	sc499_dack_w(&space.machine(), data);
 
 	// hack for DN3000: select appropriate DMA channel No.
@@ -578,7 +578,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_dma_2_hrq_changed ) {
 	// DLOG2(("dma 2 hrq changed state %02x", state));
 	machine().device(MAINCPU)->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* Assert HLDA */	
+	/* Assert HLDA */
 	dynamic_cast<i8237_device*>(machine().device(APOLLO_DMA2_TAG))->i8237_hlda_w(state);
 }
 

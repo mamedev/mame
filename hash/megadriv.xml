@@ -1206,10 +1206,10 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- 
-	dump confirmed by sunbeam
-	compared to cliffh: 
-	1 word at 0xcf14e removed (FC08), 1 word at 0xcf1fe (D011) 
+<!--
+    dump confirmed by sunbeam
+    compared to cliffh:
+    1 word at 0xcf14e removed (FC08), 1 word at 0xcf1fe (D011)
 -->
 	<software name="cliffh1" cloneof="cliffh">
 		<description>Cliffhanger (Euro, Alt)</description>
@@ -2511,7 +2511,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<year>1992</year>
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="ACSGEE1191 REV A" />	<!-- blurry pic, might be not 100% exact -->
+			<feature name="pcb" value="ACSGEE1191 REV A" /> <!-- blurry pic, might be not 100% exact -->
 			<feature name="u1" value="9153 (c) 12/91 ACWCSG" />
 			<feature name="u2" value="KM28C16-20" />
 			<feature name="u3" value="74HC00AP" />
@@ -2580,13 +2580,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro is confirmed -->
-<!-- 
-	Note from Sunbeam:
-	    On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
-	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
-	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
-	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
-	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+<!--
+    Note from Sunbeam:
+        On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K
+        boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17
+        we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one.
+        If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+        This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
 -->
 	<software name="ghouls">
 		<description>Ghouls'n Ghosts (Euro, USA, Kor, Rev. A)</description>
@@ -2607,13 +2607,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only USA is confirmed -->
-<!-- 
-	Note from Sunbeam:
-	    On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
-	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
-	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
-	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
-	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+<!--
+    Note from Sunbeam:
+        On the 171-5841 board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K
+        boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17
+        we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one.
+        If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+        This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
 -->
 	<software name="ghouls1" cloneof="ghouls">
 		<description>Ghouls'n Ghosts (Euro, USA)</description>
@@ -4943,7 +4943,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro and Jpn confirmed -->
-	<!-- 
+	<!--
 	Note from Elbarto:
 	    On the Quackshot PCB there is a 512Kb rom.
 	    Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
@@ -6375,13 +6375,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only USA is confirmed -->
-<!-- 
-	Note from Sunbeam:
-	    On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
-	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
-	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
-	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
-	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+<!--
+    Note from Sunbeam:
+        On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K
+        boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17
+        we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one.
+        If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+        This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
 -->
 	<software name="vermil">
 		<description>Sword of Vermilion (Euro, USA)</description>
@@ -6803,13 +6803,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- 
-	Note from Sunbeam:
-	   On the 171-5841A board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
-	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
-	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
-	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
-	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+<!--
+    Note from Sunbeam:
+       On the 171-5841A board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K
+        boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17
+        we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one.
+        If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+        This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
 -->
 	<software name="twincobr">
 		<description>Twin Cobra (USA)</description>
@@ -6932,13 +6932,13 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	</software>
 
 
-<!-- 
-	Note from Sunbeam:
-	    On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K 
-	    boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17 
-	    we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one. 
-	    If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
-	    This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
+<!--
+    Note from Sunbeam:
+        On this board the address line (A17) is connected to the logic IC and to the second (512K/IC2) ROM. If we are going the access data at the 128K
+        boundary (address line 17) the logic IC will disable IC1 (the first 128K ROM) and enable second ROM (512K). But due the shared connection of A17
+        we're currently addressing 0x20000 of the second ROM. So the first 128K of the second ROM are shadowed out by the first one.
+        If we are reaching the 512K boundary the 512K ROM starts mirroring and the previously inaccessible 128K appear as  mirrored data at the end.
+        This is kept for a 1 MB address space (A19=0, A20=1). If we're leaving the address range everything starts again (128K ROM gets enabled).
 -->
 	<software name="vermilj" cloneof="vermil">
 		<description>Vermilion (Jpn)</description>
@@ -7532,7 +7532,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_codemast" />
 			<feature name="pcb" value="SRJCV2-1" />
-			<feature name="u1" value="MICRO MACHINES2 MDM 2BEAD" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MICRO MACHINES2 MDM 2BEAD" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
 				<rom name="micro machines2 mdm 2bead.u1" size="1048576" crc="42bfb7eb" sha1="ab29077a6a5c2ccc777b0bf22f4d5908401f4d47" offset="000000" loadflag="load16_word_swap" />
@@ -7548,7 +7548,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_mm96" />
 			<feature name="pcb" value="SRJCV2-2" />
-			<feature name="u1" value="M/MACHINES 96MM96MDEDDB" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="M/MACHINES 96MM96MDEDDB" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
 				<rom name="m-machines 96mm96mdeddb.u1" size="1048576" crc="23319d0d" sha1="e8ff759679a0df2b3f9ece37ef686f248d3cf37b" offset="000000" loadflag="load16_word_swap" />
@@ -7604,7 +7604,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_jcart" />
 			<feature name="pcb" value="SRJCV1-2" />
-			<feature name="u1" value="SAMPRAS TENNIS MDST6636" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="SAMPRAS TENNIS MDST6636" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<!-- J-cart version also contains additional ICs for the controller ports -->
 			<dataarea name="rom" size="1048576">
 				<rom name="sampras tennis mdst6636.u1" size="1048576" crc="94e505b2" sha1="4c830ace4590294bb374b4cab71ebebf44d9a07a" offset="000000" loadflag="load16_word_swap" />
@@ -7741,9 +7741,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 
-<!-- 
-Old scrambled/interleaved dumps. 
-Some carts have been partially documented, based on available pics (from Nepereny's old website, or from MikeHaggar's and ICEKnight's contributions), 
+<!--
+Old scrambled/interleaved dumps.
+Some carts have been partially documented, based on available pics (from Nepereny's old website, or from MikeHaggar's and ICEKnight's contributions),
 but dumps still have to be confirmed.
 -->
 
@@ -9579,7 +9579,7 @@ but dumps still have to be confirmed.
 			<feature name="pcb" value="PWA 100003 REV F?" />
 			<feature name="u1" value="COLLEGE FOOT BWCF01" />
 			<feature name="u3" value="GD74LS139" />
-			<feature name="u4" value="??" />	<!-- Not readable in the pic -->
+			<feature name="u4" value="??" />    <!-- Not readable in the pic -->
 			<feature name="u5" value="GD74LS74A" />
 			<feature name="u6" value="X24C01P" />
 			<dataarea name="rom" size="1048576">
@@ -10268,7 +10268,7 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="353536" />
-			<feature name="u1" value="MPR-16380 W42" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-16380 W42" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-16380 w42.u1" size="1048576" crc="fb1ea6df" sha1="4809cf80ced70e77bc7479bb652a9d9fe22ce7e6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -19696,7 +19696,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="pcb" value="?? (Electronic Arts)" />
 			<feature name="u1" value="PGA TOUR 96 PGA9601" />   <!-- location not really marked on PCB, using u1 for consistency -->
 			<feature name="u2" value="UM62256D-70LL" />
-			<feature name="u3" value="??74HC??" />	<!-- not readable in the pic -->
+			<feature name="u3" value="??74HC??" />  <!-- not readable in the pic -->
 			<feature name="u4" value="523-1026B" />
 			<feature name="u5" value="GD74HC32" />
 			<feature name="batt" value="(Lithium Cell)" />
@@ -24301,7 +24301,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="?? (Konami)" />
-			<feature name="u1" value="MPR-15305" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="MPR-15305" /> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15305.u1" size="524288" crc="0ff33054" sha1="4a4f2cf397ade091e83e07bb3ffc7aa5862aeedd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24490,7 +24490,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="ACSGPC291?" />
-			<feature name="u1" value="ACORSG" />	<!-- location not really marked on PCB, using u1 for consistency -->
+			<feature name="u1" value="ACORSG" />    <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" size="524288">
 				<rom name="acorsg.u1" size="524288" crc="8f2fdada" sha1="89f264afba7aa8764b301d46cc8c51f74c23919e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -26755,7 +26755,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Ballistic</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
-			<feature name="pcb" value="ACSGEE1191 REV A" />	<!-- blurry pic, might be not 100% exact -->
+			<feature name="pcb" value="ACSGEE1191 REV A" /> <!-- blurry pic, might be not 100% exact -->
 			<feature name="u1" value="9341 (c) 1/92 ACWCSG-1" />
 			<feature name="u2" value="KM28C16-20" />
 			<feature name="u3" value="KS74HCTLS00N" />
@@ -30350,7 +30350,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_svp" />
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-6737A" />
-			<feature name="ic1" value="315-5750?" />		<!-- SVP -->
+			<feature name="ic1" value="315-5750?" />        <!-- SVP -->
 			<feature name="ic2" value="MPR-16420-T" />
 			<feature name="ic3" value="TC511664BJ-80" />
 			<feature name="ic4" value="HC04" />
@@ -30375,7 +30375,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_svp" />
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-6736A" />
-			<feature name="ic1" value="315-5750" />		<!-- SVP -->
+			<feature name="ic1" value="315-5750" />     <!-- SVP -->
 			<feature name="ic2" value="MPR-16389-H" />
 			<feature name="ic3" value="TC511664BJ-80" />
 			<feature name="ic4" value="HC04" />
@@ -30397,7 +30397,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="slot" value="rom_svp" />
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-6737A" />
-			<feature name="ic1" value="315-5750" />		<!-- SVP -->
+			<feature name="ic1" value="315-5750" />     <!-- SVP -->
 			<feature name="ic2" value="MPR-16419-T" />
 			<feature name="ic3" value="TC511664BJ-80" />
 			<feature name="ic4" value="HC04" />

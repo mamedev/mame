@@ -288,7 +288,6 @@ MACHINE_START_MEMBER(amiga_state,amiga)
 
 MACHINE_RESET_MEMBER(amiga_state,amiga)
 {
-
 	/* set m68k reset  function */
 	m68k_set_reset_callback(m_maincpu, amiga_m68k_reset);
 

@@ -31,16 +31,16 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_h);
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
-	
+
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
-	
+
 private:
 	UINT8 m_base_bank;
 	UINT8 m_mask;
 	UINT8 m_status;
 	UINT32 m_count;
-	
+
 	UINT32 *m_dsp_prg;
 	UINT16 *m_dsp_data;
 

@@ -1,5 +1,5 @@
 /***************************************************************************
- 
+
 Namco System II driver by K.Wilkins  (Jun1998, Oct1999)
 Email: kwns2@dysfunction.demon.co.uk
 
@@ -817,7 +817,7 @@ static ADDRESS_MAP_START( c68_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("MCUDI2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("MCUDI3")
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(dpram_byte_r,dpram_byte_w) AM_SHARE("dpram")
-	AM_RANGE(0x6000, 0x6fff) AM_READ(ack_mcu_vbl_r)	// VBL ack
+	AM_RANGE(0x6000, 0x6fff) AM_READ(ack_mcu_vbl_r) // VBL ack
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("c68", 0)
 ADDRESS_MAP_END
 
@@ -1426,7 +1426,7 @@ static INPUT_PORTS_START( sgunner )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgunner2 )
-	PORT_START("MCUB")	/* M37450 - PORT 5 (multiplexed) */
+	PORT_START("MCUB")  /* M37450 - PORT 5 (multiplexed) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -1938,11 +1938,11 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_CPU_ADD("c68", M37450, C68_CPU_CLOCK) /* C68 @ 8.192MHz (49.152MHz OSC/6) - I/O handling */
 	MCFG_M3745X_ADC14_CALLBACKS(IOPORT("AN0"), IOPORT("AN1"), IOPORT("AN2"), IOPORT("AN3"))
 	MCFG_M3745X_ADC58_CALLBACKS(IOPORT("AN4"), IOPORT("AN5"), IOPORT("AN6"), IOPORT("AN7"))
-	MCFG_M3745X_PORT3_CALLBACKS(IOPORT("MCUH"), WRITE8(namcos2_state, c68_p3_w))	// coins/test/service
+	MCFG_M3745X_PORT3_CALLBACKS(IOPORT("MCUH"), WRITE8(namcos2_state, c68_p3_w))    // coins/test/service
 	MCFG_M3745X_PORT5_CALLBACKS(READ8(namcos2_state, c68_p5_r), NULL) // muxed player 1/2
 	MCFG_M3745X_PORT6_CALLBACKS(IOPORT("MCUC"), NULL) // unused in sgunner2
 	MCFG_CPU_PROGRAM_MAP(c68_default_am)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state, irq0_line_assert)	// 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state, irq0_line_assert)    // 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* CPU slices per frame */
 

@@ -80,7 +80,7 @@ public:
 	ioport_port *m_io_pad_3b[4];
 	ioport_port *m_io_pad_6b[4];
 
-	int m_other_hacks;	// misc hacks
+	int m_other_hacks;  // misc hacks
 	genesis_z80_vars m_genz80;
 	int m_pal;
 	int m_export;
@@ -97,7 +97,7 @@ public:
 	void megadriv_init_common();
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
-	
+
 	void megadriv_z80_bank_w(UINT16 data);
 	DECLARE_WRITE16_MEMBER( megadriv_68k_z80_bank_write );
 	DECLARE_WRITE8_MEMBER(megadriv_z80_z80_bank_w);
@@ -116,9 +116,9 @@ public:
 	DECLARE_READ8_MEMBER( z80_unmapped_port_r );
 	DECLARE_WRITE8_MEMBER( z80_unmapped_port_w );
 	DECLARE_READ8_MEMBER( z80_unmapped_r );
-	DECLARE_WRITE8_MEMBER( z80_unmapped_w );	
+	DECLARE_WRITE8_MEMBER( z80_unmapped_w );
 	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
-	
+
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];
 	int m_io_stage[3];
@@ -127,7 +127,7 @@ public:
 	UINT8 m_megadrive_io_tx_regs[3];
 	read8_delegate m_megadrive_io_read_data_port_ptr;
 	write16_delegate m_megadrive_io_write_data_port_ptr;
-	
+
 
 	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
 	void megadrive_reset_io();
@@ -144,16 +144,16 @@ public:
 	void megadrive_io_write_ctrl_port(int portnum, UINT16 data);
 	void megadrive_io_write_tx_port(int portnum, UINT16 data);
 	void megadrive_io_write_rx_port(int portnum, UINT16 data);
-	void megadrive_io_write_sctrl_port(int portnum, UINT16 data);	
-	
-	void megadriv_stop_scanline_timer();	
-	
+	void megadrive_io_write_sctrl_port(int portnum, UINT16 data);
+
+	void megadriv_stop_scanline_timer();
+
 	DECLARE_MACHINE_START( megadriv );
 	DECLARE_MACHINE_RESET( megadriv );
 	DECLARE_VIDEO_START( megadriv );
 	UINT32 screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megadriv(screen_device &screen, bool state);
-	
+
 };
 
 class md_boot_state : public md_base_state
@@ -181,7 +181,7 @@ public:
 	DECLARE_READ16_MEMBER( mk3mdb_dsw_r );
 	DECLARE_READ16_MEMBER( ssf2mdb_dsw_r );
 	DECLARE_READ16_MEMBER( srmdb_dsw_r );
-	DECLARE_READ16_MEMBER( topshoot_200051_r );	
+	DECLARE_READ16_MEMBER( topshoot_200051_r );
 	DECLARE_READ16_MEMBER(puckpkmna_70001c_r);
 	DECLARE_READ16_MEMBER(puckpkmna_4b2476_r);
 
@@ -253,8 +253,8 @@ public:
 	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
 	int m_segac2_sp_pal_lookup[4];
-	void recompute_palette_tables();	
-	
+	void recompute_palette_tables();
+
 	DECLARE_WRITE16_MEMBER( segac2_upd7759_w );
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
@@ -265,7 +265,7 @@ public:
 	DECLARE_WRITE16_MEMBER( prot_w );
 	DECLARE_WRITE16_MEMBER( counter_timer_w );
 	DECLARE_READ16_MEMBER( printer_r );
-	DECLARE_WRITE16_MEMBER( print_club_camera_w );	
+	DECLARE_WRITE16_MEMBER( print_club_camera_w );
 	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
 };
@@ -309,7 +309,7 @@ public:
 
 	UINT32 screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_megaplay(screen_device &screen, bool state);
-	
+
 	DECLARE_READ8_MEMBER( megaplay_bios_banksel_r );
 	DECLARE_WRITE8_MEMBER( megaplay_bios_banksel_w );
 	DECLARE_READ8_MEMBER( megaplay_bios_gamesel_r );
@@ -329,7 +329,7 @@ public:
 	DECLARE_WRITE8_MEMBER( megaplay_game_w );
 	void mplay_start();
 	DECLARE_READ16_MEMBER( megadriv_68k_read_z80_extra_ram );
-	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_extra_ram );	
+	DECLARE_WRITE16_MEMBER( megadriv_68k_write_z80_extra_ram );
 };
 
 class mtech_state : public md_base_state
@@ -370,9 +370,9 @@ public:
 	UINT32 screen_update_mtnew(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mtnew(screen_device &screen, bool state);
 	UINT32 screen_update_megatech_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void megatech_set_megadrive_z80_as_megadrive_z80(const char* tag);
-	
+
 	DECLARE_READ8_MEMBER( megatech_cart_select_r );
 	TIMER_CALLBACK_MEMBER( megatech_z80_run_state );
 	TIMER_CALLBACK_MEMBER( megatech_z80_stop_state );

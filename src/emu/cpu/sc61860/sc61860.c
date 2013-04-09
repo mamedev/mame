@@ -58,7 +58,7 @@ struct sc61860_state
 	direct_read_data *direct;
 	int icount;
 	UINT8 ram[0x100]; // internal special ram, should be 0x60, 0x100 to avoid memory corruption for now
-	
+
 	devcb_resolved_read_line reset;
 	devcb_resolved_read_line brk;
 	devcb_resolved_read_line x;
@@ -67,7 +67,7 @@ struct sc61860_state
 	devcb_resolved_read8 inb;
 	devcb_resolved_write8 outb;
 	devcb_resolved_write8 outc;
-	
+
 };
 
 INLINE sc61860_state *get_safe_token(device_t *device)

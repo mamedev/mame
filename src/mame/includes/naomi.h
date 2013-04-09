@@ -22,7 +22,7 @@ class naomi_state : public dc_state
 		pvr2_framebuffer_ram(*this, "frameram2"),
 		elan_ram(*this, "elan_ram"),
 		m_awflash(*this, "awflash"),
-		m_eeprom(*this, "main_eeprom")	{ }
+		m_eeprom(*this, "main_eeprom")  { }
 
 	/* Naomi 2 specific (To be moved) */
 	optional_shared_ptr<UINT64> pvr2_texture_ram;
@@ -30,7 +30,7 @@ class naomi_state : public dc_state
 	optional_shared_ptr<UINT64> elan_ram;
 	optional_device<macronix_29l001mc_device> m_awflash;
 	optional_device<eeprom_device> m_eeprom;
-	
+
 	DECLARE_WRITE_LINE_MEMBER(aica_irq);
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_DRIVER_INIT(atomiswave);
@@ -48,7 +48,7 @@ class naomi_state : public dc_state
 	DECLARE_DRIVER_INIT(kick4csh);
 	DECLARE_DRIVER_INIT(vf4evoct);
 	DECLARE_DRIVER_INIT(naomi_mp);
-	DECLARE_DRIVER_INIT(mvsc2);	
+	DECLARE_DRIVER_INIT(mvsc2);
 
 	DECLARE_READ64_MEMBER( naomi_arm_r );
 	DECLARE_WRITE64_MEMBER( naomi_arm_w );
@@ -64,7 +64,7 @@ class naomi_state : public dc_state
 	DECLARE_WRITE64_MEMBER( aw_modem_w );
 
 	inline int decode_reg32_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift);
-	
+
 	int jvsboard_type;
 	UINT16 actel_id;
 

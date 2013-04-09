@@ -30,8 +30,8 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 
 DebuggerView::~DebuggerView()
 {
-    if (m_machine && m_view)
-        m_machine->debug_view().free_view(*m_view);
+	if (m_machine && m_view)
+		m_machine->debug_view().free_view(*m_view);
 }
 
 

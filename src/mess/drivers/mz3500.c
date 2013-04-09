@@ -1,27 +1,27 @@
 /***************************************************************************
 
-	MZ-3500 (c) 198? Sharp
+    MZ-3500 (c) 198? Sharp
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- BUSREQ / BUSACK signals.
-	- master/slave comms aren't perfect (especially noticeable if you change the video DIP)
+    TODO:
+    - BUSREQ / BUSACK signals.
+    - master/slave comms aren't perfect (especially noticeable if you change the video DIP)
 
-	Notes:
-	Sub-CPU test meanings:
-	* RA (tests RAM, first is work RAM, other two are shared RAM banks)
-	* VR (tests VRAM)
-	* CRT interface test:
-		- 40x20
-		- 80x25
-		- monochrome attribute test
-		- 80x25 color test (text B-R-G-W, border: black, blue, red, green, black)
-		- 40x20 color test (text B-R-G-W, border: black, blue, red, green, black)
-	* Speaker test
-	* PR (Printer interface test)
-	* LP (Light pen test)
-	* RS (RS-232C interface test)
+    Notes:
+    Sub-CPU test meanings:
+    * RA (tests RAM, first is work RAM, other two are shared RAM banks)
+    * VR (tests VRAM)
+    * CRT interface test:
+        - 40x20
+        - 80x25
+        - monochrome attribute test
+        - 80x25 color test (text B-R-G-W, border: black, blue, red, green, black)
+        - 40x20 color test (text B-R-G-W, border: black, blue, red, green, black)
+    * Speaker test
+    * PR (Printer interface test)
+    * LP (Light pen test)
+    * RS (RS-232C interface test)
 
 ***************************************************************************/
 
@@ -153,7 +153,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 hires;
 	UINT8 color_mode;
 
-//	popmessage("%02x",state->m_crtc[6]);
+//  popmessage("%02x",state->m_crtc[6]);
 
 	color_mode = state->m_crtc[4] & 1;
 	width80 = (state->m_crtc[5] & 2) >> 1;
@@ -166,7 +166,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		attr = (state->m_video_ram[((addr+x)*2+1) & 0x3ffff] & 0x0f);
 
 		//if(hires)
-		//	tile <<= 1;
+		//  tile <<= 1;
 
 		for( yi = 0; yi < lr; yi++)
 		{
@@ -187,7 +187,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					{
 						/* TODO: "highlight"  */
 						//if(attr & 4)
-						//	tile_data ^= 0xff;
+						//  tile_data ^= 0xff;
 
 						if(attr & 1) // VL
 							tile_data |= 8;
@@ -602,12 +602,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mz3500_master_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	ADDRESS_MAP_UNMAP_HIGH
+//  ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0xe4, 0xe7) SFD upd765
-//	AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
-//	AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
+//  AM_RANGE(0xe8, 0xeb) SFD I/O port and DMAC chip select
+//  AM_RANGE(0xec, 0xef) irq signal from slave to master CPU
 	AM_RANGE(0xf4, 0xf5) AM_DEVICE("upd765a", upd765a_device, map) // MFD upd765
-//	AM_RANGE(0xf8, 0xfb) MFD I/O port
+//  AM_RANGE(0xf8, 0xfb) MFD I/O port
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(mz3500_fdc_r,mz3500_fdc_w)
 	AM_RANGE(0xf9, 0xf9) AM_READ(mz3500_fdc_dma_r)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE(mz3500_io_r,mz3500_io_w) // memory mapper
@@ -622,9 +622,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mz3500_slave_io, AS_IO, 8, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
-//	AM_RANGE(0x10, 0x1f) i8251
-//	AM_RANGE(0x20, 0x2f) pit8253
+//  AM_RANGE(0x00, 0x0f) f/f and irq to master CPU
+//  AM_RANGE(0x10, 0x1f) i8251
+//  AM_RANGE(0x20, 0x2f) pit8253
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
 	AM_RANGE(0x50, 0x5f) AM_RAM_WRITE(mz3500_crtc_w)

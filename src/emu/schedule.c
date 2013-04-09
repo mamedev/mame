@@ -415,7 +415,7 @@ bool device_scheduler::can_save() const
 
 //-------------------------------------------------
 //  apply_suspend_changes - applies suspend/resume
-//	changes to all device_execute_interfaces
+//  changes to all device_execute_interfaces
 //-------------------------------------------------
 
 inline void device_scheduler::apply_suspend_changes()

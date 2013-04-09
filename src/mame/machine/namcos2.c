@@ -143,7 +143,7 @@ MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 
 	/* reset POSIRQ timer */
 	namcos2_posirq_timer->adjust(attotime::never);
-	
+
 	m_player_mux = 0;
 }
 

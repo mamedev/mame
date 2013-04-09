@@ -78,7 +78,7 @@ static const mnemonic_t mnem_reg[100] =
 	{ "movq",0x5fc },
 	{ "scanbit", 0x641 }, { "daddc", 0x642 }, { "dsubc", 0x643 }, { "dmovt", 0x644 }, { "modac",0x645 },
 	{ "modify",0x650 }, { "extract",0x651 }, { "modtc",0x654 }, { "modpc",0x655 },
-	{ "emul",0x670 }, { "ediv",0x671 }, { "cvtir", 0x674 }, { "cvtilr", 0x675 }, { "scalerl", 0x676 }, { "scaler", 0x677 }, 
+	{ "emul",0x670 }, { "ediv",0x671 }, { "cvtir", 0x674 }, { "cvtilr", 0x675 }, { "scalerl", 0x676 }, { "scaler", 0x677 },
 	{ "atanr",0x680 }, { "logepr", 0x681 }, { "logr", 0x682 }, { "remr", 0x683 }, { "cmpor", 0x684 }, { "cmpr", 0x685 }, { "sqrtr", 0x688 },
 	{ "expr", 0x689 }, { "logbnr", 0x68a }, { "roundr", 0x68b }, { "sinr", 0x68c }, { "cosr", 0x68d }, { "tanr", 0x68e }, { "classr", 0x68f },
 	{ "atanrl",0x690 }, { "logeprl", 0x691 }, { "logrl", 0x692 }, { "remrl", 0x693 }, { "cmporl", 0x694 }, { "cmprl", 0x695 }, { "sqrtrl", 0x698 },

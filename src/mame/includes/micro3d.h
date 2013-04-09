@@ -119,7 +119,7 @@ public:
 	TIMER_CALLBACK_MEMBER(adc_done_callback);
 	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
-	DECLARE_READ8_MEMBER(data_to_i8031);	
+	DECLARE_READ8_MEMBER(data_to_i8031);
 };
 
 struct micro3d_vtx

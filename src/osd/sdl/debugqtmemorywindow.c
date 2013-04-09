@@ -134,10 +134,10 @@ void MemoryWindow::memoryRegionChanged(int index)
 	debug_view_memory* memView = downcast<debug_view_memory*>(m_memTable->view());
 	switch(memView->bytes_per_chunk())
 	{
-	    case 1: chunkSizeMenuItem("chunkActOne")->setChecked(true); break;
-	    case 2: chunkSizeMenuItem("chunkActTwo")->setChecked(true); break;
-	    case 4: chunkSizeMenuItem("chunkActFour")->setChecked(true); break;
-	    default: break;
+		case 1: chunkSizeMenuItem("chunkActOne")->setChecked(true); break;
+		case 2: chunkSizeMenuItem("chunkActTwo")->setChecked(true); break;
+		case 4: chunkSizeMenuItem("chunkActFour")->setChecked(true); break;
+		default: break;
 	}
 }
 

@@ -1393,7 +1393,7 @@ INLINE UINT32 es5506_reg_read_low(es5506_state *chip, es5506_voice *voice, offs_
 
 		case 0x68/8:    /* PAR */
 			if (!chip->port_read.isnull())
-				result = chip->port_read(0);		
+				result = chip->port_read(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
@@ -1469,7 +1469,7 @@ INLINE UINT32 es5506_reg_read_high(es5506_state *chip, es5506_voice *voice, offs
 
 		case 0x68/8:    /* PAR */
 			if (!chip->port_read.isnull())
-				result = chip->port_read(0);		
+				result = chip->port_read(0);
 			break;
 
 		case 0x70/8:    /* IRQV */
@@ -1492,7 +1492,7 @@ INLINE UINT32 es5506_reg_read_test(es5506_state *chip, es5506_voice *voice, offs
 	{
 		case 0x68/8:    /* PAR */
 			if (!chip->port_read.isnull())
-				result = chip->port_read(0);		
+				result = chip->port_read(0);
 			break;
 
 		case 0x70/8:    /* IRQV */

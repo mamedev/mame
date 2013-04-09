@@ -16,7 +16,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
@@ -147,7 +147,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);

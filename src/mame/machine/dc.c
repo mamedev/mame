@@ -716,7 +716,7 @@ TIMER_CALLBACK_MEMBER(dc_state::dc_rtc_increment)
 
 /* fill the RTC registers with the proper start-up values */
 void dc_state::rtc_initial_setup()
-{	
+{
 	static UINT32 current_time;
 	static int year_count,cur_year,i;
 	static const int month_to_day_conversion[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };

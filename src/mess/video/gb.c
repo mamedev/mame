@@ -532,7 +532,7 @@ void gb_state::sgb_refresh_border()
 	{
 		UINT8 *map = m_sgb_tile_map + ( ( yidx >> 3 ) * 64 );
 		UINT16 xindex = 0;
-		
+
 		for( UINT16 xidx = 0; xidx < 64; xidx+=2 )
 		{
 			if( map[xidx+1] & 0x80 ) /* Vertical flip */

@@ -403,7 +403,7 @@ MACHINE_RESET_MEMBER(sangho_state,sexyboom)
 }
 
 WRITE_LINE_MEMBER(sangho_state::msx_vdp_interrupt)
-{	
+{
 	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 

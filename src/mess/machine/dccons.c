@@ -64,7 +64,6 @@ void dc_cons_state::gdrom_raise_irq()
 
 TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 {
-
 	UINT8 sector_buffer[ 4096 ];
 
 	atapi_timer->adjust(attotime::never);
@@ -511,7 +510,7 @@ WRITE32_MEMBER(dc_cons_state::atapi_w )
 void dc_cons_state::dreamcast_atapi_init()
 {
 	xfer_mode = ATAPI_XFER_PIO;
-	
+
 	atapi_regs = auto_alloc_array_clear(machine(), UINT8, ATAPI_REG_MAX);
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;

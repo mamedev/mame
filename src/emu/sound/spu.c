@@ -2479,7 +2479,6 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 
 		while ((cdda_buffer->get_bytes_in()) && (n--))
 		{
-
 			INT16 vl = ((sp[0]*voll)>>15);
 			INT16 vr = ((sp[1]*volr)>>15);
 

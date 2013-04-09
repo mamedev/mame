@@ -89,7 +89,7 @@ public:
 	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void discoboy_setrombank( UINT8 data );
-	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);	
+	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
 };
 
 

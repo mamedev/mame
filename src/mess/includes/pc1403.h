@@ -41,7 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc1403_asic_write);
 	DECLARE_READ8_MEMBER(pc1403_lcd_read);
 	DECLARE_WRITE8_MEMBER(pc1403_lcd_write);
-	virtual void video_start();	
+	virtual void video_start();
 	virtual void machine_start();
 };
 

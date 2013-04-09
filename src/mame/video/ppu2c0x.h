@@ -187,7 +187,7 @@ public:
 	pen_t                       *m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
 	ppu2c0x_scanline_delegate   m_scanline_callback_proc;   /* optional scanline callback */
-	ppu2c0x_hblank_delegate   	m_hblank_callback_proc; /* optional hblank callback */
+	ppu2c0x_hblank_delegate     m_hblank_callback_proc; /* optional hblank callback */
 	ppu2c0x_vidaccess_delegate  m_vidaccess_callback_proc;  /* optional video access callback */
 	ppu2c0x_nmi_delegate        m_nmi_callback_proc;        /* nmi access callback from interface */
 	int                         m_regs[PPU_MAX_REG];        /* registers */

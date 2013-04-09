@@ -185,7 +185,7 @@ machine_config_constructor aha1542_device::device_mconfig_additions() const
 }
 
 aha1542_device::aha1542_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock, "aha1542", __FILE__	),
+	device_t(mconfig, AHA1542, "AHA1542 SCSI Controller", tag, owner, clock, "aha1542", __FILE__    ),
 	device_isa16_card_interface(mconfig, *this)
 {
 }

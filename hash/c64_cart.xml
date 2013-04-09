@@ -6634,11 +6634,11 @@
 		<description>Final I (Pol)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="final1.bin" size="0x1000" crc="2637962a" sha1="bfcf38cd187a84093e822bd7cf991a6751c8524b" offset="0" />
 			</dataarea>
@@ -6650,11 +6650,11 @@
 		<description>Future Box I (Pol)</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="bbv1.bin" size="0x4000" crc="47930727" sha1="e0cedb54023b5ac6ed9adf5c1cf5a37e4f58c301" offset="0" />
 			</dataarea>
@@ -6666,11 +6666,11 @@
 		<description>Black Box III (Pol)</description>
 		<year>198?</year>
 		<publisher>Domainsoft</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="bb3d.bin" size="0x2000" crc="36d882ca" sha1="06c7a49080a6103c39739e82b06c5699a596f9ab" offset="0" />
 			</dataarea>
@@ -6682,11 +6682,11 @@
 		<description>Bis-Plus</description>
 		<year>1990</year>
 		<publisher>Micro-LUC</publisher>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x2000">
 				<rom name="bisplus.bin" size="0x2000" crc="26328a96" sha1="27cecacba10cf88c42940350413a3c7e82c9e0ec" offset="0" />
 			</dataarea>

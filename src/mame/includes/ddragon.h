@@ -102,5 +102,5 @@ public:
 	int scanline_to_vcount( int scanline );
 	void dd_adpcm_int(device_t *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);	
+	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
 };

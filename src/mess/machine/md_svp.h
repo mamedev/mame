@@ -11,23 +11,23 @@
 // ======================> md_rom_svp_device
 
 class md_rom_svp_device : public device_t,
-					  public device_md_cart_interface
+						public device_md_cart_interface
 {
 public:
 	// construction/destruction
 	md_rom_svp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
 	md_rom_svp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 //protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void set_bank_to_rom(const char *banktag, UINT32 offset);
-	
+
 	required_device<device_t> m_svp;
 	required_ioport m_test_ipt;
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);

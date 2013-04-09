@@ -1,9 +1,9 @@
 	/**********************************************************************
 
-    Wang PC keyboard emulation
+	Wang PC keyboard emulation
 
-    Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+	Copyright MESS Team.
+	Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

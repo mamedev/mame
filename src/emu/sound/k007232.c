@@ -316,7 +316,7 @@ static DEVICE_START( k007232 )
 	info->clock = device->clock();
 
 	info->portwritehandler.resolve(info->intf->portwritehandler,*device);
-	
+
 	for( i = 0; i < KDAC_A_PCM_MAX; i++ )
 	{
 		info->start[i] = 0;

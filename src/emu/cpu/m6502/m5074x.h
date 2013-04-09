@@ -54,25 +54,25 @@ public:
 
 	const address_space_config m_program_config;
 
-	template<class _read, class _write> void set_p0_callbacks(_read rd, _write wr) 
+	template<class _read, class _write> void set_p0_callbacks(_read rd, _write wr)
 	{
 		read_p0.set_callback(rd);
 		write_p0.set_callback(wr);
 	}
 
-	template<class _read, class _write> void set_p1_callbacks(_read rd, _write wr) 
+	template<class _read, class _write> void set_p1_callbacks(_read rd, _write wr)
 	{
 		read_p1.set_callback(rd);
 		write_p1.set_callback(wr);
 	}
 
-	template<class _read, class _write> void set_p2_callbacks(_read rd, _write wr) 
+	template<class _read, class _write> void set_p2_callbacks(_read rd, _write wr)
 	{
 		read_p2.set_callback(rd);
 		write_p2.set_callback(wr);
 	}
 
-	template<class _read, class _write> void set_p3_callbacks(_read rd, _write wr) 
+	template<class _read, class _write> void set_p3_callbacks(_read rd, _write wr)
 	{
 		read_p3.set_callback(rd);
 		write_p3.set_callback(wr);
@@ -81,10 +81,10 @@ public:
 	devcb2_read8  read_p0, read_p1, read_p2, read_p3;
 	devcb2_write8 write_p0, write_p1, write_p2, write_p3;
 
-    DECLARE_READ8_MEMBER(ports_r);
-    DECLARE_WRITE8_MEMBER(ports_w);
-    DECLARE_READ8_MEMBER(tmrirq_r);
-    DECLARE_WRITE8_MEMBER(tmrirq_w);
+	DECLARE_READ8_MEMBER(ports_r);
+	DECLARE_WRITE8_MEMBER(ports_w);
+	DECLARE_READ8_MEMBER(tmrirq_r);
+	DECLARE_WRITE8_MEMBER(tmrirq_w);
 
 	bool are_port_bits_output(UINT8 port, UINT8 mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 
@@ -97,12 +97,12 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
 
 	void send_port(address_space &space, UINT8 offset, UINT8 data);
-    UINT8 read_port(UINT8 offset);
+	UINT8 read_port(UINT8 offset);
 
 	void recalc_irqs();
 	void recalc_timer(int timer);
 
-    UINT8 m_ports[6], m_ddrs[6];
+	UINT8 m_ports[6], m_ddrs[6];
 	UINT8 m_intctrl, m_tmrctrl;
 	UINT8 m_tmr12pre, m_tmr1, m_tmr2, m_tmrxpre, m_tmrx;
 	UINT8 m_tmr1latch, m_tmr2latch, m_tmrxlatch;
@@ -112,7 +112,7 @@ private:
 	emu_timer *m_timers[NUM_TIMERS];
 };
 
-class m50740_device : public m5074x_device 
+class m50740_device : public m5074x_device
 {
 public:
 	m50740_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -123,7 +123,7 @@ protected:
 private:
 };
 
-class m50741_device : public m5074x_device 
+class m50741_device : public m5074x_device
 {
 public:
 	m50741_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

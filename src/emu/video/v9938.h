@@ -66,7 +66,7 @@ protected:
 public:
 	template<class _irq> void set_interrupt_callback(_irq irq) {
 		m_int_callback.set_callback(irq);
-	}	
+	}
 	int interrupt ();
 	void set_resolution (int);
 	int get_transpen();

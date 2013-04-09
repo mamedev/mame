@@ -91,11 +91,11 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 		m_emu_status &= ~SSP_PMC_SET;
 		return 0;
 	}
-	
+
 	// just in case
 	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 		m_emu_status &= ~SSP_PMC_HAVE_ADDR;
-	
+
 	if (reg == 4 || (m_svp->state().state_int(SSP_ST) & 0x60))
 	{
 #define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
@@ -110,7 +110,7 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 				int inc = get_inc(mode);
 				if (mode & 0x0400)
 					overwrite_write(&dram[addr], d);
-				else 
+				else
 					dram[addr] = d;
 				m_pmac_write[reg] += inc;
 			}
@@ -131,7 +131,7 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 			else
 			{
 				logerror("ssp FIXME: PM%i unhandled write mode %04x, [%06x] %04x\n",
-						 reg, mode, CADDR, d);
+							reg, mode, CADDR, d);
 			}
 		}
 		else
@@ -153,27 +153,27 @@ UINT32 md_rom_svp_device::pm_io(int reg, int write, UINT32 d)
 			else
 			{
 				logerror("ssp FIXME: PM%i unhandled read  mode %04x, [%06x]\n",
-						 reg, mode, CADDR);
+							reg, mode, CADDR);
 				d = 0;
 			}
 		}
-		
+
 		// PMC value corresponds to last PMR accessed (not sure).
 		if (write)
 			m_pmc.d = m_pmac_write[reg];
 		else
 			m_pmc.d = m_pmac_read[reg];
-		
+
 		return d;
 	}
-	
+
 	return (UINT32)-1;
 }
 
 READ16_MEMBER( md_rom_svp_device::read_pm0 )
 {
 	UINT32 d = pm_io(0, 0, 0);
-	if (d != (UINT32)-1) 
+	if (d != (UINT32)-1)
 		return d;
 	d = m_xst2;
 	m_xst2 &= ~2; // ?
@@ -183,7 +183,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm0 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
 {
 	UINT32 r = pm_io(0, 1, data);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return;
 	m_xst2 = data; // ?
 }
@@ -191,7 +191,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm0 )
 READ16_MEMBER( md_rom_svp_device::read_pm1 )
 {
 	UINT32 r = pm_io(1, 0, 0);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return r;
 	logerror("svp: PM1 acces in non PM mode?\n");
 	return 0;
@@ -200,7 +200,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm1 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
 {
 	UINT32 r = pm_io(1, 1, data);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return;
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
@@ -208,7 +208,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm1 )
 READ16_MEMBER( md_rom_svp_device::read_pm2 )
 {
 	UINT32 r = pm_io(2, 0, 0);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return r;
 	logerror("svp: PM2 acces in non PM mode?\n");
 	return 0;
@@ -217,7 +217,7 @@ READ16_MEMBER( md_rom_svp_device::read_pm2 )
 WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
 {
 	UINT32 r = pm_io(2, 1, data);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return;
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
@@ -225,7 +225,7 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm2 )
 READ16_MEMBER( md_rom_svp_device::read_xst )
 {
 	UINT32 d = pm_io(3, 0, 0);
-	if (d != (UINT32)-1) 
+	if (d != (UINT32)-1)
 		return d;
 	return m_xst;
 }
@@ -233,7 +233,7 @@ READ16_MEMBER( md_rom_svp_device::read_xst )
 WRITE16_MEMBER( md_rom_svp_device::write_xst )
 {
 	UINT32 r = pm_io(3, 1, data);
-	if (r != (UINT32)-1) 
+	if (r != (UINT32)-1)
 		return;
 	m_xst2 |= 1;
 	m_xst = data;
@@ -251,13 +251,13 @@ WRITE16_MEMBER( md_rom_svp_device::write_pm4 )
 
 READ16_MEMBER( md_rom_svp_device::read_pmc )
 {
-	if (m_emu_status & SSP_PMC_HAVE_ADDR) 
+	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 	{
 		m_emu_status |= SSP_PMC_SET;
 		m_emu_status &= ~SSP_PMC_HAVE_ADDR;
 		return ((m_pmc.w.l << 4) & 0xfff0) | ((m_pmc.w.l >> 4) & 0xf);
-	} 
-	else 
+	}
+	else
 	{
 		m_emu_status |= SSP_PMC_HAVE_ADDR;
 		return m_pmc.w.l;
@@ -266,13 +266,13 @@ READ16_MEMBER( md_rom_svp_device::read_pmc )
 
 WRITE16_MEMBER( md_rom_svp_device::write_pmc )
 {
-	if (m_emu_status & SSP_PMC_HAVE_ADDR) 
+	if (m_emu_status & SSP_PMC_HAVE_ADDR)
 	{
 		m_emu_status |= SSP_PMC_SET;
 		m_emu_status &= ~SSP_PMC_HAVE_ADDR;
 		m_pmc.w.h = data;
-	} 
-	else 
+	}
+	else
 	{
 		m_emu_status |= SSP_PMC_HAVE_ADDR;
 		m_pmc.w.l = data;
@@ -293,16 +293,16 @@ WRITE16_MEMBER( md_rom_svp_device::write_al )
 READ16_MEMBER( md_rom_svp_device::rom_read1 )
 {
 	UINT16 *IRAM = (UINT16 *)m_iram;
-	return IRAM[offset]; 
+	return IRAM[offset];
 }
 
 READ16_MEMBER( md_rom_svp_device::rom_read2 )
 {
-	return m_rom[offset + 0x800/2]; 
+	return m_rom[offset + 0x800/2];
 }
 
-int md_rom_svp_device::read_test() 
-{ 
+int md_rom_svp_device::read_test()
+{
 	return m_test_ipt->read();
 }
 
@@ -319,8 +319,8 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 ADDRESS_MAP_START( md_svp_ssp_map, AS_PROGRAM, 16, md_rom_svp_device )
-//	AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
-//	AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
+//  AM_RANGE(0x0000, 0x03ff) AM_READ(rom_read1)
+//  AM_RANGE(0x0400, 0xffff) AM_READ(rom_read2)
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("iram_svp")
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("cart_svp")
 ADDRESS_MAP_END
@@ -390,7 +390,7 @@ void md_rom_svp_device::device_start()
 	// IRAM
 	m_iram = auto_alloc_array(machine(), UINT8, 0x800);
 	this->membank("iram_svp")->set_base(m_iram);
-	// the other bank, "cart_svp", is setup at call_load 
+	// the other bank, "cart_svp", is setup at call_load
 }
 
 READ16_MEMBER(md_rom_svp_device::read)
@@ -415,9 +415,9 @@ READ16_MEMBER(md_rom_svp_device::read)
 		a1 = (a1 & 0x7801) | ((a1 & 0x1e) << 6) | ((a1 & 0x7e0) >> 4);
 		return DRAM[a1];
 	}
-	if (offset < 0x200000/2) 
-		return m_rom[offset]; 
-	else 
+	if (offset < 0x200000/2)
+		return m_rom[offset];
+	else
 	{
 		printf("read out of bound\n");
 		return 0xffff;

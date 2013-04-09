@@ -85,7 +85,7 @@ public:
 	void fdc_drq(bool state);
 
 	virtual void machine_start();
-	
+
 	DECLARE_WRITE_LINE_MEMBER( p8k_daisy_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( p8k_dma_irq_w );
 	DECLARE_WRITE16_MEMBER( pk8_sio_0_serial_transmit );
@@ -607,12 +607,12 @@ static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
 //  AM_RANGE(0x0fef0, 0x0feff) // clock
 	//AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE_LEGACY(p8k_16_sio0_r, p8k_16_sio0_w)
 	AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(portff82_r,portff82_w)
-	AM_RANGE(0x0ff88, 0x0ff8f) AM_READWRITE(p8k_16_sio1_r, p8k_16_sio1_w)          //"z80sio_1", 
-	AM_RANGE(0x0ff90, 0x0ff97) AM_READWRITE(p8k_16_pio0_r, p8k_16_pio0_w)          //"z80pio_0", 
-	AM_RANGE(0x0ff98, 0x0ff9f) AM_READWRITE(p8k_16_pio1_r, p8k_16_pio1_w)          //"z80pio_1", 
-	AM_RANGE(0x0ffa0, 0x0ffa7) AM_READWRITE(p8k_16_pio2_r, p8k_16_pio2_w)          //"z80pio_2", 
-	AM_RANGE(0x0ffa8, 0x0ffaf) AM_READWRITE(p8k_16_ctc0_r, p8k_16_ctc0_w)        //"z80ctc_0", 
-	AM_RANGE(0x0ffb0, 0x0ffb7) AM_READWRITE(p8k_16_ctc1_r, p8k_16_ctc1_w)        //"z80ctc_1", 
+	AM_RANGE(0x0ff88, 0x0ff8f) AM_READWRITE(p8k_16_sio1_r, p8k_16_sio1_w)          //"z80sio_1",
+	AM_RANGE(0x0ff90, 0x0ff97) AM_READWRITE(p8k_16_pio0_r, p8k_16_pio0_w)          //"z80pio_0",
+	AM_RANGE(0x0ff98, 0x0ff9f) AM_READWRITE(p8k_16_pio1_r, p8k_16_pio1_w)          //"z80pio_1",
+	AM_RANGE(0x0ffa0, 0x0ffa7) AM_READWRITE(p8k_16_pio2_r, p8k_16_pio2_w)          //"z80pio_2",
+	AM_RANGE(0x0ffa8, 0x0ffaf) AM_READWRITE(p8k_16_ctc0_r, p8k_16_ctc0_w)        //"z80ctc_0",
+	AM_RANGE(0x0ffb0, 0x0ffb7) AM_READWRITE(p8k_16_ctc1_r, p8k_16_ctc1_w)        //"z80ctc_1",
 //  AM_RANGE(0x0ffc0, 0x0ffc1) // SCR
 //  AM_RANGE(0x0ffc8, 0x0ffc9) // SBR
 //  AM_RANGE(0x0ffd0, 0x0ffd1) // NBR

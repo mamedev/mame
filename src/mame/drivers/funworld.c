@@ -825,7 +825,7 @@
      allowing to boot them. Promoted to working state.
   - Removed the 'hack' in the Magic Card 2 sets description...
      Almost all the sets on this driver were hacked in different
-	 degrees. Not proof that these were released as originals,
+     degrees. Not proof that these were released as originals,
      or just a hack.
 
 
@@ -5420,4 +5420,3 @@ GAME(  199?, soccernw,  0,        royalcd1, royalcrd,  funworld_state, soccernw,
 // Other games...
 GAME(  198?, funquiz,   0,        funquiz,  funquiz,   driver_device,  0,        ROT0, "Fun World / Oehlinger", "Fun World Quiz (Austrian)",                 0 )
 GAMEL( 1986, novoplay,  0,        fw2ndpal, novoplay,  driver_device,  0,        ROT0, "Admiral/Novomatic", "Novo Play Multi Card / Club Card",              0,                       layout_novoplay )
-

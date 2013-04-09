@@ -83,7 +83,7 @@ public:
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);	
+	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);
 };
 
 

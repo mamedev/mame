@@ -38,7 +38,7 @@
 #define HD44102_8_TAG   "m9"
 #define HD44102_9_TAG   "m10"
 #define CENTRONICS_TAG  "centronics"
-#define RS232_TAG		"rs232"
+#define RS232_TAG       "rs232"
 
 //#define I8085_TAG     "m19"
 //#define I8155_TAG     "m12"

@@ -42,5 +42,5 @@ public:
 	UINT32 screen_update_wc90b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);	
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
