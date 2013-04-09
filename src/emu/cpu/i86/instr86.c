@@ -3271,12 +3271,12 @@ static void PREFIX86(_ffpre)(i8086_state *cpustate)    /* Opcode 0xff */
 
 static void PREFIX86(_invalid)(i8086_state *cpustate)
 {
+	logerror("illegal instruction %.2x at %.5x\n",PEEKBYTE(cpustate->pc-1), cpustate->pc);
 #ifdef I80286
 	throw TRAP(ILLEGAL_INSTRUCTION,-1);
 #else
 	/* i8086/i8088 ignore an invalid opcode. */
 	/* i80186/i80188 probably also ignore an invalid opcode. */
-	logerror("illegal instruction %.2x at %.5x\n",PEEKBYTE(cpustate->pc-1), cpustate->pc);
 	ICOUNT -= 10;
 #endif
 }

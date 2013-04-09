@@ -15,21 +15,11 @@
 
 
 static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
-	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
+	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
 	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM
-	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( neat_map, AS_PROGRAM, 16, at_state )
-	AM_RANGE(0x000000, 0x09ffff) AM_MIRROR(0xff000000) AM_RAMBANK("bank10")
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_ROM
-	AM_RANGE(0x0c8000, 0x0cffff) AM_ROM
-	AM_RANGE(0x0d0000, 0x0effff) AM_RAM
-	AM_RANGE(0x0f0000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0xfeffff) AM_RAM
 	AM_RANGE(0xff0000, 0xffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
@@ -246,8 +236,6 @@ static INPUT_PORTS_START( atcga )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy installed")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-
-	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( atvga )
@@ -432,7 +420,7 @@ static MACHINE_CONFIG_START( ibm5170, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 
@@ -461,13 +449,12 @@ static MACHINE_CONFIG_START( ibm5162, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "fdc", NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "ide", NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL, false)
-
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "cga", NULL, false)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 
@@ -489,14 +476,14 @@ static MACHINE_CONFIG_START( ps2m30286, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( neat, at_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80286, 12000000)
-	MCFG_CPU_PROGRAM_MAP(neat_map)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(neat_io)
 	MCFG_CPU_CONFIG(i286_address_mask)
 
@@ -506,15 +493,14 @@ static MACHINE_CONFIG_START( neat, at_state )
 	MCFG_ISA16_SLOT_ADD("isabus", "isa1", pc_isa16_cards, "fdc", NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa2", pc_isa16_cards, "ide", NULL, false)
 	MCFG_ISA16_SLOT_ADD("isabus", "isa3", pc_isa16_cards, "comat", NULL, false)
-
-	MCFG_FRAGMENT_ADD( pcvideo_cga )
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, "svga_et4k", NULL, false)
 
 	MCFG_CS8221_ADD("cs8221", "maincpu", "isa", "bios")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( atvga, at_state )
@@ -536,7 +522,7 @@ static MACHINE_CONFIG_START( atvga, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xb42639, at_state )
@@ -557,7 +543,7 @@ static MACHINE_CONFIG_START( xb42639, at_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,15M")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -704,6 +690,12 @@ static MACHINE_CONFIG_DERIVED( at386sx, atvga )
 	MCFG_CPU_IO_MAP(at16_io)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( ct386sx, neat )
+	MCFG_CPU_REPLACE("maincpu", I386SX, 16000000)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(neat_io)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( megapc, at386 )
 	MCFG_CPU_REPLACE("maincpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(at386_map)
@@ -784,11 +776,6 @@ ROM_START( ec1849 )
 	ROM_LOAD16_BYTE( "cpu-card_27c256_016.rom", 0xf0001, 0x8000, CRC(bc3924d6) SHA1(596be415e6c2bc4ff30a187f146664531565712c))
 	ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_040.rom", 0xc0001, 0x2000, CRC(a3ece315) SHA1(e800e11c3b1b6fcaf41bfb7d4058a9d34fdd2b3f))
 	ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_041.rom", 0xc0000, 0x2000, CRC(b0a2ba7f) SHA1(c8160e8bc97cd391558f1dddd3fd3ec4a19d030c))
-
-	ROM_REGION(0x08100, "gfx1", 0)
-	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
-
-	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( ibm5170a )
@@ -819,10 +806,6 @@ ROM_START( ibm5162 ) //MB p/n 62x1168
 
 	ROM_LOAD16_BYTE("78x7460.u34", 0xf0000, 0x8000, CRC(1db4bd8f) SHA1(7be669fbb998d8b4626fefa7cd1208d3b2a88c31)) /* 78X7460 U34 // (C) IBM CORP // 1981-1986 */
 	ROM_LOAD16_BYTE("78x7461.u35", 0xf0001, 0x8000, CRC(be14b453) SHA1(ec7c10087dbd53f9c6d1174e8f14212e2aec1818)) /* 78X7461 U35 // (C) IBM CORP // 1981-1986 */
-
-	/* Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
 
 	/* Mainboard PALS */
 	ROM_REGION( 0x2000, "pals", 0 )
@@ -1016,22 +999,12 @@ ROM_START( at )
 	ROM_SYSTEM_BIOS(13, "aw303gs", "Award 303GS")
 	ROMX_LOAD( "aw303gs-hi.bin",  0xf8001, 0x4000, CRC(82392e18) SHA1(042453b7b29933a1b72301d21fcf8fa6b293c9c9), ROM_SKIP(1) | ROM_BIOS(14) )
 	ROMX_LOAD( "aw303gs-lo.bin",  0xf8000, 0x4000, CRC(a4cf8ba1) SHA1(b73e34be3b2754aaed1ac06471f4441fea06c67c), ROM_SKIP(1) | ROM_BIOS(14) )
-	/* Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
-
-	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( cmdpc30 )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROMX_LOAD( "commodore pc 30 iii even.bin", 0xf8000, 0x4000, CRC(36307aa9) SHA1(50237ffea703b867de426ab9ebc2af46bac1d0e1),ROM_SKIP(1))
 	ROMX_LOAD( "commodore pc 30 iii odd.bin",  0xf8001, 0x4000, CRC(41bae42d) SHA1(27d6ad9554be86359d44331f25591e3122a31519),ROM_SKIP(1))
-	/* Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
-
-	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( atvga )
@@ -1120,21 +1093,15 @@ ROM_START( neat )
 	//ROM_RELOAD(0xff0000,0x8000)
 	ROM_LOAD16_BYTE("at030389.1", 0xf0001, 0x8000, CRC(4e90f294) SHA1(18c21fd8d7e959e2292a9afbbaf78310f9cad12f))
 	//ROM_RELOAD(0xff0001,0x8000)
-
-	/* Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f))
-
-	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
 ROM_END
 
-ROM_START( at386sx )
+ROM_START( ct386sx )
 	ROM_REGION(0x1000000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "neatsx", "NEATsx 386sx")
 	ROMX_LOAD("012l-u25.bin", 0xf0000, 0x8000, CRC(4AB1862D) SHA1(D4E8D0FF43731270478CA7671A129080FF350A4F),ROM_SKIP(1) | ROM_BIOS(1) )
-	//ROM_RELOAD(0xff0000,0x8000)
 	ROMX_LOAD("012h-u24.bin", 0xf0001, 0x8000, CRC(17472521) SHA1(7588C148FE53D9DC4CB2D0AB6E0FD51A39BB5D1A),ROM_SKIP(1) | ROM_BIOS(1) )
-	//ROM_RELOAD(0xff0000,0x8000)
+	ROM_FILL(0xfe2c9, 1, 0) // skip incompatible keyboard controller test
+	ROM_FILL(0xfe2cb, 1, 0xbb) // fix checksum
 ROM_END
 
 ROM_START( at386 )
@@ -1459,11 +1426,11 @@ COMP ( 198?, i8580111, ibm5170, 0,       at386,     atvga, at_state,      atvga,
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "<generic>",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1987, atvga,    ibm5170, 0,       atvga,     atvga, at_state,      atvga,  "<generic>",  "PC/AT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING )
 COMP ( 1988, at386,    ibm5170, 0,       at386,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 386 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
-COMP ( 1988, at386sx,  ibm5170, 0,       at386sx,   atvga, at_state,      atvga,  "<generic>",  "PC/AT 386SX (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1988, ct386sx,  ibm5170, 0,       ct386sx,   atvga, at_state,      atvga,  "<generic>",  "NEAT 386SX (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at486,    ibm5170, 0,       at486,     atvga, at_state,      atvga,  "<generic>",  "PC/AT 486 (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1990, at586,    ibm5170, 0,       at586,     atvga, driver_device,      0,   "<generic>",  "PC/AT 586 (PIIX4)", GAME_NOT_WORKING )
 COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   atvga, driver_device,      0,       "<generic>",  "PC/AT 586 (PIIX3)", GAME_NOT_WORKING )
-COMP ( 1989, neat,     ibm5170, 0,       neat,      atcga, at_state,      atcga,  "<generic>",  "NEAT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
+COMP ( 1989, neat,     ibm5170, 0,       neat,      atvga, at_state,      atvga,  "<generic>",  "NEAT (VGA, MF2 Keyboard)", GAME_NOT_WORKING )
 COMP ( 1993, ct486,    ibm5170, 0,       ct486,     atvga, at_state,      atvga,  "<unknown>",  "PC/AT 486 with C&T chipset", GAME_NOT_WORKING )
 COMP ( 1993, ec1849,   ibm5170, 0,       ec1849,    atcga, at_state,      atcga,  "<unknown>",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1993, megapc,   ibm5170, 0,       megapc,    atvga, at_state,      atvga,  "Amstrad plc", "MegaPC", GAME_NOT_WORKING )
