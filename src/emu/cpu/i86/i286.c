@@ -153,7 +153,6 @@ static CPU_RESET( i80286 )
 	memset(&cpustate->regs, 0, sizeof(i80286basicregs));
 	cpustate->sregs[CS] = 0xf000;
 	cpustate->base[CS] = 0xff0000;
-	cpustate->base[CS] = cpustate->sregs[CS] << 4;
 	cpustate->pc = 0xfffff0;
 	cpustate->limit[CS]=cpustate->limit[SS]=cpustate->limit[DS]=cpustate->limit[ES]=0xffff;
 	cpustate->sregs[DS]=cpustate->sregs[SS]=cpustate->sregs[ES]=0;
