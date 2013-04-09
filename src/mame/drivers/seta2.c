@@ -3050,6 +3050,14 @@ Program ROMs:
 
 V1.05 program roms have been seen with labels dated 12/17/97
 
+Reel'N Quake! is also known to be available on the P-FG-03 PCB which is
+ essentially the same layout as the P-FG-02 but with standard 8-liner
+ edge connectors. Program rom labels for this (undumped) set are:
+
+   KFP       KFP
+   U02  and  U03
+   C00       C00
+
 ***************************************************************************/
 
 ROM_START( reelquak )
