@@ -56,7 +56,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(lnc_w);

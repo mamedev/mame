@@ -24,7 +24,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	UINT8     m_irq_mask;
 	DECLARE_WRITE8_MEMBER(irq_mask_w);
