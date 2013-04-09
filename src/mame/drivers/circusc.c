@@ -58,7 +58,6 @@ To enter service mode, keep 1&2 pressed on reset
 
 void circusc_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_sn_latch));

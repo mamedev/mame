@@ -389,8 +389,6 @@ GFXDECODE_END
 
 void mugsmash_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( mugsmash, mugsmash_state )

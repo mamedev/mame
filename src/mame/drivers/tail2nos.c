@@ -210,8 +210,6 @@ void tail2nos_state::machine_start()
 	membank("bank3")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 	membank("bank3")->set_entry(0);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k051316 = machine().device("k051316");
 
 	save_item(NAME(m_charbank));

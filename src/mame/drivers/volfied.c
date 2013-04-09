@@ -234,8 +234,6 @@ void volfied_state::machine_start()
 {
 	volfied_cchip_init();
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc090oj = machine().device("pc090oj");
 }
 

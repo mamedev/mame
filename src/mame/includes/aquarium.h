@@ -10,7 +10,8 @@ public:
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_scroll(*this, "scroll"){ }
+		m_scroll(*this, "scroll"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
@@ -29,7 +30,7 @@ public:
 	int m_aquarium_snd_ack;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ16_MEMBER(aquarium_coins_r);
 	DECLARE_WRITE8_MEMBER(aquarium_snd_ack_w);
 	DECLARE_WRITE16_MEMBER(aquarium_sound_w);

@@ -804,8 +804,6 @@ static const msm5205_interface msm5205_config =
 void sf_state::machine_start()
 {
 	/* devices */
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_sf_active));
 	save_item(NAME(m_bgscroll));

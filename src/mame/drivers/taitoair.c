@@ -666,7 +666,6 @@ void taitoair_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_dsp = machine().device("dsp");
 	m_tc0080vco = machine().device("tc0080vco");
 

@@ -6,7 +6,10 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_scrlram(*this, "scrlram"),
-		m_sharedram(*this, "sharedram"){ }
+		m_sharedram(*this, "sharedram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -46,9 +49,9 @@ public:
 	int m_mask;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(from_snd_r);

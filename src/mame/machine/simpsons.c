@@ -77,8 +77,6 @@ void simpsons_state::machine_start()
 	m_xtraram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053260 = machine().device("k053260");
 	m_k052109 = machine().device("k052109");
 	m_k053246 = machine().device("k053246");

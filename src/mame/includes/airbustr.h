@@ -14,7 +14,8 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_devram;
@@ -41,7 +42,7 @@ public:
 	/* devices */
 	device_t *m_master;
 	device_t *m_slave;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_pandora;
 	DECLARE_READ8_MEMBER(devram_r);
 	DECLARE_WRITE8_MEMBER(master_nmi_trigger_w);

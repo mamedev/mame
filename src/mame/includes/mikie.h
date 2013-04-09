@@ -11,7 +11,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -26,8 +28,8 @@ public:
 	int        m_last_irq;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 
 	UINT8      m_irq_mask;
 	DECLARE_READ8_MEMBER(mikie_sh_timer_r);

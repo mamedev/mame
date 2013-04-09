@@ -14,7 +14,9 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -27,8 +29,8 @@ public:
 	/* video-related */
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(supbtime_controls_r);
 	DECLARE_WRITE16_MEMBER(sound_w);

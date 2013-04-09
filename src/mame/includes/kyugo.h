@@ -14,7 +14,9 @@ public:
 		m_bgattribram(*this, "bgattribram"),
 		m_spriteram_1(*this, "spriteram_1"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_shared_ram(*this, "shared_ram"){ }
+		m_shared_ram(*this, "shared_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fgvideoram;
@@ -36,8 +38,8 @@ public:
 	const UINT8 *m_color_codes;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 
 	UINT8       m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);

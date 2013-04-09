@@ -13,7 +13,9 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_dsw_sel16(*this, "dsw_sel16"),
 			m_protection1(*this, "protection1"),
-			m_protection2(*this, "protection2")
+			m_protection2(*this, "protection2"),
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -154,8 +156,8 @@ public:
 
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	device_t *m_rtc;
 	device_t *m_ymsnd;
 	okim6295_device *m_oki;

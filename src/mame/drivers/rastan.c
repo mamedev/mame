@@ -350,8 +350,6 @@ void rastan_state::machine_start()
 	membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	membank("bank1")->configure_entries(1, 3, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc080sn = machine().device("pc080sn");
 	m_pc090oj = machine().device("pc090oj");
 

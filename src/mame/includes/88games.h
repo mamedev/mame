@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_banked_rom(*this, "banked_rom"),
 		m_paletteram_1000(*this, "paletteram_1000"),
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_banked_rom;
@@ -30,7 +31,7 @@ public:
 	int          m_speech_chip;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k052109;
 	device_t *m_k051960;
 	device_t *m_k051316;

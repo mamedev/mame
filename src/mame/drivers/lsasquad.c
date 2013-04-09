@@ -568,8 +568,6 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_port_a_in));

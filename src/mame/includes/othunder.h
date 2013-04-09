@@ -24,7 +24,9 @@ class othunder_state : public driver_device
 public:
 	othunder_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this,"spriteram") { }
+		m_spriteram(*this,"spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -39,8 +41,8 @@ public:
 	int        m_pan[4];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	eeprom_device *m_eeprom;
 	device_t *m_tc0220ioc;
 	device_t *m_tc0100scn;

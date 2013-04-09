@@ -15,7 +15,10 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_colorram(*this, "colorram"),
 		m_colorram2(*this, "colorram2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_daccpu(*this, "daccpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_scrolly;
@@ -34,9 +37,9 @@ public:
 	int           m_i8039_status;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	cpu_device *m_daccpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_daccpu;
 
 	UINT8         m_irq_mask;
 	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);

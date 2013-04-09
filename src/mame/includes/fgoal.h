@@ -5,7 +5,8 @@ class fgoal_state : public driver_device
 public:
 	fgoal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_video_ram(*this, "video_ram"){ }
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -24,7 +25,7 @@ public:
 	int        m_prev_coin;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_mb14241;
 	DECLARE_READ8_MEMBER(fgoal_analog_r);
 	DECLARE_READ8_MEMBER(fgoal_nmi_reset_r);

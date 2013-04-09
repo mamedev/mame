@@ -92,7 +92,9 @@ public:
 		m_videoram1(*this, "videoram1"),
 		m_colorram1(*this, "colorram1"),
 		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2"){ }
+		m_colorram2(*this, "colorram2"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram1;
@@ -107,8 +109,8 @@ public:
 	UINT16   m_star_shift_reg;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_audiocpu2;
 	device_t *m_ic48_1;
 	mc6845_device *m_mc6845;
@@ -672,8 +674,6 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_audiocpu2 = machine().device("audio2");
 	m_ic48_1 = machine().device("ic48_1");
 	m_mc6845 = machine().device<mc6845_device>("crtc");

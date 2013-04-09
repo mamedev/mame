@@ -203,9 +203,6 @@ void ajax_state::machine_start()
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_k007232_1 = machine().device("k007232_1");
 	m_k007232_2 = machine().device("k007232_2");
 	m_k052109 = machine().device("k052109");

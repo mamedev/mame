@@ -5,14 +5,17 @@ class dec8_state : public driver_device
 public:
 	dec8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu"),
+		m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"),
 		m_bg_data(*this, "bg_data"){ }
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 

@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -35,7 +36,7 @@ public:
 	int       m_vclk_left;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_msm;
 	DECLARE_WRITE8_MEMBER(ojankohs_rombank_w);
 	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);

@@ -13,7 +13,8 @@ public:
 	rallyx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_radarattr(*this, "radarattr") { }
+		m_radarattr(*this, "radarattr"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -36,7 +37,7 @@ public:
 	struct jungler_star m_stars[JUNGLER_MAX_STARS];
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	samples_device *m_samples;
 
 	UINT8    m_main_irq_mask;

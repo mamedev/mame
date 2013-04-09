@@ -549,9 +549,6 @@ void fuuki32_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
-
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki32_state::raster_interrupt_callback),this));
 
 	save_item(NAME(m_spr_buffered_tilebank));
@@ -571,7 +568,7 @@ void fuuki32_state::machine_reset()
 
 WRITE_LINE_MEMBER(fuuki32_state::irqhandler)
 {
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface fuuki32_ymf278b_interface =

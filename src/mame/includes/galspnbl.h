@@ -16,7 +16,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_scroll(*this, "scroll"){ }
+		m_scroll(*this, "scroll"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -27,7 +28,7 @@ public:
 //  UINT16 *    paletteram; // currently this uses generic palette handling
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
 	virtual void machine_start();
 	virtual void palette_init();

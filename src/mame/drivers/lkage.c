@@ -491,8 +491,6 @@ static const ym2203_interface ym2203_config =
 
 void lkage_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_bg_tile_bank));

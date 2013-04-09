@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"){ }
+		m_bg_videoram(*this, "bg_videoram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -25,7 +26,7 @@ public:
 	UINT8 m_scroll[2];
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(c1942_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(c1942_fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(c1942_bgvideoram_w);

@@ -8,7 +8,9 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_regs1(*this, "regs1"),
 		m_regs2(*this, "regs2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	required_shared_ptr<UINT16> m_videoram1;
 	required_shared_ptr<UINT16> m_videoram2;
@@ -19,8 +21,8 @@ public:
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
 
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
 	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
 	DECLARE_WRITE16_MEMBER(mugsmash_videoram1_w);

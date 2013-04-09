@@ -263,7 +263,6 @@ INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
 
 void kncljoe_state::machine_start()
 {
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));

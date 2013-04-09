@@ -216,7 +216,7 @@ WRITE8_MEMBER(lethal_state::sound_cmd_w)
 
 WRITE8_MEMBER(lethal_state::sound_irq_w)
 {
-	m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(lethal_state::sound_status_r)
@@ -227,7 +227,7 @@ READ8_MEMBER(lethal_state::sound_status_r)
 static void sound_nmi( device_t *device )
 {
 	lethal_state *state = device->machine().driver_data<lethal_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	state->m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(lethal_state::le_bankswitch_w)
@@ -580,9 +580,7 @@ void lethal_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	m_generic_paletteram_8.allocate(0x3800 + 0x02);
-
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	
 	m_k054539 = machine().device("k054539");
 	m_k053244 = machine().device("k053244");
 	m_k056832 = machine().device("k056832");

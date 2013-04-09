@@ -524,7 +524,6 @@ void djboy_state::machine_start()
 	membank("bank3")->configure_entries(3, 5,  &CPU2[0x10000], 0x4000);
 	membank("bank4")->configure_entry(0, &MAIN[0x10000]); /* unsure if/how this area is banked */
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_cpu1 = machine().device("cpu1");
 	m_cpu2 = machine().device("cpu2");
 	m_beast = machine().device("beast");

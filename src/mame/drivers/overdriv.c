@@ -279,9 +279,6 @@ static const k051316_interface overdriv_k051316_intf_2 =
 
 void overdriv_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_k051316_1 = machine().device("k051316_1");
 	m_k051316_2 = machine().device("k051316_2");
 	m_k053260_1 = machine().device("k053260_1");

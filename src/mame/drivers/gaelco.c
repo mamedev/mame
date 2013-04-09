@@ -492,7 +492,6 @@ GFXDECODEINFO(0x100000,64)
 
 void gaelco_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( bigkarnk, gaelco_state )

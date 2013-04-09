@@ -50,7 +50,8 @@ class discoboy_state : public driver_device
 {
 public:
 	discoboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* video-related */
 	UINT8    m_ram_bank;
@@ -60,7 +61,7 @@ public:
 	UINT8    m_toggle;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
 	UINT8    m_ram_1[0x800];
@@ -452,7 +453,6 @@ GFXDECODE_END
 
 void discoboy_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_00));

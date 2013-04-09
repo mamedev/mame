@@ -19,7 +19,9 @@ class tnzs_state : public driver_device
 {
 public:
 	tnzs_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	/* memory pointers */
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
@@ -52,8 +54,8 @@ public:
 	UINT8*   m_ROM;
 
 	/* devices */
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);

@@ -225,7 +225,6 @@ INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
 
 void commando_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));

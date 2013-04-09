@@ -184,8 +184,6 @@ static const deco16ic_interface dietgo_deco16ic_tilegen1_intf =
 
 void dietgo_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
 }
 

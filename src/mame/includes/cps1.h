@@ -73,7 +73,9 @@ public:
 		m_qsound_sharedram2(*this, "qsound_ram2"),
 		m_objram1(*this, "objram1"),
 		m_objram2(*this, "objram2"),
-		m_output(*this, "output")
+		m_output(*this, "output"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -160,8 +162,8 @@ public:
 	UINT16       *m_bootleg_work_ram;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	msm5205_device *m_msm_1;    // fcrash
 	msm5205_device *m_msm_2;    // fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);

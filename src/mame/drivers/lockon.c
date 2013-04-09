@@ -451,8 +451,6 @@ static const ym2203_interface ym2203_config =
 
 void lockon_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_ground = machine().device("ground");
 	m_object = machine().device("object");
 	m_f2203_1l = machine().device<filter_volume_device>("f2203.1l");

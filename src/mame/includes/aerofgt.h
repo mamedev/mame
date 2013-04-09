@@ -16,7 +16,8 @@ public:
 		m_tx_tilemap_ram(*this, "tx_tilemap_ram"),
 		m_spr(*this, "vsystem_spr"),
 		m_spr_old(*this, "vsystem_spr_old"),
-		m_spr_old2(*this, "vsystem_spr_ol2")
+		m_spr_old2(*this, "vsystem_spr_ol2"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -59,7 +60,7 @@ public:
 	int       m_pending_command;
 
 	/* other devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 	/* handlers */
 	DECLARE_WRITE16_MEMBER(sound_command_w);

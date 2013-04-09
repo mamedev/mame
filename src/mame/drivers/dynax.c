@@ -3972,8 +3972,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 	m_rtc = machine().device("rtc");
 	m_ymsnd = machine().device("ymsnd");
 

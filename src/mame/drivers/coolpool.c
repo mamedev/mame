@@ -134,7 +134,6 @@ static void coolpool_from_shiftreg(address_space &space, UINT32 address, UINT16 
 
 MACHINE_RESET_MEMBER(coolpool_state,amerdart)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dsp = machine().device("dsp");
 
 	m_nvram_write_enable = 0;

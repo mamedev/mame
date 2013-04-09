@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -25,7 +26,7 @@ public:
 	int        m_last_irq;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(sonson_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(sonson_coin1_counter_w);
 	DECLARE_WRITE8_MEMBER(sonson_coin2_counter_w);

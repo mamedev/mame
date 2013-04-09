@@ -275,7 +275,6 @@ GFXDECODE_END
 
 void ladyfrog_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_palette_bank));

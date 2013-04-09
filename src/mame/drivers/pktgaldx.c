@@ -315,7 +315,6 @@ static const deco16ic_interface pktgaldx_deco16ic_tilegen1_intf =
 
 void pktgaldx_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
 
 	decoprot_reset(machine());

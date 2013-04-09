@@ -26,11 +26,12 @@ public:
 	gridlee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	UINT8 m_last_analog_input[2];
 	UINT8 m_last_analog_output[2];
 	UINT8 *m_poly17;

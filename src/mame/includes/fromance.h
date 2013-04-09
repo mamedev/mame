@@ -16,7 +16,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spr_old(*this, "vsystem_spr_old")
+		m_spr_old(*this, "vsystem_spr_old"),
+		m_subcpu(*this, "sub")
 	{ }
 
 	/* memory pointers (used by pipedrm) */
@@ -56,7 +57,7 @@ public:
 	UINT8    m_sound_command;
 
 	/* devices */
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_subcpu;
 	DECLARE_READ8_MEMBER(fromance_commanddata_r);
 	DECLARE_WRITE8_MEMBER(fromance_commanddata_w);
 	DECLARE_READ8_MEMBER(fromance_busycheck_main_r);

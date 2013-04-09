@@ -7,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_tlc34076(*this, "tlc34076"),
 		m_vram_base(*this, "vram_base"),
-		m_nvram(*this, "nvram"){ }
+		m_nvram(*this, "nvram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	optional_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_base;
@@ -28,7 +29,7 @@ public:
 	UINT16 m_result;
 	UINT16 m_lastresult;
 
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_dsp;
 	UINT16 m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 	UINT8 m_nvram_write_enable;

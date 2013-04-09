@@ -331,9 +331,6 @@ GFXDECODE_END
 
 void bwing_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_palatch));
 	save_item(NAME(m_srbank));

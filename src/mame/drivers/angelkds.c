@@ -569,7 +569,6 @@ GFXDECODE_END
 
 void angelkds_state::machine_start()
 {
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_layer_ctrl));
 	save_item(NAME(m_txbank));

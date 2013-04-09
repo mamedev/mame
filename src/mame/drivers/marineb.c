@@ -59,9 +59,6 @@ MACHINE_RESET_MEMBER(marineb_state,springer)
 
 void marineb_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = NULL;
-
 	save_item(NAME(m_marineb_active_low_flipscreen));
 }
 

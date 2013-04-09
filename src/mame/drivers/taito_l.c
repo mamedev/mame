@@ -139,8 +139,6 @@ void taitol_state::state_register(  )
 
 MACHINE_START_MEMBER(taitol_state,taito_l)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_rambanks));
 	save_item(NAME(m_palette_ram));

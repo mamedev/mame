@@ -2001,8 +2001,6 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 
 void taitob_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mb87078 = machine().device("mb87078");
 	m_ym = machine().device("ymsnd");
 	m_tc0180vcu = machine().device("tc0180vcu");

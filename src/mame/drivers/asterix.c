@@ -240,8 +240,6 @@ static const k05324x_interface asterix_k05324x_intf =
 
 void asterix_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053260 = machine().device("k053260");
 	m_k056832 = machine().device("k056832");
 	m_k053244 = machine().device("k053244");

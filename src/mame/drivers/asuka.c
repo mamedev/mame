@@ -824,8 +824,6 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 
 void asuka_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc090oj = machine().device("pc090oj");
 	m_tc0100scn = machine().device("tc0100scn");
 

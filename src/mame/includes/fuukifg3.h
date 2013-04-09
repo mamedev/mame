@@ -19,7 +19,9 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_vregs(*this, "vregs"),
 		m_priority(*this, "priority"),
-		m_tilebank(*this, "tilebank"){ }
+		m_tilebank(*this, "tilebank"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr_array<UINT32,4> m_vram;
@@ -40,8 +42,8 @@ public:
 	UINT8       m_shared_ram[16];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
 	DECLARE_READ32_MEMBER(snd_020_r);
 	DECLARE_WRITE32_MEMBER(snd_020_w);

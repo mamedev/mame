@@ -12,7 +12,8 @@ public:
 	blktiger_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram") ,
-		m_txvideoram(*this, "txvideoram"){ }
+		m_txvideoram(*this, "txvideoram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -39,7 +40,7 @@ public:
 
 	/* devices */
 	device_t *m_mcu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);
 	DECLARE_READ8_MEMBER(blktiger_from_main_r);

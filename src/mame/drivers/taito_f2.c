@@ -3011,8 +3011,6 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 
 MACHINE_START_MEMBER(taitof2_state,common)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");;
 	m_tc0100scn = machine().device("tc0100scn");;
 	m_tc0100scn_1 = machine().device("tc0100scn_1");;
 	m_tc0100scn_2 = machine().device("tc0100scn_2");;

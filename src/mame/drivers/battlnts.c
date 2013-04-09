@@ -226,7 +226,6 @@ void battlnts_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007342 = machine().device("k007342");
 	m_k007420 = machine().device("k007420");
 

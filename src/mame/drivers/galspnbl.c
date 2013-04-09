@@ -218,7 +218,6 @@ static const ym3812_interface ym3812_config =
 
 void galspnbl_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( galspnbl, galspnbl_state )

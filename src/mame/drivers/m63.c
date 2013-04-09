@@ -130,7 +130,8 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scrollram;
@@ -155,7 +156,7 @@ public:
 	INT16    *m_samplebuf;
 
 	/* sound devices */
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_soundcpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
 	samples_device *m_samples;
@@ -713,7 +714,6 @@ INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 
 MACHINE_START_MEMBER(m63_state,m63)
 {
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 	m_ay1 = machine().device("ay1");
 	m_ay2 = machine().device("ay2");
 	m_samples = machine().device<samples_device>("samples");

@@ -262,8 +262,6 @@ static const ym3526_interface ym3526_config =
 
 void metlclsh_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_write_mask));
 	save_item(NAME(m_gfxbank));

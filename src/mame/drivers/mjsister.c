@@ -18,7 +18,8 @@ class mjsister_state : public driver_device
 {
 public:
 	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	bitmap_ind16 *m_tmpbitmap0;
@@ -43,7 +44,7 @@ public:
 	UINT32 m_dac_busy;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	dac_device *m_dac;
 
 	/* memory */
@@ -454,7 +455,6 @@ void mjsister_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_dac_busy));

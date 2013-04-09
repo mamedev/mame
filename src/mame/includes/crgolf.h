@@ -16,7 +16,9 @@ public:
 		m_screen_flip(*this, "screen_flip"),
 		m_screen_select(*this, "screen_select"),
 		m_screenb_enable(*this, "screenb_enable"),
-		m_screena_enable(*this, "screena_enable"){ }
+		m_screena_enable(*this, "screena_enable"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	UINT8 *  m_videoram_a;
@@ -35,8 +37,8 @@ public:
 	UINT8    m_sample_count;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(rom_bank_select_w);
 	DECLARE_READ8_MEMBER(switch_input_r);
 	DECLARE_READ8_MEMBER(analog_input_r);

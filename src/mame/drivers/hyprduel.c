@@ -628,8 +628,6 @@ void hyprduel_state::machine_reset()
 
 MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));

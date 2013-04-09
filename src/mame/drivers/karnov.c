@@ -758,8 +758,6 @@ static const ym3526_interface ym3526_config =
 
 void karnov_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_scroll));

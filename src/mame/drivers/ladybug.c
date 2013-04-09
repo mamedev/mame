@@ -725,12 +725,10 @@ static const sn76496_config psg_intf =
 
 MACHINE_START_MEMBER(ladybug_state,ladybug)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 }
 
 MACHINE_START_MEMBER(ladybug_state,sraider)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_grid_color));
 	save_item(NAME(m_sound_low));

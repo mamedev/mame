@@ -8,7 +8,8 @@ class yunsung8_state : public driver_device
 {
 public:
 	yunsung8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* video-related */
 	tilemap_t     *m_tilemap_0;
@@ -23,7 +24,7 @@ public:
 	int         m_toggle;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
 	UINT8      m_videoram[0x4000];

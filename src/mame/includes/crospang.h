@@ -14,7 +14,8 @@ public:
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -30,7 +31,7 @@ public:
 	int       m_bestri_tilebank;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(crospang_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(bestri_tilebank_w);
 	DECLARE_WRITE16_MEMBER(bestri_bg_scrolly_w);

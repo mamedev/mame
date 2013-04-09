@@ -1944,8 +1944,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_oki = machine().device("oki");
 
 	save_item(NAME(m_music_command));

@@ -10,7 +10,8 @@ public:
 	ladyfrog_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
-		m_scrlram(*this, "scrlram"){ }
+		m_scrlram(*this, "scrlram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -32,7 +33,7 @@ public:
 	UINT8      m_snd_data;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
 	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);

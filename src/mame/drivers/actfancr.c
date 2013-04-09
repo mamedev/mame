@@ -289,8 +289,6 @@ static const ym3812_interface ym3812_config =
 
 MACHINE_START_MEMBER(actfancr_state,actfancr)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 MACHINE_START_MEMBER(actfancr_state,triothep)

@@ -157,8 +157,9 @@ class adp_state : public driver_device
 public:
 	adp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_h63484(*this, "h63484"),
-			m_microtouch(*this, "microtouch")
+		m_h63484(*this, "h63484"),
+		m_microtouch(*this, "microtouch"),
+		m_maincpu(*this, "maincpu")
 		{ }
 
 	required_device<h63484_device> m_h63484;
@@ -173,7 +174,7 @@ public:
 	struct { int r,g,b,offs,offs_internal; } m_pal;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_duart;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_WRITE16_MEMBER(wh2_w);
@@ -301,7 +302,6 @@ static const microtouch_interface adb_microtouch_config =
 
 MACHINE_START_MEMBER(adp_state,skattv)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_duart = machine().device("duart68681");
 	//m_h63484 = machine().device("h63484");
 

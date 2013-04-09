@@ -1002,8 +1002,6 @@ static const msm5232_interface msm5232_config =
 
 void flstory_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	/* video */

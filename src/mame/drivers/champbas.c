@@ -574,7 +574,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(champbas_state,champbas)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mcu = machine().device(CPUTAG_MCU);
 
 	save_item(NAME(m_watchdog_count));
@@ -584,7 +583,6 @@ MACHINE_START_MEMBER(champbas_state,champbas)
 
 MACHINE_START_MEMBER(champbas_state,exctsccr)
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	// FIXME
 	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */

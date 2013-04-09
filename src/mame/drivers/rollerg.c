@@ -253,8 +253,6 @@ void rollerg_state::machine_start()
 	membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(0);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053244 = machine().device("k053244");
 	m_k051316 = machine().device("k051316");
 	m_k053260 = machine().device("k053260");

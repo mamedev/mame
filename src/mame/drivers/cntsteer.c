@@ -37,7 +37,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_videoram2(*this, "videoram2"){ }
+		m_videoram2(*this, "videoram2"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "subcpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -63,9 +66,9 @@ public:
 	int      m_nmimask; // zerotrgt only
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
 	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
@@ -817,10 +820,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("subcpu");
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_scrolly));

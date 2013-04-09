@@ -149,7 +149,6 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_sub_cpu = machine().device("sub");
 	m_snd_cpu = machine().device("soundcpu");
 	m_adpcm_1 = machine().device("adpcm1");

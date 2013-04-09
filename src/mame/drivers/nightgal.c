@@ -33,6 +33,8 @@ public:
 	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_comms_ram(*this, "comms_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_subcpu(*this, "sub")
 		, m_region_gfx1(*this, "gfx1")
 		, m_io_cr_clear(*this, "CR_CLEAR")
 		, m_io_coins(*this, "COINS")
@@ -70,8 +72,8 @@ public:
 	required_shared_ptr<UINT8> m_comms_ram;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 
 	/* memory */
 	UINT8      m_blit_buffer[256*256];
@@ -876,8 +878,6 @@ static const ay8910_interface ay8910_config =
 
 void nightgal_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));

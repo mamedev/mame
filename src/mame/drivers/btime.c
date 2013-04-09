@@ -1240,8 +1240,6 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(btime_state,btime)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));

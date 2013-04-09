@@ -12,7 +12,8 @@ public:
 		m_txtram(*this, "txtram"),
 		m_spriteram(*this, "spriteram"),
 		m_vregs(*this, "vregs"),
-		m_fgram(*this, "fgram"){ }
+		m_fgram(*this, "fgram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_txtram;
@@ -33,7 +34,7 @@ public:
 #endif
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(ginganin_fgram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_txtram16_w);
 	DECLARE_WRITE16_MEMBER(ginganin_vregs16_w);

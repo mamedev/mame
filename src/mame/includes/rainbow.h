@@ -9,7 +9,9 @@ class rbisland_state : public driver_device
 public:
 	rbisland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -28,8 +30,8 @@ public:
 	UINT8       m_current_bank;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_pc080sn;
 	device_t *m_pc090oj;
 	DECLARE_WRITE16_MEMBER(jumping_sound_w);

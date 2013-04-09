@@ -8,7 +8,9 @@ class asterix_state : public driver_device
 {
 public:
 	asterix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
@@ -26,8 +28,8 @@ public:
 	UINT16      m_prot[2];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k053260;
 	device_t *m_k056832;
 	device_t *m_k053244;

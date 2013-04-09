@@ -787,7 +787,6 @@ static const msm5205_interface msm5205_config =
 
 MACHINE_START_MEMBER(ojankohs_state,common)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_msm = machine().device("msm");
 
 	save_item(NAME(m_gfxreg));

@@ -1356,8 +1356,6 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 
@@ -1390,8 +1388,6 @@ MACHINE_START_MEMBER(cps_state,sgyxz)
 
 MACHINE_START_MEMBER(cps_state,kodb)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -1427,8 +1423,6 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 
@@ -1456,8 +1450,6 @@ MACHINE_START_MEMBER(cps_state, knightsb)
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 	m_layer_enable_reg = 0x30;
@@ -1479,8 +1471,6 @@ MACHINE_START_MEMBER(cps_state, sf2m1)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_layer_enable_reg = 0x26;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;
@@ -1947,9 +1937,6 @@ DRIVER_INIT_MEMBER(cps_state, cawingbl)
 
 MACHINE_START_MEMBER(cps_state, dinopic)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	//m_audiocpu = machine().device<cpu_device>("audiocpu");
-
 	m_layer_enable_reg = 0x0a;
 	m_layer_mask_reg[0] = 0x0c;
 	m_layer_mask_reg[1] = 0x0e;
@@ -2196,9 +2183,6 @@ ROM_END
 
 MACHINE_START_MEMBER(cps_state, punipic)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	//m_audiocpu = machine().device<cpu_device>("audiocpu");
-
 	m_layer_enable_reg = 0x12;
 	m_layer_mask_reg[0] = 0x14;
 	m_layer_mask_reg[1] = 0x16;
@@ -2588,9 +2572,6 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 
 MACHINE_START_MEMBER(cps_state, slampic)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	//m_audiocpu = machine().device<cpu_device>("audiocpu");
-
 	m_layer_enable_reg = 0x16;
 	m_layer_mask_reg[0] = 0x00;
 	m_layer_mask_reg[1] = 0x02;

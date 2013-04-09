@@ -182,8 +182,6 @@ GFXDECODE_END
 
 void mouser_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));

@@ -7,7 +7,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_slave(*this, "slave"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -26,8 +28,8 @@ public:
 	UINT8    m_buffer1[9];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_slave;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slave;
 	DECLARE_READ8_MEMBER(docastle_shared0_r);
 	DECLARE_READ8_MEMBER(docastle_shared1_r);
 	DECLARE_WRITE8_MEMBER(docastle_shared0_w);

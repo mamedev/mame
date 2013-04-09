@@ -390,7 +390,6 @@ static const ay8910_interface ay8910_config =
 
 void bking_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
 	save_item(NAME(m_pc3259_output));

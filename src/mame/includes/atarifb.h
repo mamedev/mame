@@ -24,7 +24,8 @@ public:
 		m_alphap2_videoram(*this, "p2_videoram"),
 		m_field_videoram(*this, "field_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_scroll_register(*this, "scroll_register"){ }
+		m_scroll_register(*this, "scroll_register"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_alphap1_videoram;
@@ -57,7 +58,7 @@ public:
 	int m_counter_y_in2b;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
 	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
 	DECLARE_WRITE8_MEMBER(abaseb_out1_w);

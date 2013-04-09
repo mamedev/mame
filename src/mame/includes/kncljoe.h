@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_scrollregs(*this, "scrollregs"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -29,7 +30,7 @@ public:
 	UINT8      m_port2;
 
 	/* devices */
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(kncljoe_videoram_w);

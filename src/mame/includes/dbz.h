@@ -10,7 +10,9 @@ public:
 	dbz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_bg1_videoram(*this, "bg1_videoram"),
-		m_bg2_videoram(*this, "bg2_videoram"){ }
+		m_bg2_videoram(*this, "bg2_videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_videoram;
@@ -28,8 +30,8 @@ public:
 	int           m_control;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k053246;
 	device_t *m_k053251;
 	device_t *m_k056832;

@@ -10,7 +10,9 @@ public:
 	gijoe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
-		m_workram(*this, "workram"){ }
+		m_workram(*this, "workram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -30,8 +32,8 @@ public:
 	emu_timer   *m_dmadelay_timer;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k054539;
 	device_t *m_k056832;
 	device_t *m_k053246;

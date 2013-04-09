@@ -679,9 +679,6 @@ void topspeed_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("subcpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_tc0220ioc = machine().device("tc0220ioc");
 	m_pc080sn_1 = machine().device("pc080sn_1");
 	m_pc080sn_2 = machine().device("pc080sn_2");

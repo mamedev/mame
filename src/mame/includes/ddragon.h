@@ -16,7 +16,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scrollx_lo(*this, "scrollx_lo"),
 		m_scrolly_lo(*this, "scrolly_lo"),
-		m_darktowr_mcu_ports(*this, "darktowr_mcu"){ }
+		m_darktowr_mcu_ports(*this, "darktowr_mcu"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -59,7 +60,7 @@ public:
 #endif
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_snd_cpu;
 	device_t *m_sub_cpu;
 	device_t *m_adpcm_1;

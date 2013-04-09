@@ -247,8 +247,6 @@ static const sn76496_config psg_intf =
 
 void mikie_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_last_irq));

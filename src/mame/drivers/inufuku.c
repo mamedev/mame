@@ -344,7 +344,6 @@ void inufuku_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_bg_scrollx));

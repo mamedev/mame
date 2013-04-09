@@ -89,8 +89,6 @@ INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 
 void dcheese_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_bsmt = machine().device("bsmt");
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(dcheese_state::irq_callback),this));

@@ -13,7 +13,8 @@ public:
 		m_bgbotvideoram(*this, "bgbotvideoram"),
 		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_subcpu(*this, "sub"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgtopvideoram;
@@ -34,7 +35,7 @@ public:
 	UINT8      m_layer_ctrl;
 
 	/* devices */
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_subcpu;
 	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
 	DECLARE_READ8_MEMBER(angelkds_input_r);
 	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);

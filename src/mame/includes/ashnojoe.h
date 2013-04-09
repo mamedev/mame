@@ -16,7 +16,8 @@ public:
 		m_tileram_6(*this, "tileram_6"),
 		m_tileram_7(*this, "tileram_7"),
 		m_tileram(*this, "tileram"),
-		m_tilemap_reg(*this, "tilemap_reg"){ }
+		m_tilemap_reg(*this, "tilemap_reg"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	UINT16 *    m_tileram_1;
@@ -45,7 +46,7 @@ public:
 	int         m_msm5205_vclk_toggle;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ16_MEMBER(fake_4a00a_r);
 	DECLARE_WRITE16_MEMBER(ashnojoe_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);

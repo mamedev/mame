@@ -1862,7 +1862,6 @@ static const ym3812_interface ym3812_config =
 
 MACHINE_START_MEMBER(alpha68k_state,common)
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_trigstate));
 	save_item(NAME(m_deposits1));

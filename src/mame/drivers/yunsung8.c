@@ -473,7 +473,6 @@ void yunsung8_state::machine_start()
 	membank("bank2")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
 	membank("bank2")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_layers_ctrl));

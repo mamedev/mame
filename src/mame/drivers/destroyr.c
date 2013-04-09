@@ -22,7 +22,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_alpha_num_ram(*this, "alpha_nuram"),
 		m_major_obj_ram(*this, "major_obj_ram"),
-		m_minor_obj_ram(*this, "minor_obj_ram"){ }
+		m_minor_obj_ram(*this, "minor_obj_ram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_alpha_num_ram;
@@ -41,7 +42,7 @@ public:
 	int            m_noise;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
 	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
 	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);
@@ -432,7 +433,6 @@ void destroyr_state::palette_init()
 
 void destroyr_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_wavemod));

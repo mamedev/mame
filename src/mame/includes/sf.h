@@ -10,7 +10,9 @@ public:
 	sf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
-		m_objectram(*this, "objectram"){ }
+		m_objectram(*this, "objectram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -26,8 +28,8 @@ public:
 	UINT16      m_fgscroll;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ16_MEMBER(dummy_r);
 	DECLARE_WRITE16_MEMBER(sf_coin_w);
 	DECLARE_WRITE16_MEMBER(soundcmd_w);

@@ -8,7 +8,9 @@ class volfied_state : public driver_device
 {
 public:
 	volfied_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	UINT16 *    m_video_ram;
@@ -26,8 +28,8 @@ public:
 	UINT8       m_current_cmd;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_pc090oj;
 	DECLARE_WRITE16_MEMBER(volfied_cchip_ctrl_w);
 	DECLARE_WRITE16_MEMBER(volfied_cchip_bank_w);

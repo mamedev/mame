@@ -796,9 +796,6 @@ void ninjaw_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 	m_tc0100scn_1 = machine().device("tc0100scn_1");
 	m_tc0100scn_2 = machine().device("tc0100scn_2");

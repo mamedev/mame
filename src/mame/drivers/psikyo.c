@@ -1011,7 +1011,6 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_z80_nmi));

@@ -793,8 +793,6 @@ INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
 
 MACHINE_START_MEMBER(liberate_state,liberate)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));

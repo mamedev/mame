@@ -12,7 +12,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_screen(*this, "screen"){ }
+		m_screen(*this, "screen"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -25,7 +26,7 @@ public:
 	tilemap_t      *m_tilemap[2];
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
 	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);

@@ -14,7 +14,9 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_interrupt_enable;
@@ -31,8 +33,8 @@ public:
 	int        m_spriterambank;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(ironhors_videoram_w);
 	DECLARE_WRITE8_MEMBER(ironhors_colorram_w);

@@ -414,7 +414,6 @@ static const msm5232_interface msm5232_config =
 
 void bigevglf_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_vidram_bank));

@@ -2,7 +2,8 @@ class tp84_state : public driver_device
 {
 public:
 	tp84_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
 		m_palette_bank(*this, "palette_bank"),
 		m_flipscreen_x(*this, "flipscreen_x"),
 		m_flipscreen_y(*this, "flipscreen_y"),
@@ -14,7 +15,7 @@ public:
 		m_fg_colorram(*this, "fg_colorram"),
 		m_spriteram(*this, "spriteram"){ }
 
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_palette_bank;
 	required_shared_ptr<UINT8> m_flipscreen_x;
 	required_shared_ptr<UINT8> m_flipscreen_y;

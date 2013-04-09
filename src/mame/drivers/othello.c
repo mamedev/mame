@@ -52,7 +52,8 @@ class othello_state : public driver_device
 public:
 	othello_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -69,7 +70,7 @@ public:
 	int m_n7751_busy;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	device_t *m_ay1;
@@ -382,7 +383,6 @@ static MC6845_INTERFACE( h46505_intf )
 
 void othello_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 	m_n7751 = machine().device("n7751");
 	m_ay1 = machine().device("ay1");

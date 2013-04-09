@@ -17,7 +17,9 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_spriteram16(*this, "spriteram16"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -36,8 +38,8 @@ public:
 	int       m_pri;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);

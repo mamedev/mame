@@ -153,7 +153,6 @@ INTERRUPT_GEN_MEMBER(rltennis_state::rltennis_interrupt)
 
 void rltennis_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>( "maincpu");
 	m_screen = machine().device(  "screen");
 	m_dac_1 = machine().device<dac_device>("dac1");
 	m_dac_2 = machine().device<dac_device>("dac2");

@@ -822,8 +822,6 @@ void darius_state::machine_start()
 	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
 	membank("bank1")->set_entry(4);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_cpub = machine().device("cpub");
 	m_adpcm = machine().device("adpcm");
 	m_pc080sn = machine().device("pc080sn");

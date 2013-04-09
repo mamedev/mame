@@ -13,7 +13,8 @@ public:
 		m_fg_data(*this, "fg_data"),
 		m_tx_data(*this, "tx_data"),
 		m_spriteram(*this, "spriteram"),
-		m_scrollram(*this, "scrollram"){ }
+		m_scrollram(*this, "scrollram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_data;
@@ -35,7 +36,7 @@ public:
 	int         m_adpcm_toggle;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(goal92_sound_command_w);
 	DECLARE_READ16_MEMBER(goal92_inputs_r);
 	DECLARE_WRITE8_MEMBER(adpcm_data_w);

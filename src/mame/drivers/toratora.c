@@ -28,7 +28,8 @@ class toratora_state : public driver_device
 public:
 	toratora_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -39,7 +40,7 @@ public:
 	UINT8      m_clear_tv;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	pia6821_device *m_pia_u1;
 	pia6821_device *m_pia_u2;
 	pia6821_device *m_pia_u3;
@@ -425,7 +426,6 @@ INPUT_PORTS_END
 
 void toratora_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_pia_u1 = machine().device<pia6821_device>("pia_u1");
 	m_pia_u2 = machine().device<pia6821_device>("pia_u2");
 	m_pia_u3 = machine().device<pia6821_device>("pia_u3");

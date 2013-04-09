@@ -8,7 +8,10 @@ class overdriv_state : public driver_device
 {
 public:
 	overdriv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 //  UINT16 *   m_paletteram;    // currently this uses generic palette handling
@@ -22,9 +25,9 @@ public:
 	UINT16     m_cpuB_ctrl;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k053260_1;
 	device_t *m_k053260_2;
 	device_t *m_k051316_1;

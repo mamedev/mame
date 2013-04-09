@@ -193,11 +193,6 @@ ADDRESS_MAP_END
 MACHINE_START_MEMBER(pgm_arm_type1_state,pgm_arm_type1)
 {
 	MACHINE_START_CALL_MEMBER(pgm);
-
-
-
-	m_prot = machine().device<cpu_device>("prot");
-
 	save_item(NAME(m_value0));
 	save_item(NAME(m_value1));
 	save_item(NAME(m_valuekey));

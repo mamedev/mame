@@ -9,7 +9,9 @@ class actfancr_state : public driver_device
 public:
 	actfancr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_main_ram(*this, "main_ram"){ }
+		m_main_ram(*this, "main_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_main_ram;
@@ -22,8 +24,8 @@ public:
 	int            m_trio_control_select;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(triothep_control_select_w);
 	DECLARE_READ8_MEMBER(triothep_control_r);
 	DECLARE_WRITE8_MEMBER(actfancr_sound_w);

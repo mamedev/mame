@@ -580,7 +580,6 @@ void airbustr_state::machine_start()
 
 	m_master = machine().device("master");
 	m_slave = machine().device("slave");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pandora = machine().device("pandora");
 
 	save_item(NAME(m_soundlatch_status));

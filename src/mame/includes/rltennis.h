@@ -9,10 +9,11 @@ class rltennis_state : public driver_device
 public:
 	rltennis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_data760000(0), m_data740000(0), m_dac_counter(0), m_sample_rom_offset_1(0), m_sample_rom_offset_2(0),
 		m_offset_shift(0){ }
 
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_screen;
 
 	UINT16 m_blitter[RLT_NUM_BLITTER_REGS];

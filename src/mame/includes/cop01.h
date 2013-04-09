@@ -11,7 +11,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_fgvideoram(*this, "fgvideoram"){ }
+		m_fgvideoram(*this, "fgvideoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -28,8 +30,8 @@ public:
 	int            m_timer; // kludge for ym3526 in mightguy
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
 	DECLARE_READ8_MEMBER(cop01_sound_command_r);
 	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);

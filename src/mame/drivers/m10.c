@@ -191,7 +191,6 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 
 MACHINE_START_MEMBER(m10_state,m10)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_ic8j1 = machine().device("ic8j1");
 	m_ic8j2 = machine().device("ic8j2");
 	m_samples = machine().device<samples_device>("samples");

@@ -460,8 +460,6 @@ void vendetta_state::machine_start()
 
 	m_generic_paletteram_8.allocate(0x1000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053246 = machine().device("k053246");
 	m_k053251 = machine().device("k053251");
 	m_k052109 = machine().device("k052109");

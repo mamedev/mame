@@ -16,7 +16,9 @@ public:
 	darius_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
-		m_fg_ram(*this, "fg_ram"){ }
+		m_fg_ram(*this, "fg_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -36,8 +38,8 @@ public:
 	UINT8      m_pan[DARIUS_PAN_MAX];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_cpub;
 	device_t *m_adpcm;
 	tc0140syt_device *m_tc0140syt;

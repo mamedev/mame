@@ -93,13 +93,14 @@ class junofrst_state : public tutankhm_state
 {
 public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tutankhm_state(mconfig, type, tag) { }
+		: tutankhm_state(mconfig, type, tag),
+		  m_audiocpu(*this, "audiocpu") { }
 
 	UINT8    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_i8039;
 
 	device_t *m_filter_0_0;
@@ -207,7 +208,7 @@ READ8_MEMBER(junofrst_state::junofrst_portA_r)
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (m_soundcpu->total_cycles() / (1024 / 2)) & 0x0f;
+	timer = (m_audiocpu->total_cycles() / (1024 / 2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
@@ -240,7 +241,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 	if (m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	}
 
 	m_last_irq = data;
@@ -380,9 +381,7 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_START_MEMBER(junofrst_state,junofrst)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_i8039 = machine().device("mcu");
-	m_soundcpu = machine().device<cpu_device>("audiocpu");
 	m_filter_0_0 = machine().device("filter.0.0");
 	m_filter_0_1 = machine().device("filter.0.1");
 	m_filter_0_2 = machine().device("filter.0.2");

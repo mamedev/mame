@@ -432,7 +432,6 @@ static const msm5232_interface msm5232_config =
 
 void msisaac_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
 	save_item(NAME(m_bg2_textbank));

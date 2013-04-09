@@ -23,7 +23,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_color_ram(*this,"color_ram"),
 		m_spriteram(*this,"spriteram"),
-		m_spriteext(*this,"spriteext") { }
+		m_spriteext(*this,"spriteext"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_color_ram;
@@ -49,8 +51,8 @@ public:
 	INT32      m_banknum;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	tc0140syt_device *m_tc0140syt;
 	device_t *m_tc0480scp;
 	device_t *m_tc0360pri;

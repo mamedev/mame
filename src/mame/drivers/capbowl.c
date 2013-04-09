@@ -334,8 +334,6 @@ static const ym2203_interface ym2203_config =
 
 void capbowl_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_blitter_addr));
 	save_item(NAME(m_last_trackball_val[0]));

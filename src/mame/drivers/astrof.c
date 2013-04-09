@@ -467,7 +467,6 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
 
 	/* register for state saving */
@@ -497,7 +496,6 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* the red background circuit is disabled */
 	m_red_on = FALSE;
@@ -514,7 +512,6 @@ MACHINE_START_MEMBER(astrof_state,tomahawk)
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_sn = machine().device("snsnd");
 
 	/* register for state saving */

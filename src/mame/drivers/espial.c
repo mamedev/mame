@@ -54,8 +54,6 @@ void espial_state::machine_reset()
 
 void espial_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	//state_save_register_global_array(machine(), mcu_out[1]);
 	save_item(NAME(m_sound_nmi_enabled));

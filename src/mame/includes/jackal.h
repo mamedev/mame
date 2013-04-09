@@ -10,7 +10,9 @@ public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_videoctrl(*this, "videoctrl"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_mastercpu(*this, "master"),
+		m_slavecpu(*this, "slave"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoctrl;
@@ -26,8 +28,8 @@ public:
 	UINT8    *m_spritebank;
 
 	/* devices */
-	cpu_device *m_mastercpu;
-	cpu_device *m_slavecpu;
+	required_device<cpu_device> m_mastercpu;
+	required_device<cpu_device> m_slavecpu;
 	DECLARE_READ8_MEMBER(topgunbl_rotary_r);
 	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
 	DECLARE_READ8_MEMBER(jackal_zram_r);

@@ -226,10 +226,6 @@ static const ay8910_interface ay8910_config =
 
 void megazone_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_daccpu = machine().device<cpu_device>("daccpu");
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_i8039_status));
 }

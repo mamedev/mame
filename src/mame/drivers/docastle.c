@@ -584,9 +584,6 @@ void docastle_state::machine_reset()
 
 void docastle_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_slave = machine().device<cpu_device>("slave");
-
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_idle));

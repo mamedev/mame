@@ -6,9 +6,10 @@ class lemmings_state : public driver_device
 public:
 	lemmings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_bitmap0(2048, 256),
-			m_spriteram(*this, "spriteram"),
-			m_spriteram2(*this, "spriteram2") ,
+		m_bitmap0(2048, 256),
+		m_audiocpu(*this, "audiocpu"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2") ,
 		m_paletteram(*this, "paletteram"),
 		m_control_data(*this, "control_data"),
 		m_vram_data(*this, "vram_data"),
@@ -25,7 +26,7 @@ public:
 	UINT16 m_sprite_triple_buffer_1[0x800];
 	UINT8 m_vram_buffer[2048 * 64]; // 64 bytes per VRAM character
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	/* memory pointers */

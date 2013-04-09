@@ -13,7 +13,8 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_main_ram;
@@ -30,7 +31,7 @@ public:
 	//int          m_coin;    // used in the commented out INTERRUPT_GEN - can this be removed?
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_slave;
 	DECLARE_READ8_MEMBER(exprraid_protection_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);

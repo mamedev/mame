@@ -204,7 +204,6 @@ void funybubl_state::machine_start()
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_banked_vram));
 

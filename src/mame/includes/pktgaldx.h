@@ -16,7 +16,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pktgaldb_fgram(*this, "pktgaldb_fgram"),
 		m_pktgaldb_sprites(*this, "pktgaldb_spr"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	/* memory pointers */
@@ -30,7 +31,7 @@ public:
 	optional_device<decospr_device> m_sprgen;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);

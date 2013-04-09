@@ -76,7 +76,6 @@ C004      76489 #4 trigger
 
 void tp84_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 

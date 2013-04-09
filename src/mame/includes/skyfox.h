@@ -9,7 +9,8 @@ class skyfox_state : public driver_device
 public:
 	skyfox_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -23,7 +24,7 @@ public:
 	int        m_palette_selected;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(skyfox_vregs_r);
 	DECLARE_WRITE8_MEMBER(skyfox_vregs_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);

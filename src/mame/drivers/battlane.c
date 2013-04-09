@@ -266,8 +266,6 @@ static const ym3526_interface ym3526_config =
 
 void battlane_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_video_ctrl));
 	save_item(NAME(m_cpu_control));

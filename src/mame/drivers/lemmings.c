@@ -241,7 +241,6 @@ GFXDECODE_END
 
 void lemmings_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( lemmings, lemmings_state )

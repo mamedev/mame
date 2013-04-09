@@ -60,7 +60,8 @@ public:
 	m14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"){ }
+		m_color_ram(*this, "color_ram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
@@ -71,7 +72,7 @@ public:
 	UINT8 m_hop_mux;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(m14_vram_w);
 	DECLARE_WRITE8_MEMBER(m14_cram_w);
 	DECLARE_READ8_MEMBER(m14_rng_r);
@@ -315,7 +316,6 @@ INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
 
 void m14_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_hop_mux));
 }

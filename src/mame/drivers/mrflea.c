@@ -327,8 +327,6 @@ static const ay8910_interface mrflea_ay8910_interface_1 =
 
 void mrflea_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_io));

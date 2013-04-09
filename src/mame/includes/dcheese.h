@@ -9,7 +9,9 @@ class dcheese_state : public driver_device
 {
 public:
 	dcheese_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* video-related */
 	UINT16   m_blitter_color[2];
@@ -27,8 +29,8 @@ public:
 	UINT8    m_sound_msb_latch;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_bsmt;
 	DECLARE_WRITE16_MEMBER(eeprom_control_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);

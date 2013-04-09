@@ -677,7 +677,6 @@ MACHINE_START_MEMBER(tnzs_state,jpopnics)
 	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	membank("subbank")->set_entry(m_bank2);
 
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_mcu = NULL;
 
 	m_bank1 = 2;
@@ -695,7 +694,6 @@ MACHINE_START_MEMBER(tnzs_state,tnzs)
 {
 	MACHINE_START_CALL_MEMBER( jpopnics );
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_kageki_csport_sel));

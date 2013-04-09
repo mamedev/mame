@@ -3,7 +3,8 @@ class bking_state : public driver_device
 public:
 	bking_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_playfield_ram(*this, "playfield_ram"){ }
+		m_playfield_ram(*this, "playfield_ram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -37,7 +38,7 @@ public:
 	int         m_addr_l;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 #if 0
 	/* 68705 */

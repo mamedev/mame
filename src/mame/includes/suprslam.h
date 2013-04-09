@@ -15,7 +15,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spr_ctrl(*this, "spr_ctrl"),
 		m_screen_vregs(*this, "screen_vregs"),
-		m_spr(*this, "vsystem_spr")
+		m_spr(*this, "vsystem_spr"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -39,7 +40,7 @@ public:
 	int         m_pending_command;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k053936;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ16_MEMBER(pending_command_r);

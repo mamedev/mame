@@ -8,7 +8,9 @@ class lethal_state : public driver_device
 {
 public:
 	lethal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	/* video-related */
 	int        m_layer_colorbase[4];
@@ -18,8 +20,8 @@ public:
 	UINT8      m_cur_control2;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	device_t *m_k054539;
 	device_t *m_k056832;
 	device_t *m_k053244;

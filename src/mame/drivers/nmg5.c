@@ -236,7 +236,9 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bitmap(*this, "bitmap"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu")
 	{ }
 
 	/* memory pointers */
@@ -259,8 +261,8 @@ public:
 	UINT8 m_gfx_bank;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
@@ -984,8 +986,6 @@ static const ym3812_interface ym3812_intf =
 
 void nmg5_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_priority_reg));

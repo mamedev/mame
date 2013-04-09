@@ -207,7 +207,6 @@ GFXDECODE_END
 
 void dogfgt_state::machine_start()
 {
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_bm_plane));
 	save_item(NAME(m_lastflip));

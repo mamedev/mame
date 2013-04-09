@@ -13,7 +13,10 @@ class taitoz_state : public driver_device
 public:
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub")
 	{ }
 
 	/* memory pointers */
@@ -31,9 +34,9 @@ public:
 	UINT16      m_eep_latch;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	eeprom_device *m_eeprom;
 	device_t *m_tc0480scp;
 	device_t *m_tc0150rod;

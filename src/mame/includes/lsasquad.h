@@ -6,7 +6,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -33,8 +35,8 @@ public:
 	UINT8 m_ddr_b;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(lsasquad_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(lsasquad_sh_nmi_disable_w);

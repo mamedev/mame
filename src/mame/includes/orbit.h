@@ -22,7 +22,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_playfield_ram(*this, "playfield_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_playfield_ram;
@@ -38,7 +39,7 @@ public:
 	UINT8      m_misc_flags;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);

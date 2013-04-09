@@ -135,7 +135,8 @@ public:
 		m_vidregs(*this, "vidregs"),
 		m_textureram(*this, "textureram"),
 		m_frameram(*this, "frameram"),
-		m_reset_patch(*this, "reset_patch"){ }
+		m_reset_patch(*this, "reset_patch"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_sysregs;
@@ -160,7 +161,7 @@ public:
 	UINT32    m_DMActrl[2];
 	UINT8     m_OldPort4;
 
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	ds1302_device *m_ds1302;
 	device_t *m_vr0video;
 	DECLARE_READ32_MEMBER(FlipCount_r);
@@ -577,7 +578,6 @@ void crystal_state::machine_start()
 {
 	int i;
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_ds1302 = machine().device<ds1302_device>("rtc");
 	m_vr0video = machine().device("vr0");
 

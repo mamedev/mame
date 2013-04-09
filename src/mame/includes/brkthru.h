@@ -11,7 +11,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_fg_videoram(*this, "fg_videoram"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_fg_videoram;
@@ -27,8 +29,8 @@ public:
 	//UINT8 *m_brkthru_nmi_enable; /* needs to be tracked down */
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 
 	UINT8   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(brkthru_1803_w);

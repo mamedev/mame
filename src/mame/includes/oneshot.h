@@ -8,7 +8,9 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_scroll(*this, "scroll"){ }
+		m_scroll(*this, "scroll"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sprites;
@@ -32,8 +34,8 @@ public:
 	int m_p2_wobble;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ16_MEMBER(oneshot_in0_word_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_x_p1_r);
 	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);

@@ -7,7 +7,9 @@ public:
 		m_xmen6p_spriteramleft(*this, "spriteramleft"),
 		m_xmen6p_spriteramright(*this, "spriteramright"),
 		m_xmen6p_tilemapleft(*this, "tilemapleft"),
-		m_xmen6p_tilemapright(*this, "tilemapright"){ }
+		m_xmen6p_tilemapright(*this, "tilemapright"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 //  UINT16 *   m_paletteram;    // currently this uses generic palette handling
@@ -31,8 +33,8 @@ public:
 	UINT8       m_vblank_irq_mask;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k054539;
 	device_t *m_k052109;
 	device_t *m_k053246;

@@ -10,7 +10,9 @@ public:
 	rungun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_sysreg(*this, "sysreg"),
-		m_936_videoram(*this, "936_videoram"){ }
+		m_936_videoram(*this, "936_videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sysreg;
@@ -29,8 +31,8 @@ public:
 	int         m_sound_status;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	device_t *m_k054539_1;
 	device_t *m_k054539_2;
 	device_t *m_k053936;

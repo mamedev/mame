@@ -18,6 +18,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_spriteram(*this, "spriteram"),
+		m_audiocpu(*this, "audiocpu"),
 		m_sn_1(*this, "sn1"),
 		m_sn_2(*this, "sn2"),
 		m_discrete(*this, "fltdisc"){ }
@@ -37,7 +38,7 @@ public:
 	UINT8          m_sn_latch;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<sn76496_device> m_sn_1;
 	required_device<sn76496_device> m_sn_2;
 	dac_device *m_dac;

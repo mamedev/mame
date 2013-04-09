@@ -195,7 +195,6 @@ MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 {
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_irq_toggle));
 	save_item(NAME(m_irq_enable));

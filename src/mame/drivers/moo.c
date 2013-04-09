@@ -173,7 +173,7 @@ WRITE16_MEMBER(moo_state::sound_cmd2_w)
 
 WRITE16_MEMBER(moo_state::sound_irq_w)
 {
-	m_audiocpu->set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(moo_state::sound_status_r)
@@ -426,8 +426,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(moo_state,moo)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_k054539 = machine().device("k054539");
 	m_k053246 = machine().device("k053246");
 	m_k053251 = machine().device("k053251");

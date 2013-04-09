@@ -326,7 +326,6 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mb14241 = machine().device("mb14241");
 
 	save_item(NAME(m_xpos));

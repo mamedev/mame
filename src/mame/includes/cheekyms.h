@@ -12,7 +12,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_port_80(*this, "port_80"){ }
+		m_port_80(*this, "port_80"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -24,7 +25,7 @@ public:
 	bitmap_ind16       *m_bitmap_buffer;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	dac_device *m_dac;
 
 	UINT8          m_irq_mask;

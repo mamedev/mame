@@ -16,7 +16,10 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_bwp2_sharedram1(*this, "bwp2_sharedram1"),
-		m_bwp3_rombase(*this, "bwp3_rombase"){ }
+		m_bwp3_rombase(*this, "bwp3_rombase"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bwp1_sharedram1;
@@ -48,9 +51,9 @@ public:
 	UINT8 *m_bwp123_membase[3];
 
 	/* device */
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(bwp12_sharedram1_w);
 	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
 	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);

@@ -272,7 +272,6 @@ void himesiki_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_flipscreen));

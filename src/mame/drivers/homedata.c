@@ -1140,8 +1140,6 @@ static const sn76496_config psg_intf =
 
 MACHINE_START_MEMBER(homedata_state,homedata)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_ym = machine().device("ymsnd");
 	m_sn = machine().device<sn76489a_device>("snsnd");
 	m_dac = machine().device<dac_device>("dac");

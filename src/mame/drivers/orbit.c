@@ -269,7 +269,6 @@ GFXDECODE_END
 
 void orbit_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_misc_flags));
 	save_item(NAME(m_flip_screen));

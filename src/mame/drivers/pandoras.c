@@ -287,11 +287,6 @@ GFXDECODE_END
 
 void pandoras_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_mcu = machine().device<cpu_device>("mcu");
-
 	save_item(NAME(m_firq_old_data_a));
 	save_item(NAME(m_firq_old_data_b));
 	save_item(NAME(m_irq_enable_a));

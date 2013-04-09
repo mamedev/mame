@@ -467,7 +467,6 @@ INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 
 void exprraid_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_slave = machine().device("slave");
 
 	save_item(NAME(m_bg_index));

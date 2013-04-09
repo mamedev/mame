@@ -441,8 +441,6 @@ void fuuki16_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x8000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki16_state::raster_interrupt_callback),this));
 }

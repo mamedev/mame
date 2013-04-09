@@ -8,7 +8,8 @@ class battlnts_state : public driver_device
 {
 public:
 	battlnts_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 //  UINT8 *      paletteram;    // this currently uses generic palette handling
@@ -19,7 +20,7 @@ public:
 
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
 	DECLARE_WRITE8_MEMBER(battlnts_sh_irqtrigger_w);

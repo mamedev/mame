@@ -15,7 +15,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram_2(*this, "spriteram_2"){ }
+		m_spriteram_2(*this, "spriteram_2"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -31,8 +33,8 @@ public:
 	int            m_watchdog_count;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_mcu;
 
 	UINT8          m_irq_mask;

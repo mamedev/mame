@@ -952,7 +952,6 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 
 	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
-	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));

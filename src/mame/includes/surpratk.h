@@ -9,7 +9,8 @@ class surpratk_state : public driver_device
 public:
 	surpratk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ram;
@@ -24,7 +25,7 @@ public:
 	int        m_videobank;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_k052109;
 	device_t *m_k053244;
 	device_t *m_k053251;

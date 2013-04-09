@@ -599,8 +599,6 @@ MACHINE_START_MEMBER(thunderx_state,scontra)
 {
 	m_generic_paletteram_8.allocate(0x800);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007232 = machine().device("k007232");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");

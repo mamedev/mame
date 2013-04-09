@@ -15,7 +15,9 @@ public:
 		m_tileram(*this, "tileram"),
 		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
 		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
-		m_sprites(*this, "sprites")
+		m_sprites(*this, "sprites"),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu")
 		{ }
 
 	required_shared_ptr<UINT16> m_textram;
@@ -108,8 +110,8 @@ public:
 	UINT8 *m_decrypted_region;  // goldnaxeb1 & bayrouteb1
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);

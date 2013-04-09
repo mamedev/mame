@@ -285,8 +285,6 @@ static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
 
 void tumblep_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
 }
 

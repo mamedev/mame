@@ -9,7 +9,8 @@ public:
 		m_tx_videoram(*this, "tx_videoram"),
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
-		m_spr(*this, "vsystem_spr")
+		m_spr(*this, "vsystem_spr"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -38,7 +39,7 @@ public:
 	UINT16    m_pending_command;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);

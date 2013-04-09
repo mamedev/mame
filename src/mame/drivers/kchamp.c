@@ -380,7 +380,6 @@ INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 
 MACHINE_START_MEMBER(kchamp_state,kchamp)
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_sound_nmi_enable));

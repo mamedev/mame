@@ -289,7 +289,6 @@ GFXDECODE_END
 
 void aquarium_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_aquarium_snd_ack));
 }

@@ -14,7 +14,9 @@ public:
 		m_sprite_attr(*this, "sprite_attr"),
 		m_videoram(*this, "videoram"),
 		m_status_vram(*this, "status_vram"),
-		m_vreg(*this, "vreg"){ }
+		m_vreg(*this, "vreg"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_sprite_xpos;
@@ -33,8 +35,8 @@ public:
 	int          m_nmi_enable;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);

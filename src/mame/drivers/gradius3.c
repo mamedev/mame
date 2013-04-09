@@ -281,9 +281,6 @@ static const k051960_interface gradius3_k051960_intf =
 
 void gradius3_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_k007232 = machine().device("k007232");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");

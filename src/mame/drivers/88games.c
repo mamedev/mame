@@ -300,7 +300,6 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 
 void _88games_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");
 	m_k051316 = machine().device("k051316");

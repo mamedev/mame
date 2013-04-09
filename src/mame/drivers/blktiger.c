@@ -276,7 +276,6 @@ static const ym2203_interface ym2203_config =
 
 void blktiger_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
 	/* configure bankswitching */

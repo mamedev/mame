@@ -267,8 +267,6 @@ static const k053247_interface gijoe_k053247_intf =
 
 void gijoe_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k054539 = machine().device("k054539");
 	m_k056832 = machine().device("k056832");
 	m_k053246 = machine().device("k053246");

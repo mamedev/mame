@@ -27,7 +27,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_zoomram(*this, "zoomram"),
 		m_vidregs(*this, "vidregs"),
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_device<buffered_spriteram32_device> m_spriteram;
@@ -45,7 +46,7 @@ public:
 	UINT8          m_alphatable[256];
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 
 	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);

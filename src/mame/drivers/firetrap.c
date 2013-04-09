@@ -590,8 +590,6 @@ void firetrap_state::machine_start()
 	UINT8 *MAIN = memregion("maincpu")->base();
 	UINT8 *SOUND = memregion("audiocpu")->base();
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm = machine().device("msm");
 
 	membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);

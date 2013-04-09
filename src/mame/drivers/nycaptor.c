@@ -762,9 +762,6 @@ GFXDECODE_END
 
 void nycaptor_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-	m_subcpu = machine().device<cpu_device>("sub");
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_generic_control_reg));

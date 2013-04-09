@@ -19,7 +19,9 @@ public:
 		m_text_videoram(*this, "text_videoram"),
 		m_text_videoregs(*this, "text_videoregs"),
 		m_paletteram(*this, "paletteram"),
-		m_mainram(*this, "mainram"){ }
+		m_mainram(*this, "mainram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
@@ -49,8 +51,8 @@ public:
 	INT32            m_old_fade;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
 	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
 	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);

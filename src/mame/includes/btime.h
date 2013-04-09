@@ -18,7 +18,9 @@ public:
 		m_lnc_charbank(*this, "lnc_charbank"),
 		m_deco_charram(*this, "deco_charram"),
 		m_spriteram(*this, "spriteram"),
-		m_audio_rambase(*this, "audio_rambase")
+		m_audio_rambase(*this, "audio_rambase"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -53,8 +55,8 @@ public:
 	int      m_protection_ret;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 
 	DECLARE_WRITE8_MEMBER(audio_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(lnc_w);

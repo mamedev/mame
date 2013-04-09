@@ -6,7 +6,10 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_objectram(*this, "objectram"),
 		m_protection_ram(*this, "protection_ram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_objectram;
@@ -32,9 +35,9 @@ public:
 	int      m_coin_last;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	device_t *m_mcu;
 
 	/* queue */

@@ -64,7 +64,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_bgram(*this, "bgram"){ }
+		m_bgram(*this, "bgram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_mainram;
@@ -85,7 +86,7 @@ public:
 	UINT8    m_prot_addr;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(prot_w);
 	DECLARE_WRITE8_MEMBER(char_bank_w);
 	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
@@ -447,7 +448,6 @@ INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
 
 void ddayjlc_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_bgadr));

@@ -9292,8 +9292,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 	m_oki = machine().device<okim6295_device>("oki");
 
 	save_item(NAME(m_input_sel));

@@ -61,7 +61,8 @@ class beaminv_state : public driver_device
 public:
 	beaminv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -73,7 +74,7 @@ public:
 	UINT8      m_controller_select;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(v128_r);
 	DECLARE_WRITE8_MEMBER(controller_select_w);
 	DECLARE_READ8_MEMBER(controller_r);
@@ -140,7 +141,6 @@ void beaminv_state::machine_start()
 {
 	create_interrupt_timer();
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* setup for save states */
 	save_item(NAME(m_controller_select));

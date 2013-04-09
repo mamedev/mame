@@ -9,7 +9,8 @@ class bladestl_state : public driver_device
 public:
 	bladestl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -22,7 +23,7 @@ public:
 	int        m_last_track[4];
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
 	DECLARE_READ8_MEMBER(trackball_r);

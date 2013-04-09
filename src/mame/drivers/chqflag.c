@@ -311,8 +311,6 @@ void chqflag_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k051316_1 = machine().device("k051316_1");
 	m_k051316_2 = machine().device("k051316_2");
 	m_k051960 = machine().device("k051960");

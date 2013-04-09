@@ -9,7 +9,9 @@ class opwolf_state : public driver_device
 public:
 	opwolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_cchip_ram(*this, "cchip_ram"){ }
+		m_cchip_ram(*this, "cchip_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_cchip_ram;
@@ -44,8 +46,8 @@ public:
 	UINT8        m_c58a; // These variables derived from the bootleg
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_pc080sn;
 	device_t *m_pc090oj;
 	device_t *m_msm1;

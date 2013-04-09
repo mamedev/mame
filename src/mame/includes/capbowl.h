@@ -11,7 +11,9 @@ class capbowl_state : public driver_device
 public:
 	capbowl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_rowaddress(*this, "rowaddress"){ }
+		m_rowaddress(*this, "rowaddress"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	void init_nvram(nvram_device &nvram, void *base, size_t size);
 
@@ -25,8 +27,8 @@ public:
 	UINT8 m_last_trackball_val[2];
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
 	DECLARE_READ8_MEMBER(track_0_r);
 	DECLARE_READ8_MEMBER(track_1_r);

@@ -12,7 +12,8 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_shared_ram;
@@ -43,7 +44,7 @@ public:
 	unsigned    m_game_id;  // see below
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	UINT8       m_sound_nmi_mask;
 	UINT8       m_sound_pa_latch;
 	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);

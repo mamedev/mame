@@ -229,10 +229,12 @@ class wheelfir_state : public driver_device
 {
 public:
 	wheelfir_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu") { }
 
-	cpu_device *m_maincpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 	device_t *m_screen;
 	device_t *m_eeprom;
 
@@ -638,7 +640,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 WRITE16_MEMBER(wheelfir_state::wheelfir_snd_w)
 {
 	COMBINE_DATA(&m_soundlatch);
-	machine().device("subcpu")->execute().set_input_line(1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
+	m_subcpu->set_input_line(1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
 	machine().scheduler().synchronize();
 }
 
@@ -763,10 +765,8 @@ void wheelfir_state::machine_reset()
 
 void wheelfir_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>( "maincpu");
-	m_subcpu = machine().device<cpu_device>(  "subcpu");
-	m_screen = machine().device(  "screen");
-	m_eeprom = machine().device(  "eeprom");
+	m_screen = machine().device("screen");
+	m_eeprom = machine().device("eeprom");
 
 	m_zoom_table = auto_alloc_array(machine(), INT32, ZOOM_TABLE_SIZE);
 	m_blitter_data = auto_alloc_array(machine(), UINT16, 16);

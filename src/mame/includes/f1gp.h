@@ -20,7 +20,8 @@ public:
 		m_rozregs(*this, "rozregs"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
-		m_spr(*this, "vsystem_spr")
+		m_spr(*this, "vsystem_spr"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -61,7 +62,7 @@ public:
 	int       m_pending_command;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k053936;
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);

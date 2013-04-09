@@ -15,7 +15,8 @@ public:
 		m_fg_scrollram(*this, "fg_scrollram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_ay8910_enable(*this, "ay8910_enable"){ }
+		m_ay8910_enable(*this, "ay8910_enable"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram2;
@@ -49,7 +50,7 @@ public:
 	UINT8    m_adpcm_play_reg;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
 

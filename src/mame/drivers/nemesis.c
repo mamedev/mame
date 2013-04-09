@@ -1507,8 +1507,6 @@ static const k007232_interface k007232_config =
 
 void nemesis_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_vlm = machine().device("vlm");
 
 	save_item(NAME(m_irq_on));

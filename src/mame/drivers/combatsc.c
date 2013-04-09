@@ -678,7 +678,6 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 
 	m_interleave_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007121_1 = machine().device("k007121_1");
 	m_k007121_2 = machine().device("k007121_2");
 

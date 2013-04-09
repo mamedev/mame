@@ -339,7 +339,6 @@ INPUT_PORTS_END
 
 void _20pacgal_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_eeprom = machine().device("eeprom");
 
 	save_item(NAME(m_game_selected));

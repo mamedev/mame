@@ -16,7 +16,8 @@ public:
 		m_tx_vram(*this, "tx_vram"),
 		m_spriteram(*this, "spriteram"),
 		m_bg_cram(*this, "bg_cram"),
-		m_bg_vram(*this, "bg_vram"){ }
+		m_bg_vram(*this, "bg_vram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	UINT8 *        m_buffered_spriteram;
@@ -39,7 +40,7 @@ public:
 	rectangle m_tx_clip;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
 	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);

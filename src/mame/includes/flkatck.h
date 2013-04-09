@@ -9,7 +9,8 @@ class flkatck_state : public driver_device
 public:
 	flkatck_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_k007121_ram(*this, "k007121_ram"){ }
+		m_k007121_ram(*this, "k007121_ram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_k007121_ram;
@@ -24,7 +25,7 @@ public:
 	int        m_multiply_reg[2];
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k007121;
 	DECLARE_WRITE8_MEMBER(flkatck_bankswitch_w);
 	DECLARE_READ8_MEMBER(flkatck_ls138_r);

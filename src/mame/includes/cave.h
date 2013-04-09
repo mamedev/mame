@@ -33,6 +33,8 @@ public:
 			m_spriteram_2(*this, "spriteram_2"),
 			m_paletteram(*this, "paletteram"),
 			m_mirror_ram(*this, "mirror_ram"),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
 			m_int_timer(*this, "int_timer") { }
 
 	/* memory pointers */
@@ -110,8 +112,8 @@ public:
 	int          m_hopper;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_int_timer;
 	int m_rasflag;
 	int m_old_rasflag;

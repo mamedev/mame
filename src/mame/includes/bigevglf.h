@@ -6,7 +6,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_paletteram(*this, "paletteram"),
 		m_spriteram1(*this, "spriteram1"),
-		m_spriteram2(*this, "spriteram2"){ }
+		m_spriteram2(*this, "spriteram2"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -48,7 +49,7 @@ public:
 	UINT8    m_port_select;     /* for muxed controls */
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(beg_banking_w);
 	DECLARE_WRITE8_MEMBER(beg_fromsound_w);

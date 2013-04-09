@@ -10,7 +10,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_sharedram(*this, "sharedram") { }
+		m_sharedram(*this, "sharedram"),
+		m_subcpu(*this, "sub") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -33,7 +34,7 @@ public:
 	int       m_last_snd_ctrl;
 
 	/* devices */
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_subcpu;
 	DECLARE_READ8_MEMBER(sharedram_r);
 	DECLARE_WRITE8_MEMBER(sharedram_w);
 	DECLARE_WRITE8_MEMBER(subirqtrigger_w);

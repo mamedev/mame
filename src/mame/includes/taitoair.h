@@ -26,6 +26,7 @@ public:
 			m_line_ram(*this, "line_ram"),
 			m_dsp_ram(*this, "dsp_ram"),
 			m_paletteram(*this, "paletteram"),
+			m_audiocpu(*this, "audiocpu"),
 			m_gradram(*this, "gradram"),
 			m_backregs(*this, "backregs") { }
 
@@ -43,7 +44,7 @@ public:
 	INT32         m_banknum;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_dsp;
 	device_t *m_tc0080vco;
 

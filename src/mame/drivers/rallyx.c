@@ -871,7 +871,6 @@ static const samples_interface rallyx_samples_interface =
 
 MACHINE_START_MEMBER(rallyx_state,rallyx)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
 
 	save_item(NAME(m_last_bang));

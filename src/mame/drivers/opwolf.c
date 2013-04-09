@@ -428,8 +428,6 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc080sn = machine().device("pc080sn");
 	m_pc090oj = machine().device("pc090oj");
 	m_msm1 = machine().device("msm1");

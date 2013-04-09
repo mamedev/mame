@@ -8,7 +8,9 @@ class rastan_state : public driver_device
 {
 public:
 	rastan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
@@ -22,8 +24,8 @@ public:
 	int         m_adpcm_data;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_pc090oj;
 	device_t *m_pc080sn;
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);

@@ -360,7 +360,6 @@ GFXDECODE_END
 
 void mermaid_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_ay1 = machine().device("ay1");
 	m_ay2 = machine().device("ay2");
 

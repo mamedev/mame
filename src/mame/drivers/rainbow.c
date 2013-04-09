@@ -644,8 +644,6 @@ static const tc0140syt_interface rbisland_tc0140syt_intf =
 
 void rbisland_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc080sn = machine().device("pc080sn");
 	m_pc090oj = machine().device("pc090oj");
 }

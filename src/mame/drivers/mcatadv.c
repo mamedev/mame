@@ -430,8 +430,6 @@ void mcatadv_state::machine_start()
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(1);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
 	save_item(NAME(m_palette_bank1));
 	save_item(NAME(m_palette_bank2));

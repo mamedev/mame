@@ -109,7 +109,6 @@ GFXDECODE_END
 
 void cheekyms_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dac = machine().device<dac_device>("dac");
 }
 

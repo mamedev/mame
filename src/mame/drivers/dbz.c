@@ -335,8 +335,6 @@ static const k053252_interface dbz_k053252_intf =
 
 void dbz_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053936_1 = machine().device("k053936_1");
 	m_k053936_2 = machine().device("k053936_2");
 	m_k056832 = machine().device("k056832");

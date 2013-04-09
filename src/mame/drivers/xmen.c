@@ -296,8 +296,6 @@ void xmen_state::machine_start()
 	membank("bank4")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank4")->set_entry(0);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053246 = machine().device("k053246");
 	m_k053251 = machine().device("k053251");
 	m_k052109 = machine().device("k052109");

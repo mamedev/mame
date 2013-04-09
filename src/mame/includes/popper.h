@@ -13,7 +13,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_ol_attribram(*this, "ol_attribram"),
 		m_attribram(*this, "attribram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ol_videoram;
@@ -33,7 +34,7 @@ public:
 	rectangle m_tilemap_clip;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 	UINT8 m_nmi_mask;
 	DECLARE_READ8_MEMBER(popper_input_ports_r);

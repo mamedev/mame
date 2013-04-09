@@ -255,8 +255,6 @@ void crimfght_state::machine_start()
 	membank("bank2")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 	membank("bank2")->set_entry(0);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");
 	m_k007232 = machine().device("k007232");

@@ -143,9 +143,6 @@ ADDRESS_MAP_END
 MACHINE_START_MEMBER(pgm_arm_type3_state,pgm_arm_type3)
 {
 	MACHINE_START_CALL_MEMBER(pgm);
-
-	m_prot = machine().device<cpu_device>("prot");
-
 	/* register type specific Save State stuff here */
 }
 

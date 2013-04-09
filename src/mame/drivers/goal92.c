@@ -293,7 +293,6 @@ void goal92_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_fg_bank));
 	save_item(NAME(m_msm5205next));

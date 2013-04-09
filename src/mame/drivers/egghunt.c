@@ -49,7 +49,8 @@ class egghunt_state : public driver_device
 {
 public:
 	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
 		m_atram(*this, "atram"){ }
 
 	/* video-related */
@@ -61,7 +62,7 @@ public:
 	UINT8     m_gfx_banking;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 
 	/* memory */
 	required_shared_ptr<UINT8> m_atram;
@@ -390,7 +391,6 @@ GFXDECODE_END
 
 void egghunt_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_gfx_banking));
 	save_item(NAME(m_okibanking));

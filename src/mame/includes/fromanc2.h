@@ -3,7 +3,9 @@ class fromanc2_state : public driver_device
 {
 public:
 	fromanc2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	/* memory pointers */
 	UINT16   *m_paletteram[2];
@@ -26,8 +28,8 @@ public:
 	UINT8    m_datalatch_2l;
 
 	/* devices */
-	cpu_device *m_audiocpu;
-	cpu_device *m_subcpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 	device_t *m_eeprom;
 	device_t *m_left_screen;
 	device_t *m_right_screen;

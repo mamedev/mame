@@ -325,7 +325,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(ladybug_state,redclash)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_star_speed));
 	save_item(NAME(m_gfxbank));

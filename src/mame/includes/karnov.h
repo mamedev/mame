@@ -14,7 +14,9 @@ public:
 			m_spriteram(*this, "spriteram") ,
 		m_ram(*this, "ram"),
 		m_videoram(*this, "videoram"),
-		m_pf_data(*this, "pf_data"){ }
+		m_pf_data(*this, "pf_data"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	/* memory pointers */
@@ -39,8 +41,8 @@ public:
 	int         m_latch;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(karnov_control_w);
 	DECLARE_READ16_MEMBER(karnov_control_r);
 	DECLARE_WRITE16_MEMBER(karnov_videoram_w);

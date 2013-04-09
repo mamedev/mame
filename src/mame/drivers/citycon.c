@@ -188,7 +188,6 @@ static const ym2203_interface ym2203_config =
 
 void citycon_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_bg_image));
 }

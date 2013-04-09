@@ -58,14 +58,15 @@ class diverboy_state : public driver_device
 public:
 	diverboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(soundcmd_w);
 	DECLARE_WRITE8_MEMBER(okibank_w);
 	virtual void machine_start();
@@ -248,7 +249,6 @@ GFXDECODE_END
 
 void diverboy_state::machine_start()
 {
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 static MACHINE_CONFIG_START( diverboy, diverboy_state )

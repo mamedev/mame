@@ -982,8 +982,6 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	start_393hz_timer();
 
 	/* set devices */
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_speech = machine().device("speech");
 	m_dac3 = machine().device<dac_device>("dac3");
 	m_tms = machine().device("tms");

@@ -14,7 +14,9 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
-		m_gx400_shared_ram(*this, "gx400_shared"){ }
+		m_gx400_shared_ram(*this, "gx400_shared"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_charram;
@@ -49,8 +51,8 @@ public:
 	UINT8     m_frame_counter;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_vlm;
 	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
 	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);

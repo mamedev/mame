@@ -79,7 +79,6 @@ INPUT_PORTS_END
 
 void beezer_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 }
 
 static MACHINE_CONFIG_START( beezer, beezer_state )

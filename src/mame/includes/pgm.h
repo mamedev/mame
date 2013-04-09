@@ -18,7 +18,9 @@ public:
 			m_videoregs(*this, "videoregs"),
 			m_videoram(*this, "videoram"),
 			m_z80_mainram(*this, "z80_mainram"),
-			m_mainram(*this, "sram")
+			m_mainram(*this, "sram"),
+			m_maincpu(*this, "maincpu"),
+			m_soundcpu(*this, "soundcpu")
 		{
 			m_irq4_disabled = 0;
 		}
@@ -43,8 +45,8 @@ public:
 	bitmap_rgb32      m_tmppgmbitmap;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_soundcpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	device_t *m_ics;
 
 	/* used by rendering */
@@ -179,7 +181,8 @@ class pgm_arm_type1_state : public pgm_state
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-			m_arm7_shareram(*this, "arm7_shareram") {
+			m_arm7_shareram(*this, "arm7_shareram"),
+			m_prot(*this, "prot") {
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
 	}
@@ -216,7 +219,7 @@ public:
 	UINT32        m_pgm_arm_type1_counter;
 	optional_shared_ptr<UINT32> m_arm7_shareram;
 
-	cpu_device *m_prot;
+	required_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(photoy2k);
 	DECLARE_DRIVER_INIT(kovsh);
@@ -273,7 +276,8 @@ public:
 	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram"),
-			m_arm7_shareram(*this, "arm7_shareram") {
+			m_arm7_shareram(*this, "arm7_shareram"),
+			m_prot(*this, "prot") {
 	}
 	// kov2
 	UINT32        m_kov2_latchdata_68k_w;
@@ -282,7 +286,7 @@ public:
 	required_shared_ptr<UINT32> m_arm_ram;
 	required_shared_ptr<UINT32> m_arm7_shareram;
 
-	cpu_device *m_prot;
+	required_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(kov2);
 	DECLARE_DRIVER_INIT(kov2p);
@@ -315,7 +319,8 @@ class pgm_arm_type3_state : public pgm_state
 public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
-			m_arm_ram(*this, "arm_ram") {
+			m_arm_ram(*this, "arm_ram"),
+			m_prot(*this, "prot") {
 	}
 	// svg
 	int           m_svg_ram_sel;
@@ -325,7 +330,7 @@ public:
 	UINT32        m_svg_latchdata_arm_w;
 	required_shared_ptr<UINT32> m_arm_ram;
 
-	cpu_device *m_prot;
+	required_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(theglad);
 	DECLARE_DRIVER_INIT(svg);

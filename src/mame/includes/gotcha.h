@@ -14,7 +14,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_audiocpu(*this, "audiocpu")
 	{ }
 
 	/* memory pointers */
@@ -32,7 +33,7 @@ public:
 	UINT16      m_scroll[4];
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
 	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
 	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);

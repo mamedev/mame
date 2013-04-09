@@ -11,7 +11,8 @@ public:
 	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_gfxram(*this, "gfxram"),
-		m_tileram(*this, "tileram"){ }
+		m_tileram(*this, "tileram"),
+		m_maincpu(*this, "maincpu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_gfxram;
@@ -21,7 +22,7 @@ public:
 	tilemap_t *m_tilemap;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	dac_device *m_dac1;
 	dac_device *m_dac2;
 	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
@@ -192,7 +193,6 @@ GFXDECODE_END
 
 void mogura_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dac1 = machine().device<dac_device>("dac1");
 	m_dac2 = machine().device<dac_device>("dac2");
 }

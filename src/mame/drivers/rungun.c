@@ -157,7 +157,7 @@ WRITE16_MEMBER(rungun_state::sound_cmd2_w)
 WRITE16_MEMBER(rungun_state::sound_irq_w)
 {
 	if (ACCESSING_BITS_8_15)
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(rungun_state::sound_status_msb_r)
@@ -217,7 +217,7 @@ WRITE8_MEMBER(rungun_state::z80ctrl_w)
 	membank("bank2")->set_entry(data & 0x07);
 
 	if (data & 0x10)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rungun_state::audio_interrupt)
@@ -361,8 +361,6 @@ void rungun_state::machine_start()
 
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_k053936 = machine().device("k053936");
 	m_k055673 = machine().device("k055673");
 	m_k053252 = machine().device("k053252");

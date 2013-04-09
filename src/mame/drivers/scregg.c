@@ -235,9 +235,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(scregg_state,scregg)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = NULL;
-
 	save_item(NAME(m_btime_palette));
 	save_item(NAME(m_bnj_scroll1));
 	save_item(NAME(m_bnj_scroll2));

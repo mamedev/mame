@@ -15,7 +15,8 @@ public:
 			m_spriteram2(*this, "spriteram2") ,
 		m_paletteram(*this, "paletteram"),
 		m_pf1_videoram(*this, "pf1_videoram"),
-		m_pf2_videoram(*this, "pf2_videoram"){ }
+		m_pf2_videoram(*this, "pf2_videoram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<buffered_spriteram8_device> m_spriteram2;
@@ -34,7 +35,7 @@ public:
 	int        m_gfx_bank;
 
 	/* devices */
-	cpu_device *m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
 

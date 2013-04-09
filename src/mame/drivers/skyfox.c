@@ -219,7 +219,6 @@ INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
 
 void skyfox_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_bg_pos));
 	save_item(NAME(m_bg_ctrl));

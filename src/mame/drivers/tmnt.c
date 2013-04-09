@@ -2171,8 +2171,6 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 MACHINE_START_MEMBER(tmnt_state,common)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007232 = machine().device("k007232");
 	m_k053260 = machine().device("k053260");
 	m_k054539 = machine().device("k054539");

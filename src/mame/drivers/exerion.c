@@ -379,7 +379,6 @@ static const ay8910_interface ay8910_config =
 
 void exerion_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));

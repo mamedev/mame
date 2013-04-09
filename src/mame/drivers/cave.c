@@ -1791,8 +1791,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cave_state,cave)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_soundbuf_len));
 	save_item(NAME(m_soundbuf_data));

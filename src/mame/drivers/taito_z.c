@@ -3029,9 +3029,6 @@ void taitoz_state::taitoz_postload()
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_subcpu = machine().device<cpu_device>("sub");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 	m_tc0100scn = machine().device("tc0100scn");
 	m_tc0150rod = machine().device("tc0150rod");

@@ -73,8 +73,6 @@ WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 
 void crgolf_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* configure the banking */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);

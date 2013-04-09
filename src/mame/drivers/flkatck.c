@@ -195,7 +195,6 @@ void flkatck_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
 
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007121 = machine().device("k007121");
 
 	save_item(NAME(m_irq_enabled));

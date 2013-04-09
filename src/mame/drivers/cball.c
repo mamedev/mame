@@ -13,7 +13,8 @@ class cball_state : public driver_device
 public:
 	cball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram")
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu")
 	{ }
 
 	/* memory pointers */
@@ -23,7 +24,7 @@ public:
 	tilemap_t* m_bg_tilemap;
 
 	/* devices */
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(cball_vram_w);
 	DECLARE_READ8_MEMBER(cball_wram_r);
 	DECLARE_WRITE8_MEMBER(cball_wram_w);
@@ -91,7 +92,6 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 
 void cball_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 }
 
 void cball_state::machine_reset()
