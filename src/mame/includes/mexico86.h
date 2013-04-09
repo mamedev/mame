@@ -37,7 +37,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_subcpu;
 	device_t *m_mcu;
 
 	/* queue */

@@ -45,7 +45,7 @@ public:
 	int            m_mcu_status;
 
 	/* devices */
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	/* game-specific */
 	// 1945 MCU

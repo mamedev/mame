@@ -55,7 +55,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	/* memory buffers */
 	UINT8         m_rambanks[0x1000 * 12];

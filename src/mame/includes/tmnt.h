@@ -50,7 +50,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	device_t *m_k007232;
 	device_t *m_k053260;
 	device_t *m_k054539;

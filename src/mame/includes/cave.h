@@ -113,7 +113,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<timer_device> m_int_timer;
 	int m_rasflag;
 	int m_old_rasflag;

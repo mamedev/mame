@@ -26,7 +26,7 @@ public:
 	tilemap_t      *m_tilemap[2];
 
 	/* devices */
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
 	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
 	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);

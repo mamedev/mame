@@ -32,7 +32,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_soundcpu;
 	device_t *m_k054539;
 	device_t *m_k053246;
 	device_t *m_k053251;

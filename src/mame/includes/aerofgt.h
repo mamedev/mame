@@ -60,7 +60,7 @@ public:
 	int       m_pending_command;
 
 	/* other devices */
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 
 	/* handlers */
 	DECLARE_WRITE16_MEMBER(sound_command_w);

@@ -54,8 +54,8 @@ public:
 	UINT8*   m_ROM;
 
 	/* devices */
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_subcpu;
 	device_t *m_mcu;
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);

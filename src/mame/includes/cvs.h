@@ -58,7 +58,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	device_t *m_speech;
 	dac_device *m_dac3;
 	device_t *m_tms;

@@ -42,7 +42,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	device_t *m_oki;
 	UINT8 m_semicom_prot_offset;
 	UINT16 m_protbase;

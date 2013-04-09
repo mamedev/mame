@@ -29,7 +29,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_subcpu;
 	device_t *m_eeprom;
 	device_t *m_left_screen;
 	device_t *m_right_screen;

@@ -39,7 +39,7 @@ public:
 
 	/* device */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	dac_device *m_dac;
 	device_t *m_ym;
 	sn76489a_device *m_sn;

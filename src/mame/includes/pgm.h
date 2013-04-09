@@ -219,7 +219,7 @@ public:
 	UINT32        m_pgm_arm_type1_counter;
 	optional_shared_ptr<UINT32> m_arm7_shareram;
 
-	required_device<cpu_device> m_prot;
+	optional_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(photoy2k);
 	DECLARE_DRIVER_INIT(kovsh);
@@ -286,7 +286,7 @@ public:
 	required_shared_ptr<UINT32> m_arm_ram;
 	required_shared_ptr<UINT32> m_arm7_shareram;
 
-	required_device<cpu_device> m_prot;
+	optional_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(kov2);
 	DECLARE_DRIVER_INIT(kov2p);
@@ -330,7 +330,7 @@ public:
 	UINT32        m_svg_latchdata_arm_w;
 	required_shared_ptr<UINT32> m_arm_ram;
 
-	required_device<cpu_device> m_prot;
+	optional_device<cpu_device> m_prot;
 
 	DECLARE_DRIVER_INIT(theglad);
 	DECLARE_DRIVER_INIT(svg);

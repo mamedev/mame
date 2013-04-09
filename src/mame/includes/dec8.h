@@ -14,7 +14,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
 	device_t *m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
