@@ -48,7 +48,8 @@ class k1003_state : public driver_device
 {
 public:
 	k1003_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_READ8_MEMBER(key_r);
@@ -59,6 +60,7 @@ public:
 	UINT8 m_disp_2;
 	UINT8 bit_to_dec(UINT8 val);
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

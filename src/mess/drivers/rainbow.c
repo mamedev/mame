@@ -81,7 +81,8 @@ public:
 		m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
 		m_shared(*this, "sh_ram")
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 
 	required_device<vt100_video_device> m_crtc;
@@ -134,6 +135,7 @@ public:
 	UINT32 screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	required_device<cpu_device> m_maincpu;
 };
 
 void rainbow_state::machine_start()

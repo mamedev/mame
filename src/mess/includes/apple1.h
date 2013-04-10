@@ -31,7 +31,8 @@ class apple1_state : public driver_device
 {
 public:
 	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;
@@ -55,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(apple1_pia0_kbdin);
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dspout);
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dsp_write_signal);
+	required_device<cpu_device> m_maincpu;
 };
 
 

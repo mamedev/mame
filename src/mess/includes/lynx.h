@@ -101,7 +101,8 @@ public:
 		m_mem_fc00(*this, "mem_fc00"),
 		m_mem_fd00(*this, "mem_fd00"),
 		m_mem_fe00(*this, "mem_fe00"),
-		m_mem_fffa(*this, "mem_fffa"){ }
+		m_mem_fffa(*this, "mem_fffa"),
+		m_maincpu(*this, "maincpu") { }
 
 	virtual void video_start();
 
@@ -146,6 +147,7 @@ public:
 	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
 	void lynx_postload();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
+	required_device<cpu_device> m_maincpu;
 };
 
 

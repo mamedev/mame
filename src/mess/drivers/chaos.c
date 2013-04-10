@@ -38,7 +38,8 @@ public:
 	chaos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_terminal(*this, TERMINAL_TAG),
-	m_p_ram(*this, "p_ram") { }
+	m_p_ram(*this, "p_ram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(port1e_r);
 	DECLARE_WRITE8_MEMBER(port1f_w);
@@ -50,6 +51,7 @@ public:
 	virtual void machine_reset();
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<UINT8> m_p_ram;
+	required_device<cpu_device> m_maincpu;
 };
 
 

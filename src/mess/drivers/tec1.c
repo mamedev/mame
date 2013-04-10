@@ -187,7 +187,7 @@ READ8_MEMBER( tec1_state::latch_r )
 
 READ8_MEMBER( tec1_state::tec1_kbd_r )
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_kbd | ioport("SHIFT")->read();
 }
 
@@ -248,7 +248,7 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 	if (machine().root_device().ioport(keynames[m_kbd_row])->read())
 	{
 		m_kbd = tec1_convert_col_to_bin(machine().root_device().ioport(keynames[m_kbd_row])->read(), m_kbd_row);
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 		m_key_pressed = TRUE;
 	}
 	else

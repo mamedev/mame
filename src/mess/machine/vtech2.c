@@ -147,7 +147,7 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 				write8_delegate(FUNC(vtech2_state::mwa_bank4), this),
 			};
 
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset], mwa_bank_soft[offset]);
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_soft[offset], mwa_bank_soft[offset]);
 		}
 		else
 		{
@@ -160,14 +160,14 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 				{
 					logerror("select bank #%d VIDEO!\n", offset+1);
 				}
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
-				machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
+				m_maincpu->space(AS_PROGRAM).install_read_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mra_bank_hard[offset]);
+				m_maincpu->space(AS_PROGRAM).install_write_bank(offset * 0x4000, offset * 0x4000 + 0x3fff, mwa_bank_hard[offset]);
 
 			}
 			else
 			{
 				logerror("select bank #%d MASKED!\n", offset+1);
-				machine().device("maincpu")->memory().space(AS_PROGRAM).nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
+				m_maincpu->space(AS_PROGRAM).nop_readwrite(offset * 0x4000, offset * 0x4000 + 0x3fff);
 
 			}
 		}

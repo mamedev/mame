@@ -233,7 +233,8 @@ class pdp1_state : public driver_device
 {
 public:
 	pdp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	pdp1_reset_param_t m_reset_param;
 	int m_io_status;
@@ -269,6 +270,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	TIMER_CALLBACK_MEMBER(il_timer_callback);
 	void pdp1_machine_stop();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/pdp1.c -----------*/

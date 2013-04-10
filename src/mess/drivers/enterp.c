@@ -106,7 +106,7 @@ WRITE8_MEMBER(ep_state::enterprise_dave_reg_write)
 	case 0x11:
 	case 0x12:
 	case 0x13:
-		enterprise_update_memory_page(machine().device("maincpu")->memory().space(AS_PROGRAM), offset - 0x0f, data);
+		enterprise_update_memory_page(m_maincpu->space(AS_PROGRAM), offset - 0x0f, data);
 		break;
 
 	case 0x15:
@@ -168,7 +168,7 @@ static const dave_interface enterprise_dave_interface =
 
 void ep_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_input_line_vector(0, 0xff);
+	m_maincpu->set_input_line_vector(0, 0xff);
 }
 
 

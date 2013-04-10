@@ -595,7 +595,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 				{
 					m_keyb_press = scancode;
 					m_keyb_press_flag = 1;
-					machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+					m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 					return;
 				}
 			}
@@ -608,7 +608,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 #if 0
 INTERRUPT_GEN_MEMBER(bml3_state::bml3_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 #endif
 

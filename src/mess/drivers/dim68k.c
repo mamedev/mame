@@ -204,7 +204,7 @@ void dim68k_state::machine_reset()
 
 	memcpy((UINT8*)m_ram.target(), ROM, 0x2000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 void dim68k_state::video_start()

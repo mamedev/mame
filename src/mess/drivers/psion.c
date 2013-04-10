@@ -25,7 +25,7 @@
 TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
 {
 	if (m_enable_nmi)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 UINT8 psion_state::kb_read(running_machine &machine)

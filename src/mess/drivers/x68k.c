@@ -201,7 +201,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
 //              if(m_mfp.iera & (1 << x))
 				{
 					m_current_vector[6] = (m_mfp.vr & 0xf0) | (x+8);
-					machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
+					m_maincpu->set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | (x + 8));
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | (x+8),m_mfp.irqline);
 					return;  // one at a time only
 				}
@@ -220,7 +220,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
 //              if(m_mfp.ierb & (1 << x))
 				{
 					m_current_vector[6] = (m_mfp.vr & 0xf0) | x;
-					machine().device("maincpu")->execute().set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
+					m_maincpu->set_input_line_and_vector(m_mfp.irqline,ASSERT_LINE,(m_mfp.vr & 0xf0) | x);
 //                  logerror("MFP: Sent IRQ vector 0x%02x (IRQ line %i)\n",(m_mfp.vr & 0xf0) | x,m_mfp.irqline);
 					return;  // one at a time only
 				}
@@ -442,7 +442,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 			if(machine().root_device().ioport("options")->read() & 0x01)
 			{
 				m_current_vector[6] = 0x4c;
-				machine().device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x4c);
+				m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4c);
 				logerror("MFP: Receive buffer full IRQ sent\n");
 			}
 		}
@@ -637,7 +637,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
 				m_mouse.irqactive = 1;
 				m_current_vector[5] = 0x54;
 				m_current_irq_line = 5;
-				machine().device("maincpu")->execute().set_input_line_and_vector(5,ASSERT_LINE,0x54);
+				m_maincpu->set_input_line_and_vector(5,ASSERT_LINE,0x54);
 			}
 		}
 	}
@@ -1035,7 +1035,7 @@ void x68k_state::fdc_irq(bool state)
 		m_ioc.irqstatus |= 0x80;
 		m_current_irq_line = 1;
 		logerror("FDC: IRQ triggered\n");
-		machine().device("maincpu")->execute().set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
+		m_maincpu->set_input_line_and_vector(1, ASSERT_LINE, m_current_vector[1]);
 	}
 }
 
@@ -1614,8 +1614,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 		v = 0x09;
 	if(ram[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
-		machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		machine().device("maincpu")->execute().set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		popmessage("Bus error: Unused RAM access [%08x]", val);
 	}
 }
@@ -1626,7 +1626,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 	if(ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
@@ -1643,7 +1643,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 	   then access causes a bus error */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 	if(ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
@@ -1659,7 +1659,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 	if(ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
@@ -1676,7 +1676,7 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 	   Often a method for detecting amount of installed RAM, is to read or write at 1MB intervals, until a bus error occurs */
 	m_current_vector[2] = 0x02;  // bus error
 	m_current_irq_line = 2;
-//  machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+//  m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 	if(ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
@@ -1796,7 +1796,7 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 		state = HOLD_LINE;  // to get around erroneous spurious interrupt
 //  if((m_ioc.irqstatus & 0xc0) != 0)  // if the FDC is busy, then we don't want to miss that IRQ
 //      return;
-	machine().device("maincpu")->execute().set_input_line(6, state);
+	m_maincpu->set_input_line(6, state);
 	m_current_vector[6] = 0;
 	m_mfp_prev = state;
 }
@@ -1828,12 +1828,12 @@ IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
 			m_current_vector[6] = m_mfpdev->get_vector();
 		else
-			machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
+			m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
 		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
 		return m_current_vector[6];
 	}
 
-	machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
+	m_maincpu->set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
 		m_ioc.irqstatus &= ~0xf0;
@@ -1854,7 +1854,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_irq)
 	{
 		m_current_vector[1] = 0x6c;
 		m_current_irq_line = 1;
-		machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
+		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);
 	}
 }
 
@@ -2353,7 +2353,7 @@ void x68k_state::floppy_load_unload()
 		m_current_vector[1] = 0x61;
 		m_ioc.irqstatus |= 0x40;
 		m_current_irq_line = 1;
-		machine().device("maincpu")->execute().set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
+		m_maincpu->set_input_line_and_vector(1,ASSERT_LINE,m_current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
 }
@@ -2373,7 +2373,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_net_irq)
 {
 	m_current_vector[2] = 0xf9;
 	m_current_irq_line = 2;
-	machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
+	m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 }
 
 WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
@@ -2383,7 +2383,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
 		m_net_timer->adjust(attotime::from_usec(16));
 	}
 	else
-		machine().device("maincpu")->execute().set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
+		m_maincpu->set_input_line_and_vector(2,CLEAR_LINE,m_current_vector[2]);
 	logerror("EXP: IRQ2 set to %i\n",state);
 
 }
@@ -2465,12 +2465,12 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	}
 
 	// reset CPU
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 MACHINE_START_MEMBER(x68k_state,x68000)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_emptyram_r),this));
@@ -2517,7 +2517,7 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 
 MACHINE_START_MEMBER(x68k_state,x68030)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*  Install RAM handlers  */
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_rom0_r),this),0xffffffff);
@@ -2585,7 +2585,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	mfp_init();
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
 
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200

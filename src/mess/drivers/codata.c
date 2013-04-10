@@ -15,12 +15,14 @@ class codata_state : public driver_device
 public:
 	codata_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_p_base(*this, "p_base"){ }
+		m_p_base(*this, "p_base"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_p_base;
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_codata(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -43,7 +45,7 @@ void codata_state::machine_reset()
 {
 	UINT8* RAM = memregion("user1")->base();
 	memcpy(m_p_base, RAM, 16);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 void codata_state::video_start()

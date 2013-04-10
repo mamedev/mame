@@ -58,7 +58,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 			{
 				m_key_irq_vector = 0xBC;
 			}
-			machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_maincpu->set_input_line(0, ASSERT_LINE);
 			break;
 		}
 	}
@@ -78,7 +78,7 @@ IRQ_CALLBACK_MEMBER(bk_state::bk0010_irq_callback)
 
 void bk_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bk_state::bk0010_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bk_state::bk0010_irq_callback),this));
 
 	m_kbd_state = 0;
 	m_scrool = 01330;

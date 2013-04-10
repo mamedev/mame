@@ -130,7 +130,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(nixieclock_state::timer_callback)
 {
-	i4004_set_test(machine().device("maincpu"),m_timer);
+	i4004_set_test(m_maincpu,m_timer);
 	m_timer^=1;
 }
 

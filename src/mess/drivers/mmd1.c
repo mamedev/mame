@@ -153,7 +153,8 @@ class mmd1_state : public driver_device
 {
 public:
 	mmd1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(mmd1_port0_w);
 	DECLARE_WRITE8_MEMBER(mmd1_port1_w);
@@ -171,6 +172,7 @@ public:
 	DECLARE_DRIVER_INIT(mmd2);
 	DECLARE_MACHINE_RESET(mmd1);
 	DECLARE_MACHINE_RESET(mmd2);
+	required_device<cpu_device> m_maincpu;
 };
 
 

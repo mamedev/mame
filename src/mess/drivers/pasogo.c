@@ -465,7 +465,7 @@ IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
 
 void pasogo_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pasogo_state::pasogo_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pasogo_state::pasogo_irq_callback),this));
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;
@@ -492,7 +492,7 @@ static const pit8253_config pc_pit8254_config =
 
 WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const pic8259_interface pasogo_pic8259_config =

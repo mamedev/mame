@@ -24,7 +24,8 @@ class microtan_state : public driver_device
 public:
 	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_chunky_graphics;
@@ -77,6 +78,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via_1_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(via_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(via_1_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

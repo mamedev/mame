@@ -22,7 +22,8 @@ public:
 	chessmst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_speaker(*this, SPEAKER_TAG)
-		{ }
+		,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<speaker_sound_device> m_speaker;
 
@@ -37,6 +38,7 @@ public:
 	DECLARE_READ8_MEMBER( pio2_port_a_r );
 	DECLARE_WRITE8_MEMBER( pio2_port_b_w );
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
+	required_device<cpu_device> m_maincpu;
 };
 
 

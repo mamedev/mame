@@ -52,7 +52,8 @@ class ti990_4_state : public driver_device
 {
 public:
 	ti990_4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	device_t *m_terminal;
 	DECLARE_WRITE8_MEMBER(rset_callback);
@@ -64,6 +65,7 @@ public:
 	UINT32 screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti990_4_line_interrupt);
 	void idle_callback(int state);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -105,7 +107,7 @@ WRITE8_MEMBER(ti990_4_state::rset_callback)
 
 WRITE8_MEMBER(ti990_4_state::ckon_ckof_callback)
 {
-	device_t *maincpu = machine().device("maincpu");
+	device_t *maincpu = m_maincpu;
 	ti990_ckon_ckof_callback(maincpu, (offset & 0x1000) ? 1 : 0);
 }
 

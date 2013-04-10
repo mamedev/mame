@@ -132,7 +132,8 @@ public:
 		m_mainram( *this, "mainram" ),
 		m_k1ge( *this, "k1ge" ),
 		m_io_controls( *this, "Controls" ),
-		m_io_power( *this, "Power" ) {
+		m_io_power( *this, "Power" ) ,
+		m_maincpu(*this, "maincpu") {
 			m_flash_chip[0].present = 0;
 			m_flash_chip[0].state = F_READ;
 			m_flash_chip[0].data = NULL;
@@ -200,6 +201,7 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read(emu_file &file);
 	virtual void nvram_write(emu_file &file);
+	required_device<cpu_device> m_maincpu;
 };
 
 

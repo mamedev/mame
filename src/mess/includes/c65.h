@@ -64,8 +64,8 @@ public:
 			m_kernal(*this, "kernal"),
 			m_c65_chargen(*this, "c65_chargen"),
 			m_interface(*this, "interface"),
-			m_roml_writable(0)
-	{ }
+			m_roml_writable(0),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<cbm_iec_device> m_iec;
 
@@ -142,6 +142,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( c64_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( c64_cart );
 	DECLARE_WRITE_LINE_MEMBER(c65_cia0_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -423,7 +423,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* reboot */
 		case 1:
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			popmessage("SYS: Reboot");
 		}
 		break;
@@ -1045,7 +1045,7 @@ void pcw_state::machine_reset()
 
 DRIVER_INIT_MEMBER(pcw_state,pcw)
 {
-	machine().device("maincpu")->execute().set_input_line_vector(0, 0x0ff);
+	m_maincpu->set_input_line_vector(0, 0x0ff);
 
 	/* lower 4 bits are interrupt counter */
 	m_system_status = 0x000;

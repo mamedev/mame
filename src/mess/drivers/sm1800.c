@@ -79,7 +79,7 @@ void sm1800_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, m_irq_state ?  HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, m_irq_state ?  HOLD_LINE : CLEAR_LINE);
 	m_irq_state ^= 1;
 }
 

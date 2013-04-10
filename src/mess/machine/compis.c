@@ -818,7 +818,7 @@ READ16_MEMBER( compis_state::compis_i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", m_maincpu->pc());
 			if (m_i186.intr.poll_status & 0x8000)
-				int_callback(*machine().device("maincpu"), 0);
+				int_callback(*m_maincpu, 0);
 			return m_i186.intr.poll_status;
 
 		case 0x13:
@@ -1260,7 +1260,7 @@ static void compis_cpu_init(running_machine &machine)
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
@@ -1300,7 +1300,7 @@ IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
 
 DRIVER_INIT_MEMBER(compis_state,compis)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
 	memset (&m_compis, 0, sizeof (m_compis) );
 }
 

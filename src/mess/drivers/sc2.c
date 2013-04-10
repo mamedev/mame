@@ -21,7 +21,8 @@ public:
 	sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_beep(*this, BEEPER_TAG)
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(pio_port_a_r);
@@ -37,6 +38,7 @@ public:
 	void sc2_update_display();
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )

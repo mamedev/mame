@@ -63,7 +63,8 @@ public:
 	m_scroll(0),
 	m_p_videoram(*this, "p_videoram"),
 	m_io_modifiers(*this, "MODIFIERS")
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(okean240_kbd_status_r);
 	DECLARE_READ8_MEMBER(okean240a_kbd_status_r);
@@ -88,6 +89,7 @@ public:
 protected:
 	optional_ioport m_io_modifiers;
 	ioport_port *m_io_port[11];
+	required_device<cpu_device> m_maincpu;
 };
 
 // okean240 requires bit 4 to change

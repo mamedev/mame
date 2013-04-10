@@ -87,7 +87,7 @@ READ_LINE_MEMBER(pc1251_state::pc1251_reset)
 
 void pc1251_state::machine_start()
 {
-	device_t *main_cpu = machine().device("maincpu");
+	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = memregion("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
@@ -97,7 +97,7 @@ void pc1251_state::machine_start()
 
 MACHINE_START_MEMBER(pc1251_state,pc1260 )
 {
-	device_t *main_cpu = machine().device("maincpu");
+	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = memregion("maincpu")->base() + 0x4000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

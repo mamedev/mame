@@ -136,7 +136,8 @@ class ex800_state : public driver_device
 {
 public:
 	ex800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_irq_state;
 	DECLARE_READ8_MEMBER(ex800_porta_r);
@@ -155,6 +156,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ex800_gate7a_w);
 	virtual void machine_start();
 	DECLARE_INPUT_CHANGED_MEMBER(online_switch);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -197,7 +199,7 @@ INPUT_CHANGED_MEMBER(ex800_state::online_switch)
 {
 	if (newval)
 	{
-		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, m_irq_state);
+		m_maincpu->set_input_line(UPD7810_INTF1, m_irq_state);
 		m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;
 	}
 }

@@ -14,7 +14,8 @@ class vtech2_state : public driver_device
 {
 public:
 	vtech2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_videoram;
 	int m_laser_latch;
@@ -70,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(mra_bank4);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( laser_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( laser_cart );
+	required_device<cpu_device> m_maincpu;
 };
 
 

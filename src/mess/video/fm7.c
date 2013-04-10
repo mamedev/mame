@@ -73,7 +73,7 @@ READ8_MEMBER(fm7_state::fm7_cancel_ack)
 READ8_MEMBER(fm7_state::fm7_attn_irq_r)
 {
 	m_video.attn_irq = 1;
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 	return 0xff;
 }
 

@@ -15,8 +15,8 @@ class primo_state : public driver_device
 public:
 	primo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_iec(*this, CBM_IEC_TAG)
-	{ }
+			m_iec(*this, CBM_IEC_TAG),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<cbm_iec_device> m_iec;
 
@@ -35,6 +35,7 @@ public:
 	DECLARE_MACHINE_RESET(primob);
 	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

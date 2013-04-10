@@ -603,7 +603,7 @@ static void lynx_blit_lines(lynx_state *state)
 TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
 {
 	m_blitter.busy=0; // blitter finished
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 /*
@@ -1636,16 +1636,16 @@ TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
 		if (m_uart.serctl & 0x40)
 		{
 			m_mikey.data[0x81] |= 0x10;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 
 	if (m_uart.serctl & 0x80)
 	{
 		m_mikey.data[0x81] |= 0x10;
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 }
 
@@ -1802,7 +1802,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[0x81] &= ~data; // clear interrupt source
 		// logerror("mikey write %.2x %.2x\n", offset, data);
 		if (!m_mikey.data[0x81])
-			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
 	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
@@ -1810,8 +1810,8 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[0x81] |= data;
 		if (data)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 			logerror("direct write to interupt register\n");
 		}
 		break;
@@ -1865,7 +1865,7 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 		m_mikey.data[offset] = data;
 		if (!data && m_blitter.busy)
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			/* A write of '0' to this address will reset the CPU bus request flip flop */
 		}
 		break;
@@ -1922,10 +1922,10 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 
 void lynx_state::machine_reset()
 {
-	lynx_memory_config_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&m_suzy, 0, sizeof(m_suzy));
 	memset(&m_mikey, 0, sizeof(m_mikey));
@@ -1957,7 +1957,7 @@ void lynx_state::machine_reset()
 
 void lynx_state::lynx_postload()
 {
-	lynx_memory_config_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, m_memory_config);
+	lynx_memory_config_w(m_maincpu->space(AS_PROGRAM), 0, m_memory_config);
 }
 
 void lynx_state::machine_start()

@@ -42,8 +42,10 @@ class genpc_state : public driver_device
 {
 public:
 	genpc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
+	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, genpc_state )

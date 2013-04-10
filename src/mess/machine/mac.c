@@ -279,13 +279,13 @@ void mac_state::field_interrupts()
 
 	if (m_last_taken_interrupt > -1)
 	{
-		machine().device("maincpu")->execute().set_input_line(m_last_taken_interrupt, CLEAR_LINE);
+		m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
 		m_last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt > -1)
 	{
-		machine().device("maincpu")->execute().set_input_line(take_interrupt, ASSERT_LINE);
+		m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
 		m_last_taken_interrupt = take_interrupt;
 	}
 }
@@ -398,7 +398,7 @@ void mac_state::v8_resize()
 	}
 	else
 	{
-		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space& space = m_maincpu->space(AS_PROGRAM);
 		UINT32 onboard_amt, simm_amt, simm_size;
 		static const UINT32 simm_sizes[4] = { 0, 2*1024*1024, 4*1024*1024, 8*1024*1024 };
 
@@ -489,13 +489,13 @@ void mac_state::set_memory_overlay(int overlay)
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
 		{
-			address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff, 0x9fffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
 		else if ((m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || ((m_model >= MODEL_MAC_PBDUO_210) && (m_model <= MODEL_MAC_PBDUO_270c)))
 		{
-			address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0xffffff, 0xffffff, 0);
 			mac_install_memory(machine(), 0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -1245,7 +1245,7 @@ WRITE8_MEMBER(mac_state::mac_adb_via_out_cb2)
 
 READ8_MEMBER(mac_state::mac_via_in_a)
 {
-//  printf("VIA1 IN_A (PC %x)\n", machine().device("maincpu")->safe_pc());
+//  printf("VIA1 IN_A (PC %x)\n", m_maincpu->safe_pc());
 
 	switch (m_model)
 	{
@@ -1361,7 +1361,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 		}
 	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, machine().device("maincpu")->safe_pc());
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, m_maincpu->safe_pc());
 
 	return val;
 }
@@ -1370,7 +1370,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 {
 	device_t *sound = machine().device("custom");
 	device_t *fdc = machine().device("fdc");
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, machine().device("maincpu")->safe_pc());
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
@@ -1411,7 +1411,7 @@ WRITE8_MEMBER(mac_state::mac_via_out_a)
 WRITE8_MEMBER(mac_state::mac_via_out_b)
 {
 	device_t *sound = machine().device("custom");
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, machine().device("maincpu")->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (ADB_IS_PM_VIA1)
 	{
@@ -1631,7 +1631,7 @@ READ8_MEMBER(mac_state::mac_via2_in_a)
 
 READ8_MEMBER(mac_state::mac_via2_in_b)
 {
-//  logerror("VIA2 IN B (PC %x)\n", machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 IN B (PC %x)\n", m_maincpu->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -1660,7 +1660,7 @@ READ8_MEMBER(mac_state::mac_via2_in_b)
 
 WRITE8_MEMBER(mac_state::mac_via2_out_a)
 {
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 	if (ADB_IS_PM_VIA2)
 	{
 		m_pm_data_send = data;
@@ -1670,7 +1670,7 @@ WRITE8_MEMBER(mac_state::mac_via2_out_a)
 
 WRITE8_MEMBER(mac_state::mac_via2_out_b)
 {
-//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, machine().device("maincpu")->safe_pc());
+//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
 
 	if (ADB_IS_PM_VIA2)
 	{
@@ -1922,7 +1922,7 @@ WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
 		set_memory_overlay(1);
 	}
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 void mac_state::mac_state_load()

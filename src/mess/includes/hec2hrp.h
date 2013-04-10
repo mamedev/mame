@@ -73,7 +73,8 @@ public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_videoram(*this,"videoram"),
-			m_hector_videoram(*this,"hector_videoram") { }
+			m_hector_videoram(*this,"hector_videoram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
@@ -141,6 +142,7 @@ public:
 
 	void disc2_fdc_interrupt(bool state);
 	void disc2_fdc_dma_irq(bool state);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/

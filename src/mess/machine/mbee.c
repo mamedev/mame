@@ -565,7 +565,7 @@ INTERRUPT_GEN_MEMBER(mbee_state::mbee_interrupt)
 // Due to the uncertainly and hackage here, this is commented out for now - Robbbert - 05-Oct-2010
 #if 0
 
-	//address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* The printer status connects to the pio ASTB pin, and the printer changing to not
 	    busy should signal an interrupt routine at B61C, (next line) but this doesn't work.
 	    The line below does what the interrupt should be doing. */
@@ -753,8 +753,8 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
-	device_t *cpu = image.device().machine().device("maincpu");
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	device_t *cpu = state->m_maincpu;
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
 
@@ -823,6 +823,7 @@ QUICKLOAD_LOAD( mbee )
 
 QUICKLOAD_LOAD( mbee_z80bin )
 {
+	mbee_state *state = image.device().machine().driver_data<mbee_state>();
 	UINT16 execute_address, start_addr, end_addr;
 	int autorun;
 
@@ -836,8 +837,8 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		device_t *cpu = image.device().machine().device("maincpu");
-		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		device_t *cpu = state->m_maincpu;
+		address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
 

@@ -754,7 +754,7 @@ IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 
 void apc_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
 
 	m_fdc->set_rate(500000);
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
@@ -887,7 +887,7 @@ WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
 {
 	//printf("%02x\n",interrupt);
 //  printf("irq %d\n",state);
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(apc_state::get_slave_ack)

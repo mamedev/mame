@@ -485,8 +485,8 @@ static const hd61700_config pb2000c_config =
 
 TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 {
-	machine().device("maincpu")->execute().set_input_line(HD61700_KEY_INT, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(HD61700_KEY_INT, CLEAR_LINE);
+	m_maincpu->set_input_line(HD61700_KEY_INT, ASSERT_LINE);
+	m_maincpu->set_input_line(HD61700_KEY_INT, CLEAR_LINE);
 }
 
 void pb1000_state::machine_start()

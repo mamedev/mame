@@ -13,7 +13,8 @@ class terak_state : public driver_device
 {
 public:
 	terak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ16_MEMBER(terak_fdc_status_r);
 	DECLARE_WRITE16_MEMBER(terak_fdc_command_w);
@@ -25,6 +26,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 READ16_MEMBER( terak_state::terak_fdc_status_r )

@@ -456,7 +456,7 @@ static const nes_interface nes_apu_interface =
 
 void nes_state::ppu_nmi(int *ppu_regs)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

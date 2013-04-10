@@ -335,7 +335,7 @@ void electron_state::machine_reset()
 	m_ula.screen_size = 0x8000 - 0x3000;
 	m_ula.screen_addr = 0;
 	m_ula.tape_running = 0;
-	m_ula.vram = (UINT8 *)machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(m_ula.screen_base);
+	m_ula.vram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_ula.screen_base);
 }
 
 void electron_state::machine_start()

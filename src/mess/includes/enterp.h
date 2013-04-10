@@ -20,7 +20,8 @@ class ep_state : public driver_device
 {
 public:
 	ep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
@@ -36,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(enterprise_dave_reg_read);
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_drq_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

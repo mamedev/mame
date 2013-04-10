@@ -697,7 +697,7 @@ void hp48_state::hp48_apply_modules()
 {
 	int i;
 	int nce2_enable = 1;
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	m_io_addr = 0x100000;
 

@@ -15,12 +15,14 @@ class vt520_state : public driver_device
 {
 public:
 	vt520_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -53,7 +55,7 @@ INPUT_PORTS_END
 
 void vt520_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	space.unmap_write(0x0000, 0xffff);
 	membank("bank1")->set_base(rom + 0x70000);

@@ -60,7 +60,7 @@ void tricep_state::machine_reset()
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 WRITE8_MEMBER( tricep_state::kbd_put )

@@ -58,14 +58,14 @@ DRIVER_INIT_MEMBER(dc_cons_state,dc)
 
 DRIVER_INIT_MEMBER(dc_cons_state,dcus)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
 
 	DRIVER_INIT_CALL(dc);
 }
 
 DRIVER_INIT_MEMBER(dc_cons_state,dcjp)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
 
 	DRIVER_INIT_CALL(dc);
 }

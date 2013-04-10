@@ -359,7 +359,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sms_state::sms_int_callback)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 static const sega315_5124_interface _315_5124_ntsc_intf =

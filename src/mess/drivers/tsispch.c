@@ -170,7 +170,7 @@ static GENERIC_TERMINAL_INTERFACE( tsispch_terminal_intf )
 *****************************************************************************/
 WRITE_LINE_MEMBER(tsispch_state::pic8259_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_config =
@@ -272,7 +272,7 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tsispch_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tsispch_state::irq_callback),this));
 	fprintf(stderr,"machine reset\n");
 }
 

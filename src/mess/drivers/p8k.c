@@ -228,7 +228,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 WRITE_LINE_MEMBER( p8k_state::p8k_daisy_interrupt )
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 /* Z80 DMA */

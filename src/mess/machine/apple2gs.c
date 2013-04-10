@@ -778,7 +778,7 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
 		/* call Apple II interrupt handler */
 		if ((machine().primary_screen->vpos() % 8) == 7)
 		{
-			//apple2_interrupt(machine().device("maincpu"));
+			//apple2_interrupt(m_maincpu);
 			/* TODO: check me! */
 			machine().primary_screen->update_partial(machine().primary_screen->vpos());
 		}

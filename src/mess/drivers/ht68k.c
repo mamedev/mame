@@ -75,7 +75,7 @@ void ht68k_state::machine_reset()
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x8000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)

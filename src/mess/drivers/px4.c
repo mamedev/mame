@@ -83,7 +83,8 @@ public:
 			m_speaker(*this, SPEAKER_TAG),
 			m_sio(*this, "sio"),
 			m_rs232(*this, "rs232")
-			{ }
+			,
+		m_maincpu(*this, "maincpu") { }
 
 	// internal devices
 	required_device<cpu_device> m_z80;
@@ -188,6 +189,7 @@ public:
 	TIMER_CALLBACK_MEMBER(receive_data);
 	TIMER_DEVICE_CALLBACK_MEMBER(frc_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(upd7508_1sec_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

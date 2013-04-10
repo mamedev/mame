@@ -189,7 +189,7 @@ WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 READ8_MEMBER( fp1100_state::sub_to_main_r )
 {
 	machine().scheduler().synchronize(); // force resync
-//  machine().device("maincpu")->execute().set_input_line_and_vector(0, CLEAR_LINE, 0xf0);
+//  m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0xf0);
 	return m_main_latch;
 }
 
@@ -241,7 +241,7 @@ READ8_MEMBER( fp1100_state::main_to_sub_r )
 WRITE8_MEMBER( fp1100_state::sub_to_main_w )
 {
 	machine().scheduler().synchronize(); // force resync
-//  machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
+//  m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xf0);
 	m_main_latch = data;
 }
 
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER( fp1100_state::portc_w )
 {
 	if((!(m_upd7801.portc & 8)) && data & 8)
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xf8); // TODO
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xf8); // TODO
 
 	m_upd7801.portc = data;
 }
@@ -400,7 +400,7 @@ static MC6845_INTERFACE( mc6845_intf )
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
 	if(irq_mask & 0x10)
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf0);
 }
 
 static MACHINE_CONFIG_START( fp1100, fp1100_state )

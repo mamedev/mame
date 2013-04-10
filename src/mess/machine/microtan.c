@@ -382,7 +382,7 @@ READ8_MEMBER(microtan_state::microtan_bffx_r)
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
 TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(microtan_state::microtan_bffx_w)
@@ -512,7 +512,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 {
 	UINT8 *dst = memregion("gfx2")->base();
 	int i;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for (i = 0; i < 256; i++)
 	{

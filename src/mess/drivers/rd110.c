@@ -80,6 +80,7 @@ private:
 	UINT8 midi;
 	int midi_pos;
 	UINT8 port0;
+	required_device<cpu_device> m_maincpu;
 };
 
 d110_state::d110_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -91,7 +92,8 @@ d110_state::d110_state(const machine_config &mconfig, device_type type, const ch
 	memcs(*this, "memcs"),
 	lcd(*this, "lcd"),
 	midi_timer(*this, "midi_timer")
-{
+,
+		m_maincpu(*this, "maincpu") {
 }
 
 

@@ -90,7 +90,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 		ddtdata.channel= -1;    // not used
 		ddtdata.mode= -1;       // copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
-		sh4_dma_ddt(machine().device("maincpu"), &ddtdata);
+		sh4_dma_ddt(m_maincpu, &ddtdata);
 
 		atapi_xferbase += 2048;
 	}

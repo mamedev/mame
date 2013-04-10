@@ -184,7 +184,7 @@ static Z80PIO_INTERFACE( babbage_z80pio1_intf )
 
 READ8_MEMBER( babbage_state::pio2_a_r )
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE); // release interrupt
+	m_maincpu->set_input_line(0, CLEAR_LINE); // release interrupt
 	return m_key;
 }
 

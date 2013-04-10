@@ -85,7 +85,7 @@ WRITE8_MEMBER( pv2000_state::pv2000_keys_w )
 
 	m_keyb_column = data & 0x0f;
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
@@ -308,7 +308,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 {
 	// only if it goes up
 	if (state && !m_last_state)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	m_last_state = state;
 
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 			| ioport( "IN8" )->read();
 
 		if ( key_pressed && m_key_pressed != key_pressed )
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		m_key_pressed = key_pressed;
 	}
@@ -374,7 +374,7 @@ void pv2000_state::machine_reset()
 	m_key_pressed = 0;
 	m_keyb_column = 0;
 
-	machine().device("maincpu")->execute().set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
+	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 

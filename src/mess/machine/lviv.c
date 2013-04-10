@@ -163,7 +163,7 @@ READ8_MEMBER(lviv_state::lviv_io_r)
 
 WRITE8_MEMBER(lviv_state::lviv_io_w)
 {
-	address_space &cpuspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
 	{
 		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
@@ -223,7 +223,7 @@ I8255A_INTERFACE( lviv_ppi8255_interface_1 )
 
 void lviv_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *mem;
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));

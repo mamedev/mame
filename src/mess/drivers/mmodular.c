@@ -807,12 +807,12 @@ READ8_MEMBER(polgar_state::read_keys_board_academy)
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_nmi)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_M6502_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -948,7 +948,7 @@ WRITE16_MEMBER(polgar_state::write_unknown2)
 
 READ32_MEMBER(polgar_state::read_unknown3_32)
 {
-	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) machine().device("maincpu")->state().state_int(M68K_PC));
+	logerror("Read from unknown3 offset: %x %08x\n",offset,(unsigned int) m_maincpu->state_int(M68K_PC));
 	return 0xffffffff;
 	//return unknown2_data|unknown2_data<<24;
 
@@ -975,19 +975,19 @@ WRITE32_MEMBER(polgar_state::write_1000000)
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq6)
 {
-	machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq2)
 {
-	machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq_academy)
 {
 	if (academyallowNMI) {
-		machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+		m_maincpu->set_input_line(6, HOLD_LINE);
 	}
 }
 

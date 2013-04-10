@@ -95,7 +95,7 @@ READ8_MEMBER(pc_state::ec1841_memboard_r)
 WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 {
 	pc_state *st = space.machine().driver_data<pc_state>();
-	address_space &program = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &program = st->m_maincpu->space(AS_PROGRAM);
 	running_machine &machine = space.machine();
 	UINT8 current;
 

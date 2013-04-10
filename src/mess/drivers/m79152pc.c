@@ -17,7 +17,8 @@ public:
 	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_p_videoram(*this, "p_videoram"),
-		m_p_attributes(*this, "p_attributes"){ }
+		m_p_attributes(*this, "p_attributes"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
@@ -25,6 +26,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)

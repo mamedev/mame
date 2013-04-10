@@ -207,7 +207,7 @@ UINT32 gmaster_state::screen_update_gmaster(screen_device &screen, bitmap_ind16 
 
 INTERRUPT_GEN_MEMBER(gmaster_state::gmaster_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(UPD7810_INTFE1, ASSERT_LINE);
+	m_maincpu->set_input_line(UPD7810_INTFE1, ASSERT_LINE);
 }
 
 static const UPD7810_CONFIG config = {

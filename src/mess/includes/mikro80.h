@@ -30,7 +30,8 @@ public:
 		m_io_line5(*this, "LINE5"),
 		m_io_line6(*this, "LINE6"),
 		m_io_line7(*this, "LINE7"),
-		m_io_line8(*this, "LINE8") { }
+		m_io_line8(*this, "LINE8") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_cursor_ram;
 	required_shared_ptr<UINT8> m_video_ram;
@@ -66,6 +67,7 @@ protected:
 	required_ioport m_io_line6;
 	required_ioport m_io_line7;
 	required_ioport m_io_line8;
+	required_device<cpu_device> m_maincpu;
 };
 
 

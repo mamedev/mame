@@ -405,7 +405,7 @@ MACHINE_START_MEMBER(sorcerer_state,sorcererd)
 
 void sorcerer_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Initialize cassette interface */
 	m_cass_data.output.length = 0;

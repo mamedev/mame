@@ -752,7 +752,7 @@ void z100_state::palette_init()
 
 void z100_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(z100_state::z100_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(z100_state::z100_irq_callback),this));
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 

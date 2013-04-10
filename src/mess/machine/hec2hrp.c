@@ -192,7 +192,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 						}
 	if (offset==0x04)   {   /* 0x804 => video page, BR*/
@@ -202,7 +202,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 	if (offset==0x08)   {   /* 0x808 => base page, HR*/
@@ -211,7 +211,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==1)
 							{
 								m_flag_clk=0;
-								machine().device("maincpu")->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
+								m_maincpu->set_unscaled_clock(XTAL_5MHz);  /* increase CPU*/
 							}
 
 						}
@@ -222,7 +222,7 @@ WRITE8_MEMBER(hec2hrp_state::hector_switch_bank_w)
 							if (m_flag_clk ==0)
 							{
 								m_flag_clk=1;
-								machine().device("maincpu")->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
+								m_maincpu->set_unscaled_clock(XTAL_1_75MHz);  /* slowdown CPU*/
 							}
 						}
 }
@@ -244,7 +244,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			if (isHectorHR(machine())) /* aviable for HR and up */
 			{
 				m_hector_flag_hr=1;

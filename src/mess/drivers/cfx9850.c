@@ -39,7 +39,8 @@ public:
 		m_ko9(*this, "KO9"),
 		m_ko10(*this, "KO10"),
 		m_ko11(*this, "KO11"),
-		m_ko12(*this, "KO12") { }
+		m_ko12(*this, "KO12") ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
@@ -64,6 +65,7 @@ protected:
 	required_ioport m_ko10;
 	required_ioport m_ko11;
 	required_ioport m_ko12;
+	required_device<cpu_device> m_maincpu;
 };
 
 

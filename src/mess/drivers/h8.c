@@ -56,7 +56,7 @@ public:
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
 	if (m_irq_ctl & 1)
-		machine().device("maincpu")->execute().set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
+		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf);
 }
 
 READ8_MEMBER( h8_state::h8_f0_r )
@@ -104,7 +104,7 @@ WRITE8_MEMBER( h8_state::h8_f0_w )
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
 	m_beep->set_state((data & 0x80) ? 0 : 1);
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_ctl &= 0xf0;
 	if (data & 0x40) m_irq_ctl |= 1;
 	if (~data & 0x10) m_irq_ctl |= 2;
@@ -196,7 +196,7 @@ But, all of this can only occur if bit 5 of port F0 is low. */
 			c=m_ff_b^1; // from /Q of 2nd flipflop
 			m_ff_b=a; // from Q of 1st flipflop
 			if (c)
-				machine().device("maincpu")->execute().set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
+				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7);
 		}
 	}
 	else

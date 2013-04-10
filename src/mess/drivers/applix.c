@@ -109,7 +109,7 @@ void applix_state::machine_reset()
 {
 	UINT8* RAM = memregion("maincpu")->base();
 	memcpy(m_base, RAM+0x500000, 16);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 

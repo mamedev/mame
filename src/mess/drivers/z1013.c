@@ -257,7 +257,7 @@ UINT32 z1013_state::screen_update_z1013(screen_device &screen, bitmap_ind16 &bit
 
 void z1013_state::machine_reset()
 {
-	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xF000);
+	m_maincpu->set_state_int(Z80_PC, 0xF000);
 	m_keyboard_part = 0;
 	m_keyboard_line = 0;
 }

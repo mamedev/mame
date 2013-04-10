@@ -60,7 +60,8 @@ class sbc6510_state : public driver_device
 public:
 	sbc6510_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_terminal(*this, TERMINAL_TAG) { }
+	m_terminal(*this, TERMINAL_TAG) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);
@@ -77,6 +78,7 @@ public:
 
 protected:
 	ioport_port *m_io_port[8];
+	required_device<cpu_device> m_maincpu;
 };
 
 

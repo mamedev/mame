@@ -13,7 +13,8 @@ class kramermc_state : public driver_device
 {
 public:
 	kramermc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_key_row;
 	DECLARE_DRIVER_INIT(kramermc);
@@ -23,6 +24,7 @@ public:
 	DECLARE_READ8_MEMBER(kramermc_port_a_r);
 	DECLARE_READ8_MEMBER(kramermc_port_b_r);
 	DECLARE_WRITE8_MEMBER(kramermc_port_a_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

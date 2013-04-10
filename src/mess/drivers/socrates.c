@@ -243,7 +243,7 @@ DRIVER_INIT_MEMBER(socrates_state,socrates)
 	for (i = 0; i < 0x10000; i++)
 		gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
-	machine().device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	m_maincpu->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 READ8_MEMBER(socrates_state::socrates_rom_bank_r)
@@ -906,7 +906,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_vblankstate = 0;
 }
 

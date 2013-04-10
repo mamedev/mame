@@ -29,7 +29,8 @@ public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_via_0(*this, VIA6522_0_TAG),
-	m_p_videoram(*this, "videoram"){ }
+	m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(ec65_via_read_a);
 	DECLARE_READ8_MEMBER(ec65_read_ca1 );
@@ -43,6 +44,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)

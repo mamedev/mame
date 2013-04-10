@@ -28,7 +28,8 @@ class sgi_ip6_state : public driver_device
 {
 public:
 	sgi_ip6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	ip6_regs_t m_ip6_regs;
 	DECLARE_READ32_MEMBER(ip6_unk1_r);
@@ -44,6 +45,7 @@ public:
 	UINT32 screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -44,7 +44,8 @@ class hp48_state : public driver_device
 {
 public:
 	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_io[64];
@@ -86,6 +87,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);
 	void hp48_update_annunciators();
 	void hp48_apply_modules();
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -16,11 +16,13 @@ class mk14_state : public driver_device
 {
 public:
 	mk14_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(display_w);
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*

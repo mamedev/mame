@@ -130,7 +130,8 @@ class tx0_state : public driver_device
 {
 public:
 	tx0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	tape_reader_t m_tape_reader;
 	tape_puncher_t m_tape_puncher;
@@ -160,6 +161,7 @@ public:
 	TIMER_CALLBACK_MEMBER(prt_callback);
 	TIMER_CALLBACK_MEMBER(dis_callback);
 	void tx0_machine_stop();
+	required_device<cpu_device> m_maincpu;
 };
 
 

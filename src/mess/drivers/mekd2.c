@@ -163,13 +163,13 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(mekd2_state::mekd2_trace)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 {
 	if (state)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	else
 		machine().scheduler().timer_set(attotime::from_usec(18), timer_expired_delegate(FUNC(mekd2_state::mekd2_trace),this));
 }

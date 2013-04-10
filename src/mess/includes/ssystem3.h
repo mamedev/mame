@@ -38,7 +38,8 @@ class ssystem3_state : public driver_device
 {
 public:
 	ssystem3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_porta;
 	UINT8 *m_videoram;
@@ -52,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(ssystem3_via_read_a);
 	DECLARE_READ8_MEMBER(ssystem3_via_read_b);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_b);
+	required_device<cpu_device> m_maincpu;
 };
 
 

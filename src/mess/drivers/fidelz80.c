@@ -1008,7 +1008,7 @@ void fidelz80_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::nmi_timer)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************

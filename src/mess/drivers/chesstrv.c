@@ -17,7 +17,8 @@ class chesstrv_state : public driver_device
 {
 public:
 	chesstrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start();
 
@@ -35,6 +36,7 @@ public:
 	UINT8 *m_ram;
 	UINT8 m_matrix;
 	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -197,7 +199,7 @@ INPUT_PORTS_END
 /*
 TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
 {
-    machine().device("maincpu")->execute().set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
+    m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }
 */
 

@@ -107,7 +107,7 @@ void mz_state::machine_start()
 	m_ppi = machine().device<i8255_device>("ppi8255");
 
 	/* reset memory map to defaults */
-	mz700_bank_4_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	mz700_bank_4_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 
@@ -141,7 +141,7 @@ WRITE8_MEMBER(mz_state::mz700_e008_w)
 READ8_MEMBER(mz_state::mz800_bank_0_r)
 {
 	UINT8 *videoram = m_videoram;
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in cgrom */
 	spc.install_read_bank(0x1000, 0x1fff, "bank2");
@@ -180,7 +180,7 @@ READ8_MEMBER(mz_state::mz800_bank_0_r)
 
 WRITE8_MEMBER(mz_state::mz700_bank_0_w)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	spc.install_readwrite_bank(0x0000, 0x0fff, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
@@ -188,7 +188,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_0_w)
 
 WRITE8_MEMBER(mz_state::mz800_bank_0_w)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	spc.install_readwrite_bank(0x0000, 0x7fff, "bank1");
 	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
@@ -196,7 +196,7 @@ WRITE8_MEMBER(mz_state::mz800_bank_0_w)
 
 READ8_MEMBER(mz_state::mz800_bank_1_r)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	spc.install_readwrite_bank(0x1000, 0x1fff, "bank2");
@@ -220,7 +220,7 @@ READ8_MEMBER(mz_state::mz800_bank_1_r)
 
 WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -246,7 +246,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_1_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	spc.install_read_bank(0x0000, 0x0fff, "bank1");
 	spc.nop_write(0x0000, 0x0fff);
@@ -256,7 +256,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 {
 	UINT8 *videoram = m_videoram;
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -303,7 +303,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 {
 	UINT8 *videoram = m_videoram;
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -359,7 +359,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_5_w)
 {
-	address_space &spc = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &spc = m_maincpu->space(AS_PROGRAM);
 
 	if (m_mz700_mode)
 	{
@@ -418,7 +418,7 @@ WRITE_LINE_MEMBER(mz_state::pit_out0_changed)
 WRITE_LINE_MEMBER(mz_state::pit_irq_2)
 {
 	if (!m_intmsk)
-		machine().device("maincpu")->execute().set_input_line(0, state);
+		m_maincpu->set_input_line(0, state);
 }
 
 
@@ -621,7 +621,7 @@ WRITE8_MEMBER(mz_state::mz800_display_mode_w)
 //  {
 //      logerror("mz800_display_mode_w: switching mode to %s\n", (BIT(data, 3) ? "mz700" : "mz800"));
 //      m_mz700_mode = BIT(data, 3);
-//      mz700_bank_4_w(*machine().device("maincpu")->memory().&space(AS_PROGRAM), 0, 0);
+//      mz700_bank_4_w(*m_maincpu->&space(AS_PROGRAM), 0, 0);
 //  }
 }
 
@@ -644,7 +644,7 @@ WRITE8_MEMBER(mz_state::mz800_ramdisk_w)
 /* port EB */
 WRITE8_MEMBER(mz_state::mz800_ramaddr_w)
 {
-	m_mz800_ramaddr = (machine().device("maincpu")->state().state_int(Z80_BC) & 0xff00) | (data & 0xff);
+	m_mz800_ramaddr = (m_maincpu->state_int(Z80_BC) & 0xff00) | (data & 0xff);
 	LOG(1,"mz800_ramaddr_w",("%04X\n", m_mz800_ramaddr),machine());
 }
 

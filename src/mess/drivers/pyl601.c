@@ -49,7 +49,8 @@ public:
 	m_speaker(*this, SPEAKER_TAG),
 	m_fdc(*this, "upd765"),
 	m_ram(*this, RAM_TAG)
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_rom_page;
 	UINT32 m_vdisk_addr;
@@ -83,6 +84,7 @@ public:
 	virtual void video_start();
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -353,7 +353,7 @@ MACHINE_RESET_MEMBER(camplynx_state,lynx128k)
 
 WRITE8_MEMBER( camplynx_state::lynx128k_irq )
 {
-	machine().device("maincpu")->execute().set_input_line(0, data);
+	m_maincpu->set_input_line(0, data);
 }
 
 

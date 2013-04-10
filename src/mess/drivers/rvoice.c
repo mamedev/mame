@@ -73,7 +73,8 @@ class rvoice_state : public driver_device
 {
 public:
 	rvoice_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	hd63701y0_t m_hd63701y0;
 	rvoicepc_t m_rvoicepc;
@@ -82,6 +83,7 @@ public:
 	DECLARE_DRIVER_INIT(rvoicepc);
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(null_kbd_put);
+	required_device<cpu_device> m_maincpu;
 };
 
 

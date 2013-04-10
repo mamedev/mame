@@ -30,8 +30,8 @@ public:
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
-			vram(*this, "vram")
-	{ }
+			vram(*this, "vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> maincpu;
 	required_device<mccs1850_device> rtc;
@@ -180,6 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(nextstc);
 	DECLARE_DRIVER_INIT(nextctc);
 	DECLARE_DRIVER_INIT(nexts);
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif

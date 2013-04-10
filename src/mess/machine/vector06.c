@@ -143,13 +143,13 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 	if (BIT(val, 0))
 	{
 		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
-		machine().device("maincpu")->reset();
+		m_maincpu->reset();
 	}
 
 	if (BIT(val, 1))
 	{
 		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
-		machine().device("maincpu")->reset();
+		m_maincpu->reset();
 	}
 }
 
@@ -168,9 +168,9 @@ void vector06_state::machine_start()
 
 void vector06_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vector06_state::vector06_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vector06_state::vector06_irq_callback),this));
 	space.install_read_bank (0x0000, 0x7fff, "bank1");
 	space.install_write_bank(0x0000, 0x7fff, "bank2");
 	space.install_read_bank (0x8000, 0xffff, "bank3");

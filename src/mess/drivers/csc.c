@@ -26,7 +26,8 @@ public:
 	csc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_speech(*this, "speech")
-		{ }
+		,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<s14001a_device> m_speech;
 
@@ -47,6 +48,7 @@ public:
 
 	UINT8 m_selector;
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -176,7 +178,7 @@ READ_LINE_MEMBER( csc_state::pia1_cb1_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER(csc_state::irq_timer)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 /* Address maps */

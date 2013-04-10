@@ -21,7 +21,8 @@ class mz_state : public driver_device
 {
 public:
 	mz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -91,6 +92,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_c_w);
 	DECLARE_READ8_MEMBER(mz800_z80pio_port_a_r);
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

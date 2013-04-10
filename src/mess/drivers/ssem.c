@@ -94,7 +94,7 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 	UINT8 edit2_state = machine().root_device().ioport("EDIT2")->read();
 	UINT8 edit3_state = machine().root_device().ioport("EDIT3")->read();
 	UINT8 misc_state = machine().root_device().ioport("MISC")->read();
-	device_t *ssem_cpu = machine().device("maincpu");
+	device_t *ssem_cpu = m_maincpu;
 
 	switch( (int)(FPTR)param )
 	{
@@ -451,7 +451,7 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char 
 UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 line = 0;
-	device_t *ssem_cpu = machine().device("maincpu");
+	device_t *ssem_cpu = m_maincpu;
 	UINT32 accum = ssem_cpu->state().state_int(SSEM_A);
 	UINT32 bit = 0;
 	UINT32 word = 0;

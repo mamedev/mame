@@ -96,7 +96,7 @@ INPUT_PORTS_END
 
 void ipc_state::machine_reset()
 {
-	machine().device("maincpu")->state().set_state_int(I8085_PC, 0xE800);
+	m_maincpu->set_state_int(I8085_PC, 0xE800);
 }
 
 WRITE8_MEMBER( ipc_state::kbd_put )

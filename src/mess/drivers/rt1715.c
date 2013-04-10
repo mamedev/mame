@@ -26,7 +26,8 @@ class rt1715_state : public driver_device
 {
 public:
 	rt1715_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_led1_val;
 	int m_led2_val;
@@ -39,6 +40,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
+	required_device<cpu_device> m_maincpu;
 };
 
 

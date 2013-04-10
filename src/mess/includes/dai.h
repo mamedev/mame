@@ -55,8 +55,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_pit(*this, "pit8253"),
 			m_tms5501(*this, "tms5501"),
-			m_sound(*this, "custom")
-		{ }
+			m_sound(*this, "custom"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
@@ -83,6 +83,7 @@ public:
 	UINT32 screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dai_bootstrap_callback);
 	TIMER_CALLBACK_MEMBER(dai_timer);
+	required_device<cpu_device> m_maincpu;
 };
 
 

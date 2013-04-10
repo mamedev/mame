@@ -64,12 +64,12 @@ INPUT_PORTS_END
 
 void horizon_state::machine_reset()
 {
-	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe800);
+	m_maincpu->set_state_int(Z80_PC, 0xe800);
 }
 
 MACHINE_RESET_MEMBER(horizon_state,horizon_sd)
 {
-	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe900);
+	m_maincpu->set_state_int(Z80_PC, 0xe900);
 }
 
 WRITE8_MEMBER( horizon_state::kbd_put )

@@ -18,7 +18,8 @@ class pc1350_state : public driver_device
 {
 public:
 	pc1350_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_outa;
 	UINT8 m_outb;
@@ -39,6 +40,7 @@ public:
 	DECLARE_READ8_MEMBER(pc1350_keyboard_line_r);
 
 	virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif /* PC1350_H_ */

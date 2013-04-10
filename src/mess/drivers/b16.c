@@ -23,7 +23,8 @@ class b16_state : public driver_device
 public:
 	b16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_vram(*this, "vram"){ }
+		m_vram(*this, "vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_char_rom;
 	required_shared_ptr<UINT16> m_vram;
@@ -43,6 +44,7 @@ public:
 	i8237_device  *m_dma8237;
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])

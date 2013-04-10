@@ -46,12 +46,14 @@ class pipbug_state : public driver_device
 public:
 	pipbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_terminal(*this, TERMINAL_TAG) { }
+	m_terminal(*this, TERMINAL_TAG) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(pipbug_ctrl_w);
 	DECLARE_READ8_MEMBER(pipbug_serial_r);
 	DECLARE_WRITE8_MEMBER(pipbug_serial_w);
 	required_device<serial_terminal_device> m_terminal;
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )

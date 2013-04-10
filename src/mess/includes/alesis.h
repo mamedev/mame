@@ -62,8 +62,8 @@ public:
 	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_lcdc(*this, "hd44780"),
-			m_cassette(*this, CASSETTE_TAG)
-		{ }
+			m_cassette(*this, CASSETTE_TAG),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
@@ -83,6 +83,7 @@ public:
 private:
 	UINT8       m_kb_matrix;
 	UINT8       m_lcd_digits[5];
+	required_device<cpu_device> m_maincpu;
 };
 
 // device type definition

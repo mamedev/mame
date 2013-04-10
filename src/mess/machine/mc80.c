@@ -20,7 +20,7 @@ IRQ_CALLBACK_MEMBER(mc80_state::mc8020_irq_callback)
 
 MACHINE_RESET_MEMBER(mc80_state,mc8020)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mc80_state::mc8020_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mc80_state::mc8020_irq_callback),this));
 }
 
 WRITE_LINE_MEMBER( mc80_state::ctc_z0_w )
@@ -114,7 +114,7 @@ IRQ_CALLBACK_MEMBER(mc80_state::mc8030_irq_callback )
 
 MACHINE_RESET_MEMBER(mc80_state,mc8030)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mc80_state::mc8030_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mc80_state::mc8030_irq_callback),this));
 }
 
 READ8_MEMBER( mc80_state::zve_port_a_r )

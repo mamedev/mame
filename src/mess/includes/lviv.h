@@ -14,7 +14,8 @@ class lviv_state : public driver_device
 {
 public:
 	lviv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	unsigned char * m_video_ram;
 	unsigned short m_colortable[1][4];
@@ -40,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lviv_ppi_1_porta_w);
 	DECLARE_WRITE8_MEMBER(lviv_ppi_1_portb_w);
 	DECLARE_WRITE8_MEMBER(lviv_ppi_1_portc_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

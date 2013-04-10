@@ -495,8 +495,8 @@ WRITE_LINE_MEMBER(apple3_state::apple2_via_1_irq_func)
 {
 	if (!m_via_1_irq && state)
 	{
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	}
 	m_via_1_irq = state;
 }
@@ -730,5 +730,5 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_1_irq = 0;
 	apple3_update_memory(machine());
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }

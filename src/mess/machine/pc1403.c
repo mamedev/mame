@@ -122,7 +122,7 @@ READ8_MEMBER(pc1403_state::pc1403_inb)
 WRITE8_MEMBER(pc1403_state::pc1403_outc)
 {
 	m_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->machine().device("maincpu")->safe_pc(), data);
+//    logerror("%g pc %.4x outc %.2x\n", device->machine().time().as_double(), device->m_maincpu->safe_pc(), data);
 }
 
 
@@ -138,7 +138,7 @@ READ_LINE_MEMBER(pc1403_state::pc1403_reset)
 
 void pc1403_state::machine_start()
 {
-	device_t *main_cpu = machine().device("maincpu");
+	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = memregion("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

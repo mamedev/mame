@@ -576,7 +576,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer0_callback)
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -585,7 +585,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::IOMD_timer1_callback)
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
 	}
 }
 
@@ -594,7 +594,7 @@ TIMER_CALLBACK_MEMBER(a7000_state::flyback_timer_callback)
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE,1);
+		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE,1);
 	}
 
 	m_flyback_timer->adjust(machine().primary_screen->time_until_pos(m_vidc20_vert_reg[VDER]));

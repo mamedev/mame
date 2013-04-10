@@ -68,7 +68,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_rtc(*this, "rtc"),
 		m_palram(*this, "palram")
-		{ }
+		,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<msm58321_device> m_rtc;
 	required_shared_ptr<UINT16> m_palram;
@@ -116,6 +117,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
 	IRQ_CALLBACK_MEMBER(pc100_irq_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 void pc100_state::video_start()
@@ -408,7 +410,7 @@ IRQ_CALLBACK_MEMBER(pc100_state::pc100_irq_callback)
 WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pc100_pic8259_config =
@@ -420,7 +422,7 @@ static const struct pic8259_interface pc100_pic8259_config =
 
 void pc100_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
 	m_kanji_rom = (UINT16 *)(*machine().root_device().memregion("kanji"));
 	m_vram = (UINT16 *)(*memregion("vram"));
 }

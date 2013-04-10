@@ -38,7 +38,8 @@ class amico2k_state : public driver_device
 {
 public:
 	amico2k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	void machine_start();
 
@@ -53,6 +54,7 @@ public:
 	// timers
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
+	required_device<cpu_device> m_maincpu;
 };
 
 

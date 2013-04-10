@@ -472,7 +472,7 @@ UINT32 prestige_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 {
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( prestige, prestige_state )

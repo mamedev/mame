@@ -41,7 +41,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_acia0(*this, ACIA_0_TAG),
 		m_acia1(*this, ACIA_1_TAG),
-		m_videoram(*this,"videoram") { }
+		m_videoram(*this,"videoram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<mos6551_device> m_acia0;
 	required_device<mos6551_device> m_acia1;
@@ -84,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(concept_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(concept_fdc_drq_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

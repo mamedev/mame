@@ -277,12 +277,12 @@ WRITE32_MEMBER( glasgow_state::write_beeper32 )
 
 TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi)
 {
-	machine().device("maincpu")->execute().set_input_line(7, HOLD_LINE);
+	m_maincpu->set_input_line(7, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi32)
 {
-	machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 void glasgow_state::machine_start()

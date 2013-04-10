@@ -250,7 +250,7 @@ void sun3_state::machine_reset()
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x10000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 

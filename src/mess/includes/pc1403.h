@@ -18,7 +18,8 @@ class pc1403_state : public driver_device
 {
 public:
 	pc1403_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_portc;
 	UINT8 m_outa;
@@ -43,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc1403_lcd_write);
 	virtual void video_start();
 	virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif /* PC1403_H_ */

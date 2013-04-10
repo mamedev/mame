@@ -67,7 +67,7 @@ void dual68_state::machine_reset()
 
 	memcpy((UINT8*)m_p_ram.target(),user1,0x2000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 WRITE8_MEMBER( dual68_state::kbd_put )

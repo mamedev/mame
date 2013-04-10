@@ -55,7 +55,8 @@ class electron_state : public driver_device
 {
 public:
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	ULA m_ula;
 	emu_timer *m_tape_timer;
@@ -79,6 +80,7 @@ public:
 	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

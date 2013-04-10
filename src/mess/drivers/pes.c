@@ -86,8 +86,8 @@ WRITE8_MEMBER(pes_state::pes_kbd_input)
 	fprintf(stderr,"kb input fifo fullness: %d\n",(m_infifo_head_ptr-m_infifo_tail_ptr)&0x1F);
 #endif
 	// todo: following two should be set so clear happens after one cpu cycle
-	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 }
 
 static GENERIC_TERMINAL_INTERFACE( pes_terminal_intf )
@@ -228,8 +228,8 @@ void pes_state::machine_reset()
 
 DRIVER_INIT_MEMBER(pes_state,pes)
 {
-	i8051_set_serial_tx_callback(machine().device("maincpu"), write8_delegate(FUNC(pes_state::data_from_i8031),this));
-	i8051_set_serial_rx_callback(machine().device("maincpu"), read8_delegate(FUNC(pes_state::data_to_i8031),this));
+	i8051_set_serial_tx_callback(m_maincpu, write8_delegate(FUNC(pes_state::data_from_i8031),this));
+	i8051_set_serial_rx_callback(m_maincpu, read8_delegate(FUNC(pes_state::data_to_i8031),this));
 }
 
 /******************************************************************************

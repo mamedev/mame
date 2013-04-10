@@ -406,7 +406,7 @@ WRITE8_MEMBER( tutor_state::tutor_mapper_w )
 TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
 	//assert(m_tape_interrupt_enable);
-	machine().device("maincpu")->execute().set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
@@ -442,7 +442,7 @@ WRITE8_MEMBER( tutor_state::tutor_cassette_w )
 				else
 				{
 					m_tape_interrupt_timer->adjust(attotime::never);
-					machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+					m_maincpu->set_input_line(1, CLEAR_LINE);
 				}
 			}
 			break;

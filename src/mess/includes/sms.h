@@ -38,7 +38,8 @@ public:
 		m_has_bios_full(0),
 		m_has_bios(0),
 		m_has_fm(0),
-		m_mainram(*this, "mainram") { }
+		m_mainram(*this, "mainram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	// device_ts
 	required_device<cpu_device> m_main_cpu;
@@ -224,6 +225,7 @@ protected:
 	void setup_cart_banks();
 	void setup_banks();
 	void sms_get_inputs(address_space &space);
+	required_device<cpu_device> m_maincpu;
 };
 
 

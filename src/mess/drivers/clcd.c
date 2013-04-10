@@ -46,7 +46,8 @@ public:
 		m_col6(*this,"COL6"),
 		m_col7(*this,"COL7"),
 		m_special(*this,"SPECIAL")
-	{
+	,
+		m_maincpu(*this, "maincpu") {
 	}
 
 	TILE_GET_INFO_MEMBER(get_clcd_tilemap_tile_info)
@@ -247,6 +248,7 @@ private:
 	required_ioport m_col6;
 	required_ioport m_col7;
 	required_ioport m_special;
+	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )

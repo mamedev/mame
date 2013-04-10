@@ -357,7 +357,7 @@ IRQ_CALLBACK_MEMBER(at_state::at_irq_callback)
 
 MACHINE_START_MEMBER(at_state,at)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(at_state::at_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(at_state::at_irq_callback),this));
 }
 
 MACHINE_RESET_MEMBER(at_state,at)

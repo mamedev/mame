@@ -16,7 +16,8 @@ class cp1_state : public driver_device
 {
 public:
 	cp1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(getp1);
 	DECLARE_READ8_MEMBER(getp2);
@@ -26,6 +27,7 @@ public:
 	DECLARE_WRITE8_MEMBER(putp1);
 	DECLARE_WRITE8_MEMBER(putp2);
 	DECLARE_WRITE8_MEMBER(putbus);
+	required_device<cpu_device> m_maincpu;
 };
 
 READ8_MEMBER(cp1_state::getp1)

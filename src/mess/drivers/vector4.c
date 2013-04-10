@@ -74,7 +74,7 @@ INPUT_PORTS_END
 void vector4_state::machine_reset()
 {
 	m_term_data = 0;
-	machine().device("maincpu")->state().set_state_int(Z80_PC, 0xe000);
+	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
 WRITE8_MEMBER( vector4_state::kbd_put )

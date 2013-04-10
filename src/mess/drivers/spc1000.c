@@ -21,7 +21,8 @@ class spc1000_state : public driver_device
 public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_vdg(*this, "mc6847") {}
+			m_vdg(*this, "mc6847") ,
+		m_maincpu(*this, "maincpu") {}
 
 	required_device<mc6847_base_device> m_vdg;
 	UINT8 m_IPLK;
@@ -42,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spc1000_gmode_w);
 	DECLARE_READ8_MEMBER(spc1000_gmode_r);
 	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -225,7 +227,7 @@ INPUT_PORTS_END
 
 void spc1000_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *mem = memregion("maincpu")->base();
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 

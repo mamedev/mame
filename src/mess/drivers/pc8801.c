@@ -2290,7 +2290,7 @@ void pc8801_state::pc8801_raise_irq(UINT8 irq,UINT8 state)
 
 WRITE_LINE_MEMBER(pc8801_state::pic_int_w)
 {
-	device_t *device = machine().device("maincpu");
+	device_t *device = m_maincpu;
 //  if (state == ASSERT_LINE)
 //  {
 //  }
@@ -2298,7 +2298,7 @@ WRITE_LINE_MEMBER(pc8801_state::pic_int_w)
 
 WRITE_LINE_MEMBER(pc8801_state::pic_enlg_w)
 {
-	device_t *device = machine().device("maincpu");
+	device_t *device = m_maincpu;
 	//if (state == CLEAR_LINE)
 	//{
 	//}
@@ -2379,7 +2379,7 @@ WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
 			m_sound_irq_latch = 1;
 			m_sound_irq_pending = 0;
 			//IRQ_LOG(("sound\n"));
-			machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+			m_maincpu->set_input_line(0,HOLD_LINE);
 		}
 		else
 			m_sound_irq_pending = 1;

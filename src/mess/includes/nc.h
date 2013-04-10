@@ -29,7 +29,8 @@ class nc_state : public driver_device
 {
 public:
 	nc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	emu_timer *m_serial_timer;
 	char m_memory_config[4];
@@ -101,6 +102,7 @@ public:
 
 	void nc100_machine_stop();
 	void nc200_machine_stop();
+	required_device<cpu_device> m_maincpu;
 };
 
 

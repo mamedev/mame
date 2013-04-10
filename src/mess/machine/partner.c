@@ -361,7 +361,7 @@ WRITE8_MEMBER(partner_state::partner_mem_page_w)
 WRITE_LINE_MEMBER(partner_state::hrq_w)
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 
 	/* HACK - this should be connected to the BUSACK line of Z80 */
 	machine().device<i8257_device>("dma8257")->i8257_hlda_w(state);

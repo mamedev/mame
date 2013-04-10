@@ -98,8 +98,8 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 	bitmap_ind16 &bitmap = m_bitmap;
 	r.set(r1.min_x, r1.max_x, m_ula_scanline_count, m_ula_scanline_count);
 	bitmap.fill(1, r);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) machine().device("maincpu")->state().state_int(Z80_R), (unsigned) machine().device("maincpu")->state().state_int(Z80_PC));
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	if (++m_ula_scanline_count == height)
 		m_ula_scanline_count = 0;
 }
@@ -113,10 +113,10 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 	 */
 	if (m_ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) machine().device("maincpu")->state().state_int(Z80_R), (unsigned) machine().device("maincpu")->state().state_int(Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine().primary_screen->vpos(), ula_scancode_count, (unsigned) m_maincpu->state_int(Z80_R), (unsigned) m_maincpu->state_int(Z80_PC));
 
 		m_ula_irq_active = 0;
-		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 

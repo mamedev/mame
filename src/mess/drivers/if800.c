@@ -18,13 +18,15 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_hgdc(*this, "upd7220")
 		,
-		m_video_ram(*this, "video_ram"){ }
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<upd7220_device> m_hgdc;
 
 	required_shared_ptr<UINT8> m_video_ram;
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )

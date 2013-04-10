@@ -104,8 +104,8 @@ public:
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_shared_ram(*this, "shared_ram"),
-	m_boot_ram(*this, "boot_ram")
-	{ }
+	m_boot_ram(*this, "boot_ram"),
+	m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
@@ -253,6 +253,7 @@ public:
 	IRQ_CALLBACK_MEMBER(fm7_irq_ack);
 	IRQ_CALLBACK_MEMBER(fm7_sub_irq_ack);
 	DECLARE_WRITE_LINE_MEMBER(fm77av_fmirq);
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif /*FM7_H_*/

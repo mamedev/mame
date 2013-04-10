@@ -160,7 +160,8 @@ public:
 			m_mc6847(*this, "mc6847"),
 			m_speaker(*this, SPEAKER_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_videoram(*this, "videoram"){ }
+			m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
@@ -201,6 +202,7 @@ public:
 	DECLARE_READ8_MEMBER(vtech1_mc6847_videoram_r);
 	void vtech1_get_track();
 	void vtech1_put_track();
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -623,7 +625,7 @@ READ8_MEMBER(vtech1_state::vtech1_mc6847_videoram_r)
 
 DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 {
-	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	int id;
 
 	/* ram */
@@ -676,7 +678,7 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 
 DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 {
-	address_space &prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 

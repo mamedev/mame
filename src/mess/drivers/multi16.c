@@ -125,7 +125,7 @@ IRQ_CALLBACK_MEMBER(multi16_state::multi16_irq_callback)
 WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
 {
 	//printf("%02x\n",interrupt);
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface multi16_pic8259_config =
@@ -137,7 +137,7 @@ static const struct pic8259_interface multi16_pic8259_config =
 
 void multi16_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(multi16_state::multi16_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(multi16_state::multi16_irq_callback),this));
 }
 
 

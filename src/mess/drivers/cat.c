@@ -812,12 +812,12 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	// is there some way to 'strobe' the duart to tell it that its input ports just changed?
 	m_duart_inp ^= 0x04;
 	m_6ms_counter++;
-	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE); // hack until duart ints work; as of march 2013 they do not work correctly here (they fire at the wrong rate)
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE); // hack until duart ints work; as of march 2013 they do not work correctly here (they fire at the wrong rate)
 }
 
 IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
 {
-	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1,CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
@@ -833,7 +833,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
 	m_duart_inp = 0;
 	m_6ms_counter = 0;
 	m_floppy_control = 0;
@@ -873,7 +873,7 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 
 TIMER_CALLBACK_MEMBER(cat_state::swyft_reset)
 {
-	memset(machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
+	memset(m_maincpu->space(AS_PROGRAM).get_read_ptr(0xe2341), 0xff, 1);
 }
 
 MACHINE_START_MEMBER(cat_state,swyft)
@@ -921,7 +921,7 @@ static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 #ifdef DEBUG_DUART_IRQ_HANDLER
 	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, vector);
 #endif
-	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, state, vector);
+	//device->m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, vector);
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

@@ -64,7 +64,8 @@ public:
 	m_keyboard(*this, KEYBOARD_TAG),
 	m_cass(*this, CASSETTE_TAG),
 	m_p_videoram(*this, "videoram"),
-	m_p_attribram(*this, "attribram") { }
+	m_p_attribram(*this, "attribram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ8_MEMBER(binbug_serial_r);
@@ -77,6 +78,7 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	required_shared_ptr<const UINT8> m_p_attribram;
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )

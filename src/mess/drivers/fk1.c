@@ -390,7 +390,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 	if (machine().root_device().ioport("LINE0")->read())
 	{
 		m_int_vector = 6;
-		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -414,7 +414,7 @@ IRQ_CALLBACK_MEMBER(fk1_state::fk1_irq_callback)
 TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
 {
 	m_int_vector = 3;
-	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -429,7 +429,7 @@ void fk1_state::machine_reset()
 	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0xc000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fk1_state::fk1_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fk1_state::fk1_irq_callback),this));
 }
 
 UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

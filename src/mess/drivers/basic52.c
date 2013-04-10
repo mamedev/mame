@@ -102,8 +102,8 @@ void basic52_state::machine_reset()
 
 WRITE8_MEMBER( basic52_state::kbd_put )
 {
-	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 	m_term_data = data;
 }
 

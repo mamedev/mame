@@ -283,7 +283,7 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 			addr = 0165000;
 		}
 		addr += machine().root_device().ioport("S1_2")->read() * 2;
-		machine().device("maincpu")->state().set_state_int(T11_PC, addr);
+		m_maincpu->set_state_int(T11_PC, addr);
 	}
 
 	//0173000
@@ -299,7 +299,7 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11ub2)
 
 MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 {
-	machine().device("maincpu")->state().set_state_int(T11_PC, 0xea00);
+	m_maincpu->set_state_int(T11_PC, 0xea00);
 }
 
 static const struct t11_setup pdp11_data =

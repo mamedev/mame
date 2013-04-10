@@ -37,7 +37,8 @@ class samcoupe_state :  public driver_device
 {
 public:
 	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
-			: driver_device(mconfig, type, tag) {
+			: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") {
 			sam_bank_read_ptr[0] = NULL;
 			sam_bank_write_ptr[0] = NULL;
 			sam_bank_read_ptr[1] = NULL;
@@ -116,6 +117,7 @@ public:
 	UINT8* sam_bank_read_ptr[4];
 	UINT8* sam_bank_write_ptr[4];
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -1295,7 +1295,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 	if(machine().root_device().ioport("key3")->read() & 0x40000)
 	{
 		m_break_flag = 1;
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 	}
 	else
 		m_break_flag = 0;
@@ -1339,7 +1339,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 IRQ_CALLBACK_MEMBER(fm7_state::fm7_irq_ack)
 {
 	if(irqline == M6809_FIRQ_LINE)
-		machine().device("maincpu")->execute().set_input_line(irqline,CLEAR_LINE);
+		m_maincpu->set_input_line(irqline,CLEAR_LINE);
 	return -1;
 }
 
@@ -1831,7 +1831,7 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	m_subtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_subtimer_irq),this));
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_keyboard_poll),this));
 	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm77av_vsync),this));
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_irq_ack),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_irq_ack),this));
 	machine().device("sub")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_sub_irq_ack),this));
 }
 
@@ -1955,7 +1955,7 @@ void fm7_state::machine_reset()
 	}
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)
 	{
-		fm7_mmr_refresh(machine().device("maincpu")->memory().space(AS_PROGRAM));
+		fm7_mmr_refresh(m_maincpu->space(AS_PROGRAM));
 	}
 	if(m_type == SYS_FM11)
 	{

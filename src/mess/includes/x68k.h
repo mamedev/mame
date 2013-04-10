@@ -51,8 +51,8 @@ public:
 			m_gvram16(*this, "gvram16"),
 			m_tvram16(*this, "tvram16"),
 			m_gvram32(*this, "gvram32"),
-			m_tvram32(*this, "tvram32")
-	{ }
+			m_tvram32(*this, "tvram32"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
@@ -378,6 +378,7 @@ private:
 	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
 	void x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect);
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

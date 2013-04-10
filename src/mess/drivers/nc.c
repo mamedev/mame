@@ -507,7 +507,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
 				case NC_TYPE_1xx:
 				{
 					LOG(("nmi triggered\n"));
-					machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+					m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 				}
 				break;
 

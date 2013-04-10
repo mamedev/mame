@@ -30,7 +30,8 @@ class pimps_state : public driver_device
 public:
 	pimps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_terminal(*this, TERMINAL_TAG) { }
+			m_terminal(*this, TERMINAL_TAG) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_READ8_MEMBER(term_r);
@@ -39,6 +40,7 @@ public:
 	virtual void machine_reset();
 
 	required_device<generic_terminal_device> m_terminal;
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -87,7 +87,8 @@ public:
 	dgn_beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_mc6845(*this, "crtc"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<mc6845_device> m_mc6845;
 	required_shared_ptr<UINT8> m_videoram;
@@ -193,6 +194,7 @@ public:
 	/*  WD2797 FDC */
 	DECLARE_READ8_HANDLER(dgnbeta_wd2797_r);
 	DECLARE_WRITE8_HANDLER(dgnbeta_wd2797_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

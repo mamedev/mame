@@ -710,7 +710,7 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 void pc88va_state::tsp_sprite_enable(UINT32 spr_offset, UINT8 sw_bit)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
 	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
@@ -1623,7 +1623,7 @@ IRQ_CALLBACK_MEMBER(pc88va_state::pc88va_irq_callback)
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
@@ -1651,7 +1651,7 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 
 void pc88va_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc88va_state::pc88va_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc88va_state::pc88va_irq_callback),this));
 
 	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);

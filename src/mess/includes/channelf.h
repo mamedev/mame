@@ -29,7 +29,8 @@ class channelf_state : public driver_device
 public:
 	channelf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_custom(*this,"custom")    { }
+			m_custom(*this,"custom")    ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(channelf_port_0_r);
 	DECLARE_READ8_MEMBER(channelf_port_1_r);
@@ -55,6 +56,7 @@ public:
 	UINT32 screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( channelf_cart );
 	required_device<channelf_sound_device> m_custom;
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif /* CHANNELF_H_ */

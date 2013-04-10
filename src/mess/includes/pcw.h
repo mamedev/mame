@@ -24,7 +24,8 @@ class pcw_state : public driver_device
 {
 public:
 	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_boot;
 	int m_system_status;
@@ -106,6 +107,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
 
 	void pcw_fdc_interrupt(bool state);
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif /* PCW_H_ */

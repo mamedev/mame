@@ -392,8 +392,8 @@ class rmnimbus_state : public driver_device
 public:
 	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_scsibus(*this, SCSIBUS_TAG ":host")
-	{
+			m_scsibus(*this, SCSIBUS_TAG ":host"),
+		m_maincpu(*this, "maincpu") {
 	}
 
 	required_device<scsicb_device> m_scsibus;
@@ -468,4 +468,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
+	required_device<cpu_device> m_maincpu;
 };

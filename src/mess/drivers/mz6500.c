@@ -19,7 +19,8 @@ public:
 	m_hgdc(*this, "upd7220"),
 	m_fdc(*this, "upd765")
 	,
-		m_video_ram(*this, "video_ram"){ }
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<upd7220_device> m_hgdc;
 	required_device<upd765a_device> m_fdc;
@@ -30,6 +31,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	virtual void machine_reset();
 	virtual void video_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )

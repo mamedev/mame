@@ -9,11 +9,13 @@ class stopthie_state : public driver_device
 {
 public:
 	stopthie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(stopthie_read_k);
 	DECLARE_WRITE16_MEMBER(stopthie_write_o);
 	DECLARE_WRITE16_MEMBER(stopthie_write_r);
+	required_device<cpu_device> m_maincpu;
 };
 
 

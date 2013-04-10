@@ -106,7 +106,7 @@ QUICKLOAD_LOAD(altair)
 void altair_state::machine_reset()
 {
 	// Set startup addess done by turn-key
-	machine().device("maincpu")->state().set_state_int(I8085_PC, 0xFD00);
+	m_maincpu->set_state_int(I8085_PC, 0xFD00);
 
 	m_term_data = 0;
 }

@@ -277,7 +277,7 @@ I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 
 WRITE_LINE_MEMBER(b2m_state::b2m_pic_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
 /* Driver initialization */
@@ -371,6 +371,6 @@ void b2m_state::machine_reset()
 	m_b2m_side = 0;
 	m_b2m_drive = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(b2m_state::b2m_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(b2m_state::b2m_irq_callback),this));
 	b2m_set_bank(machine(), 7);
 }

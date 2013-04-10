@@ -24,7 +24,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_via(*this, "via"),
 			m_videoram(*this, "videoram")
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<via6522_device> m_via;
 	required_shared_ptr<UINT8> m_videoram;
@@ -35,6 +36,7 @@ public:
 
 	UINT8 m_keydata;
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

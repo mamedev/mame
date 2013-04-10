@@ -452,7 +452,7 @@ WRITE16_MEMBER(x68k_state::x68k_crtc_w )
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",machine().device("maincpu")->safe_pc(),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",m_maincpu->safe_pc(),data,offset);
 }
 
 READ16_MEMBER(x68k_state::x68k_crtc_r )
@@ -468,7 +468,7 @@ READ16_MEMBER(x68k_state::x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",machine().device("maincpu")->safe_pc(),m_crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",m_maincpu->safe_pc(),m_crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -1253,7 +1253,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 		m_mfp.isra = 0;
 		m_mfp.isrb = 0;
 //      mfp_trigger_irq(MFP_IRQ_GPIP6);
-//      machine().device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x43);
+//      m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x43);
 	}
 	if(machine().input().code_pressed(KEYCODE_9))
 	{

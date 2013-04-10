@@ -29,7 +29,8 @@ class nascom1_state : public driver_device
 public:
 	nascom1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	device_t *m_hd6402;
@@ -56,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nascom1_hd6402_so);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
+	required_device<cpu_device> m_maincpu;
 };
 
 

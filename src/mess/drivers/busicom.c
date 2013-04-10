@@ -182,7 +182,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(busicom_state::timer_callback)
 	m_timer ^=1;
 	if (m_timer==1) m_drum_index++;
 	if (m_drum_index==13) m_drum_index=0;
-	i4004_set_test(machine().device("maincpu"),m_timer);
+	i4004_set_test(m_maincpu,m_timer);
 
 }
 

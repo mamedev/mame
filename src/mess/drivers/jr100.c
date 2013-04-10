@@ -42,7 +42,8 @@ public:
 		m_line5(*this, "LINE5"),
 		m_line6(*this, "LINE6"),
 		m_line7(*this, "LINE7"),
-		m_line8(*this, "LINE8") { }
+		m_line8(*this, "LINE8") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_pcg;
@@ -79,6 +80,7 @@ protected:
 	required_ioport m_line6;
 	required_ioport m_line7;
 	required_ioport m_line8;
+	required_device<cpu_device> m_maincpu;
 };
 
 

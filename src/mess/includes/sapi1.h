@@ -26,7 +26,8 @@ public:
 		m_line1(*this, "LINE1"),
 		m_line2(*this, "LINE2"),
 		m_line3(*this, "LINE3"),
-		m_line4(*this, "LINE4") { }
+		m_line4(*this, "LINE4") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_sapi_video_ram;
 	UINT8 m_keyboard_mask;
@@ -58,6 +59,7 @@ protected:
 	required_ioport m_line2;
 	required_ioport m_line3;
 	required_ioport m_line4;
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif

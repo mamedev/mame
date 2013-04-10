@@ -135,7 +135,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 			{
 				m_keyboard_int = 1;
 				m_key_code = i | bit_sel(code);
-				machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+				m_maincpu->set_input_line(0, HOLD_LINE);
 				break;
 			}
 		}
@@ -364,7 +364,7 @@ void vt100_state::machine_reset()
 
 	m_key_scan = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vt100_state::vt100_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vt100_state::vt100_irq_callback),this));
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )

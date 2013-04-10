@@ -14,7 +14,8 @@ class pp01_state : public driver_device
 {
 public:
 	pp01_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_video_scroll;
 	UINT8 m_memory_block[16];
@@ -42,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(pp01_8255_portc_w);
 	DECLARE_READ8_MEMBER(pp01_8255_portc_r);
+	required_device<cpu_device> m_maincpu;
 };
 
 

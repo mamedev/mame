@@ -49,7 +49,8 @@ class mk1_state : public driver_device
 {
 public:
 	mk1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
@@ -57,6 +58,7 @@ public:
 	UINT8 m_led[4];
 	virtual void machine_start();
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -44,7 +44,8 @@ class gizmondo_state : public driver_device
 {
 public:
 	gizmondo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT32 m_port[9];
 	device_t *m_s3c2440;
@@ -53,6 +54,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -148,7 +150,7 @@ void gizmondo_state::machine_start()
 
 void gizmondo_state::machine_reset()
 {
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 /*******************************************************************************

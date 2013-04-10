@@ -279,13 +279,13 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(vg5k_state::z80_irq_clear)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
 }
@@ -338,7 +338,7 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 
 
 	/* install expansion memory*/
-	address_space &program = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 	UINT16 ram_size = machine().device<ram_device>(RAM_TAG)->size();
 

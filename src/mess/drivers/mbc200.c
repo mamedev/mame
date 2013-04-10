@@ -43,7 +43,8 @@ public:
 		m_floppy0(*this, FLOPPY_0),
 		m_floppy1(*this, FLOPPY_1),
 		m_vram(*this, "vram")
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start();
 
@@ -63,6 +64,7 @@ public:
 
 	virtual void video_start();
 	UINT32 screen_update_mbc200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

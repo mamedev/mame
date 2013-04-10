@@ -21,7 +21,8 @@ class gmaster_state : public driver_device
 {
 public:
 	gmaster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	GMASTER_VIDEO m_video;
 	GMASTER_MACHINE m_gmachine;
@@ -33,6 +34,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_gmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gmaster_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

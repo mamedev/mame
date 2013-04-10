@@ -34,7 +34,8 @@ public:
 	junior_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_riot(*this, "riot")
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<riot6532_device> m_riot;
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
@@ -49,6 +50,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -179,7 +181,7 @@ WRITE8_MEMBER( junior_state::junior_riot_b_w )
 
 WRITE_LINE_MEMBER( junior_state::junior_riot_irq )
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

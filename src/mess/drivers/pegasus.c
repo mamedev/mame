@@ -98,7 +98,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
 
 WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER( pegasus_state::pegasus_keyboard_r )

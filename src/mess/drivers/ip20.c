@@ -50,8 +50,9 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_wd33c93(*this, "scsi:wd33c93"),
 	m_scc(*this, "scc"),
-	m_eeprom(*this, "eeprom")
-	{ }
+	m_eeprom(*this, "eeprom"),
+	m_maincpu(*this, "maincpu") { }
+
 
 	HPC_t m_HPC;
 	RTC_t m_RTC;
@@ -68,6 +69,7 @@ public:
 	required_device<scc8530_t> m_scc;
 	required_device<eeprom_device> m_eeprom;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
+	required_device<cpu_device> m_maincpu;
 };
 
 

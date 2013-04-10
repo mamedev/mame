@@ -355,7 +355,7 @@ UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 WRITE_LINE_MEMBER(pce_state::pce_irq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 

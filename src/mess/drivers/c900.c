@@ -16,9 +16,11 @@ class c900_state : public driver_device
 {
 public:
 	c900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 static ADDRESS_MAP_START(c900_mem, AS_PROGRAM, 16, c900_state)

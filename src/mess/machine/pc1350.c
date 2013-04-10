@@ -90,7 +90,7 @@ TIMER_CALLBACK_MEMBER(pc1350_state::pc1350_power_up)
 
 void pc1350_state::machine_start()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_power = 1;
 	machine().scheduler().timer_set(attotime::from_seconds(1), timer_expired_delegate(FUNC(pc1350_state::pc1350_power_up),this));
@@ -118,7 +118,7 @@ void pc1350_state::machine_start()
 		space.nop_readwrite(0x2000, 0x3fff);
 	}
 
-	device_t *main_cpu = machine().device("maincpu");
+	device_t *main_cpu = m_maincpu;
 	UINT8 *ram = machine().root_device().memregion("maincpu")->base() + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

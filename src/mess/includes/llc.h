@@ -22,7 +22,8 @@ public:
 	llc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_speaker(*this, SPEAKER_TAG),
-	m_p_videoram(*this, "videoram"){ }
+	m_p_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
 	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
@@ -53,6 +54,7 @@ public:
 	DECLARE_MACHINE_RESET(llc2);
 	UINT32 screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

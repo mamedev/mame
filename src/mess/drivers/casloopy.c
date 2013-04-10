@@ -160,7 +160,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_bios_rom(*this, "bios_rom"),
 		m_vregs(*this, "vregs")
-		{ }
+		,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	required_shared_ptr<UINT32> m_vregs;
@@ -184,6 +185,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sh7021_w);
 	DECLARE_READ8_MEMBER(casloopy_bitmap_r);
 	DECLARE_WRITE8_MEMBER(casloopy_bitmap_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -439,7 +441,7 @@ void casloopy_state::machine_start()
 
 void casloopy_state::machine_reset()
 {
-	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
+	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 
 }
 

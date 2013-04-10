@@ -389,8 +389,8 @@ void m20_state::install_memory()
 
 	m_memsize = m_ram->size();
 	UINT8 *memptr = m_ram->pointer();
-	address_space& pspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space& dspace = machine().device("maincpu")->memory().space(AS_DATA);
+	address_space& pspace = m_maincpu->space(AS_PROGRAM);
+	address_space& dspace = m_maincpu->space(AS_DATA);
 
 	/* install mainboard memory (aka DRAM0) */
 

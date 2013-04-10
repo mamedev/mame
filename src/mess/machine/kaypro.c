@@ -15,7 +15,7 @@
 
 WRITE_LINE_MEMBER(kaypro_state::kaypro_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 READ8_MEMBER( kaypro_state::pio_system_r )
@@ -155,7 +155,7 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
     d0 drive A */
 
 	/* get address space */
-	address_space &mem = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	if (BIT(data, 7))
 	{
@@ -280,8 +280,8 @@ WRITE8_MEMBER(kaypro_state::kaypro_sio_w)
 
 TIMER_CALLBACK_MEMBER(kaypro_state::kaypro_timer_callback)
 {
-	if (machine().device("maincpu")->state().state_int(Z80_HALT))
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (m_maincpu->state_int(Z80_HALT))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
@@ -289,7 +289,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_intrq_w )
 	if (state)
 		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
 	else
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
@@ -297,7 +297,7 @@ WRITE_LINE_MEMBER( kaypro_state::kaypro_fdc_drq_w )
 	if (state)
 		machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(kaypro_state::kaypro_timer_callback),this));
 	else
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 }
 

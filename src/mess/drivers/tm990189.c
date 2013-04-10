@@ -78,7 +78,8 @@ public:
 	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG),
 	m_tms9918(*this, "tms9918" )
-	{ }
+	,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<tms9980a_device> m_tms9980a;
 	required_device<speaker_sound_device> m_speaker;
@@ -153,6 +154,7 @@ private:
 	void led_set(int number, bool state);
 	void segment_set(int offset, bool state);
 	void digitsel(int offset, bool state);
+	required_device<cpu_device> m_maincpu;
 };
 
 

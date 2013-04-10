@@ -24,7 +24,8 @@ class hp49gp_state : public driver_device
 public:
 	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_steppingstone(*this, "steppingstone"){ }
+		m_steppingstone(*this, "steppingstone"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT32 m_port[9];
 	device_t *m_s3c2410;
@@ -39,6 +40,7 @@ public:
 	void lcd_spi_init( );
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r( int line);
+	required_device<cpu_device> m_maincpu;
 };
 
 /***************************************************************************
@@ -248,7 +250,7 @@ void hp49gp_state::machine_start()
 
 void hp49gp_state::machine_reset()
 {
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 /***************************************************************************

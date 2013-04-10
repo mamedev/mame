@@ -218,6 +218,7 @@ private:
 	UINT8 midi;
 	int midi_pos;
 	UINT8 port0;
+	required_device<cpu_device> m_maincpu;
 };
 
 mt32_state::mt32_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -226,7 +227,8 @@ mt32_state::mt32_state(const machine_config &mconfig, device_type type, const ch
 	ram(*this, "ram"),
 	lcd(*this, "lcd"),
 	midi_timer(*this, "midi_timer")
-{
+,
+		m_maincpu(*this, "maincpu") {
 }
 
 

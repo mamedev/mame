@@ -46,7 +46,7 @@ TIMER_CALLBACK_MEMBER(cgenie_state::handle_cassette_input)
 
 void cgenie_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	device_t *ay8910 = machine().device("ay8910");
 	UINT8 *ROM = memregion("maincpu")->base();
 
@@ -123,7 +123,7 @@ void cgenie_state::machine_reset()
 
 void cgenie_state::machine_start()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *gfx = memregion("gfx2")->base();
 	int i;
 
@@ -415,7 +415,7 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_timer_interrupt)
 	if( (m_irq_status & IRQ_TIMER) == 0 )
 	{
 		m_irq_status |= IRQ_TIMER;
-		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER(cgenie_state::cgenie_fdc_intrq_w)
 		if( (m_irq_status & IRQ_FDC) == 0 )
 		{
 			m_irq_status |= IRQ_FDC;
-			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 	else
@@ -595,7 +595,7 @@ INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_frame_interrupt)
 		m_tv_mode = ioport("DSW0")->read() & 0x10;
 		/* force setting of background color */
 		m_port_ff ^= FF_BGD0;
-		cgenie_port_ff_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, m_port_ff ^ FF_BGD0);
+		cgenie_port_ff_w(m_maincpu->space(AS_PROGRAM), 0, m_port_ff ^ FF_BGD0);
 	}
 }
 

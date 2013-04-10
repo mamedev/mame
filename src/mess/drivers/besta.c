@@ -121,7 +121,7 @@ void besta_state::machine_reset()
 	memset(m_mpcc_regs, sizeof(m_mpcc_regs), 0);    // should initialize to defined values
 	m_mpcc_regs[8] = 0x80;              // always ready to transmit
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )

@@ -178,7 +178,7 @@ WRITE8_MEMBER( mk2_state::mk2_write_b )
 
 	m_led[4]|=data;
 
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+	m_maincpu->set_input_line(M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static MOS6530_INTERFACE( mk2_mos6530_interface )

@@ -1855,7 +1855,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_f0_w)
 		/* reset POR bit, TODO: is there any other way? */
 		por = machine().device<i8255_device>("ppi8255_sys")->read(space, 2) & ~0x20;
 		machine().device<i8255_device>("ppi8255_sys")->write(space, 2,por);
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	if(offset == 0x02)
@@ -2915,7 +2915,7 @@ ir7
 WRITE_LINE_MEMBER(pc9801_state::pc9801_master_set_int_line)
 {
 	//printf("%02x\n",interrupt);
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(pc9801_state::get_slave_ack)
@@ -3338,7 +3338,7 @@ IRQ_CALLBACK_MEMBER(pc9801_state::irq_callback)
 
 MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode
