@@ -223,7 +223,7 @@ class coinmvga_state : public driver_device
 {
 public:
 	coinmvga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"){ }
 
 	required_shared_ptr<UINT16> m_vram;

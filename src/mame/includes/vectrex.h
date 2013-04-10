@@ -24,23 +24,22 @@ class vectrex_state : public driver_device
 {
 public:
 	vectrex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_gce_vectorram(*this, "gce_vectorram")
-		, m_maincpu(*this, "maincpu")
-		, m_via6522_0(*this, "via6522_0")
-		, m_dac(*this, "dac")
-		, m_ay8912(*this, "ay8912")
-		, m_io_contr1x(*this, "CONTR1X")
-		, m_io_contr1y(*this, "CONTR1Y")
-		, m_io_contr2x(*this, "CONTR2X")
-		, m_io_contr2y(*this, "CONTR2Y")
-		, m_io_buttons(*this, "BUTTONS")
-		, m_io_3dconf(*this, "3DCONF")
-		, m_io_lpenconf(*this, "LPENCONF")
-		, m_io_lpenx(*this, "LPENX")
-		, m_io_lpeny(*this, "LPENY")
-		, m_io_coin(*this, "COIN")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_gce_vectorram(*this, "gce_vectorram"),
+		m_maincpu(*this, "maincpu"),
+		m_via6522_0(*this, "via6522_0"),
+		m_dac(*this, "dac"),
+		m_ay8912(*this, "ay8912"),
+		m_io_contr1x(*this, "CONTR1X"),
+		m_io_contr1y(*this, "CONTR1Y"),
+		m_io_contr2x(*this, "CONTR2X"),
+		m_io_contr2y(*this, "CONTR2Y"),
+		m_io_buttons(*this, "BUTTONS"),
+		m_io_3dconf(*this, "3DCONF"),
+		m_io_lpenconf(*this, "LPENCONF"),
+		m_io_lpenx(*this, "LPENX"),
+		m_io_lpeny(*this, "LPENY"),
+		m_io_coin(*this, "COIN") { }
 
 	required_shared_ptr<UINT8> m_gce_vectorram;
 	int m_64k_cart;

@@ -60,7 +60,7 @@ class dmndrby_state : public driver_device
 {
 public:
 	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_dderby_vidchars(*this, "vidchars"),

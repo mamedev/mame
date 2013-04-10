@@ -4,7 +4,7 @@ class cischeat_state : public driver_device
 {
 public:
 	cischeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_scrollram(*this, "scrollram"),
 		m_ram(*this, "ram"),

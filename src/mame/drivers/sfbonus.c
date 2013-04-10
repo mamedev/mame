@@ -282,7 +282,7 @@ class sfbonus_state : public driver_device
 {
 public:
 	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_1800_regs(*this, "1800_regs"),
 		m_vregs(*this, "vregs"),

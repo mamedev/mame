@@ -2,7 +2,7 @@ class popeye_state : public driver_device
 {
 public:
 	popeye_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_background_pos(*this, "background_pos"),
 		m_palettebank(*this, "palettebank"),
 		m_spriteram(*this, "spriteram"),

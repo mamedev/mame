@@ -53,14 +53,13 @@ class sgi_ip2_state : public driver_device
 {
 public:
 	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_mainram(*this, "mainram")
-		, m_bss(*this, "bss")
-		, m_ptmap(*this, "ptmap")
-		, m_rtc(*this, "rtc")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_mainram(*this, "mainram"),
+		m_bss(*this, "bss"),
+		m_ptmap(*this, "ptmap"),
+		m_rtc(*this, "rtc") { }
 
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);

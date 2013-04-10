@@ -7,7 +7,7 @@ class chaknpop_state : public driver_device
 {
 public:
 	chaknpop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mcu_ram(*this, "mcu_ram"),
 		m_tx_ram(*this, "tx_ram"),
 		m_attr_ram(*this, "attr_ram"),

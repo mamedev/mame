@@ -2,7 +2,7 @@ class argus_state : public driver_device
 {
 public:
 	argus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg0_scrollx(*this, "bg0_scrollx"),
 		m_bg0_scrolly(*this, "bg0_scrolly"),
 		m_bg1_scrollx(*this, "bg1_scrollx"),

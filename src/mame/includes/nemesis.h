@@ -2,7 +2,7 @@ class nemesis_state : public driver_device
 {
 public:
 	nemesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_xscroll1(*this, "xscroll1"),
 		m_xscroll2(*this, "xscroll2"),

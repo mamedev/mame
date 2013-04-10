@@ -26,7 +26,7 @@ class spoker_state : public driver_device
 {
 public:
 	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"){ }

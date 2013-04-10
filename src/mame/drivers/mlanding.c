@@ -31,7 +31,7 @@ class mlanding_state : public driver_device
 {
 public:
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_g_ram(*this, "g_ram"),
 		m_ml_tileram(*this, "ml_tileram"),
 		m_dma_ram(*this, "dma_ram"),

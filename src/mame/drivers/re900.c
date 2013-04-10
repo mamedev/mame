@@ -86,7 +86,7 @@ class re900_state : public driver_device
 {
 public:
 	re900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_rom(*this, "rom"){ }
 
 	required_shared_ptr<UINT8> m_rom;

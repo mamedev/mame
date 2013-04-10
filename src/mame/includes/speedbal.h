@@ -2,7 +2,7 @@ class speedbal_state : public driver_device
 {
 public:
 	speedbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_background_videoram(*this, "bg_videoram"),
 		m_foreground_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"){ }

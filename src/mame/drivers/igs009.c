@@ -34,7 +34,7 @@ class igs009_state : public driver_device
 {
 public:
 	igs009_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_scroll(*this, "bg_scroll"),
 		m_gp98_reel1_ram(*this, "gp98_reel1_ram"),
 		m_gp98_reel2_ram(*this, "gp98_reel2_ram"),

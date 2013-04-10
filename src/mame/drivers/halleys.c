@@ -210,7 +210,7 @@ class halleys_state : public driver_device
 {
 public:
 	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_blitter_ram(*this, "blitter_ram"),
 		m_io_ram(*this, "io_ram"){ }
 

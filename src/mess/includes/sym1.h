@@ -25,21 +25,20 @@ class sym1_state : public driver_device
 {
 public:
 	sym1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_ram_1k(*this, "ram_1k")
-		, m_ram_2k(*this, "ram_2k")
-		, m_ram_3k(*this, "ram_3k")
-		, m_monitor(*this, "monitor")
-		, m_riot_ram(*this, "riot_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, RAM_TAG)
-		, m_ttl74145(*this, "ttl74145")
-		, m_row0(*this, "ROW-0")
-		, m_row1(*this, "ROW-1")
-		, m_row2(*this, "ROW-2")
-		, m_row3(*this, "ROW-3")
-		, m_wp(*this, "WP")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_ram_1k(*this, "ram_1k"),
+		m_ram_2k(*this, "ram_2k"),
+		m_ram_3k(*this, "ram_3k"),
+		m_monitor(*this, "monitor"),
+		m_riot_ram(*this, "riot_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_ttl74145(*this, "ttl74145"),
+		m_row0(*this, "ROW-0"),
+		m_row1(*this, "ROW-1"),
+		m_row2(*this, "ROW-2"),
+		m_row3(*this, "ROW-3"),
+		m_wp(*this, "WP") { }
 
 	required_shared_ptr<UINT8> m_ram_1k;
 	required_shared_ptr<UINT8> m_ram_2k;

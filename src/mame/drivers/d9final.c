@@ -28,7 +28,7 @@ class d9final_state : public driver_device
 {
 public:
 	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_lo_vram(*this, "lo_vram"),
 		m_hi_vram(*this, "hi_vram"),
 		m_cram(*this, "cram"){ }

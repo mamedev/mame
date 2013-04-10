@@ -40,8 +40,7 @@ class mboard_state : public driver_device
 {
 public:
 	mboard_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{ }
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER(mboard_read_board_8);
 	DECLARE_WRITE8_MEMBER(mboard_write_board_8);

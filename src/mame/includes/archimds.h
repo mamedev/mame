@@ -43,14 +43,13 @@ class archimedes_state : public driver_device
 {
 public:
 	archimedes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_kart(*this, "kart")
-		, m_maincpu(*this, "maincpu")
-		, m_i2cmem(*this, "i2cmem")
-		, m_wd1772(*this, "wd1772")
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_vram(*this, "vram")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_kart(*this, "kart"),
+		m_maincpu(*this, "maincpu"),
+		m_i2cmem(*this, "i2cmem"),
+		m_wd1772(*this, "wd1772"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_vram(*this, "vram") { }
 
 	optional_device<aakart_device> m_kart;
 	void archimedes_init();

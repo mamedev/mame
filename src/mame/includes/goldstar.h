@@ -2,7 +2,7 @@ class goldstar_state : public driver_device
 {
 public:
 	goldstar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fg_vidram(*this, "fg_vidram"),
 		m_fg_atrram(*this, "fg_atrram"),
 		m_reel1_ram(*this, "reel1_ram"),

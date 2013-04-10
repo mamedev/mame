@@ -17,7 +17,7 @@ class tgtpanic_state : public driver_device
 {
 public:
 	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"){ }
 
 	required_shared_ptr<UINT8> m_ram;

@@ -27,29 +27,28 @@ class supercon_state : public driver_device
 {
 public:
 	supercon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, BEEPER_TAG)
-		, m_b_white(*this, "B_WHITE")
-		, m_b_black(*this, "B_BLACK")
-		, m_b_clr(*this, "B_CLR")
-		, m_status_1(*this, "STATUS_1")
-		, m_status_2(*this, "STATUS_2")
-		, m_status_3(*this, "STATUS_3")
-		, m_status_4(*this, "STATUS_4")
-		, m_status_5(*this, "STATUS_5")
-		, m_status_6(*this, "STATUS_6")
-		, m_status_7(*this, "STATUS_7")
-		, m_status_8(*this, "STATUS_8")
-		, m_board_1(*this, "BOARD_1")
-		, m_board_2(*this, "BOARD_2")
-		, m_board_3(*this, "BOARD_3")
-		, m_board_4(*this, "BOARD_4")
-		, m_board_5(*this, "BOARD_5")
-		, m_board_6(*this, "BOARD_6")
-		, m_board_7(*this, "BOARD_7")
-		, m_board_8(*this, "BOARD_8")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, BEEPER_TAG),
+		m_b_white(*this, "B_WHITE"),
+		m_b_black(*this, "B_BLACK"),
+		m_b_clr(*this, "B_CLR"),
+		m_status_1(*this, "STATUS_1"),
+		m_status_2(*this, "STATUS_2"),
+		m_status_3(*this, "STATUS_3"),
+		m_status_4(*this, "STATUS_4"),
+		m_status_5(*this, "STATUS_5"),
+		m_status_6(*this, "STATUS_6"),
+		m_status_7(*this, "STATUS_7"),
+		m_status_8(*this, "STATUS_8"),
+		m_board_1(*this, "BOARD_1"),
+		m_board_2(*this, "BOARD_2"),
+		m_board_3(*this, "BOARD_3"),
+		m_board_4(*this, "BOARD_4"),
+		m_board_5(*this, "BOARD_5"),
+		m_board_6(*this, "BOARD_6"),
+		m_board_7(*this, "BOARD_7"),
+		m_board_8(*this, "BOARD_8") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;

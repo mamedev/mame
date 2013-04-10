@@ -74,7 +74,7 @@ class srmp6_state : public driver_device
 {
 public:
 	srmp6_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_sprram(*this, "sprram"),
 		m_chrram(*this, "chrram"),
 		m_dmaram(*this, "dmaram"),

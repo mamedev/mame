@@ -49,12 +49,11 @@ class a2600_state : public driver_device
 {
 public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_riot_ram(*this, "riot_ram")
-		, m_banking_mode(0xff)
-		, m_joy1(*this, CONTROL1_TAG)
-		, m_joy2(*this, CONTROL2_TAG)
-		{ }
+		: driver_device(mconfig, type, tag),
+		m_riot_ram(*this, "riot_ram"),
+		m_banking_mode(0xff),
+		m_joy1(*this, CONTROL1_TAG),
+		m_joy2(*this, CONTROL2_TAG) { }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;

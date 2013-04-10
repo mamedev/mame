@@ -35,7 +35,7 @@ class ettrivia_state : public driver_device
 {
 public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"){ }
 

@@ -16,12 +16,11 @@ class pc4_state : public driver_device
 {
 public:
 	pc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_beep(*this, BEEPER_TAG)
-		, m_region_charset(*this, "charset")
-		, m_rombank(*this, "rombank")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_beep(*this, BEEPER_TAG),
+		m_region_charset(*this, "charset"),
+		m_rombank(*this, "rombank") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;

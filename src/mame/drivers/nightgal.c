@@ -31,32 +31,30 @@ class nightgal_state : public driver_device
 {
 public:
 	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_comms_ram(*this, "comms_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_subcpu(*this, "sub")
-		, m_region_gfx1(*this, "gfx1")
-		, m_io_cr_clear(*this, "CR_CLEAR")
-		, m_io_coins(*this, "COINS")
-		, m_io_pl1_1(*this, "PL1_1")
-		, m_io_pl1_2(*this, "PL1_2")
-		, m_io_pl1_3(*this, "PL1_3")
-		, m_io_pl1_4(*this, "PL1_4")
-		, m_io_pl1_5(*this, "PL1_5")
-		, m_io_pl1_6(*this, "PL1_6")
-		, m_io_pl2_1(*this, "PL2_1")
-		, m_io_pl2_2(*this, "PL2_2")
-		, m_io_pl2_3(*this, "PL2_3")
-		, m_io_pl2_4(*this, "PL2_4")
-		, m_io_pl2_5(*this, "PL2_5")
-		, m_io_pl2_6(*this, "PL2_6")
-		, m_io_system(*this, "SYSTEM")
-		, m_io_sysa(*this, "SYSA")
-		, m_io_dswa(*this, "DSWA")
-		, m_io_dswb(*this, "DSWB")
-		, m_io_dswc(*this, "DSWC")
-
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_comms_ram(*this, "comms_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub"),
+		m_region_gfx1(*this, "gfx1"),
+		m_io_cr_clear(*this, "CR_CLEAR"),
+		m_io_coins(*this, "COINS"),
+		m_io_pl1_1(*this, "PL1_1"),
+		m_io_pl1_2(*this, "PL1_2"),
+		m_io_pl1_3(*this, "PL1_3"),
+		m_io_pl1_4(*this, "PL1_4"),
+		m_io_pl1_5(*this, "PL1_5"),
+		m_io_pl1_6(*this, "PL1_6"),
+		m_io_pl2_1(*this, "PL2_1"),
+		m_io_pl2_2(*this, "PL2_2"),
+		m_io_pl2_3(*this, "PL2_3"),
+		m_io_pl2_4(*this, "PL2_4"),
+		m_io_pl2_5(*this, "PL2_5"),
+		m_io_pl2_6(*this, "PL2_6"),
+		m_io_system(*this, "SYSTEM"),
+		m_io_sysa(*this, "SYSA"),
+		m_io_dswa(*this, "DSWA"),
+		m_io_dswb(*this, "DSWB"),
+		m_io_dswc(*this, "DSWC") { }
 
 	/* video-related */
 	UINT8 m_blit_raw_data[3];

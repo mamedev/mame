@@ -55,31 +55,30 @@ class svi318_state : public driver_device
 {
 public:
 	svi318_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_pcart(NULL)
-		, m_pcart_rom_size(0)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_dac(*this, "dac")
-		, m_ppi(*this, "ppi8255")
-		, m_ram(*this, RAM_TAG)
-		, m_centronics(*this, "centronics")
-		, m_ins8250_0(*this, "ins8250_0")
-		, m_ins8250_1(*this, "ins8250_1")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-		, m_line5(*this, "LINE5")
-		, m_line6(*this, "LINE6")
-		, m_line7(*this, "LINE7")
-		, m_line8(*this, "LINE8")
-		, m_line9(*this, "LINE9")
-		, m_line10(*this, "LINE10")
-		, m_joysticks(*this, "JOYSTICKS")
-		, m_buttons(*this, "BUTTONS")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_pcart(NULL),
+		m_pcart_rom_size(0),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_dac(*this, "dac"),
+		m_ppi(*this, "ppi8255"),
+		m_ram(*this, RAM_TAG),
+		m_centronics(*this, "centronics"),
+		m_ins8250_0(*this, "ins8250_0"),
+		m_ins8250_1(*this, "ins8250_1"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4"),
+		m_line5(*this, "LINE5"),
+		m_line6(*this, "LINE6"),
+		m_line7(*this, "LINE7"),
+		m_line8(*this, "LINE8"),
+		m_line9(*this, "LINE9"),
+		m_line10(*this, "LINE10"),
+		m_joysticks(*this, "JOYSTICKS"),
+		m_buttons(*this, "BUTTONS") { }
 
 	SVI_318 m_svi;
 	UINT8 *m_pcart;

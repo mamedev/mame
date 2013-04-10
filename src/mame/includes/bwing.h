@@ -10,7 +10,7 @@ class bwing_state : public driver_device
 {
 public:
 	bwing_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bwp1_sharedram1(*this, "bwp1_sharedram1"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),

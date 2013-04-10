@@ -31,13 +31,12 @@ class elekscmp_state : public driver_device
 {
 public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_x0(*this, "X0")
-		, m_x1(*this, "X1")
-		, m_x2(*this, "X2")
-		, m_x3(*this, "X3")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_x0(*this, "X0"),
+		m_x1(*this, "X1"),
+		m_x2(*this, "X2"),
+		m_x3(*this, "X3") { }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);

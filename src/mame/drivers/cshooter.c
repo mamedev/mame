@@ -92,7 +92,7 @@ class cshooter_state : public driver_device
 {
 public:
 	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"){ }

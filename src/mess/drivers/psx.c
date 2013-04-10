@@ -24,9 +24,7 @@ class psx1_state : public driver_device
 {
 public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{
-	}
+		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_exe_buffer;
 	int m_exe_size;

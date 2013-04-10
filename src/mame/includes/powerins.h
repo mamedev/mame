@@ -2,7 +2,7 @@ class powerins_state : public driver_device
 {
 public:
 	powerins_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vctrl_0(*this, "vctrl_0"),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),

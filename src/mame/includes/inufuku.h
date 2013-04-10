@@ -3,7 +3,7 @@ class inufuku_state : public driver_device
 {
 public:
 	inufuku_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_rasterram(*this, "bg_rasterram"),
 		m_tx_videoram(*this, "tx_videoram"),

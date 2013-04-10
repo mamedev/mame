@@ -21,7 +21,7 @@ class pkscram_state : public driver_device
 {
 public:
 	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
 		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
 		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"){ }

@@ -2,7 +2,7 @@ class nmk16_state : public driver_device
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_nmk_bgvideoram0(*this, "nmk_bgvideoram0"),
 		m_nmk_txvideoram(*this, "nmk_txvideoram"),
 		m_mainram(*this, "mainram"),

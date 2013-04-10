@@ -209,22 +209,21 @@ class gamecom_state : public driver_device
 {
 public:
 	gamecom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_p_nvram(*this,"p_nvram")
-		, m_p_videoram(*this,"p_videoram")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_kernel(*this, "kernel")
-		, m_io_in0(*this, "IN0")
-		, m_io_in1(*this, "IN1")
-		, m_io_in2(*this, "IN2")
-		, m_io_styx(*this, "STYX")
-		, m_io_styy(*this, "STYY")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_p_nvram(*this,"p_nvram"),
+		m_p_videoram(*this,"p_videoram"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_kernel(*this, "kernel"),
+		m_io_in0(*this, "IN0"),
+		m_io_in1(*this, "IN1"),
+		m_io_in2(*this, "IN2"),
+		m_io_styx(*this, "STYX"),
+		m_io_styy(*this, "STYY") { }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( gamecom_internal_r );

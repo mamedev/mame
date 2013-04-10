@@ -116,7 +116,7 @@ class sub_state : public driver_device
 {
 public:
 	sub_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
 		m_vid(*this, "vid"),
 		m_spriteram(*this, "spriteram"),

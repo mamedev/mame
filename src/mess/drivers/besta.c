@@ -29,12 +29,10 @@ class besta_state : public driver_device
 {
 public:
 	besta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, TERMINAL_TAG)
-		, m_p_ram(*this, "p_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG),
+		m_p_ram(*this, "p_ram") { }
 
 	DECLARE_READ8_MEMBER( mpcc_reg_r );
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );

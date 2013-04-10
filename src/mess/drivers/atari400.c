@@ -250,30 +250,29 @@ class a400_state : public driver_device
 {
 public:
 	a400_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, RAM_TAG)
-		, m_pia(*this, "pia")
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_lslot(*this, "lslot")
-		, m_region_rslot(*this, "rslot")
-		, m_region_user1(*this, "user1")
-		, m_a000(*this, "a000")
-		, m_b000(*this, "b000")
-		, m_0000(*this, "0000")
-		, m_8000(*this, "8000")
-		, m_9000(*this, "9000")
-		, m_bank0(*this, "bank0")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_a800_cart_loaded(0)
-		, m_atari(0)
-		, m_a800_cart_type(A800_UNKNOWN)
-		, m_xegs_banks(0)
-		, m_xegs_cart(0)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_pia(*this, "pia"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_lslot(*this, "lslot"),
+		m_region_rslot(*this, "rslot"),
+		m_region_user1(*this, "user1"),
+		m_a000(*this, "a000"),
+		m_b000(*this, "b000"),
+		m_0000(*this, "0000"),
+		m_8000(*this, "8000"),
+		m_9000(*this, "9000"),
+		m_bank0(*this, "bank0"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_a800_cart_loaded(0),
+		m_atari(0),
+		m_a800_cart_type(A800_UNKNOWN),
+		m_xegs_banks(0),
+		m_xegs_cart(0) { }
 
 	DECLARE_DRIVER_INIT(xegs);
 	DECLARE_DRIVER_INIT(a800xl);

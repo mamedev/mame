@@ -11,7 +11,7 @@ class starwars_state : public driver_device
 {
 public:
 	starwars_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mathram(*this, "mathram"){ }
 
 	UINT8 m_sound_data;

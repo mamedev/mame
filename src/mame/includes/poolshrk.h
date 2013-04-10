@@ -12,7 +12,7 @@ class poolshrk_state : public driver_device
 {
 public:
 	poolshrk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
 		m_vpos_ram(*this, "vpos_ram"),

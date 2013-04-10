@@ -36,32 +36,31 @@ class neogeo_state : public driver_device
 {
 public:
 	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_save_ram(*this, "save_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_upd4990a(*this, "upd4990a")
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_sprites(*this, "sprites")
-		, m_region_fixed(*this, "fixed")
-		, m_region_fixedbios(*this, "fixedbios")
-		, m_bank_vectors(*this, NEOGEO_BANK_VECTORS)
-		, m_bank_bios(*this, NEOGEO_BANK_BIOS)
-		, m_bank_cartridge(*this, NEOGEO_BANK_CARTRIDGE)
-		, m_bank_audio_main(*this, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
-	{
-		m_has_audio_banking = true;
-		m_is_mvs = true;
-		m_is_cartsys = true;
-		m_has_sprite_bus = true;
-		m_has_text_bus = true;
-		m_has_ymrom_bus = true;
-		m_has_z80_bus = true;
-		m_bank_audio_cart[0] = NULL;
-		m_bank_audio_cart[1] = NULL;
-		m_bank_audio_cart[2] = NULL;
-		m_bank_audio_cart[3] = NULL;
-	}
+		: driver_device(mconfig, type, tag),
+		m_save_ram(*this, "save_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_upd4990a(*this, "upd4990a"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_sprites(*this, "sprites"),
+		m_region_fixed(*this, "fixed"),
+		m_region_fixedbios(*this, "fixedbios"),
+		m_bank_vectors(*this, NEOGEO_BANK_VECTORS),
+		m_bank_bios(*this, NEOGEO_BANK_BIOS),
+		m_bank_cartridge(*this, NEOGEO_BANK_CARTRIDGE),
+		m_bank_audio_main(*this, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK) {
+			m_has_audio_banking = true;
+			m_is_mvs = true;
+			m_is_cartsys = true;
+			m_has_sprite_bus = true;
+			m_has_text_bus = true;
+			m_has_ymrom_bus = true;
+			m_has_z80_bus = true;
+			m_bank_audio_cart[0] = NULL;
+			m_bank_audio_cart[1] = NULL;
+			m_bank_audio_cart[2] = NULL;
+			m_bank_audio_cart[3] = NULL;
+		}
 
 	/* memory pointers */
 //  UINT8      *memcard_data;   // this currently uses generic handlers

@@ -64,7 +64,7 @@ class acommand_state : public driver_device
 {
 public:
 	acommand_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ac_bgvram(*this, "ac_bgvram"),
 		m_ac_txvram(*this, "ac_txvram"),
 		m_spriteram(*this, "spriteram"),

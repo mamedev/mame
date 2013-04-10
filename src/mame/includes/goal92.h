@@ -8,7 +8,7 @@ class goal92_state : public driver_device
 {
 public:
 	goal92_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_data(*this, "bg_data"),
 		m_fg_data(*this, "fg_data"),
 		m_tx_data(*this, "tx_data"),

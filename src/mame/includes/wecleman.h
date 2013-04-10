@@ -2,7 +2,7 @@ class wecleman_state : public driver_device
 {
 public:
 	wecleman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videostatus(*this, "videostatus"),
 		m_protection_ram(*this, "protection_ram"),
 		m_blitter_regs(*this, "blitter_regs"),

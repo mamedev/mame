@@ -21,21 +21,20 @@ class pk8020_state : public driver_device
 {
 public:
 	pk8020_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ppi8255_1(*this, "ppi8255_1")
-		, m_ppi8255_2(*this, "ppi8255_2")
-		, m_ppi8255_3(*this, "ppi8255_3")
-		, m_rs232(*this, "rs232")
-		, m_lan(*this, "lan")
-		, m_ram(*this, RAM_TAG)
-		, m_wd1793(*this, "wd1793")
-		, m_pit8253(*this, "pit8253")
-		, m_pic8259(*this, "pic8259")
-		, m_speaker(*this, SPEAKER_TAG)
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_gfx1(*this, "gfx1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_ppi8255_3(*this, "ppi8255_3"),
+		m_rs232(*this, "rs232"),
+		m_lan(*this, "lan"),
+		m_ram(*this, RAM_TAG),
+		m_wd1793(*this, "wd1793"),
+		m_pit8253(*this, "pit8253"),
+		m_pic8259(*this, "pic8259"),
+		m_speaker(*this, SPEAKER_TAG),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_gfx1(*this, "gfx1") { }
 
 	UINT8 m_color;
 	UINT8 m_video_page;

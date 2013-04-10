@@ -24,26 +24,25 @@ class jr200_state : public driver_device
 {
 public:
 	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram")
-		, m_cram(*this, "cram")
-		, m_mn1271_ram(*this, "mn1271_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_beeper(*this, BEEPER_TAG)
-		, m_pcg(*this, "pcg")
-		, m_gfx_rom(*this, "gfx_rom")
-		, m_gfx_ram(*this, "gfx_ram")
-		, m_row0(*this, "ROW0")
-		, m_row1(*this, "ROW1")
-		, m_row2(*this, "ROW2")
-		, m_row3(*this, "ROW3")
-		, m_row4(*this, "ROW4")
-		, m_row5(*this, "ROW5")
-		, m_row6(*this, "ROW6")
-		, m_row7(*this, "ROW7")
-		, m_row8(*this, "ROW8")
-		, m_row9(*this, "ROW9")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"),
+		m_mn1271_ram(*this, "mn1271_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, BEEPER_TAG),
+		m_pcg(*this, "pcg"),
+		m_gfx_rom(*this, "gfx_rom"),
+		m_gfx_ram(*this, "gfx_ram"),
+		m_row0(*this, "ROW0"),
+		m_row1(*this, "ROW1"),
+		m_row2(*this, "ROW2"),
+		m_row3(*this, "ROW3"),
+		m_row4(*this, "ROW4"),
+		m_row5(*this, "ROW5"),
+		m_row6(*this, "ROW6"),
+		m_row7(*this, "ROW7"),
+		m_row8(*this, "ROW8"),
+		m_row9(*this, "ROW9") { }
 
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;

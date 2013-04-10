@@ -15,29 +15,28 @@ class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_videoram(*this,"videoram")
-		, m_cart_rom_size(0)
-		, m_cart_ram(NULL)
-		, m_cart_ram_size(0)
-		, m_maincpu(*this, "maincpu")
-		, m_upd1771c(*this, "upd1771c")
-		, m_pa0(*this, "PA0")
-		, m_pa1(*this, "PA1")
-		, m_pa2(*this, "PA2")
-		, m_pa3(*this, "PA3")
-		, m_pa4(*this, "PA4")
-		, m_pa5(*this, "PA5")
-		, m_pa6(*this, "PA6")
-		, m_pa7(*this, "PA7")
-		, m_pc0(*this, "PC0")
-		, m_bank0(*this, "bank0")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_charrom(*this, "charrom")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this,"videoram"),
+		m_cart_rom_size(0),
+		m_cart_ram(NULL),
+		m_cart_ram_size(0),
+		m_maincpu(*this, "maincpu"),
+		m_upd1771c(*this, "upd1771c"),
+		m_pa0(*this, "PA0"),
+		m_pa1(*this, "PA1"),
+		m_pa2(*this, "PA2"),
+		m_pa3(*this, "PA3"),
+		m_pa4(*this, "PA4"),
+		m_pa5(*this, "PA5"),
+		m_pa6(*this, "PA6"),
+		m_pa7(*this, "PA7"),
+		m_pc0(*this, "PC0"),
+		m_bank0(*this, "bank0"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_charrom(*this, "charrom") { }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);

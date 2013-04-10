@@ -580,8 +580,7 @@ class snes_state : public driver_device
 {
 public:
 	snes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		{ }
+		: driver_device(mconfig, type, tag) { }
 
 	/* misc */
 	UINT16                m_hblank_offset;

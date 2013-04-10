@@ -49,7 +49,7 @@ class galaxi_state : public driver_device
 {
 public:
 	galaxi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg1_ram(*this, "bg1_ram"),
 		m_bg2_ram(*this, "bg2_ram"),
 		m_bg3_ram(*this, "bg3_ram"),

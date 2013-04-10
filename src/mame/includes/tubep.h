@@ -2,7 +2,7 @@ class tubep_state : public driver_device
 {
 public:
 	tubep_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),
 		m_sprite_colorsharedram(*this, "sprite_color"),

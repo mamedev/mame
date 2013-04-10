@@ -275,7 +275,7 @@ class aristmk4_state : public driver_device
 {
 public:
 	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) ,
+	: driver_device(mconfig, type, tag),
 		m_mkiv_vram(*this, "mkiv_vram"){ }
 
 	int m_rtc_address_strobe;

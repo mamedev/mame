@@ -8,7 +8,7 @@ class opwolf_state : public driver_device
 {
 public:
 	opwolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"){ }

@@ -91,16 +91,15 @@ class gp32_state : public driver_device
 {
 public:
 	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_s3c240x_ram(*this, "s3c240x_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_smartmedia(*this, "smartmedia")
-		, m_dac1(*this, "dac1")
-		, m_dac2(*this, "dac2")
-		, m_nvram(*this, "nvram")
-		, m_io_in0(*this, "IN0")
-		, m_io_in1(*this, "IN1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_s3c240x_ram(*this, "s3c240x_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_smartmedia(*this, "smartmedia"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
+		m_nvram(*this, "nvram"),
+		m_io_in0(*this, "IN0"),
+		m_io_in1(*this, "IN1") { }
 
 	virtual void video_start();
 

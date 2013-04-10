@@ -92,7 +92,7 @@ class blackt96_state : public driver_device
 {
 public:
 	blackt96_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_tilemapram(*this, "tilemapram"),
 		m_spriteram0(*this, "spriteram0"),
 		m_spriteram1(*this, "spriteram1"),

@@ -8,7 +8,7 @@ class playch10_state : public driver_device
 {
 public:
 	playch10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ram_8w(*this, "ram_8w"),
 		m_videoram(*this, "videoram"),
 		m_timedata(*this, "timedata"),

@@ -4,7 +4,7 @@ class portrait_state : public driver_device
 {
 public:
 	portrait_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_tms(*this, "tms"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),

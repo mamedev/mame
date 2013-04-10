@@ -23,7 +23,7 @@ class pzletime_state : public driver_device
 {
 public:
 	pzletime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_video_regs(*this, "video_regs"),
 		m_tilemap_regs(*this, "tilemap_regs"),
 		m_bg_videoram(*this, "bg_videoram"),

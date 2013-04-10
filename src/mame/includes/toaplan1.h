@@ -8,7 +8,7 @@ class toaplan1_state : public driver_device
 {
 public:
 	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_colorram1(*this, "colorram1"),
 		m_colorram2(*this, "colorram2"),
 		m_sharedram(*this, "sharedram"),

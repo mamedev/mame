@@ -26,7 +26,7 @@ class pv9234_state : public driver_device
 {
 public:
 	pv9234_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_p_ram(*this, "p_ram"){ }
 
 	DECLARE_WRITE32_MEMBER(debug_w);

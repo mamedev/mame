@@ -44,7 +44,7 @@ class skimaxx_state : public driver_device
 {
 public:
 	skimaxx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_blitter_regs(*this, "blitter_regs"),
 		m_fpga_ctrl(*this, "fpga_ctrl"),
 		m_fg_buffer(*this, "fg_buffer"){ }

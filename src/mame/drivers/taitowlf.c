@@ -44,17 +44,16 @@ class taitowlf_state : public driver_device
 {
 public:
 	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_pit8254(*this, "pit8254")
-		, m_pic8259_1(*this, "pic8259_1")
-		, m_pic8259_2(*this, "pic8259_2")
-		, m_dma8237_1(*this, "dma8237_1")
-		, m_dma8237_2(*this, "dma8237_2")
-		, m_region_user1(*this, "user1")
-		, m_region_user5(*this, "user5")
-		, m_bank1(*this, "bank1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pit8254(*this, "pit8254"),
+		m_pic8259_1(*this, "pic8259_1"),
+		m_pic8259_2(*this, "pic8259_2"),
+		m_dma8237_1(*this, "dma8237_1"),
+		m_dma8237_2(*this, "dma8237_2"),
+		m_region_user1(*this, "user1"),
+		m_region_user5(*this, "user5"),
+		m_bank1(*this, "bank1") { }
 
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];

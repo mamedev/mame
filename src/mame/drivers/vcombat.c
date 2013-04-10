@@ -94,7 +94,7 @@ class vcombat_state : public driver_device
 {
 public:
 	vcombat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
 		m_vid_0_shared_ram(*this, "vid_0_ram"),
 		m_vid_1_shared_ram(*this, "vid_1_ram"),

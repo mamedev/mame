@@ -19,7 +19,7 @@ class destroyr_state : public driver_device
 {
 public:
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_nuram"),
 		m_major_obj_ram(*this, "major_obj_ram"),
 		m_minor_obj_ram(*this, "minor_obj_ram"),

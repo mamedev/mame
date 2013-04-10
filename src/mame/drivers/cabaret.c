@@ -30,7 +30,7 @@ class cabaret_state : public driver_device
 {
 public:
 	cabaret_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
 		m_fg_color_ram(*this, "fg_color_ram"),
 		m_bg_scroll(*this, "bg_scroll"),

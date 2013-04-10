@@ -17,15 +17,14 @@ class mini2440_state : public driver_device
 {
 public:
 	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_s3c2440(*this, "s3c2440")
-		, m_nand(*this, "nand")
-		, m_dac1(*this, "dac1")
-		, m_dac2(*this, "dac2")
-		, m_penx(*this, "PENX")
-		, m_peny(*this, "PENY")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_s3c2440(*this, "s3c2440"),
+		m_nand(*this, "nand"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"),
+		m_penx(*this, "PENX"),
+		m_peny(*this, "PENY") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_s3c2440;

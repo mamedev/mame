@@ -98,7 +98,7 @@ class spool99_state : public driver_device
 {
 public:
 	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"){ }

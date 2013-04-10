@@ -8,7 +8,7 @@ class gbusters_state : public driver_device
 {
 public:
 	gbusters_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"){ }

@@ -167,7 +167,7 @@ class firebeat_state : public driver_device
 {
 public:
 	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"){ }
 
 	UINT8 m_extend_board_irq_enable;

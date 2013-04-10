@@ -2,7 +2,7 @@ class tatsumi_state : public driver_device
 {
 public:
 	tatsumi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_cyclwarr_cpua_ram(*this, "cw_cpua_ram"),
 		m_cyclwarr_cpub_ram(*this, "cw_cpub_ram"),

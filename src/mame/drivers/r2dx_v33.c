@@ -29,7 +29,7 @@ class r2dx_v33_state : public driver_device
 {
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_md_vram(*this, "md_vram"),

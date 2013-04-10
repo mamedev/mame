@@ -25,43 +25,42 @@ class trs80_state : public driver_device
 {
 public:
 	trs80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_printer(*this, "centronics")
-		, m_ay31015(*this, "tr1602")
-		, m_fdc(*this, "wd179x")
-		, m_speaker(*this, SPEAKER_TAG)
-		, m_cass(*this, CASSETTE_TAG)
-		, m_p_videoram(*this, "p_videoram")
-		, m_region_maincpu(*this, "maincpu")
-		, m_io_config(*this, "CONFIG")
-		, m_io_line0(*this, "LINE0")
-		, m_io_line1(*this, "LINE1")
-		, m_io_line2(*this, "LINE2")
-		, m_io_line3(*this, "LINE3")
-		, m_io_line4(*this, "LINE4")
-		, m_io_line5(*this, "LINE5")
-		, m_io_line6(*this, "LINE6")
-		, m_io_line7(*this, "LINE7")
-		, m_bank1(NULL)
-		, m_bank2(NULL)
-		, m_bank3(NULL)
-		, m_bank4(NULL)
-		, m_bank5(NULL)
-		, m_bank6(NULL)
-		, m_bank7(NULL)
-		, m_bank8(NULL)
-		, m_bank9(NULL)
-		, m_bank11(NULL)
-		, m_bank12(NULL)
-		, m_bank13(NULL)
-		, m_bank14(NULL)
-		, m_bank15(NULL)
-		, m_bank16(NULL)
-		, m_bank17(NULL)
-		, m_bank18(NULL)
-		, m_bank19(NULL)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_printer(*this, "centronics"),
+		m_ay31015(*this, "tr1602"),
+		m_fdc(*this, "wd179x"),
+		m_speaker(*this, SPEAKER_TAG),
+		m_cass(*this, CASSETTE_TAG),
+		m_p_videoram(*this, "p_videoram"),
+		m_region_maincpu(*this, "maincpu"),
+		m_io_config(*this, "CONFIG"),
+		m_io_line0(*this, "LINE0"),
+		m_io_line1(*this, "LINE1"),
+		m_io_line2(*this, "LINE2"),
+		m_io_line3(*this, "LINE3"),
+		m_io_line4(*this, "LINE4"),
+		m_io_line5(*this, "LINE5"),
+		m_io_line6(*this, "LINE6"),
+		m_io_line7(*this, "LINE7"),
+		m_bank1(NULL),
+		m_bank2(NULL),
+		m_bank3(NULL),
+		m_bank4(NULL),
+		m_bank5(NULL),
+		m_bank6(NULL),
+		m_bank7(NULL),
+		m_bank8(NULL),
+		m_bank9(NULL),
+		m_bank11(NULL),
+		m_bank12(NULL),
+		m_bank13(NULL),
+		m_bank14(NULL),
+		m_bank15(NULL),
+		m_bank16(NULL),
+		m_bank17(NULL),
+		m_bank18(NULL),
+		m_bank19(NULL) { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_printer;

@@ -27,7 +27,7 @@ class tank8_state : public driver_device
 {
 public:
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_pos_h_ram(*this, "pos_h_ram"),
 		m_pos_v_ram(*this, "pos_v_ram"),

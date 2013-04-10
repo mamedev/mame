@@ -17,37 +17,36 @@ class pmd85_state : public driver_device
 {
 public:
 	pmd85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, RAM_TAG)
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_sercas(*this, "sercas")
-		, m_pit8253(*this, "pit8253")
-		, m_uart(*this, "uart")
-		, m_ppi8255_0(*this, "ppi8255_0")
-		, m_ppi8255_1(*this, "ppi8255_1")
-		, m_ppi8255_2(*this, "ppi8255_2")
-		, m_ppi8255_3(*this, "ppi8255_3")
-		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
-		, m_bank9(*this, "bank9")
-		, m_bank10(*this, "bank10")
-		, m_bank11(*this, "bank11")
-		, m_bank12(*this, "bank12")
-		, m_bank13(*this, "bank13")
-		, m_bank14(*this, "bank14")
-		, m_bank15(*this, "bank15")
-		, m_bank16(*this, "bank16")
-		, m_io_reset(*this, "RESET")
-		, m_io_dsw0(*this, "DSW0")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_cassette(*this, CASSETTE_TAG),
+		m_sercas(*this, "sercas"),
+		m_pit8253(*this, "pit8253"),
+		m_uart(*this, "uart"),
+		m_ppi8255_0(*this, "ppi8255_0"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_ppi8255_3(*this, "ppi8255_3"),
+		m_region_maincpu(*this, "maincpu"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_bank8(*this, "bank8"),
+		m_bank9(*this, "bank9"),
+		m_bank10(*this, "bank10"),
+		m_bank11(*this, "bank11"),
+		m_bank12(*this, "bank12"),
+		m_bank13(*this, "bank13"),
+		m_bank14(*this, "bank14"),
+		m_bank15(*this, "bank15"),
+		m_bank16(*this, "bank16"),
+		m_io_reset(*this, "RESET"),
+		m_io_dsw0(*this, "DSW0") { }
 
 	UINT8 m_rom_module_present;
 	UINT8 m_ppi_port_outputs[4][3];

@@ -4,7 +4,7 @@ class system1_state : public driver_device
 {
 public:
 	system1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),

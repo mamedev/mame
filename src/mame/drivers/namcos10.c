@@ -272,9 +272,7 @@ class namcos10_state : public driver_device
 {
 public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{
-	}
+		: driver_device(mconfig, type, tag) { }
 
 	// memm variant interface
 	DECLARE_WRITE32_MEMBER(key_w);

@@ -2,7 +2,7 @@ class dcon_state : public driver_device
 {
 public:
 	dcon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),

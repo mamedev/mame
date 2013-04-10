@@ -2,7 +2,7 @@ class xain_state : public driver_device
 {
 public:
 	xain_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_charram(*this, "charram"),
 		m_bgram0(*this, "bgram0"),
 		m_bgram1(*this, "bgram1"),

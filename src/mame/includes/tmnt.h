@@ -4,7 +4,7 @@ class tmnt_state : public driver_device
 {
 public:
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_tmnt2_rom(*this, "tmnt2_rom"),
 		m_sunset_104000(*this, "sunset_104000"),

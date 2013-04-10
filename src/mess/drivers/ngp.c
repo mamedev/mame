@@ -122,28 +122,27 @@ class ngp_state : public driver_device, public device_nvram_interface
 {
 public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, device_nvram_interface(mconfig, *this)
-		, m_tlcs900( *this, "maincpu" )
-		, m_z80( *this, "soundcpu" )
-		, m_t6w28( *this, "t6w28" )
-		, m_dac_l( *this, "dac_l" )
-		, m_dac_r( *this, "dac_r" )
-		, m_mainram( *this, "mainram" )
-		, m_k1ge( *this, "k1ge" )
-		, m_io_controls( *this, "Controls" )
-		, m_io_power( *this, "Power" )
-	{
-		m_flash_chip[0].present = 0;
-		m_flash_chip[0].state = F_READ;
-		m_flash_chip[0].data = NULL;
+		: driver_device(mconfig, type, tag),
+		device_nvram_interface(mconfig, *this),
+		m_tlcs900( *this, "maincpu" ),
+		m_z80( *this, "soundcpu" ),
+		m_t6w28( *this, "t6w28" ),
+		m_dac_l( *this, "dac_l" ),
+		m_dac_r( *this, "dac_r" ),
+		m_mainram( *this, "mainram" ),
+		m_k1ge( *this, "k1ge" ),
+		m_io_controls( *this, "Controls" ),
+		m_io_power( *this, "Power" ) {
+			m_flash_chip[0].present = 0;
+			m_flash_chip[0].state = F_READ;
+			m_flash_chip[0].data = NULL;
 
-		m_flash_chip[1].present = 0;
-		m_flash_chip[1].state = F_READ;
-		m_flash_chip[1].data = NULL;
+			m_flash_chip[1].present = 0;
+			m_flash_chip[1].state = F_READ;
+			m_flash_chip[1].data = NULL;
 
-		m_nvram_loaded = false;
-	}
+			m_nvram_loaded = false;
+		}
 
 	virtual void machine_start();
 	virtual void machine_reset();

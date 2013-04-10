@@ -117,7 +117,7 @@ class ddealer_state : public driver_device
 {
 public:
 	ddealer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vregs(*this, "vregs"),
 		m_left_fg_vram_top(*this, "left_fg_vratop"),
 		m_right_fg_vram_top(*this, "right_fg_vratop"),

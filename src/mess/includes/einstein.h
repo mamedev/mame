@@ -48,34 +48,33 @@ class einstein_state : public driver_device
 {
 public:
 	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_fdc(*this, IC_I042)
-		, m_color_screen(*this, "screen")
-		, m_ctc(*this, IC_I058)
-		, m_tms9929a(*this, "tms9929a")
-		, m_region_gfx1(*this, "gfx1")
-		, m_mc6845(*this, "crtc")
-		, m_crtc_screen(*this, "80column")
-		, m_uart(*this, IC_I060)
-		, m_ram(*this, RAM_TAG)
-		, m_centronics(*this, "centronics")
-		, m_region_bios(*this, "bios")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-		, m_line5(*this, "LINE5")
-		, m_line6(*this, "LINE6")
-		, m_line7(*this, "LINE7")
-		, m_extra(*this, "EXTRA")
-		, m_buttons(*this, "BUTTONS")
-		, m_config(*this, "config")
-		, m_80column_dips(*this, "80column_dips")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_fdc(*this, IC_I042),
+		m_color_screen(*this, "screen"),
+		m_ctc(*this, IC_I058),
+		m_tms9929a(*this, "tms9929a"),
+		m_region_gfx1(*this, "gfx1"),
+		m_mc6845(*this, "crtc"),
+		m_crtc_screen(*this, "80column"),
+		m_uart(*this, IC_I060),
+		m_ram(*this, RAM_TAG),
+		m_centronics(*this, "centronics"),
+		m_region_bios(*this, "bios"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4"),
+		m_line5(*this, "LINE5"),
+		m_line6(*this, "LINE6"),
+		m_line7(*this, "LINE7"),
+		m_extra(*this, "EXTRA"),
+		m_buttons(*this, "BUTTONS"),
+		m_config(*this, "config"),
+		m_80column_dips(*this, "80column_dips") { }
 
 	required_device<wd1770_t> m_fdc;
 	required_device<screen_device> m_color_screen;

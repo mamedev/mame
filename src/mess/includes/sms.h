@@ -26,21 +26,19 @@ public:
 
 public:
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_main_cpu(*this, "maincpu")
-		, m_control_cpu(*this, "control")
-		, m_vdp(*this, "sms_vdp")
-		, m_main_scr(*this, "screen")
-		, m_is_gamegear(0)
-		, m_is_region_japan(0)
-		, m_has_bios_0400(0)
-		, m_has_bios_2000(0)
-		, m_has_bios_full(0)
-		, m_has_bios(0)
-		, m_has_fm(0)
-		, m_mainram(*this, "mainram")
-	{
-	}
+		: driver_device(mconfig, type, tag),
+		m_main_cpu(*this, "maincpu"),
+		m_control_cpu(*this, "control"),
+		m_vdp(*this, "sms_vdp"),
+		m_main_scr(*this, "screen"),
+		m_is_gamegear(0),
+		m_is_region_japan(0),
+		m_has_bios_0400(0),
+		m_has_bios_2000(0),
+		m_has_bios_full(0),
+		m_has_bios(0),
+		m_has_fm(0),
+		m_mainram(*this, "mainram") { }
 
 	// device_ts
 	required_device<cpu_device> m_main_cpu;

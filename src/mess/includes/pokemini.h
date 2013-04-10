@@ -48,13 +48,12 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_p_ram(*this, "p_ram")
-		, m_speaker(*this, SPEAKER_TAG)
-		, m_i2cmem(*this, "i2cmem")
-		, m_inputs(*this, "INPUTS")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_p_ram(*this, "p_ram"),
+		m_speaker(*this, SPEAKER_TAG),
+		m_i2cmem(*this, "i2cmem"),
+		m_inputs(*this, "INPUTS") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;

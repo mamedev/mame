@@ -2,7 +2,7 @@ class punchout_state : public driver_device
 {
 public:
 	punchout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_top_videoram(*this, "bg_top_videoram"),
 		m_spr1_ctrlram(*this, "spr1_ctrlram"),
 		m_spr2_ctrlram(*this, "spr2_ctrlram"),

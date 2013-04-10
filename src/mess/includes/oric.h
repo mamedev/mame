@@ -70,31 +70,30 @@ class oric_state : public driver_device
 {
 public:
 	oric_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_ram(*this, "ram")
-		, m_maincpu(*this, "maincpu")
-		, m_ay8912(*this, "ay8912")
-		, m_centronics(*this, "centronics")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_via6522_0(*this, "via6522_0")
-		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(NULL)
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_io_row0(*this, "ROW0")
-		, m_io_row1(*this, "ROW1")
-		, m_io_row2(*this, "ROW2")
-		, m_io_row3(*this, "ROW3")
-		, m_io_row4(*this, "ROW4")
-		, m_io_row5(*this, "ROW5")
-		, m_io_row6(*this, "ROW6")
-		, m_io_row7(*this, "ROW7")
-		, m_io_floppy(*this, "FLOPPY")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu"),
+		m_ay8912(*this, "ay8912"),
+		m_centronics(*this, "centronics"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_via6522_0(*this, "via6522_0"),
+		m_region_maincpu(*this, "maincpu"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(NULL),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_io_row0(*this, "ROW0"),
+		m_io_row1(*this, "ROW1"),
+		m_io_row2(*this, "ROW2"),
+		m_io_row3(*this, "ROW3"),
+		m_io_row4(*this, "ROW4"),
+		m_io_row5(*this, "ROW5"),
+		m_io_row6(*this, "ROW6"),
+		m_io_row7(*this, "ROW7"),
+		m_io_floppy(*this, "FLOPPY") { }
 
 	optional_shared_ptr<UINT8> m_ram;
 	bool m_is_telestrat;

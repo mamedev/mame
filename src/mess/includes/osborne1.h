@@ -23,28 +23,27 @@ class osborne1_state : public driver_device
 {
 public:
 	osborne1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_pia0(*this, "pia_0")
-		, m_pia1(*this, "pia_1")
-		, m_fdc(*this, "mb8877")
-		, m_beep(*this, BEEPER_TAG)
-		, m_ram(*this, RAM_TAG)
-		, m_ieee(*this, IEEE488_TAG)
-		, m_row0(*this, "ROW0")
-		, m_row1(*this, "ROW1")
-		, m_row2(*this, "ROW2")
-		, m_row3(*this, "ROW3")
-		, m_row4(*this, "ROW4")
-		, m_row5(*this, "ROW5")
-		, m_row6(*this, "ROW6")
-		, m_row7(*this, "ROW7")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_region_maincpu(*this, "maincpu")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pia0(*this, "pia_0"),
+		m_pia1(*this, "pia_1"),
+		m_fdc(*this, "mb8877"),
+		m_beep(*this, BEEPER_TAG),
+		m_ram(*this, RAM_TAG),
+		m_ieee(*this, IEEE488_TAG),
+		m_row0(*this, "ROW0"),
+		m_row1(*this, "ROW1"),
+		m_row2(*this, "ROW2"),
+		m_row3(*this, "ROW3"),
+		m_row4(*this, "ROW4"),
+		m_row5(*this, "ROW5"),
+		m_row6(*this, "ROW6"),
+		m_row7(*this, "ROW7"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_region_maincpu(*this, "maincpu") { }
 
 	virtual void video_start();
 

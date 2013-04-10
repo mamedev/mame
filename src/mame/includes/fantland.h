@@ -4,7 +4,7 @@ class fantland_state : public driver_device
 {
 public:
 	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram", 0),
 		m_spriteram2(*this, "spriteram2", 0){ }
 

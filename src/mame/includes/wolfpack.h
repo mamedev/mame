@@ -2,7 +2,7 @@ class wolfpack_state : public driver_device
 {
 public:
 	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_alpha_num_ram(*this, "alpha_num_ram"){ }
 
 	int m_collision;

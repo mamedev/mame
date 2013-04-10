@@ -8,7 +8,7 @@ class contra_state : public driver_device
 {
 public:
 	contra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_fg_cram(*this, "fg_cram"),
 		m_fg_vram(*this, "fg_vram"),

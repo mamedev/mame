@@ -229,7 +229,7 @@ class witch_state : public driver_device
 {
 public:
 	witch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_gfx0_vram(*this, "gfx0_vram"),
 		m_gfx0_cram(*this, "gfx0_cram"),
 		m_gfx1_vram(*this, "gfx1_vram"),

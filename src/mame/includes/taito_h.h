@@ -8,7 +8,7 @@ class taitoh_state : public driver_device
 {
 public:
 	taitoh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_m68000_mainram(*this, "m68000_mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"){ }

@@ -28,11 +28,10 @@ class microvision_state : public driver_device
 {
 public:
 	microvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_dac( *this, "dac" )
-		, m_i8021( *this, "maincpu1" )
-		, m_tms1100( *this, "maincpu2" )
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_dac( *this, "dac" ),
+		m_i8021( *this, "maincpu1" ),
+		m_tms1100( *this, "maincpu2" ) { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

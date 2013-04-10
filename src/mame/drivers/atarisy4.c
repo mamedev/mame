@@ -24,7 +24,7 @@ class atarisy4_state : public driver_device
 {
 public:
 	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_m68k_ram(*this, "m68k_ram"),
 		m_screen_ram(*this, "screen_ram"){ }
 

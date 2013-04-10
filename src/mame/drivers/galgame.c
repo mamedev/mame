@@ -18,7 +18,7 @@ class galaxygame_state : public driver_device
 {
 public:
 	galaxygame_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) {}
+		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_clk;
 

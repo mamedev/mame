@@ -135,13 +135,12 @@ class _3do_state : public driver_device
 {
 public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_dram(*this, "dram")
-		, m_vram(*this, "vram")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_dram(*this, "dram"),
+		m_vram(*this, "vram"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_dram;

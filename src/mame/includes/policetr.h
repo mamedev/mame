@@ -8,7 +8,7 @@ class policetr_state : public driver_device
 {
 public:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"){ }
 
 	UINT32 m_control_data;

@@ -3,7 +3,7 @@ class fitfight_state : public driver_device
 {
 public:
 	fitfight_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fof_100000(*this, "fof_100000"),
 		m_fof_600000(*this, "fof_600000"),
 		m_fof_700000(*this, "fof_700000"),

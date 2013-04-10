@@ -32,7 +32,7 @@ class tickee_state : public driver_device
 {
 public:
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
 		m_vram(*this, "vram"),
 		m_control(*this, "control"){ }

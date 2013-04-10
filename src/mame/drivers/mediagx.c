@@ -90,7 +90,7 @@ class mediagx_state : public driver_device
 {
 public:
 	mediagx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_cga_ram(*this, "cga_ram"),
 		m_bios_ram(*this, "bios_ram"),

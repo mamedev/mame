@@ -15,17 +15,16 @@ class pecom_state : public driver_device
 {
 public:
 	pecom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_cdp1802(*this, CDP1802_TAG)
-		, m_cdp1869(*this, CDP1869_TAG)
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_ram(*this, RAM_TAG)
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_io_cnt(*this, "CNT")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_cdp1802(*this, CDP1802_TAG),
+		m_cdp1869(*this, CDP1869_TAG),
+		m_cassette(*this, CASSETTE_TAG),
+		m_ram(*this, RAM_TAG),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_io_cnt(*this, "CNT") { }
 
 	required_device<cosmac_device> m_cdp1802;
 	required_device<cdp1869_device> m_cdp1869;

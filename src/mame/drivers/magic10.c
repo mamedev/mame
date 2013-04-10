@@ -89,7 +89,7 @@ class magic10_state : public driver_device
 {
 public:
 	magic10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_layer0_videoram(*this, "layer0_videoram"),
 		m_layer1_videoram(*this, "layer1_videoram"),
 		m_layer2_videoram(*this, "layer2_videoram"),

@@ -412,8 +412,7 @@ class triforce_state : public driver_device
 {
 public:
 	triforce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{ }
+		: driver_device(mconfig, type, tag) { }
 
 	DECLARE_READ64_MEMBER(gc_pi_r);
 	DECLARE_WRITE64_MEMBER(gc_pi_w);

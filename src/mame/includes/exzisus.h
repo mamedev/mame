@@ -2,7 +2,7 @@ class exzisus_state : public driver_device
 {
 public:
 	exzisus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_objectram1(*this, "objectram1"),
 		m_videoram1(*this, "videoram1"),
 		m_sharedram_ac(*this, "sharedram_ac"),

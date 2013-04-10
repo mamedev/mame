@@ -8,7 +8,7 @@ class mermaid_state : public driver_device
 {
 public:
 	mermaid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram2(*this, "videoram2"),
 		m_videoram(*this, "videoram"),
 		m_bg_scrollram(*this, "bg_scrollram"),

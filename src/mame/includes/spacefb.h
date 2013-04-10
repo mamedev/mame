@@ -28,7 +28,7 @@ class spacefb_state : public driver_device
 {
 public:
 	spacefb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"){ }
 
 	UINT8 m_sound_latch;

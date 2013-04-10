@@ -24,27 +24,26 @@ class bbc_state : public driver_device
 {
 public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_mc6845(*this, "mc6845")
-		, m_sn(*this, "sn76489")
-		, m_trom(*this, "saa505x")
-		, m_ACCCON_IRR(CLEAR_LINE)
-		, m_via_system_irq(CLEAR_LINE)
-		, m_via_user_irq(CLEAR_LINE)
-		, m_acia_irq(CLEAR_LINE)
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_user1(*this, "user1")
-		, m_region_user2(*this, "user2")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mc6845(*this, "mc6845"),
+		m_sn(*this, "sn76489"),
+		m_trom(*this, "saa505x"),
+		m_ACCCON_IRR(CLEAR_LINE),
+		m_via_system_irq(CLEAR_LINE),
+		m_via_user_irq(CLEAR_LINE),
+		m_acia_irq(CLEAR_LINE),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_user1(*this, "user1"),
+		m_region_user2(*this, "user2"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_bank8(*this, "bank8") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_mc6845;

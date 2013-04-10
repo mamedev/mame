@@ -95,7 +95,7 @@ class mil4000_state : public driver_device
 {
 public:
 	mil4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_sc0_vram(*this, "sc0_vram"),
 		m_sc1_vram(*this, "sc1_vram"),
 		m_sc2_vram(*this, "sc2_vram"),

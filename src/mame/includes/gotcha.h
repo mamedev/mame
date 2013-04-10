@@ -10,7 +10,7 @@ class gotcha_state : public driver_device
 {
 public:
 	gotcha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),

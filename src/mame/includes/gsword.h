@@ -2,7 +2,7 @@ class gsword_state : public driver_device
 {
 public:
 	gsword_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_spritetile_ram(*this, "spritetile_ram"),
 		m_spritexy_ram(*this, "spritexy_ram"),
 		m_spriteattrib_ram(*this, "spriteattram"),

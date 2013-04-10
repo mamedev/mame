@@ -51,22 +51,21 @@ class d6800_state : public driver_device
 {
 public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cass(*this, CASSETTE_TAG)
-		, m_pia(*this, "pia")
-		, m_dac(*this, "dac")
-		, m_videoram(*this, "videoram")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
-		, m_io_y0(*this, "Y0")
-		, m_io_y1(*this, "Y1")
-		, m_io_y2(*this, "Y2")
-		, m_io_y3(*this, "Y3")
-		, m_io_shift(*this, "SHIFT")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cass(*this, CASSETTE_TAG),
+		m_pia(*this, "pia"),
+		m_dac(*this, "dac"),
+		m_videoram(*this, "videoram"),
+		m_io_x0(*this, "X0"),
+		m_io_x1(*this, "X1"),
+		m_io_x2(*this, "X2"),
+		m_io_x3(*this, "X3"),
+		m_io_y0(*this, "Y0"),
+		m_io_y1(*this, "Y1"),
+		m_io_y2(*this, "Y2"),
+		m_io_y3(*this, "Y3"),
+		m_io_shift(*this, "SHIFT") { }
 
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );

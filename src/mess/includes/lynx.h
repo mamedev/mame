@@ -96,7 +96,7 @@ class lynx_state : public driver_device
 {
 public:
 	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mem_0000(*this, "mem_0000"),
 		m_mem_fc00(*this, "mem_fc00"),
 		m_mem_fd00(*this, "mem_fd00"),

@@ -4,7 +4,7 @@ class galaga_state : public driver_device
 {
 public:
 	galaga_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_galaga_ram1(*this, "galaga_ram1"),
 		m_galaga_ram2(*this, "galaga_ram2"),

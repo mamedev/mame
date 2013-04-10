@@ -26,7 +26,7 @@ class backfire_state : public driver_device
 {
 public:
 	backfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),

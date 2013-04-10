@@ -17,26 +17,25 @@ class a7800_state : public driver_device
 {
 public:
 	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_pokey(*this, "pokey")
-		, m_tia(*this, "tia")
-		, m_screen(*this, "screen")
-		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_io_joysticks(*this, "joysticks")
-		, m_io_buttons(*this, "buttons")
-		, m_io_vblank(*this, "vblank")
-		, m_io_console_buttons(*this, "console_buttons")
-		, m_bank10(NULL)
-		, m_bank11(NULL)
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_pokey(*this, "pokey"),
+		m_tia(*this, "tia"),
+		m_screen(*this, "screen"),
+		m_region_maincpu(*this, "maincpu"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_io_joysticks(*this, "joysticks"),
+		m_io_buttons(*this, "buttons"),
+		m_io_vblank(*this, "vblank"),
+		m_io_console_buttons(*this, "console_buttons"),
+		m_bank10(NULL),
+		m_bank11(NULL) { }
 
 	int m_lines;
 	int m_ispal;

@@ -20,24 +20,23 @@ class zx_state : public driver_device
 {
 public:
 	zx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_ram(*this, RAM_TAG)
-		, m_screen(*this, "screen")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_speaker(*this, SPEAKER_TAG)
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_gfx1(*this, "gfx1")
-		, m_io_row0(*this, "ROW0")
-		, m_io_row1(*this, "ROW1")
-		, m_io_row2(*this, "ROW2")
-		, m_io_row3(*this, "ROW3")
-		, m_io_row4(*this, "ROW4")
-		, m_io_row5(*this, "ROW5")
-		, m_io_row6(*this, "ROW6")
-		, m_io_row7(*this, "ROW7")
-		, m_io_config(*this, "CONFIG")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_screen(*this, "screen"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_speaker(*this, SPEAKER_TAG),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_gfx1(*this, "gfx1"),
+		m_io_row0(*this, "ROW0"),
+		m_io_row1(*this, "ROW1"),
+		m_io_row2(*this, "ROW2"),
+		m_io_row3(*this, "ROW3"),
+		m_io_row4(*this, "ROW4"),
+		m_io_row5(*this, "ROW5"),
+		m_io_row6(*this, "ROW6"),
+		m_io_row7(*this, "ROW7"),
+		m_io_config(*this, "CONFIG") { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -2,7 +2,7 @@ class vball_state : public driver_device
 {
 public:
 	vball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vb_attribram(*this, "vb_attribram"),
 		m_vb_videoram(*this, "vb_videoram"),
 		m_vb_scrolly_lo(*this, "vb_scrolly_lo"),

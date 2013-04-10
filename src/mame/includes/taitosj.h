@@ -2,7 +2,7 @@ class taitosj_state : public driver_device
 {
 public:
 	taitosj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram_1(*this, "videoram_1"),
 		m_videoram_2(*this, "videoram_2"),
 		m_videoram_3(*this, "videoram_3"),

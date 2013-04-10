@@ -9,7 +9,7 @@ class dday_state : public driver_device
 {
 public:
 	dday_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_textvideoram(*this, "textvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),

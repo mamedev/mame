@@ -18,7 +18,7 @@ class cultures_state : public driver_device
 {
 public:
 	cultures_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg0_videoram(*this, "bg0_videoram"),
 		m_bg0_regs_x(*this, "bg0_regs_x"),
 		m_bg0_regs_y(*this, "bg0_regs_y"),

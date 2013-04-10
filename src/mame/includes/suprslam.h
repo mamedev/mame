@@ -8,7 +8,7 @@ class suprslam_state : public driver_device
 {
 public:
 	suprslam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_screen_videoram(*this, "screen_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_sp_videoram(*this, "sp_videoram"),

@@ -2,7 +2,7 @@ class namcos86_state : public driver_device
 {
 public:
 	namcos86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_rthunder_videoram1(*this, "videoram1"),
 		m_rthunder_videoram2(*this, "videoram2"),
 		m_rthunder_spriteram(*this, "spriteram"){ }

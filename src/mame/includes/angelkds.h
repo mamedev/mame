@@ -8,7 +8,7 @@ class angelkds_state : public driver_device
 {
 public:
 	angelkds_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bgtopvideoram(*this, "bgtopvideoram"),
 		m_bgbotvideoram(*this, "bgbotvideoram"),
 		m_txvideoram(*this, "txvideoram"),

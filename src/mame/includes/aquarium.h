@@ -5,7 +5,7 @@ class aquarium_state : public driver_device
 {
 public:
 	aquarium_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_bak_videoram(*this, "bak_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),

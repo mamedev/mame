@@ -11,7 +11,7 @@ class esd16_state : public driver_device
 {
 public:
 	esd16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vram_0(*this, "vram_0"),
 		m_vram_1(*this, "vram_1"),
 		m_scroll_0(*this, "scroll_0"),

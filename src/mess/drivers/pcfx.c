@@ -24,10 +24,9 @@ class pcfx_state : public driver_device
 {
 public:
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_huc6261(*this, "huc6261")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_huc6261(*this, "huc6261") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;

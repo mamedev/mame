@@ -39,7 +39,7 @@ class pinkiri8_state : public driver_device
 {
 public:
 	pinkiri8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_janshi_back_vram(*this, "back_vram"),
 		m_janshi_vram1(*this, "vram1"),
 		m_janshi_unk1(*this, "unk1"),

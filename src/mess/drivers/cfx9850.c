@@ -25,22 +25,21 @@ class cfx9850_state : public driver_device
 {
 public:
 	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_video_ram(*this, "video_ram")
-		, m_display_ram(*this, "display_ram")
-		, m_ko1(*this, "KO1")
-		, m_ko2(*this, "KO2")
-		, m_ko3(*this, "KO3")
-		, m_ko4(*this, "KO4")
-		, m_ko5(*this, "KO5")
-		, m_ko6(*this, "KO6")
-		, m_ko7(*this, "KO7")
-		, m_ko8(*this, "KO8")
-		, m_ko9(*this, "KO9")
-		, m_ko10(*this, "KO10")
-		, m_ko11(*this, "KO11")
-		, m_ko12(*this, "KO12")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_video_ram(*this, "video_ram"),
+		m_display_ram(*this, "display_ram"),
+		m_ko1(*this, "KO1"),
+		m_ko2(*this, "KO2"),
+		m_ko3(*this, "KO3"),
+		m_ko4(*this, "KO4"),
+		m_ko5(*this, "KO5"),
+		m_ko6(*this, "KO6"),
+		m_ko7(*this, "KO7"),
+		m_ko8(*this, "KO8"),
+		m_ko9(*this, "KO9"),
+		m_ko10(*this, "KO10"),
+		m_ko11(*this, "KO11"),
+		m_ko12(*this, "KO12") { }
 
 	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);

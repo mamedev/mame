@@ -5,7 +5,7 @@ class dec0_state : public driver_device
 {
 public:
 	dec0_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),

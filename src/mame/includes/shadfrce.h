@@ -2,7 +2,7 @@ class shadfrce_state : public driver_device
 {
 public:
 	shadfrce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg0videoram(*this, "bg0videoram"),
 		m_bg1videoram(*this, "bg1videoram"),

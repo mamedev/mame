@@ -8,7 +8,7 @@ class bankp_state : public driver_device
 {
 public:
 	bankp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),

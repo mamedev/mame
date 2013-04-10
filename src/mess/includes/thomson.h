@@ -97,21 +97,20 @@ class thomson_state : public driver_device
 {
 public:
 	thomson_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_buzzer(*this, "buzzer")
-		, m_dac(*this, "dac")
-		, m_centronics(*this, "centronics")
-		, m_pia_sys(*this, THOM_PIA_SYS)
-		, m_pia_io(*this, THOM_PIA_IO)
-		, m_pia_game(*this, THOM_PIA_GAME)
-		, m_serial(*this, "cc90232")
-		, m_acia(*this, "acia6850")
-		, m_mea8000(*this, "mea8000")
-		, m_ram(*this, RAM_TAG)
-		, m_mc6846(*this, "mc6846")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_buzzer(*this, "buzzer"),
+		m_dac(*this, "dac"),
+		m_centronics(*this, "centronics"),
+		m_pia_sys(*this, THOM_PIA_SYS),
+		m_pia_io(*this, THOM_PIA_IO),
+		m_pia_game(*this, THOM_PIA_GAME),
+		m_serial(*this, "cc90232"),
+		m_acia(*this, "acia6850"),
+		m_mea8000(*this, "mea8000"),
+		m_ram(*this, RAM_TAG),
+		m_mc6846(*this, "mc6846") { }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );

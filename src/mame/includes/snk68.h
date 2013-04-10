@@ -2,7 +2,7 @@ class snk68_state : public driver_device
 {
 public:
 	snk68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_pow_fg_videoram(*this, "pow_fg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"){ }

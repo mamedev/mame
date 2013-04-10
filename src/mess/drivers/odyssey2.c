@@ -25,23 +25,22 @@ class odyssey2_state : public driver_device
 {
 public:
 	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
-		, m_i8244(*this, "i8244")
-		, m_sp0256(*this, "sp0256_speech")
-		, m_user1(*this, "user1")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_key0(*this, "KEY0")
-		, m_key1(*this, "KEY1")
-		, m_key2(*this, "KEY2")
-		, m_key3(*this, "KEY3")
-		, m_key4(*this, "KEY4")
-		, m_key5(*this, "KEY5")
-		, m_joy0(*this, "JOY0")
-		, m_joy1(*this, "JOY1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_i8244(*this, "i8244"),
+		m_sp0256(*this, "sp0256_speech"),
+		m_user1(*this, "user1"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_key0(*this, "KEY0"),
+		m_key1(*this, "KEY1"),
+		m_key2(*this, "KEY2"),
+		m_key3(*this, "KEY3"),
+		m_key4(*this, "KEY4"),
+		m_key5(*this, "KEY5"),
+		m_joy0(*this, "JOY0"),
+		m_joy1(*this, "JOY1") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

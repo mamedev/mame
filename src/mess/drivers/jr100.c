@@ -25,25 +25,24 @@ class jr100_state : public driver_device
 {
 public:
 	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_ram(*this, "ram")
-		, m_pcg(*this, "pcg")
-		, m_vram(*this, "vram")
-		, m_via(*this, "via")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_beeper(*this, BEEPER_TAG)
-		, m_speaker(*this, SPEAKER_TAG)
-		, m_region_maincpu(*this, "maincpu")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-		, m_line5(*this, "LINE5")
-		, m_line6(*this, "LINE6")
-		, m_line7(*this, "LINE7")
-		, m_line8(*this, "LINE8")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_ram(*this, "ram"),
+		m_pcg(*this, "pcg"),
+		m_vram(*this, "vram"),
+		m_via(*this, "via"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_beeper(*this, BEEPER_TAG),
+		m_speaker(*this, SPEAKER_TAG),
+		m_region_maincpu(*this, "maincpu"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4"),
+		m_line5(*this, "LINE5"),
+		m_line6(*this, "LINE6"),
+		m_line7(*this, "LINE7"),
+		m_line8(*this, "LINE8") { }
 
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_pcg;

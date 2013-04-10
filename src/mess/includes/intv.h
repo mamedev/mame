@@ -34,65 +34,64 @@ class intv_state : public driver_device
 {
 public:
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_intellivoice(*this, "sp0256_speech")
-		, m_sound(*this, "ay8914.1")
-		, m_ecs_sound(*this, "ay8914.2")
-		, m_intvkbd_dualport_ram(*this, "dualport_ram")
-		, m_videoram(*this, "videoram")
-		, m_keyboard(*this, "keyboard")
-		, m_region_maincpu(*this, "maincpu")
-		, m_region_ecs_rom(*this, "ecs_rom")
-		, m_region_keyboard(*this, "keyboard")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_io_keypad1(*this, "KEYPAD1")
-		, m_io_disc1(*this, "DISC1")
-		, m_io_discx1(*this, "DISCX1")
-		, m_io_discy1(*this, "DISCY1")
-		, m_io_keypad2(*this, "KEYPAD2")
-		, m_io_disc2(*this, "DISC2")
-		, m_io_discx2(*this, "DISCX2")
-		, m_io_discy2(*this, "DISCY2")
-		, m_io_options(*this, "OPTIONS")
-		, m_io_ecs_row0(*this, "ECS_ROW0")
-		, m_io_ecs_row1(*this, "ECS_ROW1")
-		, m_io_ecs_row2(*this, "ECS_ROW2")
-		, m_io_ecs_row3(*this, "ECS_ROW3")
-		, m_io_ecs_row4(*this, "ECS_ROW4")
-		, m_io_ecs_row5(*this, "ECS_ROW5")
-		, m_io_ecs_row6(*this, "ECS_ROW6")
-		, m_io_ecs_synth_row0(*this, "ECS_SYNTH_ROW0")
-		, m_io_ecs_synth_row1(*this, "ECS_SYNTH_ROW1")
-		, m_io_ecs_synth_row2(*this, "ECS_SYNTH_ROW2")
-		, m_io_ecs_synth_row3(*this, "ECS_SYNTH_ROW3")
-		, m_io_ecs_synth_row4(*this, "ECS_SYNTH_ROW4")
-		, m_io_ecs_synth_row5(*this, "ECS_SYNTH_ROW5")
-		, m_io_ecs_synth_row6(*this, "ECS_SYNTH_ROW6")
-		, m_io_keypad3(*this, "KEYPAD3")
-		, m_io_disc3(*this, "DISC3")
-		, m_io_discx3(*this, "DISCX3")
-		, m_io_discy3(*this, "DISCY3")
-		, m_io_keypad4(*this, "KEYPAD4")
-		, m_io_disc4(*this, "DISC4")
-		, m_io_discx4(*this, "DISCX4")
-		, m_io_discy4(*this, "DISCY4")
-		, m_io_ecs_cntrlsel(*this, "ECS_CNTRLSEL")
-		, m_io_row0(*this, "ROW0")
-		, m_io_row1(*this, "ROW1")
-		, m_io_row2(*this, "ROW2")
-		, m_io_row3(*this, "ROW3")
-		, m_io_row4(*this, "ROW4")
-		, m_io_row5(*this, "ROW5")
-		, m_io_row6(*this, "ROW6")
-		, m_io_row7(*this, "ROW7")
-		, m_io_row8(*this, "ROW8")
-		, m_io_row9(*this, "ROW9")
-		, m_io_test(*this, "TEST")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_intellivoice(*this, "sp0256_speech"),
+		m_sound(*this, "ay8914.1"),
+		m_ecs_sound(*this, "ay8914.2"),
+		m_intvkbd_dualport_ram(*this, "dualport_ram"),
+		m_videoram(*this, "videoram"),
+		m_keyboard(*this, "keyboard"),
+		m_region_maincpu(*this, "maincpu"),
+		m_region_ecs_rom(*this, "ecs_rom"),
+		m_region_keyboard(*this, "keyboard"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_io_keypad1(*this, "KEYPAD1"),
+		m_io_disc1(*this, "DISC1"),
+		m_io_discx1(*this, "DISCX1"),
+		m_io_discy1(*this, "DISCY1"),
+		m_io_keypad2(*this, "KEYPAD2"),
+		m_io_disc2(*this, "DISC2"),
+		m_io_discx2(*this, "DISCX2"),
+		m_io_discy2(*this, "DISCY2"),
+		m_io_options(*this, "OPTIONS"),
+		m_io_ecs_row0(*this, "ECS_ROW0"),
+		m_io_ecs_row1(*this, "ECS_ROW1"),
+		m_io_ecs_row2(*this, "ECS_ROW2"),
+		m_io_ecs_row3(*this, "ECS_ROW3"),
+		m_io_ecs_row4(*this, "ECS_ROW4"),
+		m_io_ecs_row5(*this, "ECS_ROW5"),
+		m_io_ecs_row6(*this, "ECS_ROW6"),
+		m_io_ecs_synth_row0(*this, "ECS_SYNTH_ROW0"),
+		m_io_ecs_synth_row1(*this, "ECS_SYNTH_ROW1"),
+		m_io_ecs_synth_row2(*this, "ECS_SYNTH_ROW2"),
+		m_io_ecs_synth_row3(*this, "ECS_SYNTH_ROW3"),
+		m_io_ecs_synth_row4(*this, "ECS_SYNTH_ROW4"),
+		m_io_ecs_synth_row5(*this, "ECS_SYNTH_ROW5"),
+		m_io_ecs_synth_row6(*this, "ECS_SYNTH_ROW6"),
+		m_io_keypad3(*this, "KEYPAD3"),
+		m_io_disc3(*this, "DISC3"),
+		m_io_discx3(*this, "DISCX3"),
+		m_io_discy3(*this, "DISCY3"),
+		m_io_keypad4(*this, "KEYPAD4"),
+		m_io_disc4(*this, "DISC4"),
+		m_io_discx4(*this, "DISCX4"),
+		m_io_discy4(*this, "DISCY4"),
+		m_io_ecs_cntrlsel(*this, "ECS_CNTRLSEL"),
+		m_io_row0(*this, "ROW0"),
+		m_io_row1(*this, "ROW1"),
+		m_io_row2(*this, "ROW2"),
+		m_io_row3(*this, "ROW3"),
+		m_io_row4(*this, "ROW4"),
+		m_io_row5(*this, "ROW5"),
+		m_io_row6(*this, "ROW6"),
+		m_io_row7(*this, "ROW7"),
+		m_io_row8(*this, "ROW8"),
+		m_io_row9(*this, "ROW9"),
+		m_io_test(*this, "TEST") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sp0256_device> m_intellivoice;

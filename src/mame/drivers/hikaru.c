@@ -391,8 +391,7 @@ class hikaru_state : public driver_device
 {
 public:
 	hikaru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-	{ }
+		: driver_device(mconfig, type, tag) { }
 	virtual void video_start();
 	UINT32 screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

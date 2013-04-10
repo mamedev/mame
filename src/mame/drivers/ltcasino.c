@@ -22,7 +22,7 @@ class ltcasino_state : public driver_device
 {
 public:
 	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_tile_num_ram(*this, "tile_nuram"),
 		m_tile_atr_ram(*this, "tile_atr_ram"){ }
 

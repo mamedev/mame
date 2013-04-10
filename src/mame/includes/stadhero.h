@@ -2,7 +2,7 @@ class stadhero_state : public driver_device
 {
 public:
 	stadhero_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_pf1_data(*this, "pf1_data"),
 		m_spriteram(*this, "spriteram"){ }
 

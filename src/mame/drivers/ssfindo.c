@@ -216,12 +216,11 @@ class ssfindo_state : public driver_device
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram")
-		, m_maincpu(*this, "maincpu")
-		, m_region_user2(*this, "user2")
-		, m_io_ps7500(*this, "PS7500")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_vram(*this, "vram"),
+		m_maincpu(*this, "maincpu"),
+		m_region_user2(*this, "user2"),
+		m_io_ps7500(*this, "PS7500") { }
 
 	UINT32 m_PS7500_IO[MAXIO];
 	UINT32 m_PS7500_FIFO[256];

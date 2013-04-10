@@ -26,7 +26,7 @@ class dragrace_state : public driver_device
 {
 public:
 	dragrace_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_position_ram(*this, "position_ram"),
 		m_discrete(*this, "discrete"){ }

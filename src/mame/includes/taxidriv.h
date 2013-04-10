@@ -2,7 +2,7 @@ class taxidriv_state : public driver_device
 {
 public:
 	taxidriv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_vram0(*this, "vram0"),
 		m_vram1(*this, "vram1"),
 		m_vram2(*this, "vram2"),

@@ -18,7 +18,7 @@ class xtheball_state : public driver_device
 {
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 			m_tlc34076(*this, "tlc34076"),
 			m_vram_bg(*this, "vrabg"),
 			m_vram_fg(*this, "vrafg"),

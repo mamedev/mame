@@ -8,7 +8,7 @@ class jackal_state : public driver_device
 {
 public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
 		m_paletteram(*this, "paletteram"),
 		m_mastercpu(*this, "master"),

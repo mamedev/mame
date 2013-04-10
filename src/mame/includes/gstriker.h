@@ -37,7 +37,7 @@ class gstriker_state : public driver_device
 {
 public:
 	gstriker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_MB60553_vram(*this, "mb60553_vram"),
 		m_CG10103_vram(*this, "cg10103_vram"),
 		m_VS920A_vram(*this, "vs920a_vram"),

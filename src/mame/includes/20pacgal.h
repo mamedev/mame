@@ -11,7 +11,7 @@ class _20pacgal_state : public driver_device
 {
 public:
 	_20pacgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_char_gfx_ram(*this, "char_gfx_ram"),
 		m_stars_seed(*this, "stars_seed"),

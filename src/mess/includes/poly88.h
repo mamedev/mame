@@ -15,21 +15,20 @@ class poly88_state : public driver_device
 {
 public:
 	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_video_ram(*this, "video_ram")
-		, m_maincpu(*this, "maincpu")
-		, m_uart(*this, "uart")
-		, m_sercas(*this, "sercas")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_linec(*this, "LINEC")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-		, m_line5(*this, "LINE5")
-		, m_line6(*this, "LINE6")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_uart(*this, "uart"),
+		m_sercas(*this, "sercas"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_linec(*this, "LINEC"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4"),
+		m_line5(*this, "LINE5"),
+		m_line6(*this, "LINE6") { }
 
 	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_FNT;

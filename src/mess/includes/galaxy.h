@@ -16,12 +16,11 @@ class galaxy_state : public driver_device
 {
 public:
 	galaxy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_ram(*this, RAM_TAG)
-		, m_region_gfx1(*this, "gfx1")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_ram(*this, RAM_TAG),
+		m_region_gfx1(*this, "gfx1") { }
 
 	int m_interrupts_enabled;
 	UINT8 m_latch_value;

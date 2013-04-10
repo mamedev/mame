@@ -106,15 +106,14 @@ class kim1_state : public driver_device
 {
 public:
 	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_riot2(*this, "miot_u2")
-		, m_cass(*this, CASSETTE_TAG)
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_riot2(*this, "miot_u2"),
+		m_cass(*this, CASSETTE_TAG),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_riot2;

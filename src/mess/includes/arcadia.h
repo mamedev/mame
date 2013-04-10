@@ -27,19 +27,18 @@ class arcadia_state : public driver_device
 {
 public:
 	arcadia_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_custom(*this, "custom")
-		, m_panel(*this, "panel")
-		, m_controller1_col1(*this, "controller1_col1")
-		, m_controller1_col2(*this, "controller1_col2")
-		, m_controller1_col3(*this, "controller1_col3")
-		, m_controller1_extra(*this, "controller1_extra")
-		, m_controller2_col1(*this, "controller2_col1")
-		, m_controller2_col2(*this, "controller2_col2")
-		, m_controller2_col3(*this, "controller2_col3")
-		, m_controller2_extra(*this, "controller2_extra")
-		, m_joysticks(*this, "joysticks")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_custom(*this, "custom"),
+		m_panel(*this, "panel"),
+		m_controller1_col1(*this, "controller1_col1"),
+		m_controller1_col2(*this, "controller1_col2"),
+		m_controller1_col3(*this, "controller1_col3"),
+		m_controller1_extra(*this, "controller1_extra"),
+		m_controller2_col1(*this, "controller2_col1"),
+		m_controller2_col2(*this, "controller2_col2"),
+		m_controller2_col3(*this, "controller2_col3"),
+		m_controller2_extra(*this, "controller2_extra"),
+		m_joysticks(*this, "joysticks") { }
 
 	DECLARE_READ8_MEMBER(arcadia_vsync_r);
 	DECLARE_READ8_MEMBER(arcadia_video_r);

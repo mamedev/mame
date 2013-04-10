@@ -64,37 +64,36 @@ class z80ne_state : public driver_device
 {
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_vdg(*this, "mc6847")
-		, m_videoram(*this, "videoram")
-		, m_ay31015(*this, "ay_3_1015")
-		, m_lx388_kr2376(*this, "lx388_kr2376")
-		, m_maincpu(*this, "z80ne")
-		, m_cassette1(*this, CASSETTE_TAG)
-		, m_cassette2(*this, CASSETTE2_TAG)
-		, m_wd1771(*this, "wd1771")
-		, m_region_z80ne(*this, "z80ne")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_io_row0(*this, "ROW0")
-		, m_io_row1(*this, "ROW1")
-		, m_io_ctrl(*this, "CTRL")
-		, m_io_rst(*this, "RST")
-		, m_io_lx_385(*this, "LX.385")
-		, m_io_lx388_brk(*this, "LX388_BRK")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
-		, m_io_x2(*this, "X2")
-		, m_io_x3(*this, "X3")
-		, m_io_x4(*this, "X4")
-		, m_io_x5(*this, "X5")
-		, m_io_x6(*this, "X6")
-		, m_io_x7(*this, "X7")
-		, m_io_modifiers(*this, "MODIFIERS")
-		, m_io_config(*this, "CONFIG")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_vdg(*this, "mc6847"),
+		m_videoram(*this, "videoram"),
+		m_ay31015(*this, "ay_3_1015"),
+		m_lx388_kr2376(*this, "lx388_kr2376"),
+		m_maincpu(*this, "z80ne"),
+		m_cassette1(*this, CASSETTE_TAG),
+		m_cassette2(*this, CASSETTE2_TAG),
+		m_wd1771(*this, "wd1771"),
+		m_region_z80ne(*this, "z80ne"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_io_row0(*this, "ROW0"),
+		m_io_row1(*this, "ROW1"),
+		m_io_ctrl(*this, "CTRL"),
+		m_io_rst(*this, "RST"),
+		m_io_lx_385(*this, "LX.385"),
+		m_io_lx388_brk(*this, "LX388_BRK"),
+		m_io_x0(*this, "X0"),
+		m_io_x1(*this, "X1"),
+		m_io_x2(*this, "X2"),
+		m_io_x3(*this, "X3"),
+		m_io_x4(*this, "X4"),
+		m_io_x5(*this, "X5"),
+		m_io_x6(*this, "X6"),
+		m_io_x7(*this, "X7"),
+		m_io_modifiers(*this, "MODIFIERS"),
+		m_io_config(*this, "CONFIG") { }
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;

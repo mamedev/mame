@@ -38,7 +38,7 @@ class go2000_state : public driver_device
 {
 public:
 	go2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_soundcpu(*this, "soundcpu"){ }

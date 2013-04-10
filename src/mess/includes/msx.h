@@ -38,41 +38,40 @@ class msx_state : public driver_device
 {
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_v9938(*this, "v9938")
-		, m_cass(*this, CASSETTE_TAG)
-		, m_ay8910(*this, "ay8910")
-		, m_ym(*this, "ym2413")
-		, m_k051649(*this, "k051649")
-		, m_dac(*this, "dac")
-		, m_centronics(*this, "centronics")
-		, m_rtc(*this, TC8521_TAG)
-		, m_wd179x(*this, "wd179x")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank7(*this, "bank7")
-		, m_bank8(*this, "bank8")
-		, m_bank9(*this, "bank9")
-		, m_bank10(*this, "bank10")
-		, m_bank11(*this, "bank11")
-		, m_region_maincpu(*this, "maincpu")
-		, m_io_joy0(*this, "JOY0")
-		, m_io_joy1(*this, "JOY1")
-		, m_io_dsw(*this, "DSW")
-		, m_io_mouse0(*this, "MOUSE0")
-		, m_io_mouse1(*this, "MOUSE1")
-		, m_io_key0(*this, "KEY0")
-		, m_io_key1(*this, "KEY1")
-		, m_io_key2(*this, "KEY2")
-		, m_io_key3(*this, "KEY3")
-		, m_io_key4(*this, "KEY4")
-		, m_io_key5(*this, "KEY5")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_v9938(*this, "v9938"),
+		m_cass(*this, CASSETTE_TAG),
+		m_ay8910(*this, "ay8910"),
+		m_ym(*this, "ym2413"),
+		m_k051649(*this, "k051649"),
+		m_dac(*this, "dac"),
+		m_centronics(*this, "centronics"),
+		m_rtc(*this, TC8521_TAG),
+		m_wd179x(*this, "wd179x"),
+		m_bank1(*this, "bank1"),
+		m_bank2(*this, "bank2"),
+		m_bank3(*this, "bank3"),
+		m_bank4(*this, "bank4"),
+		m_bank5(*this, "bank5"),
+		m_bank6(*this, "bank6"),
+		m_bank7(*this, "bank7"),
+		m_bank8(*this, "bank8"),
+		m_bank9(*this, "bank9"),
+		m_bank10(*this, "bank10"),
+		m_bank11(*this, "bank11"),
+		m_region_maincpu(*this, "maincpu"),
+		m_io_joy0(*this, "JOY0"),
+		m_io_joy1(*this, "JOY1"),
+		m_io_dsw(*this, "DSW"),
+		m_io_mouse0(*this, "MOUSE0"),
+		m_io_mouse1(*this, "MOUSE1"),
+		m_io_key0(*this, "KEY0"),
+		m_io_key1(*this, "KEY1"),
+		m_io_key2(*this, "KEY2"),
+		m_io_key3(*this, "KEY3"),
+		m_io_key4(*this, "KEY4"),
+		m_io_key5(*this, "KEY5") { }
 
 	DECLARE_WRITE8_MEMBER(msx_page0_w);
 	DECLARE_WRITE8_MEMBER(msx_page0_1_w);

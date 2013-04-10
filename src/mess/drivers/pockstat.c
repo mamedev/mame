@@ -91,7 +91,7 @@ class pockstat_state : public driver_device
 {
 public:
 	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"){ }
 
 	required_shared_ptr<UINT32> m_lcd_buffer;

@@ -17,32 +17,31 @@ class radio86_state : public driver_device
 {
 public:
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cassette(*this, CASSETTE_TAG)
-		, m_dma8257(*this, "dma8257")
-		, m_ppi8255_1(*this, "ppi8255_1")
-		, m_ppi8255_2(*this, "ppi8255_2")
-		, m_region_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_io_line0(*this, "LINE0")
-		, m_io_line1(*this, "LINE1")
-		, m_io_line2(*this, "LINE2")
-		, m_io_line3(*this, "LINE3")
-		, m_io_line4(*this, "LINE4")
-		, m_io_line5(*this, "LINE5")
-		, m_io_line6(*this, "LINE6")
-		, m_io_line7(*this, "LINE7")
-		, m_io_line8(*this, "LINE8")
-		, m_io_cline0(*this, "CLINE0")
-		, m_io_cline1(*this, "CLINE1")
-		, m_io_cline2(*this, "CLINE2")
-		, m_io_cline3(*this, "CLINE3")
-		, m_io_cline4(*this, "CLINE4")
-		, m_io_cline5(*this, "CLINE5")
-		, m_io_cline6(*this, "CLINE6")
-		, m_io_cline7(*this, "CLINE7")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, CASSETTE_TAG),
+		m_dma8257(*this, "dma8257"),
+		m_ppi8255_1(*this, "ppi8255_1"),
+		m_ppi8255_2(*this, "ppi8255_2"),
+		m_region_maincpu(*this, "maincpu"),
+		m_bank1(*this, "bank1"),
+		m_io_line0(*this, "LINE0"),
+		m_io_line1(*this, "LINE1"),
+		m_io_line2(*this, "LINE2"),
+		m_io_line3(*this, "LINE3"),
+		m_io_line4(*this, "LINE4"),
+		m_io_line5(*this, "LINE5"),
+		m_io_line6(*this, "LINE6"),
+		m_io_line7(*this, "LINE7"),
+		m_io_line8(*this, "LINE8"),
+		m_io_cline0(*this, "CLINE0"),
+		m_io_cline1(*this, "CLINE1"),
+		m_io_cline2(*this, "CLINE2"),
+		m_io_cline3(*this, "CLINE3"),
+		m_io_cline4(*this, "CLINE4"),
+		m_io_cline5(*this, "CLINE5"),
+		m_io_cline6(*this, "CLINE6"),
+		m_io_cline7(*this, "CLINE7") { }
 
 	virtual void video_start();
 

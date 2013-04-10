@@ -33,13 +33,12 @@ class svision_state : public driver_device
 {
 public:
 	svision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_reg(*this, "reg")
-		, m_videoram(*this, "videoram")
-		, m_joy(*this, "JOY")
-		, m_joy2(*this, "JOY2")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_reg(*this, "reg"),
+		m_videoram(*this, "videoram"),
+		m_joy(*this, "JOY"),
+		m_joy2(*this, "JOY2") { }
 
 	svision_sound_device *m_sound;
 	int *m_dma_finished;

@@ -2,7 +2,7 @@ class deco_mlc_state : public driver_device
 {
 public:
 	deco_mlc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_mlc_ram(*this, "mlc_ram"),
 		m_irq_ram(*this, "irq_ram"),
 		m_mlc_clip_ram(*this, "mlc_clip_ram"),

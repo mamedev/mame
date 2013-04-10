@@ -15,7 +15,7 @@ class drtomy_state : public driver_device
 {
 public:
 	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_videoram_fg(*this, "videorafg"),
 		m_videoram_bg(*this, "videorabg"),
 		m_spriteram(*this, "spriteram"){ }

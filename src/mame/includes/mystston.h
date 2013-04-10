@@ -14,7 +14,7 @@ class mystston_state : public driver_device
 {
 public:
 	mystston_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_ay8910_data(*this, "ay8910_data"),
 		m_ay8910_select(*this, "ay8910_select"),
 		m_bg_videoram(*this, "bg_videoram"),

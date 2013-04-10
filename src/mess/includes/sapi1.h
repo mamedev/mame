@@ -19,15 +19,14 @@ class sapi1_state : public driver_device
 {
 public:
 	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_sapi_video_ram(*this, "sapi_video_ram")
-		, m_bank1(*this, "bank1")
-		, m_line0(*this, "LINE0")
-		, m_line1(*this, "LINE1")
-		, m_line2(*this, "LINE2")
-		, m_line3(*this, "LINE3")
-		, m_line4(*this, "LINE4")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_sapi_video_ram(*this, "sapi_video_ram"),
+		m_bank1(*this, "bank1"),
+		m_line0(*this, "LINE0"),
+		m_line1(*this, "LINE1"),
+		m_line2(*this, "LINE2"),
+		m_line3(*this, "LINE3"),
+		m_line4(*this, "LINE4") { }
 
 	required_shared_ptr<UINT8> m_sapi_video_ram;
 	UINT8 m_keyboard_mask;

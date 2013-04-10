@@ -316,11 +316,10 @@ protected:
 
 public:
 	systeme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_vdp1(*this, "vdp1")
-		, m_vdp2(*this, "vdp2")
-		{ }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_vdp1(*this, "vdp1"),
+		m_vdp2(*this, "vdp2") { }
 
 	DECLARE_WRITE8_MEMBER( videoram_write );
 	DECLARE_WRITE8_MEMBER( bank_write );

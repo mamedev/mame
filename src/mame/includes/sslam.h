@@ -2,7 +2,7 @@ class sslam_state : public driver_device
 {
 public:
 	sslam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bg_tileram(*this, "bg_tileram"),
 		m_md_tileram(*this, "md_tileram"),
 		m_tx_tileram(*this, "tx_tileram"),

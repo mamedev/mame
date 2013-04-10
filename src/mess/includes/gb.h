@@ -110,14 +110,13 @@ class gb_state : public driver_device
 {
 public:
 	gb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_cartslot(*this, "gbslot")
-		, m_maincpu(*this, "maincpu")
-		, m_custom(*this, "custom")
-		, m_region_maincpu(*this, "maincpu")
-		, m_rambank(*this, "cgb_ram")
-		, m_inputs(*this, "INPUTS")
-	{ }
+		: driver_device(mconfig, type, tag),
+		m_cartslot(*this, "gbslot"),
+		m_maincpu(*this, "maincpu"),
+		m_custom(*this, "custom"),
+		m_region_maincpu(*this, "maincpu"),
+		m_rambank(*this, "cgb_ram"),
+		m_inputs(*this, "INPUTS") { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

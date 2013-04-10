@@ -2,7 +2,7 @@ class cclimber_state : public driver_device
 {
 public:
 	cclimber_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_bigsprite_videoram(*this, "bigspriteram"),
 		m_videoram(*this, "videoram"),
 		m_column_scroll(*this, "column_scroll"),
