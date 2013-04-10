@@ -220,11 +220,23 @@
 
 ***************************************************************************/
 
+/***************************************************************************
+
+  TODO
+  - how does video invert exactly work? the hardware can control it,
+    for example in bbonk death sequence
+  - bbonk video on youtube shows a 1-pixel gap horizontally between tiles,
+    maybe the characters are 9*10 or it differs per game
+  - improve sound emulation
+
+***************************************************************************/
+
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "includes/lazercmd.h"
 
+// color overlays, bbonk does not have an overlay
 #include "lazercmd.lh"
 #include "medlanes.lh"
 
@@ -355,7 +367,7 @@ WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 			else
 				m_dac->write_unsigned8(0);
 			break;
-		case 3: /* D4 clears coin detected and D0 toggles on attract mode */
+		case 3: /* D5 inverts video?, D4 clears coin detected and D0 toggles on attract mode */
 			m_attract = data;
 			break;
 	}
