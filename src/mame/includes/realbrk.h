@@ -11,7 +11,8 @@ public:
 		m_dsw_select(*this, "dsw_select"),
 		m_backup_ram(*this, "backup_ram"),
 		m_vram_0ras(*this, "vram_0ras"),
-		m_vram_1ras(*this, "vram_1ras"){ }
+		m_vram_1ras(*this, "vram_1ras"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_vram_0;
@@ -49,4 +50,5 @@ public:
 	INTERRUPT_GEN_MEMBER(realbrk_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
+	required_device<cpu_device> m_maincpu;
 };

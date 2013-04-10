@@ -8,7 +8,8 @@ class lethalj_state : public driver_device
 {
 public:
 	lethalj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_blitter_data[8];
 	UINT16 *m_screenram;
@@ -31,6 +32,7 @@ public:
 	virtual void video_start();
 	TIMER_CALLBACK_MEMBER(gen_ext1_int);
 	inline void get_crosshair_xy(int player, int *x, int *y);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/lethalj.c -----------*/

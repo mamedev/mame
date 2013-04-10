@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_scrollreg(*this, "scrollreg"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_txt_videoram(*this, "txt_videoram"){ }
+		m_txt_videoram(*this, "txt_videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_scrollreg;
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -22,4 +23,5 @@ public:
 	TILE_GET_INFO_MEMBER(txt_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_quizpani(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

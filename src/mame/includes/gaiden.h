@@ -15,7 +15,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -95,4 +96,5 @@ public:
 	void blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
 		int sx,int sy,const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

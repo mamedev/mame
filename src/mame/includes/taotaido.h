@@ -7,8 +7,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_scrollram(*this, "scrollram"),
 		m_bgram(*this, "bgram"),
-		m_spr(*this, "vsystem_spr")
-	{ }
+		m_spr(*this, "vsystem_spr"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_pending_command;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -38,4 +38,5 @@ public:
 	UINT32 screen_update_taotaido(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taotaido(screen_device &screen, bool state);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

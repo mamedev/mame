@@ -21,7 +21,8 @@ public:
 	tnzs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
@@ -106,4 +107,5 @@ public:
 	void mcu_reset(  );
 	void mcu_handle_coins( int coin );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

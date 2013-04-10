@@ -2,7 +2,8 @@ class nbmj8991_state : public driver_device
 {
 public:
 	nbmj8991_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_scrollx;
 	int m_scrolly;
@@ -57,4 +58,5 @@ public:
 	void nbmj8991_vramflip();
 	void update_pixel(int x, int y);
 	void nbmj8991_gfxdraw();
+	required_device<cpu_device> m_maincpu;
 };

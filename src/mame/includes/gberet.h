@@ -17,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
 		m_soundlatch(*this, "soundlatch"),
-		m_sn(*this, "snsnd") { }
+		m_sn(*this, "snsnd") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -60,4 +61,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gberet_interrupt_tick);
 	void gberet_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void gberetb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

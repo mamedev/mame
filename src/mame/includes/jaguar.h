@@ -51,7 +51,8 @@ public:
 			m_main_gpu_wait(NULL),
 			m_joystick_data(0),
 			m_eeprom_bit_count(0),
-			m_protection_check(0) { }
+			m_protection_check(0) ,
+		m_maincpu(*this, "maincpu") { }
 
 	// devices
 	required_device<cpu_device> m_main_cpu;
@@ -314,4 +315,5 @@ protected:
 	emu_file *jaguar_nvram_fopen( UINT32 openflags);
 	void jaguar_nvram_load();
 	void jaguar_nvram_save();
+	required_device<cpu_device> m_maincpu;
 };

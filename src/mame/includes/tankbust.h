@@ -6,7 +6,8 @@ public:
 		m_txtram(*this, "txtram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_latch;
 	UINT32 m_timer1;
@@ -47,4 +48,5 @@ public:
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	TIMER_CALLBACK_MEMBER(soundirqline_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

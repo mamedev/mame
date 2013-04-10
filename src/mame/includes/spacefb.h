@@ -29,7 +29,8 @@ class spacefb_state : public driver_device
 public:
 	spacefb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
@@ -60,6 +61,7 @@ public:
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in audio/spacefb.c -----------*/

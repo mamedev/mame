@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_ninjakun_io_a002_ctrl;
 	optional_shared_ptr<UINT8> m_fg_videoram;
@@ -47,4 +48,5 @@ public:
 	void nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void lineswap_gfx_roms(const char *region, const int bit);
+	required_device<cpu_device> m_maincpu;
 };

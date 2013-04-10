@@ -14,8 +14,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),
-		m_spriteram16(*this, "spriteram16")
-	{ }
+		m_spriteram16(*this, "spriteram16"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -120,6 +120,7 @@ public:
 	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
 	void twincobr_driver_savestate();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 

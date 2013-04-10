@@ -8,7 +8,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
-		m_colorram2(*this, "colorram2"){ }
+		m_colorram2(*this, "colorram2"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_paletteram;
@@ -38,4 +39,5 @@ public:
 	UINT32 screen_update_ssozumo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

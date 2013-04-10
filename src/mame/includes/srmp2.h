@@ -10,7 +10,8 @@ class srmp2_state : public driver_device
 {
 public:
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_color_bank;
 	int m_gfx_bank;
@@ -51,4 +52,5 @@ public:
 	UINT32 screen_update_mjyuugi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT8 iox_key_matrix_calc(UINT8 p_side);
 	DECLARE_WRITE_LINE_MEMBER(srmp2_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

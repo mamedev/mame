@@ -7,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -96,4 +97,5 @@ public:
 	void draw_obj1( bitmap_ind16 &bitmap );
 	void draw_river( bitmap_ind16 &bitmap, int sy );
 	void draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num );
+	required_device<cpu_device> m_maincpu;
 };

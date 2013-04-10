@@ -14,7 +14,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_imageram(*this, "imageram"),
 		m_spriteram(*this, "spriteram"),
-		m_scanline(*this, "scanline"){ }
+		m_scanline(*this, "scanline"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_imageram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -75,6 +76,7 @@ public:
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();
 	void exidy440_bank_select(UINT8 bank);
+	required_device<cpu_device> m_maincpu;
 };
 
 

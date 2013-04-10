@@ -14,7 +14,8 @@ public:
 		m_swimmer_palettebank(*this, "palettebank"),
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
-		m_toprollr_bg_coloram(*this, "bg_coloram"){ }
+		m_toprollr_bg_coloram(*this, "bg_coloram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -81,4 +82,5 @@ public:
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const UINT8 convtable[8][16]);
 	void cannonb_patch();
+	required_device<cpu_device> m_maincpu;
 };

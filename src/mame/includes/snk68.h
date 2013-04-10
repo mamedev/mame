@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_pow_fg_videoram(*this, "pow_fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_invert_controls;
 	int m_sound_status;
@@ -47,4 +48,5 @@ public:
 	void common_video_start();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

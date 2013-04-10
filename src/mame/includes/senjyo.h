@@ -23,7 +23,8 @@ public:
 		m_bg2videoram(*this, "bg2videoram"),
 		m_bg3videoram(*this, "bg3videoram"),
 		m_radarram(*this, "radarram"),
-		m_bgstripesram(*this, "bgstripesram"){ }
+		m_bgstripesram(*this, "bgstripesram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_int_delay_kludge;
 	UINT8 m_sound_cmd;
@@ -87,6 +88,7 @@ public:
 	void draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

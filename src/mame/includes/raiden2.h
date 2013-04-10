@@ -7,7 +7,8 @@ public:
 			fore_data(*this, "fore_data"),
 			mid_data(*this, "mid_data"),
 			text_data(*this, "text_data"),
-			sprites(*this, "sprites") { }
+			sprites(*this, "sprites") ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE16_MEMBER( cop_itoa_low_w );
 	DECLARE_WRITE16_MEMBER( cop_itoa_high_w );
@@ -157,6 +158,7 @@ public:
 	const UINT8 fade_table(int v);
 	void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask);
 	void sprcpt_init(void);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/r2crypt.c -----------*/

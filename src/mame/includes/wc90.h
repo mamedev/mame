@@ -18,7 +18,8 @@ public:
 		m_scroll1yhi(*this, "scroll1yhi"),
 		m_scroll2ylo(*this, "scroll2ylo"),
 		m_scroll2yhi(*this, "scroll2yhi"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	typedef void (wc90_state::*draw_sprites_func)(bitmap_ind16 &, const rectangle &, int, int, int, int, int );
 
@@ -67,4 +68,5 @@ public:
 	void draw_sprite_64x64(bitmap_ind16 &bitmap, const rectangle &cliprect, int code,int sx, int sy, int bank, int flags );
 	void draw_sprite_invalid(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int sx, int sy, int bank, int flags );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

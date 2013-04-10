@@ -22,7 +22,8 @@ public:
 		m_turbo_chip_squeak(*this, "tcs"),
 		m_cvsd_sound(*this, "cvsd"),
 			m_videoram(*this, "videoram"),
-			m_spriteram(*this, "spriteram") { }
+			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
 	optional_device<midway_sounds_good_device> m_sounds_good;
@@ -116,6 +117,7 @@ public:
 	inline void update_interrupts();
 	void subtract_from_counter(int counter, int count);
 	void mcr68_common_init(int clip, int xoffset);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/mcr68.c -----------*/

@@ -588,7 +588,7 @@ static const c140_interface C140_interface =
 };
 
 static MACHINE_CONFIG_START( gal3, gal3_state )
-	MCFG_CPU_ADD("cpumst", M68020, 49152000/2)
+	MCFG_CPU_ADD("maincpu", M68020, 49152000/2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gal3_state,  irq1_line_hold)
 
@@ -773,7 +773,7 @@ GLC1-SND-DATA1  4/5H    27c1000     DATA1.BIN
 
 ROM_START( gal3 )
 	/********* CPU-MST board x1 *********/
-	ROM_REGION( 0x200000, "cpumst", 0 ) /* 68020 Code */
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 Code */
 	ROM_LOAD32_BYTE( "glc1-mst-prg0e.6b", 0x00003, 0x80000, CRC(5deccd72) SHA1(8d50779221538cc171469a691fabb17b62a8e664) )
 	ROM_LOAD32_BYTE( "glc1-mst-prg1e.10b", 0x00002, 0x80000, CRC(b6144e3b) SHA1(33f63d881e7012db7f971b074bc5f876a66198b7) )
 	ROM_LOAD32_BYTE( "glc1-mst-prg2e.14b", 0x00001, 0x80000, CRC(13381084) SHA1(486c1e136e6594ba68858e40246c5fb9bef1c0d2) )

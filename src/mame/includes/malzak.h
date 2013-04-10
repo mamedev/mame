@@ -12,8 +12,8 @@ public:
 	malzak_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_trom(*this, "saa5050"),
-			m_videoram(*this, "videoram")
-	{ }
+			m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<saa5050_device> m_trom;
 	required_shared_ptr<UINT8> m_videoram;
@@ -43,4 +43,5 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

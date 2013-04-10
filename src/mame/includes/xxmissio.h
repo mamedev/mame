@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_bgram(*this, "bgram"),
 		m_fgram(*this, "fgram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_status;
 	required_shared_ptr<UINT8> m_bgram;
@@ -34,4 +35,5 @@ public:
 	DECLARE_WRITE8_MEMBER(xxmissio_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(xxmissio_scroll_y_w);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
+	required_device<cpu_device> m_maincpu;
 };

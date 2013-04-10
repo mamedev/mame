@@ -28,7 +28,8 @@ public:
 			m_paletteram(*this, "paletteram"),
 			m_audiocpu(*this, "audiocpu"),
 			m_gradram(*this, "gradram"),
-			m_backregs(*this, "backregs") { }
+			m_backregs(*this, "backregs") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_m68000_mainram;
@@ -92,4 +93,5 @@ public:
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
 	int projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

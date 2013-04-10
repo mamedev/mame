@@ -12,8 +12,8 @@ public:
 		m_palettebank(*this, "palettebank"),
 		m_spriteram_select(*this, "spriteramsel"),
 		m_scroll(*this, "scroll"),
-		m_sn(*this, "snsnd")
-	{ }
+		m_sn(*this, "snsnd"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_colorram;
@@ -45,4 +45,5 @@ public:
 	UINT32 screen_update_sbasketb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

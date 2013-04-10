@@ -4,7 +4,8 @@ class niyanpai_state : public driver_device
 {
 public:
 	niyanpai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_musobana_inputport;
 	int m_musobana_outcoin_flag;
@@ -90,4 +91,5 @@ public:
 	void update_pixel(int vram, int x, int y);
 	void niyanpai_gfxdraw(int vram);
 	void niyanpai_soundbank_w(int data);
+	required_device<cpu_device> m_maincpu;
 };

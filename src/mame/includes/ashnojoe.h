@@ -17,7 +17,8 @@ public:
 		m_tileram_7(*this, "tileram_7"),
 		m_tileram(*this, "tileram"),
 		m_tilemap_reg(*this, "tilemap_reg"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	UINT16 *    m_tileram_1;
@@ -77,4 +78,5 @@ public:
 	UINT32 screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
+	required_device<cpu_device> m_maincpu;
 };

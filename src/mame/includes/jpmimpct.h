@@ -57,7 +57,8 @@ public:
 	jpmimpct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_vfd(*this, "vfd"),
-			m_vram(*this, "vram") { }
+			m_vram(*this, "vram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;
@@ -111,6 +112,7 @@ public:
 	DECLARE_MACHINE_RESET(impctawp);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
 	void update_irqs();
+	required_device<cpu_device> m_maincpu;
 };
 
 

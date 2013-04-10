@@ -17,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_bg_cram(*this, "bg_cram"),
 		m_bg_vram(*this, "bg_vram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	UINT8 *        m_buffered_spriteram;
@@ -65,4 +66,5 @@ public:
 	INTERRUPT_GEN_MEMBER(contra_interrupt);
 	void set_pens(  );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank );
+	required_device<cpu_device> m_maincpu;
 };

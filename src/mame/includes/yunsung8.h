@@ -9,7 +9,8 @@ class yunsung8_state : public driver_device
 public:
 	yunsung8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	tilemap_t     *m_tilemap_0;
@@ -42,4 +43,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_yunsung8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

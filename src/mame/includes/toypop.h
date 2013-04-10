@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_m68000_sharedram(*this, "m68k_shared"),
-		m_bg_image(*this, "bg_image"){ }
+		m_bg_image(*this, "bg_image"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -56,4 +57,5 @@ public:
 	TIMER_CALLBACK_MEMBER(namcoio_run);
 	void draw_background(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
+	required_device<cpu_device> m_maincpu;
 };

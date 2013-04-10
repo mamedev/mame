@@ -8,7 +8,8 @@ public:
 	polyplay_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_characterram(*this, "characterram"){ }
+		m_characterram(*this, "characterram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_freq1;
@@ -36,6 +37,7 @@ public:
 	INTERRUPT_GEN_MEMBER(periodic_interrupt);
 	INTERRUPT_GEN_MEMBER(coin_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

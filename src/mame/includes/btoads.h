@@ -26,7 +26,8 @@ public:
 			m_vram_bg0(*this, "vram_bg0"),
 			m_vram_bg1(*this, "vram_bg1"),
 			m_sprite_scale(*this, "sprite_scale"),
-			m_sprite_control(*this, "sprite_control") { }
+			m_sprite_control(*this, "sprite_control") ,
+		m_maincpu(*this, "maincpu") { }
 
 	// in drivers/btoads
 	DECLARE_WRITE16_MEMBER( main_sound_w );
@@ -111,4 +112,5 @@ protected:
 	UINT16 m_sprite_dest_offs;
 	UINT16 m_misc_control;
 	int m_xcount;
+	required_device<cpu_device> m_maincpu;
 };

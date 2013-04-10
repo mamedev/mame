@@ -12,7 +12,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -57,4 +58,5 @@ public:
 	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 *decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
+	required_device<cpu_device> m_maincpu;
 };

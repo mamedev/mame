@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_bg_videoram16(*this, "bg_videoram16"){ }
+		m_bg_videoram16(*this, "bg_videoram16"),
+		m_maincpu(*this, "maincpu") { }
 
 
 	required_shared_ptr<UINT16> m_videoram;
@@ -30,4 +31,5 @@ public:
 	UINT32 screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int foreground );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

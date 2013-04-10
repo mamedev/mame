@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
-		m_shareram(*this, "shareram"){ }
+		m_shareram(*this, "shareram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_pant[2];
 	required_shared_ptr<UINT16> m_videoram;
@@ -26,4 +27,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_wrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	required_device<cpu_device> m_maincpu;
 };

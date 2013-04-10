@@ -2,7 +2,8 @@ class pk8000_base_state : public driver_device
 {
 public:
 	pk8000_base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ8_MEMBER(pk8000_video_color_r);
 	DECLARE_WRITE8_MEMBER(pk8000_video_color_w);
@@ -33,4 +34,5 @@ protected:
 	UINT8 m_pk8000_video_color;
 	UINT8 m_pk8000_color[32];
 	UINT8 m_pk8000_video_enable;
+	required_device<cpu_device> m_maincpu;
 };

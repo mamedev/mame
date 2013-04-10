@@ -9,7 +9,8 @@ public:
 		m_pageram(*this, "pageram"),
 		m_txtram(*this, "txtram"),
 		m_spriteram(*this, "spriteram"),
-		m_roadram(*this, "roadram"){ }
+		m_roadram(*this, "roadram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT16> m_videostatus;
 	optional_shared_ptr<UINT16> m_protection_ram;
@@ -84,6 +85,7 @@ public:
 	void wecleman_unpack_sprites();
 	void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
 	void hotchase_sprite_decode( int num16_banks, int bank_size );
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/wecleman.c -----------*/

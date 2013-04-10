@@ -12,7 +12,8 @@ public:
 	segag80v_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
-		m_vectorram(*this, "vectorram"){ }
+		m_vectorram(*this, "vectorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	device_t *m_usb;
@@ -57,4 +58,5 @@ public:
 	void sega_generate_vector_list();
 	offs_t decrypt_offset(address_space &space, offs_t offset);
 	inline UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0);
+	required_device<cpu_device> m_maincpu;
 };

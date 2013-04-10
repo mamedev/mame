@@ -11,7 +11,8 @@ public:
 		m_txt_videoram(*this, "txt_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_scroll(*this, "scroll"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_mid_videoram;
@@ -50,4 +51,5 @@ public:
 	UINT32 screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	UINT8 aquarium_snd_bitswap( UINT8 scrambled_data );
+	required_device<cpu_device> m_maincpu;
 };

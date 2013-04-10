@@ -17,8 +17,8 @@ public:
 		m_scroll2(*this, "scroll2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_sn(*this, "snsnd")
-	{ }
+		m_sn(*this, "snsnd"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram2;
@@ -70,4 +70,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

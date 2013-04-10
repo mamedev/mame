@@ -11,7 +11,8 @@ public:
 		m_bg0ram(*this, "bg0ram"),
 		m_bg1ram(*this, "bg1ram"),
 		m_bg0_scroll(*this, "bg0_scroll"),
-		m_bg1_scroll(*this, "bg1_scroll"){ }
+		m_bg1_scroll(*this, "bg1_scroll"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_sn_nmi_enable;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -42,6 +43,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_flower(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };
 
 

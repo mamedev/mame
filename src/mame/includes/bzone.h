@@ -14,7 +14,8 @@ class bzone_state : public driver_device
 public:
 	bzone_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_discrete(*this, "discrete") { }
+			m_discrete(*this, "discrete") ,
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<discrete_device> m_discrete;
 
@@ -31,6 +32,7 @@ public:
 	DECLARE_MACHINE_START(redbaron);
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -7,7 +7,8 @@ public:
 		m_scroll(*this, "scroll"),
 		m_videoram(*this, "videoram"),
 		m_workram(*this, "workram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_spritebank;
 	required_shared_ptr<UINT8> m_scroll;
@@ -32,4 +33,5 @@ public:
 	void set_pens();
 	void decrypt_gfx();
 	void decrypt_snd();
+	required_device<cpu_device> m_maincpu;
 };

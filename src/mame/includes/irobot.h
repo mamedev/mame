@@ -27,7 +27,8 @@ public:
 	irobot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -91,4 +92,5 @@ public:
 	void irmb_dout(const irmb_ops *curop, UINT32 d);
 	void load_oproms();
 	void irmb_run();
+	required_device<cpu_device> m_maincpu;
 };

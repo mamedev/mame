@@ -15,7 +15,8 @@ public:
 			m_ram_base(*this, "ram_base"),
 			m_linkram(*this, "linkram"),
 			m_tms32031_control(*this, "tms32031_ctl"),
-			m_zeusbase(*this, "zeusbase") { }
+			m_zeusbase(*this, "zeusbase") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -63,6 +64,7 @@ public:
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 	void exit_handler();
 	void exit_handler2();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/midzeus2.c -----------*/

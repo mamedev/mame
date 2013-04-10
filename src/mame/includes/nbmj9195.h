@@ -8,7 +8,8 @@ class nbmj9195_state : public driver_device
 {
 public:
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_inputport;
 	int m_dipswbitsel;
@@ -125,4 +126,5 @@ public:
 	int nbmj9195_dipsw_r();
 	void nbmj9195_dipswbitsel_w(int data);
 	void mscoutm_inputportsel_w(int data);
+	required_device<cpu_device> m_maincpu;
 };

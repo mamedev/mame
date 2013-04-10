@@ -7,7 +7,8 @@ public:
 		m_back_data(*this, "back_data"),
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
-		m_textram(*this, "textram"){ }
+		m_textram(*this, "textram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_back_data;
@@ -54,6 +55,7 @@ public:
 	UINT32 screen_update_grainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void descramble_legionnaire_gfx(UINT8* src);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/legionna.c -----------*/

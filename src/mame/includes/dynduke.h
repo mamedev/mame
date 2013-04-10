@@ -9,7 +9,8 @@ public:
 		m_scroll_ram(*this, "scroll_ram"),
 		m_videoram(*this, "videoram"),
 		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data"){ }
+		m_fore_data(*this, "fore_data"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_scroll_ram;
@@ -44,4 +45,5 @@ public:
 	INTERRUPT_GEN_MEMBER(dynduke_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	required_device<cpu_device> m_maincpu;
 };

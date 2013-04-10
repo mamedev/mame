@@ -45,7 +45,8 @@ public:
 			m_tms32031_control(*this, "32031_control"),
 			m_midvplus_misc(*this, "midvplus_misc"),
 			m_videoram(*this, "videoram", 32),
-			m_textureram(*this, "textureram") { }
+			m_textureram(*this, "textureram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_ram_base;
@@ -122,4 +123,5 @@ public:
 	UINT32 screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(adc_ready);
 	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
+	required_device<cpu_device> m_maincpu;
 };

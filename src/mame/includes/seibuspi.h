@@ -8,7 +8,8 @@ public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spi_scrollram(*this, "spi_scrollram"),
-		m_spimainram(*this, "spimainram"){ }
+		m_spimainram(*this, "spimainram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
@@ -131,6 +132,7 @@ public:
 	void init_rf2_common();
 	void init_rfjet_common();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

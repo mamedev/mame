@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_bgram(*this, "bgram"),
 		m_spriteram(*this, "spriteram"),
-		m_fgram(*this, "fgram"){ }
+		m_fgram(*this, "fgram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -29,4 +30,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mainsnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly );
+	required_device<cpu_device> m_maincpu;
 };

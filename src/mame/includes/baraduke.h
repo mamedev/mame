@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_textram(*this, "textram"){ }
+		m_textram(*this, "textram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_inputport_selected;
 	int m_counter;
@@ -43,4 +44,5 @@ public:
 	void scroll_w(address_space &space, int layer, int offset, int data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	void set_scroll(int layer);
+	required_device<cpu_device> m_maincpu;
 };

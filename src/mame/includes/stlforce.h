@@ -11,7 +11,8 @@ public:
 		m_mlow_scrollram(*this, "mlow_scrollram"),
 		m_mhigh_scrollram(*this, "mhigh_scrollram"),
 		m_vidattrram(*this, "vidattrram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_mlow_tilemap;
@@ -45,4 +46,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

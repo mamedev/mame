@@ -8,7 +8,8 @@ public:
 		m_tms(*this, "tms"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<tms5200n_device> m_tms;
 	required_shared_ptr<UINT8> m_bgvideoram;
@@ -29,4 +30,5 @@ public:
 	UINT32 screen_update_portrait(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, const UINT8 *source );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

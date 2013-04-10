@@ -5,7 +5,8 @@ public:
 	news_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bgram(*this, "bgram"),
-		m_fgram(*this, "fgram"){ }
+		m_fgram(*this, "fgram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgram;
@@ -25,4 +26,5 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_news(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

@@ -15,7 +15,8 @@ public:
 		m_txvideoram(*this, "txvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_paletteram(*this, "paletteram"){ }
+		m_paletteram(*this, "paletteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -53,4 +54,5 @@ public:
 	UINT32 screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bionicc_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

@@ -9,7 +9,8 @@ public:
 		m_vram_2(*this, "vram_2"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_vram_0;
@@ -57,4 +58,5 @@ public:
 	INTERRUPT_GEN_MEMBER(paradise_irq);
 	void update_pix_palbank();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

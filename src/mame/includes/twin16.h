@@ -9,7 +9,8 @@ public:
 		m_text_ram(*this, "text_ram"),
 		m_videoram(*this, "videoram"),
 		m_tile_gfx_ram(*this, "tile_gfx_ram"),
-		m_sprite_gfx_ram(*this, "sprite_gfx_ram"){ }
+		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
@@ -73,4 +74,5 @@ public:
 	int twin16_spriteram_process_enable(  );
 	void gfx_untangle(  );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	required_device<cpu_device> m_maincpu;
 };

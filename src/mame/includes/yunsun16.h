@@ -15,7 +15,8 @@ public:
 		m_scrollram_1(*this, "scrollram_1"),
 		m_priorityram(*this, "priorityram"),
 		m_spriteram(*this, "spriteram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vram_0;
@@ -48,4 +49,5 @@ public:
 	UINT32 screen_update_yunsun16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
+	required_device<cpu_device> m_maincpu;
 };

@@ -16,7 +16,8 @@ public:
 	galastrm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") { }
+		m_spriteram(*this,"spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -54,4 +55,5 @@ public:
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
+	required_device<cpu_device> m_maincpu;
 };

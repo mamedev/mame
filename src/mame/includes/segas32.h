@@ -17,7 +17,8 @@ public:
 		m_system32_workram(*this,"workram"),
 		m_system32_videoram(*this,"videoram", 0),
 		m_system32_spriteram(*this,"spriteram", 0),
-		m_system32_paletteram(*this,"paletteram", 0) { }
+		m_system32_paletteram(*this,"paletteram", 0) ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_z80_shared_ram;
 	optional_shared_ptr<UINT8> m_ga2_dpram;
@@ -249,6 +250,7 @@ public:
 	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_background(struct layer_info *layer, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/segas32.c -----------*/

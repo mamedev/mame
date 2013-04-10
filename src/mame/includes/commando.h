@@ -16,7 +16,8 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -50,4 +51,5 @@ public:
 	UINT32 screen_update_commando(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(commando_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

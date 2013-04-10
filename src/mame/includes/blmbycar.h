@@ -14,7 +14,8 @@ public:
 		m_scroll_1(*this, "scroll_1"),
 		m_scroll_0(*this, "scroll_0"),
 		m_paletteram(*this, "paletteram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_vram_1;
@@ -51,4 +52,5 @@ public:
 	DECLARE_MACHINE_RESET(watrball);
 	UINT32 screen_update_blmbycar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

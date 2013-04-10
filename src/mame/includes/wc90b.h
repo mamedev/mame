@@ -11,7 +11,8 @@ public:
 		m_scroll1y(*this, "scroll1y"),
 		m_scroll2y(*this, "scroll2y"),
 		m_scroll_x_lo(*this, "scroll_x_lo"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_msm5205next;
 	int m_toggle;
@@ -43,4 +44,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

@@ -7,7 +7,8 @@ public:
 		m_palettebank(*this, "palettebank"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_prot0;
 	UINT8 m_prot1;
@@ -46,4 +47,5 @@ public:
 	void set_background_palette(int bank);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

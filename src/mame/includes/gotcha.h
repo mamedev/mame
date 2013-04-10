@@ -15,8 +15,8 @@ public:
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprgen(*this, "spritegen"),
-		m_audiocpu(*this, "audiocpu")
-	{ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_fgvideoram;
@@ -49,4 +49,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs);
+	required_device<cpu_device> m_maincpu;
 };

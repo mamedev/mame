@@ -6,9 +6,8 @@ public:
 		m_mlc_ram(*this, "mlc_ram"),
 		m_irq_ram(*this, "irq_ram"),
 		m_mlc_clip_ram(*this, "mlc_clip_ram"),
-		m_mlc_vram(*this, "mlc_vram")
-
-	{ }
+		m_mlc_vram(*this, "mlc_vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_mlc_ram;
 	required_shared_ptr<UINT32> m_irq_ram;
@@ -60,4 +59,5 @@ public:
 	void blitRaster(bitmap_rgb32 &bitmap, int rasterMode);
 	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
 	void descramble_sound(  );
+	required_device<cpu_device> m_maincpu;
 };

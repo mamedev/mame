@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
@@ -30,4 +31,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd_irq);
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd2_irq);
+	required_device<cpu_device> m_maincpu;
 };

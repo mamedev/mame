@@ -7,7 +7,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_vreg(*this, "vreg"),
 		m_scroll_x(*this, "scroll_x"),
-		m_scroll_y(*this, "scroll_y"){ }
+		m_scroll_y(*this, "scroll_y"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_videoram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -35,4 +36,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_magmax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
+	required_device<cpu_device> m_maincpu;
 };

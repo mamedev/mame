@@ -12,7 +12,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_tx_videoram(*this, "tx_videoram"){ }
+		m_tx_videoram(*this, "tx_videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -178,4 +179,5 @@ public:
 	int turbofront_check(int small, int num);
 	int turbofront_check8(int small, int num);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
+	required_device<cpu_device> m_maincpu;
 };

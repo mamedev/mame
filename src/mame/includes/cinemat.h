@@ -10,7 +10,8 @@ class cinemat_state : public driver_device
 public:
 	cinemat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_rambase(*this, "rambase"){ }
+		m_rambase(*this, "rambase"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_sound_control;
 	void (*m_sound_handler)(running_machine &,UINT8 sound_val, UINT8 bits_changed);
@@ -70,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(sound_portb_r);
 	DECLARE_WRITE8_MEMBER(sound_portb_w);
 	DECLARE_WRITE8_MEMBER(sound_output_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in audio/cinemat.c -----------*/

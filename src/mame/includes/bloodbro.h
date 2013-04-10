@@ -7,7 +7,8 @@ public:
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_txvideoram(*this, "txvideoram"),
-		m_scroll(*this, "scroll"){ }
+		m_scroll(*this, "scroll"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_bgvideoram;
@@ -31,4 +32,5 @@ public:
 	UINT32 screen_update_skysmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void bloodbro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void weststry_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

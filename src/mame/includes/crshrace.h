@@ -13,8 +13,8 @@ public:
 		m_k053936(*this, "k053936"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_spr(*this, "vsystem_spr")
-	{ }
+		m_spr(*this, "vsystem_spr"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram1;
@@ -62,4 +62,5 @@ public:
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void crshrace_patch_code( UINT16 offset );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

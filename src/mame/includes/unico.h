@@ -7,7 +7,8 @@ public:
 		m_scroll(*this, "scroll"),
 		m_vram32(*this, "vram32"),
 		m_scroll32(*this, "scroll32"),
-		m_spriteram(*this, "spriteram", 0){ }
+		m_spriteram(*this, "spriteram", 0),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_scroll;
@@ -44,4 +45,5 @@ public:
 	UINT32 screen_update_zeropnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unico_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void zeropnt2_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

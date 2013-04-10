@@ -10,7 +10,8 @@ class othldrby_state : public driver_device
 {
 public:
 	othldrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	UINT16 *     m_vram;
@@ -45,4 +46,5 @@ public:
 	void screen_eof_othldrby(screen_device &screen, bool state);
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int plane );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	required_device<cpu_device> m_maincpu;
 };

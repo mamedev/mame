@@ -17,8 +17,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_spr_old(*this, "vsystem_spr_old"),
-		m_subcpu(*this, "sub")
-	{ }
+		m_subcpu(*this, "sub"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -95,4 +95,5 @@ public:
 	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
 	void init_common(  );
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

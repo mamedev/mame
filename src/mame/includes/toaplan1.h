@@ -12,7 +12,8 @@ public:
 		m_colorram1(*this, "colorram1"),
 		m_colorram2(*this, "colorram2"),
 		m_sharedram(*this, "sharedram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_unk_reset_port;
 	required_shared_ptr<UINT16> m_colorram1;
@@ -161,6 +162,7 @@ public:
 	void demonwld_driver_savestate();
 	void vimana_driver_savestate();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 

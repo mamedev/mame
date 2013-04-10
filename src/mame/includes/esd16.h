@@ -20,8 +20,8 @@ public:
 		m_head_layersize(*this, "head_layersize"),
 		m_headpanic_platform_x(*this, "platform_x"),
 		m_headpanic_platform_y(*this, "platform_y"),
-		m_sprgen(*this, "spritegen")
-	{
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu") {
 		m_tilemap0_color = 0;
 		m_tilemap1_color = 0;
 	}
@@ -68,4 +68,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hedpanic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	static UINT16 hedpanic_pri_callback(UINT16 x);
+	required_device<cpu_device> m_maincpu;
 };

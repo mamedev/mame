@@ -42,7 +42,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_shrike_io(*this, "shrike_io"),
-		m_shrike_shared(*this, "shrike_shared"){ }
+		m_shrike_shared(*this, "shrike_shared"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<timer_device> m_scanline_timer;
 
@@ -208,6 +209,7 @@ public:
 	void update_grudge_steering();
 	void expand_roms(UINT8 cd_rom_mask);
 	inline void config_shooter_adc(UINT8 shooter, UINT8 adc_shift);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -15,7 +15,8 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_snd_sharedram(*this, "snd_sharedram"){ }
+		m_snd_sharedram(*this, "snd_sharedram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -64,4 +65,5 @@ public:
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
 	void set_pens(  );
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen );
+	required_device<cpu_device> m_maincpu;
 };

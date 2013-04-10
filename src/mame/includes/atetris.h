@@ -10,7 +10,8 @@ public:
 	atetris_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_nvram(*this, "nvram") ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -34,4 +35,5 @@ public:
 	UINT32 screen_update_atetris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	void reset_bank();
+	required_device<cpu_device> m_maincpu;
 };

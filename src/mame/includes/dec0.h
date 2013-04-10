@@ -12,8 +12,8 @@ public:
 		m_tilegen1(*this, "tilegen1"),
 		m_tilegen2(*this, "tilegen2"),
 		m_tilegen3(*this, "tilegen3"),
-		m_spritegen(*this, "spritegen")
-	{ }
+		m_spritegen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -91,6 +91,7 @@ public:
 	void slyspy_set_protection_map( int type);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
+	required_device<cpu_device> m_maincpu;
 };
 
 

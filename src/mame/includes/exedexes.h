@@ -16,7 +16,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_nbg_yscroll(*this, "nbg_yscroll"),
 		m_nbg_xscroll(*this, "nbg_xscroll"),
-		m_bg_scroll(*this, "bg_scroll"){ }
+		m_bg_scroll(*this, "bg_scroll"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -51,4 +52,5 @@ public:
 	UINT32 screen_update_exedexes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(exedexes_scanline);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	required_device<cpu_device> m_maincpu;
 };

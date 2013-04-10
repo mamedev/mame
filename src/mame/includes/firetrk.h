@@ -44,7 +44,8 @@ public:
 		m_drone_x(*this, "drone_x"),
 		m_drone_y(*this, "drone_y"),
 		m_drone_rot(*this, "drone_rot"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_in_service_mode;
 	UINT32 m_dial[2];
@@ -121,6 +122,7 @@ public:
 	void montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection);
 	void check_collision(firetrk_state *state, int which);
 	void set_service_mode(int enable);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -14,7 +14,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
 		m_colorram2(*this, "colorram2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_scroll_y;
@@ -64,4 +65,5 @@ public:
 	void ringking_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, int *g_data, int *b_data );
 	void kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

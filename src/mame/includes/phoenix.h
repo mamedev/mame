@@ -7,7 +7,8 @@ class phoenix_state : public driver_device
 {
 public:
 	phoenix_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_videoram_pg[2];
 	UINT8 m_videoram_pg_index;
@@ -38,6 +39,7 @@ public:
 	UINT32 screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

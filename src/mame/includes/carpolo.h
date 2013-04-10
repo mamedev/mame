@@ -15,7 +15,8 @@ public:
 	carpolo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_alpharam(*this, "alpharam"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_alpharam;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -99,6 +100,7 @@ public:
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
 
+	required_device<cpu_device> m_maincpu;
 };
 
 

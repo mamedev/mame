@@ -18,7 +18,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_pc3092_data(*this, "pc3092_data"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -50,6 +51,7 @@ public:
 	void pc3092_reset(void);
 	void pc3092_update();
 	void pc3259_update(void);
+	required_device<cpu_device> m_maincpu;
 };
 
 

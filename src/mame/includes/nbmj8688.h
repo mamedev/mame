@@ -2,7 +2,8 @@ class nbmj8688_state : public driver_device
 {
 public:
 	nbmj8688_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_mjsikaku_scrolly;
 	int m_blitter_destx;
@@ -98,4 +99,5 @@ public:
 	void common_video_start();
 	void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip);
 	void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip);
+	required_device<cpu_device> m_maincpu;
 };

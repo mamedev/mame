@@ -3,7 +3,8 @@ class djmain_state : public driver_device
 public:
 	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_obj_ram(*this, "obj_ram"){ }
+		m_obj_ram(*this, "obj_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_sndram_bank;
 	UINT8 *m_sndram;
@@ -58,6 +59,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void sndram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/djmain.c -----------*/

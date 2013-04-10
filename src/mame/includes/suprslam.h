@@ -16,8 +16,8 @@ public:
 		m_spr_ctrl(*this, "spr_ctrl"),
 		m_screen_vregs(*this, "screen_vregs"),
 		m_spr(*this, "vsystem_spr"),
-		m_audiocpu(*this, "audiocpu")
-	{ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_screen_videoram;
@@ -56,4 +56,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_suprslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

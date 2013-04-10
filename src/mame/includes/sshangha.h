@@ -18,8 +18,8 @@ public:
 		m_tile_paletteram1(*this, "tile_palram1"),
 		m_prot_data(*this, "prot_data"),
 		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2")
-	{ }
+		m_sprgen2(*this, "spritegen2"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -60,4 +60,5 @@ public:
 	UINT32 screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

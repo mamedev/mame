@@ -17,8 +17,8 @@ public:
 		m_spr(*this, "vsystem_spr"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
-		m_audiocpu(*this, "audiocpu")
-	{ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1videoram;
@@ -120,4 +120,5 @@ public:
 	void aerfboot_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

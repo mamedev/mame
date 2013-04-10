@@ -12,7 +12,8 @@ public:
 		m_banked_rom(*this, "banked_rom"),
 		m_paletteram_1000(*this, "paletteram_1000"),
 		m_ram(*this, "ram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_banked_rom;
@@ -49,6 +50,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(k88games_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/88games.c -----------*/

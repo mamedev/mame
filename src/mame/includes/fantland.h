@@ -6,7 +6,8 @@ public:
 	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram", 0),
-		m_spriteram2(*this, "spriteram2", 0){ }
+		m_spriteram2(*this, "spriteram2", 0),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 //  UINT8 *    m_spriteram;   // currently directly used in a 16bit map...
@@ -59,4 +60,5 @@ public:
 	void borntofi_adpcm_start( device_t *device, int voice );
 	void borntofi_adpcm_stop( device_t *device, int voice );
 	void borntofi_adpcm_int( device_t *device, int voice );
+	required_device<cpu_device> m_maincpu;
 };

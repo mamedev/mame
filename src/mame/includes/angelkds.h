@@ -14,7 +14,8 @@ public:
 		m_txvideoram(*this, "txvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bgtopvideoram;
@@ -63,4 +64,5 @@ public:
 	UINT32 screen_update_angelkds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

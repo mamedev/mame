@@ -13,7 +13,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_shared_ram;
@@ -116,6 +117,7 @@ public:
 	void kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
 	void sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
 	DECLARE_WRITE_LINE_MEMBER(ym3812_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 /* game_id - used to deal with a few game specific situations */

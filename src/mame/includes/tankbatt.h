@@ -4,7 +4,8 @@ public:
 	tankbatt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bulletsram(*this, "bulletsram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_bulletsram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -32,4 +33,5 @@ public:
 	UINT32 screen_update_tankbatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tankbatt_interrupt);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

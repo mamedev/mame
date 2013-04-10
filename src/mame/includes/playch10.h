@@ -12,7 +12,8 @@ public:
 		m_ram_8w(*this, "ram_8w"),
 		m_videoram(*this, "videoram"),
 		m_timedata(*this, "timedata"),
-		m_work_ram(*this, "work_ram"){ }
+		m_work_ram(*this, "work_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_ram_8w;
 	required_shared_ptr<UINT8> m_videoram;
@@ -124,6 +125,7 @@ public:
 	void gboard_scanline_cb( int scanline, int vblank, int blanked );
 	void ppu_irq(int *ppu_regs);
 	void mapper9_latch(offs_t offset);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/playch10.c -----------*/

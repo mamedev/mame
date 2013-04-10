@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_sharedram(*this, "sharedram"),
-		m_bg_videoram(*this, "bg_videoram"){ }
+		m_bg_videoram(*this, "bg_videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_cpu2_m6000;
 	required_shared_ptr<UINT8> m_fg_videoram;
@@ -65,4 +66,5 @@ public:
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap);
+	required_device<cpu_device> m_maincpu;
 };

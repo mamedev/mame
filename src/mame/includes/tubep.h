@@ -6,7 +6,8 @@ public:
 		m_textram(*this, "textram"),
 		m_backgroundram(*this, "backgroundram"),
 		m_sprite_colorsharedram(*this, "sprite_color"),
-		m_rjammer_backgroundram(*this, "rjammer_bgram"){ }
+		m_rjammer_backgroundram(*this, "rjammer_bgram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_sound_latch;
 	UINT8 m_ls74;
@@ -85,6 +86,7 @@ public:
 	void tubep_vblank_end();
 	void tubep_setup_save_state();
 	DECLARE_WRITE_LINE_MEMBER(rjammer_adpcm_vck);
+	required_device<cpu_device> m_maincpu;
 };
 
 

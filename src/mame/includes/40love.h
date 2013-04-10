@@ -9,7 +9,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_mcu_ram(*this, "mcu_ram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -103,4 +104,5 @@ public:
 	void fortyl_plot_pix( int offset );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

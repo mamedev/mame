@@ -8,8 +8,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pixelram(*this, "pixelram"),
 		m_charvideoram(*this, "charvideoram"),
-		m_spr_old(*this, "vsystem_spr_old")
-	{ }
+		m_spr_old(*this, "vsystem_spr_old"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_pending_command;
 
@@ -43,4 +43,5 @@ public:
 	UINT32 screen_update_welltris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

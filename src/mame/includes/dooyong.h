@@ -8,7 +8,8 @@ public:
 			m_spriteram(*this, "spriteram"),
 			m_spriteram16(*this, "spriteram16") ,
 		m_txvideoram(*this, "txvideoram"),
-		m_paletteram_flytiger(*this, "flytiger_palram"){ }
+		m_paletteram_flytiger(*this, "flytiger_palram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
@@ -93,4 +94,5 @@ public:
 	void rshark_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
+	required_device<cpu_device> m_maincpu;
 };

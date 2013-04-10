@@ -7,7 +7,8 @@ public:
 		m_scroll(*this, "scroll"),
 		m_tx_tileram(*this, "tx_tileram"),
 		m_fg_tileram(*this, "fg_tileram"),
-		m_bg_tileram(*this, "bg_tileram"){ }
+		m_bg_tileram(*this, "bg_tileram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_scroll;
@@ -35,4 +36,5 @@ public:
 	void pirates_decrypt_p();
 	void pirates_decrypt_s();
 	void pirates_decrypt_oki();
+	required_device<cpu_device> m_maincpu;
 };

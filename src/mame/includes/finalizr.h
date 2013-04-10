@@ -15,7 +15,8 @@ public:
 		m_colorram2(*this, "colorram2"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram_2(*this, "spriteram_2"){ }
+		m_spriteram_2(*this, "spriteram_2"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_scroll;
@@ -55,4 +56,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(finalizr_scanline);
+	required_device<cpu_device> m_maincpu;
 };

@@ -10,7 +10,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_attributesram(*this, "attributesram"),
 		m_spriteram(*this, "spriteram"),
-		m_sprite_bank(*this, "sprite_bank"){ }
+		m_sprite_bank(*this, "sprite_bank"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_dsc0;
 	int m_dsc1;
@@ -56,4 +57,5 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype);
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8* sprite_ram,int bank);
+	required_device<cpu_device> m_maincpu;
 };

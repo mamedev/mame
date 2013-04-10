@@ -14,7 +14,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_workram(*this, "workram"),
 		m_spriteram_2(*this, "spriteram_2"),
-		m_mcu_ram(*this, "mcu_ram"){ }
+		m_mcu_ram(*this, "mcu_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -118,4 +119,5 @@ public:
 	void equites_update_dac(  );
 	void unpack_block( const char *region, int offset, int size );
 	void unpack_region( const char *region );
+	required_device<cpu_device> m_maincpu;
 };

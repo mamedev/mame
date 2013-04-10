@@ -15,7 +15,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_ram(*this, "ram"),
 			m_shared_ram(*this, "shared_ram"),
-			m_spriteram(*this, "spriteram") { }
+			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_coin_word;
 	UINT16 m_port_sel;
@@ -49,4 +50,5 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt5);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	void draw_sprites_cbombers(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
+	required_device<cpu_device> m_maincpu;
 };

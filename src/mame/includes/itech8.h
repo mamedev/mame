@@ -16,7 +16,8 @@ public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_tlc34076(*this, "tlc34076"),
-			m_visarea(0, 0, 0, 0){ }
+			m_visarea(0, 0, 0, 0),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<tlc34076_device> m_tlc34076;
 
@@ -132,4 +133,5 @@ public:
 							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
 	void compute_sensors();
 	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
+	required_device<cpu_device> m_maincpu;
 };

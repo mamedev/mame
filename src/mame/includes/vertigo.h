@@ -86,7 +86,8 @@ class vertigo_state : public driver_device
 public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_vectorram(*this, "vectorram") { }
+			m_vectorram(*this, "vectorram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_vectorram;
 	device_t *m_ttl74148;
@@ -120,6 +121,7 @@ public:
 	void vertigo_vgen (vector_generator *vg);
 	void vertigo_vproc(int cycles, int irq4);
 	void update_irq_encoder(int line, int state);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in machine/vertigo.c -----------*/

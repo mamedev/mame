@@ -6,7 +6,8 @@ public:
 		m_charram(*this, "charram"),
 		m_bgram0(*this, "bgram0"),
 		m_bgram1(*this, "bgram1"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_vblank;
 	int m_from_main;
@@ -73,4 +74,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

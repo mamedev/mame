@@ -13,7 +13,8 @@ public:
 		m_textvideoram(*this, "textvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_textvideoram;
@@ -53,4 +54,5 @@ public:
 	UINT32 screen_update_dday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(countdown_timer_callback);
 	void start_countdown_timer();
+	required_device<cpu_device> m_maincpu;
 };

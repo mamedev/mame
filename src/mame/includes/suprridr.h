@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_sound_data;
@@ -44,6 +45,7 @@ public:
 	INTERRUPT_GEN_MEMBER(main_nmi_gen);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	int suprridr_is_screen_flipped();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/suprridr.c -----------*/

@@ -11,7 +11,8 @@ public:
 		m_txram(*this, "txram"),
 		m_bg1ram(*this, "bg1ram"),
 		m_spriteram(*this, "spriteram"),
-		m_butasan_bg1ram(*this, "butasan_bg1ram"){ }
+		m_butasan_bg1ram(*this, "butasan_bg1ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_bg0_scrollx;
 	optional_shared_ptr<UINT8> m_bg0_scrolly;
@@ -97,4 +98,5 @@ public:
 	void butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void butasan_log_vram();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

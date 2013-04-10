@@ -17,7 +17,8 @@ public:
 		m_vscroll(*this, "vscroll"),
 		m_starx(*this, "starx"),
 		m_stary(*this, "stary"),
-		m_bgcolor(*this, "bgcolor"){ }
+		m_bgcolor(*this, "bgcolor"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_mainram;
@@ -61,4 +62,5 @@ public:
 	UINT32 screen_update_aeroboto(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(aeroboto_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

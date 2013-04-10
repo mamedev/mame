@@ -4,7 +4,8 @@ public:
 	stadhero_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_pf1_data(*this, "pf1_data"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_pf1_data;
 	tilemap_t *m_pf1_tilemap;
@@ -17,4 +18,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_stadhero(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

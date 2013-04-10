@@ -6,7 +6,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg0videoram(*this, "bg0videoram"),
 		m_bg1videoram(*this, "bg1videoram"),
-		m_spvideoram(*this, "spvideoram"){ }
+		m_spvideoram(*this, "spvideoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
@@ -46,4 +47,5 @@ public:
 	void screen_eof_shadfrce(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

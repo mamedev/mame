@@ -2,7 +2,8 @@ class starcrus_state : public driver_device
 {
 public:
 	starcrus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	bitmap_ind16 *m_ship1_vid;
 	bitmap_ind16 *m_ship2_vid;
@@ -55,4 +56,5 @@ public:
 	int collision_check_p1p2();
 	int collision_check_s1p1p2();
 	int collision_check_s2p1p2();
+	required_device<cpu_device> m_maincpu;
 };

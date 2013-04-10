@@ -16,8 +16,8 @@ public:
 		m_pixel_0_data(*this, "pixel_0_data"),
 		m_pixel_1_data(*this, "pixel_1_data"),
 		m_sprgen(*this, "spritegen"),
-		m_sprgen2(*this, "spritegen2")
-	{ }
+		m_sprgen2(*this, "spritegen2"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	bitmap_ind16 m_bitmap0;
@@ -53,4 +53,5 @@ public:
 	UINT32 screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_lemmings(screen_device &screen, bool state);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
+	required_device<cpu_device> m_maincpu;
 };

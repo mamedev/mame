@@ -3,7 +3,8 @@ class quizdna_state : public driver_device
 public:
 	quizdna_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_bg_ram;
 	UINT8 *m_fg_ram;
@@ -26,4 +27,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_quizdna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

@@ -8,8 +8,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spr_pal_clut(*this, "spr_pal_clut"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram")
-	{ }
+		m_bg_videoram(*this, "bg_videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	UINT8  *  m_text_videoram;
@@ -86,6 +86,7 @@ public:
 						UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
 
+	required_device<cpu_device> m_maincpu;
 };
 
 class bigfghtr_state : public armedf_state

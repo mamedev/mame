@@ -7,7 +7,8 @@ public:
 		m_spritexy_ram(*this, "spritexy_ram"),
 		m_spriteattrib_ram(*this, "spriteattram"),
 		m_videoram(*this, "videoram"),
-		m_cpu2_ram(*this, "cpu2_ram"){ }
+		m_cpu2_ram(*this, "cpu2_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_spritetile_ram;
 	required_shared_ptr<UINT8> m_spritexy_ram;
@@ -49,4 +50,5 @@ public:
 	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int gsword_coins_in(void);
+	required_device<cpu_device> m_maincpu;
 };

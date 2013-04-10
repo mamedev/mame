@@ -7,7 +7,8 @@ public:
 		m_vidram2(*this, "vidram2"),
 		m_vidram3(*this, "vidram3"),
 		m_sprram(*this, "sprram"),
-		m_regs(*this, "regs"){ }
+		m_regs(*this, "regs"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_vidram;
 	required_shared_ptr<UINT32> m_vidram2;
@@ -30,4 +31,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_silkroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

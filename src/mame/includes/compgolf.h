@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_bg_ram(*this, "bg_ram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -45,4 +46,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void compgolf_expand_bg();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	required_device<cpu_device> m_maincpu;
 };

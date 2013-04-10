@@ -8,7 +8,8 @@ public:
 			m_spriteram(*this, "spriteram") ,
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bg1videoram(*this, "bg1videoram"),
-		m_soundlatch2(*this, "soundlatch2"){ }
+		m_soundlatch2(*this, "soundlatch2"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -66,4 +67,5 @@ public:
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	int avengers_fetch_paldata(  );
+	required_device<cpu_device> m_maincpu;
 };

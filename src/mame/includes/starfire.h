@@ -26,8 +26,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_starfire_colorram(*this, "colorram"),
 		m_starfire_videoram(*this, "videoram"),
-		m_samples(*this, "samples")
-	{ }
+		m_samples(*this, "samples"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_starfire_colorram;
 	required_shared_ptr<UINT8> m_starfire_videoram;
@@ -63,4 +63,5 @@ public:
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	void get_pens(pen_t *pens);
+	required_device<cpu_device> m_maincpu;
 };

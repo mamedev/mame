@@ -13,8 +13,8 @@ public:
 	avalnche_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_discrete(*this, "discrete")
-	{ }
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_device<discrete_device> m_discrete;
@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(avalnche_attract_enable_w);
 	DECLARE_WRITE8_MEMBER(avalnche_audio_w);
 	DECLARE_WRITE8_MEMBER(catch_audio_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

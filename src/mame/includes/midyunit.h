@@ -36,7 +36,8 @@ public:
 			m_narc_sound(*this, "narcsnd"),
 			m_cvsd_sound(*this, "cvsd"),
 			m_adpcm_sound(*this, "adpcm"),
-			m_gfx_rom(*this, "gfx_rom", 16) { }
+			m_gfx_rom(*this, "gfx_rom", 16) ,
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
@@ -109,6 +110,7 @@ public:
 	DECLARE_VIDEO_START(common);
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
+	required_device<cpu_device> m_maincpu;
 };
 /*----------- defined in video/midyunit.c -----------*/
 void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);

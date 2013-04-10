@@ -15,7 +15,8 @@ public:
 			m_nvram(*this, "nvram"),
 			m_gfxrom(*this, "gfxrom"),
 			m_cvsd_sound(*this, "cvsd"),
-			m_adpcm_sound(*this, "adpcm") { }
+			m_adpcm_sound(*this, "adpcm") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_nvram;
 	required_memory_region m_gfxrom;
@@ -66,6 +67,7 @@ public:
 	DECLARE_MACHINE_RESET(midtunit);
 	DECLARE_VIDEO_START(midtunit);
 	TIMER_CALLBACK_MEMBER(dma_callback);
+	required_device<cpu_device> m_maincpu;
 };
 /*----------- defined in video/midtunit.c -----------*/
 extern UINT8 midtunit_gfx_rom_large;

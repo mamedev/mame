@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_attributesram(*this, "attributesram"),
 		m_spriteram(*this, "spriteram"),
-		m_spriteram2(*this, "spriteram2"){ }
+		m_spriteram2(*this, "spriteram2"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_dsw;
 	int m_active_8910;
@@ -48,4 +49,5 @@ public:
 	INTERRUPT_GEN_MEMBER(zaccaria_cb1_toggle);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section);
+	required_device<cpu_device> m_maincpu;
 };

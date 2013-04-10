@@ -14,7 +14,8 @@ public:
 	groundfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram") { }
+		m_spriteram(*this,"spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -41,4 +42,5 @@ public:
 	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
 	TIMER_CALLBACK_MEMBER(groundfx_interrupt5);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs);
+	required_device<cpu_device> m_maincpu;
 };

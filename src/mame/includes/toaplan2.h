@@ -20,8 +20,8 @@ public:
 		m_txvideoram16_offs(*this, "txvram_offs"),
 		m_txscrollram16(*this, "txscrollram16"),
 		m_tx_gfxram16(*this, "tx_gfxram16"),
-		m_mainram16(*this, "mainram16")
-	{
+		m_mainram16(*this, "mainram16"),
+		m_maincpu(*this, "maincpu") {
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;
 	}
@@ -138,4 +138,5 @@ public:
 	void toaplan2_vblank_irq(int irq_line);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

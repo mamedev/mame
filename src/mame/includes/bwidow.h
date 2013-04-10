@@ -10,13 +10,15 @@ class bwidow_state : public driver_device
 {
 public:
 	bwidow_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_lastdata;
 	DECLARE_READ8_MEMBER(spacduel_IN3_r);
 	DECLARE_WRITE8_MEMBER(bwidow_misc_w);
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	required_device<cpu_device> m_maincpu;
 };
 
 

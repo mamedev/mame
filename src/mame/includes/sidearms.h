@@ -9,7 +9,8 @@ public:
 		m_bg_scrollx(*this, "bg_scrollx"),
 		m_bg_scrolly(*this, "bg_scrolly"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_gameid;
 
@@ -56,4 +57,5 @@ public:
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );
 	void sidearms_draw_starfield( bitmap_ind16 &bitmap );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

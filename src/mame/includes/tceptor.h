@@ -10,7 +10,8 @@ public:
 		m_bg_ram(*this, "bg_ram"),
 		m_m68k_shared_ram(*this, "m68k_shared_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_c45_road(*this, "c45_road") { }
+		m_c45_road(*this, "c45_road") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_m6809_irq_enable;
 	UINT8 m_m68k_irq_enable;
@@ -75,4 +76,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
 	inline UINT8 fix_input0(UINT8 in1, UINT8 in2);
 	inline UINT8 fix_input1(UINT8 in1, UINT8 in2);
+	required_device<cpu_device> m_maincpu;
 };

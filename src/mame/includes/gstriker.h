@@ -43,8 +43,8 @@ public:
 		m_VS920A_vram(*this, "vs920a_vram"),
 		m_work_ram(*this, "work_ram"),
 		m_lineram(*this, "lineram"),
-		m_spr(*this, "vsystem_spr")
-	{ }
+		m_spr(*this, "vsystem_spr"),
+		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start()
 	{
@@ -111,6 +111,7 @@ public:
 	tilemap_t* MB60553_get_tilemap(int numchip);
 	void mcu_init(  );
 	DECLARE_WRITE_LINE_MEMBER(gs_ym2610_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 #endif

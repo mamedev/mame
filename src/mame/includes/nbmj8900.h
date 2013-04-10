@@ -2,7 +2,8 @@ class nbmj8900_state : public driver_device
 {
 public:
 	nbmj8900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_scrolly;
 	int m_blitter_destx;
@@ -50,4 +51,5 @@ public:
 	void update_pixel0(int x, int y);
 	void update_pixel1(int x, int y);
 	void nbmj8900_gfxdraw();
+	required_device<cpu_device> m_maincpu;
 };

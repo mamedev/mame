@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_nmi_enabled;
 	int m_sound_command1;
@@ -62,4 +63,5 @@ public:
 	INTERRUPT_GEN_MEMBER(samurai_interrupt);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_videoram2;
@@ -43,4 +44,5 @@ public:
 	void switch_palette();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask);
 	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	required_device<cpu_device> m_maincpu;
 };

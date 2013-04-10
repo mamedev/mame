@@ -12,7 +12,8 @@ public:
 		m_paletteram(*this, "paletteram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_rambase(*this, "rambase"){ }
+		m_rambase(*this, "rambase"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -44,4 +45,5 @@ public:
 	UINT32 screen_update_gundealr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gundealr_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(yamyam_mcu_sim);
+	required_device<cpu_device> m_maincpu;
 };

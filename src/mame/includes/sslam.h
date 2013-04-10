@@ -7,7 +7,8 @@ public:
 		m_md_tileram(*this, "md_tileram"),
 		m_tx_tileram(*this, "tx_tileram"),
 		m_regs(*this, "regs"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	emu_timer *m_music_timer;
 
@@ -54,4 +55,5 @@ public:
 	UINT32 screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

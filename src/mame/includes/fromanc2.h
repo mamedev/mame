@@ -5,7 +5,8 @@ public:
 	fromanc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	UINT16   *m_paletteram[2];
@@ -116,4 +117,5 @@ public:
 	void fromancr_gfxbank_w( int data );
 	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

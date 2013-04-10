@@ -6,7 +6,8 @@ public:
 	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_geebee_videoram(*this, "geebee_videoram"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_geebee_videoram;
 	optional_shared_ptr<UINT8> m_videoram;
@@ -50,6 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	inline void geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
+	required_device<cpu_device> m_maincpu;
 };
 
 

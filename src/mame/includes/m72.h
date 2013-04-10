@@ -14,7 +14,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_majtitle_rowscrollram(*this, "majtitle_rowscr"),
 		m_spriteram2(*this, "spriteram2"),
-		m_soundram(*this, "soundram"){ }
+		m_soundram(*this, "soundram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram1;
@@ -132,4 +133,5 @@ public:
 	int find_sample(int num);
 	void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes);
 	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
+	required_device<cpu_device> m_maincpu;
 };

@@ -7,7 +7,8 @@ public:
 		m_roz_ctrl(*this, "roz_ctrl"),
 		m_tx_scroll(*this, "tx_scroll"),
 		m_bg_scroll(*this, "bg_scroll"),
-		m_mahjong_input_select(*this, "mahjong_select"){ }
+		m_mahjong_input_select(*this, "mahjong_select"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_roz_ctrl;
@@ -96,4 +97,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder);
 	void draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 	void configure_banks();
+	required_device<cpu_device> m_maincpu;
 };

@@ -3,7 +3,8 @@ class wolfpack_state : public driver_device
 public:
 	wolfpack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_alpha_num_ram(*this, "alpha_num_ram"){ }
+		m_alpha_num_ram(*this, "alpha_num_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_collision;
 	required_shared_ptr<UINT8> m_alpha_num_ram;
@@ -61,4 +62,5 @@ public:
 	void draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

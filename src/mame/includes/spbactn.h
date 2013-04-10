@@ -10,8 +10,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_spvideoram(*this, "spvideoram"),
 		m_extraram(*this, "extraram"),
-		m_extraram2(*this, "extraram2")
-	{ }
+		m_extraram2(*this, "extraram2"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_fgvideoram;
@@ -64,4 +64,5 @@ public:
 		return 0xffff;
 	}
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };

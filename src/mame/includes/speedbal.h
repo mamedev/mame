@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_background_videoram(*this, "bg_videoram"),
 		m_foreground_videoram(*this, "fg_videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_background_videoram;
 	required_shared_ptr<UINT8> m_foreground_videoram;
@@ -20,4 +21,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_speedbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };

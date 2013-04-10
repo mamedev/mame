@@ -10,7 +10,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data"){ }
+		m_fore_data(*this, "fore_data"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_shared_ram;
@@ -43,4 +44,5 @@ public:
 	INTERRUPT_GEN_MEMBER(raiden_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask);
 	void common_decrypt();
+	required_device<cpu_device> m_maincpu;
 };

@@ -26,7 +26,8 @@ public:
 		m_headlight_pos(*this, "headlight_pos"),
 		m_edge1_pos(*this, "edge1_pos"),
 		m_edge2_pos(*this, "edge2_pos"),
-		m_scroll(*this, "scroll"){ }
+		m_scroll(*this, "scroll"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;
@@ -68,6 +69,7 @@ public:
 	void draw_headlight(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	inline UINT8 shift_common(UINT8 hi, UINT8 lo);
+	required_device<cpu_device> m_maincpu;
 };
 /*----------- defined in video/madalien.c -----------*/
 

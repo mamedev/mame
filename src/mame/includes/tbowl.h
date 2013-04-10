@@ -8,7 +8,8 @@ public:
 		m_txvideoram(*this, "txvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_bg2videoram(*this, "bg2videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
@@ -58,4 +59,5 @@ public:
 	void tbowl_adpcm_int(device_t *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(tbowl_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(tbowl_adpcm_int_2);
+	required_device<cpu_device> m_maincpu;
 };

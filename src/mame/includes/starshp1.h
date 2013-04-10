@@ -38,7 +38,8 @@ public:
 		m_playfield_ram(*this, "playfield_ram"),
 		m_hpos_ram(*this, "hpos_ram"),
 		m_vpos_ram(*this, "vpos_ram"),
-		m_obj_ram(*this, "obj_ram"){ }
+		m_obj_ram(*this, "obj_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_analog_in_select;
 	int m_attract;
@@ -96,6 +97,7 @@ public:
 	int spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect);
 	int point_in_circle(int x, int y, int center_x, int center_y, int r);
 	int circle_collision(const rectangle &rect);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in audio/starshp1.c -----------*/

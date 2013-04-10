@@ -26,7 +26,8 @@ public:
 		m_drivedge_zbuf_control(*this, "drivedge_zctl"),
 		m_tms1_boot(*this, "tms1_boot"),
 		m_tms1_ram(*this, "tms1_ram"),
-		m_tms2_ram(*this, "tms2_ram"){ }
+		m_tms2_ram(*this, "tms2_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT16> m_main_ram;
 	optional_shared_ptr<UINT16> m_nvram;
@@ -183,4 +184,5 @@ public:
 	void init_shuffle_bowl_common(int prot_addr);
 	void install_timekeeper();
 	void init_gt_common();
+	required_device<cpu_device> m_maincpu;
 };

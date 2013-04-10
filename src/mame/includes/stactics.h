@@ -19,7 +19,8 @@ public:
 		m_videoram_b(*this, "videoram_b"),
 		m_videoram_d(*this, "videoram_d"),
 		m_videoram_e(*this, "videoram_e"),
-		m_videoram_f(*this, "videoram_f"){ }
+		m_videoram_f(*this, "videoram_f"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* machine state */
 	int    m_vert_pos;
@@ -67,6 +68,7 @@ public:
 	void set_indicator_leds(int data, const char *output_name, int base_index);
 	void update_artwork();
 	void move_motor();
+	required_device<cpu_device> m_maincpu;
 };
 /*----------- defined in video/stactics.c -----------*/
 MACHINE_CONFIG_EXTERN( stactics_video );

@@ -11,7 +11,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
-		m_rowscroll(*this, "rowscroll"){ }
+		m_rowscroll(*this, "rowscroll"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_bgvideoram;
@@ -100,4 +101,5 @@ public:
 	void bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
 	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 playmark_asciitohex(UINT8 data);
+	required_device<cpu_device> m_maincpu;
 };

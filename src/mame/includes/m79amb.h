@@ -7,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_mask(*this, "mask"),
-		m_discrete(*this, "discrete"){ }
+		m_discrete(*this, "discrete"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -27,6 +28,7 @@ public:
 	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
 	DECLARE_WRITE8_MEMBER(m79amb_8000_w);
 	DECLARE_WRITE8_MEMBER(m79amb_8003_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in audio/m79amb.c -----------*/

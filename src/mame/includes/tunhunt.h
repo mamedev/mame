@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_control;
 	required_shared_ptr<UINT8> m_workram;
@@ -30,4 +31,5 @@ public:
 	void draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_shell(bitmap_ind16 &bitmap, const rectangle &cliprect, int picture_code,
 		int hposition,int vstart,int vstop,int vstretch,int hstretch);
+	required_device<cpu_device> m_maincpu;
 };

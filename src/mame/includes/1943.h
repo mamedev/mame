@@ -14,7 +14,8 @@ public:
 		m_scrollx(*this, "scrollx"),
 		m_scrolly(*this, "scrolly"),
 		m_bgscrollx(*this, "bgscrollx"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -48,4 +49,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	required_device<cpu_device> m_maincpu;
 };

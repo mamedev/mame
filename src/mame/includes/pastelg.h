@@ -2,7 +2,8 @@ class pastelg_state : public driver_device
 {
 public:
 	pastelg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_mux_data;
 	int m_blitter_destx;
@@ -39,6 +40,7 @@ public:
 	int pastelg_blitter_src_addr_r(address_space &space);
 	void pastelg_vramflip();
 	void pastelg_gfxdraw();
+	required_device<cpu_device> m_maincpu;
 };
 
 /*----------- defined in video/pastelg.c -----------*/

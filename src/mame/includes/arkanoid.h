@@ -17,8 +17,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
 		m_spriteram(*this,"spriteram"),
-		m_protram(*this,"protram")
-	{ }
+		m_protram(*this,"protram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -87,4 +87,5 @@ public:
 	TIMER_CALLBACK_MEMBER(test);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
+	required_device<cpu_device> m_maincpu;
 };

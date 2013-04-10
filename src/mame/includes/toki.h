@@ -9,7 +9,8 @@ public:
 		m_background1_videoram16(*this, "bg1_vram16"),
 		m_background2_videoram16(*this, "bg2_vram16"),
 		m_videoram(*this, "videoram"),
-		m_scrollram16(*this, "scrollram16"){ }
+		m_scrollram16(*this, "scrollram16"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_background1_videoram16;
@@ -43,4 +44,5 @@ public:
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(toki_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

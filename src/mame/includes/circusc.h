@@ -21,7 +21,8 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_sn_1(*this, "sn1"),
 		m_sn_2(*this, "sn2"),
-		m_discrete(*this, "fltdisc"){ }
+		m_discrete(*this, "fltdisc"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spritebank;
@@ -62,4 +63,5 @@ public:
 	UINT32 screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };

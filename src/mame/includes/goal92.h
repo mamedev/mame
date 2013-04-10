@@ -14,7 +14,8 @@ public:
 		m_tx_data(*this, "tx_data"),
 		m_spriteram(*this, "spriteram"),
 		m_scrollram(*this, "scrollram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_data;
@@ -57,4 +58,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(goal92_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };

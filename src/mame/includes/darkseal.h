@@ -13,8 +13,8 @@ public:
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_sprgen(*this, "spritegen")
-	{ }
+		m_sprgen(*this, "spritegen"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -36,4 +36,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_darkseal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);
+	required_device<cpu_device> m_maincpu;
 };

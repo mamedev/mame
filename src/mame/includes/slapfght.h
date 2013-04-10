@@ -24,7 +24,8 @@ public:
 			m_slapfight_scrollx_lo(*this, "scrollx_lo"),
 			m_slapfight_scrollx_hi(*this, "scrollx_hi"),
 			m_slapfight_scrolly(*this, "scrolly"),
-			m_spriteram(*this, "spriteram") { }
+			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_getstar_id;
 	required_shared_ptr<UINT8> m_slapfight_videoram;
@@ -130,6 +131,7 @@ public:
 	void slapfght_log_vram();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display );
 	void getstar_init(  );
+	required_device<cpu_device> m_maincpu;
 };
 
 
