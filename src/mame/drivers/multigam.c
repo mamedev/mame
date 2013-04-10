@@ -76,7 +76,8 @@ class multigam_state : public driver_device
 {
 public:
 	multigam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8* m_nt_ram;
 	UINT8* m_vram;
@@ -155,6 +156,7 @@ public:
 	void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
 	void ppu_irq(int *ppu_regs);
+	required_device<cpu_device> m_maincpu;
 };
 
 

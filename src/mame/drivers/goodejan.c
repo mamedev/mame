@@ -61,13 +61,15 @@ class goodejan_state : public driver_device
 {
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_mux_data;
 	DECLARE_WRITE16_MEMBER(goodejan_gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
 	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
 	INTERRUPT_GEN_MEMBER(goodejan_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

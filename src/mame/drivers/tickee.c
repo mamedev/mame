@@ -35,7 +35,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
 		m_vram(*this, "vram"),
-		m_control(*this, "control"){ }
+		m_control(*this, "control"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram;
@@ -61,6 +62,7 @@ public:
 	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
+	required_device<cpu_device> m_maincpu;
 };
 
 

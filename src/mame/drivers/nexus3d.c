@@ -24,7 +24,8 @@ class nexus3d_state : public driver_device
 public:
 	nexus3d_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_mainram(*this, "mainram"){ }
+		m_mainram(*this, "mainram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_mainram;
 
@@ -52,6 +53,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void nexus3d_flash_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

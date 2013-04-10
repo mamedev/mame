@@ -80,7 +80,8 @@ class gamecstl_state : public driver_device
 public:
 	gamecstl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cga_ram(*this, "cga_ram"){ }
+		m_cga_ram(*this, "cga_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_cga_ram;
 	UINT32 *m_bios_ram;
@@ -123,6 +124,7 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void intel82439tx_init();
+	required_device<cpu_device> m_maincpu;
 };
 
 

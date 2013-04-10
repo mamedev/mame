@@ -276,7 +276,8 @@ class aristmk4_state : public driver_device
 public:
 	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-		m_mkiv_vram(*this, "mkiv_vram"){ }
+		m_mkiv_vram(*this, "mkiv_vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
@@ -340,6 +341,7 @@ public:
 	TIMER_CALLBACK_MEMBER(hopper_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 	inline void uBackgroundColour();
+	required_device<cpu_device> m_maincpu;
 };
 
 /* Partial Cashcade protocol */

@@ -82,7 +82,8 @@ public:
 	statriv2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_question_offset(*this, "question_offset"){ }
+		m_question_offset(*this, "question_offset"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_tilemap;
@@ -111,6 +112,7 @@ public:
 	DECLARE_VIDEO_START(vertical);
 	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

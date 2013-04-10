@@ -42,7 +42,8 @@ class sbrkout_state : public driver_device
 public:
 	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	emu_timer *m_scanline_timer;
@@ -70,6 +71,7 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
+	required_device<cpu_device> m_maincpu;
 };
 
 

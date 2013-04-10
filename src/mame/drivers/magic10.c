@@ -93,7 +93,8 @@ public:
 		m_layer0_videoram(*this, "layer0_videoram"),
 		m_layer1_videoram(*this, "layer1_videoram"),
 		m_layer2_videoram(*this, "layer2_videoram"),
-		m_vregs(*this, "vregs"){ }
+		m_vregs(*this, "vregs"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_layer0_tilemap;
 	tilemap_t *m_layer1_tilemap;
@@ -122,6 +123,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

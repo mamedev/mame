@@ -32,10 +32,12 @@ class gaminator_state : public driver_device
 {
 public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE32_MEMBER(gamtor_unk_w);
 	DECLARE_DRIVER_INIT(gaminator);
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)

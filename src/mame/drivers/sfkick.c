@@ -63,7 +63,8 @@ class sfkick_state : public driver_device
 public:
 	sfkick_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_v9938(*this, "v9938") { }
+			m_v9938(*this, "v9938") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_main_mem;
 	int m_bank_cfg;
@@ -84,6 +85,7 @@ public:
 	void sfkick_bank_set(int num, int data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sfkick_vdp_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -29,7 +29,8 @@ public:
 	cardline_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_video;
 	required_shared_ptr<UINT8> m_videoram;
@@ -42,6 +43,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamps_w);
 	virtual void palette_init();
 	UINT32 screen_update_cardline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

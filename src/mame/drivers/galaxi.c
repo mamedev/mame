@@ -54,7 +54,8 @@ public:
 		m_bg2_ram(*this, "bg2_ram"),
 		m_bg3_ram(*this, "bg3_ram"),
 		m_bg4_ram(*this, "bg4_ram"),
-		m_fg_ram(*this, "fg_ram"){ }
+		m_fg_ram(*this, "fg_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_ram;
@@ -96,6 +97,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void show_out(  );
+	required_device<cpu_device> m_maincpu;
 };
 
 

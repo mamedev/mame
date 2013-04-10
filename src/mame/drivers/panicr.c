@@ -72,8 +72,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
-		m_spritebank(*this, "spritebank")
-	{ }
+		m_spritebank(*this, "spritebank"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -101,6 +101,7 @@ public:
 	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };
 
 

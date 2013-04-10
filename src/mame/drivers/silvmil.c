@@ -31,9 +31,8 @@ public:
 			m_bg_videoram(*this, "bg_videoram"),
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram"),
-			m_sprgen(*this, "spritegen")
-	{
-	}
+			m_sprgen(*this, "spritegen"),
+			m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -114,6 +113,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	required_device<cpu_device> m_maincpu;
 };
 
 

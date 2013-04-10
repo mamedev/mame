@@ -40,7 +40,8 @@ class tapatune_state : public driver_device
 public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_videoram(*this, "videoram") {}
+			m_videoram(*this, "videoram") ,
+		m_maincpu(*this, "maincpu") {}
 
 	UINT8   m_paletteram[0x300];
 	UINT16  m_palette_write_address;
@@ -73,6 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	virtual void video_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE16_MEMBER(tapatune_state::palette_w)

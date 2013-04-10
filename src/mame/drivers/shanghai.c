@@ -32,7 +32,8 @@ class shanghai_state : public driver_device
 {
 public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
 	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
@@ -40,6 +41,7 @@ public:
 	DECLARE_PALETTE_INIT(shanghai);
 	UINT32 screen_update_shanghai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(shanghai_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

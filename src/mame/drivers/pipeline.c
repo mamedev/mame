@@ -78,7 +78,8 @@ public:
 	pipeline_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram1(*this, "vram1"),
-		m_vram2(*this, "vram2"){ }
+		m_vram2(*this, "vram2"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
@@ -103,6 +104,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_pipeline(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

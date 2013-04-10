@@ -52,7 +52,8 @@ public:
 			m_laserdisc(*this, "laserdisc") ,
 		m_sprite_ram(*this, "sprite_ram"),
 		m_palette_ram(*this, "palette_ram"),
-		m_tile_ram(*this, "tile_ram"){ }
+		m_tile_ram(*this, "tile_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_start_lamp;
@@ -77,6 +78,7 @@ public:
 	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

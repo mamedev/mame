@@ -205,8 +205,8 @@ public:
 	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_v9938(*this, "v9938")
-	{ }
+		m_v9938(*this, "v9938"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
@@ -230,6 +230,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_vdp_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz

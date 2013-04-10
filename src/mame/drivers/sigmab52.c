@@ -136,7 +136,8 @@ class sigmab52_state : public driver_device
 {
 public:
 	sigmab52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_latch;
 	unsigned int m_acrtc_data;
@@ -151,6 +152,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_jwildb52(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

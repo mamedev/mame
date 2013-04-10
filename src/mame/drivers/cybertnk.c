@@ -186,8 +186,8 @@ public:
 		m_tilemap0scroll(*this, "tilemap1_scroll"),
 		m_tilemap1scroll(*this, "tilemap1_scroll"),
 		m_tilemap2scroll(*this, "tilemap2_scroll"),
-		m_roadram(*this, "roadram")
-	{ }
+		m_roadram(*this, "roadram"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_tilemap0_tilemap;
 	tilemap_t *m_tilemap1_tilemap;
@@ -221,6 +221,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_cybertnk_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cybertnk_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 /* tile format

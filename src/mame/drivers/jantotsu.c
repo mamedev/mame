@@ -103,7 +103,8 @@ class jantotsu_state : public driver_device
 {
 public:
 	jantotsu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	/* sound-related */
 	UINT32   m_adpcm_pos;
@@ -132,6 +133,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };
 
 

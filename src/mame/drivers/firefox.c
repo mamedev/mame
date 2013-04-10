@@ -44,7 +44,8 @@ public:
 		m_tileram(*this, "tileram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_palette(*this, "sprite_palette"),
-		m_tile_palette(*this, "tile_palette"){ }
+		m_tile_palette(*this, "tile_palette"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<phillips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
@@ -102,6 +103,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
+	required_device<cpu_device> m_maincpu;
 };
 
 

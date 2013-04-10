@@ -74,7 +74,8 @@ public:
 			m_pit8253(*this,"pit8253"),
 			m_pic8259_1(*this,"pic8259_1"),
 			m_pic8259_2(*this,"pic8259_2"),
-			m_dma8237_1(*this,"dma8237_1") { }
+			m_dma8237_1(*this,"dma8237_1") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_bg_bank;
 	int m_bank;
@@ -129,6 +130,7 @@ public:
 	UINT8 pcxt_speaker_get_spk();
 	void pcxt_speaker_set_spkrdata(UINT8 data);
 	void pcxt_speaker_set_input(UINT8 data);
+	required_device<cpu_device> m_maincpu;
 };
 
 UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

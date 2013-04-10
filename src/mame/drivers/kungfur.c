@@ -66,7 +66,8 @@ class kungfur_state : public driver_device
 {
 public:
 	kungfur_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_latch[3];
 	UINT8 m_control;
@@ -86,6 +87,7 @@ public:
 	INTERRUPT_GEN_MEMBER(kungfur_irq);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
 	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
+	required_device<cpu_device> m_maincpu;
 };
 
 

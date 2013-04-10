@@ -99,8 +99,8 @@ public:
 		m_tilemap_regs(*this, "tilemap_regs"),
 		m_spriteregs(*this, "spriteregs"),
 		m_blitterregs(*this, "blitterregs"),
-		m_spriteram(*this, "spriteram")
-	{ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_viewregs0;
 	required_shared_ptr<UINT32> m_viewregs6;
@@ -146,6 +146,7 @@ public:
 	void draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
 	void rabbit_do_blit();
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -52,7 +52,8 @@ public:
 	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vrafg"),
-		m_vram_bg(*this, "vrabg"){ }
+		m_vram_bg(*this, "vrabg"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_vram_fg;
 	required_shared_ptr<UINT16> m_vram_bg;
@@ -73,6 +74,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

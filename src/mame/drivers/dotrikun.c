@@ -29,7 +29,8 @@ class dotrikun_state : public driver_device
 public:
 	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_dotrikun_bitmap(*this, "dotrikun_bitmap"){ }
+		m_dotrikun_bitmap(*this, "dotrikun_bitmap"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_dotrikun_bitmap;
@@ -40,6 +41,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_dotrikun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

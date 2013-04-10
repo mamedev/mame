@@ -33,7 +33,8 @@ public:
 		m_obj_ram(*this, "obj_ram"),
 		m_out_ram(*this, "out_ram"),
 		m_color_ram(*this, "color_ram"),
-		m_fix_ram(*this, "fix_ram"){ }
+		m_fix_ram(*this, "fix_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_nmi_enable;
 
@@ -61,6 +62,7 @@ public:
 	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 /* VIDEO GOODS */

@@ -36,7 +36,8 @@ public:
 		m_ml_tileram(*this, "ml_tileram"),
 		m_dma_ram(*this, "dma_ram"),
 		m_ml_dotram(*this, "ml_dotram"),
-		m_mecha_ram(*this, "mecha_ram"){ }
+		m_mecha_ram(*this, "mecha_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
@@ -81,6 +82,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	int start_dma();
 	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
+	required_device<cpu_device> m_maincpu;
 };
 
 

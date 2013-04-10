@@ -34,8 +34,8 @@ public:
 		m_bg_vram(*this, "bg_vram"),
 		m_md_vram(*this, "md_vram"),
 		m_fg_vram(*this, "fg_vram"),
-		m_tx_vram(*this, "tx_vram")
-		{ }
+		m_tx_vram(*this, "tx_vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
@@ -73,6 +73,7 @@ public:
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	required_device<cpu_device> m_maincpu;
 };
 
 

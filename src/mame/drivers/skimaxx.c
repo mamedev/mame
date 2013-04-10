@@ -47,7 +47,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_blitter_regs(*this, "blitter_regs"),
 		m_fpga_ctrl(*this, "fpga_ctrl"),
-		m_fg_buffer(*this, "fg_buffer"){ }
+		m_fg_buffer(*this, "fg_buffer"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_blitter_regs;
 	required_shared_ptr<UINT32> m_fpga_ctrl;
@@ -74,6 +75,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_skimaxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

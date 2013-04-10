@@ -29,8 +29,8 @@ public:
 	horse_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram")
-	{ }
+		m_color_ram(*this, "color_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_video_ram;
 	required_shared_ptr<UINT8> m_color_ram;
@@ -41,6 +41,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(horse_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

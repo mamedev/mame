@@ -205,7 +205,8 @@ class konamim2_state : public driver_device
 public:
 	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_main_ram(*this, "main_ram"){ }
+		m_main_ram(*this, "main_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT64> m_main_ram;
 	UINT32 m_vdl0_address;
@@ -255,6 +256,7 @@ public:
 	void cde_handle_command();
 	void cde_handle_reports();
 	void cde_dma_transfer(address_space &space, int channel, int next);
+	required_device<cpu_device> m_maincpu;
 };
 
 

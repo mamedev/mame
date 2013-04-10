@@ -428,7 +428,8 @@ public:
 		m_interrupt_enable(*this, "int_enable"),
 		m_interrupt_config(*this, "int_config"),
 		m_asic_reset(*this, "asic_reset"),
-		m_rombase(*this, "rombase"){ }
+		m_rombase(*this, "rombase"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_nvram;
 	required_shared_ptr<UINT32> m_rambase;
@@ -511,6 +512,7 @@ public:
 	void widget_reset();
 	void update_widget_irq();
 	void init_common(int ioasic, int serialnum, int yearoffs, int config);
+	required_device<cpu_device> m_maincpu;
 };
 
 /*************************************

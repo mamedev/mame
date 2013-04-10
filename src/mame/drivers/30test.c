@@ -52,7 +52,8 @@ class namco_30test_state : public driver_device
 {
 public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_mux_data;
 	UINT8 m_oki_bank;
@@ -66,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -72,8 +72,8 @@ class bfmsys85_state : public driver_device
 public:
 	bfmsys85_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_vfd(*this, "vfd")
-		{ }
+			m_vfd(*this, "vfd"),
+			m_maincpu(*this, "maincpu") { }
 
 	optional_device<roc10937_t> m_vfd;
 	int m_mmtr_latch;
@@ -114,6 +114,7 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	int b85_find_project_string( );
+	required_device<cpu_device> m_maincpu;
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)

@@ -52,8 +52,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_scoreram(*this, "scoreram"),
 		m_ram2(*this, "ram2"),
-		m_characterram(*this, "characterram")
-	{ }
+		m_characterram(*this, "characterram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_scoreram;
@@ -72,6 +72,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
+	required_device<cpu_device> m_maincpu;
 };
 
 

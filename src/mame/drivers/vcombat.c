@@ -98,7 +98,8 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_vid_0_shared_ram(*this, "vid_0_ram"),
 		m_vid_1_shared_ram(*this, "vid_1_ram"),
-		m_framebuffer_ctrl(*this, "fb_control"){ }
+		m_framebuffer_ctrl(*this, "fb_control"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];
@@ -128,6 +129,7 @@ public:
 	DECLARE_MACHINE_RESET(shadfgtr);
 	UINT32 screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)

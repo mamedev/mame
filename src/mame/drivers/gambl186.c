@@ -35,12 +35,14 @@ class gambl186_state : public driver_device
 {
 public:
 	gambl186_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT32 screen_update_gambl186(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
+	required_device<cpu_device> m_maincpu;
 };
 
 

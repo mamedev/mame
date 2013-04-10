@@ -534,9 +534,8 @@ public:
 	ksys573_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_psxirq(*this, ":maincpu:irq"),
-		m_cr589(*this, ":cdrom")
-	{
-	}
+		m_cr589(*this, ":cdrom"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<psxirq_device> m_psxirq;
 
@@ -667,6 +666,7 @@ public:
 	void hyperbbc_lamp_callback( int data );
 	void mamboagg_output_callback( int offset, int data );
 	void punchmania_output_callback( int offset, int data );
+	required_device<cpu_device> m_maincpu;
 };
 
 void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )

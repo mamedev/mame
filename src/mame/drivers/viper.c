@@ -308,7 +308,8 @@ class viper_state : public driver_device
 {
 public:
 	viper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 
 	UINT32 m_epic_iack;
@@ -358,6 +359,7 @@ public:
 	void mpc8240_epic_reset(void);
 	int ds2430_insert_cmd_bit(int bit);
 	void DS2430_w(int bit);
+	required_device<cpu_device> m_maincpu;
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -23,8 +23,8 @@ public:
 			m_vram_bg(*this, "vrabg"),
 			m_vram_fg(*this, "vrafg"),
 			m_analog_x(*this, "ANALOGX"),
-			m_analog_y(*this, "ANALOGY")
-		{ }
+			m_analog_y(*this, "ANALOGY"),
+			m_maincpu(*this, "maincpu") { }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_bg;
@@ -35,6 +35,7 @@ public:
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
 	DECLARE_READ16_MEMBER(analogy_watchdog_r);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -144,7 +144,8 @@ public:
 		m_rambase(*this, "rambase"),
 		m_rambase2(*this, "rambase2"),
 		m_control(*this, "control"),
-		m_rombase(*this, "rombase"){ }
+		m_rombase(*this, "rombase"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_rambase;
 	required_shared_ptr<UINT32> m_rambase2;
@@ -166,6 +167,7 @@ public:
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
 	TIMER_CALLBACK_MEMBER(irq0_stop);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -155,7 +155,8 @@ class ssingles_state : public driver_device
 {
 public:
 	ssingles_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_videoram[VMEM_SIZE];
 	UINT8 m_colorram[VMEM_SIZE];
@@ -174,6 +175,7 @@ public:
 	DECLARE_DRIVER_INIT(ssingles);
 	virtual void video_start();
 	INTERRUPT_GEN_MEMBER(atamanot_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 //fake palette

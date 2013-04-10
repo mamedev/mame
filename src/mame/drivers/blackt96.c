@@ -101,9 +101,8 @@ public:
 		m_spriteram4(*this, "spriteram4"),
 		m_spriteram5(*this, "spriteram5"),
 		m_spriteram6(*this, "spriteram6"),
-		m_spriteram7(*this, "spriteram7")
-	{
-	}
+		m_spriteram7(*this, "spriteram7"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_tilemapram;
 	required_shared_ptr<UINT16> m_spriteram0;
@@ -153,6 +152,7 @@ public:
 	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column);
 	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);
+	required_device<cpu_device> m_maincpu;
 };
 
 #define GET_INFO( ram ) \

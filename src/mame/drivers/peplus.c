@@ -189,7 +189,8 @@ public:
 		m_sb000_ram(*this, "sb000_ram"),
 		m_sd000_ram(*this, "sd000_ram"),
 		m_sf000_ram(*this, "sf000_ram"),
-		m_io_port(*this, "io_port"){ }
+		m_io_port(*this, "io_port"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_cmos_ram;
 	required_shared_ptr<UINT8> m_program_ram;
@@ -270,6 +271,7 @@ public:
 	TIMER_CALLBACK_MEMBER(assert_lp_cb);
 	void peplus_load_superdata(const char *bank_name);
 	void peplus_init();
+	required_device<cpu_device> m_maincpu;
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };

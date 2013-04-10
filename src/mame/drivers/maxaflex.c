@@ -26,7 +26,8 @@ class maxaflex_state : public driver_device
 {
 public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
@@ -61,6 +62,7 @@ public:
 	DECLARE_MACHINE_RESET(supervisor_board);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
+	required_device<cpu_device> m_maincpu;
 };
 
 

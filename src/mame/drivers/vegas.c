@@ -463,7 +463,8 @@ public:
 			m_timekeeper(*this, "timekeeper") ,
 		m_rambase(*this, "rambase"),
 		m_nile_regs(*this, "nile_regs"),
-		m_rombase(*this, "rombase"){ }
+		m_rombase(*this, "rombase"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<m48t37_device> m_timekeeper;
 	required_shared_ptr<UINT32> m_rambase;
@@ -511,6 +512,7 @@ public:
 	inline void _add_dynamic_device_address(device_t *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname);
 
 	void init_common(int ioasic, int serialnum);
+	required_device<cpu_device> m_maincpu;
 };
 
 

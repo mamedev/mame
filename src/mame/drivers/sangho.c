@@ -53,7 +53,8 @@ class sangho_state : public driver_device
 public:
 	sangho_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_v9958(*this, "v9958") { }
+			m_v9958(*this, "v9958") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8* m_ram;
 	UINT8 m_sexyboom_bank[8];
@@ -71,6 +72,7 @@ public:
 	void pzlestar_map_banks();
 	void sexyboom_map_bank(int bank);
 	DECLARE_WRITE_LINE_MEMBER(msx_vdp_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

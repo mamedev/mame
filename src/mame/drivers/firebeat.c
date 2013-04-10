@@ -168,7 +168,8 @@ class firebeat_state : public driver_device
 public:
 	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_work_ram(*this, "work_ram"){ }
+		m_work_ram(*this, "work_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -260,6 +261,7 @@ public:
 	void init_firebeat();
 	void init_keyboard();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -131,8 +131,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_mips(*this, "mips"),
 		m_adsp(*this, "adsp"),
-		m_pci(*this, "pcibus")
-	,
+		m_pci(*this, "pcibus"),
 		m_adsp_pram(*this, "adsp_pram"){ }
 
 	required_device<cpu_device>         m_mips;

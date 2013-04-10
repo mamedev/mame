@@ -20,12 +20,14 @@ class ddz_state : public driver_device
 {
 public:
 	ddz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	virtual void video_start();
 	UINT32 screen_update_ddz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_ddz(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(ddz_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

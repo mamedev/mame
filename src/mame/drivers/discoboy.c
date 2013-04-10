@@ -51,7 +51,8 @@ class discoboy_state : public driver_device
 public:
 	discoboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu") ,
+		m_maincpu(*this, "maincpu") { }
 
 	/* video-related */
 	UINT8    m_ram_bank;
@@ -91,6 +92,7 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void discoboy_setrombank( UINT8 data );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	required_device<cpu_device> m_maincpu;
 };
 
 

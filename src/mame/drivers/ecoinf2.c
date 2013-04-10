@@ -15,9 +15,11 @@ class ecoinf2_state : public driver_device
 {
 public:
 	ecoinf2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 	DECLARE_WRITE8_MEMBER(ox_port5c_out_w);
 	DECLARE_DRIVER_INIT(ecoinf2);
+	required_device<cpu_device> m_maincpu;
 };
 
 

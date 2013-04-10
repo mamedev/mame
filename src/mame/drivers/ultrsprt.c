@@ -23,7 +23,8 @@ public:
 	ultrsprt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
-		m_workram(*this, "workram"){ }
+		m_workram(*this, "workram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_vram;
 	required_shared_ptr<UINT32> m_workram;
@@ -37,6 +38,7 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ultrsprt_vblank);
+	required_device<cpu_device> m_maincpu;
 };
 
 

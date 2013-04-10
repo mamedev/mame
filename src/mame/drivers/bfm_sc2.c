@@ -179,8 +179,8 @@ public:
 	bfm_sc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_vfd0(*this, "vfd0"),
-			m_vfd1(*this, "vfd1")
-			{ }
+			m_vfd1(*this, "vfd1"),
+			m_maincpu(*this, "maincpu") { }
 
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
@@ -315,6 +315,7 @@ public:
 	void adder2_common_init();
 	void sc2awp_common_init(int reels, int decrypt);
 	void sc2awpdmd_common_init(int reels, int decrypt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

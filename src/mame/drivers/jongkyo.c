@@ -37,7 +37,8 @@ class jongkyo_state : public driver_device
 public:
 	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* misc */
 	UINT8    m_rom_bank;
@@ -59,6 +60,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

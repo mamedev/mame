@@ -117,7 +117,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_stats_ram(*this, "nvram", 16),
 		m_vid1(*this, "vid1"),
-		m_vid2(*this, "vid2"){ }
+		m_vid2(*this, "vid2"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_shared_ptr<UINT8> m_stats_ram;
 	required_shared_ptr<UINT16> m_vid1;
@@ -141,6 +142,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

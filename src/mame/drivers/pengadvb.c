@@ -32,7 +32,8 @@ class pengadvb_state : public driver_device
 {
 public:
 	pengadvb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_main_mem;
 	UINT8 m_mem_map;
@@ -49,6 +50,7 @@ public:
 	void pengadvb_postload();
 	void mem_map_banks();
 	void pengadvb_decrypt(const char* region);
+	required_device<cpu_device> m_maincpu;
 };
 
 

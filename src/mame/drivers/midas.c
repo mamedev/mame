@@ -62,7 +62,8 @@ class midas_state : public driver_device
 public:
 	midas_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_gfxregs(*this, "gfxregs"){ }
+		m_gfxregs(*this, "gfxregs"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 *m_gfxram;
 	required_shared_ptr<UINT16> m_gfxregs;
@@ -81,6 +82,7 @@ public:
 	UINT32 screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(livequiz_irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 

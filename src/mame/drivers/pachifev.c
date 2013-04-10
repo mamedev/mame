@@ -90,7 +90,8 @@ class pachifev_state : public driver_device
 {
 public:
 	pachifev_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	/* controls related */
 	int m_power;
@@ -108,6 +109,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)

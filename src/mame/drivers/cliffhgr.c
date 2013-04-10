@@ -91,7 +91,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc"),
 			m_port_bank(0),
-			m_phillips_code(0) { }
+			m_phillips_code(0) ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
@@ -113,6 +114,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

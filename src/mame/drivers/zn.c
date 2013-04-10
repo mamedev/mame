@@ -37,8 +37,8 @@ public:
 		m_gpu(*this, "gpu"),
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
-		m_zndip(*this,"maincpu:sio0:zndip")
-	{
+		m_zndip(*this,"maincpu:sio0:zndip"),
+		m_maincpu(*this, "maincpu") {
 	}
 
 	required_device<psxgpu_device> m_gpu;
@@ -132,6 +132,7 @@ public:
 	void atpsx_dma_write(UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )

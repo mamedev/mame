@@ -111,7 +111,8 @@ public:
 			m_ms32_tx0_scroll(*this, "tx0_scroll"),
 			m_ms32_bg0_scroll(*this, "bg0_scroll"),
 			m_ms32_tx1_scroll(*this, "tx1_scroll"),
-			m_ms32_bg1_scroll(*this, "bg1_scroll") { }
+			m_ms32_bg1_scroll(*this, "bg1_scroll") ,
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_ms32_tx_tilemap[2];
 	tilemap_t *m_ms32_bg_tilemap[2];
@@ -164,6 +165,7 @@ public:
 	void irq_init();
 	void irq_raise(int level);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

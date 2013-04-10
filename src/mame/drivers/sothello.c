@@ -47,7 +47,8 @@ class sothello_state : public driver_device
 public:
 	sothello_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_v9938(*this, "v9938") { }
+			m_v9938(*this, "v9938") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<v9938_device> m_v9938;
 
@@ -75,6 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

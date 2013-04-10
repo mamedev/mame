@@ -231,7 +231,8 @@ class nwktr_state : public driver_device
 public:
 	nwktr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_work_ram(*this, "work_ram"){ }
+		m_work_ram(*this, "work_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -257,6 +258,7 @@ public:
 	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	void lanc2_init();
+	required_device<cpu_device> m_maincpu;
 };
 
 

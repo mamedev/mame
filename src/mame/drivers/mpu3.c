@@ -120,8 +120,8 @@ class mpu3_state : public driver_device
 public:
 	mpu3_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
-			m_vfd(*this, "vfd")
-	{ }
+			m_vfd(*this, "vfd"),
+			m_maincpu(*this, "maincpu") { }
 	optional_device<roc10937_t> m_vfd;
 
 
@@ -194,6 +194,7 @@ emu_timer *m_ic21_timer;
 	void ic21_output(mpu3_state *state,int data);
 	void ic21_setup(mpu3_state *state);
 	void mpu3_config_common();
+	required_device<cpu_device> m_maincpu;
 };
 
 #define DISPLAY_PORT 0

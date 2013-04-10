@@ -92,7 +92,8 @@ class shougi_state : public driver_device
 public:
 	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enabled;
@@ -113,6 +114,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_shougi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(shougi_vblank_nmi);
+	required_device<cpu_device> m_maincpu;
 };
 
 

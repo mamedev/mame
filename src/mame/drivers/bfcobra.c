@@ -235,7 +235,8 @@ class bfcobra_state : public driver_device
 {
 public:
 	bfcobra_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_bank_data[4];
 	UINT8 *m_work_ram;
@@ -307,6 +308,7 @@ public:
 	inline void z80_bank(int num, int data);
 	UINT8 exec_r_phase(void);
 	UINT8 results_phase(void);
+	required_device<cpu_device> m_maincpu;
 };
 
 

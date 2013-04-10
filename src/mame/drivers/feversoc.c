@@ -69,7 +69,8 @@ class feversoc_state : public driver_device
 public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_x;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -80,6 +81,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

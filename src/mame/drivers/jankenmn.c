@@ -149,12 +149,14 @@ class jankenmn_state : public driver_device
 {
 public:
 	jankenmn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(jankenmn_hopper_status_r);
 	DECLARE_WRITE8_MEMBER(jankenmn_lamps1_w);
 	DECLARE_WRITE8_MEMBER(jankenmn_lamps2_w);
 	DECLARE_WRITE8_MEMBER(jankenmn_lamps3_w);
+	required_device<cpu_device> m_maincpu;
 };
 
 

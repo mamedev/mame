@@ -37,8 +37,8 @@ public:
 		m_cmosh_ram(*this, "cmosh"),
 		m_program_ram(*this, "program_ram"),
 		m_reel_ram(*this, "reel_ram"),
-		m_io_port(*this, "io_port")
-	{
+		m_io_port(*this, "io_port"),
+		m_maincpu(*this, "maincpu") {
 		m_sda_dir = 0;
 		m_coin_state = 0;
 		m_last_cycles = 0;
@@ -102,6 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(i2c_nvram_w);
 	DECLARE_READ8_MEMBER(splus_reel_optics_r);
 	DECLARE_DRIVER_INIT(splus);
+	required_device<cpu_device> m_maincpu;
 };
 
 /* Static Variables */

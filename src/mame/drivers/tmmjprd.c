@@ -41,7 +41,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_tilemap_regs(*this, "tilemap_regs"),
 			m_spriteregs(*this, "spriteregs"),
-			m_spriteram(*this, "spriteram") { }
+			m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
 	required_shared_ptr<UINT32> m_spriteregs;
@@ -75,6 +76,7 @@ public:
 	void ttmjprd_draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom);
 	void ttmjprd_draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
 	void tmmjprd_do_blit();
+	required_device<cpu_device> m_maincpu;
 };
 
 

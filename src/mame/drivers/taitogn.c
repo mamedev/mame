@@ -336,8 +336,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
-		m_zndip(*this,"maincpu:sio0:zndip")
-	{
+		m_zndip(*this,"maincpu:sio0:zndip"),
+		m_maincpu(*this, "maincpu") {
 	}
 
 	required_device<znsec_device> m_znsec0;
@@ -398,6 +398,7 @@ public:
 	UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask);
 	void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 	void install_handlers(int mode);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -462,7 +462,8 @@ class majorpkr_state : public driver_device
 public:
 	majorpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			oki(*this, "oki") { }
+			oki(*this, "oki") ,
+		m_maincpu(*this, "maincpu") { }
 
 	int m_mux_data;
 	int m_palette_bank;
@@ -494,6 +495,7 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

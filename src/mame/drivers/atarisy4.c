@@ -26,7 +26,8 @@ public:
 	atarisy4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_m68k_ram(*this, "m68k_ram"),
-		m_screen_ram(*this, "screen_ram"){ }
+		m_screen_ram(*this, "screen_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
@@ -66,6 +67,7 @@ public:
 	inline UINT8 hex_to_ascii(UINT8 in);
 	void load_ldafile(address_space &space, const UINT8 *file);
 	void load_hexfile(address_space &space, const UINT8 *file);
+	required_device<cpu_device> m_maincpu;
 };
 
 

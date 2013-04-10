@@ -29,7 +29,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_mid_videoram(*this, "mid_videoram"),
 		m_txt_videoram(*this, "txt_videoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_video_regs;
@@ -60,6 +61,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

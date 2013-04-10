@@ -286,7 +286,8 @@ class tempest_state : public driver_device
 {
 public:
 	tempest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_player_select;
 	DECLARE_WRITE8_MEMBER(wdclr_w);
@@ -298,6 +299,7 @@ public:
 	DECLARE_READ8_MEMBER(input_port_1_bit_r);
 	DECLARE_READ8_MEMBER(input_port_2_bit_r);
 	virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 

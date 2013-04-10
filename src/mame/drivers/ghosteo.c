@@ -84,8 +84,8 @@ public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_system_memory(*this, "systememory"),
-		m_i2cmem(*this, "i2cmem")
-	{ }
+		m_i2cmem(*this, "i2cmem"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_system_memory;
 	required_device<i2cmem_device> m_i2cmem;
@@ -104,6 +104,7 @@ public:
 	DECLARE_DRIVER_INIT(bballoon);
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -123,12 +123,14 @@ class sg1000a_state : public driver_device
 {
 public:
 	sg1000a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_WRITE8_MEMBER(sg1000a_coin_counter_w);
 	DECLARE_DRIVER_INIT(sg1000a);
 	DECLARE_DRIVER_INIT(chwrestl);
+	required_device<cpu_device> m_maincpu;
 };
 
 

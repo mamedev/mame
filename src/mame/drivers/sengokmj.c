@@ -63,7 +63,8 @@ class sengokmj_state : public driver_device
 {
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_sengokumj_mux_data;
 	UINT8 m_hopper_io;
@@ -72,6 +73,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sengokmj_out_w);
 	DECLARE_READ16_MEMBER(sengokmj_system_r);
 	INTERRUPT_GEN_MEMBER(sengokmj_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

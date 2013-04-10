@@ -101,7 +101,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
-		m_cram(*this, "cram"){ }
+		m_cram(*this, "cram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
@@ -118,6 +119,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_spool99_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)

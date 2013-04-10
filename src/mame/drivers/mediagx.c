@@ -94,7 +94,8 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_cga_ram(*this, "cga_ram"),
 		m_bios_ram(*this, "bios_ram"),
-		m_vram(*this, "vram"){ }
+		m_vram(*this, "vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_main_ram;
 	required_shared_ptr<UINT32> m_cga_ram;
@@ -208,6 +209,7 @@ public:
 	void report_speedups();
 	void install_speedups(const speedup_entry *entries, int count);
 	void init_mediagx();
+	required_device<cpu_device> m_maincpu;
 };
 
 // Display controller registers

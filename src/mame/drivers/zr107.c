@@ -182,7 +182,8 @@ class zr107_state : public driver_device
 public:
 	zr107_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_workram(*this, "workram"){ }
+		m_workram(*this, "workram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -210,6 +211,7 @@ public:
 	UINT32 screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -69,7 +69,8 @@ class taitopjc_state : public driver_device
 {
 public:
 	taitopjc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ64_MEMBER(video_r);
 	DECLARE_WRITE64_MEMBER(video_w);
@@ -84,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(taitopjc_tlcs900_to3);
 	virtual void video_start();
 	UINT32 screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 void taitopjc_state::video_start()

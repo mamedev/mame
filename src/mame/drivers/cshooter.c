@@ -95,7 +95,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_txram(*this, "txram"),
 		m_mainram(*this, "mainram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_txram;
 	tilemap_t *m_txtilemap;
@@ -121,6 +122,7 @@ public:
 	DECLARE_MACHINE_RESET(airraid);
 	UINT32 screen_update_cshooter(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -52,7 +52,8 @@ class ecoinfr_state : public driver_device
 {
 public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int irq_toggle;
 	int m_optic_pattern;
@@ -109,6 +110,7 @@ public:
 	UINT8 m_credsel;
 
 	DECLARE_MACHINE_START(ecoinfr);
+	required_device<cpu_device> m_maincpu;
 };
 
 

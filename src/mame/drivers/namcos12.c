@@ -1045,7 +1045,8 @@ public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_rtc(*this, "rtc"),
-			m_sharedram(*this, "sharedram") { }
+			m_sharedram(*this, "sharedram") ,
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_sharedram;
@@ -1100,6 +1101,7 @@ public:
 	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 	void system11gun_install(  );
+	required_device<cpu_device> m_maincpu;
 };
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )

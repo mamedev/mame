@@ -331,7 +331,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_workram(*this, "workram"),
 			m_sharc_dataram0(*this, "sharc_dataram0"),
-			m_sharc_dataram1(*this, "sharc_dataram1") { }
+			m_sharc_dataram1(*this, "sharc_dataram1") ,
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -375,6 +376,7 @@ public:
 	int jvs_encode_data(UINT8 *in, int length);
 	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
 	void jamma_jvs_cmd_exec();
+	required_device<cpu_device> m_maincpu;
 };
 
 

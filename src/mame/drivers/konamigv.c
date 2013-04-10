@@ -135,7 +135,8 @@ class konamigv_state : public driver_device
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_am53cf96(*this, "scsi:am53cf96"){ }
+		m_am53cf96(*this, "scsi:am53cf96"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -172,6 +173,7 @@ public:
 	DECLARE_MACHINE_START(konamigv);
 	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	required_device<cpu_device> m_maincpu;
 };
 
 /* EEPROM handlers */

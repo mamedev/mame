@@ -32,7 +32,8 @@ class quizo_state : public driver_device
 {
 public:
 	quizo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_port60;
@@ -43,6 +44,7 @@ public:
 	DECLARE_DRIVER_INIT(quizo);
 	virtual void palette_init();
 	UINT32 screen_update_quizo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

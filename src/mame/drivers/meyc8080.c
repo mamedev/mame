@@ -70,8 +70,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram_0(*this, "vram0"),
 		m_videoram_1(*this, "vram1"),
-		m_videoram_2(*this, "vram2")
-	{ }
+		m_videoram_2(*this, "vram2"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_videoram_0;
 	required_shared_ptr<UINT8> m_videoram_1;
@@ -85,6 +85,7 @@ public:
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_3_w);
 	DECLARE_WRITE8_MEMBER(meyc8080_dac_4_w);
 	UINT32 screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

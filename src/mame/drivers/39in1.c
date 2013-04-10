@@ -32,7 +32,8 @@ class _39in1_state : public driver_device
 public:
 	_39in1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT32 m_seed;
 	UINT32 m_magic;
@@ -91,6 +92,7 @@ public:
 	void pxa255_lcd_dma_kickoff(int channel);
 	void pxa255_lcd_check_load_next_branch(int channel);
 	void pxa255_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 

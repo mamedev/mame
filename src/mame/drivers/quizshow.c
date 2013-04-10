@@ -38,7 +38,8 @@ public:
 	quizshow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
-		m_fo_state(*this, "fo_state"){ }
+		m_fo_state(*this, "fo_state"),
+		m_maincpu(*this, "maincpu") { }
 
 	tilemap_t *m_tilemap;
 	required_shared_ptr<UINT8> m_main_ram;
@@ -65,6 +66,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
+	required_device<cpu_device> m_maincpu;
 };
 
 

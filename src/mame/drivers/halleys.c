@@ -212,7 +212,8 @@ public:
 	halleys_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_blitter_ram(*this, "blitter_ram"),
-		m_io_ram(*this, "io_ram"){ }
+		m_io_ram(*this, "io_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -276,6 +277,7 @@ public:
 	void copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source);
 	void filter_bitmap(bitmap_ind16 &bitmap, int mask);
 	void init_common();
+	required_device<cpu_device> m_maincpu;
 };
 
 

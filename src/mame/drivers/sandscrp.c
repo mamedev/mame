@@ -86,9 +86,8 @@ class sandscrp_state : public driver_device
 public:
 	sandscrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_view2_0(*this, "view2_0")
-	{
-	}
+		m_view2_0(*this, "view2_0"),
+		m_maincpu(*this, "maincpu") { }
 
 	optional_device<kaneko_view2_tilemap_device> m_view2_0;
 
@@ -114,6 +113,7 @@ public:
 	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
 	void update_irq_state();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 

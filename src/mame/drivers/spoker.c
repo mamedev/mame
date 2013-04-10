@@ -29,7 +29,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_bg_tile_ram(*this, "bg_tile_ram"),
 		m_fg_tile_ram(*this, "fg_tile_ram"),
-		m_fg_color_ram(*this, "fg_color_ram"){ }
+		m_fg_color_ram(*this, "fg_color_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
@@ -60,6 +61,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spoker_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)

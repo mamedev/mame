@@ -16,8 +16,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_dmdcpu(*this, "dmdcpu"),
 		m_mc6845(*this, "mc6845"),
-		m_decobsmt(*this, "decobsmt")
-		,
+		m_decobsmt(*this, "decobsmt"),
 		m_vram(*this, "vram"){ }
 
 	required_device<cpu_device> m_maincpu;

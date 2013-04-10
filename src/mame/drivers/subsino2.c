@@ -80,7 +80,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_outputs16(*this, "outputs16"),
 		m_outputs(*this, "outputs"),
-		m_am188em_regs(*this, "am188em_regs"){ }
+		m_am188em_regs(*this, "am188em_regs"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_hm86171_colorram;
 	layer_t m_layers[2];
@@ -168,6 +169,7 @@ public:
 	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(am188em_timer2_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_timer_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -6,7 +6,8 @@ class peyper_state : public driver_device
 {
 public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 irq_state;
 
@@ -21,6 +22,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	DECLARE_DRIVER_INIT(peyper);
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

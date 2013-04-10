@@ -217,7 +217,8 @@ class maygayv1_state : public driver_device
 {
 public:
 	maygayv1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_vsync_latch_preset;
 	UINT8 m_p1;
@@ -246,6 +247,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -65,7 +65,8 @@ class cham24_state : public driver_device
 {
 public:
 	cham24_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8* m_nt_ram;
 	UINT8* m_nt_page[4];
@@ -91,6 +92,7 @@ public:
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
+	required_device<cpu_device> m_maincpu;
 };
 
 

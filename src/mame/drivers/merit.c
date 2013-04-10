@@ -89,7 +89,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram_attr(*this, "raattr"),
 		m_ram_video(*this, "ravideo"),
-		m_backup_ram(*this, "backup_ram"){ }
+		m_backup_ram(*this, "backup_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	pen_t m_pens[NUM_PENS];
@@ -124,6 +125,7 @@ public:
 	DECLARE_DRIVER_INIT(dtrvwz5);
 	virtual void machine_start();
 	DECLARE_MACHINE_START(casino5);
+	required_device<cpu_device> m_maincpu;
 };
 
 

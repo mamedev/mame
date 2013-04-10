@@ -26,7 +26,8 @@ class photoply_state : public driver_device
 {
 public:
 	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -58,6 +59,7 @@ public:
 	DECLARE_DRIVER_INIT(photoply);
 	virtual void machine_start();
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -87,8 +87,8 @@ public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
-			m_microtouch(*this, "microtouch")
-	{ }
+			m_microtouch(*this, "microtouch"),
+			m_maincpu(*this, "maincpu") { }
 
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_serial_device> m_microtouch;
@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 

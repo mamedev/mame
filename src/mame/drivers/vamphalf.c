@@ -76,8 +76,8 @@ public:
 			m_tiles(*this,"tiles"),
 			m_wram(*this,"wram"),
 			m_tiles32(*this,"tiles32"),
-			m_wram32(*this,"wram32")
-		{
+			m_wram32(*this,"wram32"),
+			m_maincpu(*this, "maincpu") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -166,6 +166,7 @@ public:
 	DECLARE_DRIVER_INIT(luplup);
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)

@@ -30,7 +30,8 @@ class forte2_state : public driver_device
 {
 public:
 	forte2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_input_mask;
 	DECLARE_READ8_MEMBER(forte2_ay8910_read_input);
@@ -39,6 +40,7 @@ public:
 	DECLARE_DRIVER_INIT(pesadelo);
 	virtual void machine_start();
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
 };
 
 

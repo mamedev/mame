@@ -70,7 +70,8 @@ class famibox_state : public driver_device
 {
 public:
 	famibox_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8* m_nt_ram;
 	UINT8* m_nt_page[4];
@@ -116,6 +117,7 @@ public:
 	void famicombox_bankswitch(UINT8 bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
+	required_device<cpu_device> m_maincpu;
 };
 
 /******************************************************

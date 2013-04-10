@@ -68,7 +68,8 @@ public:
 		m_ac_bgvram(*this, "ac_bgvram"),
 		m_ac_txvram(*this, "ac_txvram"),
 		m_spriteram(*this, "spriteram"),
-		m_ac_devram(*this, "ac_devram"){ }
+		m_ac_devram(*this, "ac_devram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_ac_bgvram;
 	required_shared_ptr<UINT16> m_ac_txvram;
@@ -96,6 +97,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 	void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -121,7 +121,8 @@ public:
 		m_vid(*this, "vid"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_scrolly(*this, "scrolly"){ }
+		m_scrolly(*this, "scrolly"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vid;
@@ -135,6 +136,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(subm_sound_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 void sub_state::video_start()

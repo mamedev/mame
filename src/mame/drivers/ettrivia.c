@@ -37,7 +37,8 @@ public:
 	ettrivia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_bg_videoram(*this, "bg_videoram"){ }
+		m_bg_videoram(*this, "bg_videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	int m_palreg;
 	int m_gfx_bank;
@@ -63,6 +64,7 @@ public:
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code);
+	required_device<cpu_device> m_maincpu;
 };
 
 

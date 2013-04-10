@@ -35,8 +35,8 @@ class headonb_state : public driver_device
 public:
 	headonb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram")
-	{ }
+		m_video_ram(*this, "video_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_video_ram;
 
@@ -48,6 +48,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_headonb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_headonb_tile_info);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -24,7 +24,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
 		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
-		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"){ }
+		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT16 m_out;
 	UINT8 m_interrupt_line_active;
@@ -47,6 +48,7 @@ public:
 	UINT32 screen_update_pkscramble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	required_device<cpu_device> m_maincpu;
 };
 
 

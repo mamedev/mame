@@ -83,7 +83,8 @@ class psattack_state : public driver_device
 {
 public:
 	psattack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ32_MEMBER(psattack_unk_r);
 	DECLARE_DRIVER_INIT(psattack);
@@ -93,6 +94,7 @@ public:
 	UINT32 screen_update_psattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psattack(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(psattack_interrupt);
+	required_device<cpu_device> m_maincpu;
 };
 
 

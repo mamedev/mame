@@ -57,12 +57,14 @@ class carrera_state : public driver_device
 public:
 	carrera_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_tileram(*this, "tileram"){ }
+		m_tileram(*this, "tileram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_tileram;
 	DECLARE_READ8_MEMBER(unknown_r);
 	virtual void palette_init();
 	UINT32 screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

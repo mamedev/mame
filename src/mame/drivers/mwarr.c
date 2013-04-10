@@ -60,7 +60,8 @@ public:
 		m_mhigh_scrollram(*this, "mhigh_scrollram"),
 		m_vidattrram(*this, "vidattrram"),
 		m_spriteram(*this, "spriteram"),
-		m_mwarr_ram(*this, "mwarr_ram"){ }
+		m_mwarr_ram(*this, "mwarr_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -101,6 +102,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	required_device<cpu_device> m_maincpu;
 };
 
 

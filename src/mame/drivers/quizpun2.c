@@ -94,7 +94,8 @@ public:
 	quizpun2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_fg_ram(*this, "fg_ram"),
-		m_bg_ram(*this, "bg_ram"){ }
+		m_bg_ram(*this, "bg_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	struct prot_t m_prot;
 	required_shared_ptr<UINT8> m_fg_ram;
@@ -113,6 +114,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

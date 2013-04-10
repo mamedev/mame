@@ -54,8 +54,8 @@ class hitpoker_state : public driver_device
 public:
 	hitpoker_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_sys_regs(*this, "sys_regs")
-	{ }
+		m_sys_regs(*this, "sys_regs"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_sys_regs;
 
@@ -83,6 +83,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hitpoker_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -38,7 +38,8 @@ class bingoc_state : public driver_device
 {
 public:
 	bingoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_x;
 	DECLARE_READ16_MEMBER(bingoc_rand_r);
@@ -47,6 +48,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bingoc_play_w);
 	virtual void video_start();
 	UINT32 screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

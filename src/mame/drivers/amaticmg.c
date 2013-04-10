@@ -430,8 +430,8 @@ public:
 	amaticmg_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_attr(*this, "attr"),
-		m_vram(*this, "vram")
-		{ }
+		m_vram(*this, "vram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vram;
@@ -457,6 +457,7 @@ public:
 	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
 	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
+	required_device<cpu_device> m_maincpu;
 };
 
 

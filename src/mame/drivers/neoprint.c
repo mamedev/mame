@@ -32,7 +32,8 @@ public:
 	neoprint_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_npvidram(*this, "npvidram"),
-		m_npvidregs(*this, "npvidregs"){ }
+		m_npvidregs(*this, "npvidregs"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
 	required_shared_ptr<UINT16> m_npvidregs;
@@ -60,6 +61,7 @@ public:
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
 	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
+	required_device<cpu_device> m_maincpu;
 };
 
 

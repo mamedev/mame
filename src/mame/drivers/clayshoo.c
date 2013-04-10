@@ -24,8 +24,8 @@ class clayshoo_state : public driver_device
 public:
 	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram")
-	{ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -44,6 +44,7 @@ public:
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
 	UINT8 difficulty_input_port_r( int bit );
 	void create_analog_timers(  );
+	required_device<cpu_device> m_maincpu;
 };
 
 

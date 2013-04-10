@@ -76,7 +76,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_laserdisc(*this, "laserdisc") ,
 		m_tile_ram(*this, "tile_ram"),
-		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
+		m_tile_control_ram(*this, "tile_ctrl_ram"),
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_shared_ptr<UINT8> m_tile_ram;
@@ -89,6 +90,7 @@ public:
 	UINT32 screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
 	TIMER_CALLBACK_MEMBER(irq_stop);
+	required_device<cpu_device> m_maincpu;
 };
 
 

@@ -53,7 +53,8 @@ public:
 			m_ldv1000(*this, "ld_ldv1000"),
 			m_pr7820(*this, "ld_pr7820"),
 			m_22vp932(*this, "ld_22vp932") ,
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_maincpu(*this, "maincpu") { }
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -118,6 +119,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dleuro_interrupt);
 	DECLARE_WRITE16_MEMBER(serial_transmit);
 	DECLARE_READ16_MEMBER(serial_receive);
+	required_device<cpu_device> m_maincpu;
 };
 
 

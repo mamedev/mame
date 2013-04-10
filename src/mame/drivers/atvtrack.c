@@ -67,7 +67,8 @@ class atvtrack_state : public driver_device
 {
 public:
 	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu") { }
 
 	DECLARE_READ64_MEMBER(area1_r);
 	DECLARE_WRITE64_MEMBER(area1_w);
@@ -90,6 +91,7 @@ public:
 	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
 	UINT32 m_area1_data[4];
 
+	required_device<cpu_device> m_maincpu;
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)

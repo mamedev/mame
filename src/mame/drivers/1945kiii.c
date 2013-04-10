@@ -56,7 +56,8 @@ public:
 			m_oki2(*this, "oki2") ,
 		m_spriteram_1(*this, "spritera1"),
 		m_spriteram_2(*this, "spritera2"),
-		m_bgram(*this, "bgram"){ }
+		m_bgram(*this, "bgram"),
+		m_maincpu(*this, "maincpu") { }
 
 	/* devices */
 	required_device<okim6295_device> m_oki1;
@@ -79,6 +80,7 @@ public:
 	virtual void video_start();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_k3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
 };
 
 

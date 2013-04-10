@@ -37,7 +37,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_backup_ram(*this, "backup_ram"),
 		m_ram_attr(*this, "raattr"),
-		m_ram_video(*this, "ravideo"){ }
+		m_ram_video(*this, "ravideo"),
+		m_maincpu(*this, "maincpu") { }
 
 	pen_t m_pens[NUM_PENS];
 	required_shared_ptr<UINT8> m_backup_ram;
@@ -49,6 +50,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
 	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
 	virtual void machine_start();
+	required_device<cpu_device> m_maincpu;
 };
 
 
