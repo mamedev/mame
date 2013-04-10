@@ -303,6 +303,7 @@ void warpspeed_state::palette_init()
 }
 
 static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
+
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
 	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
@@ -310,7 +311,6 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)
 
 	/* video hardware */
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
@@ -321,7 +321,6 @@ static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
 
 	MCFG_GFXDECODE(warpspeed)
 	MCFG_PALETTE_LENGTH(2+8)
-
 MACHINE_CONFIG_END
 
 ROM_START( warpsped )
@@ -363,4 +362,4 @@ DRIVER_INIT_MEMBER(warpspeed_state,warpspeed)
 {
 }
 
-GAME( 197?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND )
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, warpspeed, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND ) // year not shown, 1979 is according to date stamps on PCB chips.
