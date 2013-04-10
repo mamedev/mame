@@ -389,11 +389,11 @@ void device_t::set_machine(running_machine &machine)
 //  list and return status
 //-------------------------------------------------
 
-bool device_t::findit(bool find_all)
+bool device_t::findit(bool isvalidation)
 {
 	bool allfound = true;
 	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
-		allfound &= autodev->findit(find_all);
+		allfound &= autodev->findit(isvalidation);
 	return allfound;
 }
 
