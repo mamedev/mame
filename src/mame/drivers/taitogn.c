@@ -1230,7 +1230,7 @@ GAME( 2005, otenamhf, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT
 GAME( 2000, psyvaria, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT270, "Success", "Psyvariar -Medium Unit- (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2000, psyvarrv, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT270, "Success", "Psyvariar -Revision- (V2.04J)", GAME_IMPERFECT_SOUND )
 GAME( 2000, zokuoten, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Success", "Zoku Otenamihaiken (V2.03J)", GAME_IMPERFECT_SOUND )
-GAME( 2004, zooo,     taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // missing most of the playfield
+GAME( 2004, zooo,     taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Success", "Zooo (V2.01J)", GAME_IMPERFECT_SOUND )
 
 GAME( 1999, mahjngoh, taitogn,  coh3002t, coh3002t_mp, taitogn_state, coh3002t_mp, ROT0, "Warashi / Mahjong Kobo / Taito", "Mahjong Oh (V2.06J)", GAME_IMPERFECT_SOUND )
 GAME( 2001, usagi,    taitogn,  coh3002t, coh3002t_mp, taitogn_state, coh3002t_mp, ROT0, "Warashi / Mahjong Kobo / Taito", "Usagi (V2.02J)", GAME_IMPERFECT_SOUND )
@@ -1238,7 +1238,7 @@ GAME( 2000, soutenry, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT
 GAME( 2000, shanghss, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Warashi", "Shanghai Shoryu Sairin (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 2002, shangtou, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Warashi / Sunsoft / Taito", "Shanghai Sangokuhai Tougi (Ver 2.01J)", GAME_IMPERFECT_SOUND )
 
-GAME( 2001, nightrai, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Takumi", "Night Raid (V2.03J)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // no background / enemy sprites
+GAME( 2001, nightrai, taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Takumi", "Night Raid (V2.03J)", GAME_IMPERFECT_SOUND )
 GAME( 2001, otenki,   taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT0,   "Takumi", "Otenki Kororin (V2.01J)", GAME_IMPERFECT_SOUND )
 
 GAME( 2002, xiistag,  taitogn,  coh3002t, coh3002t, taitogn_state, coh3002t, ROT270, "Triangle Service", "XII Stag (V2.01J)", GAME_IMPERFECT_SOUND )
