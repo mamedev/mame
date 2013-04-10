@@ -24,23 +24,26 @@ class lazercmd_state : public driver_device
 public:
 	lazercmd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"),
+		m_videoram(*this, "videoram")
+	{ }
 
 	/* device */
 	required_device<cpu_device> m_maincpu;
-	dac_device *m_dac;
+	required_device<dac_device> m_dac;
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
-	int      m_marker_x;
-	int      m_marker_y;
+	UINT8 m_marker_x;
+	UINT8 m_marker_y;
 
 	/* misc */
-	int      m_timer_count;
-	int      m_sense_state;
-	int      m_dac_data;
+	int m_timer_count;
+	UINT8 m_sense_state;
+	UINT8 m_dac_data;
+	UINT8 m_attract;
 
 	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);
 	DECLARE_READ8_MEMBER(lazercmd_ctrl_port_r);
@@ -51,8 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
 	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
 	DECLARE_DRIVER_INIT(lazercmd);
-	DECLARE_DRIVER_INIT(bbonk);
-	DECLARE_DRIVER_INIT(medlanes);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();

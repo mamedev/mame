@@ -73,7 +73,7 @@ UINT32 lazercmd_state::screen_update_lazercmd(screen_device &screen, bitmap_ind1
 				sx,sy);
 	}
 
-	x = m_marker_x - 1;             /* normal video lags marker by 1 pixel */
+	x = m_marker_x - 1; /* normal video lags marker by 1 pixel */
 	y = vert_scale(m_marker_y) - VERT_CHR; /* first line used as scratch pad */
 	plot_pattern(bitmap, x, y);
 
