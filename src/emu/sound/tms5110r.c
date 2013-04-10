@@ -346,16 +346,25 @@ static const struct tms5100_coeffs pat4335277_coeff =
 /*
 The TMS5200CNL was decapped and imaged by digshadow in March, 2013.
 It is equivalent to the CD2501E (internally: "TMC0285") chip used
-on the TI 99/4(A) speech module.
-The LPC table is not yet verified from the decap (it comes from a PROMOUT
-programmatic read of the chip from April, 2011)
+ on the TI 99/4(A) speech module.
+The LPC table is verified to match the decap.
+ (It was previously dumped with PROMOUT which matches as well)
 The chirp table is verified to match the decap. (sum = 0x3da)
+Note that the K coefficients are VERY different from the coefficients given
+ in the US 4,335,277 patent, which may have been for some sort of prototype or
+ otherwise intentionally scrambled. The energy and pitch tables, however, are
+ identical to that patent.
+Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802.
+The interpolation coefficients still come from the patents pending verification
+ of the interpolation counter circuit from the chip decap image.
+NOTE FROM DECAP: immediately to the left of each of the K1,2,3,4,5,and 6
+ coefficients in the LPC rom are extra columns containing the constants
+ -510, -502, 313, 318, or in hex 0x202, 0x20A, 0x139, 0x13E.
+ Those EXACT constants DO appear (rather nonsensically) on the lpc table in US
+ patent 4,335,277. They don't seem to do anything except take up space and may
+ be a leftover from an older design predating even the patent.
 */
-/* The following TMS5200/TMC0285/CD2501E coefficients were directly read from an actual TMS5200 chip by Lord Nightmare using the PROMOUT pin, and can be regarded as established fact.
-The chirp table contents were read from a decap done by digshadow in March 2013
-The interpolation coefficients still come from the patents pending verification of the interpolation counter circuit from the chip decap image vs the patent.
-Note that the K coefficients are VERY different from the coefficients given in the US 4,335,277 patent, which may have been for some sort of prototype or otherwise intentionally scrambled. The energy and pitch tables, however, are identical to the patent.
-Also note, that the K coefficients are ALMOST identical to the coefficients from the CD2802, above. */
+
 static const struct tms5100_coeffs tms5200_coeff =
 {
 	/* subtype */
@@ -405,7 +414,7 @@ static const struct tms5100_coeffs tms5200_coeff =
 		/* K8 */
 		{ -205, -112,  -10,   92,  187,  269,  336,  387 },
 		/* K9 */
-		{ -249, -183, -110,  -32,   48,  126,  198,  261 },// on cd2802 the 4th entry is -19
+		{ -249, -183, -110,  -32,   48,  126,  198,  261 }, // verified from decap; on the cd2802 patent the 4th entry is -19 (patent typo?)
 		/* K10 */
 		{ -190, -133,  -73,  -10,   53,  115,  173,  227 },
 	},
@@ -533,7 +542,7 @@ static const struct tms5100_coeffs tms5220c_coeff =
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
 	/* E   */
 	{ 0,   1,   2,   3,   4,   6,   8,  11,
-		16,  23,  33,  47,  63,  85, 114,  0 },
+		16,  23,  33,  47,  63,  85, 114,  0 }, // verified from decap
 	//{ 0x0d,  0x16,  0x20,  0x2d,  0x40,  0x5b,  0x81,  0xb6,
 	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 0 }, /* values from 5220_10.bin code for the tms50c10 */
 	/* P   */
