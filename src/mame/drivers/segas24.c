@@ -756,7 +756,7 @@ READ8_MEMBER( segas24_state::frc_r )
 WRITE8_MEMBER( segas24_state::frc_w )
 {
 	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
-	machine().device("maincpu")->execute().set_input_line(IRQ_FRC+1, CLEAR_LINE);
+	m_maincpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
 	machine().device("subcpu")->execute().set_input_line(IRQ_FRC+1, CLEAR_LINE);
 }
 
@@ -873,7 +873,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 
 	irq_timer_pend0 = irq_timer_pend1 = 1;
 	if(irq_allow0 & (1 << IRQ_TIMER))
-		machine().device("maincpu")->execute().set_input_line(IRQ_TIMER+1, ASSERT_LINE);
+		m_maincpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 	if(irq_allow1 & (1 << IRQ_TIMER))
 		machine().device("subcpu")->execute().set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 
@@ -884,8 +884,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 {
 	irq_sprite = irq_vblank = 0;
-	machine().device("maincpu")->execute().set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
+	m_maincpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
+	m_maincpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 	machine().device("subcpu")->execute().set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
 	machine().device("subcpu")->execute().set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 }
@@ -893,7 +893,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
 {
 	if(irq_allow0 & (1 << IRQ_FRC) && frc_mode == 1)
-		machine().device("maincpu")->execute().set_input_line(IRQ_FRC+1, ASSERT_LINE);
+		m_maincpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
 
 	if(irq_allow1 & (1 << IRQ_FRC) && frc_mode == 1)
 		machine().device("subcpu")->execute().set_input_line(IRQ_FRC+1, ASSERT_LINE);
@@ -937,11 +937,11 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	case 2:
 		irq_allow0 = data & 0x3f;
 		irq_timer_pend0 = 0;
-		machine().device("maincpu")->execute().set_input_line(IRQ_TIMER+1, CLEAR_LINE);
-		machine().device("maincpu")->execute().set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		machine().device("maincpu")->execute().set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		machine().device("maincpu")->execute().set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
-		//machine().device("maincpu")->execute().set_input_line(IRQ_FRC+1, irq_frc && (irq_allow0 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		//m_maincpu->set_input_line(IRQ_FRC+1, irq_frc && (irq_allow0 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data & 0x3f;
@@ -970,7 +970,7 @@ READ16_MEMBER(segas24_state::irq_r)
 	switch(offset) {
 	case 2:
 		irq_timer_pend0 = 0;
-		machine().device("maincpu")->execute().set_input_line(IRQ_TIMER+1, CLEAR_LINE);
+		m_maincpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
@@ -997,7 +997,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	mask = 1 << irq;
 
 	if(irq_allow0 & mask)
-		machine().device("maincpu")->execute().set_input_line(1+irq, ASSERT_LINE);
+		m_maincpu->set_input_line(1+irq, ASSERT_LINE);
 
 	if(irq_allow1 & mask)
 		machine().device("subcpu")->execute().set_input_line(1+irq, ASSERT_LINE);

@@ -1630,7 +1630,7 @@ void gauntlet_state::common_init(int slapstic, int vindctr2)
 {
 	UINT8 *rom = memregion("maincpu")->base();
 	m_eeprom_default = NULL;
-	slapstic_configure(*subdevice<cpu_device>("maincpu"), 0x038000, 0, slapstic);
+	slapstic_configure(*m_maincpu, 0x038000, 0, slapstic);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
 	swap_memory(rom + 0x000000, rom + 0x008000, 0x8000);

@@ -233,7 +233,7 @@ static void streetg2_set_keyb_int(running_machine &machine, int state)
 
 void pcat_nit_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
 

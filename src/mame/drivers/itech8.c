@@ -571,7 +571,7 @@ static const via6522_interface via_interface =
 
 void itech8_state::itech8_update_interrupts(int periodic, int tms34061, int blitter)
 {
-	device_type main_cpu_type = machine().device("maincpu")->type();
+	device_type main_cpu_type = m_maincpu->type();
 
 	/* update the states */
 	if (periodic != -1) m_periodic_int = periodic;
@@ -582,16 +582,16 @@ void itech8_state::itech8_update_interrupts(int periodic, int tms34061, int blit
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) m_maincpu->set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) m_maincpu->set_input_line(M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) m_maincpu->set_input_line(M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		machine().device("maincpu")->execute().set_input_line(2, m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		machine().device("maincpu")->execute().set_input_line(3, m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(2, m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(3, m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -622,7 +622,7 @@ INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
@@ -650,13 +650,13 @@ MACHINE_START_MEMBER(itech8_state,sstrike)
 
 void itech8_state::machine_reset()
 {
-	device_type main_cpu_type = machine().device("maincpu")->type();
+	device_type main_cpu_type = m_maincpu->type();
 
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000]);
-		machine().device("maincpu")->reset();
+		m_maincpu->reset();
 	}
 
 	/* set the visible area */
@@ -2628,25 +2628,25 @@ ROM_END
 
 DRIVER_INIT_MEMBER(itech8_state,grmatch)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),this));
+	m_maincpu->space(AS_PROGRAM).unmap_write(0x01e0, 0x01ff);
 }
 
 
 DRIVER_INIT_MEMBER(itech8_state,slikshot)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01cf, 0x01cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x0180, 0x0180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x01cf, 0x01cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01cf, 0x01cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(itech8_state,sstrike)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x11cf, 0x11cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1180, 0x1180, read8_delegate(FUNC(itech8_state::slikshot_z80_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x11cf, 0x11cf, read8_delegate(FUNC(itech8_state::slikshot_z80_control_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x11cf, 0x11cf, write8_delegate(FUNC(itech8_state::slikshot_z80_control_w),this));
 }
 
 
@@ -2677,15 +2677,15 @@ DRIVER_INIT_MEMBER(itech8_state,neckneck)
 DRIVER_INIT_MEMBER(itech8_state,rimrockn)
 {
 	/* additional input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port (0x0162, 0x0162, "162");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port (0x0163, 0x0163, "163");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port (0x0164, 0x0164, "164");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port (0x0165, 0x0165, "165");
+	m_maincpu->space(AS_PROGRAM).install_read_port (0x0161, 0x0161, "161");
+	m_maincpu->space(AS_PROGRAM).install_read_port (0x0162, 0x0162, "162");
+	m_maincpu->space(AS_PROGRAM).install_read_port (0x0163, 0x0163, "163");
+	m_maincpu->space(AS_PROGRAM).install_read_port (0x0164, 0x0164, "164");
+	m_maincpu->space(AS_PROGRAM).install_read_port (0x0165, 0x0165, "165");
 
 	/* different banking mechanism (disable the old one) */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01a0, 0x01a0, write8_delegate(FUNC(itech8_state::rimrockn_bank_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::itech8_blitter_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01a0, 0x01a0, write8_delegate(FUNC(itech8_state::rimrockn_bank_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::itech8_blitter_w),this));
 }
 
 

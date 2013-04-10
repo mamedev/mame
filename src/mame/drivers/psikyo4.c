@@ -952,7 +952,7 @@ void psikyo4_state::install_hotgmck_pcm_bank()
 	set_hotgmck_pcm_bank(0);
 	set_hotgmck_pcm_bank(1);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_postload), this));
 }
 

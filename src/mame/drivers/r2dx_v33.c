@@ -233,7 +233,7 @@ UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		//if(machine().input().code_pressed_once(KEYCODE_A))
 		//  src_addr+=0x800;

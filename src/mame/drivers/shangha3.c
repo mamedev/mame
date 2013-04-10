@@ -123,7 +123,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 
 WRITE16_MEMBER(shangha3_state::shangha3_irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )

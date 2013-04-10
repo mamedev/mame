@@ -106,7 +106,7 @@ static void galpani2_write_kaneko(device_t *device)
 
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 {
-	address_space &srcspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
@@ -120,7 +120,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 
 void galpani2_state::galpani2_mcu_nmi1()
 {
-	address_space &srcspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
@@ -223,7 +223,7 @@ void galpani2_state::galpani2_mcu_nmi1()
 
 void galpani2_state::galpani2_mcu_nmi2()
 {
-		galpani2_write_kaneko(machine().device("maincpu"));
+		galpani2_write_kaneko(m_maincpu);
 		//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
 }
 

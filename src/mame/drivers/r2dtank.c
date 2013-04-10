@@ -106,7 +106,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 	int combined_state = pia0->irq_a_state() | pia0->irq_b_state() |
 							pia1->irq_a_state() | pia1->irq_b_state();
 
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 		data = 0x00;
 
 	soundlatch2_byte_w(space, 0, data);
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.device().safe_pc(), data);
 }

@@ -1014,7 +1014,7 @@ DRIVER_INIT_MEMBER(terracre_state,amatelas)
 DRIVER_INIT_MEMBER(terracre_state,horekid)
 {
 	m_mpProtData = mHoreKidProtData;
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),this));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

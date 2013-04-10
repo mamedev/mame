@@ -2098,7 +2098,7 @@ static UINT32 copro_fifoout_pop(address_space &space)
 	if (state->m_copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the v60 to enter wait state
-		v60_stall(space.machine().device("maincpu"));
+		v60_stall(state->m_maincpu);
 
 		space.machine().scheduler().synchronize();
 

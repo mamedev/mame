@@ -2170,7 +2170,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 
 	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
 };
 
@@ -2200,7 +2200,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4te)
 
 	ds1204_init(0, megat4te_ds1204_nvram);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
 };
 
@@ -2211,7 +2211,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4st)
 
 	ds1204_init(0, megat4te_ds1204_nvram);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
 };
 
@@ -2231,7 +2231,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat5t)
 
 	ds1204_init(0, megat5_ds1204_nvram);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
 }
 

@@ -372,12 +372,12 @@ WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 
 WRITE8_MEMBER(srmp2_state::srmp2_irq2_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 
@@ -404,13 +404,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
 {
-	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
 READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
 {
-	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
@@ -457,7 +457,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 
 WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8, srmp2_state )

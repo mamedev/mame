@@ -77,7 +77,7 @@ INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
 READ8_MEMBER(exidy_state::exidy_interrupt_r)
 {
 	/* clear any interrupts */
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return m_int_condition;
@@ -261,7 +261,7 @@ TIMER_CALLBACK_MEMBER(exidy_state::collision_irq_callback)
 	latch_condition(param);
 
 	/* set the IRQ line */
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 

@@ -1747,7 +1747,7 @@ static const eeprom_interface eeprom_interface_93C46_8bit_delay =
 
 MACHINE_RESET_MEMBER(sigmab98_state,sammymdl)
 {
-	machine().device("maincpu")->state().set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
+	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
 
 static MACHINE_CONFIG_START( sammymdl, sigmab98_state )

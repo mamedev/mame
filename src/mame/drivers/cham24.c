@@ -288,7 +288,7 @@ void cham24_state::palette_init()
 
 void cham24_state::ppu_irq(int *ppu_regs)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */

@@ -1443,7 +1443,7 @@ DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
 void jack_state::treahunt_decode(  )
 {
 	int A;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x4000);
 	int data;

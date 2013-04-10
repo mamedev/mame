@@ -537,16 +537,16 @@ DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 //  AM_RANGE(0xd806, 0xd806) AM_READ_LEGACY(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::pettanp_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::pettanp_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 
 }
 
 DRIVER_INIT_MEMBER(strnskil_state,banbam)
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::banbam_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80d, 0xd80d, write8_delegate(FUNC(strnskil_state::protection_w),this));
 }
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, driver_device, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )

@@ -220,9 +220,9 @@ WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
 void exidy440_state::exidy440_update_firq()
 {
 	if (m_firq_vblank || (m_firq_enable && m_firq_beam))
-		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 	else
-		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 

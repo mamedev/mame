@@ -129,7 +129,7 @@ MACHINE_START_MEMBER(fastfred_state,imago)
 
 WRITE8_MEMBER(fastfred_state::imago_dma_irq_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
@@ -994,8 +994,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(fastfred_state,flyboy)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc085, 0xc099, read8_delegate(FUNC(fastfred_state::flyboy_custom1_io_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc8fb, 0xc900, read8_delegate(FUNC(fastfred_state::flyboy_custom2_io_r),this));
 	m_hardware_type = 1;
 }
 
@@ -1006,29 +1006,29 @@ DRIVER_INIT_MEMBER(fastfred_state,flyboyb)
 
 DRIVER_INIT_MEMBER(fastfred_state,fastfred)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::fastfred_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 1;
 }
 
 DRIVER_INIT_MEMBER(fastfred_state,jumpcoas)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 0;
 }
 
 DRIVER_INIT_MEMBER(fastfred_state,boggy84b)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::jumpcoas_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 
 DRIVER_INIT_MEMBER(fastfred_state,boggy84)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc800, 0xcfff, read8_delegate(FUNC(fastfred_state::boggy84_custom_io_r),this));
+	m_maincpu->space(AS_PROGRAM).nop_write(0xc800, 0xcfff);
 	m_hardware_type = 2;
 }
 

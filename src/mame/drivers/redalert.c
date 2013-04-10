@@ -119,7 +119,7 @@ INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
 
 READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
 	return machine().primary_screen->vpos();
@@ -134,7 +134,7 @@ WRITE8_MEMBER(redalert_state::redalert_interrupt_clear_w)
 
 READ8_MEMBER(redalert_state::panther_interrupt_clear_r)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 
 	return ioport("STICK0")->read();
 }

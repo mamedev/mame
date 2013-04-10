@@ -714,7 +714,7 @@ void firebeat_state::GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case 0x30:
@@ -1012,12 +1012,12 @@ WRITE32_MEMBER(firebeat_state::soundflash_w)
 
 void firebeat_state::atapi_cause_irq()
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
 void firebeat_state::atapi_clear_irq()
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 void firebeat_state::atapi_init()
@@ -1833,10 +1833,10 @@ READ16_MEMBER(firebeat_state::spu_unk_r)
 MACHINE_START_MEMBER(firebeat_state,firebeat)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x01ffffff, FALSE, m_work_ram);
+	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x01ffffff, FALSE, m_work_ram);
 
 	m_flash[0] = machine().device<fujitsu_29f016a_device>("flash0");
 	m_flash[1] = machine().device<fujitsu_29f016a_device>("flash1");
@@ -2299,7 +2299,7 @@ static void security_w(device_t *device, UINT8 data)
 	firebeat_state *state = device->machine().driver_data<firebeat_state>();
 	int r = state->ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(device->machine().device("maincpu"), r);
+		ppc4xx_spu_receive_byte(state->m_maincpu, r);
 }
 
 /*****************************************************************************/
@@ -2310,9 +2310,9 @@ void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, w
 	if(out2.isnull()) out2 = write32_delegate(FUNC(firebeat_state::lamp_output2_w),this);
 	if(out3.isnull()) out3 = write32_delegate(FUNC(firebeat_state::lamp_output3_w),this);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x7d000324, 0x7d000327, out3);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000324, 0x7d000327, out3);
 }
 
 void firebeat_state::init_firebeat()
@@ -2329,7 +2329,7 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(machine().device("maincpu"), security_w);
+	ppc4xx_spu_set_tx_handler(m_maincpu, security_w);
 
 	set_ibutton(rom);
 

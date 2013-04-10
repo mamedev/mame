@@ -148,7 +148,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUB_register_w)
 	if( m_CPUB_register!=old )
 	{
 		if ((old & 0x01) == 0 && (m_CPUB_register & 0x01))
-			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
+			m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
 

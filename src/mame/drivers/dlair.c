@@ -157,7 +157,7 @@ static const UINT8 led_map[16] =
 
 WRITE_LINE_MEMBER(dlair_state::dleuro_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 

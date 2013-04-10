@@ -189,7 +189,7 @@ void cloud9_state::machine_start()
 
 void cloud9_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_irq_state = 0;
 }
 

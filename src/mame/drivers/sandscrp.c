@@ -154,9 +154,9 @@ void sandscrp_state::machine_reset()
 void sandscrp_state::update_irq_state()
 {
 	if (m_vblank_irq || m_sprite_irq || m_unknown_irq)
-		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+		m_maincpu->set_input_line(1, ASSERT_LINE);
 	else
-		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 

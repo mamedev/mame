@@ -1482,7 +1482,7 @@ DRIVER_INIT_MEMBER(exidy_state,phantoma)
 	m_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xf800, 0xffff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xf800, 0xffff, "bank1");
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0xf800);
 }
 
@@ -1513,7 +1513,7 @@ DRIVER_INIT_MEMBER(exidy_state,pepper2)
 
 DRIVER_INIT_MEMBER(exidy_state,fax)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	exidy_video_config(0x04, 0x04, TRUE);
 

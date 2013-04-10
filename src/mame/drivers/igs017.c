@@ -813,7 +813,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 	starzan_decrypt(data, size, false); // data
 	starzan_decrypt(code, size, true);  // opcodes
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).set_decrypted_region(0x00000, 0x3ffff, code);
+	m_maincpu->space(AS_PROGRAM).set_decrypted_region(0x00000, 0x3ffff, code);
 
 	mgcs_flip_sprites();
 }

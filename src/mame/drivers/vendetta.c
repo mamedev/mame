@@ -161,7 +161,7 @@ WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 
 void vendetta_state::vendetta_video_banking( int select )
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (select & 1)
 	{
@@ -476,7 +476,7 @@ void vendetta_state::machine_reset()
 {
 	int i;
 
-	konami_configure_set_lines(machine().device("maincpu"), vendetta_banking);
+	konami_configure_set_lines(m_maincpu, vendetta_banking);
 
 	for (i = 0; i < 3; i++)
 	{

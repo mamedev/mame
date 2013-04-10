@@ -9996,7 +9996,7 @@ DRIVER_INIT_MEMBER(goldstar_state,fb2010)
 		ROM[i] = x;
 	}
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedval7d_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedval7d_r),this));
 
 }
 
@@ -11125,8 +11125,8 @@ DRIVER_INIT_MEMBER(goldstar_state,schery97)
 
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(goldstar_state::fixedvala8_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(goldstar_state::fixedvalb4_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(goldstar_state::fixedvala8_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(goldstar_state::fixedvalb4_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -11154,7 +11154,7 @@ DRIVER_INIT_MEMBER(goldstar_state,schery97a)
 	}
 
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedval38_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedval38_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -11180,7 +11180,7 @@ DRIVER_INIT_MEMBER(goldstar_state,skill98)
 
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedvalea_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedvalea_r),this));
 	/* Oki 6295 at 0x20 */
 }
 
@@ -11206,7 +11206,7 @@ DRIVER_INIT_MEMBER(goldstar_state,nfb96_c1)
 		}
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(FUNC(goldstar_state::fixedval68_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8_delegate(FUNC(goldstar_state::fixedval68_r),this));
 
 }
 
@@ -11233,7 +11233,7 @@ DRIVER_INIT_MEMBER(goldstar_state,nfb96_c2)
 
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(goldstar_state::fixedval58_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x21, 0x21, read8_delegate(FUNC(goldstar_state::fixedval58_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval80_r)
@@ -11269,11 +11269,11 @@ DRIVER_INIT_MEMBER(goldstar_state,nfb96_d)
 		ROM[i] = x;
 	}
 	// nfb96b needs both of these
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(FUNC(goldstar_state::fixedval80_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(goldstar_state::fixedvalaa_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x23, 0x23, read8_delegate(FUNC(goldstar_state::fixedval80_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(goldstar_state::fixedvalaa_r),this));
 
 	// csel96b
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(goldstar_state::fixedval96_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(goldstar_state::fixedval96_r),this));
 
 }
 
@@ -11300,7 +11300,7 @@ DRIVER_INIT_MEMBER(goldstar_state,nfb96_dk)
 		}
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(goldstar_state::fixedvalbe_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(goldstar_state::fixedvalbe_r),this));
 
 }
 
@@ -11332,8 +11332,8 @@ DRIVER_INIT_MEMBER(goldstar_state,rp35)
 		ROM[i] = x;
 	}
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(goldstar_state::fixedval84_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(goldstar_state::fixedval90_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(goldstar_state::fixedval84_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x36, 0x36, read8_delegate(FUNC(goldstar_state::fixedval90_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedvalb2_r)
@@ -11360,7 +11360,7 @@ DRIVER_INIT_MEMBER(goldstar_state,rp36)
 		ROM[i] = x;
 	}
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(goldstar_state::fixedvalb2_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x34, 0x34, read8_delegate(FUNC(goldstar_state::fixedvalb2_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval48_r)
@@ -11387,7 +11387,7 @@ DRIVER_INIT_MEMBER(goldstar_state,rp36c3)
 		ROM[i] = x;
 	}
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(goldstar_state::fixedval48_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, read8_delegate(FUNC(goldstar_state::fixedval48_r),this));
 }
 
 READ8_MEMBER(goldstar_state::fixedval09_r)
@@ -11419,8 +11419,8 @@ DRIVER_INIT_MEMBER(goldstar_state,po33)
 
 		ROM[i] = x;
 	}
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(FUNC(goldstar_state::fixedval74_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(FUNC(goldstar_state::fixedval09_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x32, 0x32, read8_delegate(FUNC(goldstar_state::fixedval74_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x12, 0x12, read8_delegate(FUNC(goldstar_state::fixedval09_r),this));
 	/* oki6295 at 0x20 */
 }
 
@@ -11453,8 +11453,8 @@ DRIVER_INIT_MEMBER(goldstar_state,match133)
 		ROM[i] = x;
 	}
 
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedvalc7_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedvalc7_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),this));
 }
 
 DRIVER_INIT_MEMBER(goldstar_state,cherrys)
@@ -11519,7 +11519,7 @@ DRIVER_INIT_MEMBER(goldstar_state,unkch4)
 DRIVER_INIT_MEMBER(goldstar_state,tonypok)
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
-	address_space &io = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_port(0x04, 0x04, "IN0" );
 	io.install_read_port(0x05, 0x05, "IN1" );
 	io.install_read_port(0x06, 0x06, "IN2" );

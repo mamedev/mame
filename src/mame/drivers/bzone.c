@@ -259,7 +259,7 @@ INTERRUPT_GEN_MEMBER(bzone_state::bzone_interrupt)
 
 CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
 {
-	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
@@ -875,7 +875,7 @@ WRITE8_MEMBER(bzone_state::analog_select_w)
 
 DRIVER_INIT_MEMBER(bzone_state,bradley)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_ram(0x400, 0x7ff);
 	space.install_read_port(0x1808, 0x1808, "1808");
 	space.install_read_port(0x1809, 0x1809, "1809");

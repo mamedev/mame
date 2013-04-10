@@ -885,7 +885,7 @@ void bfcobra_state::update_irqs()
 	if (newstate != m_irq_state)
 	{
 		m_irq_state = newstate;
-		machine().device("maincpu")->execute().set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

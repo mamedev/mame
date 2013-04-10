@@ -395,7 +395,7 @@ void flyball_state::machine_reset()
 	for (i = 0; i < 0x1000; i++)
 		m_rombase[i] = ROM[i ^ 0x1ff];
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(flyball_state::flyball_quarter_callback),this));
 

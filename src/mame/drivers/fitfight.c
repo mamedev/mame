@@ -994,7 +994,7 @@ DRIVER_INIT_MEMBER(fitfight_state,fitfight)
 {
 //  UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),this));
 	m_bbprot_kludge = 0;
 }
 
@@ -1002,7 +1002,7 @@ DRIVER_INIT_MEMBER(fitfight_state,histryma)
 {
 //  UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),this));
 	m_bbprot_kludge = 0;
 }
 
@@ -1013,7 +1013,7 @@ DRIVER_INIT_MEMBER(fitfight_state,bbprot)
 
 DRIVER_INIT_MEMBER(fitfight_state,hotmindff)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200001, 0, 0, read16_delegate(FUNC(fitfight_state::hotmindff_unk_r),this));
 	DRIVER_INIT_CALL(fitfight);
 }
 

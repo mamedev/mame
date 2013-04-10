@@ -2780,7 +2780,7 @@ DRIVER_INIT_MEMBER(williams_state,mayday)
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	m_mayday_protection = machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
+	m_mayday_protection = m_maincpu->space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
 }
 
 
@@ -2814,7 +2814,7 @@ DRIVER_INIT_MEMBER(williams_state,bubbles)
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xcc00, 0xcfff, write8_delegate(FUNC(williams_state::bubbles_cmos_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc00, 0xcfff, write8_delegate(FUNC(williams_state::bubbles_cmos_w),this));
 }
 
 
@@ -2849,27 +2849,27 @@ DRIVER_INIT_MEMBER(williams_state,spdball)
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* add a third PIA */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc808, 0xc80b, read8_delegate(FUNC(pia6821_device::read), pia_3), write8_delegate(FUNC(pia6821_device::write), pia_3));
 
 	/* install extra input handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xc800, 0xc800, "AN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xc801, 0xc801, "AN1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xc802, 0xc802, "AN2");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xc803, 0xc803, "AN3");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xc800, 0xc800, "AN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xc801, 0xc801, "AN1");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xc802, 0xc802, "AN2");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xc803, 0xc803, "AN3");
 }
 
 
 DRIVER_INIT_MEMBER(williams_state,alienar)
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
+	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 
 DRIVER_INIT_MEMBER(williams_state,alienaru)
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
+	m_maincpu->space(AS_PROGRAM).nop_write(0xcbff, 0xcbff);
 }
 
 

@@ -365,7 +365,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* clear the state */
 	scanline_int_ack_w(space, 0, 0);

@@ -278,7 +278,7 @@ static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 
 TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::interrupt_gen)
 {
-	machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
 
 READ32_MEMBER(deco32_state::deco32_irq_controller_r)
@@ -288,7 +288,7 @@ READ32_MEMBER(deco32_state::deco32_irq_controller_r)
 	switch (offset)
 	{
 	case 2: /* Raster IRQ ACK - value read is not used */
-		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller

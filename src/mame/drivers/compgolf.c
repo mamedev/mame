@@ -199,7 +199,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(compgolf_state::sound_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =

@@ -369,12 +369,12 @@ READ8_MEMBER(armedf_state::soundlatch_clear_r)
 
 WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
 
@@ -2031,24 +2031,24 @@ DRIVER_INIT_MEMBER(armedf_state,terraf)
 {
 	m_scroll_type = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c006, 0x07c007, write16_delegate(FUNC(armedf_state::terraf_fg_scrolly_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c008, 0x07c009, write16_delegate(FUNC(armedf_state::terraf_fg_scrollx_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0c0001, write16_delegate(FUNC(armedf_state::terraf_fg_scroll_msb_arm_w),this));
 }
 
 DRIVER_INIT_MEMBER(armedf_state,terrafu)
 {
 	m_scroll_type = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 }
 
 DRIVER_INIT_MEMBER(armedf_state,terrafjb)
 {
 	m_scroll_type = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafjb_io_w),this));
 }
 
 DRIVER_INIT_MEMBER(armedf_state,armedf)
@@ -2061,7 +2061,7 @@ DRIVER_INIT_MEMBER(armedf_state,kozure)
 {
 	m_scroll_type = 0;
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 }
 
@@ -2076,7 +2076,7 @@ DRIVER_INIT_MEMBER(armedf_state,legion)
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 	m_scroll_type = 2;
 }
@@ -2091,14 +2091,14 @@ DRIVER_INIT_MEMBER(armedf_state,legiono)
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),this));
 
 	m_scroll_type = 2;
 }
 
 DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 	m_scroll_type = 3;
 }

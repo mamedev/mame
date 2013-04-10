@@ -369,7 +369,7 @@ To Do / Unknowns:
 
 MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 {
-	m_main_cpu = machine().device("maincpu");
+	m_main_cpu = m_maincpu;
 	m_sub_cpu = machine().device("audiocpu");
 
 	save_item(NAME(m_mcu_data));

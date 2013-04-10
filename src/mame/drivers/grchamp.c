@@ -127,7 +127,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
 				m_collide = m_collmode = 0;
 			break;

@@ -516,10 +516,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq. controls sprites, sound, i/o
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in? controls palette
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( skilldrp, astrocorp_state )

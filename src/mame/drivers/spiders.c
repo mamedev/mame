@@ -230,13 +230,13 @@ WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
 													pia2->irq_b_state() |
 							pia3->irq_a_state() | pia3->irq_b_state();
 
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 WRITE_LINE_MEMBER(spiders_state::main_cpu_firq)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

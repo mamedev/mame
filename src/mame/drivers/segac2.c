@@ -1226,7 +1226,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
 {
 	//printf("sound irq %d\n", state);
-	machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {
@@ -1840,7 +1840,7 @@ void segac2_state::segac2_common_init(int (*func)(int in))
 	m_prot_func = func;
 
 	if (upd != NULL)
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 
 
@@ -2097,7 +2097,7 @@ DRIVER_INIT_MEMBER(segac2_state,tfrceacb)
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(NULL);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x800000, 0x800001);
+	m_maincpu->space(AS_PROGRAM).nop_write(0x800000, 0x800001);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,borench)
@@ -2169,7 +2169,7 @@ DRIVER_INIT_MEMBER(segac2_state,ichirjbl)
 {
 	segac2_common_init(NULL);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(FUNC(segac2_state::ichirjbl_prot_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x840108, 0x840109, read16_delegate(FUNC(segac2_state::ichirjbl_prot_r),this) );
 }
 
 DRIVER_INIT_MEMBER(segac2_state,puyopuy2)
@@ -2187,36 +2187,36 @@ DRIVER_INIT_MEMBER(segac2_state,pclub)
 {
 	segac2_common_init(prot_func_pclub);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
 	segac2_common_init(prot_func_pclubjv2);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
 	segac2_common_init(prot_func_pclubjv4);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
 	segac2_common_init(prot_func_pclubjv5);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
 }
 
 

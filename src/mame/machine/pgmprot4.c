@@ -421,7 +421,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 	pgm_basic_init();
 	pgm_killbld_decrypt();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_w),this));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;
@@ -575,7 +575,7 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
         }
     }
 */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xDA5610, 0xDA5613, read16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xDA5610, 0xDA5613, read16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_w),this));
 
 	pgm_dw3_decrypt();
 }

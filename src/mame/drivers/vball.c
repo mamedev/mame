@@ -119,13 +119,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 	/* IRQ fires every on every 8th scanline */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* Save the scroll x register value */
@@ -138,10 +138,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
 WRITE8_MEMBER(vball_state::vball_irq_ack_w)
 {
 	if (offset == 0)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	else
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 

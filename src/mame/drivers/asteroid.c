@@ -309,7 +309,7 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(asteroid_state::clock_r)
 {
-	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )
@@ -952,14 +952,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(asteroid_state,asteroidb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2000, 0x2000, "IN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2003, 0x2003, "HS");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x2000, 0x2000, "IN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x2003, 0x2003, "HS");
 }
 
 
 DRIVER_INIT_MEMBER(asteroid_state,asterock)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
 }
 
 

@@ -70,7 +70,7 @@ public:
 
 WRITE_LINE_MEMBER(tonton_state::tonton_vdp0_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 

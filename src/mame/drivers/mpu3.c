@@ -259,7 +259,7 @@ WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
 							pia6->irq_a_state() | pia6->irq_b_state() |
 							ptm2->irq_state();
 
-		machine().device("maincpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6808 int%d \n", combined_state));
 }
 
@@ -938,7 +938,7 @@ static const mpu3_chr_table hprvpr_data[64] = {
 
 DRIVER_INIT_MEMBER(mpu3_state,m3hprvpr)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_disp_func=METER_PORT;
 	m_current_chr_table = hprvpr_data;

@@ -27,7 +27,7 @@ void triplhnt_state::triplhnt_set_collision(int code)
 {
 	m_hit_code = code;
 
-	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 

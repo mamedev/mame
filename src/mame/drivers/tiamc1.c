@@ -120,7 +120,7 @@
 
 void tiamc1_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 

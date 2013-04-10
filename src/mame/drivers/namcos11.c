@@ -880,7 +880,7 @@ void namcos11_state::namcos11_init_common(int n_daughterboard)
 
 	if (!n_daughterboard)
 	{
-		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x1fa10020, 0x1fa1002f);
+		m_maincpu->space(AS_PROGRAM).nop_write(0x1fa10020, 0x1fa1002f);
 		return;
 	}
 
@@ -889,14 +889,14 @@ void namcos11_state::namcos11_init_common(int n_daughterboard)
 	UINT32 len = memregion( "user2" )->bytes();
 	UINT8 *rgn = memregion( "user2" )->base();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f2fffff, "bank3" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f300000, 0x1f3fffff, "bank4" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f400000, 0x1f4fffff, "bank5" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f500000, 0x1f5fffff, "bank6" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f600000, 0x1f6fffff, "bank7" );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x1f700000, 0x1f7fffff, "bank8" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f2fffff, "bank3" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f300000, 0x1f3fffff, "bank4" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f400000, 0x1f4fffff, "bank5" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f500000, 0x1f5fffff, "bank6" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f600000, 0x1f6fffff, "bank7" );
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f700000, 0x1f7fffff, "bank8" );
 
 	for (bank = 0; bank < 8; bank++)
 	{
@@ -906,14 +906,14 @@ void namcos11_state::namcos11_init_common(int n_daughterboard)
 
 	if (n_daughterboard == 32)
 	{
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom32_w),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom32_w),this));
 	}
 	if (n_daughterboard == 64)
 	{
 		m_n_bankoffset = 0;
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1f080000, 0x1f080003, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_upper_w),this));
-		machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x1fa10020, 0x1fa1002f);
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_w),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1f080000, 0x1f080003, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_upper_w),this));
+		m_maincpu->space(AS_PROGRAM).nop_read(0x1fa10020, 0x1fa1002f);
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_w),this));
 		save_item( NAME(m_n_bankoffset) );
 	}
 }
@@ -925,37 +925,37 @@ DRIVER_INIT_MEMBER(namcos11_state,tekken)
 
 DRIVER_INIT_MEMBER(namcos11_state,tekken2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c406_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c406_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,souledge)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c409_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c409_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,dunkmnia)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c410_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c410_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,primglex)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c411_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c411_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,xevi3dg)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c430_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c430_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,danceyes)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c431_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c431_r),this));
 	namcos11_init_common(32);
 }
 
@@ -964,29 +964,29 @@ DRIVER_INIT_MEMBER(namcos11_state,pocketrc)
 	machine().device("c76")->memory().space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),this));
 	machine().device("c76")->memory().space(AS_IO).install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),this));
 	namcos11_init_common(32);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,starswep)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c442_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c442_r),this));
 	namcos11_init_common(0);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,myangel3)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
 	namcos11_init_common(64);
 }
 
 DRIVER_INIT_MEMBER(namcos11_state,ptblank2ua)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),this));
 	namcos11_init_common(64);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos11_state::lightgun_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos11_state::lightgun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),this));
 }
 
 MACHINE_RESET_MEMBER(namcos11_state,namcos11)

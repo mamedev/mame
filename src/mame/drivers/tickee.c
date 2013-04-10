@@ -102,14 +102,14 @@ TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 	m_gunx[which] = beamx;
 
 	/* fire the IRQ at the correct moment */
-	machine().device("maincpu")->execute().set_input_line(param, ASSERT_LINE);
+	m_maincpu->set_input_line(param, ASSERT_LINE);
 }
 
 
 TIMER_CALLBACK_MEMBER(tickee_state::clear_gun_interrupt)
 {
 	/* clear the IRQ on the next scanline? */
-	machine().device("maincpu")->execute().set_input_line(param, CLEAR_LINE);
+	m_maincpu->set_input_line(param, CLEAR_LINE);
 }
 
 

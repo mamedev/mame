@@ -191,8 +191,8 @@ DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 {
 	pgm_basic_init();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(pgm_028_025_state::olds_r),this), write16_delegate(FUNC(pgm_028_025_state::olds_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x8178f4, 0x8178f5, read16_delegate(FUNC(pgm_028_025_state::olds_prot_swap_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(pgm_028_025_state::olds_r),this), write16_delegate(FUNC(pgm_028_025_state::olds_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x8178f4, 0x8178f5, read16_delegate(FUNC(pgm_028_025_state::olds_prot_swap_r),this));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;

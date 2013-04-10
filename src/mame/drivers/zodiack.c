@@ -108,10 +108,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(zodiack_state::zodiack_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_nmi_enable) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	if(scanline == 0 ) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)

@@ -364,9 +364,9 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x80)    // CG Board 1 IRQ Ack
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)    // CG Board 0 IRQ Ack
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			//set_cgboard_id((data >> 4) & 3);
 		}
@@ -521,10 +521,10 @@ TIMER_CALLBACK_MEMBER(nwktr_state::irq_off)
 void nwktr_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x003fffff, FALSE, m_work_ram);
+	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x003fffff, FALSE, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::irq_off),this));
 }

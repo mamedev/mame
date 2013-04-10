@@ -876,7 +876,7 @@ INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
 TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::am188em_timer2_irq)
 {
 	if ((m_am188em_regs[AM188EM_IMASK+0] & 0x01) == 0)  // TMR mask
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x4c/4);
 }
 
 /***************************************************************************
@@ -886,7 +886,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::am188em_timer2_irq)
 // To be removed when cpu core is updated
 TIMER_DEVICE_CALLBACK_MEMBER(subsino2_state::h8_timer_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
+	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 

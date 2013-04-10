@@ -247,7 +247,7 @@ WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )   MechMtr_update(i, data & (1 << i) );
 
-	if ( data ) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	if ( data ) m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 ///////////////////////////////////////////////////////////////////////////
 

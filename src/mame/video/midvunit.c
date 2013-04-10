@@ -40,12 +40,12 @@ TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
 
 	if (scanline != -1)
 	{
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(scanline + 1), scanline);
 		machine().scheduler().timer_set(attotime::from_hz(25000000), timer_expired_delegate(FUNC(midvunit_state::scanline_timer_cb),this), -1);
 	}
 	else
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

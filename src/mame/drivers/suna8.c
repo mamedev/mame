@@ -73,7 +73,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 /* Non encrypted bootleg */
 DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x48000);
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
@@ -84,7 +84,7 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 
 UINT8 *suna8_state::brickzn_decrypt()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine(), UINT8, size);
@@ -214,7 +214,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
@@ -301,7 +301,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
@@ -387,7 +387,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8   *RAM    =   memregion("maincpu")->base();
 	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
@@ -1993,7 +1993,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
 
 MACHINE_RESET_MEMBER(suna8_state,hardhea2)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
 }
 

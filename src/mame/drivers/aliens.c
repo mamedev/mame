@@ -229,7 +229,7 @@ void aliens_state::machine_start()
 
 void aliens_state::machine_reset()
 {
-	konami_configure_set_lines(machine().device("maincpu"), aliens_banking);
+	konami_configure_set_lines(m_maincpu, aliens_banking);
 
 	m_palette_selected = 0;
 }

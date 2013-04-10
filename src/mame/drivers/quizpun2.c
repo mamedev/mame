@@ -351,7 +351,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(quizpun2_state::quizpun2_soundlatch_w)

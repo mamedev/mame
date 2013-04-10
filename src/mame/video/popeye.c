@@ -274,7 +274,7 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (m_lastflip != flip_screen())
 	{

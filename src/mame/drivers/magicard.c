@@ -702,7 +702,7 @@ void magicard_state::machine_reset()
 	UINT16 *src    = (UINT16*)memregion("maincpu" )->base();
 	UINT16 *dst    = m_magicram;
 	memcpy (dst, src, 0x80000);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 

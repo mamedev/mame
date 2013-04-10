@@ -3254,7 +3254,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 	#if TUMBLEP_HACK
 	tumblepb_patch_code(0x000132);
 	#endif
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),this));
 
 }
 
@@ -3292,7 +3292,7 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
 {
 	tumblepb_gfx_rearrange(1);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
 }
 
 
@@ -3356,10 +3356,10 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(tumbleb_state::paletteram_xxxxBBBBGGGGRRRR_word_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x140000, 0x140fff, write16_delegate(FUNC(tumbleb_state::paletteram_xxxxBBBBGGGGRRRR_word_w), this));
 
 	/* slightly different banking */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::chokchok_tilebank_w),this));
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
@@ -3367,7 +3367,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 	tumblepb_gfx_rearrange(1);
 
 	/* slightly different banking */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),this));
 
 	m_protbase = 0x0000;
 }

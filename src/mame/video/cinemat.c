@@ -72,7 +72,7 @@ void cinemat_vector_callback(device_t *device, INT16 sx, INT16 sy, INT16 ex, INT
 WRITE8_MEMBER(cinemat_state::cinemat_vector_control_w)
 {
 	int r, g, b, i;
-	cpu_device *cpu = machine().device<cpu_device>("maincpu");
+	cpu_device *cpu = m_maincpu;
 
 	switch (m_color_mode)
 	{
@@ -212,7 +212,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
 	SCREEN_UPDATE32_CALL(vector);
 	vector_clear_list();
 
-	ccpu_wdt_timer_trigger(machine().device("maincpu"));
+	ccpu_wdt_timer_trigger(m_maincpu);
 
 	return 0;
 }

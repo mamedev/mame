@@ -385,9 +385,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 	else if((scanline == 0) || (scanline == 120) ) //timer irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 10h */
 }
 
 static const ym2203_interface ym2203_config =

@@ -337,7 +337,7 @@ GFXDECODE_END
 
 void crbaloon_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_IO);
 
 	pc3092_reset();
 	port_sound_w(space, 0, 0);

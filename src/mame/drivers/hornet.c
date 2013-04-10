@@ -590,9 +590,9 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			    0x01 = EXRGB
 			*/
 			if (data & 0x80)
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -894,10 +894,10 @@ void hornet_state::machine_start()
 	m_jvs_sdata = auto_alloc_array_clear(machine(), UINT8, 1024);
 
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x003fffff, FALSE, m_workram);
+	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x003fffff, FALSE, m_workram);
 
 	state_save_register_global(machine(), m_led_reg0);
 	state_save_register_global(machine(), m_led_reg1);
@@ -1168,19 +1168,19 @@ int hornet_state::jvs_encode_data(UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xdf);
+			ppc4xx_spu_receive_byte(m_maincpu, 0xd0);
+			ppc4xx_spu_receive_byte(m_maincpu, 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xcf);
+			ppc4xx_spu_receive_byte(m_maincpu, 0xd0);
+			ppc4xx_spu_receive_byte(m_maincpu, 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(machine().device("maincpu"), b);
+			ppc4xx_spu_receive_byte(m_maincpu, b);
 		}
 	}
 	return sum;
@@ -1273,11 +1273,11 @@ void hornet_state::jamma_jvs_cmd_exec()
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xe0);           // sync
-	ppc4xx_spu_receive_byte(machine().device("maincpu"), 0x00);           // node
-	ppc4xx_spu_receive_byte(machine().device("maincpu"), rdata_ptr + 1);  // num of bytes
+	ppc4xx_spu_receive_byte(m_maincpu, 0xe0);           // sync
+	ppc4xx_spu_receive_byte(m_maincpu, 0x00);           // node
+	ppc4xx_spu_receive_byte(m_maincpu, rdata_ptr + 1);  // num of bytes
 	sum += jvs_encode_data(rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(machine().device("maincpu"), sum - 1);        // checksum
+	ppc4xx_spu_receive_byte(m_maincpu, sum - 1);        // checksum
 
 	m_jvs_sdata_ptr = 0;
 }
@@ -1292,7 +1292,7 @@ DRIVER_INIT_MEMBER(hornet_state,hornet)
 
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine().device("maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(m_maincpu, jamma_jvs_w);
 }
 
 DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
@@ -1303,7 +1303,7 @@ DRIVER_INIT_MEMBER(hornet_state,hornet_2board)
 
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(machine().device("maincpu"), jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(m_maincpu, jamma_jvs_w);
 }
 
 /*****************************************************************************/

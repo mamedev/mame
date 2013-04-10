@@ -62,7 +62,7 @@ void acefruit_state::acefruit_update_irq(int vpos)
 		switch( color )
 		{
 		case 0x0c:
-			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE );
+			m_maincpu->set_input_line(0, HOLD_LINE );
 			break;
 		}
 	}

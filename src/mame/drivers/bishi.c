@@ -113,10 +113,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
 	if (m_cur_control & 0x800)
 	{
 		if(scanline == 240) // vblank-out irq
-			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_3, HOLD_LINE);
+			m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE);
 
 		if(scanline == 0) // vblank-in irq
-			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
+			m_maincpu->set_input_line(M68K_IRQ_4, HOLD_LINE);
 	}
 }
 

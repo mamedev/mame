@@ -100,7 +100,7 @@ WRITE32_MEMBER(groundfx_state::color_ram_w)
 
 TIMER_CALLBACK_MEMBER(groundfx_state::groundfx_interrupt5)
 {
-	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); //from 5... ADC port
+	m_maincpu->set_input_line(5, HOLD_LINE); //from 5... ADC port
 }
 
 
@@ -456,7 +456,7 @@ DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 	int data;
 
 	/* Speedup handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),this));
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

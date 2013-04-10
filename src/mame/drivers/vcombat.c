@@ -264,15 +264,15 @@ WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
 READ16_MEMBER(vcombat_state::main_irqiack_r)
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 

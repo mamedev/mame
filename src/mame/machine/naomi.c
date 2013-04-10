@@ -190,8 +190,8 @@ void naomi_state::create_pic_from_retdat()
 
 DRIVER_INIT_MEMBER(naomi_state,naomi)
 {
-	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -200,7 +200,7 @@ DRIVER_INIT_MEMBER(naomi_state,naomi)
 
 DRIVER_INIT_MEMBER(naomi_state,naomi2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi2_biose_idle_skip_r),this)); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -209,8 +209,8 @@ DRIVER_INIT_MEMBER(naomi_state,naomi2)
 
 DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 {
-	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this); // rev e bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -219,8 +219,8 @@ DRIVER_INIT_MEMBER(naomi_state,naomi_mp)
 
 DRIVER_INIT_MEMBER(naomi_state,naomigd)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
-	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -229,8 +229,8 @@ DRIVER_INIT_MEMBER(naomi_state,naomigd)
 
 DRIVER_INIT_MEMBER(naomi_state,naomigd_mp)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
-	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2ad238, 0xc2ad23f, read64_delegate(FUNC(naomi_state::naomi_biose_idle_skip_r),this)); // rev e bios
+	//m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2b0600, 0xc2b0607, read64_delegate(FUNC(naomi_state::naomi_biosh_idle_skip_r),this)); // rev h bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -248,7 +248,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxxsla_idle_skip_r )
 
 DRIVER_INIT_MEMBER(naomi_state,ggxxsla)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc1aae18, 0xc1aae1f, read64_delegate(FUNC(naomi_state::naomigd_ggxxsla_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1aae18, 0xc1aae1f, read64_delegate(FUNC(naomi_state::naomigd_ggxxsla_idle_skip_r),this));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -263,7 +263,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxx_idle_skip_r )
 
 DRIVER_INIT_MEMBER(naomi_state,ggxx)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc1837b8, 0xc1837bf, read64_delegate(FUNC(naomi_state::naomigd_ggxx_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc1837b8, 0xc1837bf, read64_delegate(FUNC(naomi_state::naomigd_ggxx_idle_skip_r),this));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -279,7 +279,7 @@ READ64_MEMBER(naomi_state::naomigd_ggxxrl_idle_skip_r )
 
 DRIVER_INIT_MEMBER(naomi_state,ggxxrl)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc18d6c8, 0xc18d6cf, read64_delegate(FUNC(naomi_state::naomigd_ggxxrl_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc18d6c8, 0xc18d6cf, read64_delegate(FUNC(naomi_state::naomigd_ggxxrl_idle_skip_r),this));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -294,7 +294,7 @@ READ64_MEMBER(naomi_state::naomigd_sfz3ugd_idle_skip_r )
 
 DRIVER_INIT_MEMBER(naomi_state,sfz3ugd)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc5dc900, 0xc5dc907, read64_delegate(FUNC(naomi_state::naomigd_sfz3ugd_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc5dc900, 0xc5dc907, read64_delegate(FUNC(naomi_state::naomigd_sfz3ugd_idle_skip_r),this));
 	DRIVER_INIT_CALL(naomigd);
 }
 
@@ -342,7 +342,7 @@ READ64_MEMBER(naomi_state::hotd2_idle_skip_r )
 
 DRIVER_INIT_MEMBER(naomi_state,hotd2)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(FUNC(naomi_state::hotd2_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca25fb8, 0xca25fbf, read64_delegate(FUNC(naomi_state::hotd2_idle_skip_r),this));
 }
 
 // f355 PC=0xc065f7c RAM=0xc26dafc

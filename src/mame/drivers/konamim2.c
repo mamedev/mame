@@ -472,7 +472,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			m_unk3 = 0;
 		}
 	}
@@ -1111,7 +1111,7 @@ READ64_MEMBER(konamim2_state::cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((&space.device() != machine().device("maincpu")) ? 0x80000000 : 0);
+		r = (UINT64)((&space.device() != m_maincpu) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

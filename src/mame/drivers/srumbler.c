@@ -45,7 +45,7 @@ WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 
 void srumbler_state::machine_start()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }

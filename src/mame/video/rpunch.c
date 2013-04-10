@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
 
 TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
 {
-	machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+	m_maincpu->set_input_line(1, HOLD_LINE);
 	if (param != 0)
 		m_crtc_timer->adjust(machine().primary_screen->frame_period() / param, 0, machine().primary_screen->frame_period() / param);
 }

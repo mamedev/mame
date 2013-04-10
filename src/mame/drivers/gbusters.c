@@ -279,7 +279,7 @@ void gbusters_state::machine_reset()
 {
 	UINT8 *RAM = memregion("maincpu")->base();
 
-	konami_configure_set_lines(machine().device("maincpu"), gbusters_banking);
+	konami_configure_set_lines(m_maincpu, gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000);

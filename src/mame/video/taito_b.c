@@ -26,7 +26,7 @@ WRITE16_MEMBER(taitob_state::hitice_pixel_scroll_w)
 void taitob_state::hitice_clear_pixel_bitmap(  )
 {
 	int i;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
 		hitice_pixelram_w(space, i, 0, 0xffff);

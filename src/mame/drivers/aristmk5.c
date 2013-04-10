@@ -183,7 +183,7 @@ READ32_MEMBER(aristmk5_state::Ns5x58)
 	// reset 2KHz timer
 	m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
 	m_ioc_regs[IRQ_STATUS_A] &= ~0x01;
-	machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 	return 0xffffffff;
 }
 

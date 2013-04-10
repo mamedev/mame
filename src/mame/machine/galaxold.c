@@ -18,7 +18,7 @@ IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
 	/* for some reason a call to cputag_set_input_line
 	 * is significantly delayed ....
 	 *
-	 * device->machine().device("maincpu")->set_input_line(0, CLEAR_LINE);
+	 * state->m_maincpu->set_input_line(0, CLEAR_LINE);
 	 *
 	 * Therefore we reset the line without any detour ....
 	 */
@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
 WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
 {
 	/* Q goes to the NMI line */
-	machine().device("maincpu")->execute().set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
@@ -96,7 +96,7 @@ MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(0);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxold_state::hunchbkg_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxold_state::hunchbkg_irq_callback),this));
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
@@ -215,7 +215,7 @@ DRIVER_INIT_MEMBER(galaxold_state,dingoe)
 			rom[i] = BITSWAP8(rom[i],7,6,5,0,3,2,1,4);
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3001, 0x3001, FUNC(dingoe_3001_r));   /* Protection check */
+	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x3001, 0x3001, FUNC(dingoe_3001_r));   /* Protection check */
 
 }
 #endif
@@ -264,19 +264,19 @@ CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 DRIVER_INIT_MEMBER(galaxold_state,pisces)
 {
 	/* the coin lockout was replaced */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x6002, 0x6002, FUNC(galaxold_gfxbank_w));
+	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x6002, 0x6002, FUNC(galaxold_gfxbank_w));
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,checkmaj)
 {
 	/* for the title screen */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3800, 0x3800, FUNC(checkmaj_protection_r));
+	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x3800, 0x3800, FUNC(checkmaj_protection_r));
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,dingo)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3000, 0x3000, FUNC(dingo_3000_r));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x3035, 0x3035, FUNC(dingo_3035_r));
+	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x3000, 0x3000, FUNC(dingo_3000_r));
+	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x3035, 0x3035, FUNC(dingo_3035_r));
 }
 
 
@@ -294,7 +294,7 @@ UINT8 galaxold_state::decode_mooncrst(UINT8 data,offs_t addr)
 
 DRIVER_INIT_MEMBER(galaxold_state,mooncrsu)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xa000, 0xa002, FUNC(galaxold_gfxbank_w));
+	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0xa000, 0xa002, FUNC(galaxold_gfxbank_w));
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,mooncrst)
@@ -311,13 +311,13 @@ DRIVER_INIT_MEMBER(galaxold_state,mooncrst)
 
 DRIVER_INIT_MEMBER(galaxold_state,mooncrgx)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x6000, 0x6002, FUNC(galaxold_gfxbank_w));
+	m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x6000, 0x6002, FUNC(galaxold_gfxbank_w));
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,moonqsr)
 {
 	offs_t i;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
@@ -395,7 +395,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT_MEMBER(galaxold_state,4in1)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	offs_t i, len = memregion("maincpu")->bytes();
 	UINT8 *RAM = memregion("maincpu")->base();
 
@@ -419,7 +419,7 @@ INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 DRIVER_INIT_MEMBER(galaxold_state,ladybugg)
 {
 	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)

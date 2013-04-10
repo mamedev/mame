@@ -499,7 +499,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
 	if (m_NMIENABLE)
 	{
 		LOG(("6809 nmi\n"));
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, HOLD_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 
@@ -903,7 +903,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	UINT8 *okirom = memregion( "msm6376" )->base();
 
 	if (!okirom) {
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?

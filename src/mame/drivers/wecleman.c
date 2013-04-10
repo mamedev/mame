@@ -1029,9 +1029,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 	int scanline = param;
 
 	if(scanline == 232) // vblank irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	else if(((scanline % 64) == 0)) // timer irq TODO: timings
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
@@ -1039,9 +1039,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 	int scanline = param;
 
 	if(scanline == 224) // vblank irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	else if(((scanline % 64) == 0)) // timer irq TODO: timings
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 

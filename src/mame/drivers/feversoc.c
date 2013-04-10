@@ -250,7 +250,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(8, HOLD_LINE );
+	m_maincpu->set_input_line(8, HOLD_LINE );
 }
 
 static MACHINE_CONFIG_START( feversoc, feversoc_state )

@@ -636,7 +636,7 @@ MACHINE_RESET_MEMBER(thunderx_state,scontra)
 
 MACHINE_RESET_MEMBER(thunderx_state,thunderx)
 {
-	konami_configure_set_lines(machine().device("maincpu"), thunderx_banking);
+	konami_configure_set_lines(m_maincpu, thunderx_banking);
 
 	MACHINE_RESET_CALL_MEMBER(scontra);
 }

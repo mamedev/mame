@@ -1155,7 +1155,7 @@ ROM_END
 DRIVER_INIT_MEMBER(phoenix_state,condor)
 {
 	/* additional inputs for coinage */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x5000, 0x5000, "DSW1");
 }
 
 

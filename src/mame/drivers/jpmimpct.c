@@ -131,8 +131,8 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
 
 void jpmimpct_state::update_irqs()
 {
-	machine().device("maincpu")->execute().set_input_line(2, m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

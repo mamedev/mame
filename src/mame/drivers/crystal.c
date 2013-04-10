@@ -581,7 +581,7 @@ void crystal_state::machine_start()
 	m_ds1302 = machine().device<ds1302_device>("rtc");
 	m_vr0video = machine().device("vr0");
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
@@ -610,7 +610,7 @@ void crystal_state::machine_reset()
 	memset(m_vidregs, 0, 0x10000);
 	m_FlipCount = 0;
 	m_IntHigh = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
 	m_Bank = 0;
 	membank("bank1")->set_base(memregion("user1")->base() + 0);
 	m_FlashCmd = 0xff;
@@ -646,7 +646,7 @@ void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 
 UINT32 crystal_state::screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -711,7 +711,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		UINT16 head, tail;
 		int DoFlip = 0;
 

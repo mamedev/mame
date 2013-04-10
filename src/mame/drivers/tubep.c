@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
@@ -265,7 +265,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	if (scanline == 240)
 	{
 		logerror("VBLANK CPU#0\n");
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 
@@ -446,7 +446,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	if (scanline == 240)
 	{
 		logerror("VBLANK CPU#0\n");
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 

@@ -1493,7 +1493,7 @@ void mazerbla_state::machine_reset()
 
 	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mazerbla_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mazerbla_state::irq_callback),this));
 }
 
 

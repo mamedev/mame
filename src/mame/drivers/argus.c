@@ -134,10 +134,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::argus_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 16) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
@@ -145,10 +145,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
 
 	if(scanline == 8) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */

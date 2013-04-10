@@ -465,7 +465,7 @@ WRITE8_MEMBER(xtom3d_state::at_dma8237_2_w)
 
 WRITE_LINE_MEMBER(xtom3d_state::pc_dma_hrq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_dma8237_1->i8237_hlda_w( state );

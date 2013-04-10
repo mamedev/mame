@@ -210,7 +210,7 @@ WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", machine.primary_screen->vpos(), info.i);
-	machine().device("maincpu")->execute().set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
@@ -222,7 +222,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		machine().device("maincpu")->execute().set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
 		m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_irq_ram[0x14/4]));
@@ -785,14 +785,14 @@ READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 {
 	// init options
-	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(m_maincpu, SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	sh2drc_add_pcflush(machine().device("maincpu"), 0x3234);
-	sh2drc_add_pcflush(machine().device("maincpu"), 0x32dc);
+	sh2drc_add_pcflush(m_maincpu, 0x3234);
+	sh2drc_add_pcflush(m_maincpu, 0x32dc);
 
 	m_mainCpuIsArm = 0;
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
 	descramble_sound();
 }
 
@@ -801,7 +801,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
 	    effective clock rate here to compensate otherwise we have slowdowns in
 	    Skull Fung where there probably shouldn't be. */
-	machine().device("maincpu")->set_clock_scale(2.0f);
+	m_maincpu->set_clock_scale(2.0f);
 	m_mainCpuIsArm = 1;
 	deco156_decrypt(machine());
 	descramble_sound();

@@ -357,7 +357,7 @@ UINT32 astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16
 
 TIMER_CALLBACK_MEMBER(astrocde_state::interrupt_off)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -370,15 +370,15 @@ void astrocde_state::astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x01) == 0)
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0);
 			m_intoff_timer->adjust(machine().primary_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0);
-			m_intoff_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0);
+			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 
 		/* latch the feedback registers */
@@ -410,15 +410,15 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
 			machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_end(), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
-			machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(1), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
+			machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(1), timer_expired_delegate(FUNC(astrocde_state::interrupt_off),this));
 		}
 	}
 

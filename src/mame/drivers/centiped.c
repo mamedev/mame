@@ -447,7 +447,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		machine().device("maincpu")->execute().set_input_line(0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
 	machine().primary_screen->update_partial(scanline);
@@ -465,7 +465,7 @@ MACHINE_START_MEMBER(centiped_state,centiped)
 
 MACHINE_RESET_MEMBER(centiped_state,centiped)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_dsw_select = 0;
 	m_control_select = 0;
 	m_prg_bank = 0;
@@ -483,7 +483,7 @@ MACHINE_RESET_MEMBER(centiped_state,magworm)
 
 WRITE8_MEMBER(centiped_state::irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

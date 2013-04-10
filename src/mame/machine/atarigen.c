@@ -130,7 +130,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_actual_vc_latch1(0),
 		m_atarivc_playfields(0),
 		m_playfield_latch(0),
-		m_playfield2_latch(0)
+		m_playfield2_latch(0),
+		m_maincpu(*this, "maincpu") 
 {
 }
 
@@ -235,7 +236,7 @@ void atarigen_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	{
 		case TID_SCANLINE_INTERRUPT:
 		{
-			scanline_int_gen(*machine().device("maincpu"));
+			scanline_int_gen(*m_maincpu);
 			screen_device *screen = reinterpret_cast<screen_device *>(ptr);
 			timer.adjust(screen->frame_period());
 			break;
@@ -752,7 +753,7 @@ void atarigen_state::delayed_6502_write(int data)
 	// set up the states and signal the sound interrupt to the main CPU
 	m_sound_to_cpu = data;
 	m_sound_to_cpu_ready = 1;
-	sound_int_gen(*machine().device("maincpu"));
+	sound_int_gen(*m_maincpu);
 }
 
 
@@ -1030,7 +1031,7 @@ void atarigen_state::atarivc_common_w(screen_device &screen, offs_t offset, UINT
 		// scanline IRQ ack here
 		case 0x1e:
 			// hack: this should be a device
-			scanline_int_ack_w(screen.machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
+			scanline_int_ack_w(m_maincpu->space(AS_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		// log anything else

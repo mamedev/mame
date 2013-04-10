@@ -292,7 +292,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 		case 0x00:  /* IRQON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x01:  /* IOSEL */
@@ -450,7 +450,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 	int scanline = param;
 
 	if (((scanline == 64) || (scanline == 192)) && m_main_irq_mask) // 64V
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
 	{
@@ -462,7 +462,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 
 MACHINE_RESET_MEMBER(polepos_state,polepos)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -1995,9 +1995,9 @@ ROM_END
 DRIVER_INIT_MEMBER(polepos_state,topracern)
 {
 	/* extra direct mapped inputs read */
-	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x02, 0x02, "STEER");
-	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x03, 0x03, "IN0");
-	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x04, 0x04, "DSWA");
+	m_maincpu->space(AS_IO).install_read_port(0x02, 0x02, "STEER");
+	m_maincpu->space(AS_IO).install_read_port(0x03, 0x03, "IN0");
+	m_maincpu->space(AS_IO).install_read_port(0x04, 0x04, "DSWA");
 }
 
 DRIVER_INIT_MEMBER(polepos_state,polepos2)

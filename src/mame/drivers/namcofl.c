@@ -524,14 +524,14 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
 {
-	machine().device("maincpu")->execute().set_input_line(I960_IRQ0, ASSERT_LINE);
+	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 }
 
 
 TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
 {
-	machine().device("maincpu")->execute().set_input_line(I960_IRQ2, ASSERT_LINE);
+	m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 }
 
@@ -539,7 +539,7 @@ TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
 TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
 {
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	machine().device("maincpu")->execute().set_input_line(I960_IRQ1, ASSERT_LINE);
+	m_maincpu->set_input_line(I960_IRQ1, ASSERT_LINE);
 	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
 }
 

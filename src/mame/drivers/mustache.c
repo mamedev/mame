@@ -162,10 +162,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::mustache_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
 

@@ -49,7 +49,7 @@ INTERRUPT_GEN_MEMBER(aeroboto_state::aeroboto_interrupt)
 
 READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 

@@ -496,10 +496,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::panicr_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4/4);
 
 	if(scanline == 0) // <unknown>
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);
 }
 
 static MACHINE_CONFIG_START( panicr, panicr_state )

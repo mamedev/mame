@@ -13,7 +13,7 @@ TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
 {
 	int scanline = param;
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	scanline += 64;
 

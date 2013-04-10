@@ -1123,21 +1123,21 @@ DRIVER_INIT_MEMBER(limenko_state,common)
 
 DRIVER_INIT_MEMBER(limenko_state,dynabomb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe2784, 0xe2787, read32_delegate(FUNC(limenko_state::dynabomb_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
 DRIVER_INIT_MEMBER(limenko_state,legendoh)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x32ab0, 0x32ab3, read32_delegate(FUNC(limenko_state::legendoh_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
 
 DRIVER_INIT_MEMBER(limenko_state,sb2003)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x135800, 0x135803, read32_delegate(FUNC(limenko_state::sb2003_speedup_r), this));
 
 	DRIVER_INIT_CALL(common);
 }
@@ -1158,7 +1158,7 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6626c, 0x6626f, read32_delegate(FUNC(limenko_state::spotty_speedup_r), this));
 
 	m_spriteram_bit = 1;
 }

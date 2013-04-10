@@ -76,7 +76,7 @@ READ16_MEMBER(toaplan1_state::demonwld_dsp_r)
 	UINT16 input_data = 0;
 
 	switch (m_main_ram_seg) {
-		case 0xc00000: {address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
 						break;}
 		default:        logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
@@ -91,7 +91,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_w)
 	m_dsp_execute = 0;
 	switch (m_main_ram_seg) {
 		case 0xc00000: {if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = 1;
-						address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+						address_space &mainspace = m_maincpu->space(AS_PROGRAM);
 						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
 						break;}
 		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", space.device().safe_pcbase(), m_main_ram_seg + m_dsp_addr_w);
@@ -115,7 +115,7 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 	if (data == 0) {
 		if (m_dsp_execute) {
 			logerror("Turning 68000 on\n");
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_dsp_execute = 0;
 		}
 		m_dsp_BIO = ASSERT_LINE;
@@ -136,7 +136,7 @@ void toaplan1_state::demonwld_dsp(int enable)
 		logerror("Turning DSP on and 68000 off\n");
 		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{

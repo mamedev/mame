@@ -577,10 +577,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 	int scanline = param;
 
 	if(scanline == 232) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 24) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
@@ -588,10 +588,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 32) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 WRITE8_MEMBER(equites_state::equites_8155_w)
@@ -1888,8 +1888,8 @@ DRIVER_INIT_MEMBER(equites_state,gekisou)
 	unpack_region("gfx3");
 
 	// install special handlers for unknown device (protection?)
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),this));
 }
 
 DRIVER_INIT_MEMBER(equites_state,splndrbt)
@@ -1902,7 +1902,7 @@ DRIVER_INIT_MEMBER(equites_state,hvoltage)
 	unpack_region("gfx3");
 
 #if HVOLTAGE_DEBUG
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
+	m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
 #endif
 }
 

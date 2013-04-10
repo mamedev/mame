@@ -27,7 +27,7 @@ $208 strikes count
 
 WRITE8_MEMBER(tryout_state::tryout_nmi_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(tryout_state::tryout_sound_w)
@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(tryout_state::coin_inserted)
 {
 	if (oldval)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tryout )

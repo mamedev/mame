@@ -123,7 +123,7 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 
 	/* RES600 */
 	if (diff & 0x10)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))

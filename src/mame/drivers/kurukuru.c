@@ -256,7 +256,7 @@ public:
 
 WRITE_LINE_MEMBER(kurukuru_state::kurukuru_vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 

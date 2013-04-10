@@ -276,7 +276,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(progolf_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* verified from M6502 code */

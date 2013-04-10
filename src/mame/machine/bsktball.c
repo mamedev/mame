@@ -24,9 +24,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
 	int scanline = param;
 
 	if(scanline == 0) // vblank irq
-		machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	else if(((scanline % 28) == 0) && (m_nmi_on)) // 32v timer irq
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

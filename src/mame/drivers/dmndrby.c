@@ -504,12 +504,12 @@ void dmndrby_state::palette_init()
 /*Main Z80 is IM 0,HW-latched irqs. */
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_irq)
 {
-	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 {
-	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
 static MACHINE_CONFIG_START( dderby, dmndrby_state )

@@ -1479,7 +1479,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 {
-	UINT16 rega = machine().device("maincpu")->state().state_int(CCPU_A);
+	UINT16 rega = m_maincpu->state_int(CCPU_A);
 	demon_sound_w(machine(), 0x00 | (~rega & 0x0f), 0x10);
 }
 

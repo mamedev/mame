@@ -1020,7 +1020,7 @@ static void snes_init_timers( running_machine &machine )
 
 void snes_state::snes_init_ram()
 {
-	address_space &cpu0space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */

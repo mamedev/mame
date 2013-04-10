@@ -210,7 +210,7 @@ UINT8 line;
 
 MACHINE_RESET_MEMBER(bagman_state,bagman)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bagman_pal16r6_w(space, 0, 1);  /*pin 2*/
 	bagman_pal16r6_w(space, 1, 1);  /*pin 3*/
 	bagman_pal16r6_w(space, 2, 1);  /*pin 4*/

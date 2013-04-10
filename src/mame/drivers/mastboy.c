@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
 
 	m_m5205_part ^= 1;
 	if(!m_m5205_part)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -693,7 +693,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_irq0_ack_w)
 {
 	m_irq0_ack = data;
 	if ((data & 1) == 1)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mastboy_state::mastboy_interrupt)

@@ -596,18 +596,18 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),this));
 
 	// 8 independents banks for questions
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5100, 0x51ff, "bank2");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5200, 0x52ff, "bank3");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5300, 0x53ff, "bank4");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5400, 0x54ff, "bank5");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5500, 0x55ff, "bank6");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5600, 0x56ff, "bank7");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x5700, 0x57ff, "bank8");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5000, 0x50ff, "bank1");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5100, 0x51ff, "bank2");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5200, 0x52ff, "bank3");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5300, 0x53ff, "bank4");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5400, 0x54ff, "bank5");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5500, 0x55ff, "bank6");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5600, 0x56ff, "bank7");
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
 	membank("bank1")->set_base(memregion("user1")->base() + 0x100*0 );

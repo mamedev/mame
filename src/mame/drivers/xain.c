@@ -189,13 +189,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xain_state::xain_scanline)
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
 	if (!(vcount_old & 8) && (vcount & 8))
 	{
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
 	if (vcount == 0xf8)
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
@@ -231,13 +231,13 @@ WRITE8_MEMBER(xain_state::xain_main_irq_w)
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
 		machine().device("sub")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -247,7 +247,7 @@ WRITE8_MEMBER(xain_state::xain_main_irq_w)
 
 WRITE8_MEMBER(xain_state::xain_irqA_assert_w)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(xain_state::xain_irqB_clear_w)

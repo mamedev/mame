@@ -84,7 +84,7 @@
 
 void arcadecl_state::update_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -37,7 +37,7 @@ IRQ_CALLBACK_MEMBER(aztarac_state::aztarac_irq_callback)
 
 void aztarac_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(aztarac_state::aztarac_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(aztarac_state::aztarac_irq_callback),this));
 }
 
 

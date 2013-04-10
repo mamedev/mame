@@ -275,14 +275,14 @@ void toaplan1_state::toaplan1_set_scrolls()
 
 void toaplan1_state::rallybik_flipscreen()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	rallybik_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
 }
 
 void toaplan1_state::toaplan1_flipscreen()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	toaplan1_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
 }
@@ -1173,6 +1173,6 @@ void toaplan1_state::screen_eof_samesame(screen_device &screen, bool state)
 	{
 		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 		memcpy(m_buffered_spritesizeram16, m_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-		machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, HOLD_LINE);   /* Frame done */
+		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   /* Frame done */
 	}
 }

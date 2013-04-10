@@ -502,11 +502,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::expro02_scanline)
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 	else if(scanline == 0) // vblank-in irq?
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 	else if(scanline == 112) // VDP end task? (controls sprite colors in gameplay)
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 void expro02_state::machine_reset()

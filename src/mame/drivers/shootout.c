@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(shootout_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( shootout )
@@ -236,7 +236,7 @@ WRITE_LINE_MEMBER(shootout_state::shootout_snd_irq)
 
 WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =

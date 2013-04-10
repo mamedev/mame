@@ -1574,10 +1574,10 @@ ROM_END
 
 void arkanoid_state::arkanoid_bootleg_init(  )
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f000_r),this) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f002_r),this) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d018_w),this) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f000_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f002_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d018_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
@@ -1662,7 +1662,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd008, 0xd008, write8_delegate(FUNC(arkanoid_state::tetrsark_d008_w),this));
 }
 
 

@@ -232,7 +232,7 @@ static const k051316_interface rollerg_k051316_intf =
 
 WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 static const k053252_interface rollerg_k053252_intf =
@@ -262,7 +262,7 @@ void rollerg_state::machine_start()
 
 void rollerg_state::machine_reset()
 {
-	konami_configure_set_lines(machine().device("maincpu"), rollerg_banking);
+	konami_configure_set_lines(m_maincpu, rollerg_banking);
 
 	m_readzoomroms = 0;
 }

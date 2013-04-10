@@ -185,7 +185,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 
 WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 {
-	address_space &progspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &progspace = m_maincpu->space(AS_PROGRAM);
 	soundlatch_byte_w(progspace, 0, data);
 }
 

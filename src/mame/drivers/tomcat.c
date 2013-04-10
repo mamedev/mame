@@ -201,7 +201,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
 WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)
 {
 	// Clear IRQ Latch          (Address Strobe)
-	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_maincpu->set_input_line(1, CLEAR_LINE);
 }
 
 READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
@@ -222,7 +222,7 @@ READ16_MEMBER(tomcat_state::tomcat_inputs2_r)
 READ16_MEMBER(tomcat_state::tomcat_320bio_r)
 {
 	m_dsp_BIO = 1;
-	machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_SPIN, 1);
+	m_maincpu->suspend(SUSPEND_REASON_SPIN, 1);
 	return 0;
 }
 
@@ -243,7 +243,7 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 		{
 			m_dsp_idle = 0;
 			m_dsp_BIO = 0;
-			machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_SPIN );
+			m_maincpu->resume(SUSPEND_REASON_SPIN );
 			return 0;
 		}
 		else

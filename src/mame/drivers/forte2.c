@@ -101,7 +101,7 @@ static const ay8910_interface forte2_ay8910_interface =
 
 WRITE_LINE_MEMBER(forte2_state::vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(forte2_tms9928a_interface)

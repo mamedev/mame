@@ -179,7 +179,7 @@ INTERRUPT_GEN_MEMBER(supertnk_state::supertnk_interrupt)
 
 WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -287,7 +287,7 @@ UINT32 supertnk_state::screen_update_supertnk(screen_device &screen, bitmap_rgb3
 
 void supertnk_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 

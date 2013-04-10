@@ -576,7 +576,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 		}
 		else if (m_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					&space.device() == machine().device("maincpu"))
+					&space.device() == m_maincpu)
 		{ /* hack; synchronization for solvalou */
 			space.device().execute().yield();
 		}

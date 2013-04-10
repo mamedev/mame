@@ -265,7 +265,7 @@ WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 	m_nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
@@ -279,7 +279,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::shougi_vblank_nmi)
 	if ( m_nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }

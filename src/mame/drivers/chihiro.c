@@ -2778,7 +2778,7 @@ int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
 
 WRITE_LINE_MEMBER(chihiro_state::chihiro_pic8259_1_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(chihiro_state::get_slave_ack)
@@ -3032,7 +3032,7 @@ void chihiro_state::machine_start()
 	smbus_register_device(0x10,smbus_callback_pic16lc);
 	smbus_register_device(0x45,smbus_callback_cx25871);
 	smbus_register_device(0x54,smbus_callback_eeprom);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
 	chihiro_devs.pic8259_1 = machine().device( "pic8259_1" );
 	chihiro_devs.pic8259_2 = machine().device( "pic8259_2" );
 	chihiro_devs.ide = machine().device( "ide" );

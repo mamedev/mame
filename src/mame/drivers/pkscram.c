@@ -101,7 +101,7 @@ WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 
 	if (!(m_out & 0x2000) && m_interrupt_line_active)
 	{
-		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 		m_interrupt_line_active = 0;
 	}
 
@@ -224,14 +224,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pkscram_state::scanline_callback)
 	if (param == interrupt_scanline)
 	{
 		if (m_out & 0x2000)
-			machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+			m_maincpu->set_input_line(1, ASSERT_LINE);
 		timer.adjust(machine().primary_screen->time_until_pos(param + 1), param+1);
 		m_interrupt_line_active = 1;
 	}
 	else
 	{
 		if (m_interrupt_line_active)
-			machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+			m_maincpu->set_input_line(1, CLEAR_LINE);
 		timer.adjust(machine().primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 		m_interrupt_line_active = 0;
 	}
@@ -274,7 +274,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(pkscram_state::irqhandler)
 {
 	if(m_out & 0x10)
-		machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

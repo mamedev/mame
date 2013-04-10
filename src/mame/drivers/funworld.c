@@ -5132,7 +5132,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 ******************************************************/
 {
 	UINT8 *ROM = memregion("maincpu")->base();
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	int x;
 
@@ -5166,7 +5166,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 ******************************************************/
 
 	UINT8 *ROM = memregion("maincpu")->base();
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	int x;
 

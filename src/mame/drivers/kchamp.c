@@ -704,7 +704,7 @@ ROM_END
 
 UINT8 *kchamp_state::decrypt_code()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *rom = memregion("maincpu")->base();
 	int A;

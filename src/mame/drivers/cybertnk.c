@@ -575,7 +575,7 @@ WRITE8_MEMBER( cybertnk_state::cybertnk_irq_ack_w )
 	}
 	else if (offset == 1)
 	{
-		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 	}
 }
 

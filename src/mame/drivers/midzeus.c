@@ -89,7 +89,7 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 {
 	memcpy(m_ram_base, memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	cmos_protected = TRUE;
 }
@@ -104,7 +104,7 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 
 TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
@@ -1457,7 +1457,7 @@ DRIVER_INIT_MEMBER(midzeus_state,invasn)
 {
 	dcs2_init(machine(), 0, 0);
 	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),this), write32_delegate(FUNC(midzeus_state::invasn_gun_w),this));
 }
 
 
@@ -1466,8 +1466,8 @@ DRIVER_INIT_MEMBER(midzeus_state,crusnexo)
 	dcs2_init(machine(), 0, 0);
 	midway_ioasic_init(machine(), MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	membank("bank1")->configure_entries(0, 3, memregion("user2")->base(), 0x400000*4);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),this), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),this));
 }
 
 

@@ -424,7 +424,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(pinkiri8_state::output_regs_w)
 {
 	if(data & 0x40)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	//data & 0x80 is probably NMI mask
 }
 
@@ -1251,9 +1251,9 @@ READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
 
 DRIVER_INIT_MEMBER(pinkiri8_state,ronjan)
 {
-	machine().device("maincpu")->memory().space(AS_IO).install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
+	m_maincpu->space(AS_IO).install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi, driver_device,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

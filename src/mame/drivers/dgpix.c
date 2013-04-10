@@ -557,7 +557,7 @@ DRIVER_INIT_MEMBER(dgpix_state,xfiles)
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0xf0c8b440, 0xf0c8b447);
+//  m_maincpu->space(AS_PROGRAM).nop_read(0xf0c8b440, 0xf0c8b447);
 
 	m_flash_roms = 2;
 }
@@ -577,7 +577,7 @@ DRIVER_INIT_MEMBER(dgpix_state,kdynastg)
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x12341234, 0x12341243);
+//  m_maincpu->space(AS_PROGRAM).nop_read(0x12341234, 0x12341243);
 
 	m_flash_roms = 4;
 }

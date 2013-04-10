@@ -750,7 +750,7 @@ READ8_MEMBER(videopkr_state::videopkr_t0_latch)
 WRITE8_MEMBER(videopkr_state::prog_w)
 {
 	if (!data)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
+		m_maincpu->set_input_line(0, CLEAR_LINE);   /* clear interrupt FF */
 }
 
 /*************************

@@ -153,9 +153,9 @@ WRITE8_MEMBER(esh_state::led_writes)
 WRITE8_MEMBER(esh_state::nmi_line_w)
 {
 	if (data == 0x00)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	if (data == 0x01)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (data != 0x00 && data != 0x01)
 		logerror("NMI line got a weird value!\n");
@@ -284,7 +284,7 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(esh_state::irq_stop)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)

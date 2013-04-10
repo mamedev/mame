@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(ssozumo_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( ssozumo )

@@ -77,7 +77,7 @@ CHIP #  POSITION   TYPE
 
 WRITE8_MEMBER(flower_state::flower_maincpu_irq_ack)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(flower_state::flower_subcpu_irq_ack)
@@ -144,7 +144,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(flower_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( flower )

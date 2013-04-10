@@ -1071,7 +1071,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 		if (i==0 || (i==4 && !data))
 		{
 			m_blitter_busy = 0;
-			if (m_firq_level) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			if (m_firq_level) m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
@@ -1562,16 +1562,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 56*3:
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 56*2:
-			m_mVectorType = 1; machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+			m_mVectorType = 1; m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 			break;
 
 		case 56:
-			m_mVectorType = 0; machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+			m_mVectorType = 0; m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 			break;
 	}
 }
@@ -1588,13 +1588,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
 			break;
 
 		case 56*3:
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 56*2:
 		case 56*1:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!m_blitter_busy) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); else m_firq_level++;
+			if (!m_blitter_busy) m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE); else m_firq_level++;
 			break;
 	}
 }
@@ -1611,7 +1611,7 @@ WRITE8_MEMBER(halleys_state::firq_ack_w)
 	m_io_ram[0x9c] = data;
 
 	if (m_firq_level) m_firq_level--;
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

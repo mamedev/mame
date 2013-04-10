@@ -74,7 +74,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
 	}
 	else if( data == 1 )
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

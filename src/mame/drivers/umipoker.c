@@ -174,7 +174,7 @@ WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
 
 WRITE16_MEMBER(umipoker_state::umipoker_irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
+	m_maincpu->set_input_line(6, CLEAR_LINE);
 
 	/* shouldn't happen */
 	if(data)
@@ -740,13 +740,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(umipoker_state,umipoker)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::umi_counters_w), this));
 }
 
 DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00010, 0xe00011, write16_delegate(FUNC(umipoker_state::saiyu_counters_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000c, 0xe0000d, write16_delegate(FUNC(umipoker_state::lamps_w), this));
 }
 
 

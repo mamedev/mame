@@ -399,7 +399,7 @@ static void handle_lightpen( device_t *device )
 WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
 {
 	device_t *device = machine().device("crtc");
-	machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen(device);
 }
 

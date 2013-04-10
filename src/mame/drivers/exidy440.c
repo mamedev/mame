@@ -256,7 +256,7 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (oldval)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -300,9 +300,9 @@ void exidy440_state::exidy440_bank_select(UINT8 bank)
 	if (m_showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && m_bank != 0)
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),this));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),this));
 		else if (bank != 0 && m_bank == 0)
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
 	}
 
 	/* select the bank and update the bank pointer */
@@ -334,7 +334,7 @@ WRITE8_MEMBER(exidy440_state::bankram_w)
 READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return ioport("IN3")->read();
 }
 
@@ -368,7 +368,7 @@ WRITE8_MEMBER(exidy440_state::sound_command_w)
 WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -1929,7 +1929,7 @@ DRIVER_INIT_MEMBER(exidy440_state,exidy440)
 DRIVER_INIT_MEMBER(exidy440_state,claypign)
 {
 	DRIVER_INIT_CALL(exidy440);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),this));
 }
 
 
@@ -1938,11 +1938,11 @@ DRIVER_INIT_MEMBER(exidy440_state,topsecex)
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec6, 0x2ec6, "AN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	m_topsecex_yscroll = machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
+	m_topsecex_yscroll = m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),this));
 }
 
 

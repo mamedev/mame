@@ -382,7 +382,7 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 
 	if(offset==0xf && data==0xffff)
 	{
-		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 		{
 			UINT8 *rom = memregion("gfx1")->base();
@@ -744,7 +744,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 
 		if(m_scanline_cnt==0) //<=0 ?
 		{
-			machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
+			m_maincpu->set_input_line(5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		}
 
 	}
@@ -753,7 +753,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
 		if(m_current_scanline==NUM_SCANLINES) /* vblank */
 		{
 			m_toggle_bit = 0x8000;
-			machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+			m_maincpu->set_input_line(3, HOLD_LINE);
 		}
 	}
 }

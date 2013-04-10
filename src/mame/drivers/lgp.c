@@ -337,7 +337,7 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(lgp_state::irq_stop)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)

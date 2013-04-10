@@ -194,7 +194,7 @@ void surpratk_state::machine_reset()
 {
 	int i;
 
-	konami_configure_set_lines(machine().device("maincpu"), surpratk_banking);
+	konami_configure_set_lines(m_maincpu, surpratk_banking);
 
 	for (i = 0; i < 3; i++)
 	{

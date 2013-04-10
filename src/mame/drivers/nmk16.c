@@ -3521,12 +3521,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete, Vandyke definitely relies that irq fires at scanline ~0 instead of 112 (as per previous
 	   cpu_getiloops function implementation), mostly noticeable with sword collisions and related attract mode behaviour. */
 	if(scanline == 0)
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 /* bee-oh board, almost certainly it has different timings */
@@ -3535,11 +3535,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	/* This is either vblank-in or sprite dma irq complete */
 	if(scanline == 0)
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
@@ -4570,8 +4570,8 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 READ16_MEMBER(nmk16_state::vandykeb_r){ return 0x0000; }
 DRIVER_INIT_MEMBER(nmk16_state,vandykeb)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x08000e, 0x08000f, read16_delegate(FUNC(nmk16_state::vandykeb_r),this));
+	m_maincpu->space(AS_PROGRAM).nop_write(0x08001e, 0x08001f);
 }
 
 

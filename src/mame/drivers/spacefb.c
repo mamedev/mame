@@ -131,7 +131,7 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 	/* compute vector and set the interrupt line */
 	int vpos = machine().primary_screen->vpos();
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, vector);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)
@@ -177,7 +177,7 @@ void spacefb_state::machine_start()
 
 void spacefb_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_IO);
 	/* the 3 output ports are cleared on reset */
 	spacefb_port_0_w(space, 0, 0);
 	spacefb_port_1_w(space, 0, 0);

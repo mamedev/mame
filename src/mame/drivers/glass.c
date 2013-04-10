@@ -410,7 +410,7 @@ DRIVER_INIT_MEMBER(glass_state,glass)
 	glass_ROM16_split_gfx("gfx2", "gfx1", 0x0200000, 0x0200000, 0x0200000, 0x0300000);
 
 	/* install custom handler over RAM for protection */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::glass_mainram_r), this), write16_delegate(FUNC(glass_state::glass_mainram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfec000, 0xfeffff, read16_delegate(FUNC(glass_state::glass_mainram_r), this), write16_delegate(FUNC(glass_state::glass_mainram_w),this));
 
 }
 

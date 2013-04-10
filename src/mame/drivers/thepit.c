@@ -1110,7 +1110,7 @@ READ8_MEMBER(thepit_state::rtriv_question_r)
 DRIVER_INIT_MEMBER(thepit_state,rtriv)
 {
 	// Set-up the weirdest questions read ever done
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),this));
 }
 
 

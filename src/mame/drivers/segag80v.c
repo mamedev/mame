@@ -162,7 +162,7 @@ INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -200,7 +200,7 @@ WRITE8_MEMBER(segag80v_state::mainram_w)
 	m_mainram[decrypt_offset(space, offset)] = data;
 }
 
-WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, space, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80v_state::usb_ram_w){ sega_usb_ram_w(m_usb, space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
 WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
 	m_vectorram[decrypt_offset(space, offset)] = data;
@@ -1285,7 +1285,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(segag80v_state,elim2)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure security */
 	m_decrypt = segag80_security(70);
@@ -1299,7 +1299,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim2)
 
 DRIVER_INIT_MEMBER(segag80v_state,elim4)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure security */
 	m_decrypt = segag80_security(76);
@@ -1317,7 +1317,7 @@ DRIVER_INIT_MEMBER(segag80v_state,elim4)
 
 DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure security */
 	m_decrypt = segag80_security(64);
@@ -1333,7 +1333,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 
 DRIVER_INIT_MEMBER(segag80v_state,zektor)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 	device_t *ay = machine().device("aysnd");
 
 	/* configure security */
@@ -1355,8 +1355,8 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 
 DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 {
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure security */
 	m_decrypt = segag80_security(76);
@@ -1375,8 +1375,8 @@ DRIVER_INIT_MEMBER(segag80v_state,tacscan)
 
 DRIVER_INIT_MEMBER(segag80v_state,startrek)
 {
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure security */
 	m_decrypt = segag80_security(64);

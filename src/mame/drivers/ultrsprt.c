@@ -101,17 +101,17 @@ CUSTOM_INPUT_MEMBER(ultrsprt_state::analog_ctrl_r)
 
 WRITE32_MEMBER(ultrsprt_state::int_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 void ultrsprt_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x80000000, 0x8007ffff, FALSE, m_vram);
-	ppcdrc_add_fastram(machine().device("maincpu"), 0xff000000, 0xff01ffff, FALSE, m_workram);
+	ppcdrc_add_fastram(m_maincpu, 0x80000000, 0x8007ffff, FALSE, m_vram);
+	ppcdrc_add_fastram(m_maincpu, 0xff000000, 0xff01ffff, FALSE, m_workram);
 }
 
 

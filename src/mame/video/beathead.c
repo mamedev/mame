@@ -120,7 +120,7 @@ WRITE32_MEMBER( beathead_state::finescroll_w )
 	if ((oldword & 8) && !(newword & 8) && space.machine().primary_screen->vpos() != 261)
 	{
 		logerror("Suspending time! (scanline = %d)\n", space.machine().primary_screen->vpos());
-		space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 

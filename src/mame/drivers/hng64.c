@@ -1754,12 +1754,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 void hng64_state::machine_start()
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x00ffffff, FALSE, m_mainram);
-	mips3drc_add_fastram(machine().device("maincpu"), 0x04000000, 0x05ffffff, TRUE,  m_cart);
-	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x00ffffff, FALSE, m_mainram);
+	mips3drc_add_fastram(m_maincpu, 0x04000000, 0x05ffffff, TRUE,  m_cart);
+	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 }
 
 

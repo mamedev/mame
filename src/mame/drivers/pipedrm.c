@@ -896,14 +896,14 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 {
 	/* sprite RAM lives at the end of palette RAM */
 	m_spriteram.set_target(&m_generic_paletteram_8[0xc00], 0x400);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
+	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 
 
 DRIVER_INIT_MEMBER(pipedrm_state,hatris)
 {
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x20, 0x20, write8_delegate(FUNC(pipedrm_state::sound_command_nonmi_w),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, write8_delegate(FUNC(pipedrm_state::sound_command_nonmi_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x21, 0x21, write8_delegate(FUNC(pipedrm_state::fromance_gfxreg_w),this));
 }
 
 

@@ -396,7 +396,7 @@ WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
 WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 {
 	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
-	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
@@ -714,7 +714,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER( jchan_state, jchan )
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),this));
 	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),this));
 }
 

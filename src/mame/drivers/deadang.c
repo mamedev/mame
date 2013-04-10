@@ -211,10 +211,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_main_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
 
 	if(scanline == 0) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_sub_scanline)
@@ -422,8 +422,8 @@ DRIVER_INIT_MEMBER(deadang_state,ghunter)
 	seibu_adpcm_decrypt(machine(), "adpcm1");
 	seibu_adpcm_decrypt(machine(), "adpcm2");
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80000, 0x80001, read16_delegate(FUNC(deadang_state::ghunter_trackball_low_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0000, 0xb0001, read16_delegate(FUNC(deadang_state::ghunter_trackball_high_r),this));
 }
 
 /* Game Drivers */

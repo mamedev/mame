@@ -281,9 +281,9 @@ WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
 	if (m_control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+			m_maincpu->set_input_line(4, HOLD_LINE);
 		else
-			machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+			m_maincpu->set_input_line(4, CLEAR_LINE);
 	}
 }
 
@@ -292,7 +292,7 @@ WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
 TIMER_CALLBACK_MEMBER(qdrmfgp_state::gp2_timer_callback)
 {
 	if (m_control & 0x0004)
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
@@ -311,11 +311,11 @@ WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
 			if (m_gp2_irq_control)
 				m_gp2_irq_control = 0;
 			else
-				machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+				m_maincpu->set_input_line(5, HOLD_LINE);
 		}
 		else
 		{
-			machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
+			m_maincpu->set_input_line(5, CLEAR_LINE);
 		}
 	}
 }
@@ -563,7 +563,7 @@ static void sound_irq(device_t *device)
 {
 	qdrmfgp_state *state = device->machine().driver_data<qdrmfgp_state>();
 	if (state->m_control & 0x0001)
-		device->machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		state->m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 static const k054539_interface k054539_config =
@@ -600,12 +600,12 @@ static const k056832_interface qdrmfgp2_k056832_intf =
 
 WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq3_ack_w)
 {
-//  machine().device("maincpu")->execute().set_input_line(M68K_IRQ_3, CLEAR_LINE);
+//  m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(qdrmfgp_state::qdrmfgp_irq4_ack_w)
 {
-//  machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
+//  m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 }
 
 static const k053252_interface qdrmfgp_k053252_intf =

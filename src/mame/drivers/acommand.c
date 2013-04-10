@@ -594,10 +594,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in irq? (update palette and layers)
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( acommand, acommand_state )

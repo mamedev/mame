@@ -9752,7 +9752,7 @@ DRIVER_INIT_MEMBER(neogeo_state,kf2k3pcb)
 	neo_pcm2_swap(5);
 	m_fixed_layer_bank_type = 2;
 	install_pvc_protection();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc00000, 0xc7ffff, "bios" );  // 512k bios
+	m_maincpu->space(AS_PROGRAM).install_read_bank(0xc00000, 0xc7ffff, "bios" );  // 512k bios
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,kof2003)
@@ -9824,18 +9824,18 @@ DRIVER_INIT_MEMBER(neogeo_state,jockeygp)
 	kof2000_neogeo_gfx_decrypt(0xac);
 
 	/* install some extra RAM */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
 
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
+//  m_maincpu->space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
+//  m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,vliner)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x201fff);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x280000, 0x280001, "IN5");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x2c0000, 0x2c0001, "IN6");
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -9851,7 +9851,7 @@ DRIVER_INIT_MEMBER(neogeo_state,kof97oro)
 DRIVER_INIT_MEMBER(neogeo_state,kog)
 {
 	/* overlay cartridge ROM */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
 
 	kog_px_decrypt();
 	neogeo_bootleg_sx_decrypt(1);
@@ -9911,8 +9911,8 @@ DRIVER_INIT_MEMBER(neogeo_state,sbp)
 	// there are also writes to 0x1080..
 	//
 	// other stuff going on as well tho, the main overlay is still missing, and p1 inputs don't work
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00200, 0x001fff, read16_delegate(FUNC(neogeo_state::sbp_lowerrom_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x00200, 0x001fff, write16_delegate(FUNC(neogeo_state::sbp_lowerrom_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00200, 0x001fff, read16_delegate(FUNC(neogeo_state::sbp_lowerrom_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x00200, 0x001fff, write16_delegate(FUNC(neogeo_state::sbp_lowerrom_w),this));
 
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	{

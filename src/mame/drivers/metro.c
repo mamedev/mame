@@ -3576,7 +3576,7 @@ MACHINE_START_MEMBER(metro_state,metro)
 MACHINE_RESET_MEMBER(metro_state,metro)
 {
 	if (m_irq_line == -1)
-		machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(metro_state::metro_irq_callback),this));
+		m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(metro_state::metro_irq_callback),this));
 }
 
 
@@ -6274,7 +6274,7 @@ void metro_state::metro_common(  )
 
 DRIVER_INIT_MEMBER(metro_state,metro)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	metro_common();
 
@@ -6301,7 +6301,7 @@ DRIVER_INIT_MEMBER(metro_state,karatour)
 
 DRIVER_INIT_MEMBER(metro_state,daitorid)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	metro_common();
 

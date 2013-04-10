@@ -704,7 +704,7 @@ void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
 	if (!m_user5region) m_user5region = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(m_maincpu, SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios();
 	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);
@@ -717,7 +717,7 @@ void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
 
 	m_0xc0000000_ram_decrypted = auto_alloc_array(machine(), UINT32, 0x400/4);
 
-	address_space &main = machine().device<sh2_device>("maincpu")->space(AS_PROGRAM);
+	address_space &main = m_maincpu->space(AS_PROGRAM);
 	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), this));
 
 	// flash roms
@@ -1772,7 +1772,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 				}
 
 
-				machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+				m_maincpu->set_input_line(10, ASSERT_LINE);
 
 
 			}
@@ -1982,14 +1982,14 @@ void cps3_state::cps3_process_character_dma(UINT32 address)
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				m_current_table_address = real_source;
 			}
-			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			m_maincpu->set_input_line(10, ASSERT_LINE);
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
 			  - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma(real_source, real_destination, real_length );
-			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			m_maincpu->set_input_line(10, ASSERT_LINE);
 
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00600000)
@@ -1997,7 +1997,7 @@ void cps3_state::cps3_process_character_dma(UINT32 address)
 			/* 8bpp DMA decompression
 			  - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma(real_source, real_destination, real_length);
-			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			m_maincpu->set_input_line(10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2055,12 +2055,12 @@ WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
 
 WRITE32_MEMBER(cps3_state::cps3_irq10_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(10, CLEAR_LINE); return;
+	m_maincpu->set_input_line(10, CLEAR_LINE); return;
 }
 
 WRITE32_MEMBER(cps3_state::cps3_irq12_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(12, CLEAR_LINE); return;
+	m_maincpu->set_input_line(12, CLEAR_LINE); return;
 }
 
 WRITE32_MEMBER(cps3_state::cps3_unk_vidregs_w)

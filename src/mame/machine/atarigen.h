@@ -274,6 +274,7 @@ public:
 	UINT32                  m_playfield2_latch;
 
 	atarigen_screen_timer   m_screen_timer[2];
+	required_device<cpu_device> m_maincpu;
 };
 
 

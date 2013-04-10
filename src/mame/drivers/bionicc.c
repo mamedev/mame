@@ -123,10 +123,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::bionicc_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0) // vblank-in or i8751 related irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 

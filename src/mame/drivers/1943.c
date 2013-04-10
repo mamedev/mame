@@ -649,7 +649,7 @@ DRIVER_INIT_MEMBER(_1943_state,1943b)
 	DRIVER_INIT_CALL(1943);
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
 	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),this));
 
 }
 

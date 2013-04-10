@@ -281,7 +281,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(naughtyb_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )
@@ -832,10 +832,10 @@ ROM_END
 DRIVER_INIT_MEMBER(naughtyb_state,popflame)
 {
 	/* install a handler to catch protection checks */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9000, 0x9000, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9090, 0x9090, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8_delegate(FUNC(naughtyb_state::popflame_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb000, 0xb0ff, write8_delegate(FUNC(naughtyb_state::popflame_protection_w),this));
 }
 
 
@@ -863,7 +863,7 @@ WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
 DRIVER_INIT_MEMBER(naughtyb_state,trvmstr)
 {
 	/* install questions' handlers  */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),this), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),this));
 }
 
 

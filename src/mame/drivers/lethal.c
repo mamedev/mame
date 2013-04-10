@@ -598,7 +598,7 @@ void lethal_state::machine_reset()
 
 	membank("bank2")->set_base(&prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	for (i = 0; i < 4; i++)
 		m_layer_colorbase[i] = 0;

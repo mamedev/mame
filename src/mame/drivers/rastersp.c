@@ -149,7 +149,7 @@ protected:
 
 void rastersp_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rastersp_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rastersp_state::irq_callback),this));
 
 	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
 

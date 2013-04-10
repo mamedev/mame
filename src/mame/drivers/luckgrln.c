@@ -993,7 +993,7 @@ static MC6845_INTERFACE( mc6845_intf )
 INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 {
 	if(m_nmi_enable)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( luckgrln, luckgrln_state )

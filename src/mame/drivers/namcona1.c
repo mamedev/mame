@@ -847,7 +847,7 @@ WRITE8_MEMBER(namcona1_state::port4_w)
 		logerror("launching 68k, PC=%x\n", space.device().safe_pc());
 
 		// reset and launch the 68k
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	m_mcu_port4 = data;
@@ -922,7 +922,7 @@ void namcona1_state::machine_start()
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
 void namcona1_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_mcu_port5 = 1;
 }

@@ -101,7 +101,7 @@ TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_status_real_w)
 
 WRITE8_MEMBER(pitnrun_state::pitnrun_68705_portB_w)
 {
-	address_space &cpu0space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */

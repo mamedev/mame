@@ -73,7 +73,7 @@ INPUT_PORTS_END
 
 void alien_state::machine_reset()
 {
-	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( alien, alien_state )

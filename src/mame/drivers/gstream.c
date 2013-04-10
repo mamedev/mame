@@ -638,7 +638,7 @@ READ32_MEMBER(gstream_state::gstream_speedup_r)
 
 DRIVER_INIT_MEMBER(gstream_state,gstream)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), this));
 }
 
 

@@ -222,7 +222,7 @@ WRITE8_MEMBER(pacland_state::pacland_irq_1_ctrl_w)
 	int bit = !BIT(offset, 11);
 	m_main_irq_mask = bit;
 	if (!bit)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
@@ -399,7 +399,7 @@ static const namco_interface namco_config =
 INTERRUPT_GEN_MEMBER(pacland_state::main_vblank_irq)
 {
 	if(m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)

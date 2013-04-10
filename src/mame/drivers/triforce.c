@@ -520,7 +520,7 @@ static void descrambler(UINT8* data, UINT32 size)
 void triforce_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	UINT8 *rom = (UINT8*)memregion("maincpu")->base();
 	descrambler(&rom[0x100], 0x1afe00);

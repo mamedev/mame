@@ -56,7 +56,7 @@ INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
 
 TIMER_CALLBACK_MEMBER(galastrm_state::galastrm_interrupt6)
 {
-	machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 

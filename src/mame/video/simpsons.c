@@ -92,7 +92,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_k053247_w)
 
 void simpsons_state::simpsons_video_banking( int bank )
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (bank & 1)
 	{

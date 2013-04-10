@@ -480,7 +480,7 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 	pbaction_decode(machine(), "maincpu");
 
 	/* install a protection (?) workaround */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
 }
 
 DRIVER_INIT_MEMBER(pbaction_state,pbactio4)

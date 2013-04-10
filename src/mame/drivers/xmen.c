@@ -349,10 +349,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && m_vblank_irq_mask) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 0) // sprite DMA irq?
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 }
 

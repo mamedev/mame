@@ -143,12 +143,12 @@ Current Problem(s) - in order of priority
 
 UINT16 raiden2_state::rps()
 {
-	return machine().device("maincpu")->state().state_int(NEC_CS);
+	return m_maincpu->state_int(NEC_CS);
 }
 
 UINT16 raiden2_state::rpc()
 {
-	return machine().device("maincpu")->state().state_int(NEC_IP);
+	return m_maincpu->state_int(NEC_IP);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)

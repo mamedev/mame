@@ -141,7 +141,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* update the DAC state */
 	machine().device<dac_device>("dac")->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
@@ -163,7 +163,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 
 WRITE8_MEMBER(sbrkout_state::irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -207,9 +207,9 @@ READ8_MEMBER(sbrkout_state::switches_r)
 void sbrkout_state::update_nmi_state()
 {
 	if ((m_pot_trigger[0] & ~m_pot_mask[0]) | (m_pot_trigger[1] & ~m_pot_mask[1]))
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

@@ -175,9 +175,9 @@ void pgm_state::drgwld2_common_init()
 	pgm_basic_init();
 	pgm_dw2_decrypt();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd80000, 0xd80003, read16_delegate(FUNC(pgm_state::dw2_d80000_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd80000, 0xd80003, write16_delegate(FUNC(pgm_state::dw2_d80000_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd00000, 0xd00fff, write16_delegate(FUNC(pgm_state::dw2_unk_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd80000, 0xd80003, read16_delegate(FUNC(pgm_state::dw2_d80000_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd80000, 0xd80003, write16_delegate(FUNC(pgm_state::dw2_d80000_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd00000, 0xd00fff, write16_delegate(FUNC(pgm_state::dw2_unk_w),this));
 }
 
 DRIVER_INIT_MEMBER(pgm_state,drgw2)

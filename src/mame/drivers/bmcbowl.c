@@ -265,7 +265,7 @@ WRITE8_MEMBER(bmcbowl_state::via_ca2_out)
 
 WRITE8_MEMBER(bmcbowl_state::via_irq)
 {
-		machine().device("maincpu")->execute().set_input_line(4, data ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(4, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

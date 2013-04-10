@@ -419,7 +419,7 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_writeB)
 
 WRITE_LINE_MEMBER(suprgolf_state::irqhandler)
 {
-	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -442,7 +442,7 @@ WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 	if(m_toggle)
 	{
 		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
-		if(m_msm_nmi_mask) { machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+		if(m_msm_nmi_mask) { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 	}
 	else
 	{

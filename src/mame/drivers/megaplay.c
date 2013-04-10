@@ -524,7 +524,7 @@ READ8_MEMBER(mplay_state::megaplay_bios_6404_r )
 WRITE8_MEMBER(mplay_state::megaplay_bios_6404_w )
 {
 	if(((m_bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	m_bios_6404 = data;
 
 //  logerror("BIOS: 0x6404 write: 0x%02x\n", data);
@@ -872,13 +872,13 @@ DRIVER_INIT_MEMBER(mplay_state,megaplay)
 	mplay_start();
 
 	/* for now ... */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::megaplay_io_read),this), write16_delegate(FUNC(mplay_state::megaplay_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::megaplay_io_read),this), write16_delegate(FUNC(mplay_state::megaplay_io_write),this));
 
 	/* megaplay has ram shared with the bios cpu here */
 	machine().device("genesis_snd_z80")->memory().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::megadriv_68k_read_z80_extra_ram),this), write16_delegate(FUNC(mplay_state::megadriv_68k_write_z80_extra_ram),this));
 
 	init_megatech_bios(machine());
 

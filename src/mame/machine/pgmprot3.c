@@ -271,7 +271,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type3_state,dmnfrnt)
 	pgm_create_dummy_internal_arm_region();
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x18000444, 0x18000447, read32_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_speedup_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80a03c, 0x80a03d, read16_delegate(FUNC(pgm_arm_type3_state::dmnfrnt_main_speedup_r),this));
 
 	m_svg_ram_sel = 1;
 

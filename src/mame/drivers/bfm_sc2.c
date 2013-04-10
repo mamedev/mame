@@ -614,7 +614,7 @@ WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 			MechMtr_update(i, data & (1 << i) );
 		}
 	}
-	if ( data & 0x1F ) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -3763,7 +3763,7 @@ WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
 MACHINE_START_MEMBER(bfm_sc2_state,sc2dmd)
 {
 	MACHINE_START_CALL_MEMBER(bfm_sc2);
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),this));
 	space.install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),this));
 }

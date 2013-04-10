@@ -319,7 +319,7 @@ void galaxygame_state::machine_reset()
 	m_point_display_list_index = 0;
 	m_interrupt = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxygame_state::galaxygame_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxygame_state::galaxygame_irq_callback),this));
 }
 
 static const struct t11_setup t11_data =
@@ -397,7 +397,7 @@ static UINT8 read_uint8(UINT8 *pval, int pos, const UINT8* line, int linelen)
 
 DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 {
-	address_space &main = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &main = m_maincpu->space(AS_PROGRAM);
 	UINT8 *code = memregion("code")->base();
 
 	int filepos = 0, linepos, linelen;

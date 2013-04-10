@@ -547,11 +547,11 @@ void seattle_state::machine_start()
 	m_galileo.timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seattle_state::galileo_timer_callback),this));
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, 0x007fffff, FALSE, m_rambase);
-	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	mips3drc_add_fastram(m_maincpu, 0x00000000, 0x007fffff, FALSE, m_rambase);
+	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	/* register for save states */
 	state_save_register_global_array(machine(), m_galileo.reg);
@@ -621,7 +621,7 @@ void seattle_state::machine_reset()
 
 WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(IDE_IRQ_NUM, state);
+	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
 }
 
 
@@ -639,7 +639,7 @@ void seattle_state::ethernet_interrupt_machine(int state)
 	{
 		UINT8 assert = m_ethernet_irq_state && (*m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (m_ethernet_irq_num != 0)
-			machine().device("maincpu")->execute().set_input_line(m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+			m_maincpu->set_input_line(m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else if (m_board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq();
@@ -696,7 +696,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (m_vblank_irq_num != 0)
-		machine().device("maincpu")->execute().set_input_line(m_vblank_irq_num, CLEAR_LINE);
+		m_maincpu->set_input_line(m_vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*m_interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -707,7 +707,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (m_widget.irq_num != 0)
-			machine().device("maincpu")->execute().set_input_line(m_widget.irq_num, CLEAR_LINE);
+			m_maincpu->set_input_line(m_widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*m_interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -719,7 +719,7 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (m_ethernet_irq_num != 0)
-			machine().device("maincpu")->execute().set_input_line(m_ethernet_irq_num, CLEAR_LINE);
+			m_maincpu->set_input_line(m_ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*m_interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;
@@ -764,7 +764,7 @@ void seattle_state::update_vblank_irq()
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
 	if (m_vblank_latch && (*m_interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	machine().device("maincpu")->execute().set_input_line(m_vblank_irq_num, state);
+	m_maincpu->set_input_line(m_vblank_irq_num, state);
 }
 
 
@@ -926,7 +926,7 @@ void seattle_state::update_galileo_irqs()
 	/* if any unmasked interrupts are live, we generate */
 	if (m_galileo.reg[GREG_INT_STATE] & m_galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	machine().device("maincpu")->execute().set_input_line(GALILEO_IRQ_NUM, state);
+	m_maincpu->set_input_line(GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -1379,7 +1379,7 @@ static void voodoo_stall(device_t *device, int stall)
 		else
 		{
 			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", device->machine().device("maincpu")->safe_pc());
-			device->machine().device("maincpu")->execute().spin_until_trigger(45678);
+			state->m_maincpu->spin_until_trigger(45678);
 		}
 	}
 
@@ -1392,7 +1392,7 @@ static void voodoo_stall(device_t *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (state->m_galileo.dma_stalled_on_voodoo[which])
 			{
-				address_space &space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
+				address_space &space = state->m_maincpu->space(AS_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
@@ -1554,7 +1554,7 @@ void seattle_state::update_widget_irq()
 
 	/* update the IRQ state */
 	if (m_widget.irq_num != 0)
-		machine().device("maincpu")->execute().set_input_line(m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1575,7 +1575,7 @@ READ32_MEMBER(seattle_state::widget_r)
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, mem_mask);
+			result = analog_port_r(m_maincpu->space(AS_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1607,7 +1607,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, data, mem_mask);
+			analog_port_w(m_maincpu->space(AS_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1773,7 +1773,7 @@ READ32_MEMBER(seattle_state::seattle_ide_r)
 	device_t *device = machine().device("ide");
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
-		machine().device("maincpu")->execute().eat_cycles(100);
+		m_maincpu->eat_cycles(100);
 	return ide_controller32_r(device, space, offset, mem_mask);
 }
 
@@ -2853,20 +2853,20 @@ void seattle_state::init_common(int ioasic, int serialnum, int yearoffs, int con
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x00400000, 0x007fffff);
+			m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x00400000, 0x007fffff);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),this), write32_delegate(FUNC(seattle_state::widget_w),this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),this), write32_delegate(FUNC(seattle_state::widget_w),this));
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),this), write32_delegate(FUNC(seattle_state::analog_port_w),this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),this), write32_delegate(FUNC(seattle_state::analog_port_w),this));
 
 			/* set up the ethernet controller */
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),this), write32_delegate(FUNC(seattle_state::ethernet_w),this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),this), write32_delegate(FUNC(seattle_state::ethernet_w),this));
 			break;
 	}
 }
@@ -2878,9 +2878,9 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 	init_common(MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80094930, 0x00A2102B, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80092984, 0x3C028011, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80094930, 0x00A2102B, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80092984, 0x3C028011, 250);     /* confirmed */
 }
 
 
@@ -2890,7 +2890,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 	init_common(MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800108F8, 0x8C420000, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800108F8, 0x8C420000, 250);     /* confirmed */
 }
 
 
@@ -2900,9 +2900,9 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 	init_common(MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80059F34, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A5AF4, 0x8E300010, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004C260, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80059F34, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800A5AF4, 0x8E300010, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8004C260, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -2912,10 +2912,10 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 	init_common(MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800343E8, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8008F4F0, 0x3C028012, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800A365C, 0x8E300014, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051DAC, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800343E8, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8008F4F0, 0x3C028012, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800A365C, 0x8E300014, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80051DAC, 0x3C028012, 250);     /* confirmed */
 }
 
 
@@ -2926,8 +2926,8 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80032534, 0x02221024, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800B1BE4, 0x8E110014, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80032534, 0x02221024, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800B1BE4, 0x8E110014, 250);     /* confirmed */
 }
 
 
@@ -2937,9 +2937,9 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 	init_common(MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80049F14, 0x3C028020, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004859C, 0x3C028020, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005922C, 0x8E020014, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80049F14, 0x3C028020, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8004859C, 0x3C028020, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8005922C, 0x8E020014, 250);     /* confirmed */
 }
 
 
@@ -2961,8 +2961,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 	m_rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80135510, 0x3C028024, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800087DC, 0x8E820010, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80135510, 0x3C028024, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800087DC, 0x8E820010, 250);     /* confirmed */
 }
 
 
@@ -2972,8 +2972,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 	init_common(MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8014E41C, 0x3C038025, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011F10, 0x8E020018, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8014E41C, 0x3C038025, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80011F10, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -2983,8 +2983,8 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 	init_common(MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015773C, 0x3C038025, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80012CA8, 0x8E020018, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8015773C, 0x3C038025, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80012CA8, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -2994,11 +2994,11 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 	init_common(MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015176C, 0x3C03801A, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FBC, 0x8E020018, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8015176C, 0x3C03801A, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80011FBC, 0x8E020018, 250);     /* confirmed */
 }
 
 
@@ -3008,9 +3008,9 @@ DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 	init_common(MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x801643BC, 0x3C03801B, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80011FB8, 0x8E020018, 250);     /* confirmed */
-	//mips3drc_add_hotspot(machine().device("maincpu"), 0x80136A80, 0x3C02801D, 250);      /* potential */
+	mips3drc_add_hotspot(m_maincpu, 0x801643BC, 0x3C03801B, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80011FB8, 0x8E020018, 250);     /* confirmed */
+	//mips3drc_add_hotspot(m_maincpu, 0x80136A80, 0x3C02801D, 250);      /* potential */
 }
 
 

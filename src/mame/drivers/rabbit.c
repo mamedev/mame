@@ -561,7 +561,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 
 TIMER_CALLBACK_MEMBER(rabbit_state::rabbit_blit_done)
 {
-	machine().device("maincpu")->execute().set_input_line(m_bltirqlevel, HOLD_LINE);
+	m_maincpu->set_input_line(m_bltirqlevel, HOLD_LINE);
 }
 
 void rabbit_state::rabbit_do_blit()
@@ -871,7 +871,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(rabbit_state::rabbit_vblank_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(m_vblirqlevel, HOLD_LINE);
+	m_maincpu->set_input_line(m_vblirqlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )

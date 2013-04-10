@@ -553,11 +553,11 @@ void vegas_state::machine_start()
 		m_dcs_idma_cs = 0;
 
 	/* set the fastest DRC options, but strict verification */
-	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
+	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine().device("maincpu"), 0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	mips3drc_add_fastram(machine().device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	mips3drc_add_fastram(m_maincpu, 0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
+	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 
 	/* register for save states */
 	state_save_register_global(machine(), m_nile_irq_state);
@@ -903,12 +903,12 @@ void vegas_state::update_nile_irqs()
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0 + i, ASSERT_LINE);
+			m_maincpu->set_input_line(MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0 + i, CLEAR_LINE);
+			m_maincpu->set_input_line(MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");
@@ -1558,7 +1558,7 @@ void vegas_state::remap_dynamic_addresses()
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < m_dynamic_count; addr++)
-		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
+		m_maincpu->space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
 	/* the build the list of stuff */
 	m_dynamic_count = 0;
@@ -1674,7 +1674,7 @@ void vegas_state::remap_dynamic_addresses()
 
 	/* now remap everything */
 	if (LOG_DYNAMIC) logerror("remap_dynamic_addresses:\n");
-	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	for (addr = 0; addr < m_dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
@@ -2493,10 +2493,10 @@ DRIVER_INIT_MEMBER(vegas_state,gauntleg)
 	init_common(MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015430, 0x8CC38060, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015464, 0x3C09801E, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8918, 0x8FA2004C, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800C8890, 0x8FA20024, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80015430, 0x8CC38060, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80015464, 0x3C09801E, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800C8918, 0x8FA2004C, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800C8890, 0x8FA20024, 250);     /* confirmed */
 }
 
 
@@ -2506,10 +2506,10 @@ DRIVER_INIT_MEMBER(vegas_state,gauntdl)
 	init_common(MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800158EC, 0x3C0C8022, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D40C0, 0x8FA2004C, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x800D4038, 0x8FA20024, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800158B8, 0x8CC3CC40, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800158EC, 0x3C0C8022, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800D40C0, 0x8FA2004C, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x800D4038, 0x8FA20024, 250);     /* confirmed */
 }
 
 
@@ -2519,7 +2519,7 @@ DRIVER_INIT_MEMBER(vegas_state,warfa)
 	init_common(MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8009436C, 0x0C031663, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8009436C, 0x0C031663, 250);     /* confirmed */
 }
 
 
@@ -2529,10 +2529,10 @@ DRIVER_INIT_MEMBER(vegas_state,tenthdeg)
 	init_common(MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80051CD8, 0x0C023C15, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8005E674, 0x3C028017, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x8002DBCC, 0x8FA2002C, 250);     /* confirmed */
-	mips3drc_add_hotspot(machine().device("maincpu"), 0x80015930, 0x8FC20244, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80051CD8, 0x0C023C15, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8005E674, 0x3C028017, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x8002DBCC, 0x8FA2002C, 250);     /* confirmed */
+	mips3drc_add_hotspot(m_maincpu, 0x80015930, 0x8FC20244, 250);     /* confirmed */
 }
 
 

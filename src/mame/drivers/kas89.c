@@ -245,7 +245,7 @@ public:
 
 WRITE_LINE_MEMBER(kas89_state::kas89_vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_interrupt)

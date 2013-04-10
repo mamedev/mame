@@ -299,7 +299,7 @@ UINT32 ojankohs_state::screen_update_ojankoc(screen_device &screen, bitmap_ind16
 
 	if (m_screen_refresh)
 	{
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)

@@ -209,10 +209,10 @@ RoadBlasters (aka Future Vette):005*
 
 void atarisy1_state::update_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(2, m_joystick_int && m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(3, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, m_joystick_int && m_joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -2320,7 +2320,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarisy1_state,marble)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 103);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 103);
 
 	m_joystick_type = 0;    /* none */
 	m_trackball_type = 1;   /* rotated */
@@ -2329,7 +2329,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,marble)
 
 DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 107);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 107);
 
 	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
@@ -2338,7 +2338,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,peterpak)
 
 DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 105);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 105);
 
 	m_joystick_type = 1;    /* digital */
 	m_trackball_type = 0;   /* none */
@@ -2347,7 +2347,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,indytemp)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 108);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 108);
 
 	m_joystick_type = 2;    /* analog */
 	m_trackball_type = 0;   /* none */
@@ -2356,7 +2356,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadrunn)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 109);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 109);
 
 	m_joystick_type = 3;    /* pedal */
 	m_trackball_type = 2;   /* steering wheel */
@@ -2365,7 +2365,7 @@ DRIVER_INIT_MEMBER(atarisy1_state,roadb109)
 
 DRIVER_INIT_MEMBER(atarisy1_state,roadb110)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x080000, 0, 110);
+	slapstic_configure(*m_maincpu, 0x080000, 0, 110);
 
 	m_joystick_type = 3;    /* pedal */
 	m_trackball_type = 2;   /* steering wheel */

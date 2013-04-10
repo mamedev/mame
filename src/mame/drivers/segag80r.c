@@ -149,7 +149,7 @@ INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -186,7 +186,7 @@ WRITE8_MEMBER(segag80r_state::vidram_w){ segag80r_videoram_w(space, decrypt_offs
 WRITE8_MEMBER(segag80r_state::monsterb_vidram_w){ monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
 WRITE8_MEMBER(segag80r_state::pignewt_vidram_w){ pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
 WRITE8_MEMBER(segag80r_state::sindbadm_vidram_w){ sindbadm_videoram_w(space, decrypt_offset(space, offset), data); }
-WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("usbsnd"); sega_usb_ram_w(device, space, decrypt_offset(machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
+WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("usbsnd"); sega_usb_ram_w(device, space, decrypt_offset(m_maincpu->space(AS_PROGRAM), offset), data); }
 
 
 
@@ -1444,7 +1444,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 DRIVER_INIT_MEMBER(segag80r_state,astrob)
 {
 	device_t *speech = machine().device("segaspeech");
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0062 security chip */
 	m_decrypt = segag80_security(62);
@@ -1473,7 +1473,7 @@ DRIVER_INIT_MEMBER(segag80r_state,005)
 
 DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* configure the 315-0063 security chip */
 	m_decrypt = segag80_security(63);
@@ -1495,8 +1495,8 @@ DRIVER_INIT_MEMBER(segag80r_state,spaceod)
 
 DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the 315-0082 security chip */
 	m_decrypt = segag80_security(82);
@@ -1513,8 +1513,8 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 
 DRIVER_INIT_MEMBER(segag80r_state,monster2)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the 315-5006 security chip */
 	spatter_decode(machine(), "maincpu");
@@ -1534,8 +1534,8 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 {
 	device_t *usbsnd = machine().device("usbsnd");
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the 315-0063? security chip */
 	m_decrypt = segag80_security(63);
@@ -1558,8 +1558,8 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 
 DRIVER_INIT_MEMBER(segag80r_state,sindbadm)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	/* configure the encrypted Z80 */
 	sindbadm_decode(machine(), "maincpu");

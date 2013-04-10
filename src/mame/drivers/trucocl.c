@@ -45,7 +45,7 @@ WRITE8_MEMBER(trucocl_state::irq_enable_w)
 
 TIMER_CALLBACK_MEMBER(trucocl_state::dac_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)

@@ -73,7 +73,7 @@ WRITE8_MEMBER(retofinv_state::irq0_ack_w)
 {
 	m_main_irq_mask = data & 1;
 	if (!m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::irq1_ack_w)

@@ -439,7 +439,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(snk6502_state::coin_inserted)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( snk6502_generic_joy8way )

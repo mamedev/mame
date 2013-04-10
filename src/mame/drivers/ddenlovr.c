@@ -11137,7 +11137,7 @@ DRIVER_INIT_MEMBER(ddenlovr_state,rongrong)
 	   version of the game might be a bootleg with the protection
 	   patched. (both sets need this)
 	 */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_read(0x60d4, 0x60d4);
+	m_maincpu->space(AS_PROGRAM).nop_read(0x60d4, 0x60d4);
 }
 
 /***************************************************************************
@@ -12486,7 +12486,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ddenlovr_state,momotaro)
 {
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(ddenlovr_state::momotaro_protection_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8_delegate(FUNC(ddenlovr_state::momotaro_protection_r),this));
 }
 
 /***************************************************************************

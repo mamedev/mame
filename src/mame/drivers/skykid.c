@@ -77,7 +77,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_1_ctrl_w)
 	int bit = !BIT(offset,11);
 	m_main_irq_mask = bit;
 	if (!bit)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)

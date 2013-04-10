@@ -47,7 +47,7 @@ WRITE8_MEMBER(cchasm_state::cchasm_soundlatch4_w)
 {
 	m_sound_flags |= 0x40;
 	soundlatch4_byte_w(space, offset, data);
-	machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 WRITE16_MEMBER(cchasm_state::cchasm_io_w)

@@ -1356,13 +1356,13 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 {
 	DRIVER_INIT_CALL(prosport);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
+	m_maincpu->space(AS_PROGRAM).install_read_port(0xa000, 0xa000, "IN0");
 }
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
 	int A;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *ROM = memregion("maincpu")->base();
 

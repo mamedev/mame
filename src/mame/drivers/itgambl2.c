@@ -242,7 +242,7 @@ GFXDECODE_END
 void itgambl2_state::machine_reset()
 {
 	/* stop the CPU, we have no code for it anyway */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 /* default 444 palette for debug purpose*/

@@ -192,7 +192,7 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
 	UINT8 *src = auto_alloc_array(machine(), UINT8, len);

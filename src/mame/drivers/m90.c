@@ -1172,7 +1172,7 @@ ROM_END
 DRIVER_INIT_MEMBER(m90_state,quizf1)
 {
 	membank("bank1")->configure_entries(0, 16, memregion("user1")->base(), 0x10000);
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),this));
 }
 
 

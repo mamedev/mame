@@ -54,7 +54,7 @@
 
 TIMER_CALLBACK_MEMBER(gunbustr_state::gunbustr_interrupt5)
 {
-	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)

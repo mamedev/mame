@@ -1236,14 +1236,14 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// give sub cpu a bit more time to stabilize on the current fifo status
-			machine().device("maincpu")->execute().spin_until_time(attotime::from_usec(1));
+			m_maincpu->spin_until_time(attotime::from_usec(1));
 
 			if (m_m2s_int_enable & 0x80)
 			{
 				if (!m_m2s_int_mode)
 					m_main_int_active |= MAIN_INT_M2S;
 
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 			}
 
 			// EXISR needs to update for the *next* instruction during FIFO tests
@@ -1484,7 +1484,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		if ((m_vblank_enable & 0x80) == 0)
 		{
 			// clear the interrupt
-			space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
 	}
 	if (ACCESSING_BITS_16_23)
@@ -1503,7 +1503,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 			m_main_int_active &= ~MAIN_INT_S2M;
 
 			// clear the interrupt
-			space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
 	}
 	if (ACCESSING_BITS_8_15)
@@ -1529,7 +1529,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 			m_main_int_active &= ~MAIN_INT_M2S;
 
 			// clear the interrupt
-			space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
 	}
 
@@ -1722,7 +1722,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		// fire off an interrupt if enabled
 		if (m_s2m_int_enable & 0x80)
 		{
-			space.machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 	}
 	if (ACCESSING_BITS_16_23)

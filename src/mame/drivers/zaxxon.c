@@ -293,7 +293,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -308,7 +308,7 @@ WRITE8_MEMBER(zaxxon_state::int_enable_w)
 {
 	m_int_enabled = data & 1;
 	if (!m_int_enabled)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -1577,7 +1577,7 @@ DRIVER_INIT_MEMBER(zaxxon_state,futspy)
 
 DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
 {
-	address_space &pgmspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &pgmspace = m_maincpu->space(AS_PROGRAM);
 
 	nprinces_decode(machine(), "maincpu");
 

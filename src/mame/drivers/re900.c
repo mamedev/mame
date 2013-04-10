@@ -249,7 +249,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(re900_state::vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

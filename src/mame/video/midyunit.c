@@ -361,7 +361,7 @@ static void dma_draw(running_machine &machine, UINT16 command)
 TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
 {
 	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -425,7 +425,7 @@ WRITE16_MEMBER(midyunit_state::midyunit_dma_w)
 
 	/* high bit triggers action */
 	command = m_dma_register[DMA_COMMAND];
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 

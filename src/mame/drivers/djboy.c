@@ -495,11 +495,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
 	if(scanline == 64)
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface djboy_pandora_config =

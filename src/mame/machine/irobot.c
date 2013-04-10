@@ -150,7 +150,7 @@ TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
 	if (scanline == 224) m_irvg_vblank=1;
 	logerror("SCANLINE CALLBACK %d\n",scanline);
 	/* set the IRQ line state based on the 32V line state */
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set a callback for the next 32-scanline increment */
 	scanline += 32;
@@ -177,8 +177,8 @@ void irobot_state::machine_reset()
 	/* set an initial timer to go off on scanline 0 */
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(irobot_state::scanline_callback),this));
 
-	irobot_rom_banksel_w(machine().device("maincpu")->memory().space(AS_PROGRAM),0,0);
-	irobot_out0_w(machine().device("maincpu")->memory().space(AS_PROGRAM),0,0);
+	irobot_rom_banksel_w(m_maincpu->space(AS_PROGRAM),0,0);
+	irobot_out0_w(m_maincpu->space(AS_PROGRAM),0,0);
 	m_combase = m_comRAM[0];
 	m_combase_mb = m_comRAM[1];
 	m_outx = 0;
@@ -405,7 +405,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)
 {
 	logerror("mb done. ");
 	m_irmb_running = 0;
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -809,7 +809,7 @@ default:    case 0x3f:  IXOR(irmb_din(curop), 0);                            bre
 		m_irmb_timer->adjust(attotime::from_hz(200) * icount);
 	}
 #else
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 #endif
 	m_irmb_running=1;
 }

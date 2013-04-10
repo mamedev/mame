@@ -594,7 +594,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 		case 0x02:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:  /* n.c. */
@@ -638,7 +638,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 		case 0x02:
 			m_main_irq_mask = bit;
 			if (!bit)
-				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:
@@ -686,7 +686,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 		case 0x02:  /* INT ON */
 			m_main_irq_mask = bit;
 			if (!bit)
-				machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+				m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x04:  /* FLIP */
@@ -717,7 +717,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 
 MACHINE_RESET_MEMBER(mappy_state,superpac)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -727,7 +727,7 @@ MACHINE_RESET_MEMBER(mappy_state,superpac)
 
 MACHINE_RESET_MEMBER(mappy_state,phozon)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -737,7 +737,7 @@ MACHINE_RESET_MEMBER(mappy_state,phozon)
 
 MACHINE_RESET_MEMBER(mappy_state,mappy)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -769,7 +769,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
 	device_t *namcoio_2 = machine().device("namcoio_2");
 
 	if (m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::superpac_io_run),this));
@@ -800,7 +800,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
 	device_t *namcoio_2 = machine().device("namcoio_2");
 
 	if (m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::pacnpal_io_run),this));
@@ -831,7 +831,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
 	device_t *namcoio_2 = machine().device("namcoio_2");
 
 	if (m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::phozon_io_run),this));
@@ -862,7 +862,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 	device_t *namcoio_2 = machine().device("namcoio_2");
 
 	if(m_main_irq_mask)
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_1))        /* give the cpu a tiny bit of time to write the command before processing it */
 		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(mappy_state::mappy_io_run),this));
@@ -2258,7 +2258,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 DRIVER_INIT_MEMBER(mappy_state,digdug2)
 {
 	/* appears to not use the watchdog */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x8000, 0x8000);
+	m_maincpu->space(AS_PROGRAM).nop_write(0x8000, 0x8000);
 }
 
 

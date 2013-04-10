@@ -22,7 +22,7 @@
 
 TIMER_CALLBACK_MEMBER(balsente_state::irq_off)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -35,7 +35,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
 		m_scanline_timer->adjust(machine().primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(param, BALSENTE_HBSTART), timer_expired_delegate(FUNC(balsente_state::irq_off),this));
@@ -127,7 +127,7 @@ void balsente_state::machine_start()
 
 void balsente_state::machine_reset()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int numbanks;
 
 	/* reset counters; counter 2's gate is tied high */
@@ -165,7 +165,7 @@ void balsente_state::machine_reset()
 	membank("bank2")->configure_entries(0, numbanks, &memregion("maincpu")->base()[0x12000], 0x6000);
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	/* start a timer to generate interrupts */
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(0));
@@ -384,12 +384,12 @@ void balsente_state::m6850_update_io()
 	/* apply the change */
 	if (new_state && !(m_m6850_status & 0x80))
 	{
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 		m_m6850_status |= 0x80;
 	}
 	else if (!new_state && (m_m6850_status & 0x80))
 	{
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 		m_m6850_status &= ~0x80;
 	}
 

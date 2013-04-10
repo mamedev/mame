@@ -882,7 +882,7 @@ WRITE8_MEMBER(mediagx_state::at_page8_w)
 
 WRITE_LINE_MEMBER(mediagx_state::pc_dma_hrq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_dma8237_1->i8237_hlda_w( state );
@@ -1074,10 +1074,10 @@ void mediagx_state::machine_reset()
 {
 	UINT8 *rom = memregion("bios")->base();
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mediagx_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mediagx_state::irq_callback),this));
 
 	memcpy(m_bios_ram, rom, 0x40000);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	timer_device *sound_timer = machine().device<timer_device>("sound_timer");
 	sound_timer->adjust(attotime::from_msec(10));
@@ -1096,7 +1096,7 @@ void mediagx_state::machine_reset()
 
 WRITE_LINE_MEMBER(mediagx_state::mediagx_pic8259_1_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(mediagx_state::get_slave_ack)
@@ -1301,7 +1301,7 @@ void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 	for (i = 0; i < count; i++) {
 		read32_delegate func = speedup_handlers[i].func;
 		func.late_bind(*this);
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
+		m_maincpu->space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
 	}
 
 #ifdef MAME_DEBUG

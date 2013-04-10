@@ -194,9 +194,9 @@ WRITE16_MEMBER( neogeo_state::kof10th_bankswitch_w )
 
 void neogeo_state::install_kof10th_protection ()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof10th_RAMB_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x200000, 0x23ffff, write16_delegate(FUNC(neogeo_state::kof10th_custom_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(neogeo_state::kof10th_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof10th_RAMB_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x23ffff, write16_delegate(FUNC(neogeo_state::kof10th_custom_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x240000, 0x2fffff, write16_delegate(FUNC(neogeo_state::kof10th_bankswitch_w),this));
 }
 
 void neogeo_state::decrypt_kof10th()
@@ -501,7 +501,7 @@ void neogeo_state::patch_cthd2003()
 	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 
 	/* special ROM banking handler */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_state::cthd2003_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ffff0, 0x2fffff, write16_delegate(FUNC(neogeo_state::cthd2003_bankswitch_w),this));
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -745,7 +745,7 @@ WRITE16_MEMBER( neogeo_state::ms5plus_bankswitch_w )
 void neogeo_state::install_ms5plus_protection()
 {
 	// special ROM banking handler / additional protection
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2ffff0, 0x2fffff,read16_delegate(FUNC(neogeo_state::mslug5_prot_r),this), write16_delegate(FUNC(neogeo_state::ms5plus_bankswitch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2ffff0, 0x2fffff,read16_delegate(FUNC(neogeo_state::mslug5_prot_r),this), write16_delegate(FUNC(neogeo_state::ms5plus_bankswitch_w),this));
 }
 
 
@@ -986,7 +986,7 @@ void neogeo_state::kf2k3bl_px_decrypt()
 
 void neogeo_state::kf2k3bl_install_protection()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
 }
 
 
@@ -1014,7 +1014,7 @@ void neogeo_state::kf2k3pl_px_decrypt()
 
 void neogeo_state::kf2k3pl_install_protection()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003p_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003p_w),this) );
 }
 
 
@@ -1044,7 +1044,7 @@ void neogeo_state::kf2k3upl_px_decrypt()
 
 void neogeo_state::kf2k3upl_install_protection()
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2fe000, 0x2fffff, read16_delegate(FUNC(neogeo_state::kof2003_r),this), write16_delegate(FUNC(neogeo_state::kof2003_w),this) );
 }
 
 

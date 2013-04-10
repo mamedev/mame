@@ -585,7 +585,7 @@ WRITE32_MEMBER(taitogn_state::flash_s3_w)
 
 void taitogn_state::install_handlers(int mode)
 {
-	address_space &a = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &a = m_maincpu->space(AS_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
 		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_subbios_r),this), write32_delegate(FUNC(taitogn_state::flash_subbios_w),this));
@@ -783,7 +783,7 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 {
 	DRIVER_INIT_CALL(coh3002t);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1fa10100, 0x1fa10103, read32_delegate(FUNC(taitogn_state::gnet_mahjong_panel_r),this));
 }
 
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)

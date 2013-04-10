@@ -165,7 +165,7 @@ WRITE8_MEMBER(cliffhgr_state::cliff_coin_counter_w)
 READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 {
 	/* deassert IRQ on the CPU */
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -209,7 +209,7 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 	if (m_phillips_code & 0x800000)
 	{
 //      printf("%2d:code = %06X\n", param, phillips_code);
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	}
 
 	m_irq_timer->adjust(machine().primary_screen->time_until_pos(param * 2), param);
@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 
 WRITE_LINE_MEMBER(cliffhgr_state::vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

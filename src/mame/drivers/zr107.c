@@ -362,9 +362,9 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			    0x01 = ADDSCLK (ADC SCLK)
 			*/
 			if (data & 0x80)    /* CG Board 1 IRQ Ack */
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)    /* CG Board 0 IRQ Ack */
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			ioport("OUT4")->write(data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
@@ -415,12 +415,12 @@ WRITE32_MEMBER(zr107_state::ccu_w)
 void zr107_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zr107_state::irq_off),this));
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x000fffff, FALSE, m_workram);
+	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_workram);
 }
 
 static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )

@@ -74,7 +74,7 @@ void dec8_state::screen_eof_dec8(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
 	}
 }

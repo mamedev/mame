@@ -15,7 +15,7 @@ void sprint8_state::sprint8_set_collision(int n)
 {
 	if (m_collision_reset == 0)
 	{
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 		m_collision_index = n;
 	}
@@ -92,7 +92,7 @@ WRITE8_MEMBER(sprint8_state::sprint8_int_reset_w)
 	m_collision_reset = !(data & 1);
 
 	if (m_collision_reset)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

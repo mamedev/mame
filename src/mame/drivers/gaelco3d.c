@@ -162,9 +162,9 @@ static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
 WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
 {
 	if (state)
-		machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 	else
-		machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
+		m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 
@@ -259,7 +259,7 @@ INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
 
 WRITE16_MEMBER(gaelco3d_state::irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)

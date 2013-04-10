@@ -336,7 +336,7 @@ void atvtrack_state::machine_start()
 
 	m_nandaddressstep = 0;
 	m_nandregion = memregion("maincpu");
-	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &as = m_maincpu->space(AS_PROGRAM);
 	dst = (UINT8 *)(as.get_write_ptr(0x0c7f0000));
 	src = m_nandregion->base()+0x10;
 	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
@@ -349,9 +349,9 @@ void atvtrack_state::machine_reset()
 	// The routine initializes the cpu, copies the boot program from the flash memories into the cpu sdram
 	// and finally executes it.
 	// Here there is the setup of the cpu, the boot program is copied in machine_start
-	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &as = m_maincpu->space(AS_PROGRAM);
 	// set cpu PC register to 0x0c7f0000
-	machine().device("maincpu")->state().set_pc(0x0c7f0000);
+	m_maincpu->set_pc(0x0c7f0000);
 	// set BCR2 to 1
 	sh4_internal_w(as, 0x3001, 1, 0xffffffff);
 	device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));

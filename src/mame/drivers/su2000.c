@@ -178,7 +178,7 @@ static void ide_interrupt(device_t *device, int state)
 
 WRITE_LINE_MEMBER(su2000_state::su2000_pic8259_1_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(su2000_state::get_slave_ack)
@@ -253,7 +253,7 @@ IRQ_CALLBACK_MEMBER(su2000_state::irq_callback)
 
 void su2000_state::machine_start()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_pit8254 = machine().device("pit8254");
 	m_pic8259_1 = machine().device("pic8259_1");
@@ -273,7 +273,7 @@ void su2000_state::machine_start()
 	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
 	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 

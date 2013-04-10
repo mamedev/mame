@@ -143,8 +143,8 @@ DRIVER_INIT_MEMBER(pgm_asic3_state,orlegend)
 {
 	pgm_basic_init();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xC0400e, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xC04000, 0xC04001, write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_reg_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC0400e, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xC04000, 0xC04001, write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_reg_w),this));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

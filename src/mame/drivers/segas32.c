@@ -394,7 +394,7 @@ MACHINE_RESET_MEMBER(segas32_state,system32)
 	m_v60_irq_timer[1] = machine().device<timer_device>("v60_irq1");
 
 	/* clear IRQ lines */
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -415,13 +415,13 @@ void segas32_state::update_irq_state()
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, vector);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -4232,14 +4232,14 @@ READ16_MEMBER(segas32_state::arescue_slavebusy_r)
 DRIVER_INIT_MEMBER(segas32_state,arescue)
 {
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00007, read16_delegate(FUNC(segas32_state::arescue_dsp_r),this), write16_delegate(FUNC(segas32_state::arescue_dsp_w),this));
 
 	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x810000, 0x810001, read16_delegate(FUNC(segas32_state::arescue_handshake_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x81000e, 0x81000f, read16_delegate(FUNC(segas32_state::arescue_slavebusy_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x810000, 0x810001, read16_delegate(FUNC(segas32_state::arescue_handshake_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x81000e, 0x81000f, read16_delegate(FUNC(segas32_state::arescue_slavebusy_r),this));
 
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
@@ -4250,8 +4250,8 @@ DRIVER_INIT_MEMBER(segas32_state,arabfgt)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::extra_custom_io_r),this), write16_delegate());
 
 	/* install protection handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xa00100, 0xa0011f, read16_delegate(FUNC(segas32_state::arf_wakeup_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::arabfgt_protection_r),this), write16_delegate(FUNC(segas32_state::arabfgt_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa00100, 0xa0011f, read16_delegate(FUNC(segas32_state::arf_wakeup_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::arabfgt_protection_r),this), write16_delegate(FUNC(segas32_state::arabfgt_protection_w),this));
 }
 
 
@@ -4261,8 +4261,8 @@ DRIVER_INIT_MEMBER(segas32_state,brival)
 
 	/* install protection handlers */
 	m_system32_protram = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20ba00, 0x20ba07, read16_delegate(FUNC(segas32_state::brival_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa00000, 0xa00fff, write16_delegate(FUNC(segas32_state::brival_protection_w),this));
 }
 
 
@@ -4271,7 +4271,7 @@ DRIVER_INIT_MEMBER(segas32_state,darkedge)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::extra_custom_io_r),this), write16_delegate());
 
 	/* install protection handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::darkedge_protection_r),this), write16_delegate(FUNC(segas32_state::darkedge_protection_w),this));
 	m_system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -4280,7 +4280,7 @@ DRIVER_INIT_MEMBER(segas32_state,dbzvrvs)
 	segas32_common_init(read16_delegate(), write16_delegate());
 
 	/* install protection handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),this), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa7ffff, read16_delegate(FUNC(segas32_state::dbzvrvs_protection_r),this), write16_delegate(FUNC(segas32_state::dbzvrvs_protection_w),this));
 }
 
 WRITE16_MEMBER(segas32_state::f1en_comms_echo_w)
@@ -4295,10 +4295,10 @@ DRIVER_INIT_MEMBER(segas32_state,f1en)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 
 	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x810000, 0x810fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x818000, 0x818003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x810048, 0x810049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x810048, 0x810049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
 
 	m_sw1_output = &segas32_state::radm_sw1_output;
 }
@@ -4311,10 +4311,10 @@ DRIVER_INIT_MEMBER(segas32_state,f1lap)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
 
 	m_dual_pcb_comms = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x800000, 0x800fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x800000, 0x800fff, read16_delegate(FUNC(segas32_state::dual_pcb_comms_r),this), write16_delegate(FUNC(segas32_state::dual_pcb_comms_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x801000, 0x801003, read16_delegate(FUNC(segas32_state::dual_pcb_masterslave),this));
 
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x800048, 0x800049, write16_delegate(FUNC(segas32_state::f1en_comms_echo_w),this));
 	m_system32_prot_vblank = f1lap_fd1149_vblank;
 
 	m_sw1_output = &segas32_state::f1lap_sw1_output;
@@ -4326,7 +4326,7 @@ DRIVER_INIT_MEMBER(segas32_state,ga2)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::extra_custom_io_r),this), write16_delegate());
 
 	decrypt_ga2_protrom();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::ga2_dpram_r),this), write16_delegate(FUNC(segas32_state::ga2_dpram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa00000, 0xa00fff, read16_delegate(FUNC(segas32_state::ga2_dpram_r),this), write16_delegate(FUNC(segas32_state::ga2_dpram_w),this));
 }
 
 
@@ -4404,7 +4404,7 @@ DRIVER_INIT_MEMBER(segas32_state,sonic)
 	segas32_common_init(read16_delegate(FUNC(segas32_state::sonic_custom_io_r),this), write16_delegate(FUNC(segas32_state::sonic_custom_io_w),this));
 
 	/* install protection handlers */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20E5C4, 0x20E5C5, write16_delegate(FUNC(segas32_state::sonic_level_load_protection),this));
 }
 
 
@@ -4429,7 +4429,7 @@ DRIVER_INIT_MEMBER(segas32_state,svf)
 DRIVER_INIT_MEMBER(segas32_state,jleague)
 {
 	segas32_common_init(read16_delegate(), write16_delegate());
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20F700, 0x20F705, write16_delegate(FUNC(segas32_state::jleague_protection_w),this));
 }
 
 

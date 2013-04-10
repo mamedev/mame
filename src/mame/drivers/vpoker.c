@@ -642,7 +642,7 @@ void vpoker_state::palette_init()
 
 WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =

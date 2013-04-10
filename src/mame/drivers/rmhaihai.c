@@ -196,7 +196,7 @@ logerror("banksw %d\n",bank);
 
 MACHINE_RESET_MEMBER(rmhaihai_state,themj)
 {
-	themj_rombank_w(machine().device("maincpu")->memory().space(AS_IO), 0, 0);
+	themj_rombank_w(m_maincpu->space(AS_IO), 0, 0);
 }
 
 

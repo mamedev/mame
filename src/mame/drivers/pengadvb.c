@@ -71,12 +71,12 @@ void pengadvb_state::mem_map_banks()
 	{
 		case 0:
 			// BIOS
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
 			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 
 		default:
-			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
+			m_maincpu->space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
 			break;
 	}
 
@@ -85,22 +85,22 @@ void pengadvb_state::mem_map_banks()
 	{
 		case 0:
 			// BIOS
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
 			membank("bank21")->set_base(memregion("maincpu")->base() + 0x4000);
 			membank("bank22")->set_base(memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
 			membank("bank21")->set_base(memregion("game")->base() + m_mem_banks[0]*0x2000);
 			membank("bank22")->set_base(memregion("game")->base() + m_mem_banks[1]*0x2000);
 			break;
 
 		default:
-			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
+			m_maincpu->space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
 			break;
 	}
 
@@ -109,14 +109,14 @@ void pengadvb_state::mem_map_banks()
 	{
 		case 1:
 			// game
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
 			membank("bank31")->set_base(memregion("game")->base() + m_mem_banks[2]*0x2000);
 			membank("bank32")->set_base(memregion("game")->base() + m_mem_banks[3]*0x2000);
 			break;
 
 		default:
-			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
+			m_maincpu->space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
 			break;
 	}
 
@@ -125,12 +125,12 @@ void pengadvb_state::mem_map_banks()
 	{
 		case 3:
 			// RAM
-			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4" );
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4" );
 			membank("bank4")->set_base(m_main_mem);
 			break;
 
 		default:
-			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
+			m_maincpu->space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
 			break;
 	}
 }
@@ -238,7 +238,7 @@ static I8255A_INTERFACE(pengadvb_ppi8255_interface)
 
 WRITE_LINE_MEMBER(pengadvb_state::vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)

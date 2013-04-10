@@ -478,7 +478,7 @@ READ16_MEMBER(midyunit_state::mkturbo_prot_r)
 DRIVER_INIT_MEMBER(midyunit_state,mkyturbo)
 {
 	/* protection */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfffff400, 0xfffff40f, read16_delegate(FUNC(midyunit_state::mkturbo_prot_r),this));
 
 	DRIVER_INIT_CALL(mkyunit);
 }

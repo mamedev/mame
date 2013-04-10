@@ -1804,10 +1804,10 @@ DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 	}
 
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::sngkace_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::sngkace_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),this));
 
 	m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
@@ -1854,13 +1854,13 @@ void psikyo_state::s1945_mcu_init(  )
 DRIVER_INIT_MEMBER(psikyo_state,tengai)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	/* protection */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
 	s1945_mcu_init();
 	m_s1945_mcu_table = 0;
@@ -1875,10 +1875,10 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),this));
 
 	m_ka302c_banking = 1;
 
@@ -1891,13 +1891,13 @@ DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 DRIVER_INIT_MEMBER(psikyo_state,s1945)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	/* protection and tile bank switching */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945_table;
@@ -1912,13 +1912,13 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	/* protection and tile bank switching */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945a_table;
@@ -1933,13 +1933,13 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 {
 	/* input ports*/
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	/* protection and tile bank switching */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
 	s1945_mcu_init();
 	m_s1945_mcu_table = s1945j_table;
@@ -1954,10 +1954,10 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	m_ka302c_banking = 1;
 
@@ -1969,10 +1969,10 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
 {
 	/* input ports */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 
 	/* sound latch */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),this));
 
 	m_ka302c_banking = 1;
 

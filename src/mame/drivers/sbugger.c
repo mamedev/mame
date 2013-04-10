@@ -208,7 +208,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sbugger_state::sbugger_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	m_maincpu->set_input_line(I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static I8156_INTERFACE(i8156_intf)

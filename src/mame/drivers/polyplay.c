@@ -343,7 +343,7 @@ ROM_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(polyplay_state::polyplay_timer_callback)
 {
-	machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x4c);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x4c);
 }
 
 /* game driver */

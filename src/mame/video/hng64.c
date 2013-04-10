@@ -1440,7 +1440,7 @@ UINT32 hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bit
 	// but it could be useful
 	if ( machine().input().code_pressed_once(KEYCODE_L) )
 	{
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 		space.write_byte(0x2f27c8, 0x2);
 	}
 #endif

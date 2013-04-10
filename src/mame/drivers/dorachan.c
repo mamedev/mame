@@ -226,7 +226,7 @@ INPUT_PORTS_END
 
 void dorachan_state::machine_start()
 {
-	m_main_cpu = machine().device("maincpu");
+	m_main_cpu = m_maincpu;
 
 	save_item(NAME(m_flip_screen));
 }

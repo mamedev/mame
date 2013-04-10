@@ -153,7 +153,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;

@@ -228,10 +228,10 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_flipscreen_w)
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_irqack_w)
 {
 	if (offset == 0)
-		machine().device("maincpu")->execute().set_input_line(6, CLEAR_LINE);
+		m_maincpu->set_input_line(6, CLEAR_LINE);
 
 	else
-		machine().device("maincpu")->execute().set_input_line(5, CLEAR_LINE);
+		m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
 /*
@@ -267,14 +267,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
 	{
 		if (scanline > 0)
 			machine().primary_screen->update_partial(scanline - 1);
-		machine().device("maincpu")->execute().set_input_line(5, ASSERT_LINE);
+		m_maincpu->set_input_line(5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 240 */
 	if (scanline == 240)
 	{
 		machine().primary_screen->update_partial(scanline - 1);
-		machine().device("maincpu")->execute().set_input_line(6, ASSERT_LINE);
+		m_maincpu->set_input_line(6, ASSERT_LINE);
 	}
 }
 

@@ -326,7 +326,7 @@ void tempest_state::machine_start()
 
 WRITE8_MEMBER(tempest_state::wdclr_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	machine().watchdog_reset();
 }
 
@@ -350,7 +350,7 @@ CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }
 
 

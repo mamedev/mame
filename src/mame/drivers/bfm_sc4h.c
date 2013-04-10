@@ -634,12 +634,13 @@ static const ymz280b_interface ymz280b_config =
 
 void bfm_sc4_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
+	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	// triggers after reel tests on luckb, at the start on dnd...
 	// not sure this is right, causes some games to crash
 	logerror("bfm_sc4_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_licr2_interrupt((legacy_cpu_device*)device->machine().device("maincpu"));
+		m68307_licr2_interrupt(drvstate->m_maincpu);
 	}
 };
 
@@ -694,10 +695,11 @@ static const duart68681_config bfm_sc4_duart68681_config =
 
 void m68307_duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
+	sc4_state *drvstate = device->machine().driver_data<sc4_state>();
 	logerror("m68307_duart_irq_handler\n");
 	if (state == ASSERT_LINE)
 	{
-		m68307_serial_interrupt((legacy_cpu_device*)device->machine().device("maincpu"), vector);
+		m68307_serial_interrupt(drvstate->m_maincpu, vector);
 	}
 };
 

@@ -275,7 +275,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 	machine().device("prot")->memory().space(AS_PROGRAM).install_write_handler(0x48000000, 0x48000003, write32_delegate(FUNC(pgm_arm_type2_state::ddp2_arm_region_w),this));
 
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(FUNC(pgm_arm_type2_state::ddp2_speedup_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
 }
 
 

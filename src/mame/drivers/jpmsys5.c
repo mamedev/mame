@@ -498,7 +498,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
@@ -536,7 +536,7 @@ static const ptm6840_interface ptm_intf =
 
 WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(INT_6850ACIA, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INT_6850ACIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Clocks are incorrect */

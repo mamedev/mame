@@ -1555,7 +1555,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,tokiob)
 {
 	DRIVER_INIT_CALL(tokio);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
 }
 
 DRIVER_INIT_MEMBER(bublbobl_state,dland)

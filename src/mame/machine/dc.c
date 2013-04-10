@@ -299,14 +299,14 @@ void dc_state::dc_update_interrupt_status()
 	}
 
 	level=dc_compute_interrupt_level();
-	sh4_set_irln_input(machine().device("maincpu"), 15-level);
+	sh4_set_irln_input(m_maincpu, 15-level);
 
 	/* Wave DMA HW trigger */
 	if(m_wave_dma.flag && ((m_wave_dma.sel & 2) == 2))
 	{
 		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space &space = m_maincpu->space(AS_PROGRAM);
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
@@ -318,7 +318,7 @@ void dc_state::dc_update_interrupt_status()
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+			address_space &space = m_maincpu->space(AS_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
 			pvr_dma_execute(space);
@@ -374,7 +374,7 @@ WRITE64_MEMBER(dc_state::dc_sysctrl_w )
 				ddtdata.direction=0;
 				ddtdata.channel=2;
 				ddtdata.mode=25; //011001
-				sh4_dma_ddt(space.machine().device("maincpu"),&ddtdata);
+				sh4_dma_ddt(m_maincpu,&ddtdata);
 				#if DEBUG_SYSCTRL
 				if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 					if (dc_sysctrl_regs[SB_LMMODE0])

@@ -185,7 +185,7 @@ IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
 void photon_state::machine_reset()
 {
 	pk8000_set_bank(0);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photon_state::pk8000_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photon_state::pk8000_irq_callback),this));
 }
 
 void photon_state::video_start()

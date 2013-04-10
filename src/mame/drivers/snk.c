@@ -275,14 +275,14 @@ READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
 	if(!space.debugger_access())
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
 WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
@@ -6251,7 +6251,7 @@ ROM_END
 DRIVER_INIT_MEMBER(snk_state,countryc)
 {
 	// replace coin counter with trackball select
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),this));
 }
 
 

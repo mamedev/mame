@@ -261,7 +261,7 @@ void parodius_state::machine_reset()
 {
 	int i;
 
-	konami_configure_set_lines(machine().device("maincpu"), parodius_banking);
+	konami_configure_set_lines(m_maincpu, parodius_banking);
 
 	for (i = 0; i < 3; i++)
 	{

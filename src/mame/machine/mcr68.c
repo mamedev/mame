@@ -147,7 +147,7 @@ void mcr68_state::mcr68_common_init()
 	}
 
 	/* initialize the clock */
-	m_m6840_internal_counter_period = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10);
+	m_m6840_internal_counter_period = attotime::from_hz(m_maincpu->unscaled_clock() / 10);
 }
 
 
@@ -212,8 +212,8 @@ INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
 
 void mcr68_state::update_mcr68_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(m_v493_irq_vector, m_v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(m_m6840_irq_vector, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(m_v493_irq_vector, m_v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(m_m6840_irq_vector, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -259,7 +259,7 @@ WRITE8_MEMBER(mcr68_state::zwackery_pia1_w)
 
 WRITE_LINE_MEMBER(mcr68_state::zwackery_ca2_w)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_chip_squeak_deluxe->write(space, 0, (state << 4) | m_zwackery_sound_data);
 }
 

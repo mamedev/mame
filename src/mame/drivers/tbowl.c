@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(tbowl_state::tbowl_trigger_nmi)
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )

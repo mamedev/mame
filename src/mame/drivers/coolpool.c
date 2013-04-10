@@ -242,7 +242,7 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
 //  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
-	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_maincpu->set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
 }
@@ -265,7 +265,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 {
 //  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
-	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+	m_maincpu->set_input_line(1, ASSERT_LINE);
 }
 
 
@@ -465,7 +465,7 @@ WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
 	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
-	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+	m_maincpu->set_input_line(1, CLEAR_LINE);
 
 	return m_iop_answer;
 }
@@ -491,7 +491,7 @@ WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 {
 	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
-	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+	m_maincpu->set_input_line(1, ASSERT_LINE);
 }
 
 

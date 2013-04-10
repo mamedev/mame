@@ -81,9 +81,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 	/* TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?) */
 	/*       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow */
 	if(scanline == 256 && machine().primary_screen->frame_number() & 1) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	else if((scanline % 128) == 0) // timer irq
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)

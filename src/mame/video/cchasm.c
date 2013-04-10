@@ -21,7 +21,7 @@
 
 TIMER_CALLBACK_MEMBER(cchasm_state::cchasm_refresh_end)
 {
-	machine().device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
+	m_maincpu->set_input_line(2, ASSERT_LINE);
 }
 
 void cchasm_state::cchasm_refresh ()
@@ -111,7 +111,7 @@ WRITE16_MEMBER(cchasm_state::cchasm_refresh_control_w)
 			cchasm_refresh();
 			break;
 		case 0xf7:
-			machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+			m_maincpu->set_input_line(2, CLEAR_LINE);
 			break;
 		}
 	}

@@ -505,7 +505,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(hnayayoi_state::irqhandler)
 {
 	popmessage("irq");
-//  machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+//  m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

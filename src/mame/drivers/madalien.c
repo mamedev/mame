@@ -19,7 +19,7 @@
 INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

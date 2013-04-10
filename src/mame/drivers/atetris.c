@@ -71,7 +71,7 @@ TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
-	machine().device("maincpu")->execute().set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set the next timer */
 	scanline += 32;
@@ -83,7 +83,7 @@ TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
 
 WRITE8_MEMBER(atetris_state::irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

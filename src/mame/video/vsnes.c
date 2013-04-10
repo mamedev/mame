@@ -19,7 +19,7 @@ PALETTE_INIT_MEMBER(vsnes_state,vsdual)
 
 void vsnes_state::ppu_irq_1(int *ppu_regs)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 void vsnes_state::ppu_irq_2(int *ppu_regs)

@@ -455,7 +455,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
 		m_tenspot_current_game++;
 		m_tenspot_current_game%=10;
 		tenspot_set_game_bank(machine(), m_tenspot_current_game, 1);
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -834,7 +834,7 @@ void galaxian_state::monsterz_set_latch()
 	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
 
 	// and an irq on the main z80 afterwards
-	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE );
+	m_maincpu->set_input_line(0, HOLD_LINE );
 }
 
 
@@ -1061,7 +1061,7 @@ static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
 
 INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* new value is the selected game */
 	m_gmgalax_selected_game = newval;
@@ -1074,7 +1074,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -2732,7 +2732,7 @@ void galaxian_state::common_init(galaxian_draw_bullet_func draw_bullet,galaxian_
 
 void galaxian_state::unmap_galaxian_sound(offs_t base)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.unmap_write(base + 0x0004, base + 0x0007, 0, 0x07f8);
 	space.unmap_write(base + 0x0800, base + 0x0807, 0, 0x07f8);
@@ -2755,7 +2755,7 @@ DRIVER_INIT_MEMBER(galaxian_state,galaxian)
 
 DRIVER_INIT_MEMBER(galaxian_state,nolock)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2767,7 +2767,7 @@ DRIVER_INIT_MEMBER(galaxian_state,nolock)
 
 DRIVER_INIT_MEMBER(galaxian_state,azurian)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* yellow bullets instead of white ones */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -2779,7 +2779,7 @@ DRIVER_INIT_MEMBER(galaxian_state,azurian)
 
 DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::gmgalax_extend_tile_info, &galaxian_state::gmgalax_extend_sprite_info);
@@ -2796,7 +2796,7 @@ DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 
 DRIVER_INIT_MEMBER(galaxian_state,pisces)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
@@ -2808,7 +2808,7 @@ DRIVER_INIT_MEMBER(galaxian_state,pisces)
 
 DRIVER_INIT_MEMBER(galaxian_state,batman2)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
@@ -2820,7 +2820,7 @@ DRIVER_INIT_MEMBER(galaxian_state,batman2)
 
 DRIVER_INIT_MEMBER(galaxian_state,frogg)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
@@ -2856,7 +2856,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrsu)
 
 DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
@@ -2868,7 +2868,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrgx)
 
 DRIVER_INIT_MEMBER(galaxian_state,moonqsr)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	/* video extensions */
@@ -2886,7 +2886,7 @@ WRITE8_MEMBER(galaxian_state::artic_gfxbank_w)
 
 DRIVER_INIT_MEMBER(galaxian_state,pacmanbl)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2945,7 +2945,7 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 
 DRIVER_INIT_MEMBER(galaxian_state,tenspot)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
 	   which tenspot appears to have copied */
@@ -2982,7 +2982,7 @@ DRIVER_INIT_MEMBER(galaxian_state,devilfsg)
 
 DRIVER_INIT_MEMBER(galaxian_state,zigzag)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(NULL, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -3026,8 +3026,8 @@ DRIVER_INIT_MEMBER(galaxian_state,jumpbug)
 
 DRIVER_INIT_MEMBER(galaxian_state,checkman)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
@@ -3046,7 +3046,7 @@ DRIVER_INIT_MEMBER(galaxian_state,checkman)
 
 DRIVER_INIT_MEMBER(galaxian_state,checkmaj)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -3061,7 +3061,7 @@ DRIVER_INIT_MEMBER(galaxian_state,checkmaj)
 
 DRIVER_INIT_MEMBER(galaxian_state,dingo)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -3076,8 +3076,8 @@ DRIVER_INIT_MEMBER(galaxian_state,dingo)
 
 DRIVER_INIT_MEMBER(galaxian_state,dingoe)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
@@ -3098,7 +3098,7 @@ DRIVER_INIT_MEMBER(galaxian_state,dingoe)
 
 DRIVER_INIT_MEMBER(galaxian_state,skybase)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::pisces_extend_tile_info, &galaxian_state::pisces_extend_sprite_info);
@@ -3116,7 +3116,7 @@ DRIVER_INIT_MEMBER(galaxian_state,skybase)
 
 DRIVER_INIT_MEMBER(galaxian_state,kong)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, &galaxian_state::upper_extend_sprite_info);
@@ -3131,7 +3131,7 @@ DRIVER_INIT_MEMBER(galaxian_state,kong)
 
 void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x10000);
 	int A;
@@ -3242,7 +3242,7 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 
 DRIVER_INIT_MEMBER(galaxian_state,kingball)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -3262,7 +3262,7 @@ DRIVER_INIT_MEMBER(galaxian_state,kingball)
 
 DRIVER_INIT_MEMBER(galaxian_state,scorpnmc)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
@@ -3283,7 +3283,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpnmc)
 
 DRIVER_INIT_MEMBER(galaxian_state,thepitm)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
@@ -3307,7 +3307,7 @@ DRIVER_INIT_MEMBER(galaxian_state,thepitm)
 
 DRIVER_INIT_MEMBER(galaxian_state,theend)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::theend_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, NULL);
@@ -3326,7 +3326,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scramble)
 
 DRIVER_INIT_MEMBER(galaxian_state,explorer)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
@@ -3359,7 +3359,7 @@ DRIVER_INIT_MEMBER(galaxian_state,sfx)
 
 DRIVER_INIT_MEMBER(galaxian_state,atlantis)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
@@ -3401,7 +3401,7 @@ DRIVER_INIT_MEMBER(galaxian_state,frogger)
 
 DRIVER_INIT_MEMBER(galaxian_state,froggrmc)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(NULL, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
@@ -3446,7 +3446,7 @@ DRIVER_INIT_MEMBER(galaxian_state,amidar)
 
 DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 

@@ -81,9 +81,9 @@ static void cage_irq_callback(running_machine &machine, int reason);
 
 void atarigt_state::update_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, m_sound_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_video_int_state    ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1315,7 +1315,7 @@ DRIVER_INIT_MEMBER(atarigt_state,tmek)
 	m_protection_w = &atarigt_state::tmek_protection_w;
 
 	/* temp hack */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32_delegate(FUNC(atarigt_state::tmek_pf_w),this));
 }
 
 

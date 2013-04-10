@@ -62,9 +62,9 @@ void victory_state::video_start()
 void victory_state::victory_update_irq()
 {
 	if (m_vblank_irq || m_fgcoll || (m_bgcoll && (m_video_control & 0x20)))
-		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 	else
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

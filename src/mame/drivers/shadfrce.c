@@ -277,7 +277,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_ack_w)
 {
-	machine().device("maincpu")->execute().set_input_line(offset ^ 3, CLEAR_LINE);
+	m_maincpu->set_input_line(offset ^ 3, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
@@ -328,7 +328,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 			m_raster_scanline = (m_raster_scanline + 1) % 240;
 			if (m_raster_scanline > 0)
 				machine().primary_screen->update_partial(m_raster_scanline - 1);
-			machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+			m_maincpu->set_input_line(1, ASSERT_LINE);
 		}
 	}
 
@@ -339,7 +339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 		{
 			if (scanline > 0)
 				machine().primary_screen->update_partial(scanline - 1);
-			machine().device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
+			m_maincpu->set_input_line(2, ASSERT_LINE);
 		}
 	}
 
@@ -349,7 +349,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::shadfrce_scanline)
 		if (scanline == 248)
 		{
 			machine().primary_screen->update_partial(scanline - 1);
-			machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+			m_maincpu->set_input_line(3, ASSERT_LINE);
 		}
 	}
 }

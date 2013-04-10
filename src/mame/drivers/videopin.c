@@ -33,7 +33,7 @@ void videopin_state::update_plunger()
 			m_time_released = machine().time();
 
 			if (!m_mask)
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
 			m_time_pushed = machine().time();
@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 
 	update_plunger();
 
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	scanline = scanline + 32;
 
@@ -128,7 +128,7 @@ WRITE8_MEMBER(videopin_state::videopin_led_w)
 	if (i == 7)
 		set_led_status(machine(), 0, data & 8);   /* start button */
 
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER(videopin_state::videopin_out1_w)
 	m_mask = ~data & 0x10;
 
 	if (m_mask)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(machine(), ~data & 0x08);
 

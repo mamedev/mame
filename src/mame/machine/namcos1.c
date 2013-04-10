@@ -587,7 +587,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_cpu_control_w)
 
 WRITE8_MEMBER(namcos1_state::namcos1_watchdog_w)
 {
-	if (&space.device() == machine().device("maincpu"))
+	if (&space.device() == m_maincpu)
 		m_wdog |= 1;
 	else if (&space.device() == machine().device("sub"))
 		m_wdog |= 2;
@@ -743,7 +743,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_bankswitch_w)
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", device().tag(), offset, data);
 
-	namcos1_bankswitch(machine(), (&space.device() == machine().device("maincpu")) ? 0 : 1, offset, data);
+	namcos1_bankswitch(machine(), (&space.device() == m_maincpu) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -871,7 +871,7 @@ void namcos1_state::machine_reset()
 	namcos1_bankswitch(machine(), 1, 0x0e01, 0xff);
 
 	/* reset Cpu 0 and stop all other CPUs */
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

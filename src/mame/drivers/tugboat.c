@@ -207,7 +207,7 @@ static const pia6821_interface pia1_intf =
 
 TIMER_CALLBACK_MEMBER(tugboat_state::interrupt_gen)
 {
-	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(tugboat_state::interrupt_gen),this));
 }
 

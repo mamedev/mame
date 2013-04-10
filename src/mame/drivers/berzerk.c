@@ -202,7 +202,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 
 	/* set the IRQ line if enabled */
 	if (m_irq_enabled)
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfc);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfc);
 
 	/* set up for next interrupt */
 	next_irq_number = (irq_number + 1) % IRQS_PER_FRAME;
@@ -279,7 +279,7 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 
 	/* pulse the NMI line if enabled */
 	if (m_nmi_enabled)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* set up for next interrupt */
 	next_nmi_number = (nmi_number + 1) % NMIS_PER_FRAME;
@@ -1239,7 +1239,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(berzerk_state,moonwarp)
 {
-	address_space &io = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_handler (0x48, 0x48, read8_delegate(FUNC(berzerk_state::moonwarp_p1_r), this));
 	io.install_read_handler (0x4a, 0x4a, read8_delegate(FUNC(berzerk_state::moonwarp_p2_r), this));
 }

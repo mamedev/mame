@@ -681,7 +681,7 @@ WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 
 	// Active low
 	if (!(m_vsync_latch_preset))
-		machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
@@ -1030,7 +1030,7 @@ void maygayv1_state::machine_reset()
 INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 {
 	if (m_vsync_latch_preset)
-		machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 }
 
 

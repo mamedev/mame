@@ -1437,7 +1437,7 @@ DRIVER_INIT_MEMBER(trackfld_state,trackfld)
 
 DRIVER_INIT_MEMBER(trackfld_state,atlantol)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt;
 	int A;

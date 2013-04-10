@@ -262,7 +262,7 @@ void crimfght_state::machine_start()
 
 void crimfght_state::machine_reset()
 {
-	konami_configure_set_lines(machine().device("maincpu"), crimfght_banking);
+	konami_configure_set_lines(m_maincpu, crimfght_banking);
 }
 
 static MACHINE_CONFIG_START( crimfght, crimfght_state )

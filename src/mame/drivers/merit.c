@@ -312,7 +312,7 @@ WRITE_LINE_MEMBER(merit_state::hsync_changed)
 
 WRITE_LINE_MEMBER(merit_state::vsync_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MC6845_INTERFACE( mc6845_intf )

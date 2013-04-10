@@ -456,7 +456,7 @@ WRITE8_MEMBER(astrocde_state::profpac_banksw_w)
 
 void astrocde_state::profbank_banksw_restore()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_IO);
 
 	profpac_banksw_w(space, 0, m_profpac_bank);
 }
@@ -1735,54 +1735,54 @@ ROM_END
 DRIVER_INIT_MEMBER(astrocde_state,seawolf2)
 {
 	m_video_config = 0x00;
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x40, 0x40, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_sound_1_w),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x41, 0x41, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_sound_2_w),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x42, 0x43, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_lamps_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x40, 0x40, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_sound_1_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x41, 0x41, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_sound_2_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x42, 0x43, 0, 0xff18, write8_delegate(FUNC(astrocde_state::seawolf2_lamps_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,ebases)
 {
 	m_video_config = AC_SOUND_PRESENT;
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x20, 0x20, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_coin_w),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x28, 0x28, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_trackball_select_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x20, 0x20, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_coin_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x28, 0x28, 0, 0xff07, write8_delegate(FUNC(astrocde_state::ebases_trackball_select_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,spacezap)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x13, 0x13, 0x03ff, 0xff00, read8_delegate(FUNC(astrocde_state::spacezap_io_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x13, 0x13, 0x03ff, 0xff00, read8_delegate(FUNC(astrocde_state::spacezap_io_r),this));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,wow)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::wow_io_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(wow_speech_r));
+	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::wow_io_r),this));
+	m_maincpu->space(AS_IO).install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(wow_speech_r));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,gorf)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_io_1_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x16, 0x16, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_io_2_r),this));
-	machine().device("maincpu")->memory().space(AS_IO).install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(gorf_speech_r));
+	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_io_1_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_io_2_r),this));
+	m_maincpu->space(AS_IO).install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(gorf_speech_r));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,robby)
 {
 	m_video_config = AC_SOUND_PRESENT;
-	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::robby_io_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::robby_io_r),this));
 }
 
 
 DRIVER_INIT_MEMBER(astrocde_state,profpac)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	m_video_config = AC_SOUND_PRESENT;
 	iospace.install_read_handler(0x14, 0x14, 0x0fff, 0xff00, read8_delegate(FUNC(astrocde_state::profpac_io_1_r),this));
@@ -1796,7 +1796,7 @@ DRIVER_INIT_MEMBER(astrocde_state,profpac)
 
 DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	m_video_config = 0x00;
 	iospace.install_read_handler(0x14, 0x14, 0x1fff, 0xff00, read8_delegate(FUNC(astrocde_state::demndrgn_io_r),this));
@@ -1812,7 +1812,7 @@ DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 
 DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	m_video_config = 0x00;
 	iospace.install_read_port(0x60, 0x60, 0x0000, 0xff00, "P60");

@@ -399,10 +399,10 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 
 		case 4:
 			if (data & 0x80)    /* CG Board 1 IRQ Ack */
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)    /* CG Board 0 IRQ Ack */
-				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_write(adc1038, (data >> 0) & 1);
 			adc1038_clk_write(adc1038, (data >> 1) & 1);
@@ -417,10 +417,10 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 MACHINE_START_MEMBER(gticlub_state,gticlub)
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x000fffff, FALSE, m_work_ram);
+	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x000fffff, FALSE, m_work_ram);
 }
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )

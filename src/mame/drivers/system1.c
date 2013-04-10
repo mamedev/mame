@@ -363,7 +363,7 @@ void system1_state::machine_start()
 		membank("bank1")->configure_entry(0, memregion("maincpu")->base() + 0x8000);
 	membank("bank1")->set_entry(0);
 
-	z80_set_cycle_tables(machine().device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
+	z80_set_cycle_tables(m_maincpu, cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex);
 
 	m_mute_xor = 0x00;
 
@@ -558,8 +558,8 @@ WRITE8_MEMBER(system1_state::mcu_control_w)
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
 	m_mcu_control = data;
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -568,11 +568,11 @@ WRITE8_MEMBER(system1_state::mcu_io_w)
 	switch ((m_mcu_control >> 3) & 3)
 	{
 		case 0:
-			machine().device<z80_device>("maincpu")->space(AS_PROGRAM).write_byte(offset, data);
+			m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 			break;
 
 		case 2:
-			machine().device<z80_device>("maincpu")->space(AS_IO).write_byte(offset, data);
+			m_maincpu->space(AS_IO).write_byte(offset, data);
 			break;
 
 		default:
@@ -588,13 +588,13 @@ READ8_MEMBER(system1_state::mcu_io_r)
 	switch ((m_mcu_control >> 3) & 3)
 	{
 		case 0:
-			return machine().device<z80_device>("maincpu")->space(AS_PROGRAM).read_byte(offset);
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 
 		case 1:
 			return memregion("maincpu")->base()[offset + 0x10000];
 
 		case 2:
-			return machine().device<z80_device>("maincpu")->space(AS_IO).read_byte(offset);
+			return m_maincpu->space(AS_IO).read_byte(offset);
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
@@ -4718,11 +4718,11 @@ DRIVER_INIT_MEMBER(system1_state,dakkochn)
 
 	mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4);
 
-//  machine().device("maincpu")->memory().space(AS_IO).install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
-//  machine().device("maincpu")->memory().space(AS_IO).install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
-//  machine().device("maincpu")->memory().space(AS_IO).install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
+//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
+//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
+//  m_maincpu->space(AS_IO).install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
 
-//  machine().device("maincpu")->memory().space(AS_IO).install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
+//  m_maincpu->space(AS_IO).install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
 }
 
 
@@ -4780,8 +4780,8 @@ READ8_MEMBER(system1_state::nob_start_r)
 
 DRIVER_INIT_MEMBER(system1_state,nob)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	address_space &iospace = m_maincpu->space(AS_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4812,7 +4812,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 	UINT8 *ROM2 = memregion("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
@@ -4828,7 +4828,7 @@ DRIVER_INIT_MEMBER(system1_state,nobb)
 
 DRIVER_INIT_MEMBER(system1_state,bootleg)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
@@ -4836,7 +4836,7 @@ DRIVER_INIT_MEMBER(system1_state,bootleg)
 
 DRIVER_INIT_MEMBER(system1_state,bootsys2)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x20000);
 	membank("bank1")->configure_decrypted_entries(0, 4, memregion("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
@@ -4856,7 +4856,7 @@ DRIVER_INIT_MEMBER(system1_state,choplift)
 
 DRIVER_INIT_MEMBER(system1_state,shtngmst)
 {
-	address_space &iospace = machine().device("maincpu")->memory().space(AS_IO);
+	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	iospace.install_read_port(0x18, 0x18, 0x00, 0x03, "18");
 	iospace.install_read_handler(0x1c, 0x1c, 0x00, 0x02, read8_delegate(FUNC(system1_state::shtngmst_gunx_r),this));

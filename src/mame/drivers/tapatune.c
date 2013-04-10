@@ -115,7 +115,7 @@ WRITE16_MEMBER(tapatune_state::write_to_z80)
 			//  logerror("Command to Z80: %04x\n", data);
 			m_68k_to_z80_index = data & 0xff;
 			m_68k_to_z80_data = (data >> 8) & 0xff;
-			machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
+			m_maincpu->set_input_line(3, CLEAR_LINE);
 			break;
 		case 1:
 			break;
@@ -124,7 +124,7 @@ WRITE16_MEMBER(tapatune_state::write_to_z80)
 
 READ16_MEMBER(tapatune_state::irq_ack_r)
 {
-	machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+	m_maincpu->set_input_line(2, CLEAR_LINE);
 	return 0;
 }
 
@@ -174,7 +174,7 @@ WRITE8_MEMBER(tapatune_state::write_data_to_68k)
 {
 	m_z80_to_68k_data = data;
 	//logerror("Writing data from Z80: index = %02x, data = %02x\n", m_z80_to_68k_index, m_z80_to_68k_data );
-	machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+	m_maincpu->set_input_line(3, ASSERT_LINE);
 }
 
 READ8_MEMBER(tapatune_state::read_index_from_68k)
@@ -358,7 +358,7 @@ void tapatune_state::video_start()
 
 WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 {
-	machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MC6845_INTERFACE( h46505_intf )

@@ -1915,38 +1915,38 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		{
 			m_io_share_ram[0xfff] = 0x0000;
 			m_io_share_ram[0xe00] = 0xffff;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else if (m_io_share_ram[0xfff] == 0x4004 || m_io_share_ram[0xfff] == 0x4000)
 		{
 			m_io_share_ram[0xfff] = 0x0000;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else if (m_io_share_ram[0xfff] == 0x7004)
 		{
 			// this command seems to turn off interrupts on TLCS...
 			m_io_share_ram[0xfff] = 0x0000;
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 		else
 		{
 			// normally just raise INT0 on TLCS and let it handle the command
 			machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, ASSERT_LINE);
-			machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// The PPC always goes to busy loop waiting for TLCS here, so we can free up the timeslice.
 			// Only do it for HDD access and backup RAM for now...
 			if (m_io_share_ram[0xfff] == 0x1010 || m_io_share_ram[0xfff] == 0x1020 ||
 				m_io_share_ram[0xfff] == 0x6000 || m_io_share_ram[0xfff] == 0x6010)
 			{
-				//machine().device("maincpu")->execute().spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
-				machine().device("maincpu")->execute().spin_until_interrupt();
+				//m_maincpu->spin_until_trigger(PPC_TLCS_COMM_TRIGGER);
+				m_maincpu->spin_until_interrupt();
 			}
 
 			// pwrshovl sometimes writes commands during command handling... make sure that doesn't happen
 			if (m_io_share_ram[0xfff] == 0x0000)
 			{
-				machine().device("maincpu")->execute().spin_until_time(attotime::from_usec(50));
+				m_maincpu->spin_until_time(attotime::from_usec(50));
 			}
 
 			machine().scheduler().trigger(TLCS_PPC_COMM_TRIGGER);
@@ -2018,7 +2018,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 		}
 #endif
 
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, CLEAR_LINE);
 
 		machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, CLEAR_LINE);
@@ -2534,10 +2534,10 @@ void taitotz_state::machine_reset()
 void taitotz_state::machine_start()
 {
 	/* set conservative DRC options */
-	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+	ppcdrc_set_options(m_maincpu, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	ppcdrc_add_fastram(machine().device("maincpu"), 0x40000000, 0x40ffffff, FALSE, m_work_ram);
+	ppcdrc_add_fastram(m_maincpu, 0x40000000, 0x40ffffff, FALSE, m_work_ram);
 }
 
 

@@ -59,7 +59,7 @@ CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 	UINT32 ret = m_in0_b4;
 	if (m_in0_b4)
 	{
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 		m_in0_b4 = 0;
 	}
 

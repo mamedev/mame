@@ -69,7 +69,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(cchasm_state::cchasm_6840_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface cchasm_6840_intf =

@@ -392,7 +392,7 @@ GFXDECODE_END
 
 TIMER_CALLBACK_MEMBER(taito_f3_state::f3_interrupt3)
 {
-	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);    // some signal from video hardware?
+	m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
@@ -3787,8 +3787,8 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 		}
 	}
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4a001c, 0x4a001f, read32_delegate(FUNC(taito_f3_state::bubsympb_oki_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4a001c, 0x4a001f, write32_delegate(FUNC(taito_f3_state::bubsympb_oki_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4a001c, 0x4a001f, read32_delegate(FUNC(taito_f3_state::bubsympb_oki_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4a001c, 0x4a001f, write32_delegate(FUNC(taito_f3_state::bubsympb_oki_w),this));
 }
 
 

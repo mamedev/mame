@@ -42,7 +42,7 @@ public:
 	// devices
 	required_device<duart68681_device> m_duart;
 	required_device<ymz280b_device> m_ymz;
-	required_device<cpu_device> m_maincpu;
+	required_device<legacy_cpu_device> m_maincpu;
 	optional_device<bfm_bda_t> m_vfd0;
 	required_device<nvram_device> m_nvram;
 

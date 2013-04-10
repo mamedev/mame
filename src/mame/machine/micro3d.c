@@ -582,7 +582,7 @@ READ32_MEMBER(micro3d_state::micro3d_shared_r)
 
 WRITE32_MEMBER(micro3d_state::drmath_int_w)
 {
-	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 WRITE32_MEMBER(micro3d_state::drmath_intr2_ack)
@@ -613,12 +613,12 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 	/* TODO? BOTSS crashes when starting the final stage because the 68000
 	overwrites memory in use by the Am29000. Slowing down the 68000 slightly
 	avoids this */
-	machine().device("maincpu")->set_clock_scale(0.945f);
+	m_maincpu->set_clock_scale(0.945f);
 }
 
 DRIVER_INIT_MEMBER(micro3d_state,botss)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
 	space.install_read_handler(0x140000, 0x140001, read16_delegate(FUNC(micro3d_state::botss_140000_r),this));

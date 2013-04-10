@@ -431,7 +431,7 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(gpworld_state::irq_stop)
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)

@@ -1981,7 +1981,7 @@ DRIVER_INIT_MEMBER(btime_state,protennb)
 
 DRIVER_INIT_MEMBER(btime_state,wtennis)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
 	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);

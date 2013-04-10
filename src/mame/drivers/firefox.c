@@ -259,7 +259,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
 {
 	machine().primary_screen->update_now();
 
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
 }
 
 void firefox_state::set_rgba( int start, int index, unsigned char *palette_ram )
@@ -447,17 +447,17 @@ WRITE8_MEMBER(firefox_state::rom_bank_w)
 
 WRITE8_MEMBER(firefox_state::main_irq_clear_w)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::main_firq_clear_w)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 WRITE8_MEMBER(firefox_state::self_reset_w)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
+	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -483,7 +483,7 @@ WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
 {
 	if (state)
-		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
+		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 

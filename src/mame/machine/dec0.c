@@ -191,7 +191,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
 	if (offset==2)
 	{
 		if ((data&0x4)==0)
-			machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+			m_maincpu->set_input_line(5, HOLD_LINE);
 		if ((data&0x8)==0)
 			machine().device("mcu")->execute().set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
@@ -225,7 +225,7 @@ void dec0_state::baddudes_i8751_write(int data)
 	}
 
 	if (!m_i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
-	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 void dec0_state::birdtry_i8751_write(int data)
@@ -296,7 +296,7 @@ void dec0_state::birdtry_i8751_write(int data)
 		case 0x7ff: m_i8751_return = 0x200;     break;
 		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
 	}
-	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 void dec0_state::dec0_i8751_write(int data)
@@ -357,8 +357,8 @@ void dec0_state::h6280_decrypt(const char *cputag)
 DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 {
 	UINT8 *RAM = memregion("sub")->base();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
 	h6280_decrypt("sub");
 
@@ -382,7 +382,7 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 
 DRIVER_INIT_MEMBER(dec0_state,robocop)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,baddudes)

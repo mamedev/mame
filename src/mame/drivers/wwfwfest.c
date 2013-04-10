@@ -101,10 +101,10 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 {
 	if (offset == 0)
-		machine().device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 
 	else
-		machine().device("maincpu")->execute().set_input_line(2, CLEAR_LINE);
+		m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
@@ -360,14 +360,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfwfest_state::wwfwfest_scanline)
 	{
 		if (scanline > 0)
 			machine().primary_screen->update_partial(scanline - 1);
-		machine().device("maincpu")->execute().set_input_line(2, ASSERT_LINE);
+		m_maincpu->set_input_line(2, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		machine().primary_screen->update_partial(scanline - 1);
-		machine().device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 	}
 }
 

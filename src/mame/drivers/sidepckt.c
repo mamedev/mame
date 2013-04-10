@@ -148,7 +148,7 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_i8751_w)
 	static const int table_2[]={0x8e,0x42,0xad,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa2,0xff};
 	static const int table_3[]={0xbd,0x73,0x80,0xbd,0x73,0xa7,0xbd,0x73,0xe0,0x7e,0x72,0x56,0xff,0xff,0xff,0xff};
 
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (m_in_math==1) {
@@ -188,7 +188,7 @@ WRITE8_MEMBER(sidepckt_state::sidepctj_i8751_w)
 	static const int table_2[]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
 	static const int table_3[]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE); /* i8751 triggers FIRQ on main cpu */
 
 	/* This function takes multiple parameters */
 	if (m_in_math==1) {
@@ -502,14 +502,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepckt_i8751_w),this));
 }
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepctj)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3014, 0x3014, read8_delegate(FUNC(sidepckt_state::sidepckt_i8751_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x3018, 0x3018, write8_delegate(FUNC(sidepckt_state::sidepctj_i8751_w),this));
 }
 
 

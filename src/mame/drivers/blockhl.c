@@ -195,7 +195,7 @@ void blockhl_state::machine_start()
 
 void blockhl_state::machine_reset()
 {
-	konami_configure_set_lines(machine().device("maincpu"), blockhl_banking);
+	konami_configure_set_lines(m_maincpu, blockhl_banking);
 
 	m_palette_selected = 0;
 	m_rombank = 0;

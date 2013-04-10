@@ -516,7 +516,7 @@ WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 	{
 		case 0x0e:
 			tmaster_draw();
-			machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+			m_maincpu->set_input_line(2, HOLD_LINE);
 			break;
 	}
 }
@@ -977,7 +977,7 @@ MACHINE_RESET_MEMBER(tmaster_state,galgames)
 
 	galgames_update_rombank(0);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 static MACHINE_CONFIG_START( galgames, tmaster_state )

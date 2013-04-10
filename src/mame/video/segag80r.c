@@ -586,7 +586,7 @@ WRITE8_MEMBER(segag80r_state::sindbadm_back_port_w)
 	{
 		/* port 0: irq ack */
 		case 0:
-			machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+			m_maincpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control

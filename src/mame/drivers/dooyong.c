@@ -1054,10 +1054,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(dooyong_state::rshark_scanline)
 	int scanline = param;
 
 	if(scanline == 248) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	if(scanline == 120) // timer irq?
-		machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 

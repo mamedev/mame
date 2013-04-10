@@ -524,7 +524,7 @@ DRIVER_INIT_MEMBER(tnzs_state,drtoppel)
 	m_mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0xf800, 0xfbff);
+	m_maincpu->space(AS_PROGRAM).nop_write(0xf800, 0xfbff);
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,chukatai)
@@ -536,7 +536,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzs)
 {
 	m_mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
@@ -544,7 +544,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 	m_mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
+//  m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,kabukiz)

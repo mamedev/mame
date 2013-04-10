@@ -101,7 +101,7 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 	machine().watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(sprint4_state::nmi_callback),this), scanline);
 }

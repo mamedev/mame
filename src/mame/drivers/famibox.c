@@ -286,7 +286,7 @@ void famibox_state::famicombox_bankswitch(UINT8 bank)
 void famibox_state::famicombox_reset()
 {
 	famicombox_bankswitch(0);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
@@ -522,7 +522,7 @@ void famibox_state::palette_init()
 
 void famibox_state::ppu_irq(int *ppu_regs)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* our ppu interface                                            */

@@ -218,10 +218,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::darkmist_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x10); /* RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
 
@@ -400,7 +400,7 @@ void darkmist_state::decrypt_snd()
 
 DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i, len;
 	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);

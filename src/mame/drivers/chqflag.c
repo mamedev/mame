@@ -31,9 +31,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(chqflag_state::chqflag_scanline)
 	int scanline = param;
 
 	if(scanline == 240 && k051960_is_irq_enabled(m_k051960)) // vblank irq
-		machine().device("maincpu")->execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(m_k051960))) // timer irq
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)

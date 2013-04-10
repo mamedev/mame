@@ -704,7 +704,7 @@ void model1_state::irq_raise(int level)
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
 	m_last_irq = level;
-	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
@@ -727,8 +727,8 @@ IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 
 void model1_state::irq_init()
 {
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(model1_state::irq_callback),this));
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(model1_state::irq_callback),this));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)

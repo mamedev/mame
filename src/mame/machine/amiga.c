@@ -283,7 +283,7 @@ static void amiga_m68k_reset(device_t *device)
 
 MACHINE_START_MEMBER(amiga_state,amiga)
 {
-	m_maincpu_program_space = &machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_maincpu_program_space = &m_maincpu->space(AS_PROGRAM);
 }
 
 MACHINE_RESET_MEMBER(amiga_state,amiga)

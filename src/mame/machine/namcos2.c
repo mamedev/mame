@@ -121,7 +121,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 
 MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 {
-//  address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 	address_space &audio_space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 	mFinalLapProtCount = 0;
@@ -672,7 +672,7 @@ TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
 
 	if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]|namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) {
 		machine().primary_screen->update_partial(param);
-		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) machine().device("maincpu")->execute().set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
+		if (namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ]) m_maincpu->set_input_line(namcos2_68k_master_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 		if (namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ]) machine().device("slave")->execute().set_input_line(namcos2_68k_slave_C148[NAMCOS2_C148_POSIRQ] , ASSERT_LINE);
 	}
 }

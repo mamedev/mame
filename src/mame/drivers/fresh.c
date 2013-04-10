@@ -589,22 +589,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 	if(scanline == 0)
 	{
 		logerror("new frame\n");
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	}
 
 //  if(scanline == 32)
-//      machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+//      m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 64)
-		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 //  if(scanline == 96)
-//      machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+//      m_maincpu->set_input_line(5, HOLD_LINE);
 
 
 	if(scanline == 200) // vbl?
-		machine().device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+		m_maincpu->set_input_line(6, HOLD_LINE);
 
 }
 

@@ -242,7 +242,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sg1000a_state::vdp_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static TMS9928A_INTERFACE(sg1000a_tms9928a_interface)

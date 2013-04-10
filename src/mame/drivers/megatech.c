@@ -237,7 +237,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 		printf("disabling SMS Z80\n");
 		m_current_game_is_sms = 0;
 		megatech_set_megadrive_z80_as_megadrive_z80("genesis_snd_z80");
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	sprintf(tempname, "game%d", param);
 	game_region = machine().root_device().memregion(tempname)->base();
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	//machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -326,14 +326,14 @@ WRITE8_MEMBER(mtech_state::bios_ctrl_w )
 
 READ8_MEMBER(mtech_state::megatech_z80_read_68k_banked_data )
 {
-	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	address_space &space68k = m_maincpu->space();
 	UINT8 ret = space68k.read_byte(m_mt_bank_addr + offset);
 	return ret;
 }
 
 WRITE8_MEMBER(mtech_state::megatech_z80_write_68k_banked_data )
 {
-	address_space &space68k = space.machine().device<legacy_cpu_device>("maincpu")->space();
+	address_space &space68k = m_maincpu->space();
 	space68k.write_byte(m_mt_bank_addr + offset,data);
 }
 

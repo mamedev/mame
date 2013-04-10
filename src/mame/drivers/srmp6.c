@@ -533,7 +533,7 @@ WRITE16_MEMBER(srmp6_state::paletteram_w)
 
 READ16_MEMBER(srmp6_state::srmp6_irq_ack_r)
 {
-	machine().device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+	m_maincpu->set_input_line(4, CLEAR_LINE);
 	return 0; // value read doesn't matter
 }
 

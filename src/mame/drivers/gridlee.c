@@ -95,7 +95,7 @@
 
 TIMER_CALLBACK_MEMBER(gridlee_state::irq_off_tick)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -108,7 +108,7 @@ TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
 		m_irq_timer->adjust(machine().primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	m_irq_off->adjust(machine().primary_screen->time_until_pos(param, GRIDLEE_HBSTART));
@@ -117,7 +117,7 @@ TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
 
 TIMER_CALLBACK_MEMBER(gridlee_state::firq_off_tick)
 {
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -127,7 +127,7 @@ TIMER_CALLBACK_MEMBER(gridlee_state::firq_timer_tick)
 	m_firq_timer->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE));
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
-	machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	m_firq_off->adjust(machine().primary_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));

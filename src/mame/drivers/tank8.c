@@ -13,7 +13,7 @@ Atari Tank 8 driver
 
 void tank8_state::tank8_set_collision(int index)
 {
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	m_collision_index = index;
 }
@@ -40,7 +40,7 @@ WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
 {
 	m_collision_index &= ~0x3f;
 
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tank8_state::tank8_crash_w)

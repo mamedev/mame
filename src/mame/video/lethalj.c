@@ -95,7 +95,7 @@ void lethalj_state::video_start()
 
 TIMER_CALLBACK_MEMBER(lethalj_state::gen_ext1_int)
 {
-	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -157,7 +157,7 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 
 	/* clear the IRQ on offset 0 */
 	else if (offset == 0)
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 

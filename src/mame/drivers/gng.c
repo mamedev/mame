@@ -762,7 +762,7 @@ READ8_MEMBER(gng_state::diamond_hack_r)
 
 DRIVER_INIT_MEMBER(gng_state,diamond)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gng_state::diamond_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6000, read8_delegate(FUNC(gng_state::diamond_hack_r),this));
 }
 
 

@@ -1317,8 +1317,8 @@ READ32_MEMBER(namcos12_state::system11gun_r)
 
 void namcos12_state::system11gun_install(  )
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos12_state::system11gun_w),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos12_state::system11gun_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos12_state::system11gun_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos12_state::system11gun_r),this));
 }
 
 WRITE32_MEMBER(namcos12_state::kcoff_w)
@@ -1382,7 +1382,7 @@ READ32_MEMBER(namcos12_state::tektagt_protection_3_r)
 
 MACHINE_RESET_MEMBER(namcos12_state,namcos12)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	bankoffset_w(space,0,0,0xffffffff);
 
 	space.install_write_handler(0x1f801000, 0x1f801003, write32_delegate(FUNC(namcos12_state::s12_dma_bias_w),this));
