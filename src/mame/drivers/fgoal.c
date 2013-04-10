@@ -3,7 +3,7 @@
 Taito Field Goal driver
 
     set #1 / orig Taito PCB / sticker "AFN00004" / Field Goal
-    set #2 / orig Taito PCB / sticker "MFN00001" / Field Goal (different)
+    set #2 / orig Taito PCB / sticker "MFN00001" / Field Goal
 
 Differences between these sets include
 
@@ -422,5 +422,5 @@ ROM_START( fgoala )
 ROM_END
 
 
-GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal", GAME_NO_SOUND )
-GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (different)", GAME_NO_SOUND )
+GAME( 1979, fgoal,  0,     fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 1)", GAME_NO_SOUND )
+GAME( 1979, fgoala, fgoal, fgoal, fgoal, driver_device, 0, ROT90, "Taito", "Field Goal (set 2)", GAME_NO_SOUND )
