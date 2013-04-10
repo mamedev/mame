@@ -1078,6 +1078,8 @@ void validity_checker::validate_devices()
 {
 	int_map device_map;
 
+	m_current_config->root_device().findit(true);
+
 	// iterate over devices
 	device_iterator iter(m_current_config->root_device());
 	for (const device_t *device = iter.first(); device != NULL; device = iter.next())

@@ -1174,8 +1174,9 @@ public:
 		: object_finder_base<_NETClass>(base, tag), m_output(output) { }
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
+		if (isvalidation) return true;
 		device_t *device = this->m_base.subdevice(this->m_tag);
 		m_netlist = dynamic_cast<netlist_mame_device *>(device);
 		if (device != NULL && m_netlist == NULL)

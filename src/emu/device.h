@@ -239,6 +239,7 @@ public:
 
 	void set_default_bios(UINT8 bios) { m_default_bios = bios; }
 	void set_system_bios(UINT8 bios) { m_system_bios = bios; }
+	bool findit(bool isvalidation = false);
 
 protected:
 	// internal helper classes (defined below)
@@ -358,7 +359,7 @@ public:
 	virtual ~finder_base();
 
 	// getters
-	virtual bool findit() = 0;
+	virtual bool findit(bool isvalidation = false) = 0;
 
 protected:
 	// helpers
@@ -415,7 +416,7 @@ public:
 	operator _DeviceClass &() { assert(object_finder_base<_DeviceClass>::m_target != NULL); return *object_finder_base<_DeviceClass>::m_target; }
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
 		device_t *device = this->m_base.subdevice(this->m_tag);
 		this->m_target = dynamic_cast<_DeviceClass *>(device);
@@ -460,8 +461,9 @@ public:
 	operator memory_region &() { assert(object_finder_base<memory_region>::m_target != NULL); return *object_finder_base<memory_region>::m_target; }
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
+		if (isvalidation) return true;
 		m_target = m_base.memregion(m_tag);
 		return this->report_missing(m_target != NULL, "memory region", _Required);
 	}
@@ -497,8 +499,9 @@ public:
 	operator memory_bank &() { assert(object_finder_base<memory_bank>::m_target != NULL); return *object_finder_base<memory_bank>::m_target; }
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
+		if (isvalidation) return true;
 		m_target = m_base.membank(m_tag);
 		return this->report_missing(m_target != NULL, "memory bank", _Required);
 	}
@@ -534,8 +537,9 @@ public:
 	operator ioport_port &() { assert(object_finder_base<ioport_port>::m_target != NULL); return *object_finder_base<ioport_port>::m_target; }
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
+		if (isvalidation) return true;
 		m_target = m_base.ioport(m_tag);
 		return this->report_missing(m_target != NULL, "I/O port", _Required);
 	}
@@ -593,8 +597,9 @@ public:
 	}
 
 	// finder
-	virtual bool findit()
+	virtual bool findit(bool isvalidation = false)
 	{
+		if (isvalidation) return true;
 		this->m_target = reinterpret_cast<_PointerType *>(this->find_memory(m_width, m_bytes, _Required));
 		return this->report_missing(this->m_target != NULL, "shared pointer", _Required);
 	}

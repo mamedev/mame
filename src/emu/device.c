@@ -384,6 +384,18 @@ void device_t::set_machine(running_machine &machine)
 	m_save = &machine.save();
 }
 
+//-------------------------------------------------
+//  findit - seach for all objects in auto finder
+//  list and return status
+//-------------------------------------------------
+
+bool device_t::findit(bool find_all)
+{
+	bool allfound = true;
+	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
+		allfound &= autodev->findit(find_all);
+	return allfound;
+}
 
 //-------------------------------------------------
 //  start - start a device
@@ -395,10 +407,7 @@ void device_t::start()
 	m_region = machine().root_device().memregion(tag());
 
 	// find all the registered devices
-	bool allfound = true;
-	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
-		allfound &= autodev->findit();
-	if (!allfound)
+	if (!findit(false))
 		throw emu_fatalerror("Missing some required objects, unable to proceed");
 
 	// let the interfaces do their pre-work
