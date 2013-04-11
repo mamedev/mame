@@ -1022,7 +1022,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(playmark_state,playmark)
 {
-	m_oki = machine().device<okim6295_device>("oki");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
 	save_item(NAME(m_bgscrollx));

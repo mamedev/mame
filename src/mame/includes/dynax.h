@@ -13,9 +13,10 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_dsw_sel16(*this, "dsw_sel16"),
 			m_protection1(*this, "protection1"),
-			m_protection2(*this, "protection2"),
+			m_protection2(*this, "protection2"),						
 			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu")
+			m_soundcpu(*this, "soundcpu"),
+			m_oki(*this, "oki")
 		{ }
 
 	// up to 8 layers, 2 images per layer (interleaved on screen)
@@ -160,7 +161,7 @@ public:
 	optional_device<cpu_device> m_soundcpu;
 	device_t *m_rtc;
 	device_t *m_ymsnd;
-	okim6295_device *m_oki;
+	optional_device<okim6295_device> m_oki;
 	device_t *m_top_scr;
 	device_t *m_bot_scr;
 	DECLARE_WRITE8_MEMBER(dynax_vblank_ack_w);

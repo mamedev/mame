@@ -9292,8 +9292,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ddenlovr_state,ddenlovr)
 {
-	m_oki = machine().device<okim6295_device>("oki");
-
 	save_item(NAME(m_input_sel));
 	save_item(NAME(m_dsw_sel));
 	save_item(NAME(m_keyb));

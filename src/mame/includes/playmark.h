@@ -12,6 +12,7 @@ public:
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
+		m_oki(*this, "oki"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") { }
 
@@ -50,7 +51,7 @@ public:
 	int         m_old_oki_bank;
 
 	/* devices */
-	okim6295_device *m_oki;
+	required_device<okim6295_device> m_oki;
 	eeprom_device *m_eeprom;
 	DECLARE_WRITE16_MEMBER(coinctrl_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_coin_eeprom_w);
