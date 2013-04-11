@@ -497,11 +497,9 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 
 				switch( GTE_FUNCT( op ) )
 				{
+				case 0x00:
 				case 0x01:
-					if( INS_COFUN( op ) == 0x0180001 )
-					{
-						sprintf( buffer, "rtps" );
-					}
+					sprintf( buffer, "rtps%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x06:
 					sprintf( buffer, "nclip" );
@@ -516,53 +514,29 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 					sprintf( buffer, "intpl%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x12:
-					if( GTE_OP( op ) == 0x04 )
-					{
-						sprintf( buffer, "mvmva%s%s %s + %s * %s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ],
-							s_gtecv[ GTE_CV( op ) ], s_gtemx[ GTE_MX( op ) ], s_gtev[ GTE_V( op ) ] );
-					}
+					sprintf( buffer, "mvmva%s%s %s + %s * %s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ],
+						s_gtecv[ GTE_CV( op ) ], s_gtemx[ GTE_MX( op ) ], s_gtev[ GTE_V( op ) ] );
 					break;
 				case 0x13:
-					if( INS_COFUN( op ) == 0x0e80413 )
-					{
-						sprintf( buffer, "ncds" );
-					}
+					sprintf( buffer, "ncds%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x14:
-					if( INS_COFUN( op ) == 0x1280414 )
-					{
-						sprintf( buffer, "cdp" );
-					}
+					sprintf( buffer, "cdp%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x16:
-					if( INS_COFUN( op ) == 0x0f80416 )
-					{
-						sprintf( buffer, "ncdt" );
-					}
+					sprintf( buffer, "ncdt%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x1b:
-					if( INS_COFUN( op ) == 0x108041b )
-					{
-						sprintf( buffer, "nccs" );
-					}
+					sprintf( buffer, "nccs%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x1c:
-					if( INS_COFUN( op ) == 0x138041c )
-					{
-						sprintf( buffer, "cc" );
-					}
+					sprintf( buffer, "cc%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x1e:
-					if( INS_COFUN( op ) == 0x0c8041e )
-					{
-						sprintf( buffer, "ncs" );
-					}
+					sprintf( buffer, "ncs%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x20:
-					if( INS_COFUN( op ) == 0x0d80420 )
-					{
-						sprintf( buffer, "nct" );
-					}
+					sprintf( buffer, "nct%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x28:
 					sprintf( buffer, "sqr%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
@@ -580,26 +554,16 @@ unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UIN
 					sprintf( buffer, "avsz4" );
 					break;
 				case 0x30:
-					if( INS_COFUN( op ) == 0x0280030 )
-					{
-						sprintf( buffer, "rtpt" );
-					}
+					sprintf( buffer, "rtpt%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x3d:
 					sprintf( buffer, "gpf%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x3e:
-					if( GTE_OP( op ) == 0x1a )
-					{
-						sprintf( buffer, "gpl%s", s_gtesf[ GTE_SF( op ) ] );
-					}
+					sprintf( buffer, "gpl%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				case 0x3f:
-					if( INS_COFUN( op ) == 0x108043f ||
-						INS_COFUN( op ) == 0x118043f )
-					{
-						sprintf( buffer, "ncct" );
-					}
+					sprintf( buffer, "ncct%s%s", s_gtesf[ GTE_SF( op ) ], s_gtelm[ GTE_LM( op ) ] );
 					break;
 				}
 			}
