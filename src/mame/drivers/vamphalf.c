@@ -77,7 +77,8 @@ public:
 			m_wram(*this,"wram"),
 			m_tiles32(*this,"tiles32"),
 			m_wram32(*this,"wram32"),
-			m_maincpu(*this, "maincpu") {
+			m_maincpu(*this, "maincpu"),
+			m_oki(*this, "oki") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -167,6 +168,7 @@ public:
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -288,8 +290,7 @@ F94B
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data & 0x300) >> 8));
+	m_oki->set_bank_base(0x40000 * ((data & 0x300) >> 8));
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_bank_w)
@@ -333,9 +334,8 @@ WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 
 WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	if(offset)
-		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x7));
+		m_oki->set_bank_base(0x40000 * (data & 0x7));
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)

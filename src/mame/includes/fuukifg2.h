@@ -1,4 +1,4 @@
-
+#include "sound/okim6295.h"
 
 class fuuki16_state : public driver_device
 {
@@ -11,7 +11,8 @@ public:
 		m_unknown(*this, "unknown"),
 		m_priority(*this, "priority"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki"){ }
 
 	/* memory pointers */
 	required_shared_ptr_array<UINT16,4> m_vram;
@@ -54,4 +55,5 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void fuuki16_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
+	required_device<okim6295_device> m_oki;
 };

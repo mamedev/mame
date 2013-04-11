@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "video/bufsprite.h"
+#include "sound/okim6295.h"
 
 struct pf_layer_info
 {
@@ -23,7 +24,8 @@ public:
 			m_vram_data(*this, "vram_data"),
 			m_spritecontrol(*this, "spritecontrol"),
 			m_maincpu(*this, "maincpu"),
-			m_soundcpu(*this, "soundcpu")
+			m_soundcpu(*this, "soundcpu"),
+			m_oki(*this, "oki")
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
@@ -84,6 +86,7 @@ public:
 	void m92_update_scroll_positions();
 	void m92_draw_tiles(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void m92_sprite_interrupt();
+	optional_device<okim6295_device> m_oki;
 };
 
 /*----------- defined in drivers/m92.c -----------*/

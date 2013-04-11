@@ -375,8 +375,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(m92_state::oki_bank_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data+1) & 0x3)); // +1?
+	m_oki->set_bank_base(0x40000 * ((data+1) & 0x3)); // +1?
 }
 
 static ADDRESS_MAP_START( ppan_portmap, AS_IO, 16, m92_state )

@@ -746,10 +746,9 @@ WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 
 WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
+		m_oki->set_bank_base((data & 1) * 0x40000);
 	}
 }
 

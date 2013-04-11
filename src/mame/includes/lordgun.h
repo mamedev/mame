@@ -3,6 +3,7 @@
                       -= IGS Lord Of Gun =-
 
 *************************************************************************/
+#include "sound/okim6295.h"
 
 struct lordgun_gun_data
 {
@@ -22,7 +23,8 @@ public:
 			m_scroll_x(*this, "scroll_x"),
 			m_scroll_y(*this, "scroll_y") ,
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_oki(*this, "oki") { }
 
 	required_shared_ptr<UINT16> m_priority_ram;
 	required_shared_ptr<UINT16> m_scrollram;
@@ -78,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<okim6295_device> m_oki;
 };
 
 /*----------- defined in video/lordgun.c -----------*/

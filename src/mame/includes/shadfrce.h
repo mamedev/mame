@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class shadfrce_state : public driver_device
 {
 public:
@@ -8,7 +10,8 @@ public:
 		m_bg1videoram(*this, "bg1videoram"),
 		m_spvideoram(*this, "spvideoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
@@ -50,4 +53,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
 };

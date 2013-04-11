@@ -1177,23 +1177,19 @@ static void gakusai_oki_bank_set(device_t *device)
 
 WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 {
-	device_t *device = machine().device("oki");
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_gakusai_oki_bank_hi = data & 0xff;
-		gakusai_oki_bank_set(device);
+		gakusai_oki_bank_set(m_oki);
 	}
 }
 
 WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 {
-	device_t *device = machine().device("oki");
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_gakusai_oki_bank_lo = data & 0xff;
-		gakusai_oki_bank_set(device);
+		gakusai_oki_bank_set(m_oki);
 	}
 }
 

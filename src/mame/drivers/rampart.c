@@ -106,7 +106,7 @@ WRITE16_MEMBER(rampart_state::latch_w)
 	{
 		set_oki6295_volume((data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
-			machine().device("oki")->reset();
+			m_oki->reset();
 		set_ym2413_volume(((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
 			machine().device("ymsnd")->reset();

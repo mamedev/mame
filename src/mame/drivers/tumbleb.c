@@ -605,8 +605,6 @@ void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int da
 
 WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 {
-	device_t *device = machine().device("oki");
-
 	int sound = tumbleb_sound_lookup[data & 0xff];
 
 	if (sound == 0x00)
@@ -616,11 +614,11 @@ WRITE16_MEMBER(tumbleb_state::tumbleb2_soundmcu_w)
 	}
 	else if (sound == -2)
 	{
-		process_tumbleb2_music_command(downcast<okim6295_device *>(device), data);
+		process_tumbleb2_music_command(m_oki, data);
 	}
 	else
 	{
-		tumbleb2_play_sound(downcast<okim6295_device *>(device), sound);
+		tumbleb2_play_sound(m_oki, sound);
 	}
 }
 
@@ -1944,8 +1942,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 {
-	m_oki = machine().device("oki");
-
 	save_item(NAME(m_music_command));
 	save_item(NAME(m_music_bank));
 	save_item(NAME(m_music_is_playing));

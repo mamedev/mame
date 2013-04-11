@@ -267,10 +267,8 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_sw)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7) {
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(0x40000 * (data & 0x7) );
+		m_oki->set_bank_base(0x40000 * (data & 0x7) );
 		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 	}
 }

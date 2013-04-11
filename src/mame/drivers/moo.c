@@ -249,10 +249,9 @@ WRITE16_MEMBER(moo_state::moo_prot_w)
 
 WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	logerror("%x to OKI bank\n", data);
 
-	downcast<okim6295_device *>(device)->set_bank_base((data & 0x0f) * 0x40000);
+	m_oki->set_bank_base((data & 0x0f) * 0x40000);
 }
 
 static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )

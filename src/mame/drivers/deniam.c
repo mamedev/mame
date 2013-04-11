@@ -60,19 +60,15 @@ WRITE16_MEMBER(deniam_state::sound_command_w)
 
 WRITE8_MEMBER(deniam_state::deniam16b_oki_rom_bank_w)
 {
-	device_t *device = machine().device("oki");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
+	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
 }
 
 WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		if ((data&0xFE) != 0) popmessage("OKI bank was not 0 or 1! contact MAMEDEV!");
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((data & 0x01) ? 0x40000 : 0x00000);
+		m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0x00000);
 	}
 }
 

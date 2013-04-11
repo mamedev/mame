@@ -49,12 +49,11 @@ Year + Game         PCB             Notes
 ***************************************************************************/
 
 WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
-{
-	device_t *device = machine().device("oki");
+{	
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
-		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * bank );
+		m_oki->set_bank_base(0x40000 * bank );
 	}
 }
 

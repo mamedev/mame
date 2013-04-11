@@ -124,12 +124,14 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_microtouch(*this,"microtouch"),
 		m_regs(*this, "regs"),
-		m_galgames_ram(*this, "galgames_ram"){ }
+		m_galgames_ram(*this, "galgames_ram"),
+		m_oki(*this, "oki"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_device> m_microtouch;
 	required_shared_ptr<UINT16> m_regs;
 	optional_shared_ptr<UINT16> m_galgames_ram;
+	required_device<okim6295_device> m_oki;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
@@ -201,12 +203,11 @@ public:
 
 WRITE16_MEMBER(tmaster_state::tmaster_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
 		// data & 0x0800?
 		m_okibank = ((data >> 8) & 3);
-		downcast<okim6295_device *>(device)->set_bank_base(m_okibank * 0x40000);
+		m_oki->set_bank_base(m_okibank * 0x40000);
 	}
 
 	if (ACCESSING_BITS_0_7)

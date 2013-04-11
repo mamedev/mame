@@ -36,7 +36,8 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_vram(*this, "vram"),
 		m_control(*this, "control"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram;
@@ -63,6 +64,7 @@ public:
 	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };
 
 
@@ -355,23 +357,22 @@ WRITE16_MEMBER(tickee_state::rapidfir_control_w)
 
 WRITE16_MEMBER(tickee_state::sound_bank_w)
 {
-	device_t *device = machine().device("oki");
 	switch (data & 0xff)
 	{
 		case 0x2c:
-			downcast<okim6295_device *>(device)->set_bank_base(0x00000);
+			m_oki->set_bank_base(0x00000);
 			break;
 
 		case 0x2d:
-			downcast<okim6295_device *>(device)->set_bank_base(0x40000);
+			m_oki->set_bank_base(0x40000);
 			break;
 
 		case 0x1c:
-			downcast<okim6295_device *>(device)->set_bank_base(0x80000);
+			m_oki->set_bank_base(0x80000);
 			break;
 
 		case 0x1d:
-			downcast<okim6295_device *>(device)->set_bank_base(0xc0000);
+			m_oki->set_bank_base(0xc0000);
 			break;
 
 		default:

@@ -156,9 +156,7 @@ ROMs (All ROMs are 27C010 EPROM. - means not populated)
 
 WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
 {
-	device_t *device = machine().device("oki");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_bank_base((data & 1) * 0x40000);
 }
 
 WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)

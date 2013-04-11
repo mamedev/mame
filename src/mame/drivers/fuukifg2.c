@@ -122,14 +122,12 @@ WRITE8_MEMBER(fuuki16_state::fuuki16_sound_rombank_w)
 
 WRITE8_MEMBER(fuuki16_state::fuuki16_oki_banking_w)
 {
-	device_t *device = machine().device("oki");
 	/*
 	    data & 0x06 is always equals to data & 0x60
 	    data & 0x10 is always set
 	*/
 
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base(((data & 6) >> 1) * 0x40000);
+	m_oki->set_bank_base(((data & 6) >> 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8, fuuki16_state )

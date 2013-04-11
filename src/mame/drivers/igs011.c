@@ -86,7 +86,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_priority_ram(*this, "priority_ram"),
-		m_vbowl_trackball(*this, "vbowl_trackball"){ }
+		m_vbowl_trackball(*this, "vbowl_trackball"),
+		m_oki(*this, "oki"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_priority_ram;
@@ -217,6 +218,7 @@ public:
 	void ryukobou_decrypt();
 	void lhb2_decrypt_gfx();
 	void drgnwrld_gfx_decrypt();
+	optional_device<okim6295_device> m_oki;
 };
 
 
@@ -2373,11 +2375,9 @@ WRITE16_MEMBER(igs011_state::lhb_irq_enable_w)
 
 WRITE16_MEMBER(igs011_state::lhb_okibank_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
+		m_oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
 	}
 
 	if ( data & (~0x200) )

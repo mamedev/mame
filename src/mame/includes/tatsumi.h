@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class tatsumi_state : public driver_device
 {
 public:
@@ -23,7 +25,8 @@ public:
 		m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_oki(*this, "oki") { }
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -133,6 +136,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<okim6295_device> m_oki;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

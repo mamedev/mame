@@ -90,10 +90,9 @@ READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
 
 WRITE16_MEMBER(oneshot_state::soundbank_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data & 0x03) ^ 0x03));
+		m_oki->set_bank_base(0x40000 * ((data & 0x03) ^ 0x03));
 	}
 }
 

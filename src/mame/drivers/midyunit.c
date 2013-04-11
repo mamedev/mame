@@ -137,9 +137,8 @@ Notes:
 
 WRITE8_MEMBER(midyunit_state::yawdim_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	if (data & 4)
-		downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
+		m_oki->set_bank_base(0x40000 * (data & 3));
 }
 
 

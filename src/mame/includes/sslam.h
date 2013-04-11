@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class sslam_state : public driver_device
 {
 public:
@@ -9,7 +11,8 @@ public:
 		m_regs(*this, "regs"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	emu_timer *m_music_timer;
 
@@ -58,4 +61,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
 };

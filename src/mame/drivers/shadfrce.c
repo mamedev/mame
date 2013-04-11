@@ -390,8 +390,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_bank_base((data & 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )

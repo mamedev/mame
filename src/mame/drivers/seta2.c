@@ -588,21 +588,19 @@ READ32_MEMBER(seta2_state::funcube_debug_r)
 
 READ32_MEMBER(seta2_state::oki_read)
 {
-	device_t *device = machine().device("oki");
-	return downcast<okim9810_device *>(device)->read_status() << 16;
+	return m_oki->read_status() << 16;
 }
 WRITE32_MEMBER(seta2_state::oki_write)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
 		const UINT8 tmp = (data & 0x000000ff);
-		downcast<okim9810_device *>(device)->write_TMP_register(tmp);
+		m_oki->write_TMP_register(tmp);
 	}
 	else if (ACCESSING_BITS_16_23)
 	{
 		const UINT8 cmd = (data & 0x00ff0000) >> 16;
-		downcast<okim9810_device *>(device)->write_command(cmd);
+		m_oki->write_command(cmd);
 	}
 }
 

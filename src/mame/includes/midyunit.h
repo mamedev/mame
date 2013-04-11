@@ -7,6 +7,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "audio/williams.h"
 #include "machine/nvram.h"
+#include "sound/okim6295.h"
 
 /* protection data types */
 struct protection_data
@@ -38,7 +39,8 @@ public:
 			m_adpcm_sound(*this, "adpcm"),
 			m_gfx_rom(*this, "gfx_rom", 16) ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	optional_device<williams_narc_sound_device> m_narc_sound;
 	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
@@ -113,6 +115,7 @@ public:
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
 };
 /*----------- defined in video/midyunit.c -----------*/
 void midyunit_to_shiftreg(address_space &space, UINT32 address, UINT16 *shiftreg);

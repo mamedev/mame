@@ -351,12 +351,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(snowbros_state::twinadv_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	int bank = (data &0x02)>>1;
 
 	if (data&0xfd) logerror ("Unused bank bits! %02x\n",data);
 
-	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
+	m_oki->set_bank_base(bank * 0x40000);
 }
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )
@@ -471,12 +470,10 @@ void snowbros_state::sb3_play_sound (okim6295_device *oki, int data)
 
 WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 {
-	device_t *device = machine().device("oki");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
 		m_sb3_music_is_playing = 0;
-		oki->write_command(0x78);       /* Stop sounds */
+		m_oki->write_command(0x78);       /* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -484,7 +481,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(oki, data);
+			sb3_play_sound(m_oki, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -494,7 +491,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(oki, data-0x30);
+			sb3_play_sound(m_oki, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)

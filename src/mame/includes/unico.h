@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class unico_state : public driver_device
 {
 public:
@@ -8,7 +10,8 @@ public:
 		m_vram32(*this, "vram32"),
 		m_scroll32(*this, "scroll32"),
 		m_spriteram(*this, "spriteram", 0),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	optional_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_scroll;
@@ -46,4 +49,5 @@ public:
 	void unico_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void zeropnt2_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };

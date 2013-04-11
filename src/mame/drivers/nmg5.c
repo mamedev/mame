@@ -238,7 +238,8 @@ public:
 		m_bitmap(*this, "bitmap"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu")
+		m_soundcpu(*this, "soundcpu"),
+		m_oki(*this, "oki")
 	{ }
 
 	/* memory pointers */
@@ -263,6 +264,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<okim6295_device> m_oki;
 	DECLARE_WRITE16_MEMBER(fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
@@ -337,8 +339,7 @@ WRITE16_MEMBER(nmg5_state::priority_reg_w)
 
 WRITE8_MEMBER(nmg5_state::oki_banking_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
 }
 
 /*******************************************************************

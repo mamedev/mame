@@ -350,7 +350,7 @@ READ8_MEMBER(tatsumi_state::tatsumi_hack_ym2151_r)
 // Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_MEMBER(tatsumi_state::tatsumi_hack_oki_r)
 {
-	int r=downcast<okim6295_device *>(machine().device("oki"))->read(space,0);
+	int r=m_oki->read(space,0);
 
 	if (space.device().safe_pc()==0x2b70 || space.device().safe_pc()==0x2bb5
 		|| space.device().safe_pc()==0x2acc

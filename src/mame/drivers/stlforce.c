@@ -88,8 +88,7 @@ WRITE16_MEMBER(stlforce_state::eeprom_w)
 
 WRITE16_MEMBER(stlforce_state::oki_bank_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data>>8) & 3));
+	m_oki->set_bank_base(0x40000 * ((data>>8) & 3));
 }
 
 static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )

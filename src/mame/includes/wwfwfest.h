@@ -1,4 +1,5 @@
 #include "video/bufsprite.h"
+#include "sound/okim6295.h"
 
 class wwfwfest_state : public driver_device
 {
@@ -10,7 +11,8 @@ public:
 		m_bg1_videoram(*this, "bg1_videoram"),
 		m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	required_shared_ptr<UINT16> m_fg0_videoram;
 	required_shared_ptr<UINT16> m_bg0_videoram;
@@ -50,4 +52,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
 };

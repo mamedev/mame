@@ -310,8 +310,7 @@ WRITE8_MEMBER(cps_state::cps1_snd_bankswitch_w)
 
 WRITE8_MEMBER(cps_state::cps1_oki_pin7_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_pin7(data & 1);
+	m_oki->set_pin7(data & 1);
 }
 
 WRITE16_MEMBER(cps_state::cps1_soundlatch_w)

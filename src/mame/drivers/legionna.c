@@ -224,10 +224,9 @@ ADDRESS_MAP_END
 
 
 WRITE8_MEMBER(legionna_state::okim_rombank_w)
-{
-	device_t *device = machine().device("oki");
+{	
 //  popmessage("%08x",0x40000 * (data & 0x07));
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x7));
+	m_oki->set_bank_base(0x40000 * (data & 0x7));
 }
 
 static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, legionna_state )

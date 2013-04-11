@@ -86,11 +86,9 @@ WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 
 WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base((((~data & 0x0100) >> 8) * 0x40000));
+		m_oki->set_bank_base((((~data & 0x0100) >> 8) * 0x40000));
 	}
 }
 

@@ -3,6 +3,7 @@
     Wild West C.O.W.boys of Moo Mesa / Bucky O'Hare
 
 *************************************************************************/
+#include "sound/okim6295.h"
 
 class moo_state : public driver_device
 {
@@ -12,7 +13,8 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_oki(*this, "oki"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_workram;
@@ -33,6 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<okim6295_device> m_oki;
 	device_t *m_k054539;
 	device_t *m_k053246;
 	device_t *m_k053251;

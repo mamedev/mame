@@ -1,5 +1,6 @@
 #include "video/vsystem_spr.h"
 #include "video/vsystem_spr2.h"
+#include "sound/okim6295.h"
 
 class aerofgt_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_spr_old2(*this, "vsystem_spr_ol2"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1videoram;
@@ -121,4 +123,5 @@ public:
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };

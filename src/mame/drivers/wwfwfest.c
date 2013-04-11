@@ -158,8 +158,7 @@ WRITE16_MEMBER(wwfwfest_state::wwfwfest_scroll_write)
 
 WRITE8_MEMBER(wwfwfest_state::oki_bankswitch_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_bank_base((data & 1) * 0x40000);
 }
 
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)

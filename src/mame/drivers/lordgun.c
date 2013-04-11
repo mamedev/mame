@@ -351,8 +351,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 {
-	device_t *device = machine().device("oki");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
+	m_oki->set_bank_base((data & 2) ? 0x40000 : 0);
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);
 //  popmessage("OKI %x", data);
 }

@@ -14,7 +14,8 @@ public:
 		m_control(*this, "control"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki")
 	{ }
 
 	/* memory pointers */
@@ -43,7 +44,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_oki;
+	required_device<okim6295_device> m_oki;
 	UINT8 m_semicom_prot_offset;
 	UINT16 m_protbase;
 	DECLARE_WRITE16_MEMBER(tumblepb_oki_w);

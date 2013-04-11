@@ -60,7 +60,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -75,6 +76,7 @@ public:
 	UINT32 screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
 };
 
 
@@ -136,12 +138,9 @@ WRITE16_MEMBER(diverboy_state::soundcmd_w)
 
 WRITE8_MEMBER(diverboy_state::okibank_w)
 {
-	device_t *device = machine().device("oki");
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
-
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 3) * 0x40000);
+	m_oki->set_bank_base((data & 3) * 0x40000);
 }
 
 

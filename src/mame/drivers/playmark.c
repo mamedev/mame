@@ -157,15 +157,13 @@ READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 
 WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 {
-	device_t *device = machine().device("oki");
-
 	if (m_old_oki_bank != (data & 7))
 	{
 		m_old_oki_bank = data & 7;
 
 		if (((m_old_oki_bank - 1) * 0x40000) < memregion("oki")->bytes())
 		{
-			downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (m_old_oki_bank - 1));
+			m_oki->set_bank_base(0x40000 * (m_old_oki_bank - 1));
 		}
 	}
 }

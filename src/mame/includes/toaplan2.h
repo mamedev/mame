@@ -7,7 +7,7 @@
 
 // VDP related
 #include "video/gp9001.h"
-
+#include "sound/okim6295.h"
 // Cache the CPUs and VDPs for faster access
 class toaplan2_state : public driver_device
 {
@@ -22,7 +22,8 @@ public:
 		m_tx_gfxram16(*this, "tx_gfxram16"),
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") {
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") {
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;
 	}
@@ -141,4 +142,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbakraid_irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
 };
