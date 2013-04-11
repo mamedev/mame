@@ -904,7 +904,7 @@ DRIVER_INIT_MEMBER(gsword_state,gsword)
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
 #endif
 }
 
@@ -919,7 +919,7 @@ DRIVER_INIT_MEMBER(gsword_state,gsword2)
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8_delegate(FUNC(gsword_state::gsword_hack_r),this));
 #endif
 }
 

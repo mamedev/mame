@@ -352,7 +352,7 @@ C - uses sub board with support for player 3 and 4 controls
 
 WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
 {
-	machine().device("sub")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
+	m_subcpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(namcos1_state::irq_ack_w)

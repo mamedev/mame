@@ -15,7 +15,8 @@ public:
 	namcos1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	int m_dac0_value;
 	int m_dac1_value;
@@ -99,6 +100,7 @@ public:
 	void screen_eof_namcos1(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 /*----------- defined in drivers/namcos1.c -----------*/

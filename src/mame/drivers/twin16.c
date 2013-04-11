@@ -127,7 +127,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 			twin16_spriteram_process();
 
 		if ((old & 0x10) == 0 && (m_CPUA_register & 0x10))
-			machine().device("sub")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
+			m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
 		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
 		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);

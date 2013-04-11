@@ -11,7 +11,8 @@ public:
 		m_tile_gfx_ram(*this, "tile_gfx_ram"),
 		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
@@ -77,4 +78,5 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_subcpu;
 };

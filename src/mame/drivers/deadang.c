@@ -222,10 +222,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::deadang_sub_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc4/4);
 
 	if(scanline == 0) // vblank-in irq
-		machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
+		m_subcpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
 /* Machine Drivers */

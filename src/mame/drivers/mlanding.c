@@ -38,7 +38,8 @@ public:
 		m_ml_dotram(*this, "ml_dotram"),
 		m_mecha_ram(*this, "mecha_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
@@ -85,6 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -336,7 +338,7 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	}
 
 	if(!(data & 0x40)) // unknown line used
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	//data & 0x20 sound cpu?
 
@@ -746,7 +748,7 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 
 void mlanding_state::machine_reset()
 {
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_adpcm_pos = 0;

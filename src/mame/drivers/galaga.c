@@ -746,7 +746,7 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 		case 0x01:  /* IRQ2 */
 			m_sub_irq_mask = data & 1;
 			if (!m_sub_irq_mask)
-				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:  /* NMION */
@@ -754,7 +754,7 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 			break;
 
 		case 0x03:  /* RESET */
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 

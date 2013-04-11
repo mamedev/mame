@@ -1373,7 +1373,7 @@ DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
 	m_maincpu->space(AS_PROGRAM).install_ram(0xe000, 0xe7ff, m_shared_ram);
 
 	/* extra RAM on sub CPU  */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_ram(0x8800, 0x8fff);
+	m_subcpu->space(AS_PROGRAM).install_ram(0x8800, 0x8fff);
 }
 
 

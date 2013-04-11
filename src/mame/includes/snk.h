@@ -14,7 +14,8 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_tx_videoram(*this, "tx_videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	int m_countryc_trackball;
 	int m_last_value[2];
@@ -182,4 +183,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_1);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };

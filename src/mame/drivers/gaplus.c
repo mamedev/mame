@@ -181,7 +181,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
 	int bit = offset & 1;
 	m_sub_irq_mask = bit & 1;
 	if (!bit)
-		machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
@@ -195,7 +195,7 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
 WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 {
 	int bit = !BIT(offset, 11);
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(machine().device("namco"), bit);
 }
@@ -231,7 +231,7 @@ void gaplus_state::machine_reset()
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
 	m_sub_irq_mask = 0;
-	machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
@@ -268,7 +268,7 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)
 {
 	if(m_sub_irq_mask)
-		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)

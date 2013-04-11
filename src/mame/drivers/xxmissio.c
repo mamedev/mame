@@ -35,7 +35,7 @@ WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
 
 		case 0x40:
 			m_status &= ~0x08;
-			machine().device("sub")->execute().set_input_line_and_vector(0, HOLD_LINE, 0x10);
+			m_subcpu->set_input_line_and_vector(0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:

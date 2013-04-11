@@ -45,9 +45,9 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 	}
 
 	if (m_control_word & 0x10)
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x80)
 		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -171,9 +171,9 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 	COMBINE_DATA(&m_control_word);
 
 	if (m_control_word & 0x10)
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x4)
 		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -204,7 +204,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 	*/
 
 	if ((m_control_word & 0x8) == 0 && !(m_last_control & 0x8))
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_IRQ4, ASSERT_LINE);
 //  if (tatsumi_control_w&0x200)
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //  else
@@ -237,7 +237,7 @@ WRITE16_MEMBER(tatsumi_state::roundup5_e0000_w)
 	*/
 
 	COMBINE_DATA(&m_roundup5_e0000_ram[offset]);
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
+	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
 //  logerror("d_68k_e0000_w %06x %04x\n", space.device().safe_pc(), data);
 }
@@ -269,13 +269,13 @@ WRITE16_MEMBER(tatsumi_state::cyclwarr_control_w)
 	if ((m_control_word & 4) == 4 && (m_last_control & 4) == 0)
 	{
 //      logerror("68k 2 halt\n");
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	if ((m_control_word & 4) == 0 && (m_last_control & 4) == 4)
 	{
 //      logerror("68k 2 irq go\n");
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 

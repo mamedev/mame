@@ -864,7 +864,7 @@ MACHINE_RESET_MEMBER(tatsumi_state,apache3)
 	machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	m68k_set_reset_callback(machine().device("sub"), apache3_68000_reset);
+	m68k_set_reset_callback(m_subcpu, apache3_68000_reset);
 }
 
 

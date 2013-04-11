@@ -14,7 +14,8 @@ public:
 			m_customio_3(*this,"customio_3"),
 			m_videoram(*this,"videoram"),
 			m_spriteram(*this,"spriteram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;
@@ -56,4 +57,5 @@ public:
 	void starfield_render(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };

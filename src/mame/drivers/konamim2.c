@@ -206,7 +206,8 @@ public:
 	konamim2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT64> m_main_ram;
 	UINT32 m_vdl0_address;
@@ -257,6 +258,7 @@ public:
 	void cde_handle_reports();
 	void cde_dma_transfer(address_space &space, int channel, int next);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -378,7 +380,7 @@ WRITE64_MEMBER(konamim2_state::unk4_w)
 		if (data & 0x800000)
 		{
 //          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		m_unk20004 = (UINT32)(data);

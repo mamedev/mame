@@ -68,7 +68,8 @@ class atvtrack_state : public driver_device
 public:
 	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu") { }
 
 	DECLARE_READ64_MEMBER(area1_r);
 	DECLARE_WRITE64_MEMBER(area1_w);
@@ -92,6 +93,7 @@ public:
 	UINT32 m_area1_data[4];
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
@@ -146,9 +148,8 @@ WRITE64_MEMBER(atvtrack_state::area1_w)
 //  old = m_area1_data[addr];
 	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
-		if (data & 4) {
-			device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));
-			exec->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		if (data & 4) {			
+			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
 	logerror("Write %08x at %08x ",dat, 0x20000+addr*4+0);
@@ -354,8 +355,7 @@ void atvtrack_state::machine_reset()
 	m_maincpu->set_pc(0x0c7f0000);
 	// set BCR2 to 1
 	sh4_internal_w(as, 0x3001, 1, 0xffffffff);
-	device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));
-	exec->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )

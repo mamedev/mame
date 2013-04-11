@@ -273,7 +273,7 @@ WRITE8_MEMBER(gladiatr_state::gladiator_int_control_w)
 WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -312,7 +312,7 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 {
-	machine().device("sub")->execute().set_input_line(0, HOLD_LINE);
+	m_subcpu->set_input_line(0, HOLD_LINE);
 }
 #endif
 

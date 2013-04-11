@@ -54,7 +54,7 @@ TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
 		if ((param & 1) == 0)
-			machine().device("sub")->execute().set_input_line(0, HOLD_LINE);
+			m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 

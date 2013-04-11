@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
 		m_work_ram_1(*this, "work_ram_1"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT8> m_work_ram;
 	optional_shared_ptr<UINT8> m_work_ram_1;
@@ -109,6 +110,7 @@ public:
 	void ppu_irq_1(int *ppu_regs);
 	void ppu_irq_2(int *ppu_regs);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
 };
 
 /*----------- defined in video/vsnes.c -----------*/

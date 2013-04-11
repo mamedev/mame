@@ -7,7 +7,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scroll_ram(*this, "scroll_ram"),
 		m_video_data(*this, "video_data"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -38,4 +39,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(deadang_sub_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };

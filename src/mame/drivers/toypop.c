@@ -136,12 +136,12 @@ WRITE8_MEMBER(toypop_state::toypop_sound_assert_w)
 
 WRITE8_MEMBER(toypop_state::toypop_m68000_clear_w)
 {
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(toypop_state::toypop_m68000_assert_w)
 {
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void toypop_state::machine_reset()

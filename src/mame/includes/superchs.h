@@ -16,7 +16,8 @@ public:
 		m_ram(*this,"ram"),
 		m_spriteram(*this,"spriteram"),
 		m_shared_ram(*this,"shared_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	UINT16 m_coin_word;
 	required_shared_ptr<UINT32> m_ram;
@@ -41,4 +42,5 @@ public:
 	UINT32 screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };

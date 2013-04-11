@@ -5,7 +5,8 @@ class segas24_state : public driver_device
 public:
 	segas24_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu")  { }
 
 
 	static const UINT8  mahmajn_mlt[8];
@@ -120,4 +121,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_vbl);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };

@@ -265,7 +265,7 @@ WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 		case 0x04:  /* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x05:  /* OUT5 - unused */

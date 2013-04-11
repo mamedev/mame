@@ -687,13 +687,13 @@ void segas24_state::reset_reset()
 	int changed = resetcontrol ^ prev_resetcontrol;
 	if(changed & 2) {
 		if(resetcontrol & 2) {
-			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 //          mame_printf_debug("enable 2nd cpu!\n");
 //          debugger_break(machine);
 
 		} else
-			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	if(changed & 4)
 		machine().device("ymsnd")->reset();
@@ -757,7 +757,7 @@ WRITE8_MEMBER( segas24_state::frc_w )
 {
 	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
 	m_maincpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
-	machine().device("subcpu")->execute().set_input_line(IRQ_FRC+1, CLEAR_LINE);
+	m_subcpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
 }
 
 
@@ -875,7 +875,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 	if(irq_allow0 & (1 << IRQ_TIMER))
 		m_maincpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 	if(irq_allow1 & (1 << IRQ_TIMER))
-		machine().device("subcpu")->execute().set_input_line(IRQ_TIMER+1, ASSERT_LINE);
+		m_subcpu->set_input_line(IRQ_TIMER+1, ASSERT_LINE);
 
 	if(irq_tmode == 1 || irq_tmode == 2)
 		machine().primary_screen->update_now();
@@ -886,8 +886,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 	irq_sprite = irq_vblank = 0;
 	m_maincpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
 	m_maincpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
-	machine().device("subcpu")->execute().set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
-	machine().device("subcpu")->execute().set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
+	m_subcpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
+	m_subcpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
@@ -896,7 +896,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
 		m_maincpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
 
 	if(irq_allow1 & (1 << IRQ_FRC) && frc_mode == 1)
-		machine().device("subcpu")->execute().set_input_line(IRQ_FRC+1, ASSERT_LINE);
+		m_subcpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
 }
 
 void segas24_state::irq_init()
@@ -946,11 +946,11 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	case 3:
 		irq_allow1 = data & 0x3f;
 		irq_timer_pend1 = 0;
-		machine().device("subcpu")->execute().set_input_line(IRQ_TIMER+1, CLEAR_LINE);
-		machine().device("subcpu")->execute().set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		machine().device("subcpu")->execute().set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		machine().device("subcpu")->execute().set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
-		//machine().device("subcpu")->execute().set_input_line(IRQ_FRC+1, irq_frc && (irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		//m_subcpu->set_input_line(IRQ_FRC+1, irq_frc && (irq_allow1 & (1 << IRQ_FRC)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -974,7 +974,7 @@ READ16_MEMBER(segas24_state::irq_r)
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		machine().device("subcpu")->execute().set_input_line(IRQ_TIMER+1, CLEAR_LINE);
+		m_subcpu->set_input_line(IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	irq_timer_sync();
@@ -1000,7 +1000,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 		m_maincpu->set_input_line(1+irq, ASSERT_LINE);
 
 	if(irq_allow1 & mask)
-		machine().device("subcpu")->execute().set_input_line(1+irq, ASSERT_LINE);
+		m_subcpu->set_input_line(1+irq, ASSERT_LINE);
 
 	if(scanline == 384) {
 		// Ensure one index pulse every 20 frames
@@ -1271,7 +1271,7 @@ void segas24_state::machine_start()
 
 void segas24_state::machine_reset()
 {
-	machine().device("subcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	prev_resetcontrol = resetcontrol = 0x06;
 	fdc_init();
 	curbank = 0;

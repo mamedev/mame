@@ -523,7 +523,7 @@ static const ay8910_interface ay8912_interface =
 WRITE8_MEMBER(astrocde_state::tenpindx_sound_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

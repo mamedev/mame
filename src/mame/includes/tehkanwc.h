@@ -8,7 +8,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	int m_track0[2];
 	int m_track1[2];
@@ -55,4 +56,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tehkanwc_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };

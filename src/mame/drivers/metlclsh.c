@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(metlclsh_state::coin_inserted)
 {
 	if (oldval)
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( metlclsh )

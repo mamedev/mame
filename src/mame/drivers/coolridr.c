@@ -3726,7 +3726,7 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 
 	sh2drc_set_options(m_maincpu, SH2DRC_FASTEST_OPTIONS);
-	sh2drc_set_options(machine().device("sub"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(m_subcpu, SH2DRC_FASTEST_OPTIONS);
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)

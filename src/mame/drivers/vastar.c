@@ -106,7 +106,7 @@ Vsync : 60.58hz
 void vastar_state::machine_reset()
 {
 	/* we must start with the second CPU halted */
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_nmi_mask = 0;
 	m_sprite_priority[0] = 0;
 
@@ -120,7 +120,7 @@ void vastar_state::machine_reset()
 WRITE8_MEMBER(vastar_state::vastar_hold_cpu2_w)
 {
 	/* I'm not sure that this works exactly like this */
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(vastar_state::flip_screen_w)

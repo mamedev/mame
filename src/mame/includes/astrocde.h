@@ -21,7 +21,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_protected_ram(*this, "protected_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_video_config;
@@ -134,6 +135,7 @@ public:
 	void execute_blit(address_space &space);
 	void init_sparklestar();
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_subcpu;
 };
 
 /*----------- defined in audio/wow.c -----------*/

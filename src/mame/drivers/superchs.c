@@ -80,7 +80,7 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
 		if (data&0x8000) m_maincpu->set_input_line(3, HOLD_LINE); /* Guess */
 	}
 
@@ -453,7 +453,7 @@ DRIVER_INIT_MEMBER(superchs_state,superchs)
 {
 	/* Speedup handlers */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x100003, read32_delegate(FUNC(superchs_state::main_cycle_r),this));
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x80000a, 0x80000b, read16_delegate(FUNC(superchs_state::sub_cycle_r),this));
 }
 
 GAMEL( 1992, superchs,         0, superchs, superchs, superchs_state, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

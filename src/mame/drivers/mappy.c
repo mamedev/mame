@@ -588,7 +588,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 		case 0x00:  /* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
-				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:  /* INT ON */
@@ -610,7 +610,7 @@ WRITE8_MEMBER(mappy_state::superpac_latch_w)
 			break;
 
 		case 0x0a:  /* SUB RESET */
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:  /* n.c. */
@@ -632,7 +632,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 		case 0x00:
 			m_sub_irq_mask = bit;
 			if (!bit)
-				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:
@@ -657,7 +657,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 			break;
 
 		case 0x0a:
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
@@ -680,7 +680,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 		case 0x00:  /* INT ON 2 */
 			m_sub_irq_mask = bit;
 			if (!bit)
-				machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x02:  /* INT ON */
@@ -703,7 +703,7 @@ WRITE8_MEMBER(mappy_state::mappy_latch_w)
 			break;
 
 		case 0x0a:  /* SUB RESET */
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:  /* n.c. */
@@ -874,7 +874,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
 {
 	if(m_sub_irq_mask)
-		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
@@ -2252,7 +2252,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the DAC might be built-in after all.
 	  */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
 }
 
 DRIVER_INIT_MEMBER(mappy_state,digdug2)

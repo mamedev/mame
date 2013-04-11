@@ -82,7 +82,7 @@ WRITE8_MEMBER(flower_state::flower_maincpu_irq_ack)
 
 WRITE8_MEMBER(flower_state::flower_subcpu_irq_ack)
 {
-	machine().device("subcpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(flower_state::flower_soundcpu_irq_ack)

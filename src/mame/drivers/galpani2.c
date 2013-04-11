@@ -107,7 +107,7 @@ static void galpani2_write_kaneko(device_t *device)
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
-	address_space &dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
+	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
@@ -115,13 +115,13 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 		mcu_data    =   srcspace.read_byte(mcu_address );
 		dstspace.write_byte(mcu_address-0x10, mcu_data);
 	}
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
+	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
 void galpani2_state::galpani2_mcu_nmi1()
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
-	address_space &dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
+	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )

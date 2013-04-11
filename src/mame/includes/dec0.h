@@ -14,7 +14,8 @@ public:
 		m_tilegen3(*this, "tilegen3"),
 		m_spritegen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -94,6 +95,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq2);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_subcpu;
 };
 
 

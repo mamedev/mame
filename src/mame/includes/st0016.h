@@ -4,8 +4,8 @@ class st0016_state : public driver_device
 public:
 	st0016_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	int mux_port;
 	UINT32 m_st0016_rom_bank;
@@ -43,6 +43,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void st0016_save_init();
 	void draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority);
+	optional_device<cpu_device> m_subcpu;
 };
 
 #define ISMACS  (st0016_game&0x80)

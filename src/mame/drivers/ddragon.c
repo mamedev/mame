@@ -149,8 +149,6 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	m_sub_cpu = machine().device("sub");
-	m_snd_cpu = m_soundcpu;
 	m_adpcm_1 = machine().device("adpcm1");
 	m_adpcm_2 = machine().device("adpcm2");
 
@@ -195,7 +193,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_bankswitch_w)
 	if (data & 0x10)
 		m_dd_sub_cpu_busy = 0;
 	else if (m_dd_sub_cpu_busy == 0)
-		m_sub_cpu->execute().set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		m_subcpu->set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	membank("bank1")->set_entry((data & 0xe0) >> 5);
 }
@@ -270,7 +268,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
 	if (data & 0x10)
 		m_dd_sub_cpu_busy = 0;
 	else if (m_dd_sub_cpu_busy == 0)
-		m_sub_cpu->execute().set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		m_subcpu->set_input_line(m_sprite_irq, (m_sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -305,7 +303,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 
 		case 3: /* 380e - SND irq */
 			soundlatch_byte_w(space, 0, data);
-			m_snd_cpu->execute().set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			m_soundcpu->set_input_line(m_sound_irq, (m_sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -317,7 +315,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_interrupt_w)
 
 WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_ack_w)
 {
-	m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE );
+	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE );
 }
 
 
@@ -329,7 +327,7 @@ WRITE8_MEMBER(ddragon_state::ddragon2_sub_irq_w)
 
 WRITE_LINE_MEMBER(ddragon_state::irq_handler)
 {
-	m_snd_cpu->execute().set_input_line(m_ym_irq , state ? ASSERT_LINE : CLEAR_LINE );
+	m_soundcpu->set_input_line(m_ym_irq , state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -371,7 +369,7 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 		if (data & 3)
 		{
 			m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-			m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE);
+			m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -396,7 +394,7 @@ READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 {
-	if (&space.device() == m_sub_cpu && offset == 0)
+	if (&space.device() == m_subcpu && offset == 0)
 		m_dd_sub_cpu_busy = 1;
 
 	m_spriteram[offset] = data;
@@ -558,7 +556,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(ddragon_state::ddragonba_port_w)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-	m_sub_cpu->execute().set_input_line(m_sprite_irq, CLEAR_LINE );
+	m_subcpu->set_input_line(m_sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )

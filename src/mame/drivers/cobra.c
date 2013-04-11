@@ -1233,7 +1233,7 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 	{
 		case cobra_fifo::EVENT_EMPTY:
 		{
-			machine().device("subcpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// give sub cpu a bit more time to stabilize on the current fifo status
 			m_maincpu->spin_until_time(attotime::from_usec(1));
@@ -1427,7 +1427,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		if (!m_m2s_int_mode)
 			m_main_int_active &= ~MAIN_INT_M2S;
 
-		space.machine().device("subcpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		// EXISR needs to update for the *next* instruction during FIFO tests
 		// TODO: try to abort the timeslice before the next instruction?

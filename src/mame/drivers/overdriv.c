@@ -302,7 +302,7 @@ void overdriv_state::machine_reset()
 	m_road_colorbase[1] = 0;
 
 	/* start with cpu B halted */
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const k053252_interface overdriv_k053252_intf =

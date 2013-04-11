@@ -333,13 +333,13 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 
 		// Bit 0 : SUBINT
 		if ( (m_irqctrl & 1) && (!(data & 1)) ) // 1->0 transition
-			machine().device("sub")->execute().set_input_line(4, HOLD_LINE);
+			m_subcpu->set_input_line(4, HOLD_LINE);
 
 		// Bit 1 : NSUBRST
 		if (data & 2)
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST

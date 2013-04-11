@@ -98,9 +98,9 @@ TO DO :
 WRITE8_MEMBER(tehkanwc_state::sub_cpu_halt_w)
 {
 	if (data)
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

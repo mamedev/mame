@@ -560,9 +560,9 @@ DRIVER_INIT_MEMBER(tnzs_state,insectx)
 	m_mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_port(0xc000, 0xc000, "IN0" );
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_port(0xc001, 0xc001, "IN1" );
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_port(0xc002, 0xc002, "IN2" );
+	m_subcpu->space(AS_PROGRAM).install_read_port(0xc000, 0xc000, "IN0" );
+	m_subcpu->space(AS_PROGRAM).install_read_port(0xc001, 0xc001, "IN1" );
+	m_subcpu->space(AS_PROGRAM).install_read_port(0xc002, 0xc002, "IN2" );
 }
 
 DRIVER_INIT_MEMBER(tnzs_state,kageki)

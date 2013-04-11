@@ -235,7 +235,8 @@ public:
 		m_gfx1_vram(*this, "gfx1_vram"),
 		m_gfx1_cram(*this, "gfx1_cram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
@@ -273,6 +274,7 @@ public:
 	INTERRUPT_GEN_MEMBER(witch_sub_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -940,7 +942,7 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	UINT8 *ROM = (UINT8 *)memregion("maincpu")->base();
 	membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
 
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 	m_bank = -1;
 }
 

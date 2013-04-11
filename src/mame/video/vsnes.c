@@ -24,7 +24,7 @@ void vsnes_state::ppu_irq_1(int *ppu_regs)
 
 void vsnes_state::ppu_irq_2(int *ppu_regs)
 {
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

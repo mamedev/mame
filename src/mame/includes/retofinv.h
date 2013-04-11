@@ -7,7 +7,8 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	UINT8 m_cpu2_m6000;
 	required_shared_ptr<UINT8> m_fg_videoram;
@@ -69,4 +70,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };

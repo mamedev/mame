@@ -240,7 +240,7 @@ WRITE8_MEMBER(xain_state::xain_main_irq_w)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		machine().device("sub")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -252,7 +252,7 @@ WRITE8_MEMBER(xain_state::xain_irqA_assert_w)
 
 WRITE8_MEMBER(xain_state::xain_irqB_clear_w)
 {
-	machine().device("sub")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 READ8_MEMBER(xain_state::xain_68705_r)

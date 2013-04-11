@@ -9,7 +9,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_textram(*this, "textram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -73,4 +74,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };

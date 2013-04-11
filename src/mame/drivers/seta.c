@@ -1545,7 +1545,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
-					machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+					m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				m_sub_ctrl_data = data;
 			}
 			break;
@@ -1704,7 +1704,7 @@ WRITE16_MEMBER(seta_state::calibr50_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
 	}
 }

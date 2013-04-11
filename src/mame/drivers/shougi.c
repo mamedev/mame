@@ -93,7 +93,8 @@ public:
 	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enabled;
@@ -115,6 +116,7 @@ public:
 	UINT32 screen_update_shougi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(shougi_vblank_nmi);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -266,7 +268,7 @@ WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(shougi_state::nmi_enable_w)
@@ -280,7 +282,7 @@ INTERRUPT_GEN_MEMBER(shougi_state::shougi_vblank_nmi)
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 

@@ -191,13 +191,15 @@ class tourvision_state : public pce_common_state
 {
 public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag),
+		m_subcpu(*this, "subcpu") { }
 
 	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_a_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_b_w);
 	DECLARE_WRITE8_MEMBER(tourvision_i8155_c_w);
 	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -328,7 +330,7 @@ WRITE8_MEMBER(tourvision_state::tourvision_i8155_c_w)
 
 WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
 {
-	machine().device("subcpu")->execute().set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);
 }
 

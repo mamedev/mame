@@ -10,7 +10,8 @@ public:
 		m_galaga_ram2(*this, "galaga_ram2"),
 		m_galaga_ram3(*this, "galaga_ram3"),
 		m_galaga_starcontrol(*this, "starcontrol"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "sub") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -72,6 +73,7 @@ public:
 
 	static struct star m_star_seed_tab[];
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 class xevious_state : public galaga_state

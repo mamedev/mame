@@ -339,7 +339,7 @@ WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 	m_robocop_shared_ram[offset]=data&0xff;
 
 	if (offset == 0x7ff) /* A control address - not standard ram */
-		machine().device("sub")->execute().set_input_line(0, HOLD_LINE);
+		m_subcpu->set_input_line(0, HOLD_LINE);
 }
 
 /******************************************************************************/

@@ -38,7 +38,7 @@ Notes:
 
 WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
 {
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
@@ -80,7 +80,7 @@ WRITE8_MEMBER(retofinv_state::irq1_ack_w)
 {
 	m_sub_irq_mask = data & 1;
 	if (!m_sub_irq_mask)
-		machine().device("sub")->execute().set_input_line(0, CLEAR_LINE);
+		m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::coincounter_w)

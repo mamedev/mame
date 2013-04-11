@@ -984,7 +984,7 @@ DRIVER_INIT_MEMBER(vsnes_state,bnglngby)
 
 WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking)
 {
-	device_t *other_cpu = (&space.device() == m_maincpu) ? machine().device("sub") : m_maincpu;
+	device_t *other_cpu = (&space.device() == m_maincpu) ? m_subcpu : m_maincpu;
 	/* switch vrom */
 	(&space.device() == m_maincpu) ? membank("bank2")->set_entry(BIT(data, 2)) : membank("bank3")->set_entry(BIT(data, 2));
 
@@ -1004,9 +1004,9 @@ DRIVER_INIT_MEMBER(vsnes_state,vsdual)
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));
-	machine().device("sub")->memory().space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));
 
 	/* shared ram at $6000 */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
-	machine().device("sub")->memory().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
+	m_subcpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);
 }

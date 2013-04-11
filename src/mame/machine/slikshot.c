@@ -488,9 +488,9 @@ TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
 
 	/* this is a big kludge: only allow a reset if the Z80 is stopped */
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
-	if ((data & 0x10) || machine().device("sub")->state().state_int(Z80_PC) == 0x13a)
+	if ((data & 0x10) || m_subcpu->state_int(Z80_PC) == 0x13a)
 	{
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
 		if ((data & 0x10) && !(m_z80_ctrl & 0x10))

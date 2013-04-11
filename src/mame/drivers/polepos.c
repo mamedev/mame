@@ -313,7 +313,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			break;
 
 		case 0x04:  /* RESB */
-			machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:  /* RESA */
@@ -454,7 +454,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
 	{
-		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu->set_input_line(0, ASSERT_LINE);
 		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 	}
 }
@@ -470,7 +470,7 @@ MACHINE_RESET_MEMBER(polepos_state,polepos)
 		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	machine().device("sub")->execute().set_input_line_vector(0, Z8000_NVI);
+	m_subcpu->set_input_line_vector(0, Z8000_NVI);
 	machine().device("sub2")->execute().set_input_line_vector(0, Z8000_NVI);
 }
 
@@ -2003,7 +2003,7 @@ DRIVER_INIT_MEMBER(polepos_state,topracern)
 DRIVER_INIT_MEMBER(polepos_state,polepos2)
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine().device("sub")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),this));
 }
 
 

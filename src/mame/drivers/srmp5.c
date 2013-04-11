@@ -331,7 +331,7 @@ WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
 
 READ32_MEMBER(srmp5_state::irq_ack_clear)
 {
-	machine().device("sub")->execute().set_input_line(R3000_IRQ4, CLEAR_LINE);
+	m_subcpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 

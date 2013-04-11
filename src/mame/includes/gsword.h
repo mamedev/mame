@@ -9,7 +9,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_cpu2_ram(*this, "cpu2_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_shared_ptr<UINT8> m_spritetile_ram;
 	required_shared_ptr<UINT8> m_spritexy_ram;
@@ -53,4 +54,5 @@ public:
 	int gsword_coins_in(void);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_subcpu;
 };

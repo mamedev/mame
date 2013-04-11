@@ -49,7 +49,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_v9938(*this, "v9938") ,
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_subcpu(*this, "sub") { }
 
 	required_device<v9938_device> m_v9938;
 
@@ -79,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 
@@ -115,7 +117,7 @@ TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 {
 	machine().device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(sothello_state::subcpu_halt_set)
@@ -317,7 +319,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sothello_state::irqhandler)
 {
-	machine().device("sub")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(sothello_state::sothello_vdp_interrupt)

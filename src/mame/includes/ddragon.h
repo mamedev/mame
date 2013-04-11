@@ -18,7 +18,8 @@ public:
 		m_scrolly_lo(*this, "scrolly_lo"),
 		m_darktowr_mcu_ports(*this, "darktowr_mcu"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_subcpu(*this, "sub") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -62,9 +63,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
-	device_t *m_snd_cpu;
-	device_t *m_sub_cpu;
+	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_subcpu;
 	device_t *m_adpcm_1;
 	device_t *m_adpcm_2;
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);

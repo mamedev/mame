@@ -18,7 +18,8 @@ public:
 		m_rightram(*this, "rightram"),
 		m_centerram(*this, "centerram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_subcpu(*this, "sub") { }
 
 	UINT8       m_cpu0_out[16];
 	UINT8       m_cpu1_out[16];
@@ -80,6 +81,7 @@ public:
 	void draw_objects(int y, UINT8 *objdata);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
 };
 
 /* Discrete Sound Input Nodes */
