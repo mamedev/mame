@@ -1387,12 +1387,12 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2dkot2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m1",       CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m2",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 1 },
+	{"sf2m3",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2m4",       HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m5",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m6",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m7",       CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
-	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 1 },
+	{"sf2m8",       HACK_B_1,     mapper_S9263B, 0,    0, 0, 2 },
 	{"sf2dongb",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2yyc",      CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2koryu",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
@@ -1828,6 +1828,14 @@ void cps_state::cps1_get_video_base()
 		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
 		scroll1xoff = -0x0c;
 		scroll2xoff = -0x0e;
+		scroll3xoff = -0x10;
+	}
+	else
+	if (m_game_config->bootleg_kludge == 2)
+	{
+		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
+		scroll1xoff = -0x0c;
+		scroll2xoff = -0x10;
 		scroll3xoff = -0x10;
 	}
 
@@ -2298,7 +2306,7 @@ void cps_state::cps1_render_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 	UINT16 *base = m_buffered_obj;
 
 	/* some sf2 hacks draw the sprites in reverse order */
-	if (m_game_config->bootleg_kludge == 1)
+	if ((m_game_config->bootleg_kludge == 1) || (m_game_config->bootleg_kludge == 2))
 	{
 		base += m_last_sprite_offset;
 		baseadd = -4;
