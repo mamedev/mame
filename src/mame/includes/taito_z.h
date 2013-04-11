@@ -16,7 +16,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub")
+		m_subcpu(*this, "sub"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	/* memory pointers */
@@ -37,7 +38,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	eeprom_device *m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	device_t *m_tc0480scp;
 	device_t *m_tc0150rod;
 	device_t *m_tc0100scn;

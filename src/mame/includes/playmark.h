@@ -13,6 +13,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
 		m_oki(*this, "oki"),
+		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") { }
 
@@ -52,7 +53,7 @@ public:
 
 	/* devices */
 	required_device<okim6295_device> m_oki;
-	eeprom_device *m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	DECLARE_WRITE16_MEMBER(coinctrl_w);
 	DECLARE_WRITE16_MEMBER(wbeachvl_coin_eeprom_w);
 	DECLARE_WRITE16_MEMBER(hotmind_coin_eeprom_w);

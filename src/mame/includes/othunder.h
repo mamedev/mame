@@ -26,7 +26,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this,"spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -43,7 +44,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	eeprom_device *m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	device_t *m_tc0220ioc;
 	device_t *m_tc0100scn;
 	device_t *m_tc0110pcr;

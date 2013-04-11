@@ -3029,7 +3029,6 @@ void taitoz_state::taitoz_postload()
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
 {
-	m_eeprom = machine().device<eeprom_device>("eeprom");
 	m_tc0100scn = machine().device("tc0100scn");
 	m_tc0150rod = machine().device("tc0150rod");
 	m_tc0480scp = machine().device("tc0480scp");

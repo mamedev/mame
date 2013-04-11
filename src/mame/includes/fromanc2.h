@@ -1,3 +1,4 @@
+#include "machine/eeprom.h"
 
 class fromanc2_state : public driver_device
 {
@@ -5,7 +6,8 @@ public:
 	fromanc2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") ,
+		m_subcpu(*this, "sub"),
+		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -31,7 +33,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
-	device_t *m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	device_t *m_left_screen;
 	device_t *m_right_screen;
 	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);

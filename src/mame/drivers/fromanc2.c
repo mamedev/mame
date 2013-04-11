@@ -501,7 +501,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 {
-	m_eeprom = machine().device("eeprom");
 	m_left_screen = machine().device("lscreen");
 	m_right_screen = machine().device("rscreen");
 

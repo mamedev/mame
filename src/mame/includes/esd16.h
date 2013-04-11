@@ -21,6 +21,7 @@ public:
 		m_headpanic_platform_x(*this, "platform_x"),
 		m_headpanic_platform_y(*this, "platform_y"),
 		m_sprgen(*this, "spritegen"),
+		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") {
 		m_tilemap0_color = 0;
@@ -48,7 +49,7 @@ public:
 	int           m_tilemap1_color;
 
 	/* devices */
-	eeprom_device *m_eeprom;
+	optional_device<eeprom_device> m_eeprom;
 	DECLARE_WRITE16_MEMBER(esd16_sound_command_w);
 	DECLARE_WRITE16_MEMBER(hedpanic_platform_w);
 	DECLARE_READ16_MEMBER(esd_eeprom_r);

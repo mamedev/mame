@@ -1022,8 +1022,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(playmark_state,playmark)
 {
-	m_eeprom = machine().device<eeprom_device>("eeprom");
-
 	save_item(NAME(m_bgscrollx));
 	save_item(NAME(m_bgscrolly));
 	save_item(NAME(m_bg_enable));

@@ -664,7 +664,6 @@ void othunder_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_eeprom = machine().device<eeprom_device>("eeprom");
 	m_tc0220ioc = machine().device("tc0220ioc");
 	m_tc0100scn = machine().device("tc0100scn");
 	m_tc0110pcr = machine().device("tc0110pcr");
