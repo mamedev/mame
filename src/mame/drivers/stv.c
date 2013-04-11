@@ -333,8 +333,8 @@ void stv_state::install_stvbios_speedups( void )
 	sh2drc_add_pcflush(m_maincpu, 0x60154b2);
 	sh2drc_add_pcflush(m_maincpu, 0x6013aee);
 
-	sh2drc_add_pcflush(machine().device("slave"), 0x60154b2);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6013aee);
+	sh2drc_add_pcflush(m_slave, 0x60154b2);
+	sh2drc_add_pcflush(m_slave, 0x6013aee);
 }
 
 DRIVER_INIT_MEMBER(stv_state,stv)
@@ -359,7 +359,7 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	// cottonbm needs strict PCREL
 	// todo: test what games need this and don't turn it on for them...
 	sh2drc_set_options(m_maincpu, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(m_slave, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
@@ -436,7 +436,7 @@ DRIVER_INIT_MEMBER(stv_state,shienryu)
 	// master
 	sh2drc_add_pcflush(m_maincpu, 0x60041c6);
 	// slave
-	sh2drc_add_pcflush(machine().device("slave"), 0x600440e);
+	sh2drc_add_pcflush(m_slave, 0x600440e);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -454,7 +454,7 @@ DRIVER_INIT_MEMBER(stv_state,prikura)
 	// master
 	sh2drc_add_pcflush(m_maincpu, 0x6018640);
 	// slave
-	sh2drc_add_pcflush(machine().device("slave"), 0x6018c6e);
+	sh2drc_add_pcflush(m_slave, 0x6018c6e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -509,7 +509,7 @@ DRIVER_INIT_MEMBER(stv_state,puyosun)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6021cf0);
 
-	sh2drc_add_pcflush(machine().device("slave"), 0x60236fe);
+	sh2drc_add_pcflush(m_slave, 0x60236fe);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -540,7 +540,7 @@ DRIVER_INIT_MEMBER(stv_state,mausuke)
 DRIVER_INIT_MEMBER(stv_state,cottonbm)
 {
 //  sh2drc_add_pcflush(m_maincpu, 0x6030ee2);
-//  sh2drc_add_pcflush(machine().device("slave"), 0x6032b52);
+//  sh2drc_add_pcflush(m_slave, 0x6032b52);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -550,7 +550,7 @@ DRIVER_INIT_MEMBER(stv_state,cottonbm)
 DRIVER_INIT_MEMBER(stv_state,cotton2)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6031c7a);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60338ea);
+	sh2drc_add_pcflush(m_slave, 0x60338ea);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -564,9 +564,9 @@ DRIVER_INIT_MEMBER(stv_state,dnmtdeka)
 	sh2drc_add_pcflush(m_maincpu, 0xd04);
 	sh2drc_add_pcflush(m_maincpu, 0x60051f2);
 
-	sh2drc_add_pcflush(machine().device("slave"), 0x6027c90);
-	sh2drc_add_pcflush(machine().device("slave"), 0xd04);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60051f2);
+	sh2drc_add_pcflush(m_slave, 0x6027c90);
+	sh2drc_add_pcflush(m_slave, 0xd04);
+	sh2drc_add_pcflush(m_slave, 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -578,9 +578,9 @@ DRIVER_INIT_MEMBER(stv_state,diehard)
 	sh2drc_add_pcflush(m_maincpu, 0xd04);
 	sh2drc_add_pcflush(m_maincpu, 0x60051f2);
 
-	sh2drc_add_pcflush(machine().device("slave"), 0x6027c98);
-	sh2drc_add_pcflush(machine().device("slave"), 0xd04);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60051f2);
+	sh2drc_add_pcflush(m_slave, 0x6027c98);
+	sh2drc_add_pcflush(m_slave, 0xd04);
+	sh2drc_add_pcflush(m_slave, 0x60051f2);
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -602,7 +602,7 @@ DRIVER_INIT_MEMBER(stv_state,groovef)
 	sh2drc_add_pcflush(m_maincpu, 0x6005e86);
 	sh2drc_add_pcflush(m_maincpu, 0x60a4970);
 
-	sh2drc_add_pcflush(machine().device("slave"), 0x60060c2);
+	sh2drc_add_pcflush(m_slave, 0x60060c2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -614,7 +614,7 @@ DRIVER_INIT_MEMBER(stv_state,danchih)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6028b28);
 	sh2drc_add_pcflush(m_maincpu, 0x6028c8e);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602ae26);
+	sh2drc_add_pcflush(m_slave, 0x602ae26);
 
 	DRIVER_INIT_CALL(stvmp);
 
@@ -625,7 +625,7 @@ DRIVER_INIT_MEMBER(stv_state,danchiq)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6028b28);
 	sh2drc_add_pcflush(m_maincpu, 0x6028c8e);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602ae26);
+	sh2drc_add_pcflush(m_slave, 0x602ae26);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -646,7 +646,7 @@ DRIVER_INIT_MEMBER(stv_state,thunt)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x602A024);
 	sh2drc_add_pcflush(m_maincpu, 0x6013EEA);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602AAF8);
+	sh2drc_add_pcflush(m_slave, 0x602AAF8);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -657,7 +657,7 @@ DRIVER_INIT_MEMBER(stv_state,sandor)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x602a0f8);
 	sh2drc_add_pcflush(m_maincpu, 0x6013fbe);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602abcc);
+	sh2drc_add_pcflush(m_slave, 0x602abcc);
 
 	DRIVER_INIT_CALL(stv);
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(1);
@@ -666,7 +666,7 @@ DRIVER_INIT_MEMBER(stv_state,sandor)
 DRIVER_INIT_MEMBER(stv_state,grdforce)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6041e32);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6043aa2);
+	sh2drc_add_pcflush(m_slave, 0x6043aa2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -676,7 +676,7 @@ DRIVER_INIT_MEMBER(stv_state,grdforce)
 DRIVER_INIT_MEMBER(stv_state,batmanfr)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x60121c0);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60125bc);
+	sh2drc_add_pcflush(m_slave, 0x60125bc);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -686,7 +686,7 @@ DRIVER_INIT_MEMBER(stv_state,batmanfr)
 
 DRIVER_INIT_MEMBER(stv_state,colmns97)
 {
-	sh2drc_add_pcflush(machine().device("slave"), 0x60298a2);
+	sh2drc_add_pcflush(m_slave, 0x60298a2);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -696,7 +696,7 @@ DRIVER_INIT_MEMBER(stv_state,colmns97)
 DRIVER_INIT_MEMBER(stv_state,winterht)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6098aea);
-	sh2drc_add_pcflush(machine().device("slave"), 0x609ae4e);
+	sh2drc_add_pcflush(m_slave, 0x609ae4e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -706,7 +706,7 @@ DRIVER_INIT_MEMBER(stv_state,winterht)
 DRIVER_INIT_MEMBER(stv_state,seabass)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x602cbfa);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60321ee);
+	sh2drc_add_pcflush(m_slave, 0x60321ee);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -716,7 +716,7 @@ DRIVER_INIT_MEMBER(stv_state,seabass)
 DRIVER_INIT_MEMBER(stv_state,vfremix)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x602c30c);
-	sh2drc_add_pcflush(machine().device("slave"), 0x604c332);
+	sh2drc_add_pcflush(m_slave, 0x604c332);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -726,7 +726,7 @@ DRIVER_INIT_MEMBER(stv_state,vfremix)
 DRIVER_INIT_MEMBER(stv_state,sss)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6026398);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6028cd6);
+	sh2drc_add_pcflush(m_slave, 0x6028cd6);
 
 	install_sss_protection(machine());
 
@@ -738,7 +738,7 @@ DRIVER_INIT_MEMBER(stv_state,sss)
 DRIVER_INIT_MEMBER(stv_state,othellos)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x602bcbe);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602d92e);
+	sh2drc_add_pcflush(m_slave, 0x602d92e);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -747,7 +747,7 @@ DRIVER_INIT_MEMBER(stv_state,othellos)
 
 DRIVER_INIT_MEMBER(stv_state,sasissu)
 {
-	sh2drc_add_pcflush(machine().device("slave"), 0x60710be);
+	sh2drc_add_pcflush(m_slave, 0x60710be);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -779,7 +779,7 @@ DRIVER_INIT_MEMBER(stv_state,sokyugrt)
 DRIVER_INIT_MEMBER(stv_state,znpwfv)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6012ec2);
-	sh2drc_add_pcflush(machine().device("slave"), 0x60175a6);
+	sh2drc_add_pcflush(m_slave, 0x60175a6);
 
 	DRIVER_INIT_CALL(stv);
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_nsec(500);
@@ -788,7 +788,7 @@ DRIVER_INIT_MEMBER(stv_state,znpwfv)
 DRIVER_INIT_MEMBER(stv_state,twcup98)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x605edde);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6062bca);
+	sh2drc_add_pcflush(m_slave, 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 	install_twcup98_protection(machine());
@@ -799,7 +799,7 @@ DRIVER_INIT_MEMBER(stv_state,twcup98)
 DRIVER_INIT_MEMBER(stv_state,smleague)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6063bf4);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6062bca);
+	sh2drc_add_pcflush(m_slave, 0x6062bca);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -822,7 +822,7 @@ DRIVER_INIT_MEMBER(stv_state,finlarch)
 DRIVER_INIT_MEMBER(stv_state,maruchan)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x601ba46);
-	sh2drc_add_pcflush(machine().device("slave"), 0x601ba46);
+	sh2drc_add_pcflush(m_slave, 0x601ba46);
 
 	DRIVER_INIT_CALL(stv);
 
@@ -846,7 +846,7 @@ DRIVER_INIT_MEMBER(stv_state,shanhigw)
 DRIVER_INIT_MEMBER(stv_state,elandore)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x604eac0);
-	sh2drc_add_pcflush(machine().device("slave"), 0x605340a);
+	sh2drc_add_pcflush(m_slave, 0x605340a);
 
 	install_elandore_protection(machine());
 
@@ -857,7 +857,7 @@ DRIVER_INIT_MEMBER(stv_state,elandore)
 DRIVER_INIT_MEMBER(stv_state,rsgun)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x6034d04);
-	sh2drc_add_pcflush(machine().device("slave"), 0x6036152);
+	sh2drc_add_pcflush(m_slave, 0x6036152);
 
 	install_rsgun_protection(machine());
 
@@ -881,7 +881,7 @@ DRIVER_INIT_MEMBER(stv_state,decathlt)
 DRIVER_INIT_MEMBER(stv_state,nameclv3)
 {
 	sh2drc_add_pcflush(m_maincpu, 0x601eb4c);
-	sh2drc_add_pcflush(machine().device("slave"), 0x602b80e);
+	sh2drc_add_pcflush(m_slave, 0x602b80e);
 
 	DRIVER_INIT_CALL(stv);
 }

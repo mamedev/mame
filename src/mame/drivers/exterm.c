@@ -78,13 +78,13 @@
 
 WRITE16_MEMBER(exterm_state::exterm_host_data_w)
 {
-	tms34010_host_w(machine().device("slave"), offset / TOWORD(0x00100000), data);
+	tms34010_host_w(m_slave, offset / TOWORD(0x00100000), data);
 }
 
 
 READ16_MEMBER(exterm_state::exterm_host_data_r)
 {
-	return tms34010_host_r(machine().device("slave"), offset / TOWORD(0x00100000));
+	return tms34010_host_r(m_slave, offset / TOWORD(0x00100000));
 }
 
 
