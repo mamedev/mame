@@ -18,7 +18,8 @@ public:
 		m_blaster_palette_0(*this, "blaster_pal0"),
 		m_blaster_scanline_control(*this, "blaster_scan"),
 		m_williams2_tileram(*this, "williams2_tile"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	UINT8 *m_mayday_protection;
@@ -147,6 +148,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mysticm_main_irq);
 	DECLARE_WRITE_LINE_MEMBER(tshoot_main_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 

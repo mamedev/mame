@@ -84,7 +84,8 @@ public:
 		m_sprite_ram(*this,"sprite_ram"),
 		m_vidhw(DKONG_BOARD),
 		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -235,6 +236,7 @@ public:
 	void braze_decrypt_rom(UINT8 *dest);
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
 };
 
 /*----------- defined in audio/dkong.c -----------*/

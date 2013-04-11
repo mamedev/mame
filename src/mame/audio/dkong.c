@@ -1274,9 +1274,9 @@ WRITE8_MEMBER(dkong_state::dkong_p1_w)
 WRITE8_MEMBER(dkong_state::dkong_audio_irq_w)
 {
 	if (data)
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_soundcpu->set_input_line(0, ASSERT_LINE);
 	else
-		machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 

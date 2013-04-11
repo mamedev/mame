@@ -183,7 +183,7 @@ WRITE32_MEMBER(polygonet_state::sound_w)
 
 WRITE32_MEMBER(polygonet_state::sound_irq_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 /* DSP communications */

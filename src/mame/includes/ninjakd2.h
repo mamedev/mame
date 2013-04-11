@@ -10,12 +10,14 @@ public:
 	ninjakd2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	optional_shared_ptr<UINT8> m_bg_videoram;
 	required_shared_ptr<UINT8> m_fg_videoram;
 	required_shared_ptr<UINT8> m_spriteram;

@@ -72,7 +72,8 @@ class roul_state : public driver_device
 public:
 	roul_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	UINT8 m_reg[0x10];
 	UINT8 *m_videobuf;
@@ -85,6 +86,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_roul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -173,7 +175,7 @@ WRITE8_MEMBER(roul_state::blitter_cmd_w)
 WRITE8_MEMBER(roul_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(roul_state::ball_w)

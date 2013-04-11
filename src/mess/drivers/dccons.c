@@ -199,7 +199,7 @@ MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
 
 WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
 {
-	machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const aica_interface dc_aica_interface =

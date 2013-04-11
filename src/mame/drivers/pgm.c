@@ -498,7 +498,7 @@ MACHINE_START_MEMBER(pgm_state,pgm)
 
 MACHINE_RESET_MEMBER(pgm_state,pgm)
 {
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 MACHINE_CONFIG_FRAGMENT( pgmbase )

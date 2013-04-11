@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_data(*this, "video_data"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_shared_ptr<UINT16> m_video_data;
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -57,4 +58,5 @@ public:
 	void dynablsb_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void markdirty(tilemap_t *tmap,int page,offs_t offset);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };

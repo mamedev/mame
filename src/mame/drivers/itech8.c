@@ -628,7 +628,7 @@ WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 
 WRITE_LINE_MEMBER(itech8_state::generate_sound_irq)
 {
-	machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -781,7 +781,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
 {
 	m_sound_data = param;
-	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_soundcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -804,7 +804,7 @@ WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 
 READ8_MEMBER(itech8_state::sound_data_r)
 {
-	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	return m_sound_data;
 }
 

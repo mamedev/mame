@@ -7,7 +7,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	int m_adpcm_pos;
 	int m_adpcm_end;
@@ -54,4 +55,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(tecmo_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };

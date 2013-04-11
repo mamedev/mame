@@ -122,7 +122,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_scrolly(*this, "scrolly"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_shared_ptr<UINT8> m_attr;
 	required_shared_ptr<UINT8> m_vid;
@@ -137,6 +138,7 @@ public:
 	UINT32 screen_update_sub(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(subm_sound_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 void sub_state::video_start()
@@ -250,7 +252,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(sub_state::subm_to_sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(sub_state::nmi_mask_w)
@@ -423,7 +425,7 @@ void sub_state::palette_init()
 INTERRUPT_GEN_MEMBER(sub_state::subm_sound_irq)
 {
 	if(m_nmi_en)
-		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( sub, sub_state )

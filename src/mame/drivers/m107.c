@@ -90,7 +90,7 @@ WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 
 WRITE16_MEMBER(m107_state::m107_soundlatch_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 	soundlatch_byte_w(space, 0, data & 0xff);
 //      logerror("soundlatch_byte_w %02x\n",data);
 }
@@ -102,13 +102,13 @@ READ16_MEMBER(m107_state::m107_sound_status_r)
 
 READ16_MEMBER(m107_state::m107_soundlatch_r)
 {
-	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_irq_ack_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(m107_state::m107_sound_status_w)
@@ -119,7 +119,7 @@ WRITE16_MEMBER(m107_state::m107_sound_status_w)
 
 WRITE16_MEMBER(m107_state::m107_sound_reset_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*****************************************************************************/

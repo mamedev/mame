@@ -340,7 +340,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_bankselect_w)
 WRITE8_MEMBER(ninjakd2_state::ninjakd2_soundreset_w)
 {
 	// bit 4 resets sound CPU
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -867,7 +867,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(ninjakd2_state::irqhandler)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1450,7 +1450,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 
 DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
 {
-	address_space &space = machine().device("soundcpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_soundcpu->space(AS_PROGRAM);
 	space.set_decrypted_region(0x0000, 0x7fff, memregion("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble();

@@ -11,7 +11,8 @@ public:
 		m_k053936_0_linectrl(*this,"k053936_0_line",32),
 		m_k053936_0_ctrl_16(*this,"k053936_0_ct16",16),
 		m_k053936_0_linectrl_16(*this,"k053936_0_li16",16),
-		m_konamigx_type3_psac2_bank(*this,"psac2_bank")
+		m_konamigx_type3_psac2_bank(*this,"psac2_bank"),
+		m_soundcpu(*this, "soundcpu")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -86,6 +87,7 @@ public:
 	INTERRUPT_GEN_MEMBER(tms_sync);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
+	optional_device<cpu_device> m_soundcpu;
 };
 
 

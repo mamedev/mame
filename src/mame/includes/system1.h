@@ -10,7 +10,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;
@@ -122,4 +123,5 @@ public:
 	void bank0c_custom_w(UINT8 data, UINT8 prevdata);
 	void dakkochn_custom_w(UINT8 data, UINT8 prevdata);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };

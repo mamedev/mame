@@ -789,7 +789,7 @@ void dc_state::machine_start()
 void dc_state::machine_reset()
 {
 	/* halt the ARM7 */
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memset(dc_sysctrl_regs, 0, sizeof(dc_sysctrl_regs));
 
@@ -824,12 +824,12 @@ WRITE64_MEMBER(dc_state::dc_aica_reg_w)
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_soundcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
 

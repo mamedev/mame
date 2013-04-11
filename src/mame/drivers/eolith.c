@@ -1469,7 +1469,7 @@ ROM_END
 
 MACHINE_RESET_MEMBER(eolith_state,eolith)
 {
-	machine().device("soundcpu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 DRIVER_INIT_MEMBER(eolith_state,eolith)
@@ -1477,7 +1477,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	init_eolith_speedup(machine());
 
 	// Sound CPU -> QS1000 CPU serial link
-	i8051_set_serial_tx_callback(machine().device("soundcpu"), write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
+	i8051_set_serial_tx_callback(m_soundcpu, write8_delegate(FUNC(eolith_state::soundcpu_to_qs1000),this));
 
 	// Configure the sound ROM banking
 	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);

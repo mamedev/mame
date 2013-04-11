@@ -12,7 +12,8 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	/* 68k-side shared ram */
 	required_shared_ptr<UINT32> m_shared_ram;
@@ -78,4 +79,5 @@ public:
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void reset_sound_region();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };

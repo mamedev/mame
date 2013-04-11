@@ -9,7 +9,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spi_scrollram(*this, "spi_scrollram"),
 		m_spimainram(*this, "spimainram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
@@ -133,6 +134,7 @@ public:
 	void init_rfjet_common();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_soundcpu;
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

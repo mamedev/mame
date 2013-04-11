@@ -68,12 +68,12 @@ WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 WRITE8_MEMBER(tecmo_state::tecmo_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
@@ -605,7 +605,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(tecmo_state::irqhandler)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, state);
+	m_soundcpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1140,9 +1140,9 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 	m_video_type = 2;
 
 	/* no MSM */
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc000, 0xc000);
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc400, 0xc400);
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).nop_write(0xc800, 0xc800);
+	m_soundcpu->space(AS_PROGRAM).nop_write(0xc000, 0xc000);
+	m_soundcpu->space(AS_PROGRAM).nop_write(0xc400, 0xc400);
+	m_soundcpu->space(AS_PROGRAM).nop_write(0xc800, 0xc800);
 }
 
 

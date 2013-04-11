@@ -646,7 +646,7 @@ TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
 {
 	m_sound_data = param;
 	m_sound_int_state = 1;
-	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+	m_soundcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -672,7 +672,7 @@ WRITE32_MEMBER(itech32_state::sound_data32_w)
 
 READ8_MEMBER(itech32_state::sound_data_r)
 {
-	machine().device("soundcpu")->execute().set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
+	m_soundcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 	m_sound_int_state = 0;
 	return m_sound_data;
 }
@@ -769,7 +769,7 @@ static const via6522_interface drivedge_via_interface =
 
 WRITE8_MEMBER(itech32_state::firq_clear_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
+	m_soundcpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

@@ -322,7 +322,8 @@ class corona_state : public driver_device
 public:
 	corona_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	UINT8 m_blitter_x_reg;
 	UINT8 m_blitter_y_reg;
@@ -352,6 +353,7 @@ public:
 	UINT32 screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -493,12 +495,12 @@ UINT32 corona_state::screen_update_luckyrlt(screen_device &screen, bitmap_ind16 
 WRITE8_MEMBER(corona_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_soundcpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(corona_state::sound_latch_r)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 

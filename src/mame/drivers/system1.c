@@ -491,7 +491,7 @@ WRITE8_MEMBER(system1_state::sound_control_w)
 	/* bit 6 = feedback from sound board that read occurrred */
 
 	/* bit 7 controls the sound CPU's NMI line */
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* remaining bits are used for video RAM banking */
 	system1_videoram_bank_w(space, offset, data);
@@ -534,7 +534,7 @@ WRITE8_MEMBER(system1_state::soundport_w)
 TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	machine().device("soundcpu")->execute().set_input_line(0, HOLD_LINE);
+	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 

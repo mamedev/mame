@@ -695,7 +695,7 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 		case 0x1c/2:
 			m_system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				space.machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				m_soundcpu->set_input_line(INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -1047,13 +1047,13 @@ void segas32_state::update_sound_irq_state()
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			machine().device("soundcpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 2 * vector);
+			m_soundcpu->set_input_line_and_vector(0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -4386,7 +4386,7 @@ DRIVER_INIT_MEMBER(segas32_state,radr)
 DRIVER_INIT_MEMBER(segas32_state,scross)
 {
 	segas32_common_init(read16_delegate(FUNC(segas32_state::analog_custom_io_r),this), write16_delegate(FUNC(segas32_state::analog_custom_io_w),this));
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
+	m_soundcpu->space(AS_PROGRAM).install_write_handler(0xb0, 0xbf, write8_delegate(FUNC(segas32_state::scross_bank_w),this));
 
 	m_sw1_output = &segas32_state::scross_sw1_output;
 	m_sw2_output = &segas32_state::scross_sw2_output;

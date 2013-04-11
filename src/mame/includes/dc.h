@@ -16,7 +16,8 @@ class dc_state : public driver_device
 		dc_texture_ram(*this, "dc_texture_ram"),
 		dc_sound_ram(*this, "dc_sound_ram"),
 		dc_ram(*this, "dc_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_shared_ptr<UINT64> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<UINT64> dc_texture_ram; // '64-bit access area'
@@ -113,6 +114,7 @@ class dc_state : public driver_device
 	DECLARE_WRITE64_MEMBER( dc_rtc_w );
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

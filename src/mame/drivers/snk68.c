@@ -107,7 +107,7 @@ WRITE16_MEMBER(snk68_state::sound_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, data >> 8);
-		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -576,7 +576,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(snk68_state::irqhandler)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

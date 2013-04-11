@@ -319,7 +319,7 @@ void powerins_state::machine_reset()
 
 WRITE_LINE_MEMBER(powerins_state::irqhandler)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

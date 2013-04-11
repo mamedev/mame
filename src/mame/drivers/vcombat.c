@@ -99,7 +99,8 @@ public:
 		m_vid_0_shared_ram(*this, "vid_0_ram"),
 		m_vid_1_shared_ram(*this, "vid_1_ram"),
 		m_framebuffer_ctrl(*this, "fb_control"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];
@@ -130,6 +131,7 @@ public:
 	UINT32 screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -565,7 +567,7 @@ INPUT_PORTS_END
 WRITE_LINE_MEMBER(vcombat_state::sound_update)
 {
 	/* Seems reasonable */
-	machine().device("soundcpu")->execute().set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static MC6845_INTERFACE( mc6845_intf )

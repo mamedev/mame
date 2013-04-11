@@ -39,7 +39,8 @@ class bingoc_state : public driver_device
 public:
 	bingoc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	UINT8 m_x;
 	DECLARE_READ16_MEMBER(bingoc_rand_r);
@@ -49,6 +50,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -93,7 +95,7 @@ READ8_MEMBER(bingoc_state::sound_test_r)
 WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
 	soundlatch_byte_w(space,0,data&0xff);
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 

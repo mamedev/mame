@@ -317,7 +317,7 @@ WRITE8_MEMBER(m72_state::m72_mcu_port_w)
 	if (offset == 1)
 	{
 		m_mcu_sample_latch = data;
-		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);
@@ -352,7 +352,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	address_space &io = m_maincpu->space(AS_IO);
-	address_space &sndio = machine().device("soundcpu")->memory().space(AS_IO);
+	address_space &sndio = m_soundcpu->space(AS_IO);
 
 	m_protection_ram = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");

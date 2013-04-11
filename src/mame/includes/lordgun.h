@@ -21,7 +21,8 @@ public:
 			m_vram(*this, "vram"),
 			m_scroll_x(*this, "scroll_x"),
 			m_scroll_y(*this, "scroll_y") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_shared_ptr<UINT16> m_priority_ram;
 	required_shared_ptr<UINT16> m_scrollram;
@@ -76,6 +77,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(soundirq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 /*----------- defined in video/lordgun.c -----------*/

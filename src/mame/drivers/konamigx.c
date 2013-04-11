@@ -506,13 +506,13 @@ WRITE32_MEMBER(konamigx_state::control_w)
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_soundcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_soundcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -3643,7 +3643,7 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	memset(sndto020, 0, 16);
 
 	// sound CPU initially disabled?
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	machine().device("dasp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (!strcmp(machine().system().name, "tkmmpzdm"))

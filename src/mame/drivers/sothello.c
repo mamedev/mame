@@ -48,7 +48,8 @@ public:
 	sothello_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_v9938(*this, "v9938") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_device<v9938_device> m_v9938;
 
@@ -77,6 +78,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	DECLARE_WRITE_LINE_MEMBER(sothello_vdp_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -197,7 +199,7 @@ WRITE8_MEMBER(sothello_state::soundcpu_busyflag_reset_w)
 
 WRITE8_MEMBER(sothello_state::soundcpu_int_clear_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE );
+	m_soundcpu->set_input_line(0, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( soundcpu_mem_map, AS_PROGRAM, 8, sothello_state )
@@ -332,7 +334,7 @@ WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
 	msm5205_data_w(machine().device("msm"), m_msm_data & 0x0f );
-	machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE );
+	m_soundcpu->set_input_line(0, ASSERT_LINE );
 }
 
 

@@ -226,7 +226,7 @@ READ8_MEMBER(tubep_state::tubep_soundlatch_r)
 
 READ8_MEMBER(tubep_state::tubep_sound_irq_ack)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
@@ -299,7 +299,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
+		m_soundcpu->set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
 	}
 
 
@@ -392,7 +392,7 @@ WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
 WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
 {
 	m_sound_latch = data;
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -480,7 +480,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
 	if ((scanline == 64) || (scanline == 192))
 	{
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
+		m_soundcpu->set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
 	}
 
 
@@ -556,7 +556,7 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 	if (m_ls74 == 1)
 	{
 		msm5205_data_w(machine().device("msm"), (m_ls377 >> 0) & 15 );
-		machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE );
+		m_soundcpu->set_input_line(0, ASSERT_LINE );
 	}
 	else
 	{
@@ -578,7 +578,7 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
 	        I do it here because this port (0x80) is first one accessed
 	        in the interrupt routine.
 	*/
-	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE );
+	m_soundcpu->set_input_line(0, CLEAR_LINE );
 	return;
 }
 

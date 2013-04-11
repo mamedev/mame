@@ -81,7 +81,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_attr(*this, "attr"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_soundcpu(*this, "soundcpu"){ }
 
 	UINT8 m_sound_cmd;
 	required_shared_ptr<UINT8> m_vram;
@@ -112,6 +113,7 @@ public:
 	DECLARE_PALETTE_INIT(kingdrbb);
 	UINT32 screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -288,7 +290,7 @@ WRITE8_MEMBER(kingdrby_state::hopper_io_w)
 
 WRITE8_MEMBER(kingdrby_state::sound_cmd_w)
 {
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_byte_w(space,0, data);

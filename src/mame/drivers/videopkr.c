@@ -301,7 +301,8 @@ class videopkr_state : public driver_device
 public:
 	videopkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	UINT8 m_data_ram[0x100];
 	UINT8 m_video_ram[0x0400];
@@ -367,6 +368,7 @@ public:
 	UINT32 screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 
@@ -941,7 +943,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(videopkr_state::sound_t1_callback)
 
 		if (m_dc_40103 == 0)
 		{
-			machine().device("soundcpu")->execute().set_input_line(0, ASSERT_LINE);
+			m_soundcpu->set_input_line(0, ASSERT_LINE);
 		}
 	}
 }

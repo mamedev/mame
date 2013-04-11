@@ -1812,7 +1812,7 @@ ADDRESS_MAP_END
  */
 WRITE_LINE_MEMBER(naomi_state::aica_irq)
 {
-	machine().device("soundcpu")->execute().set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

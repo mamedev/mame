@@ -61,7 +61,8 @@ public:
 	konamigq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -88,6 +89,7 @@ public:
 	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 /* Sound */
@@ -99,7 +101,7 @@ WRITE32_MEMBER(konamigq_state::soundr3k_w)
 		m_sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			machine().device("soundcpu")->execute().set_input_line(1, HOLD_LINE );
+			m_soundcpu->set_input_line(1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_BITS_0_15 )
@@ -151,7 +153,7 @@ static const UINT16 konamigq_def_eeprom[64] =
 WRITE32_MEMBER(konamigq_state::eeprom_w)
 {
 	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 

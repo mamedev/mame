@@ -41,7 +41,8 @@ public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_videoram(*this, "videoram") ,
-		m_maincpu(*this, "maincpu") {}
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu") {}
 
 	UINT8   m_paletteram[0x300];
 	UINT16  m_palette_write_address;
@@ -75,6 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	virtual void video_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 };
 
 WRITE16_MEMBER(tapatune_state::palette_w)
@@ -144,7 +146,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(tapatune_state::sound_irq_clear)
 {
-	machine().device("soundcpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
