@@ -499,11 +499,7 @@ void cps_state::fcrash_render_sprites( bitmap_ind16 &bitmap, const rectangle &cl
 	int num_sprites = machine().gfx[2]->elements();
 	int last_sprite_offset = 0x1ffc;
 	UINT16 *sprite_ram = m_gfxram;
-
-	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
-	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
-//  if (m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
-//  printf("cps1_cps_a_regs %04x\n", m_cps_a_regs[0]);
+	UINT16 tileno,flipx,flipy,colour,xpos,ypos;
 
 	/* if we have separate sprite ram, use it */
 	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram;
@@ -512,25 +508,23 @@ void cps_state::fcrash_render_sprites( bitmap_ind16 &bitmap, const rectangle &cl
 	for (pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
 		if (sprite_ram[base + pos - 1] == m_sprite_list_end_marker) last_sprite_offset = pos;
 
-	for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
+	/* If we are using bootleg sprite ram, the index must be less than 0x2000 */
+	if (((base + last_sprite_offset) < 0x2000) || (!m_bootleg_sprite_ram))
 	{
-		int tileno;
-		int xpos;
-		int ypos;
-		int flipx, flipy;
-		int colour;
+		for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
+		{
+			tileno = sprite_ram[base + pos];
+			if (tileno >= num_sprites) continue; /* don't render anything outside our tiles */
+			xpos   = sprite_ram[base + pos + 2] & 0x1ff;
+			ypos   = sprite_ram[base + pos - 1] & 0x1ff;
+			flipx  = sprite_ram[base + pos + 1] & 0x20;
+			flipy  = sprite_ram[base + pos + 1] & 0x40;
+			colour = sprite_ram[base + pos + 1] & 0x1f;
+			ypos   = 256 - ypos - 16;
+			xpos   = xpos + m_sprite_x_offset + 49;
 
-		tileno = sprite_ram[base + pos];
-		if (tileno >= num_sprites) continue; /* don't render anything outside our tiles */
-		xpos   = sprite_ram[base + pos + 2] & 0x1ff;
-		ypos   = sprite_ram[base + pos - 1] & 0x1ff;
-		flipx  = sprite_ram[base + pos + 1] & 0x20;
-		flipy  = sprite_ram[base + pos + 1] & 0x40;
-		colour = sprite_ram[base + pos + 1] & 0x1f;
-		ypos   = 256 - ypos;
-		xpos  += m_sprite_x_offset;
-
-		pdrawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine().priority_bitmap, 0x02, 15);
+			pdrawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, colour, flipx, flipy, xpos, ypos, machine().priority_bitmap, 0x02, 15);
+		}
 	}
 }
 
