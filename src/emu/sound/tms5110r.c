@@ -68,14 +68,9 @@ struct tms5100_coeffs
 
 /*
 The TMS5100NL was decapped and imaged by digshadow in April, 2013.
-The LPC table is not yet verified from the decap (it comes from US Patent
-4,209,836 and several others, and have been verified using derivative
-analysis to show which values were bad (due to poor quality images or badly
-typed copies of the tables in the patents, depending on which patent you look
-at) which were then corrected by figuring out what the tiny remaining marks on
-the photocopied version of the coefficient sheet COULD have been which would
-make the derivatives play nice.
-The chirp table from the decap is verified to match the patent and decap.
+The LPC table is verified to match the decap.
+ It also matches the intended contents of US Patent 4,209,836 and several others.
+The chirp table is verified to match the decap, and also matches the patents.
 The TMS5100 (development name: TMC0280) and the Speak and spell's "CD2801" chip
 are believed to be the same silicon. The 5100 may be the 'A' die revision of
 the CD2801 based on die markings.
@@ -88,45 +83,46 @@ static const struct tms5100_coeffs pat4209836_coeff =
 	4,
 	5,
 	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	/* E   */
-	{ 0, 0, 1, 1, 2, 3, 5, 7, 10, 15, 21, 30, 43, 61, 86, 511 }, /* last value is actually 0 in ROM, but 511 is stop sentinel */
-	/* P   note: value #20 may be 95; value #29 may be 140 */
+	/* E  */
+	{ 0,  0,  1,  1,  2,  3,  5,  7,
+		10,  15,  21,  30,  43,  61,  86, COEFF_ENERGY_SENTINEL }, // last rom value is actually really 0, but the tms5110.c code still requires the sentinel value to function correctly, until it is properly updated or merged with tms5220.c
+	/* P  */
 	{   0,  41,  43,  45,  47,  49,  51,  53,
 		55,  58,  60,  63,  66,  70,  73,  76,
 		79,  83,  87,  90,  94,  99, 103, 107,
-		112, 118, 123, 129, 134, 141, 147, 153 },
+		112, 118, 123, 129, 134, 140, 147, 153 },
 	{
 		/* K1  */
 		{ -501, -497, -493, -488, -480, -471, -460, -446,
 			-427, -405, -378, -344, -305, -259, -206, -148,
 			-86,  -21,   45,  110,  171,  227,  277,  320,
-			357,  388,  413,  434,  451,  464,  474,  482 },
+			357,  388,  413,  434,  451,  464,  474,  498 },
 		/* K2  */
 		{ -349, -328, -305, -280, -252, -223, -192, -158,
 			-124,  -88,  -51,  -14,  23,    60,   97,  133,
 			167,  199,  230,  259,  286,  310,  333,  354,
-			372,  389,  404,  417,  429,  439,  449,  490 },
+			372,  389,  404,  417,  429,  439,  449,  506 },
 		/* K3  */
 		{ -397, -365, -327, -282, -229, -170, -104, -36,
 			35,  104,  169,  228,  281,  326,  364, 396 },
 		/* K4  */
-		{ -373, -334, -293, -245, -191, -131, -67,  -1,
+		{ -369, -334, -293, -245, -191, -131, -67,  -1,
 			64,  128,  188,  243,  291,  332, 367, 397 },
 		/* K5  */
 		{ -319, -286, -250, -211, -168, -122, -74, -25,
-			24,   73,  121,  167,  210,  249, 285, 319 },
+			24,   73,  121,  167,  210,  249, 285, 318 },
 		/* K6  */
 		{ -290, -252, -209, -163, -114,  -62,  -9,  44,
-			97,  147,  194,  239,  278,  313, 344, 371 },
+			97,  147,  194,  238,  278,  313, 344, 371 },
 		/* K7  */
 		{ -291, -256, -216, -174, -128, -80, -31,  19,
 			69,  117,  163,  206,  246, 283, 316, 345 },
 		/* K8  */
-		{ -219, -133,  -38,  59,  152,  235, 305, 361 },
+		{ -218, -133,  -38,  59,  152,  235, 305, 361 },
 		/* K9  */
-		{ -225, -157,  -82,  -3,   76,  151, 220, 280 },
+		{ -226, -157,  -82,  -3,   76,  151, 220, 280 },
 		/* K10 */
-		{ -179, -122,  -61,    1,   63,  123, 179, 231 },
+		{ -179, -122,  -61,    1,   62,  123, 179, 231 },
 	},
 	/* Chirp table */
 	{   0,  42, -44, 50, -78, 18, 37, 20,
