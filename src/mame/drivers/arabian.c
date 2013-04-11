@@ -80,8 +80,8 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 	    bit 0 = coin 1 counter
 	*/
 
-	machine().device("mcu")->execute().set_input_line(MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* clock the coin counters */
 	coin_counter_w(machine(), 1, ~data & 0x02);

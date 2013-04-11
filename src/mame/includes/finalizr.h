@@ -40,7 +40,6 @@ public:
 	UINT8         m_irq_enable;
 
 	/* devices */
-	device_t *m_audio_cpu;
 	DECLARE_WRITE8_MEMBER(finalizr_coin_w);
 	DECLARE_WRITE8_MEMBER(finalizr_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(finalizr_i8039_irq_w);

@@ -8,6 +8,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -58,7 +59,7 @@ public:
 	UINT8    m_mcu_pc_0;
 
 	/* devices */
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
 	DECLARE_READ8_MEMBER(changela_68705_port_a_r);

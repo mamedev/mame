@@ -425,8 +425,6 @@ void mexico86_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_a_out));
 	save_item(NAME(m_ddr_a));

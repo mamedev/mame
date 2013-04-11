@@ -1002,8 +1002,6 @@ static const msm5232_interface msm5232_config =
 
 void flstory_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	/* video */
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_palette_bank));

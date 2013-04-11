@@ -15,6 +15,7 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_mcu_ram(*this, "mcu_ram"),
+		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") { }
 
@@ -56,7 +57,7 @@ public:
 #endif
 
 	/* devices */
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	msm5232_device *m_msm;
 	dac_device *m_dac_1;
 	dac_device *m_dac_2;

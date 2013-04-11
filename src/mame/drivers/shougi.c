@@ -94,7 +94,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enabled;
@@ -117,6 +118,7 @@ public:
 	INTERRUPT_GEN_MEMBER(shougi_vblank_nmi);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_mcu;
 };
 
 
@@ -252,13 +254,13 @@ WRITE8_MEMBER(shougi_state::shougi_watchdog_reset_w)
 WRITE8_MEMBER(shougi_state::shougi_mcu_halt_off_w)
 {
 	/* logerror("mcu HALT OFF"); */
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(shougi_state::shougi_mcu_halt_on_w)
 {
 	/* logerror("mcu HALT ON"); */
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 

@@ -16,7 +16,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_soundram(*this, "soundram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_mcu(*this, "mcu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram1;
@@ -136,4 +137,5 @@ public:
 	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_mcu;
 };

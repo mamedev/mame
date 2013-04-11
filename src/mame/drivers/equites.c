@@ -686,12 +686,12 @@ WRITE16_MEMBER(equites_state::mcu_w)
 
 WRITE16_MEMBER(equites_state::mcu_halt_assert_w)
 {
-	m_mcu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(equites_state::mcu_halt_clear_w)
 {
-	m_mcu->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -1184,7 +1184,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(equites_state,equites)
 {
-	m_mcu = machine().device("mcu");
 	m_msm = machine().device<msm5232_device>("msm");
 	m_dac_1 = machine().device<dac_device>("dac1");
 	m_dac_2 = machine().device<dac_device>("dac2");

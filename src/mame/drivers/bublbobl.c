@@ -721,9 +721,6 @@ static const ym2203_interface ym2203_config =
 
 MACHINE_START_MEMBER(bublbobl_state,common)
 {
-	m_mcu = machine().device("mcu");
-	m_slave = machine().device("slave");
-
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sound_status));

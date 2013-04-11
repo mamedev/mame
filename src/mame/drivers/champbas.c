@@ -176,7 +176,7 @@ WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
 		return;
 
 	data &= 1;
-	m_mcu->execute().set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -574,8 +574,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(champbas_state,champbas)
 {
-	m_mcu = machine().device(CPUTAG_MCU);
-
 	save_item(NAME(m_watchdog_count));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_gfx_bank));

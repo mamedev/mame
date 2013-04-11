@@ -15,6 +15,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_paletteram(*this, "paletteram"),
+		m_master(*this, "master"),
+		m_slave(*this, "slave"),
 		m_audiocpu(*this, "audiocpu"){ }
 
 	/* memory pointers */
@@ -40,8 +42,8 @@ public:
 	int        m_soundlatch2_status;
 
 	/* devices */
-	device_t *m_master;
-	device_t *m_slave;
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
 	device_t *m_pandora;
 	DECLARE_READ8_MEMBER(devram_r);

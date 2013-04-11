@@ -413,13 +413,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-	generic_pulse_irq_line(m_mcu->execute(), 0, 1);
+	generic_pulse_irq_line(m_mcu, 0, 1);
 }
 
 void changela_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	/* video */
 	save_item(NAME(m_slopeROM_bank));
 	save_item(NAME(m_tree_en));

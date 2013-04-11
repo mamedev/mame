@@ -11,7 +11,8 @@ public:
 		m_nob_mcu_latch(*this, "nob_mcu_latch"),
 		m_nob_mcu_status(*this, "nob_mcu_status"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_mcu(*this, "mcu") { }
 
 	optional_device<i8255_device>  m_ppi8255;
 	required_shared_ptr<UINT8> m_ram;
@@ -124,4 +125,5 @@ public:
 	void dakkochn_custom_w(UINT8 data, UINT8 prevdata);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_mcu;
 };

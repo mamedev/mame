@@ -10,7 +10,8 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_mcu_ram(*this, "mcu_ram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -105,4 +106,5 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_mcu;
 };

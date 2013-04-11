@@ -20,11 +20,11 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	m_slave->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
 	if (m_mcu != NULL) // only if we have a MCU
-		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	m_video_enable = data & 0x40;
@@ -51,7 +51,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 {
-	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -362,7 +362,7 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 ***************************************************************************/
 TIMER_CALLBACK_MEMBER(bublbobl_state::bublbobl_m68705_irq_ack)
 {
-	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)

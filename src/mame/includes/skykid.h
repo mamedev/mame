@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	UINT8 m_inputport_selected;
 	required_shared_ptr<UINT8> m_videoram;
@@ -46,4 +47,5 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };

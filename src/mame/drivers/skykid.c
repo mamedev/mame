@@ -64,7 +64,7 @@ WRITE8_MEMBER(skykid_state::skykid_led_w)
 WRITE8_MEMBER(skykid_state::skykid_subreset_w)
 {
 	int bit = !BIT(offset,11);
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(skykid_state::skykid_bankswitch_w)
@@ -85,7 +85,7 @@ WRITE8_MEMBER(skykid_state::skykid_irq_2_ctrl_w)
 	int bit = !BIT(offset,13);
 	m_mcu_irq_mask = bit;
 	if (!bit)
-		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 void skykid_state::machine_start()

@@ -159,7 +159,7 @@ WRITE16_MEMBER(exterm_state::exterm_output_port_0_w)
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(m_last & 0x2000))
-			machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+			m_slave->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
 		coin_counter_w(machine(), 0, data & 0x8000);

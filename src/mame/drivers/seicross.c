@@ -76,7 +76,7 @@ static NVRAM_HANDLER( seicross )
 void seicross_state::machine_reset()
 {
 	/* start with the protection mcu halted */
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -98,8 +98,8 @@ WRITE8_MEMBER(seicross_state::friskyt_portB_w)
 	if (((m_portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */

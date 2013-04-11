@@ -8,6 +8,7 @@ public:
 		m_spriteram1(*this, "spriteram1"),
 		m_spriteram2(*this, "spriteram2"),
 		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -51,7 +52,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	DECLARE_WRITE8_MEMBER(beg_banking_w);
 	DECLARE_WRITE8_MEMBER(beg_fromsound_w);
 	DECLARE_READ8_MEMBER(beg_fromsound_r);

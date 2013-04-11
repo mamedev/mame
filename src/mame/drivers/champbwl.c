@@ -438,8 +438,6 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 {
 	UINT8 *ROM = memregion("maincpu")->base();
 
-	m_mcu = NULL;
-
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	save_item(NAME(m_screenflip));

@@ -193,7 +193,7 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
 		if ((data&0x4)==0)
 			m_maincpu->set_input_line(5, HOLD_LINE);
 		if ((data&0x8)==0)
-			machine().device("mcu")->execute().set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+			m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		if ((data&0x40)==0)
 			m_i8751_return=(m_i8751_return&0xff00)|(m_i8751_ports[0]);
 		if ((data&0x80)==0)
@@ -304,7 +304,7 @@ void dec0_state::dec0_i8751_write(int data)
 	m_i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (m_GAME == 1) machine().device("mcu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	if (m_GAME == 1) m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 	if (m_GAME == 2) baddudes_i8751_write(data);
 	if (m_GAME == 3) birdtry_i8751_write(data);
 

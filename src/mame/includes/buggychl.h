@@ -13,7 +13,8 @@ public:
 		m_scrollv(*this, "scrollv"),
 		m_scrollh(*this, "scrollh"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_charram;
@@ -64,4 +65,5 @@ public:
 	void draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };

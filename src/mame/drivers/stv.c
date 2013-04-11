@@ -1025,7 +1025,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	m_port_sel = m_mux_data = 0;
 
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
 	stvcd_reset();
 

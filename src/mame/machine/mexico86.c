@@ -19,7 +19,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 	if (m_mcu != NULL)
 	{
 		// mexico 86, knight boy
-		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -299,7 +299,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_68705_port_b_w)
 	{
 		m_maincpu->set_input_line_vector(0, m_protection_ram[0]);
 		m_maincpu->set_input_line(0, HOLD_LINE);        // HOLD_LINE works better in Z80 interrupt mode 1.
-		m_mcu->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 	}
 
 	if (BIT(m_ddr_b, 6) && BIT(~data, 6) && BIT(m_port_b_out, 6))

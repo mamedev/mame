@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi;
@@ -61,4 +62,5 @@ public:
 	void pitnrun_spotlights();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };

@@ -8,15 +8,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"),
 		m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data"){ }
+		m_bg_data(*this, "bg_data") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
 	/* memory pointers */

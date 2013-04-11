@@ -1025,7 +1025,7 @@ MACHINE_RESET_MEMBER(fortyl_state,common)
 
 MACHINE_RESET_MEMBER(fortyl_state,40love)
 {
-	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_mcu->set_input_line(0, CLEAR_LINE);
 
 	MACHINE_RESET_CALL_MEMBER(common);
 }

@@ -339,13 +339,13 @@ WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 	/* if (!(data & 0x04)) */
 	if (data & 0x04)
 	{
-		machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
+		m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 	}
 	else
-		machine().device("mcu")->execute().set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */

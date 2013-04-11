@@ -285,7 +285,7 @@ WRITE8_MEMBER(leland_state::leland_master_video_addr_w)
 
 TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
 {
-	address_space &space = machine().device("master")->memory().space(AS_PROGRAM);
+	address_space &space = m_master->space(AS_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;

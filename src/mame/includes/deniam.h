@@ -43,7 +43,6 @@ public:
 	UINT16         m_coinctrl;
 
 	/* devices */
-	device_t *m_audio_cpu;  // system 16c does not have sound CPU
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
@@ -69,5 +68,5 @@ public:
 	void set_fg_page( int page, int value );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu; // system 16c does not have sound CPU
 };

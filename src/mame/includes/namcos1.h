@@ -16,7 +16,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu") { }
 
 	int m_dac0_value;
 	int m_dac1_value;
@@ -101,6 +102,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_mcu;
 };
 
 /*----------- defined in drivers/namcos1.c -----------*/

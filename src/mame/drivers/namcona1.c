@@ -719,7 +719,7 @@ WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_68k)
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 

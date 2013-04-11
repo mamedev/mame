@@ -762,8 +762,6 @@ GFXDECODE_END
 
 void nycaptor_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_generic_control_reg));
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));

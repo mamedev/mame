@@ -414,8 +414,6 @@ static const msm5232_interface msm5232_config =
 
 void bigevglf_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_vidram_bank));
 	save_item(NAME(m_plane_selected));
 	save_item(NAME(m_plane_visible));

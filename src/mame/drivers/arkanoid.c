@@ -948,8 +948,6 @@ static const ay8910_interface hexa_ay8910_config =
 
 MACHINE_START_MEMBER(arkanoid_state,arkanoid)
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_bootleg_cmd));
 
 	save_item(NAME(m_paddle_select));

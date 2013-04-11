@@ -9,7 +9,8 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -52,7 +53,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);

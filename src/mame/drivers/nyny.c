@@ -94,7 +94,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_colorram2(*this, "colorram2"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_audiocpu2(*this, "audio2"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram1;
@@ -111,7 +112,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_audiocpu2;
+	required_device<cpu_device> m_audiocpu2;
 	device_t *m_ic48_1;
 	mc6845_device *m_mc6845;
 	pia6821_device *m_pia1;
@@ -501,7 +502,7 @@ static const ay8910_interface ay8910_64_interface =
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
 	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
-	m_audiocpu2->execute().set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu2->set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -674,7 +675,6 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
-	m_audiocpu2 = machine().device("audio2");
 	m_ic48_1 = machine().device("ic48_1");
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 	m_pia1 = machine().device<pia6821_device>("pia1");

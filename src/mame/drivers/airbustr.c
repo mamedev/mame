@@ -260,7 +260,7 @@ READ8_MEMBER(airbustr_state::devram_r)
 
 WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 {
-	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
@@ -550,11 +550,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		machine().device("master")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_master->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
@@ -578,8 +578,6 @@ void airbustr_state::machine_start()
 	membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
 	membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
-	m_master = machine().device("master");
-	m_slave = machine().device("slave");
 	m_pandora = machine().device("pandora");
 
 	save_item(NAME(m_soundlatch_status));
@@ -778,7 +776,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(airbustr_state,airbustr)
 {
-	machine().device("master")->memory().space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
+	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
 }
 
 

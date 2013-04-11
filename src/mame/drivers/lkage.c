@@ -491,8 +491,6 @@ static const ym2203_interface ym2203_config =
 
 void lkage_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_bg_tile_bank));
 	save_item(NAME(m_fg_tile_bank));
 	save_item(NAME(m_tx_tile_bank));

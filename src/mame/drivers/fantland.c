@@ -76,7 +76,7 @@ WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
 WRITE8_MEMBER(fantland_state::fantland_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_soundlatch_16_w)
@@ -815,8 +815,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(fantland_state,fantland)
 {
-	m_audio_cpu = m_audiocpu;
-
 	save_item(NAME(m_nmi_enable));
 }
 
@@ -880,7 +878,7 @@ MACHINE_CONFIG_END
 
 WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 {
-	m_audio_cpu->execute().set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static MACHINE_CONFIG_START( galaxygn, fantland_state )

@@ -15,7 +15,8 @@ public:
 		m_spritegen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu") { }
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -96,6 +97,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_mcu;
 };
 
 

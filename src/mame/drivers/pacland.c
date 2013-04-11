@@ -181,7 +181,7 @@ Notes:
 WRITE8_MEMBER(pacland_state::pacland_subreset_w)
 {
 	int bit = !BIT(offset,11);
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(pacland_state::pacland_flipscreen_w)
@@ -230,7 +230,7 @@ WRITE8_MEMBER(pacland_state::pacland_irq_2_ctrl_w)
 	int bit = !BIT(offset, 13);
 	m_mcu_irq_mask = bit;
 	if (!bit)
-		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -405,7 +405,7 @@ INTERRUPT_GEN_MEMBER(pacland_state::main_vblank_irq)
 INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
 {
 	if(m_mcu_irq_mask)
-		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( pacland, pacland_state )

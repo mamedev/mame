@@ -17,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, CPUTAG_MCU){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -35,7 +36,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 
 	UINT8          m_irq_mask;
 	DECLARE_WRITE8_MEMBER(champbas_watchdog_reset_w);

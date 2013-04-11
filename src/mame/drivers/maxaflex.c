@@ -27,7 +27,8 @@ class maxaflex_state : public driver_device
 public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
@@ -63,6 +64,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
 	int atari_input_disabled();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };
 
 
@@ -116,7 +118,7 @@ WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		machine().device("mcu")->execute().set_input_line(M6805_IRQ_LINE, CLEAR_LINE );
+		m_mcu->set_input_line(M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	machine().sound().system_enable((data >> 5) & 1);
@@ -191,7 +193,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(maxaflex_state::mcu_timer_proc)
 		if ( (m_tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			generic_pulse_irq_line(machine().device("mcu")->execute(), M68705_INT_TIMER, 1);
+			generic_pulse_irq_line(m_mcu, M68705_INT_TIMER, 1);
 		}
 	}
 }
@@ -263,7 +265,7 @@ MACHINE_RESET_MEMBER(maxaflex_state,supervisor_board)
 INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 {
 	if (!newval)
-		machine().device("mcu")->execute().set_input_line(M6805_IRQ_LINE, HOLD_LINE );
+		m_mcu->set_input_line(M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int maxaflex_state::atari_input_disabled()

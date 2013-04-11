@@ -356,7 +356,7 @@ WRITE8_MEMBER(renegade_state::renegade_68705_port_b_w)
 		m_port_a_in = m_from_main;
 
 		if (m_main_sent)
-			machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+			m_mcu->set_input_line(0, CLEAR_LINE);
 
 		m_main_sent = 0;
 	}
@@ -413,7 +413,7 @@ READ8_MEMBER(renegade_state::mcu_reset_r)
 	}
 	else
 	{
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 	return 0;
 }
@@ -443,7 +443,7 @@ WRITE8_MEMBER(renegade_state::mcu_w)
 	{
 		m_from_main = data;
 		m_main_sent = 1;
-		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, ASSERT_LINE);
 	}
 }
 

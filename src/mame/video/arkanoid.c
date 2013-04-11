@@ -67,7 +67,7 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 	 which resets itself).  This bit is the likely candidate as it is flipped
 	 early in bootup just prior to accessing the MCU for the first time. */
 	if (m_mcu != NULL)  // Bootlegs don't have the MCU but still set this bit
-		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

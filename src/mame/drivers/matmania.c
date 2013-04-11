@@ -298,7 +298,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(matmania_state,matmania)
 {
-	m_mcu = machine().device("mcu");
 }
 
 static MACHINE_CONFIG_START( matmania, matmania_state )

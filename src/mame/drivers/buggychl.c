@@ -374,7 +374,7 @@ void buggychl_state::machine_start()
 
 void buggychl_state::machine_reset()
 {
-	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_mcu->set_input_line(0, CLEAR_LINE);
 
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;

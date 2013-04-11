@@ -21,7 +21,8 @@ public:
 	tnzs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") ,
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -57,7 +58,7 @@ public:
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_subbankswitch_w);

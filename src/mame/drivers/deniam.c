@@ -54,7 +54,7 @@ WRITE16_MEMBER(deniam_state::sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space,offset, (data >> 8) & 0xff);
-		m_audio_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -228,8 +228,8 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(deniam_state::irqhandler)
 {
 	/* system 16c doesn't have the sound CPU */
-	if (m_audio_cpu != NULL)
-		m_audio_cpu->execute().set_input_line(0, state);
+	if (m_audiocpu != NULL)
+		m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
@@ -241,8 +241,6 @@ static const ym3812_interface ym3812_config =
 
 void deniam_state::machine_start()
 {
-	m_audio_cpu = m_audiocpu;
-
 	save_item(NAME(m_display_enable));
 	save_item(NAME(m_coinctrl));
 

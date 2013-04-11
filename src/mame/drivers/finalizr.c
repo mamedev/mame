@@ -49,7 +49,7 @@ WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 
 WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
 {
-	m_audio_cpu->execute().set_input_line(0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
@@ -60,7 +60,7 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 	*/
 
 	if ((data & 0x80) == 0)
-		m_audio_cpu->execute().set_input_line(0, CLEAR_LINE);
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(finalizr_state::i8039_T1_r)
@@ -251,8 +251,6 @@ static const sn76496_config psg_intf =
 
 void finalizr_state::machine_start()
 {
-	m_audio_cpu = m_audiocpu;
-
 	save_item(NAME(m_spriterambank));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_T1_line));

@@ -22,8 +22,13 @@ class leland_state : public driver_device
 {
 public:
 	leland_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_master(*this, "master"),
+		m_slave(*this, "slave") { }
 
+	required_device<cpu_device> m_master;
+	required_device<cpu_device> m_slave;
+	
 	UINT8 m_dac_control;
 	UINT8 *m_alleymas_kludge_mem;
 	UINT8 *m_ataxx_qram;

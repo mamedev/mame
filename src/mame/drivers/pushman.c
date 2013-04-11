@@ -72,7 +72,7 @@ WRITE16_MEMBER(pushman_state::pushman_68705_w)
 
 	if (offset == 1)
 	{
-		m_mcu->execute().set_input_line(M68705_IRQ_LINE, HOLD_LINE);
+		m_mcu->set_input_line(M68705_IRQ_LINE, HOLD_LINE);
 		space.device().execute().spin();
 		m_new_latch = 0;
 	}
@@ -396,8 +396,6 @@ static const ym2203_interface ym2203_config =
 
 void pushman_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_shared_ram));
 	save_item(NAME(m_latch));

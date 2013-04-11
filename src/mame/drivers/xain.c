@@ -267,7 +267,7 @@ WRITE8_MEMBER(xain_state::xain_68705_w)
 	m_mcu_accept = 0;
 
 	if (machine().device("mcu") != NULL)
-		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(xain_state::xain_vblank_r)
@@ -312,7 +312,7 @@ WRITE8_MEMBER(xain_state::xain_68705_port_b_w)
 	else if ((m_ddr_b & 0x02) && (~m_port_b_out & 0x02) && (data & 0x02))
 	{
 		m_mcu_accept = 1;
-		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 	}
 
 	/* Rising edge of PB2 */
@@ -377,7 +377,7 @@ READ8_MEMBER(xain_state::mcu_comm_reset_r)
 	m_mcu_accept = 1;
 
 	if (machine().device("mcu") != NULL)
-		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 
 	return 0xff;
 }

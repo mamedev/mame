@@ -14,7 +14,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_slave(*this, "slave"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_main_ram;
@@ -32,7 +33,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_slave;
+	required_device<cpu_device> m_slave;
 	DECLARE_READ8_MEMBER(exprraid_protection_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_READ8_MEMBER(vblank_r);

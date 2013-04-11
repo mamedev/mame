@@ -12,7 +12,8 @@ public:
 	namcond1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_shared_ram(*this, "shared_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	UINT8 m_h8_irq5_enabled;
 	required_shared_ptr<UINT16> m_shared_ram;
@@ -30,4 +31,5 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };

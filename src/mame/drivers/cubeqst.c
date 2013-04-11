@@ -30,13 +30,19 @@ class cubeqst_state : public driver_device
 public:
 	cubeqst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_laserdisc(*this, "laserdisc") { }
+			m_laserdisc(*this, "laserdisc"),
+			m_rotatecpu(*this, "rotate_cpu"),
+			m_linecpu(*this, "line_cpu"),
+			m_soundcpu(*this, "sound_cpu") { }
 
 	UINT8 *m_depth_buffer;
 	int m_video_field;
 	UINT8 m_io_latch;
 	UINT8 m_reset_latch;
 	required_device<simutrek_special_device> m_laserdisc;
+	required_device<cpu_device> m_rotatecpu;
+	required_device<cpu_device> m_linecpu;
+	required_device<cpu_device> m_soundcpu;	
 	rgb_t *m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);
@@ -130,8 +136,8 @@ UINT32 cubeqst_state::screen_update_cubeqst(screen_device &screen, bitmap_rgb32 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
 		int i;
-		int num_entries = cubeqcpu_get_ptr_ram_val(machine().device("line_cpu"), y);
-		UINT32 *stk_ram = cubeqcpu_get_stack_ram(machine().device("line_cpu"));
+		int num_entries = cubeqcpu_get_ptr_ram_val(m_linecpu, y);
+		UINT32 *stk_ram = cubeqcpu_get_stack_ram(m_linecpu);
 		UINT32 *dest = &bitmap.pix32(y);
 		UINT32 pen;
 
@@ -260,10 +266,10 @@ WRITE16_MEMBER(cubeqst_state::control_w)
 
 TIMER_CALLBACK_MEMBER(cubeqst_state::delayed_bank_swap)
 {
-	cubeqcpu_swap_line_banks(machine().device("line_cpu"));
+	cubeqcpu_swap_line_banks(m_linecpu);
 
 	/* TODO: This is a little dubious */
-	cubeqcpu_clear_stack(machine().device("line_cpu"));
+	cubeqcpu_clear_stack(m_linecpu);
 }
 
 
@@ -284,9 +290,9 @@ void cubeqst_state::swap_linecpu_banks()
 */
 WRITE16_MEMBER(cubeqst_state::reset_w)
 {
-	machine().device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_rotatecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	m_linecpu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(m_reset_latch, 0) && BIT(data, 0))
@@ -395,22 +401,22 @@ INPUT_PORTS_END
 
 READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return cubeqcpu_rotram_r(machine().device("rotate_cpu"), space, offset, mem_mask);
+	return cubeqcpu_rotram_r(m_rotatecpu, space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	cubeqcpu_rotram_w(machine().device("rotate_cpu"), space, offset, data, mem_mask);
+	cubeqcpu_rotram_w(m_rotatecpu, space, offset, data, mem_mask);
 }
 
 READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return cubeqcpu_sndram_r(machine().device("sound_cpu"), space, offset, mem_mask);
+	return cubeqcpu_sndram_r(m_soundcpu, space, offset, mem_mask);
 }
 
 WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	cubeqcpu_sndram_w(machine().device("sound_cpu"), space, offset, data, mem_mask);
+	cubeqcpu_sndram_w(m_soundcpu, space, offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
@@ -454,9 +460,9 @@ void cubeqst_state::machine_reset()
 	m_reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
-	machine().device("sound_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("rotate_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("line_cpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_rotatecpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_linecpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

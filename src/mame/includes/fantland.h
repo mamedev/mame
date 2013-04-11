@@ -26,7 +26,6 @@ public:
 	int        m_adpcm_nibble[4];
 
 	/* devices */
-	device_t *m_audio_cpu;
 	device_t *m_msm1;
 	device_t *m_msm2;
 	device_t *m_msm3;

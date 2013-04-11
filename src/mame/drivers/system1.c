@@ -669,7 +669,7 @@ READ8_MEMBER(system1_state::nob_maincpu_latch_r)
 WRITE8_MEMBER(system1_state::nob_maincpu_latch_w)
 {
 	m_nob_maincpu_latch = data;
-	machine().device("mcu")->execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

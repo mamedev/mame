@@ -86,7 +86,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		m_audio_cpu->execute().set_input_line(0, ASSERT_LINE);      // Generate an IRQ
+		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
 		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
 }
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
 READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
 	/* Clear IRQ only after reading the command, or some get lost */
-	m_audio_cpu->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 
@@ -584,7 +584,6 @@ void esd16_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 
-	m_audio_cpu = m_audiocpu;
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
 	save_item(NAME(m_tilemap0_color));

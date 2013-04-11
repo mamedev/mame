@@ -16,7 +16,7 @@ void pitnrun_state::machine_reset()
 {
 	m_zaccept = 1;
 	m_zready = 0;
-	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_real_data_r)
@@ -33,7 +33,7 @@ READ8_MEMBER(pitnrun_state::pitnrun_mcu_data_r)
 TIMER_CALLBACK_MEMBER(pitnrun_state::pitnrun_mcu_real_data_w)
 {
 	m_zready = 1;
-	machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+	m_mcu->set_input_line(0, ASSERT_LINE);
 	m_fromz80 = param;
 }
 
@@ -106,7 +106,7 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_68705_portB_w)
 	{
 		/* 68705 is going to read data from the Z80 */
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(pitnrun_state::pitnrun_mcu_data_real_r),this));
-		machine().device("mcu")->execute().set_input_line(0,CLEAR_LINE);
+		m_mcu->set_input_line(0,CLEAR_LINE);
 		m_portA_in = m_fromz80;
 	}
 	if (~data & 0x04)

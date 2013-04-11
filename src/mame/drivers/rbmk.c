@@ -64,7 +64,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_gms_vidram2(*this, "gms_vidram2"),
 		m_gms_vidram(*this, "gms_vidram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_mcu(*this, "mcu") { }
 
 	required_shared_ptr<UINT16> m_gms_vidram2;
 	required_shared_ptr<UINT16> m_gms_vidram;
@@ -82,6 +83,7 @@ public:
 	UINT32 screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
 };
 
 
@@ -532,7 +534,7 @@ UINT32 rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitma
 
 INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 {
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( rbmk, rbmk_state )

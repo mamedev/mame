@@ -61,23 +61,23 @@
 /* Main CPU and Z80 synchronisation */
 WRITE16_MEMBER(tx1_state::z80_busreq_w)
 {
-	machine().device("audio_cpu")->execute().set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(tx1_state::resume_math_w)
 {
-	machine().device("math_cpu")->execute().set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
+	m_mathcpu->set_input_line(INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(tx1_state::halt_math_w)
 {
-	machine().device("math_cpu")->execute().set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
+	m_mathcpu->set_input_line(INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
 WRITE8_MEMBER(tx1_state::z80_intreq_w)
 {
-	machine().device("audio_cpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */

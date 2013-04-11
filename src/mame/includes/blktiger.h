@@ -13,6 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_spriteram(*this, "spriteram") ,
 		m_txvideoram(*this, "txvideoram"),
+		m_mcu(*this, "mcu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -40,7 +41,7 @@ public:
 	UINT8   m_i8751_latch;
 
 	/* devices */
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
 	DECLARE_READ8_MEMBER(blktiger_from_mcu_r);
 	DECLARE_WRITE8_MEMBER(blktiger_to_mcu_w);

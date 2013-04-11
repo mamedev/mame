@@ -61,7 +61,7 @@ WRITE8_MEMBER(flstory_state::flstory_68705_port_b_w)
 	{
 		m_port_a_in = m_from_main;
 		if (m_main_sent)
-			m_mcu->execute().set_input_line(0, CLEAR_LINE);
+			m_mcu->set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 		logerror("read command %02x from main cpu\n", m_port_a_in);
 	}
@@ -110,7 +110,7 @@ WRITE8_MEMBER(flstory_state::flstory_mcu_w)
 	logerror("%04x: mcu_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
 	m_main_sent = 1;
-	m_mcu->execute().set_input_line(0, ASSERT_LINE);
+	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(flstory_state::flstory_mcu_r)

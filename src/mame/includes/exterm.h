@@ -12,7 +12,8 @@ public:
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_slave(*this, "slave")  { }
 
 	UINT8 m_aimpos[2];
 	UINT8 m_trackball_old[2];
@@ -41,6 +42,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_slave;
 };
 
 /*----------- defined in video/exterm.c -----------*/

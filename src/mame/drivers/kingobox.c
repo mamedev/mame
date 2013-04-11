@@ -40,7 +40,7 @@ WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
 WRITE8_MEMBER(kingofb_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_audio_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 
@@ -452,7 +452,6 @@ void kingofb_state::machine_start()
 {
 	m_video_cpu = machine().device("video");
 	m_sprite_cpu = machine().device("sprite");
-	m_audio_cpu = m_audiocpu;
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_palette_bank));

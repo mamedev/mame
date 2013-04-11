@@ -78,6 +78,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_mastercpu(*this, "master"),
+		m_slavecpu(*this, "slave"),
 		m_soundcpu(*this, "soundcpu"){ }
 
 	/* Video */
@@ -97,9 +99,8 @@ public:
 	UINT8           m_mermaid_p[4];
 
 	/* Devices */
-	device_t    *m_master_cpu;
-	device_t    *m_slave_cpu;
-	device_t    *m_sound_cpu;
+	required_device<cpu_device> m_mastercpu;
+	required_device<cpu_device> m_slavecpu;
 	device_t    *m_mermaid;
 	device_t    *m_pandora;
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
@@ -142,9 +143,6 @@ public:
 
 void hvyunit_state::machine_start()
 {
-	m_master_cpu = machine().device("master");
-	m_slave_cpu = machine().device("slave");
-	m_sound_cpu = m_soundcpu;
 	m_mermaid = machine().device("mermaid");
 	m_pandora = machine().device("pandora");
 
@@ -211,7 +209,7 @@ void hvyunit_state::screen_eof_hvyunit(screen_device &screen, bool state)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	m_slave_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slavecpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
@@ -251,7 +249,7 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
@@ -390,7 +388,7 @@ READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
 {
 	m_mermaid_p[3] = data;
-	m_slave_cpu->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_slavecpu->set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -615,11 +613,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::hvyunit_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 
 	/* Pandora "sprite end dma" irq? TODO: timing is likely off */
 	if(scanline == 64)
-		m_master_cpu->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_mastercpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface hvyunit_pandora_config =

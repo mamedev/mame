@@ -35,10 +35,18 @@ class esripsys_state : public driver_device
 public:
 	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_framecpu(*this, "frame_cpu"),
 			m_videocpu(*this, "video_cpu"),
+			m_gamecpu(*this, "game_cpu"),
+			m_soundcpu(*this, "sound_cpu"),
+			m_tms(*this, "tms5220nl"),
 			m_pal_ram(*this, "pal_ram") { }
 
+	required_device<cpu_device> m_framecpu;
 	required_device<esrip_device> m_videocpu;
+	required_device<cpu_device> m_gamecpu;
+	required_device<cpu_device> m_soundcpu;
+	required_device<device_t> m_tms;
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;

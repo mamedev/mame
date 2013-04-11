@@ -367,7 +367,7 @@ TIMER_CALLBACK_MEMBER(superqix_state::delayed_z80_mcu_w)
 //  logerror("Z80 sends command %02x\n",param);
 	m_from_z80 = param;
 	m_from_mcu_pending = 0;
-	machine().device("mcu")->execute().set_input_line(0, HOLD_LINE);
+	m_mcu->set_input_line(0, HOLD_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
 }
 

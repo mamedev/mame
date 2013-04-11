@@ -12,7 +12,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -32,7 +33,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	DECLARE_WRITE16_MEMBER(pushman_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(pushman_control_w);
 	DECLARE_READ16_MEMBER(pushman_68705_r);

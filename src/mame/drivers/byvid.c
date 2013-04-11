@@ -104,7 +104,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(by133_state::vdp_interrupt)
 {
-	machine().device("videocpu")->execute().set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_videocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TMS9928A_INTERFACE(byvid_tms9928a_interface)

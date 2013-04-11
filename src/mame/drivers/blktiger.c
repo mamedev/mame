@@ -33,13 +33,13 @@ READ8_MEMBER(blktiger_state::blktiger_from_mcu_r)
 
 WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
 {
-	m_mcu->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 	m_z80_latch = data;
 }
 
 READ8_MEMBER(blktiger_state::blktiger_from_main_r)
 {
-	m_mcu->execute().set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
 	return m_z80_latch;
 }
@@ -276,8 +276,6 @@ static const ym2203_interface ym2203_config =
 
 void blktiger_state::machine_start()
 {
-	m_mcu = machine().device("mcu");
-
 	/* configure bankswitching */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 

@@ -26,7 +26,8 @@ public:
 			m_slapfight_scrolly(*this, "scrolly"),
 			m_spriteram(*this, "spriteram") ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_mcu(*this, "mcu") { }
 
 	int m_getstar_id;
 	required_shared_ptr<UINT8> m_slapfight_videoram;
@@ -134,6 +135,7 @@ public:
 	void getstar_init(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_mcu;
 };
 
 

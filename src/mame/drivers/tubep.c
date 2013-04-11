@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 {
-	machine().device("slave")->execute().set_input_line(0, CLEAR_LINE);
+	m_slave->set_input_line(0, CLEAR_LINE);
 	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
@@ -274,7 +274,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	if (scanline == 16)
 	{
 		logerror("/VBLANK CPU#1\n");
-		machine().device("slave")->execute().set_input_line(0, ASSERT_LINE);
+		m_slave->set_input_line(0, ASSERT_LINE);
 	}
 
 
@@ -284,14 +284,14 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	{
 		logerror("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_mcu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 
@@ -455,7 +455,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	if (scanline == 16)
 	{
 		logerror("/VBLANK CPU#1\n");
-		machine().device("slave")->execute().set_input_line(0, HOLD_LINE);
+		m_slave->set_input_line(0, HOLD_LINE);
 	}
 
 
@@ -465,14 +465,14 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	{
 		logerror("/nmi CPU#3\n");
 		tubep_vblank_end(); /* switch buffered sprite RAM page */
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_mcu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
 	/* deactivates at the start of VBLANK signal which happens at the beginning of scanline number 240*/
 	if (scanline == 240)
 	{
 		logerror("CPU#3 nmi clear\n");
-		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_mcu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
 

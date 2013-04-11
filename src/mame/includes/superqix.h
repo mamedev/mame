@@ -4,12 +4,14 @@ public:
 	superqix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_mcu(*this,"mcu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_bitmapram(*this, "bitmapram"),
 		m_bitmapram2(*this, "bitmapram2"){ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_mcu;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bitmapram;

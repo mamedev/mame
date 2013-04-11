@@ -5242,7 +5242,7 @@ DRIVER_INIT_MEMBER(namcos2_state,assaultp_hack)
 	//
 	// This is used in conjunction with the interleave increase in the
 	// MACHINE_DRIVER
-	machine().device("mcu")->set_clock_scale(4.0f);
+	m_mcu->set_clock_scale(4.0f);
 
 	DRIVER_INIT_CALL(assaultp);
 }

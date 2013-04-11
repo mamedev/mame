@@ -107,7 +107,10 @@ public:
 			m_math_ram(*this, "math_ram"),
 			m_vram(*this, "vram"),
 			m_objram(*this, "objram"),
-			m_rcram(*this, "rcram") { }
+			m_rcram(*this, "rcram"),
+			m_maincpu(*this, "main_cpu"),
+			m_mathcpu(*this, "math_cpu"),
+			m_audiocpu(*this, "audio_cpu") { }
 
 	math_t m_math;
 	sn74s516_t m_sn74s516;
@@ -179,6 +182,9 @@ public:
 	void screen_eof_buggyboy(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(z80_irq);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mathcpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in audio/tx1.c -----------*/

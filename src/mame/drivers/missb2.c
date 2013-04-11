@@ -438,9 +438,6 @@ INTERRUPT_GEN_MEMBER(missb2_state::missb2_interrupt)
 
 MACHINE_START_MEMBER(missb2_state,missb2)
 {
-	m_slave = machine().device("slave");
-	m_mcu = NULL;
-
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_sound_status));

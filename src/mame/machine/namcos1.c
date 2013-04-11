@@ -580,7 +580,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_cpu_control_w)
 
 	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -874,7 +874,7 @@ void namcos1_state::machine_reset()
 	m_maincpu->reset();
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* mcu patch data clear */
 	m_mcu_patch_data = 0;
@@ -1216,7 +1216,7 @@ DRIVER_INIT_MEMBER(namcos1_state,tankfrc4)
 	};
 	namcos1_driver_init(machine(), &tankfrce_specific);
 
-	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }
 
 /*******************************************************************************
@@ -1307,7 +1307,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT_MEMBER(namcos1_state,quester)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
+	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
 }
 
 
@@ -1396,7 +1396,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT_MEMBER(namcos1_state,berabohm)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
+	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
 }
 
 
@@ -1466,5 +1466,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT_MEMBER(namcos1_state,faceoff)
 {
 	namcos1_driver_init(machine(), NULL);
-	machine().device("mcu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
+	m_mcu->space(AS_PROGRAM).install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }

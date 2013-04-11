@@ -9,7 +9,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_mcu(*this, "mcu") { }
 
 	int m_vblank;
 	int m_from_main;
@@ -79,4 +80,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	optional_device<cpu_device> m_mcu;
 };

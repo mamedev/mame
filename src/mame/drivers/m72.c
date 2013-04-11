@@ -231,7 +231,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_mcu_snd_cmd_latch = data;
-		machine().device("mcu")->execute().set_input_line(1, ASSERT_LINE);
+		m_mcu->set_input_line(1, ASSERT_LINE);
 	}
 }
 
@@ -248,7 +248,7 @@ WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
 		m_protection_ram[offset] = val;
-		machine().device("mcu")->execute().set_input_line(0, ASSERT_LINE);
+		m_mcu->set_input_line(0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
 		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
 		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
@@ -272,7 +272,7 @@ READ8_MEMBER(m72_state::m72_mcu_data_r)
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+		m_mcu->set_input_line(0, CLEAR_LINE);
 	}
 
 	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
@@ -297,7 +297,7 @@ READ8_MEMBER(m72_state::m72_mcu_sample_r)
 
 WRITE8_MEMBER(m72_state::m72_mcu_ack_w)
 {
-	machine().device("mcu")->execute().set_input_line(1, CLEAR_LINE);
+	m_mcu->set_input_line(1, CLEAR_LINE);
 	m_mcu_snd_cmd_latch = 0;
 }
 

@@ -288,11 +288,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_interrupt)
 
 	/* TODO: real sources of these */
 	if (scanline == 224)
-		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 	else if (scanline == 0)
-		machine().device("mcu")->execute().set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 	else if (scanline == 128)
-		machine().device("mcu")->execute().set_input_line(M37710_LINE_ADC, HOLD_LINE);
+		m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 
 

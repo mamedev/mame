@@ -196,8 +196,6 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_START_MEMBER(cchance_state,cchance)
 {
-	m_mcu = NULL;
-
 	save_item(NAME(m_screenflip));
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));

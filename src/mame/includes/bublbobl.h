@@ -8,7 +8,9 @@ public:
 		m_objectram(*this, "objectram"),
 		m_mcu_sharedram(*this, "mcu_sharedram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_mcu(*this, "mcu"),
+		m_audiocpu(*this, "audiocpu"),		
+		m_slave(*this, "slave"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -55,9 +57,9 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_mcu;
+	optional_device<cpu_device> m_mcu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_slave;
+	required_device<cpu_device> m_slave;
 	DECLARE_WRITE8_MEMBER(bublbobl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);

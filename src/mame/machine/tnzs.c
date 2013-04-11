@@ -677,8 +677,6 @@ MACHINE_START_MEMBER(tnzs_state,jpopnics)
 	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	membank("subbank")->set_entry(m_bank2);
 
-	m_mcu = NULL;
-
 	m_bank1 = 2;
 	m_bank2 = 0;
 
@@ -693,8 +691,6 @@ MACHINE_START_MEMBER(tnzs_state,jpopnics)
 MACHINE_START_MEMBER(tnzs_state,tnzs)
 {
 	MACHINE_START_CALL_MEMBER( jpopnics );
-
-	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_kageki_csport_sel));
 	save_item(NAME(m_input_select));
@@ -738,7 +734,7 @@ WRITE8_MEMBER(tnzs_state::tnzs_bankswitch1_w)
 				if (data & 0x04)
 				{
 					if (m_mcu != NULL && m_mcu->type() == I8742)
-						m_mcu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+						m_mcu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

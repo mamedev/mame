@@ -462,7 +462,7 @@ void msisaac_state::machine_reset()
 	m_snd_ctrl1 = 0;
 
 #ifdef USE_MCU
-	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
+	m_mcu->set_input_line(0, CLEAR_LINE);
 #else
 	m_mcu_val = 0;
 	m_direction = 0;

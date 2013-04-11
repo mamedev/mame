@@ -232,7 +232,7 @@ READ8_MEMBER(exprraid_state::exprraid_protection_r)
 WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	m_slave->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(exprraid_state::vblank_r)
@@ -436,7 +436,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(exprraid_state::irqhandler)
 {
-	m_slave->execute().set_input_line_and_vector(0, state, 0xff);
+	m_slave->set_input_line_and_vector(0, state, 0xff);
 }
 
 static const ym3526_interface ym3526_config =
@@ -467,8 +467,6 @@ INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 
 void exprraid_state::machine_start()
 {
-	m_slave = machine().device("slave");
-
 	save_item(NAME(m_bg_index));
 }
 
