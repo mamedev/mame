@@ -33,8 +33,8 @@
 
 void batman_state::update_interrupts()
 {
-	subdevice("maincpu")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	subdevice("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -98,9 +98,9 @@ WRITE16_MEMBER(batman_state::latch_w)
 
 	/* bit 4 is connected to the /RESET pin on the 6502 */
 	if (m_latch_data & 0x0010)
-		machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_jsacpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_jsacpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* alpha bank is selected by the upper 4 bits */
 	if ((oldword ^ m_latch_data) & 0x7000)

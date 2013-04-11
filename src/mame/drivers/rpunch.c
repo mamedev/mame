@@ -125,7 +125,7 @@
 WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
 {
 	m_ym2151_irq = state;
-	subdevice("audiocpu")->execute().set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

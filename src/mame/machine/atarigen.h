@@ -276,6 +276,7 @@ public:
 	atarigen_screen_timer   m_screen_timer[2];
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<m6502_device> m_jsacpu;
 };
 
 

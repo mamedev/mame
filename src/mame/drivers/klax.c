@@ -33,7 +33,7 @@
 
 void klax_state::update_interrupts()
 {
-	subdevice("maincpu")->execute().set_input_line(4, m_video_int_state || m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_video_int_state || m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -41,7 +41,7 @@ void klax_state::scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(ioport("P1")->read() & 0x800))
-		scanline_int_gen(*subdevice("maincpu"));
+		scanline_int_gen(m_maincpu);
 }
 
 

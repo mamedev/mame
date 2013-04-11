@@ -112,7 +112,7 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		m_jsacpu->set_input_line(INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

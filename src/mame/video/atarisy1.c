@@ -377,7 +377,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 	int scanline = param;
 
 	/* update the state */
-	scanline_int_gen(*subdevice("maincpu"));
+	scanline_int_gen(m_maincpu);
 
 	/* set a timer to turn it off */
 	m_int3off_timer->adjust(machine().primary_screen->scan_period());

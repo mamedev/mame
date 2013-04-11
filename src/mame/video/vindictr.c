@@ -183,7 +183,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:     /* /VIRQ */
-				scanline_int_gen(*subdevice("maincpu"));
+				scanline_int_gen(m_maincpu);
 				break;
 
 			case 7:     /* /PFVS */

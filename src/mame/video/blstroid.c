@@ -90,7 +90,7 @@ VIDEO_START_MEMBER(blstroid_state,blstroid)
 TIMER_CALLBACK_MEMBER(blstroid_state::irq_off)
 {
 	/* clear the interrupt */
-	address_space &space = subdevice("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	scanline_int_ack_w(space, 0, 0);
 }
 
@@ -98,7 +98,7 @@ TIMER_CALLBACK_MEMBER(blstroid_state::irq_off)
 TIMER_CALLBACK_MEMBER(blstroid_state::irq_on)
 {
 	/* generate the interrupt */
-	scanline_int_gen(*subdevice("maincpu"));
+	scanline_int_gen(m_maincpu);
 	update_interrupts();
 }
 

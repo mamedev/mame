@@ -1018,8 +1018,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 WRITE_LINE_MEMBER(segas24_state::irq_ym)
 {
 	irq_yms = state;
-	subdevice("maincpu")->execute().set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	subdevice("subcpu")->execute().set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

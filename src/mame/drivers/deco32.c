@@ -1625,7 +1625,7 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 		m_nslasher_sound_irq |= 0x01;
 	else
 		m_nslasher_sound_irq &= ~0x01;
-	subdevice("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)

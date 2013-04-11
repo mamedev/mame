@@ -566,7 +566,7 @@ READ8_MEMBER(galaxian_state::konami_sound_timer_r)
 	    current counter index, we use the sound cpu clock times 8 mod
 	    16*16*2*8*5*2.
 	*/
-	UINT32 cycles = (machine().device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (m_audiocpu->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */

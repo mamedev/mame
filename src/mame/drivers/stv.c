@@ -362,7 +362,7 @@ DRIVER_INIT_MEMBER(stv_state,stv)
 	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 
 	m_vdp2.pal = 0;
 }
@@ -371,7 +371,7 @@ DRIVER_INIT_MEMBER(stv_state,critcrsh)
 {
 	DRIVER_INIT_CALL(stv);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
 }
 
 /*
@@ -407,7 +407,7 @@ DRIVER_INIT_MEMBER(stv_state,magzun)
 	DRIVER_INIT_CALL(stv);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x608e830, 0x608e833, read32_delegate(FUNC(stv_state::magzun_hef_hack_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60ff3b4, 0x60ff3b7, read32_delegate(FUNC(stv_state::magzun_rx_hack_r),this));
@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(stv_state,stvmp)
 {
 	DRIVER_INIT_CALL(stv);
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
 }
 
 
@@ -1016,7 +1016,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 	m_scsp_last_line = 0;
 
 	// don't let the slave cpu and the 68k go anywhere
-	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_en_68k = 0;
@@ -1088,10 +1088,6 @@ MACHINE_START_MEMBER(stv_state,stv)
 {
 	system_time systime;
 	machine().base_datetime(systime);
-
-	m_maincpu = downcast<legacy_cpu_device*>( m_maincpu );
-	m_slave = downcast<legacy_cpu_device*>( machine().device("slave") );
-	m_audiocpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("audiocpu") );
 
 	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
 

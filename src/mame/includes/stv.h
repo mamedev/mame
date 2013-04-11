@@ -13,7 +13,10 @@ public:
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
-			m_fake_comms(*this, "fake")
+			m_fake_comms(*this, "fake"),
+			m_maincpu(*this, "maincpu"),
+			m_slave(*this, "slave"),
+			m_audiocpu(*this, "audiocpu")
 	{
 	}
 
@@ -134,9 +137,9 @@ public:
 	UINT8     m_system_output;
 	UINT16    m_serial_tx;
 
-	legacy_cpu_device* m_maincpu;
-	legacy_cpu_device* m_slave;
-	legacy_cpu_device* m_audiocpu;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_slave;
+	required_device<cpu_device> m_audiocpu;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);

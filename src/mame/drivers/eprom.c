@@ -39,12 +39,12 @@
 
 void eprom_state::update_interrupts()
 {
-	subdevice("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (subdevice("extra") != NULL)
 		subdevice("extra")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 
-	subdevice("maincpu")->execute().set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

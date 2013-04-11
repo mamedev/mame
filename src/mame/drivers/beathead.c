@@ -213,7 +213,7 @@ void beathead_state::update_interrupts()
 	{
 		m_irq_line_state = gen_int;
 		//if (m_irq_line_state != CLEAR_LINE)
-			subdevice("maincpu")->execute().set_input_line(ASAP_IRQ0, m_irq_line_state);
+			m_maincpu->set_input_line(ASAP_IRQ0, m_irq_line_state);
 		//else
 			//asap_set_irq_line(ASAP_IRQ0, m_irq_line_state);
 	}
@@ -295,7 +295,7 @@ READ32_MEMBER( beathead_state::input_2_r )
 WRITE32_MEMBER( beathead_state::sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	machine().device("jsa")->execute().set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	m_jsacpu->set_input_line(INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

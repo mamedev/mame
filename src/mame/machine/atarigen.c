@@ -132,7 +132,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_playfield_latch(0),
 		m_playfield2_latch(0),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_jsacpu(*this, "jsa")
 {
 }
 
@@ -141,9 +142,8 @@ void atarigen_state::machine_start()
 	// find the sound CPU, until JSA is moved to be independent
 	if (m_sound_cpu == NULL)
 	{
-		device_t *device = subdevice("jsa");
-		if (device != NULL)
-			m_sound_cpu.set_target(downcast<m6502_device *>(device));
+		if (m_jsacpu != NULL)
+			m_sound_cpu.set_target(m_jsacpu);
 	}
 
 	screen_device *screen;
