@@ -241,7 +241,8 @@ public:
 	gticlub_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	required_shared_ptr<UINT32> m_work_ram;
 	UINT32 *m_sharc_dataram_0;
@@ -269,6 +270,7 @@ public:
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -714,7 +716,7 @@ static const sharc_config sharc_cfg =
 
 TIMER_CALLBACK_MEMBER(gticlub_state::irq_off)
 {
-	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	m_audiocpu->set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )

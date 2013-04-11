@@ -32,7 +32,7 @@ Notes:
 WRITE8_MEMBER(spdodgeb_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
@@ -384,7 +384,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(spdodgeb_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

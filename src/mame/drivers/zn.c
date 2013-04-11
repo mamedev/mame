@@ -38,7 +38,8 @@ public:
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
-		m_maincpu(*this, "maincpu") {
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") {
 	}
 
 	required_device<psxgpu_device> m_gpu;
@@ -133,6 +134,7 @@ public:
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -621,7 +623,7 @@ INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
 WRITE32_MEMBER(zn_state::zn_qsound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 DRIVER_INIT_MEMBER(zn_state,coh1000c)
@@ -1160,7 +1162,7 @@ ADDRESS_MAP_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(zn_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1577,7 +1579,7 @@ WRITE32_MEMBER(zn_state::coh1002e_bank_w)
 WRITE32_MEMBER(zn_state::coh1002e_latch_w)
 {
 	if (offset)
-		machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);   // irq 2 on the 68k
+		m_audiocpu->set_input_line(2, HOLD_LINE);   // irq 2 on the 68k
 	else
 		soundlatch_byte_w(space, 0, data);
 }

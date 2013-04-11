@@ -23,7 +23,7 @@ MACHINE_RESET_MEMBER(slapfght_state,slapfight)
 	m_getstar_sh_intenabled = 0;    /* disable sound cpu interrupts */
 
 	/* SOUND CPU */
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* MCU */
 	m_mcu_val = 0;
@@ -38,14 +38,14 @@ MACHINE_RESET_MEMBER(slapfght_state,slapfight)
 /* Reset and hold sound CPU */
 WRITE8_MEMBER(slapfght_state::slapfight_port_00_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */

@@ -58,7 +58,7 @@ WRITE16_MEMBER(stadhero_state::stadhero_control_w)
 			break;
 		case 6: /* 6502 sound cpu */
 			soundlatch_byte_w(space, 0, data & 0xff);
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+offset);
@@ -214,7 +214,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(stadhero_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =

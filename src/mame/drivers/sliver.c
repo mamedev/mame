@@ -82,7 +82,8 @@ public:
 	sliver_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_colorram(*this, "colorram"){ }
+		m_colorram(*this, "colorram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	UINT16 m_io_offset;
 	UINT16 m_io_reg[IO_SIZE];
@@ -118,6 +119,7 @@ public:
 	void plot_pixel_pal(int x, int y, int addr);
 	void blit_gfx();
 	void render_jpeg();
+	required_device<cpu_device> m_audiocpu;
 };
 
 void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
@@ -310,7 +312,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 WRITE16_MEMBER(sliver_state::sound_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	machine().device("audiocpu")->execute().set_input_line(MCS51_INT0_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16, sliver_state )

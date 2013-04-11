@@ -15,7 +15,8 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	optional_shared_ptr<UINT8> m_sharedram;
 	optional_device<buffered_spriteram8_device> m_spriteram8;
@@ -121,6 +122,7 @@ public:
 	void twincobr_driver_savestate();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 

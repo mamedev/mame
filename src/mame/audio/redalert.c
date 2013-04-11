@@ -70,7 +70,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 	/* D7 is also connected to the NMI input of the CPU -
 	   the NMI is actually toggled by a 74121 */
 	if ((data & 0x80) == 0x00)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -282,7 +282,7 @@ WRITE8_MEMBER(redalert_state::demoneye_audio_command_w)
 {
 	/* the byte is connected to port A of the AY8910 */
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

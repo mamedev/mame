@@ -584,7 +584,7 @@ void esd16_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 
-	m_audio_cpu = machine().device("audiocpu");
+	m_audio_cpu = m_audiocpu;
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
 	save_item(NAME(m_tilemap0_color));

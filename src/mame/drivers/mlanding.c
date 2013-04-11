@@ -37,7 +37,8 @@ public:
 		m_dma_ram(*this, "dma_ram"),
 		m_ml_dotram(*this, "ml_dotram"),
 		m_mecha_ram(*this, "mecha_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
@@ -83,6 +84,7 @@ public:
 	int start_dma();
 	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -303,7 +305,7 @@ WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 		if(m_trigger == 0)
 		{
 			m_adpcm_pos++;
-			//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			//m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			/*TODO: simplify this */
 			if(ROM[m_adpcm_pos] == 0x00 && ROM[m_adpcm_pos+1] == 0x00 && ROM[m_adpcm_pos+2] == 0x00 && ROM[m_adpcm_pos+3] == 0x00
 				&& ROM[m_adpcm_pos+4] == 0x00 && ROM[m_adpcm_pos+5] == 0x00 && ROM[m_adpcm_pos+6] == 0x00 && ROM[m_adpcm_pos+7] == 0x00
@@ -352,7 +354,7 @@ WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 		tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		//m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
 	}
 }
@@ -364,7 +366,7 @@ WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 		tc0140syt->tc0140syt_slave_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		//m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		tc0140syt->tc0140syt_slave_comm_w(space, 0, data & 0xff);
 	}
 }
@@ -460,7 +462,7 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 
 WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
 {
-//  machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+//  m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
@@ -745,7 +747,7 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 void mlanding_state::machine_reset()
 {
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;

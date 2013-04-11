@@ -357,7 +357,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(sshangha_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym2203_interface ym2203_config =

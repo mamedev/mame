@@ -217,7 +217,7 @@ WRITE16_MEMBER(wwfsstar_state::wwfsstar_scrollwrite)
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_soundwrite)
 {
 	soundlatch_byte_w(space, 1, data & 0xff);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_flipscreen_w)

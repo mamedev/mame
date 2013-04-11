@@ -15,7 +15,8 @@ public:
 		m_swimmer_background_color(*this, "bgcolor"),
 		m_toprollr_bg_videoram(*this, "bg_videoram"),
 		m_toprollr_bg_coloram(*this, "bg_coloram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_bigsprite_videoram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -83,4 +84,5 @@ public:
 	void cclimber_decode(const UINT8 convtable[8][16]);
 	void cannonb_patch();
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

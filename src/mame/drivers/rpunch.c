@@ -159,7 +159,7 @@ TIMER_CALLBACK_MEMBER(rpunch_state::sound_command_w_callback)
 {
 	m_sound_busy = 1;
 	m_sound_data = param;
-	machine().device("audiocpu")->execute().set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -173,7 +173,7 @@ WRITE16_MEMBER(rpunch_state::sound_command_w)
 READ8_MEMBER(rpunch_state::sound_command_r)
 {
 	m_sound_busy = 0;
-	machine().device("audiocpu")->execute().set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return m_sound_data;
 }
 

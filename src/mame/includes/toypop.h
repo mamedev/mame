@@ -7,7 +7,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_m68000_sharedram(*this, "m68k_shared"),
 		m_bg_image(*this, "bg_image"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -58,4 +59,5 @@ public:
 	void draw_background(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

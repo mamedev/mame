@@ -12,7 +12,8 @@ public:
 		m_fgram(*this, "fgram"),
 		m_bgram(*this, "bgram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_sound_data;
@@ -46,6 +47,7 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	int suprridr_is_screen_flipped();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in video/suprridr.c -----------*/

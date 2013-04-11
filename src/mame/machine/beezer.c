@@ -88,9 +88,9 @@ READ8_MEMBER(beezer_state::b_via_0_pb_r)
 WRITE8_MEMBER(beezer_state::b_via_0_pa_w)
 {
 	if ((data & 0x08) == 0)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{

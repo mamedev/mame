@@ -1035,14 +1035,14 @@ WRITE32_MEMBER( hng64_state::hng64_soundcpu_enable_w )
 		if (cmd==0x55AA)
 		{
 			printf("soundcpu ON\n");
-			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else if (cmd==0xAA55)
 		{
 			printf("soundcpu OFF\n");
-			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-			space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
@@ -1772,8 +1772,8 @@ void hng64_state::machine_reset()
 	UINT8 *RAM = (UINT8*)m_soundram;
 	membank("bank1")->set_base(&RAM[0x1f0000]); // allows us to boot
 	membank("bank2")->set_base(&RAM[0x1f0000]); // seems to be the right default for most games (initial area jumps to a DI here)
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Comm CPU */
 	KL5C80_init(this);

@@ -11,14 +11,15 @@ public:
 		m_hardhead_ip(*this, "hardhead_ip"),
 		m_spriteram(*this, "spriteram"),
 		m_wram(*this, "wram"),
-		m_banked_paletteram(*this, "paletteram")
-	{ }
+		m_banked_paletteram(*this, "paletteram"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_hardhead_ip;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_wram;
 	optional_shared_ptr<UINT8> m_banked_paletteram;
+	required_device<cpu_device> m_audiocpu;
 
 	UINT8 m_rombank;
 	UINT8 m_rombank_latch;

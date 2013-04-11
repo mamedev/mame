@@ -263,7 +263,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_sound_brt_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 1, data >> 8);
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{

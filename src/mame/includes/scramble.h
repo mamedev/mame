@@ -8,7 +8,7 @@ public:
 		: galaxold_state(mconfig, type, tag),
 			m_ppi8255_0(*this, "ppi8255_0"),
 			m_ppi8255_1(*this, "ppi8255_1"),
-			m_soundram(*this, "soundram")
+			m_soundram(*this, "soundram") 
 	{ }
 
 	optional_device<i8255_device>  m_ppi8255_0;

@@ -47,9 +47,9 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
 	else
 	{
 		state->m_m68681_tx0 = data;
-		device->machine().device("audiocpu")->execute().set_input_line(MCS51_RX_LINE, ASSERT_LINE);
+		state->m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
 		// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
-		device->machine().device("audiocpu")->execute().set_input_line(MCS51_RX_LINE, CLEAR_LINE);
+		state->m_audiocpu->set_input_line(MCS51_RX_LINE, CLEAR_LINE);
 	}
 };
 
@@ -601,8 +601,8 @@ DRIVER_INIT_MEMBER(micro3d_state,micro3d)
 {
 	address_space &space = machine().device("drmath")->memory().space(AS_DATA);
 
-	i8051_set_serial_tx_callback(machine().device("audiocpu"), write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
-	i8051_set_serial_rx_callback(machine().device("audiocpu"), read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
+	i8051_set_serial_tx_callback(m_audiocpu, write8_delegate(FUNC(micro3d_state::data_from_i8031),this));
+	i8051_set_serial_rx_callback(m_audiocpu, read8_delegate(FUNC(micro3d_state::data_to_i8031),this));
 
 	m_duart68681 = machine().device("duart68681");
 
@@ -633,5 +633,5 @@ void micro3d_state::machine_reset()
 
 	machine().device("vgb")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("drmath")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

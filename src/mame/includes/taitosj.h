@@ -17,7 +17,8 @@ public:
 		m_video_priority(*this, "video_priority"),
 		m_collision_reg(*this, "collision_reg"),
 		m_kikstart_scrollram(*this, "kikstart_scroll"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
@@ -116,4 +117,5 @@ public:
 	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect,copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);
 	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

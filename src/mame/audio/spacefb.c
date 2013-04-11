@@ -33,7 +33,7 @@ WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
 {
 	samples_device *samples = machine().device<samples_device>("samples");
 
-	machine().device("audiocpu")->execute().set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
 	if (!(data & 0x01) && (m_sound_latch & 0x01))  samples->start(0,0);

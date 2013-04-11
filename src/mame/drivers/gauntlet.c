@@ -202,7 +202,7 @@ WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 
 		if ((oldword ^ m_sound_reset_val) & 1)
 		{
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			sound_cpu_reset();
 			if (m_sound_reset_val & 1)
 			{

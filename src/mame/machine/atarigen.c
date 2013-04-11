@@ -131,7 +131,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_atarivc_playfields(0),
 		m_playfield_latch(0),
 		m_playfield2_latch(0),
-		m_maincpu(*this, "maincpu") 
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")
 {
 }
 

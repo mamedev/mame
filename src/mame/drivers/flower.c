@@ -87,7 +87,7 @@ WRITE8_MEMBER(flower_state::flower_subcpu_irq_ack)
 
 WRITE8_MEMBER(flower_state::flower_soundcpu_irq_ack)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(flower_state::flower_coin_counter_w)
@@ -105,7 +105,7 @@ WRITE8_MEMBER(flower_state::sound_command_w)
 	soundlatch_byte_w(space, 0, data);
 
 	if (*m_sn_nmi_enable & 1)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8, flower_state )

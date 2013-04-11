@@ -12,7 +12,8 @@ public:
 		m_scroll2y(*this, "scroll2y"),
 		m_scroll_x_lo(*this, "scroll_x_lo"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_msm5205next;
 	int m_toggle;
@@ -45,4 +46,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

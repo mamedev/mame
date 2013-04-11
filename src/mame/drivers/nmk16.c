@@ -206,7 +206,7 @@ WRITE16_MEMBER(nmk16_state::ssmissin_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -264,7 +264,7 @@ WRITE16_MEMBER(nmk16_state::macross2_sound_reset_w)
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
 	   every time music changes Z80 is resetted */
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(nmk16_state::macross2_sound_command_w)
@@ -303,7 +303,7 @@ WRITE16_MEMBER(nmk16_state::afega_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data&0xff);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -3503,7 +3503,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 
 WRITE_LINE_MEMBER(nmk16_state::ym2203_irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

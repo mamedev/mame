@@ -242,7 +242,7 @@ void ginganin_state::machine_reset()
 
 WRITE8_MEMBER(ginganin_state::ptm_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ptm6840_interface ptm_intf =

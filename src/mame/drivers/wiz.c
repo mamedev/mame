@@ -1090,7 +1090,7 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 
 DRIVER_INIT_MEMBER(wiz_state,scion)
 {
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).nop_write(0x4000, 0x4001);
+	m_audiocpu->space(AS_PROGRAM).nop_write(0x4000, 0x4001);
 }
 
 

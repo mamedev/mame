@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(spiders_state::main_cpu_firq)
 
 WRITE_LINE_MEMBER(spiders_state::audio_cpu_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

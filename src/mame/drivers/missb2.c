@@ -419,7 +419,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(missb2_state::irqhandler)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  machine().device("audiocpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =

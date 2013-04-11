@@ -6,7 +6,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg0_videoram(*this, "fg0_videoram"),
 		m_bg0_videoram(*this, "bg0_videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_vblank;
 	int m_scrollx;
@@ -31,4 +32,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

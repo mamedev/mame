@@ -223,7 +223,7 @@ WRITE8_MEMBER(xain_state::xainCPUB_bankswitch_w)
 WRITE8_MEMBER(xain_state::xain_sound_command_w)
 {
 	soundlatch_byte_w(space,offset,data);
-	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(xain_state::xain_main_irq_w)
@@ -552,7 +552,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(xain_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

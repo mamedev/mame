@@ -28,6 +28,7 @@ public:
 	seta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this,"sub"),
 		m_sharedram(*this,"sharedram"),
 		m_workram(*this,"workram"),
@@ -43,6 +44,7 @@ public:
 		m_inttoote_700000(*this,"inttoote_700000") { }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 
 	optional_shared_ptr<UINT8> m_sharedram;

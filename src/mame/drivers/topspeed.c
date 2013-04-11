@@ -420,7 +420,7 @@ WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched betwe
 WRITE8_MEMBER(topspeed_state::topspeed_tc0140syt_comm_w)
 {
 	tc0140syt_device *device = machine().device<tc0140syt_device>("tc0140syt");
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	device->tc0140syt_comm_w(space, 0, data);
 }
 

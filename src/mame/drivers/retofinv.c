@@ -43,7 +43,7 @@ WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
 
 WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::mcu_reset_w)
@@ -66,7 +66,7 @@ READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
 		soundlatch_byte_w(space, 0, data);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::irq0_ack_w)

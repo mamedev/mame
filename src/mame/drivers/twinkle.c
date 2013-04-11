@@ -246,7 +246,8 @@ public:
 	twinkle_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -274,6 +275,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_DRIVER_INIT(twinkle);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /* RTC */
@@ -655,7 +657,7 @@ WRITE_LINE_MEMBER(twinkle_state::ide_interrupt)
 {
 	if ((state) && (m_spu_ctrl & 0x0400))
 	{
-		machine().device("audiocpu")->execute().set_input_line(M68K_IRQ_6, ASSERT_LINE);
+		m_audiocpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
 	}
 }
 

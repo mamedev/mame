@@ -252,7 +252,7 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data&0xff);
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -635,7 +635,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(bbusters_state::sound_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =

@@ -14,7 +14,8 @@ public:
 		m_textram(*this, "textram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -68,4 +69,5 @@ public:
 	void set_fg_page( int page, int value );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

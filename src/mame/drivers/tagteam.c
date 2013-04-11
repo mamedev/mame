@@ -33,7 +33,7 @@ TODO:
 WRITE8_MEMBER(tagteam_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 WRITE8_MEMBER(tagteam_state::irq_clear_w)

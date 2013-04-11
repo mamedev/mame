@@ -5,7 +5,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this,"maincpu"){ }
+		m_maincpu(*this,"maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	int m_toggle;
 	int m_adpcm_pos[2];
@@ -54,4 +55,5 @@ public:
 	void spd_adpcm_int(device_t *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
+	required_device<cpu_device> m_audiocpu;
 };

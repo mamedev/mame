@@ -213,7 +213,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_blitter_ram(*this, "blitter_ram"),
 		m_io_ram(*this, "io_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT16 *m_render_layer[MAX_LAYERS];
 	UINT8 m_sound_fifo[MAX_SOUNDS];
@@ -278,6 +279,7 @@ public:
 	void filter_bitmap(bitmap_ind16 &bitmap, int mask);
 	void init_common();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -1625,7 +1627,7 @@ WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
 	m_io_ram[0x8a] = data;
 	soundlatch_byte_w(space,offset,data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -1968,7 +1968,7 @@ DRIVER_INIT_MEMBER(btime_state,disco)
 
 DRIVER_INIT_MEMBER(btime_state,cookrace)
 {
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
+	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -1983,7 +1983,7 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
+	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }

@@ -116,7 +116,7 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
 TIMER_CALLBACK_MEMBER(suprridr_state::delayed_sound_w)
 {
 	m_sound_data = param;
-	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -134,7 +134,7 @@ READ8_MEMBER(suprridr_state::sound_data_r)
 
 WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 

@@ -87,7 +87,8 @@ class chinagat_state : public ddragon_state
 {
 public:
 	chinagat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ddragon_state(mconfig, type, tag) {};
+		: ddragon_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu") {};
 
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
 	DECLARE_DRIVER_INIT(chinagat);
@@ -106,6 +107,7 @@ public:
 	DECLARE_READ8_MEMBER( saiyugoub1_m5205_irq_r );
 	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(chinagat_irq_handler);
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -532,7 +534,7 @@ static const ym2203_interface ym2203_config =
 MACHINE_START_MEMBER(chinagat_state,chinagat)
 {
 	m_sub_cpu = machine().device("sub");
-	m_snd_cpu = machine().device("audiocpu");
+	m_snd_cpu = m_audiocpu;
 
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);

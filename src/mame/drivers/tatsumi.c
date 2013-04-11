@@ -210,7 +210,7 @@ READ16_MEMBER(tatsumi_state::cyclwarr_input2_r)
 WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 {
 	soundlatch_byte_w(space, 0, data >> 8);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/

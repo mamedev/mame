@@ -141,12 +141,12 @@ WRITE8_MEMBER(tehkanwc_state::tehkanwc_track_1_reset_w)
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(tehkanwc_state::reset_callback)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)

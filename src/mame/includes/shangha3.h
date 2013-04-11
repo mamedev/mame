@@ -4,7 +4,8 @@ public:
 	shangha3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_prot_count;
 	required_shared_ptr<UINT16> m_ram;
@@ -31,4 +32,5 @@ public:
 	UINT32 screen_update_shangha3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

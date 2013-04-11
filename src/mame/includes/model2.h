@@ -20,7 +20,8 @@ public:
 		m_lumaram(*this, "lumaram"),
 		m_soundram(*this, "soundram"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_tgp_program(*this, "tgp_program"){ }
+		m_tgp_program(*this, "tgp_program"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_workram;
@@ -170,6 +171,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
 	void model2_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in video/model2.c -----------*/

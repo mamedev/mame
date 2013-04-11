@@ -11,7 +11,8 @@ public:
 		m_attributesram(*this, "attributesram"),
 		m_spriteram(*this, "spriteram"),
 		m_sprite_bank(*this, "sprite_bank"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_dsc0;
 	int m_dsc1;
@@ -58,4 +59,5 @@ public:
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8* sprite_ram,int bank);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

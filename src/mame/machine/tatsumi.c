@@ -50,9 +50,9 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x80)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	m_last_control=m_control_word;
 }
@@ -66,7 +66,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_z80_ctrl_w)
 
 READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 {
-	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
 	/* Each V20 byte maps to a V30 word */
 	if ((m_control_word & 0xe0) == 0xe0)
@@ -82,7 +82,7 @@ READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)
 
 WRITE16_MEMBER(tatsumi_state::apache3_v30_v20_w)
 {
-	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
 	if ((m_control_word & 0xe0) != 0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n", space.device().safe_pc(), offset);
@@ -142,7 +142,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_rotate_w)
 
 READ16_MEMBER(tatsumi_state::roundup_v30_z80_r)
 {
-	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
 	/* Each Z80 byte maps to a V30 word */
 	if (m_control_word & 0x20)
@@ -153,7 +153,7 @@ READ16_MEMBER(tatsumi_state::roundup_v30_z80_r)
 
 WRITE16_MEMBER(tatsumi_state::roundup_v30_z80_w)
 {
-	address_space &targetspace = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &targetspace = m_audiocpu->space(AS_PROGRAM);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
@@ -176,9 +176,9 @@ WRITE16_MEMBER(tatsumi_state::roundup5_control_w)
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (m_control_word & 0x4)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
 //      logerror("%08x:  Changed bank to %04x (%d)\n", space.device().safe_pc(), tatsumi_control_w,offset);

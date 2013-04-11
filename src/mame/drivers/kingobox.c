@@ -452,7 +452,7 @@ void kingofb_state::machine_start()
 {
 	m_video_cpu = machine().device("video");
 	m_sprite_cpu = machine().device("sprite");
-	m_audio_cpu = machine().device("audiocpu");
+	m_audio_cpu = m_audiocpu;
 
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_palette_bank));

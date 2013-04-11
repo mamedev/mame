@@ -129,7 +129,7 @@ TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
 
 	/* IRQ is set by /32V */
 	m_maincpu->set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(M6502_IRQ_LINE, (scanline & 32) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* set up for the next */
 	scanline += 32;

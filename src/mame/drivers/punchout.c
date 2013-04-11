@@ -146,9 +146,9 @@ WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
 WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
 {
 	if (data & 1)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

@@ -356,7 +356,7 @@ MACHINE_RESET_MEMBER(model2_state,model2_scsp)
 
 	// copy the 68k vector table into RAM
 	memcpy(m_soundram, memregion("audiocpu")->base() + 0x80000, 16);
-	machine().device("audiocpu")->reset();
+	m_audiocpu->reset();
 	scsp_set_ram_base(machine().device("scsp"), m_soundram);
 }
 
@@ -963,7 +963,8 @@ WRITE32_MEMBER(model2_state::model2_irq_w)
 
 static int snd_68k_ready_r(address_space &space)
 {
-	int sr = space.machine().device("audiocpu")->state().state_int(M68K_SR);
+	model2_state *state = space.machine().driver_data<model2_state>();
+	int sr = state->m_audiocpu->state_int(M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
@@ -984,7 +985,7 @@ static void snd_latch_to_68k_w(address_space &space, int data)
 
 	state->m_to_68k = data;
 
-	space.machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
+	state->m_audiocpu->set_input_line(2, HOLD_LINE);
 
 	// give the 68k time to notice
 	space.device().execute().spin_until_time(attotime::from_usec(40));
@@ -1877,10 +1878,10 @@ WRITE_LINE_MEMBER(model2_state::scsp_irq)
 	if (state > 0)
 	{
 		m_scsp_last_line = state;
-		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
+		m_audiocpu->set_input_line(state, ASSERT_LINE);
 	}
 	else
-		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
+		m_audiocpu->set_input_line(-state, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

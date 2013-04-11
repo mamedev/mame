@@ -22,7 +22,7 @@ WRITE16_MEMBER(aztarac_state::aztarac_sound_w)
 		soundlatch_byte_w(space, offset, data);
 		m_sound_status ^= 0x21;
 		if (m_sound_status & 0x20)
-			machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+			m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 

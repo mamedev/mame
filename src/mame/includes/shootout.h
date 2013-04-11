@@ -6,7 +6,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_textram(*this, "textram"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
@@ -32,4 +33,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd_irq);
 	DECLARE_WRITE_LINE_MEMBER(shootout_snd2_irq);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

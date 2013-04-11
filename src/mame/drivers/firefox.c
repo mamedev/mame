@@ -45,7 +45,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_sprite_palette(*this, "sprite_palette"),
 		m_tile_palette(*this, "tile_palette"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<phillips_22vp931_device> m_laserdisc;
 	required_shared_ptr<unsigned char> m_tileram;
@@ -104,6 +105,7 @@ public:
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -317,12 +319,12 @@ WRITE8_MEMBER(firefox_state::main_to_sound_w)
 {
 	m_main_to_sound_flag = 1;
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(firefox_state::sound_reset_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if ((data & 0x80) != 0)
 		m_sound_to_main_flag = m_main_to_sound_flag = 0;
 }
@@ -375,7 +377,7 @@ WRITE8_MEMBER(firefox_state::riot_porta_w)
 
 WRITE_LINE_MEMBER(firefox_state::riot_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -102,7 +102,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -147,6 +148,7 @@ public:
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -358,20 +360,20 @@ WRITE8_MEMBER(looping_state::main_irq_ack_w)
 WRITE8_MEMBER(looping_state::looping_souint_clr)
 {
 	if (data == 0)
-		machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
 
 WRITE_LINE_MEMBER(looping_state::looping_spcint)
 {
-	machine().device("audiocpu")->execute().set_input_line_and_vector(0, !state, 6);
+	m_audiocpu->set_input_line_and_vector(0, !state, 6);
 }
 
 
 WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 4);
+	m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 4);
 }
 
 

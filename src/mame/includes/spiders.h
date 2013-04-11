@@ -14,7 +14,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_ram;
 	required_device<discrete_device> m_discrete;
@@ -39,6 +40,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spiders_audio_b_w);
 	DECLARE_WRITE8_MEMBER(spiders_audio_ctrl_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in audio/spiders.c -----------*/

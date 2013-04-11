@@ -15,7 +15,8 @@ public:
 		m_nmk_bgvideoram3(*this, "nmk_bgvideoram3"),
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int mask[4*2];
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
@@ -175,4 +176,5 @@ public:
 	void decode_ssmissin();
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

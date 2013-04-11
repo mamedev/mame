@@ -208,7 +208,7 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(newselect & 0x0080)) sound_cpu_reset();
 	}
 

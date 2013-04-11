@@ -815,7 +815,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(fantland_state,fantland)
 {
-	m_audio_cpu = machine().device("audiocpu");
+	m_audio_cpu = m_audiocpu;
 
 	save_item(NAME(m_nmi_enable));
 }

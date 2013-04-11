@@ -775,13 +775,13 @@ READ8_MEMBER(dooyong_state::unk_r)
 WRITE_LINE_MEMBER(dooyong_state::irqhandler_2203_1)
 {
 	m_interrupt_line_1=state;
-	machine().device("audiocpu")->execute().set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(dooyong_state::irqhandler_2203_2)
 {
 	m_interrupt_line_2=state;
-	machine().device("audiocpu")->execute().set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =

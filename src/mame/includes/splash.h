@@ -9,7 +9,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_protdata(*this, "protdata"),
 		m_bitmap_mode(*this, "bitmap_mode"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	required_shared_ptr<UINT16> m_pixelram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -75,4 +76,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

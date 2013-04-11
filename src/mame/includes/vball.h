@@ -7,7 +7,8 @@ public:
 		m_vb_videoram(*this, "vb_videoram"),
 		m_vb_scrolly_lo(*this, "vb_scrolly_lo"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_vb_attribram;
 	required_shared_ptr<UINT8> m_vb_videoram;
@@ -40,4 +41,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

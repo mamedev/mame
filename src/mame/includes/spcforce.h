@@ -11,7 +11,8 @@ public:
 		m_sn1(*this, "sn1"),
 		m_sn2(*this, "sn2"),
 		m_sn3(*this, "sn3"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 
 	required_shared_ptr<UINT8> m_scrollram;
@@ -37,4 +38,5 @@ public:
 	UINT32 screen_update_spcforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

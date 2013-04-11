@@ -38,7 +38,8 @@ public:
 			m_ppi8255_2(*this, "ppi8255_2"),
 			m_spriteram(*this, "spriteram"),
 			m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu") { }
 
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
@@ -286,4 +287,5 @@ public:
 	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

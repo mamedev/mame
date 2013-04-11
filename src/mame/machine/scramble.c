@@ -17,7 +17,7 @@ MACHINE_RESET_MEMBER(scramble_state,scramble)
 {
 	MACHINE_RESET_CALL_MEMBER(galaxold);
 
-	if (machine().device("audiocpu") != NULL)
+	if (m_audiocpu != NULL)
 		scramble_sh_init(machine());
 
 	m_security_2B_counter = 0;

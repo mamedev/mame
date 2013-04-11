@@ -186,13 +186,13 @@ void badlands_state::update_interrupts()
 
 void badlands_state::scanline_update(screen_device &screen, int scanline)
 {
-	address_space &space = subdevice("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_audiocpu->space(AS_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		m6502_irq_ack_r(space, 0);
 	else if (!(ioport("FE4000")->read() & 0x40))
-		m6502_irq_gen(*screen.machine().device("audiocpu"));
+		m6502_irq_gen(m_audiocpu);
 }
 
 

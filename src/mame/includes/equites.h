@@ -15,7 +15,8 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram_2(*this, "spriteram_2"),
 		m_mcu_ram(*this, "mcu_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -56,7 +57,6 @@ public:
 
 	/* devices */
 	device_t *m_mcu;
-	device_t *m_audio_cpu;
 	msm5232_device *m_msm;
 	dac_device *m_dac_1;
 	dac_device *m_dac_2;
@@ -120,4 +120,5 @@ public:
 	void unpack_block( const char *region, int offset, int size );
 	void unpack_region( const char *region );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

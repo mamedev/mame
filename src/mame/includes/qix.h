@@ -27,6 +27,7 @@ public:
 	qix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_videocpu(*this, "videocpu"),
 		m_pia0(*this, "pia0"),
 		m_pia1(*this, "pia1"),
@@ -47,6 +48,7 @@ public:
 
 	/* devices */
 	required_device<m6809_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<m6809_device> m_videocpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;

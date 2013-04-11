@@ -8,7 +8,8 @@ public:
 		m_tx_tileram(*this, "tx_tileram"),
 		m_regs(*this, "regs"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	emu_timer *m_music_timer;
 
@@ -56,4 +57,5 @@ public:
 	TIMER_CALLBACK_MEMBER(music_playback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

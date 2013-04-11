@@ -32,7 +32,7 @@ WRITE16_MEMBER(darkseal_state::darkseal_control_w)
 		return;
 	case 8: /* Sound CPU write */
 		soundlatch_byte_w(space, 0, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 		return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;

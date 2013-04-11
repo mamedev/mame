@@ -171,7 +171,7 @@ WRITE8_MEMBER(vball_state::vb_bankswitch_w)
 WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

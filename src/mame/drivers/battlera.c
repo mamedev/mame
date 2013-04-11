@@ -36,7 +36,7 @@ WRITE8_MEMBER(battlera_state::battlera_sound_w)
 	if (offset == 0)
 	{
 		soundlatch_byte_w(space,0,data);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -90,7 +90,7 @@ WRITE_LINE_MEMBER(battlera_state::battlera_adpcm_int)
 
 	m_toggle = 1 - m_toggle;
 	if (m_toggle)
-		machine().device("audiocpu")->execute().set_input_line(1, HOLD_LINE);
+		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
 WRITE8_MEMBER(battlera_state::battlera_adpcm_data_w)

@@ -186,7 +186,7 @@ WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 		case 0x0e:  /* OUT14 */
 			/* O-21 connector */
 			soundlatch_byte_w(space, 0, data);
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }

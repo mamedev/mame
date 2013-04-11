@@ -121,7 +121,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
-			machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 		if ((old & 0x40) && (m_CPUA_register & 0x40) == 0)
 			twin16_spriteram_process();
@@ -164,7 +164,7 @@ WRITE16_MEMBER(twin16_state::fround_CPU_register_w)
 	if (m_CPUA_register != old)
 	{
 		if ((old & 0x08) == 0 && (m_CPUA_register & 0x08))
-			machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 		coin_counter_w(machine(), 0, m_CPUA_register & 0x01);
 		coin_counter_w(machine(), 1, m_CPUA_register & 0x02);

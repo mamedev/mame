@@ -183,7 +183,8 @@ public:
 	zr107_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -212,6 +213,7 @@ public:
 	INTERRUPT_GEN_MEMBER(zr107_vblank);
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -346,7 +348,7 @@ WRITE8_MEMBER(zr107_state::sysreg_w)
 			    0x01 = EEPDI
 			*/
 			ioport("EEPROMOUT")->write(data & 0x07, 0xff);
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -687,7 +689,7 @@ static const adc083x_interface zr107_adc_interface = {
 
 TIMER_CALLBACK_MEMBER(zr107_state::irq_off)
 {
-	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	m_audiocpu->set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )

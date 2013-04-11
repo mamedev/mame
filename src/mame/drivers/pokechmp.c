@@ -72,7 +72,7 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

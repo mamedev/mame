@@ -1017,7 +1017,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 	// don't let the slave cpu and the 68k go anywhere
 	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	m_en_68k = 0;
 	m_NMI_reset = 0;

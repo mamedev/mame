@@ -1819,7 +1819,7 @@ static const ymz280b_interface ymz280b_intf =
 
 WRITE_LINE_MEMBER(cave_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

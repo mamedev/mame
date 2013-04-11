@@ -251,7 +251,7 @@ static const sn76496_config psg_intf =
 
 void finalizr_state::machine_start()
 {
-	m_audio_cpu = machine().device("audiocpu");
+	m_audio_cpu = m_audiocpu;
 
 	save_item(NAME(m_spriterambank));
 	save_item(NAME(m_charbank));

@@ -11,7 +11,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_master_videoram(*this, "master_videoram"),
 		m_slave_videoram(*this, "slave_videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_aimpos[2];
 	UINT8 m_trackball_old[2];
@@ -39,6 +40,7 @@ public:
 	TIMER_CALLBACK_MEMBER(sound_delayed_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in video/exterm.c -----------*/

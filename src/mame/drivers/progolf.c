@@ -63,7 +63,8 @@ public:
 	progolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_fbram(*this, "fbram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 *m_videoram;
 	UINT8 m_char_pen;
@@ -88,6 +89,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -204,12 +206,12 @@ WRITE8_MEMBER(progolf_state::progolf_flip_screen_w)
 WRITE8_MEMBER(progolf_state::audio_command_w)
 {
 	m_sound_cmd = data;
-	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(progolf_state::audio_command_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return m_sound_cmd;
 }
 

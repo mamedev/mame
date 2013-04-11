@@ -232,7 +232,8 @@ public:
 	nwktr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -259,6 +260,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	void lanc2_init();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -515,7 +517,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 
 TIMER_CALLBACK_MEMBER(nwktr_state::irq_off)
 {
-	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	m_audiocpu->set_input_line(param, CLEAR_LINE);
 }
 
 void nwktr_state::machine_start()

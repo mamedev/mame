@@ -19,7 +19,8 @@ public:
 		m_prot_data(*this, "prot_data"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -61,4 +62,5 @@ public:
 	inline void sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

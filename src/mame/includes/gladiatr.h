@@ -8,7 +8,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_textram(*this, "textram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -71,4 +72,5 @@ public:
 	void swap_block(UINT8 *src1,UINT8 *src2,int len);
 	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

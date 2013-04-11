@@ -134,7 +134,7 @@ Stephh's notes (based on the games M6809 code and some tests) :
 WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(sidepckt_state::sidepckt_i8751_r)

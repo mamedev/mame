@@ -284,7 +284,7 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 WRITE8_MEMBER(segag80r_state::sindbadm_soundport_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 

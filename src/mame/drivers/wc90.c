@@ -102,7 +102,7 @@ WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
 WRITE8_MEMBER(wc90_state::wc90_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -292,7 +292,7 @@ GFXDECODE_END
 /* handler called by the 2608 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(wc90_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =

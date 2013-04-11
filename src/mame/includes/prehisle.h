@@ -6,7 +6,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bg_videoram16(*this, "bg_videoram16"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 
 	required_shared_ptr<UINT16> m_videoram;
@@ -32,4 +33,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int foreground );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

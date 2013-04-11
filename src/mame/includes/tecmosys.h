@@ -23,7 +23,8 @@ public:
 		m_c00000regs(*this, "c00000regs"),
 		m_c80000regs(*this, "c80000regs"),
 		m_880000regs(*this, "880000regs"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_tilemap_paletteram16;
@@ -90,4 +91,5 @@ public:
 	void tecmosys_descramble();
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

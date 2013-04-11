@@ -27,7 +27,8 @@ public:
 		m_edge1_pos(*this, "edge1_pos"),
 		m_edge2_pos(*this, "edge2_pos"),
 		m_scroll(*this, "scroll"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;
@@ -70,6 +71,7 @@ public:
 	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	inline UINT8 shift_common(UINT8 hi, UINT8 lo);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 /*----------- defined in video/madalien.c -----------*/
 

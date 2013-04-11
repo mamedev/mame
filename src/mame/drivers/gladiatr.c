@@ -258,7 +258,7 @@ MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 	{
 		UINT8 *rom = machine().root_device().memregion("audiocpu")->base() + 0x10000;
 		machine().root_device().membank("bank2")->set_base(rom);
-		machine().device("audiocpu")->reset();
+		m_audiocpu->reset();
 	}
 }
 
@@ -293,12 +293,12 @@ WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
 WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
 {
 	soundlatch_byte_w(space,0,data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(space,0);
 }
 

@@ -14,7 +14,7 @@ driver by Mirko Buffoni
 WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game

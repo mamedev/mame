@@ -36,7 +36,7 @@ WRITE8_MEMBER(timelimt_state::nmi_enable_w)
 WRITE8_MEMBER(timelimt_state::sound_reset_w)
 {
 	if (data & 1)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /***************************************************************************/

@@ -59,7 +59,7 @@ READ8_MEMBER(nbmj8991_state::nbmj8991_sound_r)
 
 void nbmj8991_state::machine_reset()
 {
-	device_t *audiocpu = machine().device("audiocpu");
+	device_t *audiocpu = m_audiocpu;
 	if (audiocpu != NULL && audiocpu->type() == Z80)
 	{
 		membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x8000, 0x8000);

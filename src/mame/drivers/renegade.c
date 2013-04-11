@@ -259,7 +259,7 @@ WRITE8_MEMBER(renegade_state::adpcm_play_w)
 WRITE8_MEMBER(renegade_state::sound_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/

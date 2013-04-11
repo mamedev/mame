@@ -1765,7 +1765,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(suna8_state::soundirq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used

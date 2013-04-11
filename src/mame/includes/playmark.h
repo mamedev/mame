@@ -12,7 +12,8 @@ public:
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_bgvideoram;
@@ -102,4 +103,5 @@ public:
 	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	UINT8 playmark_asciitohex(UINT8 data);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

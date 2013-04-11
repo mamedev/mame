@@ -46,7 +46,8 @@ public:
 	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_f3_ram(*this,"f3_ram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
@@ -276,4 +277,5 @@ public:
 	INTERRUPT_GEN_MEMBER(f3_interrupt2);
 	TIMER_CALLBACK_MEMBER(f3_interrupt3);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

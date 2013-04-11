@@ -3,7 +3,8 @@ class nbmj8991_state : public driver_device
 public:
 	nbmj8991_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_scrollx;
 	int m_scrolly;
@@ -59,4 +60,5 @@ public:
 	void update_pixel(int x, int y);
 	void nbmj8991_gfxdraw();
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };

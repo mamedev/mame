@@ -746,7 +746,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 		// if the FIFO has something in it, signal the 68k too
 		if (m_fifo_rptr != m_fifo_wptr)
 		{
-			machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
+			m_audiocpu->set_input_line(2, HOLD_LINE);
 		}
 	}
 }
@@ -853,7 +853,7 @@ WRITE16_MEMBER(model1_state::mr2_w)
 
 READ16_MEMBER(model1_state::snd_68k_ready_r)
 {
-	int sr = machine().device("audiocpu")->state().state_int(M68K_SR);
+	int sr = m_audiocpu->state_int(M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
@@ -893,7 +893,7 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 	m_snd_cmd_state++;
 
 	// signal the 68000 that there's data waiting
-	machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
+	m_audiocpu->set_input_line(2, HOLD_LINE);
 	// give the 68k time to reply
 	space.device().execute().spin_until_time(attotime::from_usec(40));
 }

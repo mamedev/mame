@@ -70,7 +70,7 @@ WRITE8_MEMBER(tbowl_state::shared_w)
 WRITE8_MEMBER(tbowl_state::tbowl_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -429,7 +429,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(tbowl_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =

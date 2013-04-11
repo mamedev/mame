@@ -104,10 +104,12 @@ public:
 	royalmah_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+	optional_device<cpu_device> m_audiocpu;
 	UINT8 m_input_port_select;
 	UINT8 m_dsw_select;
 	UINT8 m_rombank;
@@ -769,7 +771,7 @@ READ8_MEMBER(royalmah_state::jansou_6405_r)
 WRITE8_MEMBER(royalmah_state::jansou_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

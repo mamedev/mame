@@ -54,14 +54,14 @@ WRITE8_MEMBER(madalien_state::madalien_output_w)
 
 WRITE8_MEMBER(madalien_state::madalien_sound_command_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 	soundlatch_byte_w(space, offset, data);
 }
 
 
 READ8_MEMBER(madalien_state::madalien_sound_command_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, offset);
 }
 

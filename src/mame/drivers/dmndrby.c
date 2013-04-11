@@ -65,7 +65,8 @@ public:
 		m_sprite_ram(*this, "sprite_ram"),
 		m_dderby_vidchars(*this, "vidchars"),
 		m_dderby_vidattribs(*this, "vidattribs"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_scroll_ram;
 	required_shared_ptr<UINT8> m_sprite_ram;
@@ -85,13 +86,14 @@ public:
 	INTERRUPT_GEN_MEMBER(dderby_irq);
 	INTERRUPT_GEN_MEMBER(dderby_timer_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
 WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
 	soundlatch_byte_w(space,0,data);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 

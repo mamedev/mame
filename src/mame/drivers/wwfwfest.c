@@ -165,7 +165,7 @@ WRITE8_MEMBER(wwfwfest_state::oki_bankswitch_w)
 WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
 	soundlatch_byte_w(space,1,data & 0xff);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************

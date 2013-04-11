@@ -122,7 +122,7 @@ MACHINE_START_MEMBER(namcos2_shared_state,namcos2)
 MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 {
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-	address_space &audio_space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+	address_space &audio_space = m_audiocpu->space(AS_PROGRAM);
 
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl = 0;
@@ -133,7 +133,7 @@ MACHINE_RESET_MEMBER(namcos2_shared_state,namcos2)
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(audio_space, 0, 0); /* Page in bank 0 */
 
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
 
 	/* Place CPU2 & CPU3 into the reset condition */
 	ResetAllSubCPUs( machine(), ASSERT_LINE );

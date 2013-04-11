@@ -584,7 +584,7 @@ WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xFF);
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -645,7 +645,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xFF);
-		machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 

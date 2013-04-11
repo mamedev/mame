@@ -117,7 +117,7 @@ WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
 WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 WRITE8_MEMBER(wc90b_state::adpcm_control_w)
@@ -327,7 +327,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(wc90b_state::irqhandler)
 {
 	/* NMI writes to MSM ports *only*! -AS */
-	//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	if(m_toggle)
 	{
 		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0x0f) >> 0);

@@ -236,7 +236,8 @@ class bfcobra_state : public driver_device
 public:
 	bfcobra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT8 m_bank_data[4];
 	UINT8 *m_work_ram;
@@ -309,6 +310,7 @@ public:
 	UINT8 exec_r_phase(void);
 	UINT8 results_phase(void);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -1656,7 +1658,7 @@ WRITE_LINE_MEMBER(bfcobra_state::m6809_acia_tx_w)
 
 WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )

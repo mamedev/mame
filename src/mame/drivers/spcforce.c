@@ -73,7 +73,7 @@ READ8_MEMBER(spcforce_state::spcforce_t0_r)
 
 WRITE8_MEMBER(spcforce_state::spcforce_soundtrigger_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(spcforce_state::irq_mask_w)

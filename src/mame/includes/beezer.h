@@ -6,7 +6,8 @@ public:
 	beezer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
 	int m_pbus;
@@ -29,6 +30,7 @@ public:
 	DECLARE_READ8_MEMBER(b_via_1_pb_r);
 	DECLARE_WRITE8_MEMBER(b_via_1_pa_w);
 	DECLARE_WRITE8_MEMBER(b_via_1_pb_w);
+	required_device<cpu_device> m_audiocpu;
 };
 
 

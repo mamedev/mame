@@ -21,7 +21,8 @@ public:
 		m_roundup_p_ram(*this, "roundup_p_ram"),
 		m_roundup_l_ram(*this, "roundup_l_ram"),
 		m_spriteram(*this, "spriteram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	optional_shared_ptr<UINT16> m_videoram;
 	optional_shared_ptr<UINT16> m_cyclwarr_cpua_ram;
@@ -129,6 +130,7 @@ public:
 	DECLARE_READ8_MEMBER(tatsumi_hack_ym2151_r);
 	DECLARE_READ8_MEMBER(tatsumi_hack_oki_r);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in machine/tatsumi.c -----------*/

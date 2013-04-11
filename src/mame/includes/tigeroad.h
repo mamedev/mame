@@ -8,7 +8,8 @@ public:
 			m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"),
 		m_ram16(*this, "ram16"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -33,4 +34,5 @@ public:
 	void f1dream_protection_w(address_space &space);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

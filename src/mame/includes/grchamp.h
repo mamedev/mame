@@ -17,7 +17,8 @@ public:
 		m_leftram(*this, "leftram"),
 		m_rightram(*this, "rightram"),
 		m_centerram(*this, "centerram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	UINT8       m_cpu0_out[16];
 	UINT8       m_cpu1_out[16];
@@ -78,6 +79,7 @@ public:
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
 	void draw_objects(int y, UINT8 *objdata);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /* Discrete Sound Input Nodes */

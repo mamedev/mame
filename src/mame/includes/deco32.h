@@ -8,6 +8,7 @@ public:
 	deco32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_decobsmt(*this, "decobsmt"),
 		m_spriteram(*this, "spriteram"),
 		m_ram(*this, "ram"),
@@ -22,6 +23,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<decobsmt_device> m_decobsmt;
 	optional_device<buffered_spriteram32_device> m_spriteram;
 	required_shared_ptr<UINT32> m_ram;

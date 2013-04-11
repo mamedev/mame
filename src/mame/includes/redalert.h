@@ -16,7 +16,8 @@ public:
 		m_charmap_videoram(*this, "charram"),
 		m_video_control(*this, "video_control"),
 		m_bitmap_color(*this, "bitmap_color"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_ay8910_latch_1;
 	UINT8 m_ay8910_latch_2;
@@ -52,6 +53,7 @@ public:
 	void get_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 /*----------- defined in audio/redalert.c -----------*/
 

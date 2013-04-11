@@ -19,7 +19,8 @@ public:
 		m_scroll2ylo(*this, "scroll2ylo"),
 		m_scroll2yhi(*this, "scroll2yhi"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	typedef void (wc90_state::*draw_sprites_func)(bitmap_ind16 &, const rectangle &, int, int, int, int, int );
 
@@ -69,4 +70,5 @@ public:
 	void draw_sprite_invalid(bitmap_ind16 &bitmap, const rectangle &cliprect, int code, int sx, int sy, int bank, int flags );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

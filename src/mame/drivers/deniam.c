@@ -241,7 +241,7 @@ static const ym3812_interface ym3812_config =
 
 void deniam_state::machine_start()
 {
-	m_audio_cpu = machine().device("audiocpu");
+	m_audio_cpu = m_audiocpu;
 
 	save_item(NAME(m_display_enable));
 	save_item(NAME(m_coinctrl));

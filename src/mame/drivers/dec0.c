@@ -187,7 +187,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
@@ -226,7 +226,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+				m_audiocpu->set_input_line(0, HOLD_LINE);
 			}
 			break;
 
@@ -259,7 +259,7 @@ WRITE16_MEMBER(dec0_state::slyspy_control_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_byte_w(space, 0, data & 0xff);
-				machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+				m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -273,7 +273,7 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1296,12 +1296,12 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(dec0_state::sound_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state); /* IRQ */
+	m_audiocpu->set_input_line(0, state); /* IRQ */
 }
 
 WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 {
-	machine().device("audiocpu")->execute().set_input_line(1, state); /* IRQ2 */
+	m_audiocpu->set_input_line(1, state); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =
@@ -1393,7 +1393,7 @@ WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
 	else
 	{
 		msm5205_data_w(machine().device("msm"), m_automat_adpcm_byte >> 4);
-		//device->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
+		//device->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
 	}
 
 	m_automat_msm5205_vclk_toggle ^= 1;

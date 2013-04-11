@@ -13,7 +13,8 @@ public:
 	starwars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_mathram(*this, "mathram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_sound_data;
 	UINT8 m_main_data;
@@ -73,6 +74,7 @@ public:
 	void run_mproc();
 	void esb_slapstic_tweak(address_space &space, offs_t offset);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 

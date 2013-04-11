@@ -50,7 +50,7 @@ WRITE8_MEMBER(shootout_state::shootout_bankswitch_w)
 WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
 	soundlatch_byte_w( space, offset, data );
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE8_MEMBER(shootout_state::shootout_flipscreen_w)
@@ -231,7 +231,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(shootout_state::shootout_snd_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state);
+	m_audiocpu->set_input_line(0, state);
 }
 
 WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)

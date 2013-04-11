@@ -217,7 +217,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
 	soundlatch_byte_w(space,offset,data);
-	machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 

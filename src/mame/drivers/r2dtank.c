@@ -56,7 +56,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -79,6 +80,7 @@ public:
 	virtual void machine_start();
 	DECLARE_WRITE8_MEMBER(ttl74123_output_changed);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -130,7 +132,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
 	soundlatch_byte_w(space, 0, ~data);
-	machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
 }

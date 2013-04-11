@@ -8,7 +8,8 @@ public:
 		m_scrollram(*this, "scrollram"),
 		m_bgram(*this, "bgram"),
 		m_spr(*this, "vsystem_spr"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_pending_command;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -39,4 +40,5 @@ public:
 	void screen_eof_taotaido(screen_device &screen, bool state);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

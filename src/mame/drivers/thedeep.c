@@ -46,7 +46,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_nmi_w)
 WRITE8_MEMBER(thedeep_state::thedeep_sound_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -391,7 +391,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(thedeep_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =

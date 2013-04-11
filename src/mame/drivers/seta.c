@@ -1489,7 +1489,7 @@ static const x1_010_interface seta_sound_intf2 =
 
 WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, state);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 static const ym3438_interface utoukond_ym3438_intf =
@@ -2763,7 +2763,7 @@ READ8_MEMBER(seta_state::wiggie_soundlatch_r)
 WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
 {
 	m_wiggie_soundlatch = data >> 8;
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -2829,7 +2829,7 @@ WRITE16_MEMBER(seta_state::utoukond_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }

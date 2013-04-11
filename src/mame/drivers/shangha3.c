@@ -117,7 +117,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);  /* RST 38h */
+		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);  /* RST 38h */
 	}
 }
 
@@ -467,7 +467,7 @@ static const ay8910_interface ay8910_config =
 
 WRITE_LINE_MEMBER(shangha3_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, state);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 static const ym3438_interface ym3438_config =

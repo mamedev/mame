@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

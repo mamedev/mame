@@ -33,7 +33,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_npvidram(*this, "npvidram"),
 		m_npvidregs(*this, "npvidregs"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT16> m_npvidram;
 	required_shared_ptr<UINT16> m_npvidregs;
@@ -62,6 +63,7 @@ public:
 	void audio_cpu_assert_nmi();
 	DECLARE_WRITE_LINE_MEMBER(audio_cpu_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -171,13 +173,13 @@ READ16_MEMBER(neoprint_state::neoprint_audio_result_r)
 
 void neoprint_state::audio_cpu_assert_nmi()
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(neoprint_state::audio_command_w)
@@ -453,7 +455,7 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(neoprint_state::audio_cpu_irq)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

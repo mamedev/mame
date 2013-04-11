@@ -43,7 +43,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_shrike_io(*this, "shrike_io"),
 		m_shrike_shared(*this, "shrike_shared"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_device<timer_device> m_scanline_timer;
 
@@ -210,6 +211,7 @@ public:
 	void expand_roms(UINT8 cd_rom_mask);
 	inline void config_shooter_adc(UINT8 shooter, UINT8 adc_shift);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 

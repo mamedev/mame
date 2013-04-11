@@ -8,7 +8,8 @@ public:
 		m_spriteattrib_ram(*this, "spriteattram"),
 		m_videoram(*this, "videoram"),
 		m_cpu2_ram(*this, "cpu2_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_spritetile_ram;
 	required_shared_ptr<UINT8> m_spritexy_ram;
@@ -51,4 +52,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int gsword_coins_in(void);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

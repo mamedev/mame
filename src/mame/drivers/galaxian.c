@@ -543,7 +543,7 @@ WRITE8_MEMBER(galaxian_state::konami_sound_control_w)
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
 	machine().sound().system_mute(data & 0x10);
@@ -748,14 +748,14 @@ static I8255A_INTERFACE( scramble_ppi8255_1_intf )
 
 WRITE8_MEMBER(galaxian_state::explorer_sound_control_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
 
 READ8_MEMBER(galaxian_state::explorer_sound_latch_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return soundlatch_byte_r(m_audiocpu->space(AS_PROGRAM), 0);
 }
 
 
@@ -927,7 +927,7 @@ READ8_MEMBER(galaxian_state::frogger_sound_timer_r)
 
 WRITE8_MEMBER(galaxian_state::froggrmc_sound_control_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1254,13 +1254,13 @@ READ8_MEMBER(galaxian_state::jumpbug_protection_r)
 WRITE8_MEMBER(galaxian_state::checkman_sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -3352,7 +3352,7 @@ DRIVER_INIT_MEMBER(galaxian_state,sfx)
 	m_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
+	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->set_base(memregion("audiocpu")->base());
 }
 
@@ -3451,7 +3451,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 
 	/* hook up AY8910 */
-	machine().device("audiocpu")->memory().space(AS_IO).install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),this), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),this));
+	m_audiocpu->space(AS_IO).install_readwrite_handler(0x00, 0xff, read8_delegate(FUNC(galaxian_state::scorpion_ay8910_r),this), write8_delegate(FUNC(galaxian_state::scorpion_ay8910_w),this));
 
 	/* extra ROM */
 	space.install_read_bank(0x5800, 0x67ff, "bank1");
@@ -3460,7 +3460,7 @@ DRIVER_INIT_MEMBER(galaxian_state,scorpion)
 	/* no background related */
 //  space.nop_write(0x6803, 0x6803);
 
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
+	m_audiocpu->space(AS_PROGRAM).install_read_handler(0x3000, 0x3000, read8_delegate(FUNC(galaxian_state::scorpion_digitalker_intr_r),this));
 /*
 {
     const UINT8 *rom = memregion("speech")->base();

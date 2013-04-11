@@ -110,12 +110,12 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)

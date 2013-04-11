@@ -116,7 +116,7 @@ WRITE8_MEMBER(mainsnk_state::sound_command_w)
 {
 	m_sound_cpu_busy = 1;
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(mainsnk_state::sound_command_r)

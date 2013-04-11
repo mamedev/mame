@@ -181,7 +181,7 @@ void enigma2_state::machine_start()
 
 void enigma2_state::machine_reset()
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_last_sound_data = 0;
 	m_flip_screen = 0;

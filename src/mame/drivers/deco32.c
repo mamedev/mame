@@ -344,7 +344,7 @@ WRITE32_MEMBER(deco32_state::deco32_irq_controller_w)
 WRITE32_MEMBER(deco32_state::deco32_sound_w)
 {
 	soundlatch_byte_w(space,0,data & 0xff);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ32_MEMBER(deco32_state::deco32_71_r)
@@ -671,7 +671,7 @@ WRITE32_MEMBER(deco32_state::nslasher_prot_w)
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 		soundlatch_byte_w(space,0,(data>>16)&0xff);
 		m_nslasher_sound_irq |= 0x02;
-		machine().device("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1014,7 +1014,7 @@ READ8_MEMBER(deco32_state::latch_r)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_nslasher_sound_irq &= ~0x02;
-	machine().device("audiocpu")->execute().set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return soundlatch_byte_r(space,0);
 }
 

@@ -298,7 +298,7 @@ static int sound_nmi_enabled;
 
 void tmnt_state::sound_nmi_callback( int param )
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ( sound_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	sound_nmi_enabled = 0;
 }

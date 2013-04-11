@@ -402,12 +402,12 @@ void balsente_state::m6850_update_io()
 	/* apply the change */
 	if (new_state && !(m_m6850_sound_status & 0x80))
 	{
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		m_m6850_sound_status |= 0x80;
 	}
 	else if (!new_state && (m_m6850_sound_status & 0x80))
 	{
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_m6850_sound_status &= ~0x80;
 	}
 }
@@ -693,7 +693,7 @@ void balsente_state::counter_set_out(int which, int out)
 {
 	/* OUT on counter 2 is hooked to the /INT line on the Z80 */
 	if (which == 2)
-		machine().device("audiocpu")->execute().set_input_line(0, out ? ASSERT_LINE : CLEAR_LINE);
+		m_audiocpu->set_input_line(0, out ? ASSERT_LINE : CLEAR_LINE);
 
 	/* OUT on counter 0 is hooked to the GATE line on counter 1 */
 	else if (which == 0)

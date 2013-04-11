@@ -8,8 +8,9 @@ public:
 		m_fg0_videoram(*this, "fg0_videoram"),
 		m_bg0_videoram(*this, "bg0_videoram"),
 		m_bg1_videoram(*this, "bg1_videoram"),
-			m_spriteram(*this, "spriteram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_spriteram(*this, "spriteram") ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT16> m_fg0_videoram;
 	required_shared_ptr<UINT16> m_bg0_videoram;
@@ -48,4 +49,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(wwfwfest_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

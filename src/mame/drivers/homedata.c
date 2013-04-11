@@ -2019,7 +2019,7 @@ DRIVER_INIT_MEMBER(homedata_state,mjikaga)
 {
 	/* Mahjong Ikagadesuka is different as well. */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7802, 0x7802, read8_delegate(FUNC(homedata_state::pteacher_snd_r),this));
-	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0x0123, 0x0123, write8_delegate(FUNC(homedata_state::pteacher_snd_answer_w),this));
 }
 
 DRIVER_INIT_MEMBER(homedata_state,reikaids)

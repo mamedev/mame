@@ -545,7 +545,7 @@ DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 			data_lo = drgnmst_asciitohex((drgnmst_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(machine().device("audiocpu"), data);
+			pic16c5x_set_config(m_audiocpu, data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

@@ -23,7 +23,8 @@ public:
 	wink_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
@@ -46,6 +47,7 @@ public:
 	UINT32 screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wink_sound);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -111,7 +113,7 @@ READ8_MEMBER(wink_state::player_inputs_r)
 
 WRITE8_MEMBER(wink_state::sound_irq_w)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//machine().scheduler().synchronize();
 }

@@ -579,7 +579,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_cpu_control_w)
 	}
 
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -591,7 +591,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_watchdog_w)
 		m_wdog |= 1;
 	else if (&space.device() == machine().device("sub"))
 		m_wdog |= 2;
-	else if (&space.device() == machine().device("audiocpu"))
+	else if (&space.device() == m_audiocpu)
 		m_wdog |= 4;
 
 	if (m_wdog == 7 || !m_reset)
@@ -873,7 +873,7 @@ void namcos1_state::machine_reset()
 	/* reset Cpu 0 and stop all other CPUs */
 	m_maincpu->reset();
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* mcu patch data clear */

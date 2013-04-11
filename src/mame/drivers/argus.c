@@ -154,7 +154,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
 WRITE_LINE_MEMBER(argus_state::irqhandler)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

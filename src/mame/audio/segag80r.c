@@ -957,7 +957,7 @@ WRITE8_MEMBER(segag80r_state::n7751_command_w)
 	    D3    = /INT line
 	*/
 	m_n7751_command = data & 0x07;
-	machine().device("audiocpu")->execute().set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 

@@ -8,7 +8,8 @@ public:
 		m_fore_data(*this, "fore_data"),
 		m_mid_data(*this, "mid_data"),
 		m_textram(*this, "textram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_back_data;
@@ -56,6 +57,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void descramble_legionnaire_gfx(UINT8* src);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in video/legionna.c -----------*/

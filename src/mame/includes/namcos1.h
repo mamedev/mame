@@ -14,7 +14,8 @@ class namcos1_state : public driver_device
 public:
 	namcos1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_dac0_value;
 	int m_dac1_value;
@@ -97,6 +98,7 @@ public:
 	UINT32 screen_update_namcos1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_namcos1(screen_device &screen, bool state);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in drivers/namcos1.c -----------*/

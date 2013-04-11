@@ -332,7 +332,8 @@ public:
 			m_workram(*this, "workram"),
 			m_sharc_dataram0(*this, "sharc_dataram0"),
 			m_sharc_dataram1(*this, "sharc_dataram1") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -377,6 +378,7 @@ public:
 	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
 	void jamma_jvs_cmd_exec();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 
@@ -555,7 +557,7 @@ WRITE8_MEMBER(hornet_state::sysreg_w)
 			adc1213x_di_w(adc12138, space, 0, (data >> 1) & 0x1);
 			adc1213x_sclk_w(adc12138, space, 0, data & 0x1);
 
-			machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -941,7 +943,7 @@ static const adc12138_interface hornet_adc_interface = {
 
 TIMER_CALLBACK_MEMBER(hornet_state::irq_off)
 {
-	machine().device("audiocpu")->execute().set_input_line(param, CLEAR_LINE);
+	m_audiocpu->set_input_line(param, CLEAR_LINE);
 }
 
 static void sound_irq_callback( running_machine &machine, int irq )

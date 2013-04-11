@@ -23,7 +23,8 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_soundram(*this, "soundram"){ }
+		m_soundram(*this, "soundram"),
+		m_audiocpu(*this, "audiocpu"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -205,6 +206,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
+	required_device<cpu_device> m_audiocpu;
 };
 
 

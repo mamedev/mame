@@ -177,7 +177,7 @@ WRITE8_MEMBER(playmark_state::playmark_oki_w)
 
 WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 {
-//  address_&space space = device->machine().device("audiocpu")->memory().&space(AS_PROGRAM);
+//  address_&space space = device->m_audiocpu->&space(AS_PROGRAM);
 
 	/*  This port controls communications to and from the 68K, and the OKI
 	    device.
@@ -1762,7 +1762,7 @@ DRIVER_INIT_MEMBER(playmark_state,bigtwin)
 			data_lo = playmark_asciitohex((playmark_PICROM_HEX[src_pos + 3]));
 			data |= (data_hi << 12) | (data_lo << 8);
 
-			pic16c5x_set_config(machine().device("audiocpu"), data);
+			pic16c5x_set_config(m_audiocpu, data);
 
 			src_pos = 0x7fff;       /* Force Exit */
 		}

@@ -89,7 +89,7 @@ WRITE8_MEMBER(shangkid_state::chinhero_ay8910_porta_w)
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE );
+			m_audiocpu->set_input_line(0, HOLD_LINE );
 	}
 }
 
@@ -99,7 +99,7 @@ WRITE8_MEMBER(shangkid_state::shangkid_ay8910_porta_w)
 	{
 		if( data == 0x01 )
 			/* 0->1 transition triggers interrupt on Sound CPU */
-			machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE );
+			m_audiocpu->set_input_line(0, HOLD_LINE );
 	}
 	else
 		membank("bank2")->set_entry(data ? 0 : 1);

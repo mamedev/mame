@@ -12,7 +12,8 @@ public:
 		m_bg1ram(*this, "bg1ram"),
 		m_spriteram(*this, "spriteram"),
 		m_butasan_bg1ram(*this, "butasan_bg1ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu")  { }
 
 	optional_shared_ptr<UINT8> m_bg0_scrollx;
 	optional_shared_ptr<UINT8> m_bg0_scrolly;
@@ -99,4 +100,5 @@ public:
 	void butasan_log_vram();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

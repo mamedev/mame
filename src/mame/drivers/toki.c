@@ -46,7 +46,7 @@ for now. Even at 12 this slowdown still happens a little.
 WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(toki_state::pip16_r)
@@ -63,7 +63,7 @@ WRITE_LINE_MEMBER(toki_state::toki_adpcm_int)
 
 	m_toggle ^= 1;
 	if (m_toggle)
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(toki_state::toki_adpcm_control_w)
@@ -858,7 +858,7 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 	/* Decrypt data for z80 program */
 	{
-		address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_audiocpu->space(AS_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x20000);
 		UINT8 *rom = memregion("audiocpu")->base();
 		int i;

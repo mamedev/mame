@@ -11,7 +11,8 @@ public:
 		m_spr2_videoram(*this, "spr2_videoram"),
 		m_bg_bot_videoram(*this, "bg_bot_videoram"),
 		m_armwrest_fg_videoram(*this, "armwrest_fgram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_rp5c01_mode_sel;
 	int m_rp5c01_mem[16*4];
@@ -75,4 +76,5 @@ public:
 	void punchout_copy_top_palette(int bank);
 	void punchout_copy_bot_palette(int bank);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

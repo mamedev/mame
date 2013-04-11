@@ -54,7 +54,7 @@ INTERRUPT_GEN_MEMBER(scotrsht_state::scotrsht_interrupt)
 WRITE8_MEMBER(scotrsht_state::scotrsht_soundlatch_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )

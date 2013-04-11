@@ -32,7 +32,8 @@ public:
 			m_bulletsram(*this,"bulletsram"),
 			m_rockclim_videoram(*this,"rockclim_vram"),
 			m_racknrol_tiles_bank(*this,"racknrol_tbank"),
-		m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -238,6 +239,7 @@ public:
 	void machine_reset_common(int line);
 	UINT8 decode_mooncrst(UINT8 data,offs_t addr);
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

@@ -35,13 +35,13 @@ WRITE16_MEMBER(magmax_state::magmax_sound_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sound_latch = (data & 0xff) << 1;
-		machine().device("audiocpu")->execute().set_input_line(0, ASSERT_LINE);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
 READ8_MEMBER(magmax_state::magmax_sound_irq_ack)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 

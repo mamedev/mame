@@ -318,7 +318,7 @@ WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 {
 	m_marvins_sound_busy_flag = 1;
 	soundlatch_byte_w(space, offset, data);
-	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(snk_state::marvins_soundlatch_r)
@@ -334,7 +334,7 @@ CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -357,7 +357,7 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 			break;
 	}
 
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (m_sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -381,7 +381,7 @@ READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
 
 READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
 {
-	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -442,7 +442,7 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 			break;
 	}
 
-	machine().device("audiocpu")->execute().set_input_line(0, (m_sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, (m_sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

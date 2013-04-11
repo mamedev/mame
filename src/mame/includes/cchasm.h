@@ -12,7 +12,8 @@ public:
 	cchasm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_sound_flags;
 	int m_coin_flag;
@@ -38,6 +39,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
 	void cchasm_refresh ();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
 
 /*----------- defined in audio/cchasm.c -----------*/

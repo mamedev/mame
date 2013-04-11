@@ -7,7 +7,8 @@ public:
 		m_bg0videoram(*this, "bg0videoram"),
 		m_bg1videoram(*this, "bg1videoram"),
 		m_spvideoram(*this, "spvideoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	tilemap_t *m_fgtilemap;
 	tilemap_t *m_bg0tilemap;
@@ -48,4 +49,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_scanline);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

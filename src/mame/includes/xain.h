@@ -7,7 +7,8 @@ public:
 		m_bgram0(*this, "bgram0"),
 		m_bgram1(*this, "bgram1"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_vblank;
 	int m_from_main;
@@ -75,4 +76,5 @@ public:
 	inline int scanline_to_vcount(int scanline);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };

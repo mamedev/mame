@@ -5291,10 +5291,10 @@ WRITE_LINE_MEMBER(model3_state::scsp_irq)
 	if (state > 0)
 	{
 		m_scsp_last_line = state;
-		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
+		m_audiocpu->set_input_line(state, ASSERT_LINE);
 	}
 	else
-		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
+		m_audiocpu->set_input_line(-state, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

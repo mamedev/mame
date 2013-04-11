@@ -208,7 +208,7 @@ WRITE16_MEMBER(tecmosys_state::sound_w)
 	{
 		machine().scheduler().synchronize();
 		soundlatch_byte_w(space, 0x00, data & 0xff);
-		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -439,7 +439,7 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
 {
 	/* IRQ */
-	machine().device("audiocpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =

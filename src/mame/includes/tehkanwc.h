@@ -7,7 +7,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu") { }
 
 	int m_track0[2];
 	int m_track1[2];
@@ -53,4 +54,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(tehkanwc_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 };
