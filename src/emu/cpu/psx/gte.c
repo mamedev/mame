@@ -41,19 +41,15 @@ INLINE void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...) {}
 #define CV2( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
 #define CV3( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
 
-#define VXY0 ( m_cp2dr[ 0 ].d )
 #define VX0  ( m_cp2dr[ 0 ].sw.l )
 #define VY0  ( m_cp2dr[ 0 ].sw.h )
 #define VZ0  ( m_cp2dr[ 1 ].sw.l )
-#define VXY1 ( m_cp2dr[ 2 ].d )
 #define VX1  ( m_cp2dr[ 2 ].w.l )
 #define VY1  ( m_cp2dr[ 2 ].w.h )
 #define VZ1  ( m_cp2dr[ 3 ].w.l )
-#define VXY2 ( m_cp2dr[ 4 ].d )
 #define VX2  ( m_cp2dr[ 4 ].w.l )
 #define VY2  ( m_cp2dr[ 4 ].w.h )
 #define VZ2  ( m_cp2dr[ 5 ].w.l )
-#define RGB  ( m_cp2dr[ 6 ].d )
 #define R    ( m_cp2dr[ 6 ].b.l )
 #define G    ( m_cp2dr[ 6 ].b.h )
 #define B    ( m_cp2dr[ 6 ].b.h2 )
@@ -2680,9 +2676,9 @@ int gte::docop2( UINT32 pc, int gteop )
 	case 0x1c:
 		GTELOG( pc, "%08x CC", gteop );
 
-		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( ( ( (INT64) RBK ) << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( ( ( (INT64) GBK ) << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( ( ( (INT64) BBK ) << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
