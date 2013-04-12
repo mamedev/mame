@@ -243,8 +243,8 @@ private:
 	int     m_subc_reload;      // contains 1 for normal speech, 0 when SPKSLOW is active
 	int     m_PC;               // current parameter counter (what param is being interpolated), ranges from 0 to 12
 
-	// TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1
-	int     m_interp_period;    // the current interpolation period
+	// TODO/NOTE: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,2,2,1
+	int     m_IP;    // the current interpolation period
 	bool    m_inhibit;          // If 1, interpolation is inhibited until the DIV1 period
 	UINT8   m_tms5220c_rate;    // only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command
 	UINT16  m_pitch_count;      // pitch counter; provides chirp rom address
