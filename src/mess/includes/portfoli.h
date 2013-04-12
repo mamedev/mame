@@ -33,7 +33,7 @@ public:
 			m_lcdc(*this, HD61830_TAG),
 			m_ppi(*this, M82C55A_TAG),
 			m_uart(*this, M82C50A_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_timer_tick(*this, TIMER_TICK_TAG),
 			m_rom(*this, M80C88A_TAG),
 			m_char_rom(*this, HD61830_TAG),

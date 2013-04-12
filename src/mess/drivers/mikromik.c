@@ -671,7 +671,7 @@ static I8085_CONFIG( i8085_intf )
 	DEVCB_NULL,         // STATUS changed callback
 	DEVCB_NULL,         // INTE changed callback
 	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dsra_r),    // SID changed callback (I8085A only)
-	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w) // SOD changed callback (I8085A only)
+	DEVCB_DEVICE_LINE("speaker", speaker_level_w) // SOD changed callback (I8085A only)
 };
 
 
@@ -810,7 +810,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// peripheral hardware

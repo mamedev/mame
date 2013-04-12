@@ -245,7 +245,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_3MHz, llc2_z80pio1_intf )

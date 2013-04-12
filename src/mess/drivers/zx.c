@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)   /* Used by pc8300/lambda/pow3000 */
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)   /* Used by pc8300/lambda/pow3000 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

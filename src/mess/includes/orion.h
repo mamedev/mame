@@ -27,7 +27,7 @@ public:
 		, m_fd2(*this, "fd2")
 		, m_fd3(*this, "fd3")
 		, m_rtc(*this, "rtc")
-		, m_speaker(*this, SPEAKER_TAG)
+		, m_speaker(*this, "speaker")
 		, m_ay8912(*this, "ay8912")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")

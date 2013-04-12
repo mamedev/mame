@@ -28,7 +28,8 @@ public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_speaker(*this, "speaker") { }
 
 	UINT8 m_portA_in;
 	UINT8 m_portA_out;
@@ -65,6 +66,7 @@ public:
 	int atari_input_disabled();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -92,7 +94,7 @@ READ8_MEMBER(maxaflex_state::mcu_portA_r)
 WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
 {
 	m_portA_out = data;
-	speaker_level_w(machine().device("speaker"), data >> 7);
+	speaker_level_w(m_speaker, data >> 7);
 }
 
 /* Port B:

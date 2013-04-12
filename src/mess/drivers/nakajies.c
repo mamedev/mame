@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( SPEAKER_TAG, SPEAKER_SOUND, 0 )
+	MCFG_SOUND_ADD( "speaker", SPEAKER_SOUND, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* rtc */

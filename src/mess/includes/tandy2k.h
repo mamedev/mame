@@ -51,7 +51,7 @@ public:
 			m_drb1(*this, CRT9212_1_TAG),
 			m_vac(*this, CRT9021B_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, I8272A_TAG ":0:525qd"),
 			m_floppy1(*this, I8272A_TAG ":1:525qd"),

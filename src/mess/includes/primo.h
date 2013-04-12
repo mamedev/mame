@@ -9,6 +9,7 @@
 
 #include "imagedev/snapquik.h"
 #include "machine/cbmiec.h"
+#include "sound/speaker.h"
 
 class primo_state : public driver_device
 {
@@ -16,7 +17,8 @@ public:
 	primo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_iec(*this, CBM_IEC_TAG),
-		m_maincpu(*this, "maincpu") { }
+			m_maincpu(*this, "maincpu"),
+			m_speaker(*this, "speaker") { }
 
 	required_device<cbm_iec_device> m_iec;
 
@@ -36,6 +38,7 @@ public:
 	UINT32 screen_update_primo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 

@@ -25,7 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, UB8830D_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_centronics(*this, CENTRONICS_TAG),
 		m_video_ram(*this, "video_ram"){ }
 

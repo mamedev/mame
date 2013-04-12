@@ -78,7 +78,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_ram(*this, RAM_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_upd765(*this, "upd765"),
 		m_upd765_0(*this, "upd765:0"),
 		m_upd765_1(*this, "upd765:1"),

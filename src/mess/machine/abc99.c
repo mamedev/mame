@@ -215,7 +215,7 @@ static MACHINE_CONFIG_FRAGMENT( abc99 )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -524,7 +524,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, ABC99, "Luxor ABC 99", tag, owner, clock, "abc99", __FILE__),
 		m_maincpu(*this, I8035_Z2_TAG),
 		m_mousecpu(*this, I8035_Z5_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_z14(*this, "Z14"),
 		m_mouseb(*this, "MOUSEB"),
 		m_si(1),

@@ -32,7 +32,7 @@ public:
 		m_via(*this, "via"),
 		m_cassette(*this, CASSETTE_TAG),
 		m_beeper(*this, BEEPER_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_line0(*this, "LINE0"),
 		m_line1(*this, "LINE1"),
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)

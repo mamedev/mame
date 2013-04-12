@@ -72,7 +72,7 @@ public:
 			m_ipc(*this, I8749_TAG),
 			m_zx8301(*this, ZX8301_TAG),
 			m_zx8302(*this, ZX8302_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_mdv1(*this, MDV_1),
 			m_mdv2(*this, MDV_2),
 			m_ram(*this, RAM_TAG),

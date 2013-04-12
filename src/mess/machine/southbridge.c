@@ -138,7 +138,7 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ISA16_BUS_ADD("isabus", ":maincpu", isabus_intf)
@@ -169,7 +169,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 	m_pit8254(*this, "pit8254"),
 	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_mc146818(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc")
 {

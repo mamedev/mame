@@ -13,8 +13,6 @@
 
 #include "devlegcy.h"
 
-#define SPEAKER_TAG     "speaker"
-
 struct speaker_interface
 {
 	int num_level;  /* optional: number of levels (if not two) */

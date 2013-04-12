@@ -67,7 +67,7 @@ public:
 	m_subcpu(*this, "sub"),
 	//m_cass(*this, CASSETTE_TAG),
 	//m_wave(*this, WAVE_TAG),
-	//m_speaker(*this, SPEAKER_TAG),
+	//m_speaker(*this, "speaker"),
 	//m_printer(*this, "centronics"),
 	m_crtc(*this, "crtc"),
 	//m_fdc(*this, "fdc"),

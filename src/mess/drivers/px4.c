@@ -80,7 +80,7 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_centronics(*this, "centronics"),
 			m_ext_cas(*this, "extcas"),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_sio(*this, "sio"),
 			m_rs232(*this, "rs232")
 			,
@@ -1276,7 +1276,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))

@@ -351,19 +351,17 @@ UINT8 pc_speaker_get_spk(running_machine &machine)
 
 void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
+	speaker_level_w( st->m_speaker, pc_speaker_get_spk(machine) );
 }
 
 
 void pc_speaker_set_input(running_machine &machine, UINT8 data)
 {
-	device_t *speaker = machine.device(SPEAKER_TAG);
 	pc_state *st = machine.driver_data<pc_state>();
 	st->m_pc_input = data ? 1 : 0;
-	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
+	speaker_level_w( st->m_speaker, pc_speaker_get_spk(machine) );
 }
 
 
@@ -1484,8 +1482,6 @@ MACHINE_START_MEMBER(pc_state,pc)
 
 MACHINE_RESET_MEMBER(pc_state,pc)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
-
 	m_u73_q2 = 0;
 	m_out1 = 0;
 	m_pc_spkrdata = 0;
@@ -1503,7 +1499,7 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
 
-	speaker_level_w( speaker, 0 );
+	speaker_level_w( m_speaker, 0 );
 }
 
 
@@ -1549,7 +1545,6 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 
 MACHINE_RESET_MEMBER(pc_state,pcjr)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
 	m_u73_q2 = 0;
 	m_out1 = 0;
 	m_pc_spkrdata = 0;
@@ -1567,7 +1562,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
 	m_pcjr_dor = 0;
-	speaker_level_w( speaker, 0 );
+	speaker_level_w( m_speaker, 0 );
 
 	m_pcjx_1ff_count = 0;
 	m_pcjx_1ff_val = 0;

@@ -37,7 +37,7 @@ public:
 			m_com_pia(*this, MC6820_COM_TAG),
 			m_acia(*this, MC6850_TAG),
 			m_gpib(*this, IEEE488_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, MC6800_TAG),
 			m_bsofl_rom(*this, "020_0147_00"),

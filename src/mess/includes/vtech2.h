@@ -6,7 +6,7 @@
 
 #ifndef VTECH2_H_
 #define VTECH2_H_
-
+#include "sound/speaker.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
@@ -15,7 +15,8 @@ class vtech2_state : public driver_device
 public:
 	vtech2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker") { }
 
 	UINT8 *m_videoram;
 	int m_laser_latch;
@@ -72,6 +73,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( laser_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( laser_cart );
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 

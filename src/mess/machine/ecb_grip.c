@@ -545,7 +545,7 @@ static MACHINE_CONFIG_FRAGMENT( grip )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_CONFIG(speaker_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -672,7 +672,7 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 	m_sti(*this, Z80STI_TAG),
 	m_crtc(*this, MC6845_TAG),
 	m_centronics(*this, CENTRONICS_TAG),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_video_ram(*this, "video_ram"),
 	m_j3a(*this, "J3A"),
 	m_j3b(*this, "J3B"),

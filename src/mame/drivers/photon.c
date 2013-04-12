@@ -26,7 +26,8 @@ class photon_state : public pk8000_base_state
 {
 public:
 	photon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pk8000_base_state(mconfig, type, tag) { }
+		: pk8000_base_state(mconfig, type, tag),
+		m_speaker(*this, "speaker") { }
 
 	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
 	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
@@ -37,6 +38,7 @@ public:
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
 	void pk8000_set_bank(UINT8 data);
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -111,7 +113,7 @@ READ8_MEMBER(photon_state::pk8000_80_portb_r)
 
 WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
 {
-	speaker_level_w(machine().device("speaker"), BIT(data,7));
+	speaker_level_w(m_speaker, BIT(data,7));
 }
 
 static I8255_INTERFACE( pk8000_ppi8255_interface_1 )

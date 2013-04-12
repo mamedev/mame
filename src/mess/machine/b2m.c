@@ -327,7 +327,6 @@ void b2m_state::machine_start()
 {
 	m_pic = machine().device("pic8259");
 	m_fdc = machine().device<fd1793_t>("fd1793");
-	m_speaker = machine().device(SPEAKER_TAG);
 
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(b2m_state::b2m_fdc_drq), this));
 

@@ -75,7 +75,7 @@ public:
 	tm990189_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_tms9980a(*this, "maincpu"),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_cass(*this, CASSETTE_TAG),
 	m_tms9918(*this, "tms9918" )
 	,
@@ -424,8 +424,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker, state);
+	speaker_level_w(m_speaker, state);
 }
 
 WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
@@ -842,7 +841,7 @@ static MACHINE_CONFIG_START( tm990_189, tm990189_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
@@ -874,7 +873,7 @@ static MACHINE_CONFIG_START( tm990_189_v, tm990189_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)   /* one two-level buzzer */
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)   /* one two-level buzzer */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

@@ -105,7 +105,7 @@ public:
 		m_via1(*this, "via6522_1"),
 		m_fdc(*this, "fdc"),
 		m_scc(*this, "scc"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),

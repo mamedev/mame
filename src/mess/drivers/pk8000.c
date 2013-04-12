@@ -26,7 +26,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, CASSETTE_TAG)
 		, m_ram(*this, RAM_TAG)
-		, m_speaker(*this, SPEAKER_TAG)
+		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -396,7 +396,7 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

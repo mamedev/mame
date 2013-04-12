@@ -23,7 +23,7 @@ public:
 	beta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6502_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_eprom(*this, EPROM_TAG),
 			m_q6(*this, "Q6"),
 			m_q7(*this, "Q7"),

@@ -22,7 +22,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
-		m_speaker(*this, SPEAKER_TAG) { }
+		m_speaker(*this, "speaker") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;

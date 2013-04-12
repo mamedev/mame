@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "includes/mw8080bw.h"
-
+#include "sound/speaker.h"
 /* for games in 8080bw.c */
 #define CABINET_PORT_TAG                  "CAB"
 
@@ -17,14 +17,15 @@ public:
 		: mw8080bw_state(mconfig, type, tag),
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
-		m_discrete(*this, "discrete")
+		m_discrete(*this, "discrete"),
+		m_speaker(*this, "speaker")
 	{ }
 
 	/* devices/memory pointers */
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<discrete_device> m_discrete;
-	device_t *m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 
 	/* misc game specific */

@@ -247,15 +247,13 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
 {
 	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
-	device_t *speaker = machine().device(SPEAKER_TAG);
-
 	m_border = data;
 
 	/* bit 3, cassette output */
 	cassette->output( BIT(data, 3) ? -1.0 : +1.0);
 
 	/* bit 4, beep */
-	speaker_level_w(speaker, BIT(data, 4));
+	speaker_level_w(m_speaker, BIT(data, 4));
 }
 
 READ8_MEMBER(samcoupe_state::samcoupe_attributes_r)
@@ -549,7 +547,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SAA1099_ADD("saa1099", SAMCOUPE_XTAL_X1/3) /* 8 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

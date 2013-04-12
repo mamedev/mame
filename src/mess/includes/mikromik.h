@@ -43,7 +43,7 @@ public:
 			m_fdc(*this, UPD765_TAG),
 			m_mpsc(*this, UPD7201_TAG),
 			m_hgdc(*this, UPD7220_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_floppy0(*this, UPD765_TAG ":0:525qd"),
 			m_floppy1(*this, UPD765_TAG ":1:525qd"),
 			m_rs232a(*this, RS232_A_TAG),

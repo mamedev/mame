@@ -30,7 +30,7 @@ public:
 		m_printer(*this, "centronics"),
 		m_ay31015(*this, "tr1602"),
 		m_fdc(*this, "wd179x"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_cass(*this, CASSETTE_TAG),
 		m_p_videoram(*this, "p_videoram"),
 		m_region_maincpu(*this, "maincpu"),

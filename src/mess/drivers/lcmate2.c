@@ -44,7 +44,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_lcdc(*this, "hd44780"),
 	m_rtc(*this, "rtc"),
-	m_speaker(*this, SPEAKER_TAG)
+	m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

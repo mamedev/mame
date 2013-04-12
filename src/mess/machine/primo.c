@@ -133,7 +133,6 @@ READ8_MEMBER(primo_state::primo_be_2_r)
 
 WRITE8_MEMBER(primo_state::primo_ki_1_w)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
 	// bit 7 - NMI generator enable/disable
 	m_nmi = (data & 0x80) ? 1 : 0;
 
@@ -142,7 +141,7 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	// bit 5 - V.24 (2) / tape control (not emulated)
 
 	// bit 4 - speaker
-	speaker_level_w(speaker, (data&0x10)>>4);
+	speaker_level_w(m_speaker, (data&0x10)>>4);
 
 	// bit 3 - display buffer
 	if (data & 0x08)
@@ -267,7 +266,6 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 {
 	primo_state *state = machine.driver_data<primo_state>();
 	int i;
-	device_t *speaker = machine.device(SPEAKER_TAG);
 
 	/* Z80 registers */
 
@@ -293,7 +291,7 @@ static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UIN
 	state->m_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
-	speaker_level_w(speaker, (snapshot_data[30]&0x10)>>4);
+	speaker_level_w(state->m_speaker, (snapshot_data[30]&0x10)>>4);
 
 
 	/* memory */

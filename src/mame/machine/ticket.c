@@ -64,7 +64,7 @@ const device_type TICKET_DISPENSER = &device_creator<ticket_dispenser_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  speaker_device - constructor
+//  ticket_dispenser_device - constructor
 //-------------------------------------------------
 
 ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

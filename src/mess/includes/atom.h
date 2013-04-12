@@ -46,7 +46,7 @@ public:
 			m_vdg(*this, MC6847_TAG),
 			m_cassette(*this, CASSETTE_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_extrom(*this, EXTROM_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),

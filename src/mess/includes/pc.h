@@ -14,6 +14,7 @@
 #include "machine/ser_mouse.h"
 #include "machine/pc_kbdc.h"
 #include "machine/upd765.h"
+#include "sound/speaker.h"
 
 class pc_state : public driver_device
 {
@@ -21,13 +22,15 @@ public:
 	pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_dma8237(*this, "dma8237"),
-		m_pc_kbdc(*this, "pc_kbdc") { }
+		m_pc_kbdc(*this, "pc_kbdc"),
+		m_speaker(*this, "speaker") { }
 
 	cpu_device *m_maincpu;
 	device_t *m_pic8259;
 	optional_device<am9517a_device> m_dma8237;
 	device_t *m_pit8253;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
+	optional_device<speaker_sound_device> m_speaker;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */

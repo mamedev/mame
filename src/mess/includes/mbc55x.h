@@ -96,7 +96,7 @@ public:
 	m_ppi(*this, PPI8255_TAG),
 	m_pic(*this, PIC8259_TAG),
 	m_fdc(*this, FDC_TAG),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_ram(*this, RAM_TAG)
 	{ }
 

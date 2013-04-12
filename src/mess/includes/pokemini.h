@@ -51,7 +51,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_p_ram(*this, "p_ram"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_i2cmem(*this, "i2cmem"),
 		m_inputs(*this, "INPUTS") { }
 

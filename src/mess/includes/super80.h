@@ -27,7 +27,7 @@ public:
 			m_pio(*this, "z80pio"),
 			m_cass(*this, CASSETTE_TAG),
 			m_wave(*this, WAVE_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_centronics(*this, "centronics"),
 			m_6845(*this, "crtc"),
 			m_io_dsw(*this, "DSW"),

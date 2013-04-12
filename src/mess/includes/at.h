@@ -96,7 +96,7 @@ public:
 	m_ide(*this, "ide"),
 	m_keybc(*this, "keybc"),
 	m_isabus(*this, "isabus"),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_ram(*this, RAM_TAG),
 	m_mc146818(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc")

@@ -24,7 +24,7 @@ public:
 		m_pit(*this, "pit8253"),
 		m_ppi(*this, "ppi8255"),
 		m_cass(*this, CASSETTE_TAG),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_p_ram(*this, "p_ram"),
 		m_p_videoram(*this, "p_videoram"){ }
 

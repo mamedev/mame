@@ -491,7 +491,7 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -562,7 +562,7 @@ ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *
 		m_dma8237(*this, "dma8237"),
 		m_pit8253(*this, "pit8253"),
 		m_ppi8255(*this, "ppi8255"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_isabus(*this, "isa"),
 		m_pc_kbdc(*this, "pc_kbdc")
 {

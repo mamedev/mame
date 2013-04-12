@@ -12,6 +12,7 @@
 #define SAMCOUPE_H_
 
 #include "machine/wd_fdc.h"
+#include "sound/speaker.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -38,16 +39,17 @@ class samcoupe_state :  public driver_device
 public:
 	samcoupe_state(const machine_config &mconfig, device_type type, const char *tag)
 			: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") {
-			sam_bank_read_ptr[0] = NULL;
-			sam_bank_write_ptr[0] = NULL;
-			sam_bank_read_ptr[1] = NULL;
-			sam_bank_write_ptr[1] = NULL;
-			sam_bank_read_ptr[2] = NULL;
-			sam_bank_write_ptr[2] = NULL;
-			sam_bank_read_ptr[3] = NULL;
-			sam_bank_write_ptr[3] = NULL;
-		}
+			m_maincpu(*this, "maincpu"),
+			m_speaker(*this, "speaker") {
+				sam_bank_read_ptr[0] = NULL;
+				sam_bank_write_ptr[0] = NULL;
+				sam_bank_read_ptr[1] = NULL;
+				sam_bank_write_ptr[1] = NULL;
+				sam_bank_read_ptr[2] = NULL;
+				sam_bank_write_ptr[2] = NULL;
+				sam_bank_read_ptr[3] = NULL;
+				sam_bank_write_ptr[3] = NULL;
+			}
 
 	virtual void video_start();
 
@@ -118,6 +120,7 @@ public:
 	UINT8* sam_bank_write_ptr[4];
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 

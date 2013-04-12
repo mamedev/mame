@@ -61,7 +61,7 @@ public:
 			m_z80pio(*this, "z80pio"),
 			m_z80ctc(*this, "z80ctc"),
 			m_ram(*this, RAM_TAG),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_cassette(*this, CASSETTE_TAG)
 	{ }
 

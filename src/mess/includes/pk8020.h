@@ -32,7 +32,7 @@ public:
 		m_wd1793(*this, "wd1793"),
 		m_pit8253(*this, "pit8253"),
 		m_pic8259(*this, "pic8259"),
-		m_speaker(*this, SPEAKER_TAG),
+		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1") { }
 

@@ -16,8 +16,6 @@
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 {
-	m_speaker = machine().device("speaker");
-
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
 	save_item(NAME(m_port_3_last_extra));

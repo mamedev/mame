@@ -133,7 +133,7 @@ class xerox820ii_state : public xerox820_state
 public:
 	xerox820ii_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xerox820_state(mconfig, type, tag),
-			m_speaker(*this, SPEAKER_TAG),
+			m_speaker(*this, "speaker"),
 			m_sasibus(*this, SASIBUS_TAG ":host")
 	{ }
 

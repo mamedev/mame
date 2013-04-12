@@ -19,7 +19,8 @@ public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_spectrum_video_ram(*this, "spectrum_vram"){ }
+		m_spectrum_video_ram(*this, "spectrum_vram"),
+		m_speaker(*this, "speaker"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_spectrum_video_ram;
@@ -38,6 +39,7 @@ public:
 	UINT32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
+	required_device<speaker_sound_device> m_speaker;
 };
 
 
@@ -211,10 +213,9 @@ READ8_MEMBER(photon2_state::photon2_fe_r)
 
 WRITE8_MEMBER(photon2_state::photon2_fe_w)
 {
-	device_t *speaker = machine().device("speaker");
 	m_spectrum_port_fe = data;
 
-	speaker_level_w(speaker, BIT(data,4));
+	speaker_level_w(m_speaker, BIT(data,4));
 }
 
 WRITE8_MEMBER(photon2_state::photon2_misc_w)

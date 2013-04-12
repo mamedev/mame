@@ -279,7 +279,6 @@ int vtech2_state::mra_bank(int bank, int offs)
  ************************************************/
 void vtech2_state::mwa_bank(int bank, int offs, int data)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
 	offs += 0x4000 * m_laser_bank[bank];
 	switch (m_laser_bank[bank])
 	{
@@ -293,7 +292,7 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 			logerror("bank #%d write to I/O [$%05X] $%02X\n", bank+1, offs, data);
 			/* Toggle between graphics and text modes? */
 			if ((data ^ m_laser_latch) & 0x01)
-				speaker_level_w(speaker, data & 1);
+				speaker_level_w(m_speaker, data & 1);
 			m_laser_latch = data;
 		}
 		break;

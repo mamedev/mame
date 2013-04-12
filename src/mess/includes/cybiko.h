@@ -49,7 +49,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "hd66421"),
-	m_speaker(*this, SPEAKER_TAG),
+	m_speaker(*this, "speaker"),
 	m_rtc(*this, "rtc"),
 	m_ram(*this, RAM_TAG),
 	m_flash1(*this, "flash1")

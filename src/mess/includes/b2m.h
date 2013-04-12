@@ -19,7 +19,8 @@ class b2m_state : public driver_device
 public:
 	b2m_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker") { }
 
 	UINT8 m_b2m_8255_porta;
 	UINT8 m_b2m_video_scroll;
@@ -40,7 +41,7 @@ public:
 	/* devices */
 	fd1793_t *m_fdc;
 	device_t *m_pic;
-	device_t *m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER(b2m_keyboard_r);
 	DECLARE_WRITE8_MEMBER(b2m_palette_w);
 	DECLARE_READ8_MEMBER(b2m_palette_r);

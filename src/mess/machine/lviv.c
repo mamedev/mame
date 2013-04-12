@@ -86,10 +86,9 @@ WRITE8_MEMBER(lviv_state::lviv_ppi_0_portb_w)
 
 WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off */
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
 	m_ppi_port_outputs[0][2] = data;
 	if (m_ppi_port_outputs[0][1]&0x80)
-		speaker_level_w(speaker, data&0x01);
+		speaker_level_w(m_speaker, data&0x01);
 	machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? -1.0 : 1.0);
 	lviv_update_memory(machine());
 }
