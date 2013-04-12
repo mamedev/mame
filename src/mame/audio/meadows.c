@@ -32,7 +32,7 @@ SAMPLES_START( meadows_sh_start )
 {
 	meadows_state *state = device.machine().driver_data<meadows_state>();
 	state->m_0c00 = state->m_0c01 = state->m_0c02 = state->m_0c03 = 0;
-	state->m_dac = 0;
+	state->m_dac_data = 0;
 	state->m_dac_enable = 0;
 	state->m_channel = 0;
 	state->m_freq1 = state->m_freq2 = 1000;
@@ -94,9 +94,9 @@ void meadows_sh_update(running_machine &machine)
 		state->m_dac_enable = state->m_0c03 & ENABLE_DAC;
 
 		if (state->m_dac_enable)
-			machine.device<dac_device>("dac")->write_unsigned8(state->m_dac);
+			state->m_dac->write_unsigned8(state->m_dac_data);
 		else
-			machine.device<dac_device>("dac")->write_unsigned8(0);
+			state->m_dac->write_unsigned8(0);
 	}
 
 	state->m_latched_0c01 = state->m_0c01;
@@ -110,9 +110,9 @@ void meadows_sh_update(running_machine &machine)
 void meadows_sh_dac_w(running_machine &machine, int data)
 {
 	meadows_state *state = machine.driver_data<meadows_state>();
-	state->m_dac = data;
+	state->m_dac_data = data;
 	if (state->m_dac_enable)
-		machine.device<dac_device>("dac")->write_unsigned8(state->m_dac);
+		state->m_dac->write_unsigned8(state->m_dac_data);
 	else
-		machine.device<dac_device>("dac")->write_unsigned8(0);
+		state->m_dac->write_unsigned8(0);
 }

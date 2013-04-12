@@ -1,3 +1,4 @@
+#include "sound/dac.h"
 #define NAMCOS1_MAX_BANK 0x400
 
 /* Bank handler definitions */
@@ -17,7 +18,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_dac(*this, "dac") { }
 
 	int m_dac0_value;
 	int m_dac1_value;
@@ -103,6 +105,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_mcu;
+	required_device<dac_device> m_dac;
 };
 
 /*----------- defined in drivers/namcos1.c -----------*/

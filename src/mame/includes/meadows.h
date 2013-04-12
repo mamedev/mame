@@ -3,7 +3,7 @@
     Meadows S2650 hardware
 
 *************************************************************************/
-
+#include "sound/dac.h"
 #include "sound/samples.h"
 
 class meadows_state : public driver_device
@@ -13,11 +13,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac")	{ }
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
-	UINT8 m_dac;
+	UINT8 m_dac_data;
 	int m_dac_enable;
 	int m_channel;
 	int m_freq1;
@@ -52,6 +53,7 @@ public:
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	required_device<cpu_device> m_maincpu;
+	optional_device<dac_device> m_dac;
 };
 
 

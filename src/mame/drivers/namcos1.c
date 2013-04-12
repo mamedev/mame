@@ -384,7 +384,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 static void namcos1_update_DACs(running_machine &machine)
 {
 	namcos1_state *state = machine.driver_data<namcos1_state>();
-	machine.device<dac_device>("dac")->write_signed16(0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
+	state->m_dac->write_signed16(0x8000 + (state->m_dac0_value * state->m_dac0_gain) + (state->m_dac1_value * state->m_dac1_gain));
 }
 
 void namcos1_init_DACs(running_machine &machine)
