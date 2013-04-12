@@ -94,7 +94,7 @@ WRITE16_MEMBER(powerbal_state::oki_banking)
 		int addr = 0x40000 * ((data & 3) - 1);
 
 		if (addr < machine().root_device().memregion("oki")->bytes())
-			machine().device<okim6295_device>("oki")->set_bank_base(addr);
+			m_oki->set_bank_base(addr);
 	}
 }
 

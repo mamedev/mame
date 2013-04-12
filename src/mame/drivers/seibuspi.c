@@ -866,8 +866,6 @@ READ32_MEMBER(seibuspi_state::spi_unknown_r)
 
 WRITE32_MEMBER(seibuspi_state::eeprom_w)
 {
-	okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
@@ -878,8 +876,8 @@ WRITE32_MEMBER(seibuspi_state::eeprom_w)
 	}
 
 	// oki banking
-	if (oki2 != NULL)
-		oki2->set_bank_base((data & 0x4000000) ? 0x40000 : 0);
+	if (m_oki2 != NULL)
+		m_oki2->set_bank_base((data & 0x4000000) ? 0x40000 : 0);
 }
 
 WRITE32_MEMBER(seibuspi_state::z80_prg_fifo_w)

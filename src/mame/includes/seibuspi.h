@@ -1,5 +1,6 @@
 #include "machine/intelfsh.h"
 #include "machine/eeprom.h"
+#include "sound/okim6295.h"
 
 #define FIFO_SIZE 512
 
@@ -12,7 +13,8 @@ public:
 		m_spimainram(*this, "spimainram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_oki2(*this, "oki2") { }
 
 	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
@@ -138,6 +140,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	required_device<eeprom_device> m_eeprom;
+	optional_device<okim6295_device> m_oki2;
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

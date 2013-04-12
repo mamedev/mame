@@ -216,9 +216,7 @@ static const UINT8 sslam_snd_loop[8][19] =
 TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 {
 	int pattern = 0;
-	okim6295_device *device = machine().device<okim6295_device>("oki");
-
-	if ((device->read_status() & 0x08) == 0)
+	if ((m_oki->read_status() & 0x08) == 0)
 	{
 		m_bar += 1;
 		pattern = sslam_snd_loop[m_melody][m_bar];
@@ -229,8 +227,8 @@ TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
 				pattern = sslam_snd_loop[m_melody][m_bar];
 			}
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
-			device->write_command(0x80 | pattern);
-			device->write_command(0x81);
+			m_oki->write_command(0x80 | pattern);
+			m_oki->write_command(0x81);
 		}
 		else if (pattern == 0x00) {     /* Non-looped track. Stop playing it */
 			m_track = 0;
@@ -432,7 +430,7 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 		data = soundlatch_byte_r(space,0);
 	}
 	else if ((m_oki_control & 0x38) == 0x28) {
-		data = (machine().device<okim6295_device>("oki")->read(space,0) & 0x0f);
+		data = (m_oki->read(space,0) & 0x0f);
 	}
 
 	return data;
@@ -452,13 +450,13 @@ WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 		if (m_oki_bank != ((data & 3) - 1))
 		{
 			m_oki_bank = (data & 3) - 1;
-			machine().device<okim6295_device>("oki")->set_bank_base(0x40000 * m_oki_bank);
+			m_oki->set_bank_base(0x40000 * m_oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		machine().device<okim6295_device>("oki")->write(space, 0, m_oki_command);
+		m_oki->write(space, 0, m_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

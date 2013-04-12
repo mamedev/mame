@@ -317,7 +317,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(psikyo_state::s1945bl_oki_r)
 {
-	UINT8 dat = machine().device<okim6295_device>("oki")->read(space, 0);
+	UINT8 dat = m_oki->read(space, 0);
 	return dat << 24;
 }
 
@@ -325,8 +325,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->write(space, 0, data >> 24);
+		m_oki->write(space, 0, data >> 24);
 	}
 
 	if (ACCESSING_BITS_16_23)

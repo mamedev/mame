@@ -2,6 +2,7 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "machine/eeprom.h"
+#include "sound/okim6295.h"
 
 class deco32_state : public driver_device
 {
@@ -21,7 +22,9 @@ public:
 		m_sprgen(*this, "spritegen"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
-		m_eeprom(*this, "eeprom")
+		m_eeprom(*this, "eeprom"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -41,6 +44,8 @@ public:
 	optional_device<decospr_device> m_sprgen2;
 	
 	optional_device<eeprom_device> m_eeprom;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;
 
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;

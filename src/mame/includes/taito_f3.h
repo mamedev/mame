@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 /* This it the best way to allow game specific kludges until the system is fully understood */
 enum {
 	/* Early F3 class games, these are not cartridge games and system features may be different */
@@ -47,7 +49,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_f3_ram(*this,"f3_ram") ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
@@ -278,4 +281,5 @@ public:
 	TIMER_CALLBACK_MEMBER(f3_interrupt3);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki;
 };

@@ -133,7 +133,8 @@ atarigen_state::atarigen_state(const machine_config &mconfig, device_type type, 
 		m_playfield2_latch(0),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_jsacpu(*this, "jsa")
+		m_jsacpu(*this, "jsa"),
+		m_oki(*this, "oki")
 {
 }
 

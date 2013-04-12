@@ -70,7 +70,8 @@ public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	UINT16 m_x;
 	required_shared_ptr<UINT32> m_spriteram;
@@ -82,6 +83,7 @@ public:
 	UINT32 screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
 };
 
 
@@ -157,8 +159,7 @@ WRITE32_MEMBER(feversoc_state::output_w)
 		//data>>16 & 2 coin out
 		coin_counter_w(machine(), 1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
-		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
+		m_oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{

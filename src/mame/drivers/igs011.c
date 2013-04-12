@@ -1517,8 +1517,7 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 			{
 				m_lhb2_pen_hi = data & 0x07;
 
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
 			}
 
 			if ( m_lhb2_pen_hi & ~0xf )
@@ -1652,8 +1651,7 @@ WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 				coin_counter_w(machine(), 0,    data & 0x01);
 				//  coin out        data & 0x02
 
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 				m_igs_hopper        =   data & 0x20;
 			}
 

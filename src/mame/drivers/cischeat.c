@@ -483,10 +483,8 @@ WRITE16_MEMBER(cischeat_state::scudhamm_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-		okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-		oki1->set_bank_base(0x40000 * ((data >> 0) & 0x3) );
-		oki2->set_bank_base(0x40000 * ((data >> 4) & 0x3) );
+		m_oki1->set_bank_base(0x40000 * ((data >> 0) & 0x3) );
+		m_oki2->set_bank_base(0x40000 * ((data >> 4) & 0x3) );
 	}
 }
 
@@ -679,10 +677,8 @@ WRITE16_MEMBER(cischeat_state::bigrun_soundbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-		okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-		oki1->set_bank_base(0x40000 * ((data >> 0) & 1) );
-		oki2->set_bank_base(0x40000 * ((data >> 4) & 1) );
+		m_oki1->set_bank_base(0x40000 * ((data >> 0) & 1) );
+		m_oki2->set_bank_base(0x40000 * ((data >> 4) & 1) );
 	}
 }
 

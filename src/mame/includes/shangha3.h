@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class shangha3_state : public driver_device
 {
 public:
@@ -5,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki") { }
 
 	int m_prot_count;
 	required_shared_ptr<UINT16> m_ram;
@@ -33,4 +36,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
 };

@@ -1623,10 +1623,8 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 {
-	okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-	okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-	oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
-	oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
+	m_oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
+	m_oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
 }
 
 static const eeprom_interface eeprom_interface_tattass =

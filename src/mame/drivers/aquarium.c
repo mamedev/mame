@@ -88,15 +88,13 @@ UINT8 aquarium_state::aquarium_snd_bitswap( UINT8 scrambled_data )
 
 READ8_MEMBER(aquarium_state::aquarium_oki_r)
 {
-	okim6295_device *oki = machine().device<okim6295_device>("oki");
-	return aquarium_snd_bitswap(oki->read(space, offset));
+	return aquarium_snd_bitswap(m_oki->read(space, offset));
 }
 
 WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 {
 	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
-	okim6295_device *oki = machine().device<okim6295_device>("oki");
-	oki->write(space, offset, (aquarium_snd_bitswap(data)));
+	m_oki->write(space, offset, (aquarium_snd_bitswap(data)));
 }
 
 

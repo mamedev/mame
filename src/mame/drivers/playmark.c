@@ -195,8 +195,7 @@ WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 	if ((data & 0x38) == 0x18)
 	{
 		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",space.device().safe_pcbase(),playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->write(space, 0, m_oki_command);
+		m_oki->write(space, 0, m_oki_command);
 	}
 }
 

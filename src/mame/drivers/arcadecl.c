@@ -128,8 +128,7 @@ WRITE16_MEMBER(arcadecl_state::latch_w)
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
+		m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
 		set_oki6295_volume((data & 0x001f) * 100 / 0x1f);
 	}
 }

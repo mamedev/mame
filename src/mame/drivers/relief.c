@@ -69,7 +69,7 @@ MACHINE_RESET_MEMBER(relief_state,relief)
 	atarigen_state::machine_reset();
 	atarivc_reset(*machine().primary_screen, m_atarivc_eof_data, 2);
 
-	machine().device<okim6295_device>("oki")->set_bank_base(0);
+	m_oki->set_bank_base(0);
 	m_ym2413_volume = 15;
 	m_overall_volume = 127;
 	m_adpcm_bank_base = 0;
@@ -110,8 +110,7 @@ WRITE16_MEMBER(relief_state::audio_control_w)
 	if (ACCESSING_BITS_8_15)
 		m_adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (m_adpcm_bank_base & 0x0c0000);
 
-	okim6295_device *oki = machine().device<okim6295_device>("oki");
-	oki->set_bank_base(m_adpcm_bank_base);
+	m_oki->set_bank_base(m_adpcm_bank_base);
 }
 
 

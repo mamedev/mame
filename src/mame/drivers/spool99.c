@@ -103,7 +103,8 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_oki(*this, "oki") { }
 
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
@@ -122,6 +123,7 @@ public:
 	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
+	required_device<okim6295_device> m_oki;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
@@ -185,7 +187,7 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return m_eeprom->read_bit();
-			case 0xaff8: return machine().device<okim6295_device>("oki")->read(space,0);
+			case 0xaff8: return m_oki->read(space,0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -243,7 +245,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 			case 0xa725: return ioport("HOLD3")->read();
 			case 0xa726: return ioport("HOLD4")->read();
 			case 0xa727: return ioport("HOLD2")->read();
-			case 0xa780: return machine().device<okim6295_device>("oki")->read(space,0);
+			case 0xa780: return m_oki->read(space,0);
 			case 0xa7a0: return ioport("HOLD1")->read();
 			case 0xa7a1: return ioport("HOLD5")->read();
 			case 0xa7a2: return ioport("START")->read();

@@ -69,7 +69,9 @@ public:
 		m_ac_txvram(*this, "ac_txvram"),
 		m_spriteram(*this, "spriteram"),
 		m_ac_devram(*this, "ac_devram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2") { }
 
 	required_shared_ptr<UINT16> m_ac_bgvram;
 	required_shared_ptr<UINT16> m_ac_txvram;
@@ -98,6 +100,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 	void draw_led(bitmap_ind16 &bitmap, int x, int y,UINT8 value);
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki1;
+	required_device<okim6295_device> m_oki2;
 };
 
 
@@ -329,10 +333,10 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 			return ioport("IN0")->read();
 		case 0x0014/2:
 		case 0x0016/2:
-			return machine().device<okim6295_device>("oki1")->read(space,0);
+			return m_oki1->read(space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return machine().device<okim6295_device>("oki2")->read(space,0);
+			return m_oki2->read(space,0);
 		case 0x0040/2:
 			/*
 			    "Upper switch / Under Switch"
@@ -410,26 +414,22 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-				okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-				oki1->set_bank_base(0x40000 * (data & 0x3));
-				oki2->set_bank_base(0x40000 * (data & 0x30) >> 4);
+				m_oki1->set_bank_base(0x40000 * (data & 0x3));
+				m_oki2->set_bank_base(0x40000 * (data & 0x30) >> 4);
 			}
 			break;
 		case 0x14/2:
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-				oki1->write(space,0,data);
+				m_oki1->write(space,0,data);
 			}
 			break;
 		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-				oki2->write(space,0,data);
+				m_oki2->write(space,0,data);
 			}
 			break;
 		case 0x1c/2:

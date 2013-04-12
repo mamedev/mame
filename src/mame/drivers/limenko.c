@@ -41,7 +41,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_videoreg(*this, "videoreg"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki")  { }
 
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_fg_videoram;
@@ -92,6 +93,7 @@ public:
 	void draw_sprites(UINT32 *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };
 
 /*****************************************************************************************************
@@ -288,7 +290,7 @@ READ8_MEMBER(limenko_state::spotty_sound_r)
 	if(m_spotty_sound_cmd == 0xf7)
 		return soundlatch_byte_r(space,0);
 	else
-		return machine().device<okim6295_device>("oki")->read(space,0);
+		return m_oki->read(space,0);
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8, limenko_state )

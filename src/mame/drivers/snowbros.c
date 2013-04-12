@@ -136,8 +136,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 {
-	okim6295_device *adpcm = machine().device<okim6295_device>("oki");
-	int status = adpcm->read_status();
+	int status = m_oki->read_status();
 	int scanline = param;
 
 	if(scanline == 240)
@@ -153,8 +152,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 	{
 		if ((status&0x08)==0x00)
 		{
-			adpcm->write_command(0x80|m_sb3_music);
-			adpcm->write_command(0x00|0x82);
+			m_oki->write_command(0x80|m_sb3_music);
+			m_oki->write_command(0x00|0x82);
 		}
 
 	}
@@ -162,7 +161,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
 	{
 		if ((status&0x08)==0x08)
 		{
-			adpcm->write_command(0x40);     /* Stop playing music */
+			m_oki->write_command(0x40);     /* Stop playing music */
 		}
 	}
 

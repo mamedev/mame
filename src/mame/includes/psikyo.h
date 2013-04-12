@@ -3,6 +3,7 @@
     Psikyo Games
 
 *************************************************************************/
+#include "sound/okim6295.h"
 
 class psikyo_state : public driver_device
 {
@@ -15,7 +16,8 @@ public:
 		m_vregs(*this, "vregs"),
 		m_bootleg_spritebuffer(*this, "boot_spritebuf"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT32> m_spriteram;
@@ -103,6 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
+	optional_device<okim6295_device> m_oki;
 };
 
 /*----------- defined in video/psikyo.c -----------*/

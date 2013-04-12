@@ -53,7 +53,8 @@ class namco_30test_state : public driver_device
 public:
 	namco_30test_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki") { }
 
 	UINT8 m_mux_data;
 	UINT8 m_oki_bank;
@@ -68,6 +69,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
 };
 
 
@@ -125,10 +127,8 @@ READ8_MEMBER(namco_30test_state::hc11_okibank_r)
 
 WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 {
-	okim6295_device *oki = machine().device<okim6295_device>("oki");
-
 	m_oki_bank = data;
-	oki->set_bank_base((data & 1) ? 0x40000 : 0);
+	m_oki->set_bank_base((data & 1) ? 0x40000 : 0);
 }
 
 

@@ -43,7 +43,7 @@
 #include "machine/nvram.h"
 #include "machine/er2055.h"
 #include "cpu/m6502/m6502.h"
-
+#include "sound/okim6295.h"
 
 /***************************************************************************
     CONSTANTS
@@ -277,6 +277,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<m6502_device> m_jsacpu;
+	optional_device<okim6295_device> m_oki;
 };
 
 

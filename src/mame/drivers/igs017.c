@@ -58,13 +58,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_spriteram(*this, "spriteram", 0),
 		m_fg_videoram(*this, "fg_videoram", 0),
-		m_bg_videoram(*this, "bg_videoram", 0){ }
+		m_bg_videoram(*this, "bg_videoram", 0),
+		m_oki(*this, "oki"){ }
 
 	int m_input_addr;
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_fg_videoram;
 	optional_shared_ptr<UINT8> m_bg_videoram;
+	required_device<okim6295_device> m_oki;
 
 	int m_toggle;
 	int m_debug_addr;
@@ -1511,8 +1513,7 @@ WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
 			}
 			break;
 
@@ -1613,8 +1614,7 @@ WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 			}
 			break;
 
@@ -1710,7 +1710,7 @@ WRITE8_MEMBER(igs017_state::tjsb_output_w)
 			break;
 
 		case 0x02:
-			machine().device<okim6295_device>("oki")->set_bank_base((data & 0x10) ? 0x40000 : 0);   // oki bank (0x20/0x30)
+			m_oki->set_bank_base((data & 0x10) ? 0x40000 : 0);   // oki bank (0x20/0x30)
 			if (!(data & ~0x30))
 				return;
 			break;
@@ -1801,8 +1801,7 @@ WRITE16_MEMBER(igs017_state::lhzb2_magic_w)
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
 
 				if ( data & 0x7f )
 					logerror("%s: warning, unknown bits written in oki bank = %04x\n", machine().describe_context(), data);
@@ -2162,8 +2161,7 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_device *oki = machine().device<okim6295_device>("oki");
-		oki->set_bank_base((data & 0x0100) ? 0x40000 : 0);
+		m_oki->set_bank_base((data & 0x0100) ? 0x40000 : 0);
 
 		if ( data & 0x0fe00 )
 			logerror("%s: warning, unknown bits written in input_select = %04x\n", machine().describe_context(), data);
@@ -2220,8 +2218,7 @@ WRITE16_MEMBER(igs017_state::slqz2_magic_w)
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki = machine().device<okim6295_device>("oki");
-				oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
+				m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0);
 
 //              m_hopper            =           data & 0x20;    // hopper motor
 //              coin_counter_w(machine(), 1,    data & 0x40);   // coin out counter

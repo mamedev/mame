@@ -314,15 +314,14 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 {
-	okim6295_device *oki = machine().device<okim6295_device>("oki");
 	if (mem_mask == 0xffff)
 	{
-		oki->write(space, 0, data & 0xff);
+		m_oki->write(space, 0, data & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		oki->write(space, 0, (data >> 8) & 0xff);
+		m_oki->write(space, 0, (data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	/* STUFF IN OTHER BYTE TOO..*/

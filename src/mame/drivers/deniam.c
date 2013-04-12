@@ -261,7 +261,7 @@ void deniam_state::machine_reset()
 	doesn't matter since the coinup sfx (sample borrowed from 'tyrian' on PC)
 	exists in both banks; it properly sets the bank as soon as the ufo sfx
 	plays or a player character is selected on the character select screen */
-	machine().device<okim6295_device>("oki")->set_bank_base(0x00000);
+	m_oki->set_bank_base(0x00000);
 }
 
 static MACHINE_CONFIG_START( deniam16b, deniam_state )
