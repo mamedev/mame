@@ -580,7 +580,11 @@ class snes_state : public driver_device
 {
 public:
 	snes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_spc700(*this, "spc700"),
+		m_superfx(*this, "superfx") { }
 
 	/* misc */
 	UINT16                m_hblank_offset;
@@ -649,10 +653,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* devices */
-	_5a22_device *m_maincpu;
-	spc700_device *m_soundcpu;
-	snes_sound_device *m_spc700;
-	cpu_device *m_superfx;
+	required_device<_5a22_device> m_maincpu;
+	required_device<spc700_device> m_soundcpu;
+	required_device<snes_sound_device> m_spc700;
+	optional_device<cpu_device> m_superfx;
 	upd7725_device *m_upd7725;
 	upd96050_device *m_upd96050;
 
