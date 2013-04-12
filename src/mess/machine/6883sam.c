@@ -288,13 +288,13 @@ void sam6883_device::update_memory(void)
 
 	if (setup_rom)
 	{
-		m_space_8000.point(&m_banks[1], 0x0000);
-		m_space_A000.point(&m_banks[2], 0x0000);
-		m_space_C000.point(&m_banks[3], 0x0000);
+		m_space_8000.point(&m_banks[1], m_banks[1].m_memory_offset);
+		m_space_A000.point(&m_banks[2], m_banks[2].m_memory_offset);
+		m_space_C000.point(&m_banks[3], m_banks[3].m_memory_offset);
 	}
 
 	// update $FFE0-$FFFF
-	m_space_FFE0.point(&m_banks[2], 0x1FE0);
+	m_space_FFE0.point(&m_banks[2], m_banks[2].m_memory_offset + 0x1FE0);
 }
 
 

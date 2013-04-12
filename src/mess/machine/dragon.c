@@ -124,6 +124,7 @@ void dragon64_state::pia1_pb_changed(void)
 	if (ddr & 0x04)
 	{
 		page_rom(m_pia_1->b_output() & 0x04 ? true : false);
+		logerror("pia1_pb_changed\n");
 	}
 }
 
@@ -145,7 +146,6 @@ void dragon64_state::page_rom(bool romswitch)
 	offs_t offset = romswitch
 		? 0x0000    // This is the 32k mode basic(64)/boot rom(alpha)
 		: 0x8000;   // This is the 64k mode basic(64)/basic rom(alpha)
-	m_sam->set_bank_offset(1, offset);
-	m_sam->set_bank_offset(2, offset);
-	m_sam->set_bank_offset(3, offset);
+	m_sam->set_bank_offset(1, offset);		// 0x8000-0x9FFF
+	m_sam->set_bank_offset(2, offset);		// 0xA000-0xBFFF
 }

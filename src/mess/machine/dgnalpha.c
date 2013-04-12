@@ -220,11 +220,14 @@ WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 
 WRITE8_MEMBER( dragon_alpha_state::pia2_pa_w )
 {
+	UINT8 ddr = ~m_pia_2->port_b_z_mask();
+
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
 	/* to control the paging of the boot and basic roms */
 	/* Otherwise it set as an input, with an internal pull-up so it should */
 	/* always be high (enabling boot rom) */
 	/* PIA FIXME if (pia_get_ddr_a(2) & 0x04) */
+	if(ddr & 0x04)
 	{
 		page_rom(data & 0x04 ? true : false);   /* bit 2 controls boot or basic rom */
 	}

@@ -260,7 +260,7 @@ ROM_START(tanodr64)
 ROM_END
 
 ROM_START(dgnalpha)
-	ROM_REGION(0xC000,"maincpu",1)
+	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("alpha_bt.rom",    0x2000,  0x2000, CRC(c3dab585) SHA1(4a5851aa66eb426e9bb0bba196f1e02d48156068))
 	ROM_LOAD("alpha_ba.rom",    0x8000,  0x4000, CRC(84f68bf9) SHA1(1983b4fb398e3dd9668d424c666c5a0b3f1e2b69))
 ROM_END
