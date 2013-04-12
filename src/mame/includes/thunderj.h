@@ -10,7 +10,8 @@ class thunderj_state : public atarigen_state
 {
 public:
 	thunderj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_extra(*this, "extra") { }
 
 	UINT8           m_alpha_tile_bank;
 	virtual void update_interrupts();
@@ -26,4 +27,5 @@ public:
 	DECLARE_MACHINE_RESET(thunderj);
 	DECLARE_VIDEO_START(thunderj);
 	UINT32 screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_extra;
 };

@@ -10,7 +10,8 @@ class eprom_state : public atarigen_state
 {
 public:
 	eprom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_extra(*this, "extra") { }
 
 	int             m_screen_intensity;
 	int             m_video_disable;
@@ -36,6 +37,7 @@ public:
 	UINT32 screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_palette();
+	optional_device<cpu_device> m_extra;
 };
 
 /*----------- defined in video/eprom.c -----------*/

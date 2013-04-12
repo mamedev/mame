@@ -730,7 +730,7 @@ MACHINE_RESET_MEMBER(sat_console_state,saturn)
 	//memset(stv_m_workram_h, 0, 0x100000);
 
 	m_maincpu->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	m_slave->set_unscaled_clock(MASTER_CLOCK_320/2);
 
 	stvcd_reset();
 
@@ -843,7 +843,7 @@ void sat_console_state::saturn_init_driver(int rgn)
 
 	// set compatible options
 	sh2drc_set_options(m_maincpu, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(m_slave, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;

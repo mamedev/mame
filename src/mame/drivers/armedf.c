@@ -330,7 +330,7 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 WRITE16_MEMBER(armedf_state::terrafjb_io_w)
 {
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		machine().device("extra")->execute().set_input_line(0, HOLD_LINE);
+		m_extra->set_input_line(0, HOLD_LINE);
 
 	COMBINE_DATA(&m_vreg);
 

@@ -35,7 +35,7 @@
 void thunderj_state::update_interrupts()
 {
 	m_maincpu->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	subdevice("extra")->execute().set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_extra->set_input_line(4, m_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(6, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -81,9 +81,9 @@ WRITE16_MEMBER(thunderj_state::latch_w)
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			m_extra->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_extra->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (m_alpha_tile_bank != ((data >> 2) & 7))
