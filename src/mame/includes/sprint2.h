@@ -27,7 +27,8 @@ public:
 	sprint2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete") { }
 
 	int m_attract;
 	int m_steering[2];
@@ -74,6 +75,7 @@ public:
 	inline int get_sprite_y(UINT8 *video_ram, int n);
 	int service_mode();
 	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

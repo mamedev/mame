@@ -18,7 +18,8 @@ public:
 	hitme_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -45,6 +46,7 @@ public:
 	UINT8 read_port_and_t0( int port );
 	UINT8 read_port_and_t0_and_hblank( int port );
 	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
 };
 
 

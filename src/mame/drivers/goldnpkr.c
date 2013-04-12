@@ -962,7 +962,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -1007,6 +1008,7 @@ public:
 	DECLARE_PALETTE_INIT(wcrdxtnd);
 	UINT32 screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	optional_device<discrete_device> m_discrete;
 };
 
 
@@ -1358,13 +1360,12 @@ WRITE8_MEMBER(goldnpkr_state::lamps_a_w)
 
 WRITE8_MEMBER(goldnpkr_state::sound_w)
 {
-	device_t *device = machine().device("discrete");
 	/* 555 voltage controlled */
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(device, space, NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(device, space, NODE_10, data & 0x07);
+	discrete_sound_w(m_discrete, space, NODE_01, data >> 3 & 0x01);
+	discrete_sound_w(m_discrete, space, NODE_10, data & 0x07);
 }
 
 

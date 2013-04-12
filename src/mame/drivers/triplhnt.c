@@ -33,8 +33,7 @@ void triplhnt_state::triplhnt_set_collision(int code)
 
 void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 {
-	samples_device *samples = space.machine().device<samples_device>("samples");
-	device_t *discrete = space.machine().device("discrete");
+	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -64,16 +63,16 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 	m_sprite_zoom = (m_misc_flags >> 4) & 1;
 	m_sprite_bank = (m_misc_flags >> 7) & 1;
 
-	set_led_status(space.machine(), 0, m_misc_flags & 0x02);
+	set_led_status(machine(), 0, m_misc_flags & 0x02);
 
-	coin_lockout_w(space.machine(), 0, !(m_misc_flags & 0x08));
-	coin_lockout_w(space.machine(), 1, !(m_misc_flags & 0x08));
+	coin_lockout_w(machine(), 0, !(m_misc_flags & 0x08));
+	coin_lockout_w(machine(), 1, !(m_misc_flags & 0x08));
 
-	discrete_sound_w(discrete, space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
-	discrete_sound_w(discrete, space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise
-	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_EN, m_misc_flags & 0x80);    // bear
+	discrete_sound_w(m_discrete, space, TRIPLHNT_SCREECH_EN, m_misc_flags & 0x04); // screech
+	discrete_sound_w(m_discrete, space, TRIPLHNT_LAMP_EN, m_misc_flags & 0x02);    // Lamp is used to reset noise
+	discrete_sound_w(m_discrete, space, TRIPLHNT_BEAR_EN, m_misc_flags & 0x80);    // bear
 
-	is_witch_hunt = space.machine().root_device().ioport("0C09")->read() == 0x40;
+	is_witch_hunt = ioport("0C09")->read() == 0x40;
 	bit = ~m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */

@@ -104,8 +104,6 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 UINT32 triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *discrete = machine().device("discrete");
-
 	m_bg_tilemap->mark_all_dirty();
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -113,7 +111,7 @@ UINT32 triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_ind1
 	draw_sprites(bitmap, cliprect);
 
 	address_space &space = machine().driver_data()->generic_space();
-	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
-	discrete_sound_w(discrete, space, TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
+	discrete_sound_w(m_discrete, space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
+	discrete_sound_w(m_discrete, space, TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
 	return 0;
 }

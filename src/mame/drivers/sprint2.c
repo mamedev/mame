@@ -62,8 +62,6 @@ int sprint2_state::service_mode()
 
 INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 {
-	device_t *discrete = machine().device("discrete");
-
 	/* handle steering wheels */
 
 	if (GAME_IS_SPRINT1 || GAME_IS_SPRINT2)
@@ -96,9 +94,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 	}
 
 	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-	discrete_sound_w(discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
-	discrete_sound_w(discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
-	discrete_sound_w(discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
+	discrete_sound_w(m_discrete, space, SPRINT2_MOTORSND1_DATA, m_video_ram[0x394] & 15); // also DOMINOS_FREQ_DATA
+	discrete_sound_w(m_discrete, space, SPRINT2_MOTORSND2_DATA, m_video_ram[0x395] & 15);
+	discrete_sound_w(m_discrete, space, SPRINT2_CRASHSND_DATA, m_video_ram[0x396] & 15);  // also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -202,32 +200,28 @@ WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
 
 WRITE8_MEMBER(sprint2_state::sprint2_attract_w)
 {
-	device_t *device = machine().device("discrete");
 	m_attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(device, space, SPRINT2_ATTRACT_EN, m_attract);
+	discrete_sound_w(m_discrete, space, SPRINT2_ATTRACT_EN, m_attract);
 }
 
 
 WRITE8_MEMBER(sprint2_state::sprint2_noise_reset_w)
 {
-	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, space, SPRINT2_NOISE_RESET, 0);
+	discrete_sound_w(m_discrete, space, SPRINT2_NOISE_RESET, 0);
 }
 
 
 WRITE8_MEMBER(sprint2_state::sprint2_skid1_w)
 {
-	device_t *device = machine().device("discrete");
 	// also DOMINOS_TUMBLE_EN
-	discrete_sound_w(device, space, SPRINT2_SKIDSND1_EN, offset & 1);
+	discrete_sound_w(m_discrete, space, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
 WRITE8_MEMBER(sprint2_state::sprint2_skid2_w)
 {
-	device_t *device = machine().device("discrete");
-	discrete_sound_w(device, space, SPRINT2_SKIDSND2_EN, offset & 1);
+	discrete_sound_w(m_discrete, space, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 

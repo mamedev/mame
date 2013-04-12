@@ -28,7 +28,8 @@ public:
 		m_edge2_pos(*this, "edge2_pos"),
 		m_scroll(*this, "scroll"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_discrete(*this, "discrete") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_charram;
@@ -72,6 +73,7 @@ public:
 	inline UINT8 shift_common(UINT8 hi, UINT8 lo);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<discrete_device> m_discrete;
 };
 /*----------- defined in video/madalien.c -----------*/
 

@@ -43,8 +43,6 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	device_t *discrete = machine().device("discrete");
-
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 	for (offs = 0x400 - 1; offs >= 0; offs--)
@@ -114,8 +112,8 @@ UINT32 subs_state::screen_update_subs_left(screen_device &screen, bitmap_ind16 &
 
 	/* Update sound */
 	address_space &space = machine().driver_data()->generic_space();
-	discrete_sound_w(discrete, space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);   // Launch data
-	discrete_sound_w(discrete, space, SUBS_CRASH_DATA, spriteram[5] >> 4);      // Crash/explode data
+	discrete_sound_w(m_discrete, space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);   // Launch data
+	discrete_sound_w(m_discrete, space, SUBS_CRASH_DATA, spriteram[5] >> 4);      // Crash/explode data
 	return 0;
 }
 

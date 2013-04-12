@@ -668,14 +668,12 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
   xxxx ----  * Discrete Sound Lines.
 */
 
-	device_t *discrete = machine().device("discrete");
-
 	output_set_lamp_value(8, (data >> 0) & 1);  /* DEAL / DRAW lamp */
 	output_set_lamp_value(9, (data >> 1) & 1);  /* BET / COLLECT lamp */
 
 	/* the 4 MSB are for discrete sound */
-	discrete_sound_w(discrete, space, NORAUTP_SND_EN, (data >> 7) & 0x01);
-	discrete_sound_w(discrete, space, NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
+	discrete_sound_w(m_discrete, space, NORAUTP_SND_EN, (data >> 7) & 0x01);
+	discrete_sound_w(m_discrete, space, NORAUTP_FREQ_DATA, (data >> 4) & 0x07);
 
 //  popmessage("sound bits 4-5-6-7: %02x, %02x, %02x, %02x", ((data >> 4) & 0x01), ((data >> 5) & 0x01), ((data >> 6) & 0x01), ((data >> 7) & 0x01));
 }

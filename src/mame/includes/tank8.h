@@ -33,7 +33,8 @@ public:
 		m_pos_v_ram(*this, "pos_v_ram"),
 		m_pos_d_ram(*this, "pos_d_ram"),
 		m_team(*this, "team"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete") { }
 
 	int m_collision_index;
 	required_shared_ptr<UINT8> m_video_ram;
@@ -70,6 +71,7 @@ public:
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tank8_set_collision(int index);
 	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
 };
 
 /*----------- defined in audio/tank8.c -----------*/

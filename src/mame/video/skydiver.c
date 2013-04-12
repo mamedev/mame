@@ -124,7 +124,6 @@ WRITE8_MEMBER(skydiver_state::skydiver_lamp_d_w)
 
 WRITE8_MEMBER(skydiver_state::skydiver_2000_201F_w)
 {
-	device_t *discrete = machine().device("discrete");
 	int bit = offset & 0x01;
 
 	watchdog_reset_w(space,0,0);
@@ -144,13 +143,13 @@ WRITE8_MEMBER(skydiver_state::skydiver_2000_201F_w)
 			output_set_value("lampr", bit);
 			break;
 		case (0x0a):
-			discrete_sound_w(discrete, space, SKYDIVER_OCT1_EN, bit);
+			discrete_sound_w(m_discrete, space, SKYDIVER_OCT1_EN, bit);
 			break;
 		case (0x0c):
-			discrete_sound_w(discrete, space, SKYDIVER_OCT2_EN, bit);
+			discrete_sound_w(m_discrete, space, SKYDIVER_OCT2_EN, bit);
 			break;
 		case (0x0e):
-			discrete_sound_w(discrete, space, SKYDIVER_NOISE_RST, bit);
+			discrete_sound_w(m_discrete, space, SKYDIVER_NOISE_RST, bit);
 			break;
 	}
 }

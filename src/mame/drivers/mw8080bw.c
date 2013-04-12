@@ -864,7 +864,7 @@ MACHINE_CONFIG_END
 
 void mw8080bw_state::maze_update_discrete()
 {
-	maze_write_discrete(machine().device("discrete"), m_maze_tone_timing_state);
+	maze_write_discrete(m_discrete, m_maze_tone_timing_state);
 }
 
 

@@ -95,7 +95,6 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 	{
 		int i;
 		UINT16 BG = colortable_entry_get_value(machine().colortable, 0);
-		device_t *discrete = machine().device("discrete");
 		UINT8 *videoram = m_videoram;
 
 		/* check for sprite-playfield collisions */
@@ -141,8 +140,8 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 		/* update sound status */
 
 		address_space &space = machine().driver_data()->generic_space();
-		discrete_sound_w(discrete, space, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-		discrete_sound_w(discrete, space, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
+		discrete_sound_w(m_discrete, space, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+		discrete_sound_w(m_discrete, space, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 	}
 }
 
