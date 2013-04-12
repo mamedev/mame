@@ -766,7 +766,6 @@ void wheelfir_state::machine_reset()
 void wheelfir_state::machine_start()
 {
 	m_screen = machine().device("screen");
-	m_eeprom = machine().device("eeprom");
 
 	m_zoom_table = auto_alloc_array(machine(), INT32, ZOOM_TABLE_SIZE);
 	m_blitter_data = auto_alloc_array(machine(), UINT16, 16);

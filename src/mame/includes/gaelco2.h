@@ -1,5 +1,6 @@
 #include "cpu/m68000/m68000.h"
 #include "video/bufsprite.h"
+#include "machine/eeprom.h"
 
 class gaelco2_state : public driver_device
 {
@@ -9,12 +10,14 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_spriteram(*this,"spriteram"),
 		m_vregs(*this, "vregs"),
-		m_snowboar_protection(*this, "snowboar_prot"){ }
+		m_snowboar_protection(*this, "snowboar_prot"),
+		m_eeprom(*this, "eeprom"){ }
 
 	required_device<m68000_device> m_maincpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_vregs;
 	optional_shared_ptr<UINT16> m_snowboar_protection;
+	optional_device<eeprom_device> m_eeprom;
 
 	int m_clr_gun_int;
 	UINT8 m_analog_ports[2];

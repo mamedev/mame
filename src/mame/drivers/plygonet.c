@@ -103,11 +103,9 @@ static const eeprom_interface eeprom_intf =
 
 READ32_MEMBER(polygonet_state::polygonet_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_15)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		return 0x0200 | (eeprom->read_bit() << 8);
+		return 0x0200 | (m_eeprom->read_bit() << 8);
 	}
 	else
 	{

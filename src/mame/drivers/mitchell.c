@@ -106,23 +106,17 @@ READ8_MEMBER(mitchell_state::pang_port5_r)
 
 WRITE8_MEMBER(mitchell_state::eeprom_cs_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(mitchell_state::eeprom_clock_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(mitchell_state::eeprom_serial_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data);
+	m_eeprom->write_bit(data);
 }
 
 

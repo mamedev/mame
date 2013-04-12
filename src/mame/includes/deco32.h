@@ -1,6 +1,7 @@
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "machine/eeprom.h"
 
 class deco32_state : public driver_device
 {
@@ -19,7 +20,8 @@ public:
 		m_ace_ram(*this, "ace_ram"),
 		m_sprgen(*this, "spritegen"),
 		m_sprgen1(*this, "spritegen1"),
-		m_sprgen2(*this, "spritegen2")
+		m_sprgen2(*this, "spritegen2"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -37,6 +39,8 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
+	
+	optional_device<eeprom_device> m_eeprom;
 
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;

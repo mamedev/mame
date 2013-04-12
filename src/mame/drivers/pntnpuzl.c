@@ -131,10 +131,11 @@ class pntnpuzl_state : public driver_device
 public:
 	pntnpuzl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
+		m_maincpu(*this,"maincpu"),
+		m_eeprom(*this, "eeprom")
 		{ }
 
-	UINT16 m_eeprom;
+	UINT16 m_eeprom_data;
 	UINT16 m_pntpzl_200000;
 	UINT16 m_serial;
 	UINT16 m_serial_out;
@@ -153,6 +154,7 @@ public:
 	DECLARE_READ16_MEMBER(pntnpuzl_eeprom_r);
 	DECLARE_WRITE16_MEMBER(pntnpuzl_eeprom_w);
 	DECLARE_DRIVER_INIT(pip);
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -170,25 +172,21 @@ static const eeprom_interface eeprom_intf =
 
 READ16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
 	/* bit 11 is EEPROM data */
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (m_eeprom & 0xf4ff) | (eeprom->read_bit()<<11) | (ioport("IN1")->read() & 0x0300);
+	return (m_eeprom_data & 0xf4ff) | (m_eeprom->read_bit()<<11) | (ioport("IN1")->read() & 0x0300);
 }
 
 WRITE16_MEMBER(pntnpuzl_state::pntnpuzl_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-	m_eeprom = data;
+	m_eeprom_data = data;
 
 	/* bit 12 is data */
 	/* bit 13 is clock (active high) */
 	/* bit 14 is cs (active high) */
 
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x1000);
-	eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit(data & 0x1000);
+	m_eeprom->set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -182,14 +182,12 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 
 WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
-			eeprom_device *eeprom = downcast<eeprom_device *>(device);
-			eeprom->set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom->write_bit(ebyte & 0x1);
-			eeprom->set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->write_bit(ebyte & 0x1);
+			m_eeprom->set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 //      }
 	}
 	else if (ACCESSING_BITS_0_7) {

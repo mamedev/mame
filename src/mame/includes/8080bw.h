@@ -25,7 +25,7 @@ public:
 	optional_device<timer_device> m_schaser_effect_555_timer;
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<discrete_device> m_discrete;
-	required_device<speaker_sound_device> m_speaker;
+	optional_device<speaker_sound_device> m_speaker;
 
 
 	/* misc game specific */

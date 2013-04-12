@@ -3,6 +3,7 @@
     tecmosys protection simulation
 
 ***************************************************************************/
+#include "machine/eeprom.h"
 
 class tecmosys_state : public driver_device
 {
@@ -24,7 +25,8 @@ public:
 		m_c80000regs(*this, "c80000regs"),
 		m_880000regs(*this, "880000regs"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_tilemap_paletteram16;
@@ -92,4 +94,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<eeprom_device> m_eeprom;
 };

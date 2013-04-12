@@ -136,7 +136,8 @@ public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -174,17 +175,16 @@ public:
 	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 /* EEPROM handlers */
 
 WRITE32_MEMBER(konamigv_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit((data&0x01) ? 1 : 0);
-	eeprom->set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom->set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->write_bit((data&0x01) ? 1 : 0);
+	m_eeprom->set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE32_MEMBER(konamigv_state::mb89371_w)

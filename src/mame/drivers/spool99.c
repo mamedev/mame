@@ -102,7 +102,8 @@ public:
 		m_main(*this, "mainram"),
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_shared_ptr<UINT8> m_main;
 	required_shared_ptr<UINT8> m_vram;
@@ -120,6 +121,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
@@ -194,26 +196,20 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 
 WRITE8_MEMBER(spool99_state::eeprom_resetline_w)
 {
-	device_t *device = machine().device("eeprom");
 	// reset line asserted: reset.
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_MEMBER(spool99_state::eeprom_clockline_w)
 {
-	device_t *device = machine().device("eeprom");
 	// clock line asserted: write latch or select next bit to read
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE8_MEMBER(spool99_state::eeprom_dataline_w)
 {
-	device_t *device = machine().device("eeprom");
 	// latch the bit
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x01);
+	m_eeprom->write_bit(data & 0x01);
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )

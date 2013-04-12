@@ -5,7 +5,7 @@
     driver by Nicola Salmoria
 
 ***************************************************************************/
-
+#include "machine/eeprom.h"
 
 class _20pacgal_state : public driver_device
 {
@@ -17,7 +17,8 @@ public:
 		m_stars_seed(*this, "stars_seed"),
 		m_stars_ctrl(*this, "stars_ctrl"),
 		m_flip(*this, "flip"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -31,7 +32,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_eeprom;
+	required_device<eeprom_device> m_eeprom;
 
 	/* memory */
 	UINT8 m_sprite_gfx_ram[0x2000];

@@ -331,7 +331,8 @@ public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_vram(*this, "vram"){ }
+		m_vram(*this, "vram"),
+		m_eeprom(*this, "eeprom"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_vram;
@@ -344,6 +345,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -432,7 +434,6 @@ R = 82 Ohms Pull Down.
 
 WRITE8_MEMBER(fortecar_state::ppi0_portc_w)
 {
-	device_t *device = machine().device("eeprom");
 /*
 NM93CS56N Serial EEPROM
 
@@ -441,18 +442,15 @@ CK   PPI_PC1
 DIN  PPI_PC2
 DOUT PPI_PC4
 */
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit((data & 0x04) >> 2);
-	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit((data & 0x04) >> 2);
+	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(fortecar_state::ppi0_portc_r)
 {
-	device_t *device = machine().device("eeprom");
 //  popmessage("%s",machine().describe_context());
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return ((eeprom->read_bit()<<4) & 0x10);
+	return ((m_eeprom->read_bit()<<4) & 0x10);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )

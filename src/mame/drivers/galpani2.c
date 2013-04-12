@@ -35,26 +35,22 @@ To Do:
 
 READ16_MEMBER(galpani2_state::galpani2_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (m_eeprom_word & ~1) | (eeprom->read_bit() & 1);
+	return (m_eeprom_word & ~1) | (m_eeprom->read_bit() & 1);
 }
 
 WRITE16_MEMBER(galpani2_state::galpani2_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	COMBINE_DATA( &m_eeprom_word );
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x02);
+		m_eeprom->write_bit(data & 0x02);
 
 		// reset line asserted: reset.
-		eeprom->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

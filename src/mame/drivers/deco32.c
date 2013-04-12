@@ -457,19 +457,15 @@ WRITE32_MEMBER(dragngun_state::dragngun_lightgun_w)
 
 READ32_MEMBER(deco32_state::dragngun_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return 0xfffffffe | eeprom->read_bit();
+	return 0xfffffffe | m_eeprom->read_bit();
 }
 
 WRITE32_MEMBER(deco32_state::dragngun_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7) {
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->write_bit(data & 0x1);
-		eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(data & 0x1);
+		m_eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
 	logerror("%s:Write control 1 %08x %08x\n",machine().describe_context(),offset,data);

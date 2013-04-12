@@ -65,7 +65,8 @@ public:
 		m_gms_vidram2(*this, "gms_vidram2"),
 		m_gms_vidram(*this, "gms_vidram"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_shared_ptr<UINT16> m_gms_vidram2;
 	required_shared_ptr<UINT16> m_gms_vidram;
@@ -84,6 +85,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -108,15 +110,13 @@ WRITE16_MEMBER(rbmk_state::gms_write3)
 
 WRITE16_MEMBER(rbmk_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x04);
-		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
+		m_eeprom->write_bit(data & 0x04);
+		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
 
-		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

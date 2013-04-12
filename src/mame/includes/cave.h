@@ -3,6 +3,7 @@
     Cave hardware
 
 ***************************************************************************/
+#include "machine/eeprom.h"
 
 struct sprite_cave
 {
@@ -35,7 +36,8 @@ public:
 			m_mirror_ram(*this, "mirror_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_int_timer(*this, "int_timer") { }
+			m_int_timer(*this, "int_timer"),
+			m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoregs;
@@ -210,4 +212,5 @@ public:
 	void sailormn_tilebank_w(int bank);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_gen);
+	optional_device<eeprom_device> m_eeprom;
 };

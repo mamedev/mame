@@ -820,10 +820,9 @@ WRITE8_MEMBER(leland_state::ataxx_eeprom_w)
 {
 	if (LOG_EEPROM) logerror("%s:EE write %d%d%d\n", machine().describe_context(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	eeprom_device *eeprom = downcast<eeprom_device *>(machine().device("eeprom"));
-	eeprom->write_bit     ((data & 0x10) >> 4);
-	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit     ((data & 0x10) >> 4);
+	m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -1,5 +1,6 @@
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
+#include "machine/eeprom.h"
 
 class galpani2_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		m_subcpu(*this,"sub"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_spriteram(*this, "spriteram"),
-		m_oki2(*this, "oki2")
+		m_oki2(*this, "oki2"),
+		m_eeprom(*this, "eeprom")
 		{ }
 
 	required_shared_ptr_array<UINT16, 2> m_bg8;
@@ -69,4 +71,5 @@ public:
 
 	DECLARE_WRITE16_MEMBER( galpani2_bg15_w );
 	required_device<okim6295_device> m_oki2;
+	required_device<eeprom_device> m_eeprom;
 };

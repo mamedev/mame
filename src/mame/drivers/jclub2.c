@@ -112,7 +112,8 @@ public:
 		m_tmapscroll2(*this, "tmapscroll2"),
 		m_spriteram(*this, "spriteram"),
 		m_gdfs_st0020(*this, "st0020_spr"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	virtual void machine_start()
 	{
@@ -130,6 +131,7 @@ public:
 	optional_shared_ptr<UINT32> m_spriteram;
 	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
 	DECLARE_WRITE32_MEMBER(paletteram32_xBBBBBGGGGGRRRRR_dword_w);
@@ -286,21 +288,19 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 
 WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (data & ~0xff000000)
 		logerror("%s: Unknown EEPROM bit written %08X\n",machine().describe_context(),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
 		// latch the bit
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x04000000);
+		m_eeprom->write_bit(data & 0x04000000);
 
 		// reset line asserted: reset.
-		eeprom->set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

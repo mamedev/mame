@@ -1208,26 +1208,21 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 
 READ16_MEMBER(metro_state::gakusai_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return eeprom->read_bit() & 1;
+	return m_eeprom->read_bit() & 1;
 }
 
 WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-
 		// latch the bit
-		eeprom->write_bit(BIT(data, 0));
+		m_eeprom->write_bit(BIT(data, 0));
 
 		// reset line asserted: reset.
-		eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -1310,38 +1305,32 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
 	// clock line asserted: write latch or select next bit to read
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_clock_line(CLEAR_LINE);
-	eeprom->set_clock_line(ASSERT_LINE);
+	m_eeprom->set_clock_line(CLEAR_LINE);
+	m_eeprom->set_clock_line(ASSERT_LINE);
 
-	return eeprom->read_bit() & 1;
+	return m_eeprom->read_bit() & 1;
 }
 
 WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(BIT(data, 0));
+		m_eeprom->write_bit(BIT(data, 0));
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom->set_clock_line(CLEAR_LINE);
-		eeprom->set_clock_line(ASSERT_LINE);
+		m_eeprom->set_clock_line(CLEAR_LINE);
+		m_eeprom->set_clock_line(ASSERT_LINE);
 	}
 }
 
 WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->set_cs_line(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_cs_line(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

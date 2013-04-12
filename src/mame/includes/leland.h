@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "devlegcy.h"
+#include "machine/eeprom.h"
 
 #define LELAND_BATTERY_RAM_SIZE 0x4000
 #define ATAXX_EXTRA_TRAM_SIZE 0x800
@@ -24,10 +25,12 @@ public:
 	leland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_master(*this, "master"),
-		m_slave(*this, "slave") { }
+		m_slave(*this, "slave"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
+	required_device<eeprom_device> m_eeprom;
 	
 	UINT8 m_dac_control;
 	UINT8 *m_alleymas_kludge_mem;

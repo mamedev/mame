@@ -269,20 +269,16 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 
 READ16_MEMBER(tecmosys_state::eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		return ((eeprom->read_bit() & 0x01) << 11);
+	return ((m_eeprom->read_bit() & 0x01) << 11);
 }
 
 WRITE16_MEMBER(tecmosys_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if ( ACCESSING_BITS_8_15 )
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x0800);
-		eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		m_eeprom->write_bit(data & 0x0800);
+		m_eeprom->set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 

@@ -321,13 +321,11 @@ static const eeprom_interface eeprom_interface_93C56 =
 
 WRITE32_MEMBER(psikyosh_state::psh_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_24_31)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit((data & 0x20000000) ? 1 : 0);
-		eeprom->set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom->set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit((data & 0x20000000) ? 1 : 0);
+		m_eeprom->set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}

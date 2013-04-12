@@ -282,7 +282,6 @@ WRITE32_MEMBER(gaelco3d_state::irq_ack32_w)
 
 READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 {
-	device_t *device = machine().device("eeprom");
 	UINT32 result = 0xffff;
 
 	if (ACCESSING_BITS_0_7)
@@ -293,8 +292,7 @@ READ16_MEMBER(gaelco3d_state::eeprom_data_r)
 		result |= gaelco_serial_status_r(machine().device("serial"), space, 0);
 	}
 
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	if (eeprom->read_bit())
+	if (m_eeprom->read_bit())
 		result ^= 0x0004;
 	if (LOG)
 		logerror("eeprom_data_r(%02X)\n", result);
@@ -321,11 +319,9 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 
 WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x01);
+		m_eeprom->write_bit(data & 0x01);
 	}
 	else if (mem_mask != 0xffff)
 		logerror("write mask: %08x data %08x\n", mem_mask, data);
@@ -334,22 +330,18 @@ WRITE16_MEMBER(gaelco3d_state::eeprom_data_w)
 
 WRITE16_MEMBER(gaelco3d_state::eeprom_clock_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
 WRITE16_MEMBER(gaelco3d_state::eeprom_cs_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

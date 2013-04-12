@@ -1,4 +1,5 @@
 #include "machine/intelfsh.h"
+#include "machine/eeprom.h"
 
 #define FIFO_SIZE 512
 
@@ -10,7 +11,8 @@ public:
 		m_spi_scrollram(*this, "spi_scrollram"),
 		m_spimainram(*this, "spimainram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	optional_shared_ptr<UINT32> m_spi_scrollram;
 	required_shared_ptr<UINT32> m_spimainram;
@@ -135,6 +137,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
+	required_device<eeprom_device> m_eeprom;
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

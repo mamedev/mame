@@ -165,13 +165,11 @@ static const eeprom_interface eeprom_interface_93C56 =
 
 WRITE32_MEMBER(psikyo4_state::ps4_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if (ACCESSING_BITS_16_31)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit((data & 0x00200000) ? 1 : 0);
-		eeprom->set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit((data & 0x00200000) ? 1 : 0);
+		m_eeprom->set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}

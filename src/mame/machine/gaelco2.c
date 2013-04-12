@@ -263,22 +263,19 @@ WRITE16_MEMBER(gaelco2_state::wrally2_adc_cs)
 WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_cs_w)
 {
 	/* bit 0 is CS (active low) */
-	eeprom_device *eeprom = downcast<eeprom_device *>(machine().device("eeprom"));
-	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_sk_w)
 {
 	/* bit 0 is SK (active high) */
-	eeprom_device *eeprom = downcast<eeprom_device *>(machine().device("eeprom"));
-	eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(gaelco2_state::gaelco2_eeprom_data_w)
 {
 	/* bit 0 is EEPROM data (DIN) */
-	eeprom_device *eeprom = downcast<eeprom_device *>(machine().device("eeprom"));
-	eeprom->write_bit(data & 0x01);
+	m_eeprom->write_bit(data & 0x01);
 }
 
 /***************************************************************************

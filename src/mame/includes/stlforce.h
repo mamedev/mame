@@ -1,4 +1,5 @@
 #include "sound/okim6295.h"
+#include "machine/eeprom.h"
 
 class stlforce_state : public driver_device
 {
@@ -15,7 +16,8 @@ public:
 		m_vidattrram(*this, "vidattrram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_eeprom(*this, "eeprom") { }
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_mlow_tilemap;
@@ -51,4 +53,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_device<eeprom_device> m_eeprom;
 };

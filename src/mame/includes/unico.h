@@ -1,4 +1,5 @@
 #include "sound/okim6295.h"
+#include "machine/eeprom.h"
 
 class unico_state : public driver_device
 {
@@ -11,7 +12,8 @@ public:
 		m_scroll32(*this, "scroll32"),
 		m_spriteram(*this, "spriteram", 0),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_eeprom(*this, "eeprom") { }
 
 	optional_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_scroll;
@@ -50,4 +52,5 @@ public:
 	void zeropnt2_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<eeprom_device> m_eeprom;
 };

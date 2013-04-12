@@ -182,18 +182,14 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta2_state::gundamex_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return ((eeprom->read_bit() & 1)) << 3;
+	return ((m_eeprom->read_bit() & 1)) << 3;
 }
 
 WRITE16_MEMBER(seta2_state::gundamex_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom->write_bit(data & 0x1);
-	eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit(data & 0x1);
+	m_eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )

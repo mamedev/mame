@@ -103,11 +103,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_spriteram(*this, "spriteram"),
-		m_nvram(*this, "nvram"){ }
+		m_nvram(*this, "nvram"),
+		m_eeprom(*this, "eeprom"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_nvram;
+	required_device<eeprom_device> m_eeprom;
 
 	UINT8 m_reg;
 	UINT8 m_rombank;
@@ -443,17 +445,15 @@ void sigmab98_state::show_outputs()
 // Port c0
 WRITE8_MEMBER(sigmab98_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	// latch the bit
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x40);
+	m_eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
 //  if ((m_c0 ^ data) & 0x20)
-		eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	m_c0 = data;
 	//show_outputs(state);
@@ -644,23 +644,19 @@ READ8_MEMBER(sigmab98_state::animalc_rambank_r)
 
 READ8_MEMBER(sigmab98_state::sammymdl_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return eeprom->read_bit() ? 0x80 : 0;
+	return m_eeprom->read_bit() ? 0x80 : 0;
 }
 
 WRITE8_MEMBER(sigmab98_state::sammymdl_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	// latch the bit
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x40);
+	m_eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x8f)
 		logerror("%s: unknown eeeprom bits written %02x\n", machine().describe_context(), data);

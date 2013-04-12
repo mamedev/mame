@@ -79,7 +79,8 @@ public:
 			m_wram32(*this,"wram32"),
 			m_maincpu(*this, "maincpu"),
 			m_oki(*this, "oki"),
-			m_oki2(*this, "oki_2") {
+			m_oki2(*this, "oki_2"),
+			m_eeprom(*this, "eeprom") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -171,15 +172,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
+	required_device<eeprom_device> m_eeprom;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
 	if(offset)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		return eeprom->read_bit();
+		return m_eeprom->read_bit();
 	}
 	else
 		return 0;
@@ -187,20 +187,16 @@ READ16_MEMBER(vamphalf_state::eeprom_r)
 
 READ32_MEMBER(vamphalf_state::eeprom32_r)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return eeprom->read_bit();
+	return m_eeprom->read_bit();
 }
 
 WRITE16_MEMBER(vamphalf_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if(offset)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x01);
-		eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->write_bit(data & 0x01);
+		m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 
 		// data & 8?
 	}
@@ -208,20 +204,16 @@ WRITE16_MEMBER(vamphalf_state::eeprom_w)
 
 WRITE32_MEMBER(vamphalf_state::eeprom32_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x01);
-	eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->write_bit(data & 0x01);
+	m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit(data & 0x4000);
-	eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->write_bit(data & 0x4000);
+	m_eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 WRITE16_MEMBER(vamphalf_state::flipscreen_w)

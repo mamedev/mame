@@ -7,6 +7,7 @@
 #include "sound/okim6295.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
+#include "machine/eeprom.h"
 
 class metro_state : public driver_device
 {
@@ -33,7 +34,8 @@ public:
 		m_videoregs(*this, "videoregs"),
 		m_screenctrl(*this, "screenctrl"),
 		m_input_sel(*this, "input_sel"),
-		m_k053936_ram(*this, "k053936_ram")
+		m_k053936_ram(*this, "k053936_ram"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	/* devices */
@@ -60,6 +62,8 @@ public:
 	optional_shared_ptr<UINT16> m_screenctrl;
 	optional_shared_ptr<UINT16> m_input_sel;
 	optional_shared_ptr<UINT16> m_k053936_ram;
+	
+	optional_device<eeprom_device> m_eeprom;
 
 
 	int         m_flip_screen;

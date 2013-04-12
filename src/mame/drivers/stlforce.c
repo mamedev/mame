@@ -76,13 +76,11 @@ TO DO :
 
 WRITE16_MEMBER(stlforce_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	if( ACCESSING_BITS_0_7 )
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x01);
-		eeprom->set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
-		eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->write_bit(data & 0x01);
+		m_eeprom->set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

@@ -866,17 +866,15 @@ READ32_MEMBER(seibuspi_state::spi_unknown_r)
 
 WRITE32_MEMBER(seibuspi_state::eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
 
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
 
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit((data & 0x800000) ? 1 : 0);
-		eeprom->set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->write_bit((data & 0x800000) ? 1 : 0);
+		m_eeprom->set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// oki banking
@@ -1101,11 +1099,9 @@ WRITE_LINE_MEMBER(seibuspi_state::irqhandler)
 
 WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	eeprom->write_bit((data & 0x80) ? 1 : 0);
-	eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->write_bit((data & 0x80) ? 1 : 0);
+	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static const ymf271_interface ymf271_config =
