@@ -110,12 +110,12 @@ public:
 
 READ8_MEMBER(snes_console_state::spc_ram_100_r )
 {
-	return spc_ram_r(machine().device("spc700"), space, offset + 0x100);
+	return spc_ram_r(m_spc700, space, offset + 0x100);
 }
 
 WRITE8_MEMBER(snes_console_state::spc_ram_100_w )
 {
-	spc_ram_w(machine().device("spc700"), space, offset + 0x100, data);
+	spc_ram_w(m_spc700, space, offset + 0x100, data);
 }
 
 // Memory access for the various types of carts
