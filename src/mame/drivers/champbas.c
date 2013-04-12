@@ -141,20 +141,17 @@ TIMER_CALLBACK_MEMBER(champbas_state::exctsccr_fm_callback)
 // Champion Baseball has only one DAC
 WRITE8_MEMBER(champbas_state::champbas_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	device->write_signed8(data << 2);
+	m_dac->write_signed8(data << 2);
 }
 
 WRITE8_MEMBER(champbas_state::champbas_dac1_w)
 {
-	dac_device *device = machine().device<dac_device>("dac1");
-	device->write_signed8(data << 2);
+	m_dac1->write_signed8(data << 2);
 }
 
 WRITE8_MEMBER(champbas_state::champbas_dac2_w)
 {
-	dac_device *device = machine().device<dac_device>("dac2");
-	device->write_signed8(data << 2);
+	m_dac2->write_signed8(data << 2);
 }
 
 /*************************************

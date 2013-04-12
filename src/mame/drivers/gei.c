@@ -82,7 +82,8 @@ class gei_state : public driver_device
 public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	virtual void video_start();
 
@@ -137,6 +138,7 @@ public:
 	DECLARE_PALETTE_INIT(quizvid);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -228,7 +230,7 @@ WRITE8_MEMBER(gei_state::sound_w)
 	m_nmi_mask = data & 0x40;
 
 	/* bit 7 goes directly to the sound amplifier */
-	machine().device<dac_device>("dac")->write_unsigned8(((data & 0x80) >> 7) * 255);
+	m_dac->write_unsigned8(((data & 0x80) >> 7) * 255);
 }
 
 WRITE8_MEMBER(gei_state::sound2_w)
@@ -245,7 +247,7 @@ WRITE8_MEMBER(gei_state::sound2_w)
 	set_led_status(machine(), 12,data & 0x20);
 
 	/* bit 7 goes directly to the sound amplifier */
-	machine().device<dac_device>("dac")->write(((data & 0x80) >> 7) * 255);
+	m_dac->write(((data & 0x80) >> 7) * 255);
 }
 
 WRITE8_MEMBER(gei_state::lamps2_w)

@@ -131,7 +131,9 @@ class calchase_state : public driver_device
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_dac_l(*this, "dac_l"),
+			m_dac_r(*this, "dac_r")
 			{ }
 
 	UINT32 *m_bios_ram;
@@ -183,6 +185,8 @@ public:
 	virtual void machine_reset();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void intel82439tx_init();
+	required_device<dac_device> m_dac_l;
+	required_device<dac_device> m_dac_r;
 };
 
 
@@ -531,14 +535,12 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 
 WRITE16_MEMBER(calchase_state::calchase_dac_l_w)
 {
-	dac_device *device = machine().device<dac_device>("dac_l");
-	device->write_unsigned16((data & 0xfff) << 4);
+	m_dac_l->write_unsigned16((data & 0xfff) << 4);
 }
 
 WRITE16_MEMBER(calchase_state::calchase_dac_r_w)
 {
-	dac_device *device = machine().device<dac_device>("dac_r");
-	device->write_unsigned16((data & 0xfff) << 4);
+	m_dac_r->write_unsigned16((data & 0xfff) << 4);
 }
 
 static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )

@@ -89,8 +89,7 @@ WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 
 WRITE8_MEMBER(tceptor_state::voice_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	device->write_signed16(data ? (data + 1) * 0x100 : 0x8000);
+	m_dac->write_signed16(data ? (data + 1) * 0x100 : 0x8000);
 }
 
 

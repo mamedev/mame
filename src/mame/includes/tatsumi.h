@@ -137,7 +137,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_subcpu2;
+	optional_device<cpu_device> m_subcpu2;
 	required_device<okim6295_device> m_oki;
 };
 

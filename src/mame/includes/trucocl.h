@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 class trucocl_state : public driver_device
 {
 public:
@@ -5,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	int m_cur_dac_address;
 	int m_cur_dac_address_index;
@@ -26,4 +29,5 @@ public:
 	INTERRUPT_GEN_MEMBER(trucocl_interrupt);
 	TIMER_CALLBACK_MEMBER(dac_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };

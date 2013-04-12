@@ -598,7 +598,7 @@ void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		machine().device<dac_device>("dac")->write_signed8(data);
+		m_dac->write_signed8(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -612,7 +612,7 @@ void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		machine().device<dac_device>("dac")->write_signed8(data);
+		m_dac->write_signed8(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);

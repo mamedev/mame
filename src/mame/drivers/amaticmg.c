@@ -621,7 +621,7 @@ WRITE8_MEMBER(amaticmg_state::out_c_w)
 
 WRITE8_MEMBER( amaticmg_state::unk80_w )
 {
-//  machine().device<dac_device>("dac")->write_unsigned8(data & 0x01);       /* Sound DAC */
+//  m_dac->write_unsigned8(data & 0x01);       /* Sound DAC */
 }
 
 

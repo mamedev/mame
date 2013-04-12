@@ -557,7 +557,6 @@ WRITE8_MEMBER(esripsys_state::control_w)
 /* 10-bit MC3410CL DAC */
 WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	if (offset == 0)
 	{
 		m_dac_msb = data & 3;
@@ -570,7 +569,7 @@ WRITE8_MEMBER(esripsys_state::esripsys_dac_w)
 		    The 8-bit DAC modulates the 10-bit DAC.
 		    Shift down to prevent clipping.
 		*/
-		device->write_signed16((m_dac_vol * dac_data) >> 1);
+		m_dac->write_signed16((m_dac_vol * dac_data) >> 1);
 	}
 }
 

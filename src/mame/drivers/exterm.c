@@ -238,10 +238,9 @@ READ8_MEMBER(exterm_state::sound_slave_latch_r)
 
 WRITE8_MEMBER(exterm_state::sound_slave_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	/* DAC A is used to modulate DAC B */
 	m_dac_value[offset & 1] = data;
-	device->write_unsigned16((m_dac_value[0] ^ 0xff) * m_dac_value[1]);
+	m_dac->write_unsigned16((m_dac_value[0] ^ 0xff) * m_dac_value[1]);
 }
 
 

@@ -3,6 +3,7 @@
     Gottlieb Exterminator hardware
 
 *************************************************************************/
+#include "sound/dac.h"
 
 class exterm_state : public driver_device
 {
@@ -13,7 +14,8 @@ public:
 		m_slave_videoram(*this, "slave_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_slave(*this, "slave")  { }
+		m_slave(*this, "slave"),
+		m_dac(*this, "dac") { }
 
 	UINT8 m_aimpos[2];
 	UINT8 m_trackball_old[2];
@@ -43,6 +45,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_slave;
+	required_device<dac_device> m_dac;
 };
 
 /*----------- defined in video/exterm.c -----------*/

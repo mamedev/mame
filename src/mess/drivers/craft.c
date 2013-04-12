@@ -230,8 +230,6 @@ DRIVER_INIT_MEMBER(craft_state,craft)
 
 void craft_state::machine_reset()
 {
-	m_dac = machine().device<dac_device>("dac");
-
 	m_dac->write_unsigned8(0x00);
 
 	m_frame_start_cycle = 0;

@@ -50,7 +50,6 @@ TIMER_CALLBACK_MEMBER(trucocl_state::dac_irq)
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	UINT8 *rom = memregion("maincpu")->base();
 	int dac_address = ( data & 0xf0 ) << 8;
 	int sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
@@ -73,7 +72,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	dac_address += 0x10000;
 
-	device->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
+	m_dac->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
 
 	machine().scheduler().timer_set( attotime::from_hz( 16000 ), timer_expired_delegate(FUNC(trucocl_state::dac_irq),this));
 }

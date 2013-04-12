@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/z80ctc.h"
+#include "sound/dac.h"
 
 class cchasm_state : public driver_device
 {
@@ -13,7 +14,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2") { }
 
 	int m_sound_flags;
 	int m_coin_flag;
@@ -40,6 +43,8 @@ public:
 	void cchasm_refresh ();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
 };
 
 /*----------- defined in audio/cchasm.c -----------*/

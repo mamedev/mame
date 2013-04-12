@@ -294,7 +294,7 @@ WRITE16_MEMBER(harddriv_state::hdsnddsp_dac_w)
 {
 	/* DAC L */
 	if (!m_dacmute)
-		downcast<dac_device *>(machine().device("dac"))->write_signed16(data ^ 0x8000);
+		m_dac->write_signed16(data ^ 0x8000);
 }
 
 

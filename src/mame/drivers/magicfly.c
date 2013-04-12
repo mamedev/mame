@@ -449,7 +449,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
@@ -467,6 +468,7 @@ public:
 	DECLARE_VIDEO_START(7mezzo);
 	UINT32 screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -646,7 +648,7 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 */
 	m_input_selector = data & 0x0f; /* Input Selector */
 
-	machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);      /* Sound DAC */
+	m_dac->write_unsigned8(data & 0x80);      /* Sound DAC */
 
 	coin_counter_w(machine(), 0, data & 0x40);  /* Coin1 */
 	coin_counter_w(machine(), 1, data & 0x10);  /* Coin2 */

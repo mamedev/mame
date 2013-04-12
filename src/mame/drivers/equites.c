@@ -1185,8 +1185,6 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(equites_state,equites)
 {
 	m_msm = machine().device<msm5232_device>("msm");
-	m_dac_1 = machine().device<dac_device>("dac1");
-	m_dac_2 = machine().device<dac_device>("dac2");
 
 	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_bgcolor));

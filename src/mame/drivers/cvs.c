@@ -312,7 +312,6 @@ void cvs_state::start_393hz_timer()
 
 WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 {
-	dac_device *device = machine().device<dac_device>("dac2");
 	UINT8 dac_value;
 	static int old_data[4] = {0,0,0,0};
 
@@ -330,7 +329,7 @@ WRITE8_MEMBER(cvs_state::cvs_4_bit_dac_data_w)
 				(m_cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
-	device->write_unsigned8((dac_value << 4) | dac_value);
+	m_dac2->write_unsigned8((dac_value << 4) | dac_value);
 }
 
 WRITE8_MEMBER(cvs_state::cvs_unknown_w)
@@ -983,7 +982,6 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 
 	/* set devices */
 	m_speech = machine().device("speech");
-	m_dac3 = machine().device<dac_device>("dac3");
 	m_tms = machine().device("tms");
 	m_s2636_0 = machine().device("s2636_0");
 	m_s2636_1 = machine().device("s2636_1");

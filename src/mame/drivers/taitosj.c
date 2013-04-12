@@ -1731,16 +1731,14 @@ static const UINT8 voltable[256] =
 
 WRITE8_MEMBER(taitosj_state::dac_out_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	m_dac_out = data - 0x80;
-	device->write_signed16(m_dac_out * m_dac_vol + 0x8000);
+	m_dac->write_signed16(m_dac_out * m_dac_vol + 0x8000);
 }
 
 WRITE8_MEMBER(taitosj_state::dac_vol_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	m_dac_vol = voltable[data];
-	device->write_signed16(m_dac_out * m_dac_vol + 0x8000);
+	m_dac->write_signed16(m_dac_out * m_dac_vol + 0x8000);
 }
 
 

@@ -325,23 +325,19 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(suna16_state::bssoccer_DAC1_w)
 {
-	dac_device *device = machine().device<dac_device>("dac1");
-	device->write_unsigned8( (data & 0xf) * 0x11 );
+	m_dac1->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC2_w)
 {
-	dac_device *device = machine().device<dac_device>("dac2");
-	device->write_unsigned8( (data & 0xf) * 0x11 );
+	m_dac2->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC3_w)
 {
-	dac_device *device = machine().device<dac_device>("dac3");
-	device->write_unsigned8( (data & 0xf) * 0x11 );
+	m_dac3->write_unsigned8( (data & 0xf) * 0x11 );
 }
 WRITE8_MEMBER(suna16_state::bssoccer_DAC4_w)
 {
-	dac_device *device = machine().device<dac_device>("dac4");
-	device->write_unsigned8( (data & 0xf) * 0x11 );
+	m_dac4->write_unsigned8( (data & 0xf) * 0x11 );
 }
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )

@@ -539,8 +539,7 @@ WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 
 WRITE16_MEMBER(coolpool_state::dsp_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	device->write_signed16((INT16)(data << 4) + 0x8000);
+	m_dac->write_signed16((INT16)(data << 4) + 0x8000);
 }
 
 

@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 #define VRAM_MAX    2
 
 #define SCANLINE_MIN    0
@@ -9,7 +11,9 @@ class nbmj9195_state : public driver_device
 public:
 	nbmj9195_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2") { }
 
 	int m_inputport;
 	int m_dipswbitsel;
@@ -127,4 +131,6 @@ public:
 	void nbmj9195_dipswbitsel_w(int data);
 	void mscoutm_inputportsel_w(int data);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;	
 };

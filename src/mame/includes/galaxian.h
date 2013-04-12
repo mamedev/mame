@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "machine/i8255.h"
+#include "sound/dac.h"
 
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE         3
@@ -39,7 +40,8 @@ public:
 			m_spriteram(*this, "spriteram"),
 			m_videoram(*this, "videoram"),
 			m_maincpu(*this, "maincpu"),
-			m_audiocpu(*this, "audiocpu") { }
+			m_audiocpu(*this, "audiocpu"),
+			m_dac(*this, "dac") { }
 
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
@@ -288,4 +290,5 @@ public:
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<dac_device> m_dac;
 };

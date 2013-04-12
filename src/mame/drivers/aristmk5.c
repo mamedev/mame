@@ -376,7 +376,7 @@ void aristmk5_state::machine_start()
 	archimedes_init();
 
 	// reset the DAC to centerline
-	//machine().device<dac_device>("dac")->write_signed8(0x80);
+	//m_dac->write_signed8(0x80);
 
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
 	m_mk5_VSYNC_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_VSYNC_callback),this));

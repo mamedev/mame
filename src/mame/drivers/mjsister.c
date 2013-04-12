@@ -455,8 +455,6 @@ void mjsister_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x8000);
 
-	m_dac = machine().device<dac_device>("dac");
-
 	save_item(NAME(m_dac_busy));
 	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_video_enable));

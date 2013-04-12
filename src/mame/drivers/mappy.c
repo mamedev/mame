@@ -2238,8 +2238,7 @@ ROM_END
 
 WRITE8_MEMBER(mappy_state::grobda_DAC_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	device->write_unsigned8((data << 4) | data);
+	m_dac->write_unsigned8((data << 4) | data);
 }
 
 DRIVER_INIT_MEMBER(mappy_state,grobda)

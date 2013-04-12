@@ -6,7 +6,7 @@
 
 
 #define CPUTAG_MCU "mcu"
-
+#include "sound/dac.h"
 
 class champbas_state : public driver_device
 {
@@ -18,7 +18,10 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, CPUTAG_MCU){ }
+		m_mcu(*this, CPUTAG_MCU),
+		m_dac(*this, "dac"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg_videoram;
@@ -70,4 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(exctsccr_fm_callback);
 	void champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	optional_device<dac_device> m_dac;
+	optional_device<dac_device> m_dac1;
+	optional_device<dac_device> m_dac2;
 };

@@ -396,13 +396,13 @@ READ8_MEMBER(n8080_state::helifire_8035_p2_r)
 
 WRITE8_MEMBER(n8080_state::n8080_dac_w)
 {
-	machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);
+	m_dac->write_unsigned8(data & 0x80);
 }
 
 
 WRITE8_MEMBER(n8080_state::helifire_dac_w)
 {
-	machine().device<dac_device>("dac")->write_unsigned8(data * m_helifire_dac_volume);
+	m_dac->write_unsigned8(data * m_helifire_dac_volume);
 }
 
 

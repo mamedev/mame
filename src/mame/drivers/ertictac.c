@@ -202,7 +202,7 @@ void ertictac_state::machine_start()
 	archimedes_init();
 
 	// reset the DAC to centerline
-	//machine().device<dac_device>("dac")->write_signed8(0x80);
+	//m_dac->write_signed8(0x80);
 }
 
 void ertictac_state::machine_reset()

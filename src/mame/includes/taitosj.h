@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 class taitosj_state : public driver_device
 {
 public:
@@ -19,7 +21,8 @@ public:
 		m_kikstart_scrollram(*this, "kikstart_scroll"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_dac(*this, "dac") { }
 
 	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
 									const rectangle &, int, int *, rectangle *);
@@ -120,4 +123,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_mcu;
+	required_device<dac_device> m_dac;
 };

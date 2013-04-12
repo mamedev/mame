@@ -21,6 +21,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_sn_1(*this, "sn1"),
 		m_sn_2(*this, "sn2"),
+		m_dac(*this, "dac"),
 		m_discrete(*this, "fltdisc"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -42,7 +43,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<sn76496_device> m_sn_1;
 	required_device<sn76496_device> m_sn_2;
-	dac_device *m_dac;
+	required_device<dac_device> m_dac;
 	required_device<discrete_device> m_discrete;
 
 	UINT8          m_irq_mask;

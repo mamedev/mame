@@ -43,7 +43,8 @@ public:
 	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	emu_timer *m_scanline_timer;
@@ -72,6 +73,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
 	void update_nmi_state();
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -144,7 +146,7 @@ TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	/* update the DAC state */
-	machine().device<dac_device>("dac")->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	m_dac->write_unsigned8((videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine().primary_screen->visible_area().max_y + 1)

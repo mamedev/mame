@@ -1,4 +1,5 @@
 #define NVRAM_UNLOCK_SEQ_LEN 10
+#include "sound/dac.h"
 
 class coolpool_state : public driver_device
 {
@@ -8,7 +9,8 @@ public:
 		m_tlc34076(*this, "tlc34076"),
 		m_vram_base(*this, "vram_base"),
 		m_nvram(*this, "nvram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"){ }
 
 	optional_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_base;
@@ -64,4 +66,5 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_iop_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
+	required_device<dac_device> m_dac;
 };

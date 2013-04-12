@@ -39,7 +39,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_main_ram(*this, "main_ram"),
 		m_fo_state(*this, "fo_state"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	tilemap_t *m_tilemap;
 	required_shared_ptr<UINT8> m_main_ram;
@@ -67,6 +68,7 @@ public:
 	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -167,7 +169,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
 	// d1: audio out
-	machine().device<dac_device>("dac")->write_signed8((data & 2) ? 0x7f : 0);
+	m_dac->write_signed8((data & 2) ? 0x7f : 0);
 
 	// d0, d2-d7: N/C
 }

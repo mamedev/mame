@@ -190,8 +190,7 @@ WRITE8_MEMBER(zaccaria_state::sound1_command_w)
 
 WRITE8_MEMBER(zaccaria_state::mc1408_data_w)
 {
-	dac_device *device = machine().device<dac_device>("dac2");
-	device->write_unsigned8(data);
+	m_dac2->write_unsigned8(data);
 }
 
 

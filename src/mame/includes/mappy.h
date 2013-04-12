@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 class mappy_state : public driver_device
 {
 public:
@@ -7,7 +9,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2") { }
+		m_subcpu2(*this, "sub2"),
+		m_dac(*this, "dac")  { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -69,5 +72,6 @@ public:
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_subcpu2;
+	optional_device<cpu_device> m_subcpu2;
+	optional_device<dac_device> m_dac;
 };

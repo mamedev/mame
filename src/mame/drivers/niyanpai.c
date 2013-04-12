@@ -112,10 +112,10 @@ WRITE8_MEMBER(niyanpai_state::tmpz84c011_pio_w)
 			niyanpai_soundbank_w(data & 0x03);
 			break;
 		case 1:         /* PB_0 */
-			machine().device<dac_device>("dac1")->write_unsigned8(data);
+			m_dac1->write_unsigned8(data);
 			break;
 		case 2:         /* PC_0 */
-			machine().device<dac_device>("dac2")->write_unsigned8(data);
+			m_dac2->write_unsigned8(data);
 			break;
 		case 3:         /* PD_0 */
 			break;

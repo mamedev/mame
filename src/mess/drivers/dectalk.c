@@ -235,8 +235,9 @@ class dectalk_state : public driver_device
 public:
 	dectalk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_terminal(*this, TERMINAL_TAG) ,
-		m_maincpu(*this, "maincpu") { }
+		m_terminal(*this, TERMINAL_TAG) ,
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
 	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space
@@ -285,6 +286,7 @@ public:
 	void dectalk_semaphore_w ( UINT16 data );
 	UINT16 dectalk_outfifo_r (  );
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -783,13 +785,12 @@ INPUT_PORTS_END
 TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
 	UINT16 data;
-	dac_device *speaker = machine().device<dac_device>("dac");
 	data = dectalk_outfifo_r();
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
 	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
-	speaker->write_signed16(data);
+	m_dac->write_signed16(data);
 	// hack for break key, requires hacked up duart core so disabled for now
 	// also it doesn't work well, the setup menu is badly corrupt
 	/*device_t *duart = machine().device("duart68681");

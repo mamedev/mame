@@ -13,7 +13,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_port_80(*this, "port_80"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -26,7 +27,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	dac_device *m_dac;
+	required_device<dac_device> m_dac;
 
 	UINT8          m_irq_mask;
 	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);

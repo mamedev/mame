@@ -246,7 +246,7 @@ void hp48_reg_out( device_t *device, int out )
 	/* bits 9-10: unused */
 
 	/* bit 11: beeper */
-	device->machine().device<dac_device>("dac")->write_unsigned8((out & 0x800) ? 0x80 : 00 );
+	state->m_dac->write_unsigned8((out & 0x800) ? 0x80 : 00 );
 }
 
 static int hp48_get_in( running_machine &machine )

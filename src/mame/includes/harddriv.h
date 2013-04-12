@@ -45,7 +45,8 @@ public:
 			m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
 			m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
 			m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
-			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer") { }
+			m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer"),
+			m_dac(*this, "dac") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -259,6 +260,7 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
 	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
 	DECLARE_WRITE16_MEMBER(hdsnddsp_dac_w);
+	optional_device<dac_device> m_dac;
 };
 
 

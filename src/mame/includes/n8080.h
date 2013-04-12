@@ -1,3 +1,4 @@
+#include "sound/dac.h"
 
 class n8080_state : public driver_device
 {
@@ -6,7 +7,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -89,6 +91,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(helifire_dac_volume_timer);
 	void spacefev_start_red_cannon(  );
 	void helifire_next_line(  );
+	required_device<dac_device> m_dac;
 };
 
 /*----------- defined in audio/n8080.c -----------*/

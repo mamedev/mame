@@ -958,7 +958,6 @@ static const samples_interface cosmicg_samples_interface =
 MACHINE_START_MEMBER(cosmic_state,cosmic)
 {
 	m_samples = machine().device<samples_device>("samples");
-	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
@@ -1539,11 +1538,10 @@ DRIVER_INIT_MEMBER(cosmic_state,devzone)
 
 DRIVER_INIT_MEMBER(cosmic_state,nomnlnd)
 {
-	dac_device *dac = machine().device<dac_device>("dac");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),dac));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
 }
 
 DRIVER_INIT_MEMBER(cosmic_state,panic)

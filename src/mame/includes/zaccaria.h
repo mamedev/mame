@@ -1,3 +1,5 @@
+#include "sound/dac.h"
+
 class zaccaria_state : public driver_device
 {
 public:
@@ -8,7 +10,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_dac2(*this, "dac2") { }
 
 	int m_dsw;
 	int m_active_8910;
@@ -52,4 +55,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac2;
 };

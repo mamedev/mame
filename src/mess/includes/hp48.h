@@ -9,7 +9,7 @@
 #ifdef CHARDEV
 #include "devices/chardev.h"
 #endif
-
+#include "sound/dac.h"
 /* model */
 enum hp48_models {
 	HP48_S,
@@ -45,7 +45,8 @@ class hp48_state : public driver_device
 public:
 	hp48_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_io[64];
@@ -88,6 +89,7 @@ public:
 	void hp48_update_annunciators();
 	void hp48_apply_modules();
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 

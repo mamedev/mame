@@ -3,6 +3,7 @@
     Irem M72 hardware
 
 *************************************************************************/
+#include "sound/dac.h"
 
 class m72_state : public driver_device
 {
@@ -17,7 +18,8 @@ public:
 		m_soundram(*this, "soundram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_dac(*this, "dac") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_videoram1;
@@ -138,4 +140,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_mcu;
+	optional_device<dac_device> m_dac;
 };

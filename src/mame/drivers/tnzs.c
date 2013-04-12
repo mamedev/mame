@@ -742,10 +742,9 @@ WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 
 WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		device->write_unsigned8(data);
+		m_dac->write_unsigned8(data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )

@@ -779,7 +779,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_io_w)
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) m_ppi8255_2->write(space, offset & 3, data);
-	if (offset & 0x10) machine().device<dac_device>("dac")->write_signed8(data);
+	if (offset & 0x10) m_dac->write_signed8(data);
 }
 
 
@@ -1182,8 +1182,7 @@ WRITE8_MEMBER(galaxian_state::kingball_sound2_w)
 
 WRITE8_MEMBER(galaxian_state::kingball_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	device->write_unsigned8(data ^ 0xff);
+	m_dac->write_unsigned8(data ^ 0xff);
 }
 
 

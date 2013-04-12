@@ -16,6 +16,8 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_mcu_ram(*this, "mcu_ram"),
 		m_mcu(*this, "mcu"),
+		m_dac_1(*this, "dac1"),
+		m_dac_2(*this, "dac2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") { }
 
@@ -59,8 +61,8 @@ public:
 	/* devices */
 	optional_device<cpu_device> m_mcu;
 	msm5232_device *m_msm;
-	dac_device *m_dac_1;
-	dac_device *m_dac_2;
+	required_device<dac_device> m_dac_1;
+	required_device<dac_device> m_dac_2;
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);

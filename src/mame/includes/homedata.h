@@ -9,7 +9,8 @@ public:
 		m_vreg(*this, "vreg"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") {}
+		m_audiocpu(*this, "audiocpu"),
+		m_dac(*this, "dac") {}
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_vreg;
@@ -40,7 +41,7 @@ public:
 	/* device */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	dac_device *m_dac;
+	optional_device<dac_device> m_dac;
 	device_t *m_ym;
 	sn76489a_device *m_sn;
 	UINT8 m_prot_data;

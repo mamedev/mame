@@ -470,7 +470,7 @@ WRITE8_MEMBER(mpoker_state::outport7_w)
 
 WRITE8_MEMBER(mpoker_state::sound_w)
 //{
-//  machine().device<dac_device>("dac")->write_unsigned8(data);
+//  m_dac->write_unsigned8(data);
 //}
 */
 

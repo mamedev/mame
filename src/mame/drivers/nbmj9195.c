@@ -327,10 +327,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:         /* PB_1 */
-				machine().device<dac_device>("dac2")->write_unsigned8(data);
+				m_dac2->write_unsigned8(data);
 				break;
 			case 7:         /* PC_1 */
-				machine().device<dac_device>("dac1")->write_unsigned8(data);
+				m_dac1->write_unsigned8(data);
 				break;
 			case 8:         /* PD_1 */
 				break;
@@ -365,10 +365,10 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:         /* PB_1 */
-				machine().device<dac_device>("dac1")->write_unsigned8(data);
+				m_dac1->write_unsigned8(data);
 				break;
 			case 7:         /* PC_1 */
-				machine().device<dac_device>("dac2")->write_unsigned8(data);
+				m_dac2->write_unsigned8(data);
 				break;
 			case 8:         /* PD_1 */
 				break;

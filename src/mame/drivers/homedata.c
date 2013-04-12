@@ -1142,7 +1142,6 @@ MACHINE_START_MEMBER(homedata_state,homedata)
 {
 	m_ym = machine().device("ymsnd");
 	m_sn = machine().device<sn76489a_device>("snsnd");
-	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_visible_page));
 	save_item(NAME(m_flipscreen));

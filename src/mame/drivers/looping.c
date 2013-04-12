@@ -103,7 +103,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_dac(*this, "dac") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -149,6 +150,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -386,7 +388,6 @@ WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 
 WRITE8_MEMBER(looping_state::looping_sound_sw)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	/* this can be improved by adding the missing signals for decay etc. (see schematics)
 
 	    0001 = ASOV
@@ -399,7 +400,7 @@ WRITE8_MEMBER(looping_state::looping_sound_sw)
 	*/
 
 	m_sound[offset + 1] = data ^ 1;
-	device->write_unsigned8(((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
+	m_dac->write_unsigned8(((m_sound[2] << 7) + (m_sound[3] << 6)) * m_sound[7]);
 }
 
 

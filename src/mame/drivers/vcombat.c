@@ -100,7 +100,8 @@ public:
 		m_vid_1_shared_ram(*this, "vid_1_ram"),
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_dac(*this, "dac") { }
 
 	UINT16* m_m68k_framebuffer[2];
 	UINT16* m_i860_framebuffer[2][2];
@@ -132,6 +133,7 @@ public:
 	UINT32 screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<dac_device> m_dac;
 };
 
 static UINT32 update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -339,9 +341,8 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 
 WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
 	INT16 newval = ((INT16)data - 0x6000) << 2;
-	device->write_signed16(newval + 0x8000);
+	m_dac->write_signed16(newval + 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vcombat_state )

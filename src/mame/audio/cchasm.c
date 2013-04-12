@@ -102,7 +102,7 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
 	{
 		m_output[0] ^= 0x7f;
 		m_channel_active[0] = 1;
-		machine().device<dac_device>("dac1")->write_unsigned8(m_output[0]);
+		m_dac1->write_unsigned8(m_output[0]);
 	}
 }
 
@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
 	{
 		m_output[1] ^= 0x7f;
 		m_channel_active[1] = 1;
-		machine().device<dac_device>("dac2")->write_unsigned8(m_output[0]);
+		m_dac2->write_unsigned8(m_output[0]);
 	}
 }
 

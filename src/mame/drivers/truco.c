@@ -238,7 +238,7 @@ WRITE8_MEMBER(truco_state::portb_w)
 {
 	if ((data & 0x80) | (data == 0))
 	{
-		machine().device<dac_device>("dac")->write_unsigned8(data & 0x80);  /* Isolated the bit for Delta-Sigma DAC */
+		m_dac->write_unsigned8(data & 0x80);  /* Isolated the bit for Delta-Sigma DAC */
 	}
 	else
 		logerror("Port B writes: %2x\n", data);

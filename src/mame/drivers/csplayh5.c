@@ -32,7 +32,9 @@ public:
 	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_v9958(*this,"v9958")
+		m_v9958(*this,"v9958"),
+		m_dac1(*this, "dac1"),
+		m_dac2(*this, "dac2")
 		{ }
 
 	UINT16 m_mux_data;
@@ -82,6 +84,8 @@ public:
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;	
 };
 
 
@@ -235,10 +239,10 @@ WRITE8_MEMBER(csplayh5_state::tmpz84c011_pio_w)
 			csplayh5_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:         /* PB_0 */
-			machine().device<dac_device>("dac2")->DAC_WRITE(data);
+			m_dac2->DAC_WRITE(data);
 			break;
 		case 2:         /* PC_0 */
-			machine().device<dac_device>("dac1")->DAC_WRITE(data);
+			m_dac1->DAC_WRITE(data);
 			break;
 		case 3:         /* PD_0 */
 			break;

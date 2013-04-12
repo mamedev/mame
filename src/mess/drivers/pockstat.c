@@ -93,7 +93,8 @@ public:
 	pockstat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_lcd_buffer(*this, "lcd_buffer"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dac(*this, "dac") { }
 
 	required_shared_ptr<UINT32> m_lcd_buffer;
 	ps_ftlb_regs_t m_ftlb_regs;
@@ -133,6 +134,7 @@ public:
 	void ps_intc_set_interrupt_line(UINT32 line, int state);
 	void ps_timer_start(int index);
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -818,7 +820,7 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 
 WRITE32_MEMBER(pockstat_state::ps_dac_w)
 {
-	machine().device<dac_device>("dac")->write_unsigned16((UINT16)((data + 0x8000) & 0x0000ffff));
+	m_dac->write_unsigned16((UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
 static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )

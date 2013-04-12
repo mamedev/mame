@@ -338,9 +338,8 @@ WRITE8_MEMBER(m72_state::m72_mcu_high_w)
 
 WRITE8_MEMBER(m72_state::m72_snd_cpu_sample_w)
 {
-	dac_device *device = machine().device<dac_device>("dac");
-	//device->write_signed8(data);
-	device->write_unsigned8(data);
+	//m_dac->write_signed8(data);
+	m_dac->write_unsigned8(data);
 }
 
 READ8_MEMBER(m72_state::m72_snd_cpu_sample_r)
