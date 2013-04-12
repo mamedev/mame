@@ -65,8 +65,7 @@ bootleg todo:
 
 WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 {
-	device_t *device = machine().device("oki2");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 3) * 0x40000);
+	m_oki2->set_bank_base((data & 3) * 0x40000);
 }
 
 /**********************************************************************************/

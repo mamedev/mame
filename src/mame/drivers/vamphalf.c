@@ -78,7 +78,8 @@ public:
 			m_tiles32(*this,"tiles32"),
 			m_wram32(*this,"wram32"),
 			m_maincpu(*this, "maincpu"),
-			m_oki(*this, "oki") {
+			m_oki(*this, "oki"),
+			m_oki2(*this, "oki_2") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -169,6 +170,7 @@ public:
 	UINT32 screen_update_aoh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki2;
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -328,8 +330,7 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 
 WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 {
-	device_t *device = machine().device("oki_2");
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
+	m_oki2->set_bank_base(0x40000 * (data & 0x3));
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)

@@ -4669,11 +4669,10 @@ WRITE16_MEMBER(nmk16_state::twinactn_flipscreen_w)
 ***************************************************************************/
 WRITE8_MEMBER(nmk16_state::spec2k_oki1_banking_w)
 {
-	device_t *device = machine().device("oki2");
 	if(data == 0xfe)
-		downcast<okim6295_device *>(device)->set_bank_base(0);
+		m_oki2->set_bank_base(0);
 	else if(data == 0xff)
-		downcast<okim6295_device *>(device)->set_bank_base(0x40000);
+		m_oki2->set_bank_base(0x40000);
 }
 
 static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8, nmk16_state )
@@ -4699,8 +4698,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(nmk16_state::twinactn_oki_bank_w)
 {
-	device_t *device = machine().device("oki1");
-	downcast<okim6295_device *>(device)->set_bank_base((data & 3) * 0x40000);
+	m_oki1->set_bank_base((data & 3) * 0x40000);
 
 	if (data & (~3))
 		logerror("%s: invalid oki bank %02x\n", machine().describe_context(), data);

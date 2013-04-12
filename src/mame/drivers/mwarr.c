@@ -61,7 +61,8 @@ public:
 		m_vidattrram(*this, "vidattrram"),
 		m_spriteram(*this, "spriteram"),
 		m_mwarr_ram(*this, "mwarr_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -103,6 +104,7 @@ public:
 	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki2;
 };
 
 
@@ -138,8 +140,7 @@ WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 
 WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
-	device_t *device = machine().device("oki2");
-	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
+	m_oki2->set_bank_base(0x40000 * (data & 3));
 }
 
 WRITE16_MEMBER(mwarr_state::sprites_commands_w)

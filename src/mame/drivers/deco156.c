@@ -30,6 +30,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_deco_tilegen1(*this, "tilegen1"),
+			m_oki1(*this, "oki1"),
 			m_oki2(*this, "oki2"),
 			m_sprgen(*this, "spritegen")
 	{ }
@@ -37,6 +38,7 @@ public:
 	/* devices */
 	required_device<arm_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
+	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
 	optional_device<decospr_device> m_sprgen;
 
@@ -104,9 +106,7 @@ WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 
 WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
 {
-	device_t *device = machine().device("oki1");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	oki->set_bank_base((data & 1) * 0x40000);
+	m_oki1->set_bank_base((data & 1) * 0x40000);
 }
 
 WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)

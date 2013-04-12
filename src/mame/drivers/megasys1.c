@@ -3842,9 +3842,8 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 
 DRIVER_INIT_MEMBER(megasys1_state,edfbl)
 {
-	//device_t *oki1 = machine().device("oki1");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
-	//m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
+	//m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(*m_oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)

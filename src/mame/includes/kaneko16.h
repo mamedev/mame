@@ -28,7 +28,9 @@ public:
 		m_view2_1(*this, "view2_1"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki") { }
+		m_oki(*this, "oki"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2") { }
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -74,6 +76,8 @@ public:
 	void kaneko16_expand_sample_banks(const char *region);
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;
 };
 
 class kaneko16_gtmr_state : public kaneko16_state

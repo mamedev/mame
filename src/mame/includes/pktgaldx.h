@@ -3,7 +3,7 @@
     Pocket Gal Deluxe
 
 *************************************************************************/
-
+#include "sound/okim6295.h"
 #include "video/decospr.h"
 
 class pktgaldx_state : public driver_device
@@ -17,7 +17,8 @@ public:
 		m_pktgaldb_fgram(*this, "pktgaldb_fgram"),
 		m_pktgaldb_sprites(*this, "pktgaldb_spr"),
 		m_sprgen(*this, "spritegen"),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_oki2(*this, "oki2")
 	{ }
 
 	/* memory pointers */
@@ -32,6 +33,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki2;
 	device_t *m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);

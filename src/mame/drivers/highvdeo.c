@@ -108,7 +108,8 @@ public:
 	highvdeo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_blit_ram(*this, "blit_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_okim6376(*this, "oki") { }
 
 	required_shared_ptr<UINT16> m_blit_ram;
 	UINT16 m_vblank_bit;
@@ -143,6 +144,7 @@ public:
 	UINT32 screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6376_device> m_okim6376;
 };
 
 
@@ -276,22 +278,20 @@ WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 
 WRITE16_MEMBER(highvdeo_state::tv_oki6376_w)
 {
-	device_t *device = machine().device("oki");
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data)
 	{
 		okidata = data;
-		okim6376_w(device, space, 0, data & ~0x80);
-		okim6376_st_w (device, data & 0x80);
+		okim6376_w(m_okim6376, space, 0, data & ~0x80);
+		okim6376_st_w (m_okim6376, data & 0x80);
 	}
 }
 
 READ16_MEMBER(highvdeo_state::tv_oki6376_r)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-		return okim6376_busy_r(device);
+		return okim6376_busy_r(m_okim6376);
 	}
 	return 0xff;
 }
@@ -351,20 +351,18 @@ READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 
 WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_w)
 {
-	device_t *device = machine().device("oki");
 	static int okidata;
 	if (ACCESSING_BITS_0_7 && okidata != data) {
 		okidata = data;
-		okim6376_w(device, space, 0, data );
+		okim6376_w(m_okim6376, space, 0, data );
 	}
 }
 
 WRITE16_MEMBER(highvdeo_state::tv_ncf_oki6376_st_w)
 {
-	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6376_st_w(device, (data & 0x80) );
+		okim6376_st_w(m_okim6376, (data & 0x80) );
 	}
 }
 

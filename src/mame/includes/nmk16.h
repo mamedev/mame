@@ -1,3 +1,5 @@
+#include "sound/okim6295.h"
+
 class nmk16_state : public driver_device
 {
 public:
@@ -16,7 +18,9 @@ public:
 		m_afega_scroll_0(*this, "afega_scroll_0"),
 		m_afega_scroll_1(*this, "afega_scroll_1"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_oki1(*this, "oki1"),
+		m_oki2(*this, "oki2") { }
 
 	int mask[4*2];
 	required_shared_ptr<UINT16> m_nmk_bgvideoram0;
@@ -177,4 +181,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;	
 };

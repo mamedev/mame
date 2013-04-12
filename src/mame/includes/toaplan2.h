@@ -23,7 +23,8 @@ public:
 		m_mainram16(*this, "mainram16"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki") {
+		m_oki(*this, "oki"),
+		m_oki1(*this, "oki1") {
 		m_vdp0 = NULL;
 		m_vdp1 = NULL;
 	}
@@ -143,4 +144,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<okim6295_device> m_oki1;
 };

@@ -703,16 +703,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(cischeat_state::cischeat_soundbank_1_w)
 {
-	device_t *device = machine().device("oki1");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	if (ACCESSING_BITS_0_7) oki->set_bank_base(0x40000 * (data & 1) );
+	if (ACCESSING_BITS_0_7) m_oki1->set_bank_base(0x40000 * (data & 1) );
 }
 
 WRITE16_MEMBER(cischeat_state::cischeat_soundbank_2_w)
 {
-	device_t *device = machine().device("oki2");
-	okim6295_device *oki = downcast<okim6295_device *>(device);
-	if (ACCESSING_BITS_0_7) oki->set_bank_base(0x40000 * (data & 1) );
+	if (ACCESSING_BITS_0_7) m_oki2->set_bank_base(0x40000 * (data & 1) );
 }
 static ADDRESS_MAP_START( cischeat_sound_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                 // ROM

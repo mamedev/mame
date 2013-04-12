@@ -328,22 +328,18 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 {
-	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(0x40000 * (data & 0xf) );
+		m_oki1->set_bank_base(0x40000 * (data & 0xf) );
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 
 WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 {
-	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(0x40000 * data );
+		m_oki2->set_bank_base(0x40000 * data );
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -396,22 +392,18 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
 {
-	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(0x40000 * (data & 0xF));
+		m_oki1->set_bank_base(0x40000 * (data & 0xF));
 		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
 	}
 }
 
 WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
 {
-	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base(0x40000 * data );
+		m_oki2->set_bank_base(0x40000 * data );
 		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -469,22 +461,18 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
 
 WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 {
-	device_t *device = machine().device("oki1");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base( 0x40000 * (data & 0xF) );
+		m_oki1->set_bank_base( 0x40000 * (data & 0xF) );
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
 
 WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
 {
-	device_t *device = machine().device("oki2");
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = downcast<okim6295_device *>(device);
-		oki->set_bank_base( 0x40000 * (data & 0x1) );
+		m_oki2->set_bank_base( 0x40000 * (data & 0x1) );
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
