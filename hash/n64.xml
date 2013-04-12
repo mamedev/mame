@@ -10978,4 +10978,52 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
+<!-- These come from a batch of proto/test carts auctioned in Jpn -->
+
+	<software name="64gbchk" supported="no">
+		<description>64GB Checker (Jpn, v1.05)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="64gb checker v1.05.bin" size="8388608" crc="049924fd" sha1="caee91a7a1059ae7c6fd299138745f0cd284de3d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="photovw" supported="no">
+		<description>Photo Viewer (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="photo viewer.bin" size="8388608" crc="6d3897e0" sha1="a05946880d590aa0696e2fcf3a1b6727e5229d52" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="u64demo" supported="no">
+		<description>U64 Demo (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="u64 demo.bin" size="16777216" crc="c07f24ee" sha1="4b8aa22dc0422402afeed682727fe9b22a5daf42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unktest" supported="no">
+		<description>Unknown Test Cart (Jpn)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="unknown test.bin" size="8388608" crc="cba61bc8" sha1="b1d514c8b50aa05c688b20121783dff6069087bf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
 </softwarelist>
