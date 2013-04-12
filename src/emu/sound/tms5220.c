@@ -148,7 +148,7 @@ Interpolation is inhibited (i.e. interpolation at IP frames will not happen
   "P=0" != "OLDP" ("P=0" = 1, and OLDP = 0; OR "P=0" = 0, and OLDP = 1)
     This means the new frame is unvoiced and the old one was voiced, or vice
     versa.
-* TODO the 5100 and 5200 patents are inconistent about the above. Trace the decaps!
+* TODO the 5100 and 5200 patents are inconsistent about the above. Trace the decaps!
   "OLDE" = 1 and "E=0" = 0
     This means the new frame is not silent, and the old frame was silent.
 
