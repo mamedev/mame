@@ -11,7 +11,7 @@ public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_mr2(*this, "mr2"),
 		m_mr(*this, "mr"),
