@@ -242,7 +242,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom")  { }
 
 	required_shared_ptr<UINT32> m_work_ram;
 	UINT32 *m_sharc_dataram_0;
@@ -271,6 +272,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -349,8 +351,6 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	device_t *adc1038 = machine().device("adc1038");
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	switch (offset)
 	{
 		case 0:
@@ -369,7 +369,7 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (eeprom->read_bit() << 1);
+			UINT32 eeprom_bit = (m_eeprom->read_bit() << 1);
 			UINT32 adc_bit = (adc1038_do_read(adc1038) << 2);
 			return (eeprom_bit | adc_bit);
 		}
@@ -384,8 +384,6 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 WRITE8_MEMBER(gticlub_state::sysreg_w)
 {
 	device_t *adc1038 = machine().device("adc1038");
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	switch (offset)
 	{
 		case 0:
@@ -394,9 +392,9 @@ WRITE8_MEMBER(gticlub_state::sysreg_w)
 			break;
 
 		case 3:
-			eeprom->write_bit((data & 0x01) ? 1 : 0);
-			eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			m_eeprom->write_bit((data & 0x01) ? 1 : 0);
+			m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 4:

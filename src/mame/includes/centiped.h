@@ -3,6 +3,7 @@
     Atari Centipede hardware
 
 *************************************************************************/
+#include "machine/eeprom.h"
 
 class centiped_state : public driver_device
 {
@@ -13,7 +14,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_bullsdrt_tiles_bankram(*this, "bullsdrt_bank"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
@@ -85,4 +87,5 @@ public:
 	void milliped_set_color(offs_t offset, UINT8 data);
 	inline int read_trackball(int idx, int switch_port);
 	required_device<cpu_device> m_maincpu;
+	optional_device<eeprom_device> m_eeprom;
 };

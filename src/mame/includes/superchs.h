@@ -1,3 +1,4 @@
+#include "machine/eeprom.h"
 struct tempsprite
 {
 	int gfx;
@@ -17,7 +18,8 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_shared_ram(*this,"shared_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_eeprom(*this, "eeprom") { }
 
 	UINT16 m_coin_word;
 	required_shared_ptr<UINT32> m_ram;
@@ -43,4 +45,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<eeprom_device> m_eeprom;
 };

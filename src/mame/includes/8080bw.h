@@ -6,6 +6,7 @@
 
 #include "includes/mw8080bw.h"
 #include "sound/speaker.h"
+#include "machine/eeprom.h"
 /* for games in 8080bw.c */
 #define CABINET_PORT_TAG                  "CAB"
 
@@ -18,7 +19,8 @@ public:
 		m_schaser_effect_555_timer(*this, "schaser_sh_555"),
 		m_claybust_gun_on(*this, "claybust_gun"),
 		m_discrete(*this, "discrete"),
-		m_speaker(*this, "speaker")
+		m_speaker(*this, "speaker"),
+		m_eeprom(*this, "eeprom")
 	{ }
 
 	/* devices/memory pointers */
@@ -26,6 +28,7 @@ public:
 	optional_device<timer_device> m_claybust_gun_on;
 	optional_device<discrete_device> m_discrete;
 	optional_device<speaker_sound_device> m_speaker;
+	optional_device<eeprom_device> m_eeprom;
 
 
 	/* misc game specific */

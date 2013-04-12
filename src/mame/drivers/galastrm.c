@@ -119,10 +119,9 @@ popmessage(t);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-				eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom->write_bit(data & 0x40);
-				eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->write_bit(data & 0x40);
+				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 			return;

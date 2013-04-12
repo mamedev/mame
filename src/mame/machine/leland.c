@@ -1112,8 +1112,6 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 WRITE8_MEMBER(leland_state::leland_master_output_w)
 {
-	eeprom_device *eeprom;
-
 	switch (offset)
 	{
 		case 0x09:  /* /MCONT */
@@ -1122,12 +1120,11 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 			m_slave->set_input_line(INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			m_slave->set_input_line(0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
-			eeprom = machine().device<eeprom_device>("eeprom");
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", space.device().safe_pc(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			eeprom->write_bit     ((data & 0x10) >> 4);
-			eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->write_bit     ((data & 0x10) >> 4);
+			m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->set_cs_line   ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:  /* /OGIA */

@@ -378,7 +378,7 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 	switch (offset) {
 	case 0: return 0xffff0000 | ioport("IN0")->read();
 	case 1: return 0xffff0000 | ioport("IN1")->read(); //check top bits??
-	case 2: return 0xfffffffe | machine().device<eeprom_device>("eeprom")->read_bit();
+	case 2: return 0xfffffffe | m_eeprom->read_bit();
 	}
 
 	return 0xffffffff;
@@ -387,10 +387,9 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-		eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->write_bit(data & 0x10);
-		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(data & 0x10);
+		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
@@ -500,8 +499,7 @@ WRITE32_MEMBER(deco32_state::tattass_prot_w)
 
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	address_space &eeprom_space = eeprom->space();
+	address_space &eeprom_space = m_eeprom->space();
 
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
@@ -636,7 +634,7 @@ READ32_MEMBER(deco32_state::nslasher_prot_r)
 	switch (offset<<1) {
 	case 0x280: return ioport("IN0")->read() << 16| 0xffff; /* IN0 */
 	case 0x4c4: return ioport("IN1")->read() << 16| 0xffff; /* IN1 */
-	case 0x35a: return (machine().device<eeprom_device>("eeprom")->read_bit()<< 16) | 0xffff; // Debug switch in low word??
+	case 0x35a: return (m_eeprom->read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
 	//logerror("%08x: Read unmapped prot %08x (%08x)\n",space.device().safe_pc(),offset<<1,mem_mask);
@@ -648,10 +646,9 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-		eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->write_bit(data & 0x10);
-		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(data & 0x10);
+		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 		deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}

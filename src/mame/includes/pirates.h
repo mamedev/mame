@@ -1,3 +1,5 @@
+#include "machine/eeprom.h"
+
 class pirates_state : public driver_device
 {
 public:
@@ -8,7 +10,8 @@ public:
 		m_tx_tileram(*this, "tx_tileram"),
 		m_fg_tileram(*this, "fg_tileram"),
 		m_bg_tileram(*this, "bg_tileram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_scroll;
@@ -37,4 +40,5 @@ public:
 	void pirates_decrypt_s();
 	void pirates_decrypt_oki();
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
 };

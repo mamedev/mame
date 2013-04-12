@@ -184,7 +184,7 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 			case 0xafe4: return ioport("SERVICE2")->read();//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return machine().device<eeprom_device>("eeprom")->read_bit();
+			case 0xafe7: return m_eeprom->read_bit();
 			case 0xaff8: return machine().device<okim6295_device>("oki")->read(space,0);
 		}
 	}
@@ -249,7 +249,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 			case 0xa7a2: return ioport("START")->read();
 			case 0xa7a3: return ioport("BET")->read();//system 2
 
-			case 0xa7a7: return machine().device<eeprom_device>("eeprom")->read_bit();
+			case 0xa7a7: return m_eeprom->read_bit();
 
 		}
 	}

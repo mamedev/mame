@@ -412,11 +412,10 @@ WRITE32_MEMBER(model2_state::ctrl0_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 		m_ctrlmode = data & 0x01;
-		eeprom->write_bit(data & 0x20);
-		eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->write_bit(data & 0x20);
+		m_eeprom->set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -455,7 +454,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 	else
 	{
 		ret &= ~0x0030;
-		return ret | 0x00d0 | (machine().device<eeprom_device>("eeprom")->read_bit() << 5);
+		return ret | 0x00d0 | (m_eeprom->read_bit() << 5);
 	}
 }
 

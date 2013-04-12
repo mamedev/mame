@@ -3,14 +3,15 @@
     P&P Marketing Police Trainer hardware
 
 **************************************************************************/
-
+#include "machine/eeprom.h"
 class policetr_state : public driver_device
 {
 public:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	UINT32 m_control_data;
 	UINT32 m_bsmt_data_bank;
@@ -52,4 +53,5 @@ public:
 	TIMER_CALLBACK_MEMBER(irq5_gen);
 	void render_display_list(offs_t offset);
 	required_device<cpu_device> m_maincpu;
+	required_device<eeprom_device> m_eeprom;
 };

@@ -1586,8 +1586,7 @@ GFXDECODE_END
 
 READ8_MEMBER(dkong_state::braze_eeprom_r)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	return eeprom->read_bit();
+	return m_eeprom->read_bit();
 }
 
 WRITE8_MEMBER(dkong_state::braze_a15_w)
@@ -1598,10 +1597,9 @@ WRITE8_MEMBER(dkong_state::braze_a15_w)
 
 WRITE8_MEMBER(dkong_state::braze_eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	eeprom->write_bit(data & 0x01);
-	eeprom->set_cs_line(data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
-	eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->write_bit(data & 0x01);
+	m_eeprom->set_cs_line(data & 0x04 ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void dkong_state::braze_decrypt_rom(UINT8 *dest)

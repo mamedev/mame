@@ -3025,22 +3025,19 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(_8080bw_state::invmulti_eeprom_r)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	return eeprom->read_bit();
+	return m_eeprom->read_bit();
 }
 
 WRITE8_MEMBER(_8080bw_state::invmulti_eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	// d0: latch bit
-	eeprom->write_bit(data & 1);
+	m_eeprom->write_bit(data & 1);
 
 	// d6: reset
-	eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	m_eeprom->set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	// d4: write latch or select next bit to read
-	eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_MEMBER(_8080bw_state::invmulti_bank_w)

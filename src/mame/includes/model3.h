@@ -2,6 +2,7 @@
 #include "machine/scsibus.h"
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
+#include "machine/eeprom.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -24,7 +25,8 @@ public:
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_soundram(*this, "soundram"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
@@ -207,6 +209,7 @@ public:
 	void model3_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 	required_device<cpu_device> m_audiocpu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 

@@ -1,3 +1,5 @@
+#include "machine/eeprom.h"
+
 struct tempsprite
 {
 	int gfx;
@@ -15,7 +17,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_ram(*this,"ram"),
-		m_spriteram(*this,"spriteram")
+		m_spriteram(*this,"spriteram"),
+		m_eeprom(*this, "eeprom")
 	{
 		m_coin_lockout = true;
 	}
@@ -23,6 +26,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_ram;
 	required_shared_ptr<UINT32> m_spriteram;
+	required_device<eeprom_device> m_eeprom;
 
 	bool m_coin_lockout;
 	UINT16 m_coin_word;

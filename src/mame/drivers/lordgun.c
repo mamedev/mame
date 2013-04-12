@@ -167,7 +167,6 @@ WRITE8_MEMBER(lordgun_state::fake2_w)
 
 WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	int i;
 
 	if (data & ~0xfd)
@@ -184,13 +183,13 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 			lordgun_update_gun(i);
 
 	// latch the bit
-	eeprom->write_bit(data & 0x40);
+	m_eeprom->write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-	eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	m_whitescreen = data & 0x80;
 
@@ -199,8 +198,6 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 
 WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	if (~data & ~0xf8)
 	{
 //      popmessage("EE: %02x", data);
@@ -214,13 +211,13 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 	coin_counter_w(machine(), 1, data & 0x10);
 
 	// latch the bit
-	eeprom->write_bit(data & 0x80);
+	m_eeprom->write_bit(data & 0x80);
 
 	// reset line asserted: reset.
-	eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

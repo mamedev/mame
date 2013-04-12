@@ -33,6 +33,7 @@ public:
 	_39in1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
+		m_eeprom(*this, "eeprom"),
 		m_maincpu(*this, "maincpu") { }
 
 	UINT32 m_seed;
@@ -49,7 +50,7 @@ public:
 	PXA255_LCD_Regs m_lcd_regs;
 
 	dmadac_sound_device *m_dmadac[2];
-	eeprom_device *m_eeprom;
+	required_device<eeprom_device> m_eeprom;
 	UINT32 m_pxa255_lcd_palette[0x100];
 	UINT8 m_pxa255_lcd_framebuffer[0x100000];
 
@@ -1439,8 +1440,7 @@ DRIVER_INIT_MEMBER(_39in1_state,39in1)
 {
 	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
-	m_eeprom = machine().device<eeprom_device>("eeprom");
-
+	
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler (0xa0151648, 0xa015164b, read32_delegate(FUNC(_39in1_state::prot_cheater_r), this));
 }

@@ -1,5 +1,6 @@
 /*----------- defined in drivers/stv.c -----------*/
 #include "cdrom.h"
+#include "machine/eeprom.h"
 
 #define MAX_FILTERS (24)
 #define MAX_BLOCKS  (200)
@@ -16,7 +17,8 @@ public:
 			m_fake_comms(*this, "fake"),
 			m_maincpu(*this, "maincpu"),
 			m_slave(*this, "slave"),
-			m_audiocpu(*this, "audiocpu")
+			m_audiocpu(*this, "audiocpu"),
+			m_eeprom(*this, "eeprom")
 	{
 	}
 
@@ -140,6 +142,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<eeprom_device> m_eeprom;
 
 	bitmap_rgb32 m_tmpbitmap;
 	DECLARE_VIDEO_START(stv_vdp2);

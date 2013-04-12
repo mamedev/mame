@@ -1910,7 +1910,6 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_lphaser_1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_1_callback),this));
 	m_lphaser_2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_2_callback),this));
 
-	m_eeprom = machine().device<eeprom_device>("eeprom");
 	m_ym = machine().device("ym2413");
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");

@@ -505,29 +505,26 @@ static NVRAM_HANDLER( jaguar )
 */
 WRITE32_MEMBER(jaguar_state::eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	m_eeprom_bit_count++;
 	if (m_eeprom_bit_count != 9)        /* kill extra bit at end of address */
 	{
-		eeprom->write_bit(data >> 31);
-		eeprom->set_clock_line(PULSE_LINE);
+		m_eeprom->write_bit(data >> 31);
+		m_eeprom->set_clock_line(PULSE_LINE);
 	}
 }
 
 READ32_MEMBER(jaguar_state::eeprom_clk)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	eeprom->set_clock_line(PULSE_LINE); /* get next bit when reading */
+	m_eeprom->set_clock_line(PULSE_LINE); /* get next bit when reading */
 	return 0;
 }
 
 READ32_MEMBER(jaguar_state::eeprom_cs)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	eeprom->set_cs_line(ASSERT_LINE);   /* must do at end of an operation */
-	eeprom->set_cs_line(CLEAR_LINE);        /* enable chip for next operation */
-	eeprom->write_bit(1);           /* write a start bit */
-	eeprom->set_clock_line(PULSE_LINE);
+	m_eeprom->set_cs_line(ASSERT_LINE);   /* must do at end of an operation */
+	m_eeprom->set_cs_line(CLEAR_LINE);        /* enable chip for next operation */
+	m_eeprom->write_bit(1);           /* write a start bit */
+	m_eeprom->set_clock_line(PULSE_LINE);
 	m_eeprom_bit_count = 0;
 	return 0;
 }
@@ -667,7 +664,7 @@ READ32_MEMBER(jaguar_state::joystick_r)
 		}
 	}
 
-	joystick_result |= machine().device<eeprom_device>("eeprom")->read_bit();
+	joystick_result |= m_eeprom->read_bit();
 	joybuts_result |= (ioport("CONFIG")->read() & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;

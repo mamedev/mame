@@ -137,10 +137,9 @@ WRITE32_MEMBER(policetr_state::control_w)
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-		eeprom->write_bit(data & 0x00800000);
-		eeprom->set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(data & 0x00800000);
+		m_eeprom->set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* toggling BSMT off then on causes a reset */

@@ -1,4 +1,5 @@
 #include "sound/discrete.h"
+#include "machine/eeprom.h"
 
 /*
  * From the schematics:
@@ -85,7 +86,8 @@ public:
 		m_vidhw(DKONG_BOARD),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_video_ram;
@@ -237,6 +239,7 @@ public:
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<eeprom_device> m_eeprom;
 };
 
 /*----------- defined in audio/dkong.c -----------*/

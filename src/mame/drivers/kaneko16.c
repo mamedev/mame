@@ -1595,9 +1595,8 @@ WRITE8_MEMBER(kaneko16_state::kaneko16_eeprom_reset_w)
 {
 	// FIXME: the device line cannot be directly put in the interface due to inverse value!
 	// we might want to define a "reversed" set_cs_line handler
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 	// reset line asserted: reset.
-	eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static const ay8910_interface ay8910_intf_eeprom =

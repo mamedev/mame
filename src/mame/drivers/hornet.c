@@ -333,7 +333,8 @@ public:
 			m_sharc_dataram0(*this, "sharc_dataram0"),
 			m_sharc_dataram1(*this, "sharc_dataram1") ,
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_eeprom(*this, "eeprom")  { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -379,6 +380,7 @@ public:
 	void jamma_jvs_cmd_exec();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -477,8 +479,6 @@ READ8_MEMBER(hornet_state::sysreg_r)
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 	device_t *adc12138 = machine().device("adc12138");
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	switch (offset)
 	{
 		case 0: /* I/O port 0 */
@@ -497,7 +497,7 @@ READ8_MEMBER(hornet_state::sysreg_r)
 			    0x02 = ADDOR (ADC DOR)
 			    0x01 = ADDO (ADC DO)
 			*/
-			r = 0xf0 | (eeprom->read_bit() << 3);
+			r = 0xf0 | (m_eeprom->read_bit() << 3);
 			r |= adc1213x_do_r(adc12138, space, 0) | (adc1213x_eoc_r(adc12138, space, 0) << 2);
 			break;
 

@@ -831,14 +831,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(centiped_state::multiped_eeprom_r)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-	return eeprom->read_bit() ? 0x80 : 0;
+	return m_eeprom->read_bit() ? 0x80 : 0;
 }
 
 WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	// a0: always high
 	// a3-a7: always low
 	// a8-a10: same as a0-a2
@@ -846,15 +843,15 @@ WRITE8_MEMBER(centiped_state::multiped_eeprom_w)
 
 	// a1 low: latch bit
 	if (~offset & 2)
-		eeprom->write_bit((data & 0x80) ? 1 : 0);
+		m_eeprom->write_bit((data & 0x80) ? 1 : 0);
 
 	// a2 low: write latch or select next bit to read
 	if (~offset & 4)
-		eeprom->set_clock_line((~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->set_clock_line((~data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	// both high: reset
 	else if (offset & 2)
-		eeprom->set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(centiped_state::multiped_prgbank_w)

@@ -1392,11 +1392,10 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 		case 0:
 			if (ACCESSING_BITS_56_63)
 			{
-				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 				int reg = (data >> 56) & 0xff;
-				eeprom->write_bit((reg & 0x20) ? 1 : 0);
-				eeprom->set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				eeprom->set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->write_bit((reg & 0x20) ? 1 : 0);
+				m_eeprom->set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 				m_controls_bank = reg & 0xff;
 			}
 			return;

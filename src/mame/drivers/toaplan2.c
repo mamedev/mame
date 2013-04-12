@@ -965,15 +965,13 @@ static const eeprom_interface bbakraid_93C66_intf =
 
 READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 {
-	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
 	// These accesses are made when the 68K wants to read the Z80
 	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
 	int data;
-	data  = ((eeprom->read_bit() & 0x01) << 4);
+	data  = ((m_eeprom->read_bit() & 0x01) << 4);
 	data |= ((m_z80_busreq >> 4) & 0x01);   // Loop BUSRQ to BUSAK
 
 	return data;

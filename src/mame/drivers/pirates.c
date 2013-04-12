@@ -109,12 +109,10 @@ WRITE16_MEMBER(pirates_state::pirates_out_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
-
 		/* bits 0-2 control EEPROM */
-		eeprom->write_bit(data & 0x04);
-		eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(data & 0x04);
+		m_eeprom->set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
 		okim6295_device *oki = machine().device<okim6295_device>("oki");

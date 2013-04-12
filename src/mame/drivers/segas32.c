@@ -666,15 +666,14 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 
 			if (which == 0)
 			{
-				eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
-				eeprom->write_bit(data & 0x80);
-				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->write_bit(data & 0x80);
+				m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
-/*            coin_lockout_w(space.machine(), 1 + 2*which, data & 0x08);
-            coin_lockout_w(space.machine(), 0 + 2*which, data & 0x04);*/
-			coin_counter_w(space.machine(), 1 + 2*which, data & 0x02);
-			coin_counter_w(space.machine(), 0 + 2*which, data & 0x01);
+/*            coin_lockout_w(machine(), 1 + 2*which, data & 0x08);
+            coin_lockout_w(machine(), 0 + 2*which, data & 0x04);*/
+			coin_counter_w(machine(), 1 + 2*which, data & 0x02);
+			coin_counter_w(machine(), 0 + 2*which, data & 0x01);
 			break;
 
 		/* tile banking */
@@ -684,10 +683,9 @@ void segas32_state::common_io_chip_w(address_space &space, int which, offs_t off
 			else
 			{
 				/* multi-32 EEPROM access */
-				eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
-				eeprom->write_bit(data & 0x80);
-				eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->write_bit(data & 0x80);
+				m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 

@@ -819,7 +819,7 @@ READ8_HANDLER( stv_SMPC_r )
 		return_data = state->ioport("DSW1")->read();
 
 	if (offset == 0x77)//PDR2 read
-		return_data = (0xfe | space.machine().device<eeprom_device>("eeprom")->read_bit());
+		return_data = (0xfe | state->m_eeprom->read_bit());
 
 	return return_data;
 }
@@ -881,10 +881,9 @@ WRITE8_HANDLER( stv_SMPC_w )
 		---- -x-- EEPROM CS line
 		---- --xx A-Bus bank bits
 		*/
-		eeprom_device *eeprom = space.machine().device<eeprom_device>("eeprom");
-		eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->write_bit(data & 0x10);
-		eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+		state->m_eeprom->set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		state->m_eeprom->write_bit(data & 0x10);
+		state->m_eeprom->set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 		state->m_stv_multi_bank = data & 3;
 
 		stv_select_game(space.machine(), state->m_stv_multi_bank);

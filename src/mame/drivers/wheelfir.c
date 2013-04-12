@@ -236,7 +236,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	device_t *m_screen;
-	device_t *m_eeprom;
 
 	INT32 *m_zoom_table;
 	UINT16 *m_blitter_data;
