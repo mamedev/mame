@@ -644,7 +644,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 		case 0x04:
 			m_sub2_irq_mask = bit;
 			if (!bit)
-				machine().device("sub2")->execute().set_input_line(0, CLEAR_LINE);
+				m_subcpu2->set_input_line(0, CLEAR_LINE);
 			break;
 
 		case 0x06:
@@ -661,7 +661,7 @@ WRITE8_MEMBER(mappy_state::phozon_latch_w)
 			break;
 
 		case 0x0c:
-			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -880,7 +880,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
 INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
 {
 	if(m_sub2_irq_mask)
-		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )

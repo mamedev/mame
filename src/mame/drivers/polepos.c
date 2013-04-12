@@ -317,7 +317,7 @@ WRITE8_MEMBER(polepos_state::polepos_latch_w)
 			break;
 
 		case 0x05:  /* RESA */
-			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:  /* SB0 */
@@ -455,7 +455,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
 	if (scanline == 240 && m_sub_irq_mask)  // VBLANK
 	{
 		m_subcpu->set_input_line(0, ASSERT_LINE);
-		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu2->set_input_line(0, ASSERT_LINE);
 	}
 }
 
@@ -471,7 +471,7 @@ MACHINE_RESET_MEMBER(polepos_state,polepos)
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	m_subcpu->set_input_line_vector(0, Z8000_NVI);
-	machine().device("sub2")->execute().set_input_line_vector(0, Z8000_NVI);
+	m_subcpu2->set_input_line_vector(0, Z8000_NVI);
 }
 
 

@@ -755,7 +755,7 @@ WRITE8_MEMBER(galaga_state::bosco_latch_w)
 
 		case 0x03:  /* RESET */
 			m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-			machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			m_subcpu2->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:  /* n.c. */
@@ -860,7 +860,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 	int scanline = param;
 
 	if(m_sub2_nmi_mask)
-		nmi_line_pulse(machine().device("sub2")->execute());
+		nmi_line_pulse(m_subcpu2);
 
 	scanline = scanline + 128;
 	if (scanline >= 272)

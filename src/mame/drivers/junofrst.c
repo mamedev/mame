@@ -94,14 +94,15 @@ class junofrst_state : public tutankhm_state
 public:
 	junofrst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tutankhm_state(mconfig, type, tag),
-		  m_audiocpu(*this, "audiocpu") { }
+		  m_audiocpu(*this, "audiocpu"),
+		  m_i8039(*this, "mcu") { }
 
 	UINT8    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_i8039;
+	required_device<cpu_device> m_i8039;
 
 	device_t *m_filter_0_0;
 	device_t *m_filter_0_1;
@@ -250,14 +251,14 @@ WRITE8_MEMBER(junofrst_state::junofrst_sh_irqtrigger_w)
 
 WRITE8_MEMBER(junofrst_state::junofrst_i8039_irq_w)
 {
-	m_i8039->execute().set_input_line(0, ASSERT_LINE);
+	m_i8039->set_input_line(0, ASSERT_LINE);
 }
 
 
 WRITE8_MEMBER(junofrst_state::i8039_irqen_and_status_w)
 {
 	if ((data & 0x80) == 0)
-		m_i8039->execute().set_input_line(0, CLEAR_LINE);
+		m_i8039->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
 }
 
@@ -381,7 +382,6 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_START_MEMBER(junofrst_state,junofrst)
 {
-	m_i8039 = machine().device("mcu");
 	m_filter_0_0 = machine().device("filter.0.0");
 	m_filter_0_1 = machine().device("filter.0.1");
 	m_filter_0_2 = machine().device("filter.0.2");

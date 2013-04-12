@@ -189,14 +189,14 @@ WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
 	int bit = !BIT(offset, 13);
 	m_sub2_irq_mask = bit & 1;
 	if (!bit)
-		machine().device("sub2")->execute().set_input_line(0, CLEAR_LINE);
+		m_subcpu2->set_input_line(0, CLEAR_LINE);
 }
 
 WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 {
 	int bit = !BIT(offset, 11);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu2->set_input_line(INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(machine().device("namco"), bit);
 }
 
@@ -274,7 +274,7 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)
 {
 	if(m_sub2_irq_mask)
-		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
+		m_subcpu2->set_input_line(0, ASSERT_LINE);
 }
 
 

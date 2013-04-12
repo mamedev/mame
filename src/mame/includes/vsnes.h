@@ -71,7 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mapper68_rom_banking);
 	DECLARE_WRITE8_MEMBER(set_bnglngby_irq_w);
 	DECLARE_READ8_MEMBER(set_bnglngby_irq_r);
-	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking);
+	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_main);
+	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking_sub);
 	void v_set_mirroring(int ppu, int mirroring);
 	DECLARE_READ8_MEMBER(psg1_4015_r);
 	DECLARE_WRITE8_MEMBER(psg1_4015_w);

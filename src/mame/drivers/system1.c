@@ -410,11 +410,9 @@ void system1_state::bank0c_custom_w(UINT8 data, UINT8 prevdata)
 
 WRITE8_MEMBER(system1_state::videomode_w)
 {
-	device_t *i8751 = machine().device("mcu");
-
 	/* bit 6 is connected to the 8751 IRQ */
-	if (i8751 != NULL)
-		i8751->execute().set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_mcu != NULL)
+		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* handle any custom banking or other stuff */
 	if (m_videomode_custom != NULL)
@@ -623,9 +621,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
 	   choplift is even more picky about it, affecting scroll speed
 	*/
 
-	device_t *mcu = machine().device("mcu");
-	mcu->execute().set_input_line(MCS51_T0_LINE, ASSERT_LINE);
-	mcu->execute().set_input_line(MCS51_T0_LINE, CLEAR_LINE);
+	m_mcu->set_input_line(MCS51_T0_LINE, ASSERT_LINE);
+	m_mcu->set_input_line(MCS51_T0_LINE, CLEAR_LINE);
 }
 
 

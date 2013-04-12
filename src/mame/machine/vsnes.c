@@ -982,20 +982,28 @@ DRIVER_INIT_MEMBER(vsnes_state,bnglngby)
 /**********************************************************************************/
 /* VS Dualsystem */
 
-WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking)
+WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking_main)
 {
-	device_t *other_cpu = (&space.device() == m_maincpu) ? m_subcpu : m_maincpu;
 	/* switch vrom */
-	(&space.device() == m_maincpu) ? membank("bank2")->set_entry(BIT(data, 2)) : membank("bank3")->set_entry(BIT(data, 2));
+	membank("bank2")->set_entry(BIT(data, 2));
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
-	other_cpu->execute().set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* move along */
-	if (&space.device() == m_maincpu)
-		vsnes_in0_w(space, offset, data);
-	else
-		vsnes_in0_1_w(space, offset, data);
+	vsnes_in0_w(space, offset, data);
+}
+
+WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking_sub)
+{
+	/* switch vrom */
+	membank("bank3")->set_entry(BIT(data, 2));
+
+	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
+	m_maincpu->set_input_line(0, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+
+	/* move along */
+	vsnes_in0_1_w(space, offset, data);
 }
 
 DRIVER_INIT_MEMBER(vsnes_state,vsdual)
@@ -1003,8 +1011,8 @@ DRIVER_INIT_MEMBER(vsnes_state,vsdual)
 	UINT8 *prg = memregion("maincpu")->base();
 
 	/* vrom switching is enabled with bit 2 of $4016 */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking_main),this));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking_sub),this));
 
 	/* shared ram at $6000 */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, &prg[0x6000]);

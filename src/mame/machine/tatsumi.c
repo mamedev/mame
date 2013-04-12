@@ -41,7 +41,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 	if (m_control_word & 0x7f00)
 	{
 		logerror("Unknown control Word: %04x\n",m_control_word);
-		machine().device("sub2")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE); // ?
+		m_subcpu2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); // ?
 	}
 
 	if (m_control_word & 0x10)
@@ -61,7 +61,7 @@ WRITE16_MEMBER(tatsumi_state::apache3_bank_w)
 // D0 = /GRDACC - Allow 68000 access to road pattern RAM
 WRITE16_MEMBER(tatsumi_state::apache3_z80_ctrl_w)
 {
-	machine().device("sub2")->execute().set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	m_subcpu2->set_input_line(INPUT_LINE_HALT, data & 2 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(tatsumi_state::apache3_v30_v20_r)

@@ -856,12 +856,13 @@ INTERRUPT_GEN_MEMBER(tatsumi_state::roundup5_interrupt)
 
 static void apache3_68000_reset(device_t *device)
 {
-	device->machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	tatsumi_state *state = device->machine().driver_data<tatsumi_state>();
+	state->m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 MACHINE_RESET_MEMBER(tatsumi_state,apache3)
 {
-	machine().device("sub2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
+	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
 	m68k_set_reset_callback(m_subcpu, apache3_68000_reset);

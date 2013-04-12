@@ -45,7 +45,7 @@ void taitosj_state::machine_reset()
 	m_zaccept = 1;
 	m_zready = 0;
 	m_busreq = 0;
-	if (machine().device("mcu") != NULL)
+	if (m_mcu != NULL)
 		m_mcu->set_input_line(0, CLEAR_LINE);
 
 	m_spacecr_prot_value = 0;
