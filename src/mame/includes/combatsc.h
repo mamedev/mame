@@ -12,6 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007121_1(*this, "k007121_1"),
+		m_k007121_2(*this, "k007121_2"),
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd") { }
 
@@ -44,8 +46,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007121_1;
-	device_t *m_k007121_2;
+	optional_device<k007121_device> m_k007121_1;
+	optional_device<k007121_device> m_k007121_2;
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
 	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(combatscb_io_r);

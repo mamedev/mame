@@ -17,6 +17,8 @@ public:
 		m_pf1_videoram(*this, "pf1_videoram"),
 		m_pf2_videoram(*this, "pf2_videoram"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007121_1(*this, "k007121_1"),
+		m_k007121_2(*this, "k007121_2"),
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -37,8 +39,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007121_1;
-	device_t *m_k007121_2;
+	required_device<k007121_device> m_k007121_1;
+	required_device<k007121_device> m_k007121_2;
 
 	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);

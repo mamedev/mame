@@ -18,6 +18,8 @@ public:
 		m_bg_cram(*this, "bg_cram"),
 		m_bg_vram(*this, "bg_vram"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007121_1(*this, "k007121_1"),
+		m_k007121_2(*this, "k007121_2"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -42,8 +44,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007121_1;
-	device_t *m_k007121_2;
+	required_device<k007121_device> m_k007121_1;
+	required_device<k007121_device> m_k007121_2;
 	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);

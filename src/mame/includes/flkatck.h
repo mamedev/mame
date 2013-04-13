@@ -3,6 +3,7 @@
     Flak Attack / MX5000
 
 *************************************************************************/
+#include "sound/k007232.h"
 
 class flkatck_state : public driver_device
 {
@@ -11,6 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_k007121_ram(*this, "k007121_ram"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007121(*this, "k007121"),
+		m_k007232(*this, "k007232"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -27,7 +30,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007121;
+	required_device<k007121_device> m_k007121;
+	required_device<k007232_device> m_k007232;
 	DECLARE_WRITE8_MEMBER(flkatck_bankswitch_w);
 	DECLARE_READ8_MEMBER(flkatck_ls138_r);
 	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
