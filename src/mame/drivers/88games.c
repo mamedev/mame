@@ -71,10 +71,8 @@ WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 
 WRITE8_MEMBER(_88games_state::speech_control_w)
 {
-	device_t *upd;
-
 	m_speech_chip = (data & 4) ? 1 : 0;
-	upd = m_speech_chip ? m_upd_2 : m_upd_1;
+	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
 	upd7759_reset_w(upd, data & 2);
 	upd7759_start_w(upd, data & 1);
@@ -82,7 +80,7 @@ WRITE8_MEMBER(_88games_state::speech_control_w)
 
 WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
-	device_t *upd = m_speech_chip ? m_upd_2 : m_upd_1;
+	upd7759_device *upd = m_speech_chip ? m_upd7759_2 : m_upd7759_1;
 
 	upd7759_port_w(upd, space, 0, data);
 }
@@ -303,8 +301,6 @@ void _88games_state::machine_start()
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");
 	m_k051316 = machine().device("k051316");
-	m_upd_1 = machine().device("upd1");
-	m_upd_2 = machine().device("upd2");
 
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));

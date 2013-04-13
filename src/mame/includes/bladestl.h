@@ -3,6 +3,7 @@
     Blades of Steel
 
 *************************************************************************/
+#include "sound/upd7759.h"
 
 class bladestl_state : public driver_device
 {
@@ -11,7 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_upd7759(*this, "upd") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_paletteram;
@@ -39,6 +41,7 @@ public:
 	UINT32 screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
 	required_device<cpu_device> m_maincpu;
+	required_device<upd7759_device> m_upd7759;
 };
 
 /*----------- defined in video/bladestl.c -----------*/

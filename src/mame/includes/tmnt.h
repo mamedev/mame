@@ -1,4 +1,5 @@
 #include "sound/samples.h"
+#include "sound/upd7759.h"
 
 class tmnt_state : public driver_device
 {
@@ -10,7 +11,8 @@ public:
 		m_sunset_104000(*this, "sunset_104000"),
 		m_tmnt2_1c0800(*this, "tmnt2_1c0800"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_upd7759(*this, "upd"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -60,7 +62,7 @@ public:
 	device_t *m_k053251;
 	device_t *m_k053936;
 	device_t *m_k054000;
-	device_t *m_upd;
+	optional_device<upd7759_device> m_upd7759;
 	samples_device *m_samples;
 
 	/* memory buffers */

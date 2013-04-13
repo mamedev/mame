@@ -5,6 +5,7 @@
 ****************************************************************************/
 #include "machine/roc10937.h"
 #include "cpu/tms34010/tms34010.h"
+#include "sound/upd7759.h"
 
 struct duart_t
 {
@@ -58,7 +59,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_vfd(*this, "vfd"),
 			m_vram(*this, "vram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_upd7759(*this, "upd") { }
 
 	UINT8 m_tms_irq;
 	UINT8 m_duart_1_irq;
@@ -113,6 +115,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
 	void update_irqs();
 	required_device<cpu_device> m_maincpu;
+	required_device<upd7759_device> m_upd7759;
 };
 
 

@@ -193,23 +193,21 @@ READ16_MEMBER(rpunch_state::sound_busy_r)
 
 WRITE8_MEMBER(rpunch_state::upd_control_w)
 {
-	device_t *device = machine().device("upd");
 	if ((data & 1) != m_upd_rom_bank)
 	{
 		UINT8 *snd = memregion("upd")->base();
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
-	upd7759_reset_w(device, data >> 7);
+	upd7759_reset_w(m_upd7759, data >> 7);
 }
 
 
 WRITE8_MEMBER(rpunch_state::upd_data_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_port_w(device, space, 0, data);
-	upd7759_start_w(device, 0);
-	upd7759_start_w(device, 1);
+	upd7759_port_w(m_upd7759, space, 0, data);
+	upd7759_start_w(m_upd7759, 0);
+	upd7759_start_w(m_upd7759, 1);
 }
 
 

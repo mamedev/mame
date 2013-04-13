@@ -236,7 +236,7 @@ READ8_MEMBER(tmnt_state::tmnt_sres_r)
 WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 {
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(m_upd, data & 2);
+	upd7759_reset_w(m_upd7759, data & 2);
 
 	/* bit 2 plays the title music */
 	if (data & 0x04)
@@ -251,14 +251,12 @@ WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 
 WRITE8_MEMBER(tmnt_state::tmnt_upd_start_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_start_w(device, data & 1);
+	upd7759_start_w(m_upd7759, data & 1);
 }
 
 READ8_MEMBER(tmnt_state::tmnt_upd_busy_r)
 {
-	device_t *device = machine().device("upd");
-	return upd7759_busy_r(device) ? 1 : 0;
+	return upd7759_busy_r(m_upd7759) ? 1 : 0;
 }
 
 
@@ -2174,7 +2172,6 @@ MACHINE_START_MEMBER(tmnt_state,common)
 	m_k007232 = machine().device("k007232");
 	m_k053260 = machine().device("k053260");
 	m_k054539 = machine().device("k054539");
-	m_upd = machine().device("upd");
 	m_samples = machine().device<samples_device>("samples");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");
@@ -2296,8 +2293,8 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 {
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	upd7759_start_w(m_upd, 0);
-	upd7759_reset_w(m_upd, 1);
+	upd7759_start_w(m_upd7759, 0);
+	upd7759_reset_w(m_upd7759, 1);
 }
 
 static MACHINE_CONFIG_START( tmnt, tmnt_state )

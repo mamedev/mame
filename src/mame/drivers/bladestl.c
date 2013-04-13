@@ -94,22 +94,19 @@ WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 
 WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 {
-	device_t *device = machine().device("upd");
 	/* bit 1, 2 unknown */
-	upd7759_set_bank_base(device, ((data & 0x38) >> 3) * 0x20000);
+	upd7759_set_bank_base(m_upd7759, ((data & 0x38) >> 3) * 0x20000);
 }
 
 READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
 {
-	device_t *device = machine().device("upd");
-	return upd7759_busy_r(device) ? 1 : 0;
+	return upd7759_busy_r(m_upd7759) ? 1 : 0;
 }
 
 WRITE8_MEMBER(bladestl_state::bladestl_speech_ctrl_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_reset_w(device, data & 1);
-	upd7759_start_w(device, data & 2);
+	upd7759_reset_w(m_upd7759, data & 1);
+	upd7759_start_w(m_upd7759, data & 2);
 }
 
 /*************************************

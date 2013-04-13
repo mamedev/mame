@@ -41,16 +41,14 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(prehisle_state::D7759_write_port_0_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_port_w(device, space, 0, data);
-	upd7759_start_w(device, 0);
-	upd7759_start_w(device, 1);
+	upd7759_port_w(m_upd7759, space, 0, data);
+	upd7759_start_w(m_upd7759, 0);
+	upd7759_start_w(m_upd7759, 1);
 }
 
 WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_reset_w(device, data & 0x80);
+	upd7759_reset_w(m_upd7759, data & 0x80);
 }
 
 static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )

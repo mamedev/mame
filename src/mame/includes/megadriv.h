@@ -10,7 +10,7 @@
 #include "sound/dac.h"
 #include "sound/rf5c68.h"
 #include "sound/sn76496.h"
-
+#include "sound/upd7759.h"
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
 
@@ -194,7 +194,8 @@ class segac2_state : public md_base_state
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag),
-		m_paletteram(*this, "paletteram") { }
+		m_paletteram(*this, "paletteram"),
+		m_upd7759(*this, "upd") { }
 
 	// for Print Club only
 	int m_cam_data;
@@ -268,6 +269,7 @@ public:
 	DECLARE_WRITE16_MEMBER( print_club_camera_w );
 	DECLARE_READ16_MEMBER(ichirjbl_prot_r);
 	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	optional_device<upd7759_device> m_upd7759;
 };
 
 class mplay_state : public md_base_state

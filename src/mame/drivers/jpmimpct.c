@@ -480,31 +480,28 @@ READ16_MEMBER(jpmimpct_state::inputs1_r)
  *************************************/
 WRITE16_MEMBER(jpmimpct_state::volume_w)
 {
-	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_set_bank_base(device, 0x20000 * ((data >> 1) & 3));
-		upd7759_reset_w(device, data & 0x01);
+		upd7759_set_bank_base(m_upd7759, 0x20000 * ((data >> 1) & 3));
+		upd7759_reset_w(m_upd7759, data & 0x01);
 	}
 }
 
 WRITE16_MEMBER(jpmimpct_state::upd7759_w)
 {
-	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(device, space, 0, data);
-		upd7759_start_w(device, 0);
-		upd7759_start_w(device, 1);
+		upd7759_port_w(m_upd7759, space, 0, data);
+		upd7759_start_w(m_upd7759, 0);
+		upd7759_start_w(m_upd7759, 1);
 	}
 }
 
 READ16_MEMBER(jpmimpct_state::upd7759_r)
 {
-	device_t *device = machine().device("upd");
 	if (ACCESSING_BITS_0_7)
 	{
-		return upd7759_busy_r(device);
+		return upd7759_busy_r(m_upd7759);
 	}
 
 	return 0xffff;

@@ -237,7 +237,8 @@ public:
 	bfcobra_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_upd7759(*this, "upd") { }
 
 	UINT8 m_bank_data[4];
 	UINT8 *m_work_ram;
@@ -311,6 +312,7 @@ public:
 	UINT8 results_phase(void);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<upd7759_device> m_upd7759;
 };
 
 
@@ -1465,16 +1467,14 @@ WRITE8_MEMBER(bfcobra_state::latch_w)
 
 READ8_MEMBER(bfcobra_state::upd_r)
 {
-	device_t *device = machine().device("upd");
-	return 2 | upd7759_busy_r(device);
+	return 2 | upd7759_busy_r(m_upd7759);
 }
 
 WRITE8_MEMBER(bfcobra_state::upd_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_reset_w(device, data & 0x80);
-	upd7759_port_w(device, space, 0, data & 0x3f);
-	upd7759_start_w(device, data & 0x40 ? 0 : 1);
+	upd7759_reset_w(m_upd7759, data & 0x80);
+	upd7759_port_w(m_upd7759, space, 0, data & 0x3f);
+	upd7759_start_w(m_upd7759, data & 0x40 ? 0 : 1);
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )

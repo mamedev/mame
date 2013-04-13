@@ -189,20 +189,17 @@ READ16_MEMBER(twin16_state::twin16_input_r)
 
 READ8_MEMBER(twin16_state::twin16_upd_busy_r)
 {
-	device_t *device = machine().device("upd");
-	return upd7759_busy_r(device);
+	return upd7759_busy_r(m_upd7759);
 }
 
 WRITE8_MEMBER(twin16_state::twin16_upd_reset_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_reset_w(device, data & 2);
+	upd7759_reset_w(m_upd7759, data & 2);
 }
 
 WRITE8_MEMBER(twin16_state::twin16_upd_start_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_start_w(device, data & 1);
+	upd7759_start_w(m_upd7759, data & 1);
 }
 
 READ16_MEMBER(twin16_state::cuebrickj_nvram_r)

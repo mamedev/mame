@@ -156,7 +156,6 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 /* handle writes to the UPD7759 */
 WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
 {
-	device_t *upd = machine().device("upd");
 	/* make sure we have a UPD chip */
 	if (!m_sound_banks)
 		return;
@@ -164,9 +163,9 @@ WRITE16_MEMBER(segac2_state::segac2_upd7759_w )
 	/* only works if we're accessing the low byte */
 	if (ACCESSING_BITS_0_7)
 	{
-		upd7759_port_w(upd, space, 0, data & 0xff);
-		upd7759_start_w(upd, 0);
-		upd7759_start_w(upd, 1);
+		upd7759_port_w(m_upd7759, space, 0, data & 0xff);
+		upd7759_start_w(m_upd7759, 0);
+		upd7759_start_w(m_upd7759, 1);
 	}
 }
 
@@ -326,7 +325,7 @@ READ16_MEMBER(segac2_state::io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && m_sound_banks)
-				return (space.machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(space.machine().device("upd")) << 6);
+				return (space.machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(m_upd7759) << 6);
 			return space.machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
@@ -413,9 +412,8 @@ WRITE16_MEMBER(segac2_state::io_chip_w )
 			}
 			if (m_sound_banks > 1)
 			{
-				device_t *upd = space.machine().device("upd");
 				newbank = (data >> 2) & (m_sound_banks - 1);
-				upd7759_set_bank_base(upd, newbank * 0x20000);
+				upd7759_set_bank_base(m_upd7759, newbank * 0x20000);
 			}
 			break;
 
@@ -423,8 +421,7 @@ WRITE16_MEMBER(segac2_state::io_chip_w )
 		case 0x1c/2:
 			if (m_sound_banks > 1)
 			{
-				device_t *upd = space.machine().device("upd");
-				upd7759_reset_w(upd, (data >> 1) & 1);
+				upd7759_reset_w(m_upd7759, (data >> 1) & 1);
 			}
 			break;
 	}
@@ -1835,11 +1832,9 @@ it should be, otherwise I don't see how the formula could be computed.
 void segac2_state::segac2_common_init(int (*func)(int in))
 {
 	DRIVER_INIT_CALL(megadriv_c2);
-	device_t *upd = machine().device("upd");
-
 	m_prot_func = func;
 
-	if (upd != NULL)
+	if (m_upd7759 != NULL)
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 

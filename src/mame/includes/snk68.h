@@ -1,3 +1,5 @@
+#include "sound/upd7759.h"
+
 class snk68_state : public driver_device
 {
 public:
@@ -7,7 +9,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_upd7759(*this, "upd") { }
 
 	int m_invert_controls;
 	int m_sound_status;
@@ -51,4 +54,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<upd7759_device> m_upd7759;
 };

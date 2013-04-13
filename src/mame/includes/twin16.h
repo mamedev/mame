@@ -1,4 +1,5 @@
 #include "video/bufsprite.h"
+#include "sound/upd7759.h"
 
 class twin16_state : public driver_device
 {
@@ -12,7 +13,8 @@ public:
 		m_sprite_gfx_ram(*this, "sprite_gfx_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_upd7759(*this, "upd") { }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_shared_ptr<UINT16> m_text_ram;
@@ -79,4 +81,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
+	required_device<upd7759_device> m_upd7759;
 };

@@ -3,6 +3,7 @@
     The Main Event / Devastators
 
 *************************************************************************/
+#include "sound/upd7759.h"
 
 class mainevt_state : public driver_device
 {
@@ -10,7 +11,8 @@ public:
 	mainevt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_upd7759(*this, "upd")	{ }
 
 	/* memory pointers */
 //  UINT8 *    m_paletteram;    // currently this uses generic palette handling
@@ -26,7 +28,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_upd;
+	optional_device<upd7759_device> m_upd7759;
 	device_t *m_k007232;
 	device_t *m_k052109;
 	device_t *m_k051960;

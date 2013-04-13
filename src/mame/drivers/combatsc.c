@@ -322,20 +322,17 @@ WRITE8_MEMBER(combatsc_state::combatsc_sh_irqtrigger_w)
 
 READ8_MEMBER(combatsc_state::combatsc_busy_r)
 {
-	device_t *device = machine().device("upd");
-	return upd7759_busy_r(device) ? 1 : 0;
+	return upd7759_busy_r(m_upd7759) ? 1 : 0;
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_play_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_start_w(device, data & 2);
+	upd7759_start_w(m_upd7759, data & 2);
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_voice_reset_w)
 {
-	device_t *device = machine().device("upd");
-	upd7759_reset_w(device,data & 1);
+	upd7759_reset_w(m_upd7759,data & 1);
 }
 
 WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
