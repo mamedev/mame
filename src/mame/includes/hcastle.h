@@ -43,7 +43,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121_1;
 	required_device<k007121_device> m_k007121_2;
-	optional_device<k007232_device> m_k007232;
+	required_device<k007232_device> m_k007232;
 
 	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);
