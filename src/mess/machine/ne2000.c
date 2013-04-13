@@ -107,6 +107,7 @@ WRITE_LINE_MEMBER(ne2000_device::ne2000_irq_w) {
 }
 
 READ8_MEMBER(ne2000_device::ne2000_mem_read) {
+	offset &= ~0x8000;
 	if(offset < 32) return m_prom[offset>>1];
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
 		logerror("ne2000: invalid memory read %04X\n", offset);
@@ -116,6 +117,7 @@ READ8_MEMBER(ne2000_device::ne2000_mem_read) {
 }
 
 WRITE8_MEMBER(ne2000_device::ne2000_mem_write) {
+	offset &= ~0x8000;
 	if((offset < (16*1024)) || (offset >= (32*1024))) {
 		logerror("ne2000: invalid memory write %04X\n", offset);
 		return;

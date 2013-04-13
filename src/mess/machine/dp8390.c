@@ -298,6 +298,9 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 	case 0x8f:
 		data = m_regs.imr;
 		break;
+	case 0xc0:
+		data = m_regs.cr;
+		break;
 	default:
 		if(m_type == TYPE_RTL8019A) {
 			switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
@@ -307,9 +310,7 @@ READ16_MEMBER(dp8390_device::dp8390_r) {
 				case 0x0b:
 					data = 'p';
 					break;
-				case 0xc0:
-					data = m_regs.cr;
-					break;
+
 				case 0xc1:
 					data = m_8019regs.cr9346;
 					break;
@@ -465,12 +466,12 @@ WRITE16_MEMBER(dp8390_device::dp8390_w) {
 	case 0x87:
 		m_regs.ac = (m_regs.ac & 0xff00) | data;
 		break;
+	case 0xc0:
+		set_cr(data);
+		break;
 	default:
 		if(m_type == TYPE_RTL8019A) {
 			switch((offset & 0x0f)|(m_regs.cr & 0xc0)) {
-				case 0xc0:
-					set_cr(data);
-					break;
 				// XXX: rest of the regs
 				default:
 					logerror("rtl8019: invalid write page %01X reg %02X data %04X\n", (m_regs.cr & 0xc0) >> 6, offset & 0x0f, data);
