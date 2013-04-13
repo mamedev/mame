@@ -684,7 +684,7 @@ WRITE8_MEMBER( to7_io_line_device::porta_out )
 	int tx  = data & 1;
 	int dtr = ( data & 2 ) ? 1 : 0;
 
-	LOG_IO(( "$%04x %f to7_io_porta_out: tx=%i, dtr=%i\n",  machine().device("maincpu")->safe_pcbase(), machine().time().as_double(), tx, dtr ));
+	LOG_IO(( "%s %f to7_io_porta_out: tx=%i, dtr=%i\n",  machine().describe_context(), machine().time().as_double(), tx, dtr ));
 	if ( dtr )
 		m_connection_state |=  SERIAL_STATE_DTR;
 	else
@@ -708,7 +708,7 @@ READ8_MEMBER( to7_io_line_device::porta_in )
 	else
 		cts = !printer->busy_r();
 
-	LOG_IO(( "$%04x %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", machine().device("maincpu")->safe_pcbase(), machine().time().as_double(), machine().driver_data<thomson_state>()->to7_io_mode(), cts, dsr, rd ));
+	LOG_IO(( "%s %f to7_io_porta_in: mode=%i cts=%i, dsr=%i, rd=%i\n", machine().describe_context(), machine().time().as_double(), machine().driver_data<thomson_state>()->to7_io_mode(), cts, dsr, rd ));
 
 	return (dsr ? 0x20 : 0) | (cts ? 0x40 : 0) | (rd ? 0x80: 0);
 }
@@ -1204,8 +1204,8 @@ READ8_HANDLER ( to7_midi_r )
 		/* bit 5:     overrun */
 		/* bit 6:     parity error (ignored) */
 		/* bit 7:     interrupt */
-		LOG_MIDI(( "$%04x %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
-				space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), to7_midi_status,
+		LOG_MIDI(( "%s %f to7_midi_r: status $%02X (rdrf=%i, tdre=%i, ovrn=%i, irq=%i)\n",
+				space.machine().describe_context(), space.machine().time().as_double(), to7_midi_status,
 				(to7_midi_status & ACIA_6850_RDRF) ? 1 : 0,
 				(to7_midi_status & ACIA_6850_TDRE) ? 1 : 0,
 				(to7_midi_status & ACIA_6850_OVRN) ? 1 : 0,
@@ -1224,8 +1224,8 @@ READ8_HANDLER ( to7_midi_r )
 						else
 								to7_midi_status &= ~ACIA_6850_OVRN;
 						to7_midi_overrun = 0;
-						LOG_MIDI(( "$%04x %f to7_midi_r: read data $%02X\n",
-									space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
+						LOG_MIDI(( "%s %f to7_midi_r: read data $%02X\n",
+									space.machine().describe_context(), space.machine().time().as_double(), data ));
 						to7_midi_update_irq( space.machine() );
 				}
 				return data;
@@ -1233,8 +1233,8 @@ READ8_HANDLER ( to7_midi_r )
 
 
 	default:
-		logerror( "$%04x to7_midi_r: invalid offset %i\n",
-				space.machine().device("maincpu")->safe_pcbase(),  offset );
+		logerror( "%s to7_midi_r: invalid offset %i\n",
+				space.machine().describe_context(),  offset );
 		return 0;
 	}
 }
@@ -1252,7 +1252,7 @@ WRITE8_HANDLER ( to7_midi_w )
 		if ( (data & 3) == 3 )
 		{
 			/* reset */
-			LOG_MIDI(( "$%04x %f to7_midi_w: reset (data=$%02X)\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
+			LOG_MIDI(( "%s %f to7_midi_w: reset (data=$%02X)\n", space.machine().describe_context(), space.machine().time().as_double(), data ));
 			to7_midi_overrun = 0;
 			to7_midi_status = 2;
 			to7_midi_intr = 0;
@@ -1268,8 +1268,8 @@ WRITE8_HANDLER ( to7_midi_w )
 				static const int bits[8] = { 7,7,7,7,8,8,8,8 };
 				static const int stop[8] = { 2,2,1,1,2,1,1,1 };
 				static const char parity[8] = { 'e','o','e','o','-','-','e','o' };
-				LOG_MIDI(( "$%04x %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
-						space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(),
+				LOG_MIDI(( "%s %f to7_midi_w: set control to $%02X (bits=%i, stop=%i, parity=%c, intr in=%i out=%i)\n",
+						space.machine().describe_context(), space.machine().time().as_double(),
 						data,
 						bits[ (data >> 2) & 7 ],
 						stop[ (data >> 2) & 7 ],
@@ -1283,7 +1283,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	case 1: /* output data */
-		LOG_MIDI(( "$%04x %f to7_midi_w: write data $%02X\n", space.machine().device("maincpu")->safe_pcbase(), space.machine().time().as_double(), data ));
+		LOG_MIDI(( "%s %f to7_midi_w: write data $%02X\n", space.machine().describe_context(), space.machine().time().as_double(), data ));
 		if ( data == 0x55 )
 			/* cable-detect: shortcut */
 			chardev_fake_in( to7_midi_chardev, 0x55 );
@@ -1297,7 +1297,7 @@ WRITE8_HANDLER ( to7_midi_w )
 
 
 	default:
-		logerror( "$%04x to7_midi_w: invalid offset %i (data=$%02X) \n", space.machine().device("maincpu")->safe_pcbase(), offset, data );
+		logerror( "%s to7_midi_w: invalid offset %i (data=$%02X) \n", space.machine().describe_context(), offset, data );
 	}
 }
 

@@ -160,8 +160,8 @@ static void hp48_rs232_send_byte( running_machine &machine )
 	hp48_state *state = machine.driver_data<hp48_state>();
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
-	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n",
-				machine.device("maincpu")->safe_pcbase(), machine.time().as_double(), data ));
+	LOG_SERIAL(( "%s %f hp48_rs232_send_byte: start sending, data=%02x\n",
+				machine.describe_context(), machine.time().as_double(), data ));
 
 	/* set byte sending and send buffer full */
 	state->m_io[0x12] |= 3;
@@ -237,8 +237,8 @@ static const chardev_interface hp48_chardev_iface =
 void hp48_reg_out( device_t *device, int out )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
-	LOG(( "%05x %f hp48_reg_out: %03x\n",
-			device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), out ));
+	LOG(( "%s %f hp48_reg_out: %03x\n",
+			device->machine().describe_context(), device->machine().time().as_double(), out ));
 
 	/* bits 0-8: keyboard lines */
 	state->m_out = out & 0x1ff;
@@ -275,8 +275,8 @@ static int hp48_get_in( running_machine &machine )
 int hp48_reg_in( device_t *device )
 {
 	int in = hp48_get_in(device->machine());
-	LOG(( "%05x %f hp48_reg_in: %04x\n",
-			device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), in ));
+	LOG(( "%s %f hp48_reg_in: %04x\n",
+			device->machine().describe_context(), device->machine().time().as_double(), in ));
 	return in;
 }
 
@@ -320,7 +320,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
 void hp48_rsi( device_t *device )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
-	LOG(( "%05x %f hp48_rsi\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double() ));
+	LOG(( "%s %f hp48_rsi\n", device->machine().describe_context(), device->machine().time().as_double() ));
 
 	/* enables interrupts on key repeat
 	   (normally, there is only one interrupt, when the key is pressed)
@@ -362,8 +362,8 @@ void hp48_state::hp48_update_annunciators()
 
 WRITE8_MEMBER(hp48_state::hp48_io_w)
 {
-	LOG(( "%05x %f hp48_io_w: off=%02x data=%x\n",
-			space.device().safe_pcbase(), space.machine().time().as_double(), offset, data ));
+	LOG(( "%s %f hp48_io_w: off=%02x data=%x\n",
+			space.machine().describe_context(), space.machine().time().as_double(), offset, data ));
 
 	switch( offset )
 	{
@@ -405,7 +405,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 
 	/* cards */
 	case 0x0e:
-		LOG(( "%05x: card control write %02x\n", space.device().safe_pcbase(), data ));
+		LOG(( "%s: card control write %02x\n", space.machine().describe_context(), data ));
 
 		/* bit 0: software interrupt */
 		if ( data & 1 )
@@ -424,7 +424,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 		break;
 
 	case 0x0f:
-		LOG(( "%05x: card info write %02x\n", space.device().safe_pcbase(), data ));
+		LOG(( "%s: card info write %02x\n", space.machine().describe_context(), data ));
 		m_io[0x0f] = data;
 		break;
 
@@ -554,7 +554,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	/* cards */
 	case 0x0e: /* detection */
 		data = m_io[0x0e];
-		LOG(( "%05x: card control read %02x\n", space.device().safe_pcbase(), data ));
+		LOG(( "%s: card control read %02x\n", space.machine().describe_context(), data ));
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -572,15 +572,15 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 			if ( m_port_size[0] && m_port_write[0] ) data |= 4;
 			if ( m_port_size[1] && m_port_write[1] ) data |= 8;
 		}
-		LOG(( "%05x: card info read %02x\n", space.device().safe_pcbase(), data ));
+		LOG(( "%s: card info read %02x\n", space.machine().describe_context(), data ));
 		break;
 
 
 	default: data = m_io[offset];
 	}
 
-	LOG(( "%05x %f hp48_io_r: off=%02x data=%x\n",
-			space.device().safe_pcbase(), space.machine().time().as_double(), offset, data ));
+	LOG(( "%s %f hp48_io_r: off=%02x data=%x\n",
+			space.machine().describe_context(), space.machine().time().as_double(), offset, data ));
 	return data;
 }
 
@@ -593,7 +593,7 @@ READ8_MEMBER(hp48_state::hp48_bank_r)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp48_bank_r: off=%03x\n", space.device().safe_pcbase(), space.machine().time().as_double(), offset ));
+		LOG(( "%s %f hp48_bank_r: off=%03x\n", space.machine().describe_context(), space.machine().time().as_double(), offset ));
 		m_bank_switch = offset;
 		hp48_apply_modules();
 	}
@@ -823,7 +823,7 @@ static void hp48_reset_modules( running_machine &machine )
 /* RESET opcode */
 void hp48_mem_reset( device_t *device )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double() ));
+	LOG(( "%s %f hp48_mem_reset\n", device->machine().describe_context(), device->machine().time().as_double() ));
 	hp48_reset_modules(device->machine());
 }
 
@@ -834,7 +834,7 @@ void hp48_mem_config( device_t *device, int v )
 	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), v ));
+	LOG(( "%s %f hp48_mem_config: %05x\n", device->machine().describe_context(), device->machine().time().as_double(), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -866,7 +866,7 @@ void hp48_mem_unconfig( device_t *device, int v )
 {
 	hp48_state *state = device->machine().driver_data<hp48_state>();
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), v ));
+	LOG(( "%s %f hp48_mem_unconfig: %05x\n", device->machine().describe_context(), device->machine().time().as_double(), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -909,8 +909,8 @@ int  hp48_mem_id( device_t *device )
 		}
 	}
 
-	LOG(( "%05x %f hp48_mem_id = %02x\n",
-			device->machine().device("maincpu")->safe_pcbase(), device->machine().time().as_double(), data ));
+	LOG(( "%s %f hp48_mem_id = %02x\n",
+			device->machine().describe_context(), device->machine().time().as_double(), data ));
 
 	return data; /* everything is configured */
 }
