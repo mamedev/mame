@@ -9,13 +9,13 @@
 
 #define MCFG_K053250_ADD(_tag, screen_tag, offx, offy)  \
 	MCFG_DEVICE_ADD(_tag, K053250, 0) \
-	k053250_t::static_set_screen_tag(*device, screen_tag); \
-	k053250_t::static_set_offsets(*device, offx, offy);
+	k053250_device::static_set_screen_tag(*device, screen_tag); \
+	k053250_device::static_set_offsets(*device, offx, offy);
 
-class k053250_t : public device_t
+class k053250_device : public device_t
 {
 public:
-	k053250_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	static void static_set_screen_tag(device_t &device, const char *screen_tag);
 	static void static_set_offsets(device_t &device, int offx, int offy);

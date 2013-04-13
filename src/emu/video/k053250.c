@@ -1,26 +1,26 @@
 #include "k053250.h"
 
-const device_type K053250 = &device_creator<k053250_t>;
+const device_type K053250 = &device_creator<k053250_device>;
 
-k053250_t::k053250_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K053250, "K053250", tag, owner, clock)
 {
 }
 
-void k053250_t::static_set_screen_tag(device_t &device, const char *screen_tag)
+void k053250_device::static_set_screen_tag(device_t &device, const char *screen_tag)
 {
-	k053250_t &dev = downcast<k053250_t &>(device);
+	k053250_device &dev = downcast<k053250_device &>(device);
 	dev.screen_tag = screen_tag;
 }
 
-void k053250_t::static_set_offsets(device_t &device, int offx, int offy)
+void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
 {
-	k053250_t &dev = downcast<k053250_t &>(device);
+	k053250_device &dev = downcast<k053250_device &>(device);
 	dev.offx = offx;
 	dev.offy = offy;
 }
 
-void k053250_t::unpack_nibbles()
+void k053250_device::unpack_nibbles()
 {
 	if(!m_region)
 		throw emu_fatalerror("k053250 %s: no associated region found\n", tag());
@@ -35,7 +35,7 @@ void k053250_t::unpack_nibbles()
 	unpacked_size = 2*size;
 }
 
-void k053250_t::device_start()
+void k053250_device::device_start()
 {
 	screen = machine().device<screen_device>(screen_tag);
 	ram = auto_alloc_array_clear(machine(), UINT16, 0x6000/2);
@@ -50,7 +50,7 @@ void k053250_t::device_start()
 	save_item(NAME(frame));
 }
 
-void k053250_t::device_reset()
+void k053250_device::device_reset()
 {
 	page = 0;
 	frame = -1;
@@ -58,7 +58,7 @@ void k053250_t::device_reset()
 }
 
 // utility function to render a clipped scanline vertically or horizontally
-inline void k053250_t::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
+inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palette, UINT8 *source,
 										const rectangle &cliprect, int linepos, int scroll, int zoom,
 										UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri)
 {
@@ -221,7 +221,7 @@ inline void k053250_t::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *palet
 #undef FIXPOINT_PRECISION_HALF
 }
 
-void k053250_t::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
+void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority )
 {
 	UINT8 *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
@@ -423,7 +423,7 @@ void k053250_t::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int color
 	}
 }
 
-void k053250_t::dma(int limiter)
+void k053250_device::dma(int limiter)
 {
 	int current_frame = screen->frame_number();
 
@@ -435,12 +435,12 @@ void k053250_t::dma(int limiter)
 	page ^= 1;
 }
 
-READ16_MEMBER(k053250_t::reg_r)
+READ16_MEMBER(k053250_device::reg_r)
 {
 	return regs[offset];
 }
 
-WRITE16_MEMBER(k053250_t::reg_w)
+WRITE16_MEMBER(k053250_device::reg_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -452,17 +452,17 @@ WRITE16_MEMBER(k053250_t::reg_w)
 	}
 }
 
-READ16_MEMBER(k053250_t::ram_r)
+READ16_MEMBER(k053250_device::ram_r)
 {
 	return ram[offset];
 }
 
-WRITE16_MEMBER(k053250_t::ram_w)
+WRITE16_MEMBER(k053250_device::ram_w)
 {
 	COMBINE_DATA(ram+offset);
 }
 
-READ16_MEMBER(k053250_t::rom_r)
+READ16_MEMBER(k053250_device::rom_r)
 {
 	return m_region->base()[0x80000 * regs[6] + 0x800 * regs[7] + offset/2];
 }

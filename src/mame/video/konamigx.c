@@ -1593,7 +1593,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 					}
 					else
 					{
-						machine.device<k053250_t>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
+						machine.device<k053250_device>("k053250_1")->draw(bitmap, cliprect, vcblk[4]<<l, 0, 0);
 					}
 				}
 				continue;
@@ -1655,7 +1655,7 @@ void konamigx_mixer(running_machine &machine, bitmap_rgb32 &bitmap, const rectan
 						}
 					}
 					else
-						machine.device<k053250_t>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
+						machine.device<k053250_device>("k053250_2")->draw(bitmap, cliprect, vcblk[5]<<l, 0, 0);
 				}
 				continue;
 			}

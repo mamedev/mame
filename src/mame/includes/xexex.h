@@ -47,7 +47,7 @@ public:
 	filter_volume_device *m_filter2r;
 	device_t *m_k056832;
 	device_t *m_k053246;
-	k053250_t *m_k053250;
+	k053250_device *m_k053250;
 	device_t *m_k053251;
 	device_t *m_k053252;
 	device_t *m_k054338;

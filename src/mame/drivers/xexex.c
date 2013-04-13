@@ -314,8 +314,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)              // VACSET (K054157)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)              // OBJSET1
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)               // Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_t, ram_r, ram_w)    // K053250 "road" RAM
-	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_t, reg_r, reg_w)
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_device, ram_r, ram_w)    // K053250 "road" RAM
+	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_device, reg_r, reg_w)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)              // CLTC
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)               // priority encoder
 //  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r,k053252_w,0x00ff)                // CCU
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)       // Passthrough to tile roms
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_t, rom_r)
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_device, rom_r)
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 
 #if XE_DEBUG
@@ -450,7 +450,7 @@ void xexex_state::machine_start()
 	membank("bank2")->set_entry(0);
 
 	m_k053246 = machine().device("k053246");
-	m_k053250 = machine().device<k053250_t>("k053250");
+	m_k053250 = machine().device<k053250_device>("k053250");
 	m_k053251 = machine().device("k053251");
 	m_k053252 = machine().device("k053252");
 	m_k056832 = machine().device("k056832");
