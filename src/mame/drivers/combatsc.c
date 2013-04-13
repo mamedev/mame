@@ -675,9 +675,6 @@ MACHINE_START_MEMBER(combatsc_state,combatsc)
 
 	m_interleave_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
-	m_k007121_1 = machine().device("k007121_1");
-	m_k007121_2 = machine().device("k007121_2");
-
 	membank("bank1")->configure_entries(0, 10, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_priority));

@@ -203,12 +203,6 @@ void ajax_state::machine_start()
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);
 
-	m_k007232_1 = machine().device("k007232_1");
-	m_k007232_2 = machine().device("k007232_2");
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k051316 = machine().device("k051316");
-
 	save_item(NAME(m_priority));
 	save_item(NAME(m_firq_enable));
 }

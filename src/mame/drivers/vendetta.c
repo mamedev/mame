@@ -219,8 +219,7 @@ READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 
 READ8_MEMBER(vendetta_state::vendetta_sound_r)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 /********************************************/
@@ -459,12 +458,6 @@ void vendetta_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	m_generic_paletteram_8.allocate(0x1000);
-
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
-	m_k052109 = machine().device("k052109");
-	m_k054000 = machine().device("k054000");
-	m_k053260 = machine().device("k053260");
 
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_sprite_colorbase));

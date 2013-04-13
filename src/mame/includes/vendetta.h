@@ -3,6 +3,7 @@
     Vendetta
 
 *************************************************************************/
+#include "sound/k053260.h"
 
 class vendetta_state : public driver_device
 {
@@ -10,7 +11,12 @@ public:
 	vendetta_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_k053260(*this, "k053260"),
+		m_k052109(*this, "k052109"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_k054000(*this, "k054000") { }
 
 	/* memory pointers */
 	UINT8 *    m_ram;
@@ -28,11 +34,11 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k053260;
-	device_t *m_k052109;
-	device_t *m_k053246;
-	device_t *m_k053251;
-	device_t *m_k054000;
+	required_device<k053260_device> m_k053260;
+	required_device<k052109_device> m_k052109;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	optional_device<k054000_device> m_k054000;
 	DECLARE_WRITE8_MEMBER(vendetta_eeprom_w);
 	DECLARE_READ8_MEMBER(vendetta_K052109_r);
 	DECLARE_WRITE8_MEMBER(vendetta_K052109_w);

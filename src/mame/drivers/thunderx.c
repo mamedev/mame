@@ -352,13 +352,12 @@ WRITE8_MEMBER(thunderx_state::thunderx_sh_irqtrigger_w)
 
 WRITE8_MEMBER(thunderx_state::scontra_snd_bankswitch_w)
 {
-	device_t *device = machine().device("k007232");
 	/* b3-b2: bank for chanel B */
 	/* b1-b0: bank for chanel A */
 
 	int bank_A = (data & 0x03);
 	int bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(device, bank_A, bank_B);
+	k007232_set_bank(m_k007232, bank_A, bank_B);
 }
 
 READ8_MEMBER(thunderx_state::k052109_051960_r)
@@ -598,10 +597,6 @@ static const k051960_interface thunderx_k051960_intf =
 MACHINE_START_MEMBER(thunderx_state,scontra)
 {
 	m_generic_paletteram_8.allocate(0x800);
-
-	m_k007232 = machine().device("k007232");
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
 
 	save_item(NAME(m_priority));
 	save_item(NAME(m_1f98_data));

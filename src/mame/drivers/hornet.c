@@ -334,7 +334,9 @@ public:
 			m_sharc_dataram1(*this, "sharc_dataram1") ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_eeprom(*this, "eeprom")  { }
+		m_eeprom(*this, "eeprom"),
+		m_k037122_1(*this, "k037122_1"),
+		m_k037122_2(*this, "k037122_2" ) { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -381,6 +383,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<eeprom_device> m_eeprom;
+	optional_device<k037122_device> m_k037122_1;
+	optional_device<k037122_device> m_k037122_2;
 };
 
 
@@ -388,38 +392,38 @@ public:
 
 READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122_sram_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122_sram_w(k037122, space, offset, data, mem_mask);
 }
 
 
 READ32_MEMBER(hornet_state::hornet_k037122_char_r)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122_char_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122_char_w(k037122, space, offset, data, mem_mask);
 }
 
 READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	return k037122_reg_r(k037122, space, offset, mem_mask);
 }
 
 WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 {
-	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	k037122_device *k037122 = get_cgboard_id() ? m_k037122_2 : m_k037122_1;
 	k037122_reg_w(k037122, space, offset, data, mem_mask);
 }
 
@@ -435,11 +439,10 @@ static void voodoo_vblank_1(device_t *device, int param)
 UINT32 hornet_state::screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	device_t *voodoo = machine().device("voodoo0");
-	device_t *k037122 = machine().device("k037122_1");
 
 	voodoo_update(voodoo, bitmap, cliprect);
 
-	k037122_tile_draw(k037122, bitmap, cliprect);
+	k037122_tile_draw(m_k037122_1, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -450,21 +453,19 @@ UINT32 hornet_state::screen_update_hornet_2board(screen_device &screen, bitmap_r
 {
 	if (strcmp(screen.tag(), ":lscreen") == 0)
 	{
-		device_t *k037122 = machine().device("k037122_1");
 		device_t *voodoo = machine().device("voodoo0");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		k037122_tile_draw(k037122, bitmap, cliprect);
+		k037122_tile_draw(m_k037122_1, bitmap, cliprect);
 	}
 	else if (strcmp(screen.tag(), ":rscreen") == 0)
 	{
-		device_t *k037122 = machine().device("k037122_2");
 		device_t *voodoo = machine().device("voodoo1");
 		voodoo_update(voodoo, bitmap, cliprect);
 
 		/* TODO: tilemaps per screen */
-		k037122_tile_draw(k037122, bitmap, cliprect);
+		k037122_tile_draw(m_k037122_2, bitmap, cliprect);
 	}
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);

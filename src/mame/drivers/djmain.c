@@ -205,9 +205,8 @@ WRITE32_MEMBER(djmain_state::v_ctrl_w)
 
 READ32_MEMBER(djmain_state::v_rom_r)
 {
-	device_t *k056832 = machine().device("k056832");
 	UINT8 *mem8 = memregion("gfx2")->base();
-	int bank = k056832_word_r(k056832, space, 0x34/2, 0xffff);
+	int bank = k056832_word_r(m_k056832, space, 0x34/2, 0xffff);
 
 	offset *= 2;
 

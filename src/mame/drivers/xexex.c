@@ -449,13 +449,6 @@ void xexex_state::machine_start()
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank2")->set_entry(0);
 
-	m_k053246 = machine().device("k053246");
-	m_k053250 = machine().device<k053250_device>("k053250");
-	m_k053251 = machine().device("k053251");
-	m_k053252 = machine().device("k053252");
-	m_k056832 = machine().device("k056832");
-	m_k054338 = machine().device("k054338");
-	m_k054539 = machine().device("k054539");
 	m_filter1l = machine().device<filter_volume_device>("filter1l");
 	m_filter1r = machine().device<filter_volume_device>("filter1r");
 	m_filter2l = machine().device<filter_volume_device>("filter2l");
@@ -493,7 +486,7 @@ void xexex_state::machine_reset()
 	m_suspension_active = 0;
 	m_resume_trigger = 1000;
 	m_frame = -1;
-	machine().device<k054539_device>("k054539")->init_flags(k054539_device::REVERSE_STEREO);
+	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
 static MACHINE_CONFIG_START( xexex, xexex_state )

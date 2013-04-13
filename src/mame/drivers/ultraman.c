@@ -191,11 +191,6 @@ static const k051316_interface ultraman_k051316_intf_2 =
 
 void ultraman_state::machine_start()
 {
-	m_k051960 = machine().device("k051960");
-	m_k051316_1 = machine().device("k051316_1");
-	m_k051316_2 = machine().device("k051316_2");
-	m_k051316_3 = machine().device("k051316_3");
-
 	save_item(NAME(m_bank0));
 	save_item(NAME(m_bank1));
 	save_item(NAME(m_bank2));

@@ -22,6 +22,7 @@ public:
 		m_spr_old2(*this, "vsystem_spr_ol2"),
 		m_spr(*this, "vsystem_spr"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k053936(*this, "k053936"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -63,7 +64,7 @@ public:
 
 	/* devices */
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_k053936;
+	optional_device<k053936_device> m_k053936;
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_READ16_MEMBER(extrarom_r);

@@ -301,9 +301,6 @@ void bladestl_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	m_k007342 = machine().device("k007342");
-	m_k007420 = machine().device("k007420");
-
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_last_track));

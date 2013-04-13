@@ -115,7 +115,6 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 
 WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 {
-	device_t *device = machine().device("k007232");
 	int bank_A, bank_B;
 
 //logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
@@ -123,7 +122,7 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
 	bank_B = ((data >> 2) & 0x3);
-	k007232_set_bank(device, bank_A, bank_B);
+	k007232_set_bank(m_k007232, bank_A, bank_B);
 }
 
 READ8_MEMBER(mainevt_state::k052109_051960_r)
@@ -406,10 +405,6 @@ void mainevt_state::machine_start()
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
-
-	m_k007232 = machine().device("k007232");
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
 
 	save_item(NAME(m_nmi_enable));
 }

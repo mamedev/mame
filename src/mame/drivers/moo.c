@@ -425,12 +425,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(moo_state,moo)
 {
-	m_k054539 = machine().device("k054539");
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
-	m_k056832 = machine().device("k056832");
-	m_k054338 = machine().device("k054338");
-
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_alpha_enabled));
 	save_item(NAME(m_sprite_colorbase));

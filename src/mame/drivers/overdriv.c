@@ -133,14 +133,12 @@ WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 
 READ8_MEMBER(overdriv_state::overdriv_1_sound_r)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260_1");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260_1->k053260_r(space, 2 + offset);
 }
 
 READ8_MEMBER(overdriv_state::overdriv_2_sound_r)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260_2");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260_2->k053260_r(space, 2 + offset);
 }
 
 WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
@@ -279,13 +277,6 @@ static const k051316_interface overdriv_k051316_intf_2 =
 
 void overdriv_state::machine_start()
 {
-	m_k051316_1 = machine().device("k051316_1");
-	m_k051316_2 = machine().device("k051316_2");
-	m_k053260_1 = machine().device("k053260_1");
-	m_k053260_2 = machine().device("k053260_2");
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
-
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));

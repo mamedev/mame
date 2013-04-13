@@ -387,10 +387,6 @@ static const k054338_interface bishi_k054338_intf =
 
 void bishi_state::machine_start()
 {
-	m_k056832 = machine().device("k056832");
-	m_k054338 = machine().device("k054338");
-	m_k055555 = machine().device("k055555");
-
 	save_item(NAME(m_cur_control));
 	save_item(NAME(m_cur_control2));
 }

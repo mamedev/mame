@@ -505,11 +505,6 @@ void spy_state::machine_start()
 	m_generic_paletteram_8.allocate(0x800);
 	memset(m_pmcram, 0, sizeof(m_pmcram));
 
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k007232_1 = machine().device("k007232_1");
-	m_k007232_2 = machine().device("k007232_2");
-
 	save_item(NAME(m_rambank));
 	save_item(NAME(m_pmcbank));
 	save_item(NAME(m_video_enable));

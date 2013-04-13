@@ -233,7 +233,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_k001604(*this, "k001604")  { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -261,6 +262,7 @@ public:
 	void lanc2_init();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<k001604_device> m_k001604;
 };
 
 
@@ -283,7 +285,6 @@ static void voodoo_vblank_0(device_t *device, int param)
 UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	device_t *voodoo = machine().device("voodoo");
-	device_t *k001604 = machine().device("k001604");
 
 	bitmap.fill(machine().pens[0], cliprect);
 
@@ -292,7 +293,7 @@ UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bit
 	const rectangle &visarea = screen.visible_area();
 	const rectangle tilemap_rect(visarea.min_x, visarea.max_x, visarea.min_y+16, visarea.max_y);
 
-	k001604_draw_front_layer(k001604, bitmap, tilemap_rect);
+	k001604_draw_front_layer(m_k001604, bitmap, tilemap_rect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);

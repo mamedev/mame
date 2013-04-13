@@ -152,21 +152,20 @@ WRITE8_MEMBER(ajax_state::sound_bank_w)
 
 WRITE8_MEMBER(ajax_state::volume_callback0)
 {
-	k007232_set_volume(machine().device("k007232_1"), 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(machine().device("k007232_1"), 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232_1, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_k007232_1, 1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(ajax_state::k007232_extvol_w)
 {
-	device_t *device = machine().device("k007232_2");
 	/* channel A volume (mono) */
-	k007232_set_volume(device, 0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
+	k007232_set_volume(m_k007232_2, 0, (data & 0x0f) * 0x11/2, (data & 0x0f) * 0x11/2);
 }
 
 WRITE8_MEMBER(ajax_state::volume_callback1)
 {
 	/* channel B volume/pan */
-	k007232_set_volume(machine().device("k007232_2"), 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
+	k007232_set_volume(m_k007232_2, 1, (data & 0x0f) * 0x11/2, (data >> 4) * 0x11/2);
 }
 
 static const k007232_interface k007232_interface_1 =

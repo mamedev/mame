@@ -1,5 +1,8 @@
 #include "sound/samples.h"
 #include "sound/upd7759.h"
+#include "sound/k007232.h"
+#include "sound/k053260.h"
+#include "sound/k054539.h"
 
 class tmnt_state : public driver_device
 {
@@ -12,6 +15,15 @@ public:
 		m_tmnt2_1c0800(*this, "tmnt2_1c0800"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007232(*this, "k007232"),
+		m_k053260(*this, "k053260"),
+		m_k054539(*this, "k054539"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960"),
+		m_k053245(*this, "k053245"),
+		m_k053251(*this, "k053251"),
+		m_k053936(*this, "k053936"),
+		m_k054000(*this, "k054000"),
 		m_upd7759(*this, "upd"){ }
 
 	/* memory pointers */
@@ -53,15 +65,15 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_k007232;
-	device_t *m_k053260;
-	device_t *m_k054539;
-	device_t *m_k052109;
-	device_t *m_k051960;
-	device_t *m_k053245;
-	device_t *m_k053251;
-	device_t *m_k053936;
-	device_t *m_k054000;
+	optional_device<k007232_device> m_k007232;
+	optional_device<k053260_device> m_k053260;
+	optional_device<k054539_device> m_k054539;
+	required_device<k052109_device> m_k052109;
+	optional_device<k051960_device> m_k051960;
+	optional_device<k05324x_device> m_k053245;
+	optional_device<k053251_device> m_k053251;
+	optional_device<k053936_device> m_k053936;
+	optional_device<k054000_device> m_k054000;
 	optional_device<upd7759_device> m_upd7759;
 	samples_device *m_samples;
 

@@ -1,3 +1,6 @@
+#include "sound/k007232.h"
+#include "sound/k005289.h"
+
 class nemesis_state : public driver_device
 {
 public:
@@ -15,6 +18,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
 		m_gx400_shared_ram(*this, "gx400_shared"),
+		m_k007232(*this, "k007232"),
+		m_k005289(*this, "k005289"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"){ }
 
@@ -31,6 +36,8 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_paletteram;
 	optional_shared_ptr<UINT8> m_gx400_shared_ram;
+	optional_device<k007232_device> m_k007232;
+	optional_device<k005289_device> m_k005289;
 
 	/* video-related */
 	tilemap_t *m_background;

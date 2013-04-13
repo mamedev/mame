@@ -315,12 +315,6 @@ void bottom9_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x2000);
 
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k051316 = machine().device("k051316");
-	m_k007232_1 = machine().device("k007232_1");
-	m_k007232_2 = machine().device("k007232_2");
-
 	save_item(NAME(m_video_enable));
 	save_item(NAME(m_zoomreadroms));
 	save_item(NAME(m_k052109_selected));

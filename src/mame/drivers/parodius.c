@@ -95,8 +95,7 @@ WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 
 READ8_MEMBER(parodius_state::parodius_sound_r)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
@@ -245,11 +244,6 @@ void parodius_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	m_generic_paletteram_8.allocate(0x1000);
-
-	m_k053260 = machine().device("k053260");
-	m_k053245 = machine().device("k053245");
-	m_k053251 = machine().device("k053251");
-	m_k052109 = machine().device("k052109");
 
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_sprite_colorbase));

@@ -607,13 +607,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_gfxcpu(*this, "gfxcpu"),
-		m_gfx_pagetable(*this, "pagetable")
+		m_gfx_pagetable(*this, "pagetable"),
+		m_k001604(*this, "k001604")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_gfxcpu;
 	required_shared_ptr<UINT64> m_gfx_pagetable;
+	required_device<k001604_device> m_k001604;
 
 	DECLARE_READ64_MEMBER(main_comram_r);
 	DECLARE_WRITE64_MEMBER(main_comram_w);
@@ -1001,10 +1003,8 @@ UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bit
 {
 	if (m_has_psac)
 	{
-		device_t *k001604 = machine().device("k001604");
-
-		k001604_draw_back_layer(k001604, bitmap, cliprect);
-		k001604_draw_front_layer(k001604, bitmap, cliprect);
+		k001604_draw_back_layer(m_k001604, bitmap, cliprect);
+		k001604_draw_front_layer(m_k001604, bitmap, cliprect);
 	}
 
 	m_renderer->display(&bitmap, cliprect);

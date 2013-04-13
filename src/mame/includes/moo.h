@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/okim6295.h"
+#include "sound/k054539.h"
 
 class moo_state : public driver_device
 {
@@ -14,7 +15,12 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_oki(*this, "oki"){ }
+		m_oki(*this, "oki"),
+		m_k054539(*this, "k054539"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_k056832(*this, "k056832"),
+		m_k054338(*this, "k054338") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_workram;
@@ -36,11 +42,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
-	device_t *m_k054539;
-	device_t *m_k053246;
-	device_t *m_k053251;
-	device_t *m_k056832;
-	device_t *m_k054338;
+	optional_device<k054539_device> m_k054539;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<k056832_device> m_k056832;
+	required_device<k054338_device> m_k054338;
 
 	emu_timer *m_dmaend_timer;
 	DECLARE_READ16_MEMBER(control2_r);

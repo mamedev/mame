@@ -187,14 +187,12 @@ READ8_MEMBER(tmnt_state::punkshot_sound_r)
 {
 	/* If the sound CPU is running, read the status, otherwise
 	   just make it pass the test */
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 WRITE8_MEMBER(tmnt_state::glfgreat_sound_w)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	device->k053260_w(space, offset, data);
+	m_k053260->k053260_w(space, offset, data);
 
 	if (offset)
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -1139,12 +1137,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(tmnt_state::k054539_ctrl_r)
 {
-	return machine().device<k054539_device>("k054539")->read(space, 0x200 + offset, 0xff);
+	return m_k054539->read(space, 0x200 + offset, 0xff);
 }
 
 WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
 {
-	machine().device<k054539_device>("k054539")->write(space, 0x200 + offset, data, 0xff);
+	m_k054539->write(space, 0x200 + offset, data, 0xff);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )
@@ -2169,16 +2167,7 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 MACHINE_START_MEMBER(tmnt_state,common)
 {
-	m_k007232 = machine().device("k007232");
-	m_k053260 = machine().device("k053260");
-	m_k054539 = machine().device("k054539");
 	m_samples = machine().device<samples_device>("samples");
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k053245 = machine().device("k053245");
-	m_k053251 = machine().device("k053251");
-	m_k053936 = machine().device("k053936");
-	m_k054000 = machine().device("k054000");
 
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_last));

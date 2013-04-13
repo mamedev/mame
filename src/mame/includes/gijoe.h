@@ -3,6 +3,7 @@
     GI Joe
 
 *************************************************************************/
+#include "sound/k054539.h"
 
 class gijoe_state : public driver_device
 {
@@ -12,7 +13,11 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_k054539(*this, "k054539"),
+		m_k056832(*this, "k056832"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -34,10 +39,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k054539;
-	device_t *m_k056832;
-	device_t *m_k053246;
-	device_t *m_k053251;
+	required_device<k054539_device> m_k054539;
+	required_device<k056832_device> m_k056832;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
 	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);

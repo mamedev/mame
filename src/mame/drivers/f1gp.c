@@ -426,8 +426,6 @@ MACHINE_START_MEMBER(f1gp_state,f1gp)
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
 
-	m_k053936 = machine().device("k053936");
-
 	MACHINE_START_CALL_MEMBER(f1gpb);
 }
 

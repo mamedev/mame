@@ -100,10 +100,9 @@ WRITE8_MEMBER(gbusters_state::gbusters_sh_irqtrigger_w)
 
 WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
 {
-	device_t *device = machine().device("k007232");
 	int bank_B = BIT(data, 2);  /* ?? */
 	int bank_A = BIT(data, 0);      /* ?? */
-	k007232_set_bank(device, bank_A, bank_B );
+	k007232_set_bank(m_k007232, bank_A, bank_B );
 
 #if 0
 	{
@@ -266,10 +265,6 @@ void gbusters_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	m_generic_paletteram_8.allocate(0x800);
-
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k007232 = machine().device("k007232");
 
 	save_item(NAME(m_palette_selected));
 	save_item(NAME(m_priority));

@@ -581,11 +581,6 @@ void lethal_state::machine_start()
 
 	m_generic_paletteram_8.allocate(0x3800 + 0x02);
 	
-	m_k054539 = machine().device("k054539");
-	m_k053244 = machine().device("k053244");
-	m_k056832 = machine().device("k056832");
-	m_k054000 = machine().device("k054000");
-
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

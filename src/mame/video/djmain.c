@@ -14,11 +14,10 @@
 
 void djmain_state::draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k055555 = machine().device("k055555");
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 
-	machine().gfx[0]->set_colorbase(k055555_read_register(k055555, K55_PALBASE_SUB2) * 0x400);
+	machine().gfx[0]->set_colorbase(k055555_read_register(m_k055555, K55_PALBASE_SUB2) * 0x400);
 
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
@@ -135,25 +134,21 @@ void djmain_tile_callback(running_machine& machine, int layer, int *code, int *c
 
 void djmain_state::video_start()
 {
-	device_t *k056832 = machine().device("k056832");
-
-	k056832_set_layer_offs(k056832, 0, -92, -27);
-	// k056832_set_layer_offs(k056832, 1, -87, -27);
-	k056832_set_layer_offs(k056832, 1, -88, -27);
+	k056832_set_layer_offs(m_k056832, 0, -92, -27);
+	// k056832_set_layer_offs(m_k056832, 1, -87, -27);
+	k056832_set_layer_offs(m_k056832, 1, -88, -27);
 }
 
 UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k056832 = machine().device("k056832");
-	device_t *k055555 = machine().device("k055555");
-	int enables = k055555_read_register(k055555, K55_INPUT_ENABLES);
+	int enables = k055555_read_register(m_k055555, K55_INPUT_ENABLES);
 	int pri[NUM_LAYERS + 1];
 	int order[NUM_LAYERS + 1];
 	int i, j;
 
 	for (i = 0; i < NUM_LAYERS; i++)
-		pri[i] = k055555_read_register(k055555, K55_PRIINP_0 + i * 3);
-	pri[i] = k055555_read_register(k055555, K55_PRIINP_10);
+		pri[i] = k055555_read_register(m_k055555, K55_PRIINP_0 + i * 3);
+	pri[i] = k055555_read_register(m_k055555, K55_PRIINP_10);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 		order[i] = i;
@@ -182,7 +177,7 @@ UINT32 djmain_state::screen_update_djmain(screen_device &screen, bitmap_rgb32 &b
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				k056832_tilemap_draw_dj(k056832, bitmap, cliprect, layer, 0, 1 << i);
+				k056832_tilemap_draw_dj(m_k056832, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

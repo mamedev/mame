@@ -311,12 +311,6 @@ void chqflag_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
-	m_k051316_1 = machine().device("k051316_1");
-	m_k051316_2 = machine().device("k051316_2");
-	m_k051960 = machine().device("k051960");
-	m_k007232_1 = machine().device("k007232_1");
-	m_k007232_2 = machine().device("k007232_2");
-
 	save_item(NAME(m_k051316_readroms));
 	save_item(NAME(m_last_vreg));
 	save_item(NAME(m_analog_ctrl));

@@ -16,7 +16,8 @@ public:
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_eeprom(*this, "eeprom"),
+		m_k053936(*this, "k053936") { }
 
 	/* 68k-side shared ram */
 	required_shared_ptr<UINT32> m_shared_ram;
@@ -84,4 +85,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<eeprom_device> m_eeprom;
+	required_device<k053936_device> m_k053936;
 };

@@ -208,7 +208,6 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	m_konami2 = machine().device("konami2");
-	m_k007121 = machine().device("k007121");
 }
 
 static MACHINE_CONFIG_START( fastlane, fastlane_state )

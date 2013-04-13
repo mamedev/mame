@@ -267,11 +267,6 @@ static const k053247_interface gijoe_k053247_intf =
 
 void gijoe_state::machine_start()
 {
-	m_k054539 = machine().device("k054539");
-	m_k056832 = machine().device("k056832");
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
-
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gijoe_state::dmaend_callback),this));
 
 	save_item(NAME(m_cur_control2));

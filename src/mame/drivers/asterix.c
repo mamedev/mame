@@ -63,8 +63,7 @@ INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 
 READ8_MEMBER(asterix_state::asterix_sound_r)
 {
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 TIMER_CALLBACK_MEMBER(asterix_state::nmi_callback)
@@ -240,11 +239,6 @@ static const k05324x_interface asterix_k05324x_intf =
 
 void asterix_state::machine_start()
 {
-	m_k053260 = machine().device("k053260");
-	m_k056832 = machine().device("k056832");
-	m_k053244 = machine().device("k053244");
-	m_k053251 = machine().device("k053251");
-
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_prot));
 

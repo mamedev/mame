@@ -1109,8 +1109,6 @@ UINT32 wecleman_state::screen_update_wecleman(screen_device &screen, bitmap_rgb3
 
 UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	device_t *k051316_1 = machine().device("k051316_1");
-	device_t *k051316_2 = machine().device("k051316_2");
 	int video_on;
 
 	video_on = m_irqctrl & 0x40;
@@ -1123,7 +1121,7 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	/* Draw the background */
 	if (video_on)
-		k051316_zoom_draw(k051316_1, bitmap, cliprect, 0, 0);
+		k051316_zoom_draw(m_k051316_1, bitmap, cliprect, 0, 0);
 
 	/* Draw the road */
 	if (video_on)
@@ -1135,6 +1133,6 @@ UINT32 wecleman_state::screen_update_hotchase(screen_device &screen, bitmap_ind1
 
 	/* Draw the foreground (text) */
 	if (video_on)
-		k051316_zoom_draw(k051316_2, bitmap, cliprect, 0, 0);
+		k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 0);
 	return 0;
 }

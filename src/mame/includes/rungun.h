@@ -3,6 +3,8 @@
     Run and Gun / Slam Dunk
 
 *************************************************************************/
+#include "sound/k054539.h"
+#include "machine/k053252.h"
 
 class rungun_state : public driver_device
 {
@@ -12,7 +14,12 @@ public:
 		m_sysreg(*this, "sysreg"),
 		m_936_videoram(*this, "936_videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_soundcpu(*this, "soundcpu"),
+		m_k054539_1(*this, "k054539_1"),
+		m_k054539_2(*this, "k054539_2"),
+		m_k053936(*this, "k053936"),
+		m_k055673(*this, "k055673"),
+		m_k053252(*this, "k053252") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_sysreg;
@@ -33,11 +40,11 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	device_t *m_k054539_1;
-	device_t *m_k054539_2;
-	device_t *m_k053936;
-	device_t *m_k055673;
-	device_t *m_k053252;
+	required_device<k054539_device> m_k054539_1;
+	required_device<k054539_device> m_k054539_2;
+	required_device<k053936_device> m_k053936;
+	required_device<k055673_device> m_k055673;
+	required_device<k053252_device> m_k053252;
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
 	DECLARE_WRITE16_MEMBER(sound_cmd1_w);

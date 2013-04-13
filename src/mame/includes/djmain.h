@@ -4,7 +4,9 @@ public:
 	djmain_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_obj_ram(*this, "obj_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_k056832(*this, "k056832"),
+		m_k055555(*this, "k055555") { }
 
 	int m_sndram_bank;
 	UINT8 *m_sndram;
@@ -60,6 +62,8 @@ public:
 	void sndram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k055555_device> m_k055555;
 };
 
 /*----------- defined in video/djmain.c -----------*/

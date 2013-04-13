@@ -184,7 +184,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_k001604(*this, "k001604"),
+		m_k056832(*this, "k056832") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
@@ -214,6 +216,8 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<k001604_device> m_k001604;
+	optional_device<k056832_device> m_k056832;
 };
 
 
@@ -229,15 +233,13 @@ VIDEO_START_MEMBER(zr107_state,jetwave)
 
 UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k001604 = machine().device("k001604");
-
 	bitmap.fill(machine().pens[0], cliprect);
 
-	k001604_draw_back_layer(k001604, bitmap, cliprect);
+	k001604_draw_back_layer(m_k001604, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
 
-	k001604_draw_front_layer(k001604, bitmap, cliprect);
+	k001604_draw_front_layer(m_k001604, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);
@@ -266,16 +268,14 @@ static void game_tile_callback(running_machine &machine, int layer, int *code, i
 
 VIDEO_START_MEMBER(zr107_state,zr107)
 {
-	device_t *k056832 = machine().device("k056832");
-
-	k056832_set_layer_offs(k056832, 0, -29, -27);
-	k056832_set_layer_offs(k056832, 1, -29, -27);
-	k056832_set_layer_offs(k056832, 2, -29, -27);
-	k056832_set_layer_offs(k056832, 3, -29, -27);
-	k056832_set_layer_offs(k056832, 4, -29, -27);
-	k056832_set_layer_offs(k056832, 5, -29, -27);
-	k056832_set_layer_offs(k056832, 6, -29, -27);
-	k056832_set_layer_offs(k056832, 7, -29, -27);
+	k056832_set_layer_offs(m_k056832, 0, -29, -27);
+	k056832_set_layer_offs(m_k056832, 1, -29, -27);
+	k056832_set_layer_offs(m_k056832, 2, -29, -27);
+	k056832_set_layer_offs(m_k056832, 3, -29, -27);
+	k056832_set_layer_offs(m_k056832, 4, -29, -27);
+	k056832_set_layer_offs(m_k056832, 5, -29, -27);
+	k056832_set_layer_offs(m_k056832, 6, -29, -27);
+	k056832_set_layer_offs(m_k056832, 7, -29, -27);
 
 	K001006_init(machine());
 	K001005_init(machine());
@@ -283,12 +283,11 @@ VIDEO_START_MEMBER(zr107_state,zr107)
 
 UINT32 zr107_state::screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	device_t *k056832 = machine().device("k056832");
 	bitmap.fill(machine().pens[0], cliprect);
 
-	k056832_tilemap_draw(k056832, bitmap, cliprect, 1, 0, 0);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 1, 0, 0);
 	K001005_draw(bitmap, cliprect);
-	k056832_tilemap_draw(k056832, bitmap, cliprect, 0, 0, 0);
+	k056832_tilemap_draw(m_k056832, bitmap, cliprect, 0, 0, 0);
 
 	draw_7segment_led(bitmap, 3, 3, m_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, m_led_reg1);

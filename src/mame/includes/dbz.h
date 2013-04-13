@@ -3,6 +3,7 @@
     Dragonball Z
 
 *************************************************************************/
+#include "video/konicdev.h"
 
 class dbz_state : public driver_device
 {
@@ -12,7 +13,12 @@ public:
 		m_bg1_videoram(*this, "bg1_videoram"),
 		m_bg2_videoram(*this, "bg2_videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_k053246(*this, "k053246"),
+		m_k053251(*this, "k053251"),
+		m_k056832(*this, "k056832"),
+		m_k053936_1(*this, "k053936_1"),
+		m_k053936_2(*this, "k053936_2") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg1_videoram;
@@ -32,11 +38,11 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k053246;
-	device_t *m_k053251;
-	device_t *m_k056832;
-	device_t *m_k053936_1;
-	device_t *m_k053936_2;
+	required_device<k053247_device> m_k053246;
+	required_device<k053251_device> m_k053251;
+	required_device<k056832_device> m_k056832;
+	required_device<k053936_device> m_k053936_1;
+	required_device<k053936_device> m_k053936_2;
 	DECLARE_READ16_MEMBER(dbzcontrol_r);
 	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
 	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);

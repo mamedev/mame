@@ -17,6 +17,7 @@ public:
 		m_screen_vregs(*this, "screen_vregs"),
 		m_spr(*this, "vsystem_spr"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k053936(*this, "k053936"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -41,7 +42,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k053936;
+	required_device<k053936_device> m_k053936;
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_READ16_MEMBER(pending_command_r);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);

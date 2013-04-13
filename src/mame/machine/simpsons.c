@@ -51,7 +51,7 @@ READ8_MEMBER(simpsons_state::simpsons_sound_interrupt_r)
 
 READ8_MEMBER(simpsons_state::simpsons_sound_r)
 {
-	return machine().device<k053260_device>("k053260")->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 
@@ -76,11 +76,6 @@ void simpsons_state::machine_start()
 	m_generic_paletteram_8.allocate(0x1000);
 	m_xtraram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);
-
-	m_k053260 = machine().device("k053260");
-	m_k052109 = machine().device("k052109");
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
 
 	save_item(NAME(m_firq_enabled));
 	save_item(NAME(m_video_bank));

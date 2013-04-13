@@ -3,6 +3,7 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
+#include "sound/k007232.h"
 
 class thunderx_state : public driver_device
 {
@@ -11,7 +12,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_k007232(*this, "k007232"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_ram;
@@ -32,9 +36,9 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007232;
-	device_t *m_k052109;
-	device_t *m_k051960;
+	optional_device<k007232_device> m_k007232;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
 	DECLARE_READ8_MEMBER(scontra_bankedram_r);
 	DECLARE_WRITE8_MEMBER(scontra_bankedram_w);
 	DECLARE_READ8_MEMBER(thunderx_bankedram_r);

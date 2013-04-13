@@ -361,12 +361,6 @@ void rungun_state::machine_start()
 
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_k053936 = machine().device("k053936");
-	m_k055673 = machine().device("k055673");
-	m_k053252 = machine().device("k053252");
-	m_k054539_1 = machine().device("k054539_1");
-	m_k054539_2 = machine().device("k054539_2");
-
 	save_item(NAME(m_z80_control));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_ttl_vram));
@@ -374,7 +368,7 @@ void rungun_state::machine_start()
 
 void rungun_state::machine_reset()
 {
-	machine().device<k054539_device>("k054539_1")->init_flags(k054539_device::REVERSE_STEREO);
+	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(m_sysreg, 0, 0x20);
 	memset(m_ttl_vram, 0, 0x1000 * sizeof(UINT16));

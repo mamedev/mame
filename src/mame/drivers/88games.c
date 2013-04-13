@@ -298,10 +298,6 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 
 void _88games_state::machine_start()
 {
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-	m_k051316 = machine().device("k051316");
-
 	save_item(NAME(m_videobank));
 	save_item(NAME(m_zoomreadroms));
 	save_item(NAME(m_speech_chip));

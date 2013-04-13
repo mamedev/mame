@@ -335,12 +335,6 @@ static const k053252_interface dbz_k053252_intf =
 
 void dbz_state::machine_start()
 {
-	m_k053936_1 = machine().device("k053936_1");
-	m_k053936_2 = machine().device("k053936_2");
-	m_k056832 = machine().device("k056832");
-	m_k053246 = machine().device("k053246");
-	m_k053251 = machine().device("k053251");
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layerpri));

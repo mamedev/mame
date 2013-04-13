@@ -24,7 +24,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
 		m_workram(*this, "workram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_k056800(*this, "k056800") { }
 
 	required_shared_ptr<UINT32> m_vram;
 	required_shared_ptr<UINT32> m_workram;
@@ -39,6 +40,7 @@ public:
 	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ultrsprt_vblank);
 	required_device<cpu_device> m_maincpu;
+	required_device<k056800_device> m_k056800;
 };
 
 
@@ -135,27 +137,24 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ultrsprt_state::K056800_68k_r)
 {
-	device_t *k056800 = machine().device("k056800");
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
-		r |= k056800_sound_r(k056800, space, (offset*2)+0, 0xffff) << 8;
+		r |= k056800_sound_r(m_k056800, space, (offset*2)+0, 0xffff) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= k056800_sound_r(k056800, space, (offset*2)+1, 0xffff) << 0;
+		r |= k056800_sound_r(m_k056800, space, (offset*2)+1, 0xffff) << 0;
 
 	return r;
 }
 
 WRITE16_MEMBER(ultrsprt_state::K056800_68k_w)
 {
-	device_t *k056800 = machine().device("k056800");
-
 	if (ACCESSING_BITS_8_15)
-		k056800_sound_w(k056800, space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
+		k056800_sound_w(m_k056800, space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
 
 	if (ACCESSING_BITS_0_7)
-		k056800_sound_w(k056800, space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
+		k056800_sound_w(m_k056800, space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )

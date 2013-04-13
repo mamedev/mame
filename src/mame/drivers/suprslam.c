@@ -295,8 +295,6 @@ static const k053936_interface suprslam_k053936_intf =
 
 void suprslam_state::machine_start()
 {
-	m_k053936 = machine().device("k053936");
-
 	save_item(NAME(m_screen_bank));
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_pending_command));

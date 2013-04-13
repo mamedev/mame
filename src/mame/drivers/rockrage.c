@@ -241,9 +241,6 @@ void rockrage_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	m_k007342 = machine().device("k007342");
-	m_k007420 = machine().device("k007420");
-
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_layer_colorbase));
 }

@@ -6,6 +6,8 @@
 
 #include <video/k053250.h>
 #include <sound/flt_vol.h>
+#include "sound/k054539.h"
+#include "machine/k053252.h"
 
 class xexex_state : public driver_device
 {
@@ -15,7 +17,14 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_k054539(*this, "k054539"),
+		m_k056832(*this, "k056832"),
+		m_k053246(*this, "k053246"),
+		m_k053250(*this, "k053250"),
+		m_k053251(*this, "k053251"),
+		m_k053252(*this, "k053252"),
+		m_k054338(*this, "k054338") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_workram;
@@ -40,17 +49,17 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k054539;
+	required_device<k054539_device> m_k054539;
 	filter_volume_device *m_filter1l;
 	filter_volume_device *m_filter1r;
 	filter_volume_device *m_filter2l;
 	filter_volume_device *m_filter2r;
-	device_t *m_k056832;
-	device_t *m_k053246;
-	k053250_device *m_k053250;
-	device_t *m_k053251;
-	device_t *m_k053252;
-	device_t *m_k054338;
+	required_device<k056832_device> m_k056832;
+	required_device<k053247_device> m_k053246;
+	required_device<k053250_device> m_k053250;
+	required_device<k053251_device> m_k053251;
+	required_device<k053252_device> m_k053252;
+	required_device<k054338_device> m_k054338;
 	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
 	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
 	DECLARE_READ16_MEMBER(spriteram_mirror_r);

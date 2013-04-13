@@ -3,6 +3,7 @@
     Gradius 3
 
 *************************************************************************/
+#include "sound/k007232.h"
 
 class gradius3_state : public driver_device
 {
@@ -12,7 +13,10 @@ public:
 		m_gfxram(*this, "gfxram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_k007232(*this, "k007232"),
+		m_k052109(*this, "k052109"),
+		m_k051960(*this, "k051960") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_gfxram;
@@ -31,9 +35,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	device_t *m_k007232;
-	device_t *m_k052109;
-	device_t *m_k051960;
+	required_device<k007232_device> m_k007232;
+	required_device<k052109_device> m_k052109;
+	required_device<k051960_device> m_k051960;
 	DECLARE_READ16_MEMBER(k052109_halfword_r);
 	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
 	DECLARE_READ16_MEMBER(k051937_halfword_r);

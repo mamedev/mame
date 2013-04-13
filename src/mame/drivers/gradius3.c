@@ -137,13 +137,12 @@ WRITE16_MEMBER(gradius3_state::sound_irq_w)
 
 WRITE8_MEMBER(gradius3_state::sound_bank_w)
 {
-	device_t *device = machine().device("k007232");
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(device, bank_A, bank_B);
+	k007232_set_bank(m_k007232, bank_A, bank_B);
 }
 
 
@@ -281,10 +280,6 @@ static const k051960_interface gradius3_k051960_intf =
 
 void gradius3_state::machine_start()
 {
-	m_k007232 = machine().device("k007232");
-	m_k052109 = machine().device("k052109");
-	m_k051960 = machine().device("k051960");
-
 	save_item(NAME(m_irqAen));
 	save_item(NAME(m_irqBmask));
 	save_item(NAME(m_priority));

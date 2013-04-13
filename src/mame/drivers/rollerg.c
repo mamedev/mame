@@ -51,8 +51,7 @@ READ8_MEMBER(rollerg_state::rollerg_sound_r)
 {
 	/* If the sound CPU is running, read the status, otherwise
 	   just make it pass the test */
-	k053260_device *device = machine().device<k053260_device>("k053260");
-	return device->k053260_r(space, 2 + offset);
+	return m_k053260->k053260_r(space, 2 + offset);
 }
 
 WRITE8_MEMBER(rollerg_state::soundirq_w)
@@ -252,10 +251,6 @@ void rollerg_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 	membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->set_entry(0);
-
-	m_k053244 = machine().device("k053244");
-	m_k051316 = machine().device("k051316");
-	m_k053260 = machine().device("k053260");
 
 	save_item(NAME(m_readzoomroms));
 }
