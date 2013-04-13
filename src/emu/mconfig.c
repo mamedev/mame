@@ -67,7 +67,7 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
 
-	bool is_selected_driver = strcmp(gamedrv.name,options.system_name())==0;
+	bool is_selected_driver = mame_stricmp(gamedrv.name,options.system_name())==0;
 	// intialize slot devices - make sure that any required devices have been allocated
 	slot_interface_iterator slotiter(root_device());
 	for (device_slot_interface *slot = slotiter.first(); slot != NULL; slot = slotiter.next())
@@ -87,12 +87,12 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 				bool found = false;
 				for (int i = 0; intf[i].name != NULL; i++)
 				{
-					if (strcmp(selval, intf[i].name) == 0)
+					if (mame_stricmp(selval, intf[i].name) == 0)
 					{
 						if ((!intf[i].internal) || (isdefault && intf[i].internal))
 						{
 							const char *def = slot->get_default_card();
-							bool is_default = (def != NULL && strcmp(def, selval) == 0);
+							bool is_default = (def != NULL && mame_stricmp(def, selval) == 0);
 							device_t *new_dev = device_add(&owner, intf[i].name, intf[i].devtype, is_default ? slot->default_clock() : 0);
 							found = true;
 							if (is_default) {
