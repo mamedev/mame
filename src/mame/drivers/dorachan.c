@@ -50,14 +50,14 @@ CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_protection_r)
 {
 	UINT8 ret = 0;
 
-	switch (((device_t*)m_maincpu)->safe_pcbase())
+	switch (m_maincpu->pcbase())
 	{
 	case 0x70ce: ret = 0xf2; break;
 	case 0x72a2: ret = 0xd5; break;
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", ((device_t*)m_maincpu)->safe_pcbase());
+		mame_printf_debug("unhandled $2400 read @ %x\n", m_maincpu->pcbase());
 		break;
 	}
 
