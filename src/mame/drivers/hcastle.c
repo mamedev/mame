@@ -65,22 +65,21 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(hcastle_state::sound_bank_w)
 {
-	device_t *device = machine().device("konami1");
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
-	k007232_set_bank(device, bank_A, bank_B );
+	k007232_set_bank(m_k007232, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("konami2", k051649_device, k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_device, k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_device, k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_device, k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("konami2", k051649_device, k051649_test_r, k051649_test_w)
+	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_device, k051649_waveform_r, k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("k051649", k051649_device, k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
+	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami1", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -163,8 +162,8 @@ WRITE_LINE_MEMBER(hcastle_state::irqhandler)
 
 WRITE8_MEMBER(hcastle_state::volume_callback)
 {
-	k007232_set_volume(machine().device("konami1"), 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(machine().device("konami1"), 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_k007232, 1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -231,7 +230,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("konami1", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.44)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -240,7 +239,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_K051649_ADD("konami2", 3579545/2)
+	MCFG_K051649_ADD("k051649", 3579545/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -269,7 +268,7 @@ ROM_START( hcastle )
 	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
 	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -296,7 +295,7 @@ ROM_START( hcastlek )
 	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
 	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -323,7 +322,7 @@ ROM_START( hcastlee )
 	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
 	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -350,7 +349,7 @@ ROM_START( akumajou )
 	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
 	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 
@@ -377,7 +376,7 @@ ROM_START( akumajoun )
 	ROM_LOAD( "768c10.i3",    0x0300, 0x0100, CRC(b32071b7) SHA1(09a699a3f20c155eae1e63429f03ed91abc54784) )    /* 007121 #1 char lookup table (same) */
 	ROM_LOAD( "768b12.d20",   0x0400, 0x0100, CRC(362544b8) SHA1(744c8d2ccfa980fc9a7354b4d241c569b3c1fffe) )    /* priority encoder (not used) */
 
-	ROM_REGION( 0x80000, "konami1", 0 ) /* 512k for the samples */
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 512k for the samples */
 	ROM_LOAD( "768c07.e17",   0x00000, 0x80000, CRC(01f9889c) SHA1(01252d2ce7b14cfbe39ac8d7a5bd7417f1c2fc22) )
 ROM_END
 

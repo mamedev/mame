@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "video/bufsprite.h"
+#include "sound/k007232.h"
 
 class hcastle_state : public driver_device
 {
@@ -19,6 +20,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
+		m_k007232(*this, "k007232"),
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<buffered_spriteram8_device> m_spriteram;
@@ -41,6 +43,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121_1;
 	required_device<k007121_device> m_k007121_2;
+	optional_device<k007232_device> m_k007232;
 
 	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);

@@ -3,6 +3,7 @@
     Fast Lane
 
 *************************************************************************/
+#include "sound/k007232.h"
 
 class fastlane_state : public driver_device
 {
@@ -15,6 +16,8 @@ public:
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
+		m_k007232_1(*this, "k007232_1"),
+		m_k007232_2(*this, "k007232_2"),
 		m_k007121(*this, "k007121") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -33,7 +36,8 @@ public:
 	rectangle  m_clip1;
 
 	/* devices */
-	device_t *m_konami2;
+	required_device<k007232_device> m_k007232_1;
+	required_device<k007232_device> m_k007232_2;
 	required_device<k007121_device> m_k007121;
 
 	DECLARE_WRITE8_MEMBER(k007121_registers_w);

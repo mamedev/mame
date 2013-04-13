@@ -46,7 +46,7 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 	membank("bank1")->set_entry((data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(m_konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
+	k007232_set_bank(m_k007232_2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -56,26 +56,22 @@ WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 
 READ8_MEMBER(fastlane_state::fastlane_k1_k007232_r)
 {
-	device_t *device = machine().device("konami1");
-	return k007232_r(device, space, offset ^ 1);
+	return k007232_r(m_k007232_1, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k1_k007232_w)
 {
-	device_t *device = machine().device("konami1");
-	k007232_w(device, space, offset ^ 1, data);
+	k007232_w(m_k007232_1, space, offset ^ 1, data);
 }
 
 READ8_MEMBER(fastlane_state::fastlane_k2_k007232_r)
 {
-	device_t *device = machine().device("konami2");
-	return k007232_r(device, space, offset ^ 1);
+	return k007232_r(m_k007232_2, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(fastlane_state::fastlane_k2_k007232_w)
 {
-	device_t *device = machine().device("konami2");
-	k007232_w(device, space, offset ^ 1, data);
+	k007232_w(m_k007232_2, space, offset ^ 1, data);
 }
 static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_SHARE("k007121_regs") /* 007121 registers */
@@ -181,14 +177,14 @@ GFXDECODE_END
 
 WRITE8_MEMBER(fastlane_state::volume_callback0)
 {
-	k007232_set_volume(machine().device("konami1"), 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(machine().device("konami1"), 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232_1, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_k007232_1, 1, 0, (data & 0x0f) * 0x11);
 }
 
 WRITE8_MEMBER(fastlane_state::volume_callback1)
 {
-	k007232_set_volume(m_konami2, 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(m_konami2, 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232_2, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_k007232_2, 1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_interface_1 =
@@ -206,8 +202,6 @@ void fastlane_state::machine_start()
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
-
-	m_konami2 = machine().device("konami2");
 }
 
 static MACHINE_CONFIG_START( fastlane, fastlane_state )
@@ -234,12 +228,12 @@ static MACHINE_CONFIG_START( fastlane, fastlane_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("konami1", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_interface_1)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("konami2", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz)
 	MCFG_SOUND_CONFIG(k007232_interface_2)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
@@ -263,10 +257,10 @@ ROM_START( fastlane )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "752e03.6h",   0x0000, 0x0100, CRC(44300aeb) SHA1(580c6e88cbb3b6d8156ea0b9103834f199ec2747) )
 
-	ROM_REGION( 0x20000, "konami1", 0 ) /* 007232 data */
+	ROM_REGION( 0x20000, "k007232_1", 0 ) /* 007232 data */
 	ROM_LOAD( "752e06.4c",   0x00000, 0x20000, CRC(85d691ed) SHA1(7f8d05562a68c75672141fc80ce7e7acb80588b9) ) /* chip 1 */
 
-	ROM_REGION( 0x80000, "konami2", 0 ) /* 007232 data */
+	ROM_REGION( 0x80000, "k007232_2", 0 ) /* 007232 data */
 	ROM_LOAD( "752e05.12b",  0x00000, 0x80000, CRC(119e9cbf) SHA1(21e3def9ab10b210632df11b6df4699140c473db) ) /* chip 2 */
 ROM_END
 

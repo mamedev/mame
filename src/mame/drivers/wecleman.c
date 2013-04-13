@@ -617,8 +617,7 @@ WRITE8_MEMBER(wecleman_state::multiply_w)
 
 WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 {
-	device_t *device = machine().device("konami");
-	k007232_set_bank(device, 0, ~data&1 );  //* (wecleman062gre)
+	k007232_set_bank(m_k007232, 0, ~data&1 );  //* (wecleman062gre)
 }
 
 static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
@@ -629,7 +628,7 @@ static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r) // From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w) // K007232 (Reading offset 5/b triggers the sample)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
 ADDRESS_MAP_END
@@ -651,13 +650,13 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 
 WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
 {
-	device_t *sound[3];
+	k007232_device *sound[3];
 
 //  int reg[8];
 
-	sound[0] = machine().device("konami1");
-	sound[1] = machine().device("konami2");
-	sound[2] = machine().device("konami3");
+	sound[0] = m_k007232_1;
+	sound[1] = m_k007232_2;
+	sound[2] = m_k007232_3;
 
 //  reg[offset] = data;
 
@@ -706,38 +705,32 @@ WRITE8_MEMBER(wecleman_state::hotchase_sound_control_w)
    even and odd register are mapped swapped */
 READ8_MEMBER(wecleman_state::hotchase_1_k007232_r)
 {
-	device_t *device = machine().device("konami1");
-	return k007232_r(device, space, offset ^ 1);
+	return k007232_r(m_k007232_1, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_1_k007232_w)
 {
-	device_t *device = machine().device("konami1");
-	k007232_w(device, space, offset ^ 1, data);
+	k007232_w(m_k007232_1, space, offset ^ 1, data);
 }
 
 READ8_MEMBER(wecleman_state::hotchase_2_k007232_r)
 {
-	device_t *device = machine().device("konami2");
-	return k007232_r(device, space, offset ^ 1);
+	return k007232_r(m_k007232_2, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_2_k007232_w)
 {
-	device_t *device = machine().device("konami2");
-	k007232_w(device, space, offset ^ 1, data);
+	k007232_w(m_k007232_2, space, offset ^ 1, data);
 }
 
 READ8_MEMBER(wecleman_state::hotchase_3_k007232_r)
 {
-	device_t *device = machine().device("konami3");
-	return k007232_r(device, space, offset ^ 1);
+	return k007232_r(m_k007232_3, space, offset ^ 1);
 }
 
 WRITE8_MEMBER(wecleman_state::hotchase_3_k007232_w)
 {
-	device_t *device = machine().device("konami3");
-	k007232_w(device, space, offset ^ 1, data);
+	k007232_w(m_k007232_3, space, offset ^ 1, data);
 }
 
 static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
@@ -1047,7 +1040,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
 
 MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 {
-	k007232_set_bank( machine().device("konami"), 0, 1 );
+	k007232_set_bank( m_k007232, 0, 1 );
 }
 
 static MACHINE_CONFIG_START( wecleman, wecleman_state )
@@ -1089,7 +1082,7 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.85)
 	MCFG_SOUND_ROUTE(1, "mono", 0.85)
 
-	MCFG_SOUND_ADD("konami", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -1171,15 +1164,15 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("konami1", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
-	MCFG_SOUND_ADD("konami2", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 
-	MCFG_SOUND_ADD("konami3", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_3", K007232, 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_CONFIG_END
@@ -1230,7 +1223,7 @@ ROM_START( wecleman )
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "konami", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "k007232", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
@@ -1280,7 +1273,7 @@ ROM_START( wecleman2 )
 	ROM_LOAD( "602a04.11e", 0x000000, 0x08000, CRC(ade9f359) SHA1(58db6be6217ed697827015e50e99e58602042a4c) )
 	ROM_LOAD( "602a05.13e", 0x008000, 0x04000, CRC(f22b7f2b) SHA1(857389c57552c4e2237cb599f4c68c381430475e) )   // may also exist as 32KB with one half empty
 
-	ROM_REGION( 0x40000, "konami", 0 )  /* Samples (Channel A 0x20000=Channel B) */
+	ROM_REGION( 0x40000, "k007232", 0 )  /* Samples (Channel A 0x20000=Channel B) */
 	ROM_LOAD( "602a03.10a", 0x00000, 0x20000, CRC(31392b01) SHA1(0424747bc2015c9c93afd20e6a23083c0dcc4fb7) )
 	ROM_LOAD( "602a02.8a",  0x20000, 0x20000, CRC(e2be10ae) SHA1(109c31bf7252c83a062d259143cd8299681db778) )
 
@@ -1397,13 +1390,13 @@ ROM_START( hotchase )
 	ROM_REGION( 0x20000, "gfx4", 0 )    /* road */
 	ROM_LOAD( "763e15", 0x000000, 0x020000, CRC(7110aa43) SHA1(639dc002cc1580f0530bb5bb17f574e2258d5954) )
 
-	ROM_REGION( 0x40000, "konami1", 0 ) /* Samples, 2 banks */
+	ROM_REGION( 0x40000, "k007232_1", 0 ) /* Samples, 2 banks */
 	ROM_LOAD( "763e11", 0x000000, 0x040000, CRC(9d99a5a7) SHA1(96e37bbb259e0a91d124c26b6b1a9b70de2e19a4) )
 
-	ROM_REGION( 0x40000, "konami2", 0 ) /* Samples, 2 banks */
+	ROM_REGION( 0x40000, "k007232_2", 0 ) /* Samples, 2 banks */
 	ROM_LOAD( "763e10", 0x000000, 0x040000, CRC(ca409210) SHA1(703d7619c4bd33d2ff5fad127d98c82906fede33) )
 
-	ROM_REGION( 0x100000, "konami3", 0 )    /* Samples, 4 banks for each ROM */
+	ROM_REGION( 0x100000, "k007232_3", 0 )    /* Samples, 4 banks for each ROM */
 	ROM_LOAD( "763e08", 0x000000, 0x080000, CRC(054a9a63) SHA1(45d7926c9e7af47c041ba9b733e334bccd730a6d) )
 	ROM_LOAD( "763e09", 0x080000, 0x080000, CRC(c39857db) SHA1(64b135a9ccf9e1dd50789cdd5c6bc03da8decfd0) )
 

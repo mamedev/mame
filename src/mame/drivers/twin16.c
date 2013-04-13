@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(twin16_upd_reset_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(twin16_upd_start_w)
@@ -670,8 +670,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(twin16_state::volume_callback)
 {
-	k007232_set_volume(machine().device("konami"),0,(data >> 4) * 0x11,0);
-	k007232_set_volume(machine().device("konami"),1,0,(data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232,0,(data >> 4) * 0x11,0);
+	k007232_set_volume(m_k007232,1,0,(data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -754,7 +754,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("konami", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12) // estimated with gradius2 OST
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( fround, twin16_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("konami", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, 3579545)
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.12)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.12)
@@ -862,7 +862,7 @@ ROM_START( devilw )
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "687_i01.5a", 0x00000, 0x20000, CRC(d4992dfb) SHA1(c65bef07b6adb9ab6328d679595450945dbf6a88) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -898,7 +898,7 @@ ROM_START( majuu )
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "687_i01.5a", 0x00000, 0x20000, CRC(d4992dfb) SHA1(c65bef07b6adb9ab6328d679595450945dbf6a88) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -934,7 +934,7 @@ ROM_START( darkadv )
 	ROM_LOAD16_BYTE( "687_l11.10r", 0x00000, 0x10000, CRC(399deee8) SHA1(dcc65e95f28ae4e9b671e70ce0bd5ba0fe178506) )
 	ROM_LOAD16_BYTE( "687_l10.8r",  0x00001, 0x10000, CRC(117c91ee) SHA1(dcf8efb25fc73cff916b66b7bcfd3c1fb2556a53) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "687_i01.5a", 0x00000, 0x20000, CRC(d4992dfb) SHA1(c65bef07b6adb9ab6328d679595450945dbf6a88) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -968,7 +968,7 @@ ROM_START( vulcan )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1002,7 +1002,7 @@ ROM_START( vulcana )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1036,7 +1036,7 @@ ROM_START( vulcanb )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1075,7 +1075,7 @@ ROM_START( gradius2 )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1109,7 +1109,7 @@ ROM_START( gradius2a )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1143,7 +1143,7 @@ ROM_START( gradius2b )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "785_f01.5a", 0x00000, 0x20000, CRC(a0d8d69e) SHA1(2994e5740b7c099d55fb162a363a26ef1995c756) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1167,7 +1167,7 @@ ROM_START( fround )
 	ROM_LOAD16_WORD("870c16.p15", 0x100000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
 	ROM_LOAD16_WORD("870c15.p13", 0x180000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1191,7 +1191,7 @@ ROM_START( froundl )
 	ROM_LOAD16_WORD("870c16.p15", 0x100000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
 	ROM_LOAD16_WORD("870c15.p13", 0x180000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
 
 	ROM_REGION( 0x20000, "upd", 0 ) // samples
@@ -1221,7 +1221,7 @@ ROM_START( hpuncher )
 	ROM_LOAD16_WORD("870c15.p13", 0x100000, 0x80000, CRC(8c9281df) SHA1(5e3d80be414db108d5363d0ea1b74021ba942c33) )
 	ROM_LOAD16_WORD("870c16.p15", 0x180000, 0x80000, CRC(41df6a1b) SHA1(32e0fdeb53628d18adde851e4496dd01ac6ec68f) )
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD( "870_c01.5a", 0x00000, 0x20000, CRC(6af96546) SHA1(63b49b28c0f2ef8f52bc4c5955ad6a633dd553cf) )
 
 	ROM_REGION( 0x20000, "upd", 0 )     // samples
@@ -1253,7 +1253,7 @@ ROM_START( miaj )
 
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_ERASE00 )    // tile data; mapped at 0x80000 on CPUB
 
-	ROM_REGION( 0x20000, "konami", 0 )  // samples
+	ROM_REGION( 0x20000, "k007232", 0 )  // samples
 	ROM_LOAD("808_d01.5a", 0x00000, 0x20000, CRC(fd4d37c0) SHA1(ef91c6e7bb57c27a9a51729fffd1bfe3e806fb61) )
 
 	ROM_REGION( 0x20000, "upd", ROMREGION_ERASE00 )     // samples
@@ -1285,7 +1285,7 @@ ROM_START( cuebrickj )
 	ROM_LOAD16_BYTE( "903_e11.10r", 0x00000, 0x10000, CRC(5c41faf8) SHA1(f9eee6a7b92d3b3aa4320747da6390310522a2cf) )
 	ROM_LOAD16_BYTE( "903_e10.8r",  0x00001, 0x10000, CRC(417576d4) SHA1(e84762743e3a1117b6ef7ea0b304877e4a719f75) )
 
-	ROM_REGION( 0x20000, "konami", ROMREGION_ERASE00 )  // samples
+	ROM_REGION( 0x20000, "k007232", ROMREGION_ERASE00 )  // samples
 	// unpopulated
 
 	ROM_REGION( 0x20000, "upd", ROMREGION_ERASE00 )     // samples
