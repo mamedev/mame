@@ -285,7 +285,6 @@ static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
 
 void tumblep_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( tumblep, tumblep_state )

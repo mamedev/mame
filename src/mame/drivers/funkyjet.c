@@ -288,8 +288,6 @@ static const deco16ic_interface funkyjet_deco16ic_tilegen1_intf =
 
 void funkyjet_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-
 	decoprot_reset(machine());
 }
 

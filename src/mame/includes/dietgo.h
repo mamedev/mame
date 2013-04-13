@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 class dietgo_state : public driver_device
 {
@@ -16,7 +17,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_deco_tilegen1(*this, "tilegen1")
 	{ }
 
 	/* memory pointers */
@@ -29,7 +31,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_DRIVER_INIT(dietgo);
 	virtual void machine_start();
 	UINT32 screen_update_dietgo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

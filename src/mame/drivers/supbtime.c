@@ -320,7 +320,6 @@ static const deco16ic_interface supbtime_deco16ic_tilegen1_intf =
 
 void supbtime_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( supbtime, supbtime_state )

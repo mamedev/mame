@@ -568,9 +568,6 @@ void dragngun_state::screen_eof_dragngun(screen_device &screen, bool state)
 
 UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-
 	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	machine().priority_bitmap.fill(0, cliprect);
@@ -604,9 +601,6 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 
 UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
@@ -643,9 +637,6 @@ UINT32 dragngun_state::screen_update_dragngun(screen_device &screen, bitmap_rgb3
 
 UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(machine().pens[0x000], cliprect); // Palette index not confirmed
 
@@ -818,9 +809,6 @@ void deco32_state::mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cl
 UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int alphaTilemap=0;
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 

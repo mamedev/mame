@@ -1,6 +1,7 @@
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 
@@ -24,7 +25,9 @@ public:
 		m_sprgen2(*this, "spritegen2"),
 		m_eeprom(*this, "eeprom"),
 		m_oki1(*this, "oki1"),
-		m_oki2(*this, "oki2")
+		m_oki2(*this, "oki2"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen2(*this, "tilegen2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -77,8 +80,8 @@ public:
 	UINT16    m_pf3_rowscroll[0x1000];
 	UINT16    m_pf4_rowscroll[0x1000];
 
-	device_t *m_deco_tilegen1;
-	device_t *m_deco_tilegen2;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen2;
 	UINT8 m_irq_source;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
 	DECLARE_READ32_MEMBER(deco32_irq_controller_r);

@@ -291,9 +291,6 @@ static const deco16ic_interface twocrude_deco16ic_tilegen2_intf =
 
 void cbuster_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-
 	save_item(NAME(m_prot));
 	save_item(NAME(m_pri));
 }

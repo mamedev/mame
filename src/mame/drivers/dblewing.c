@@ -36,7 +36,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_deco_tilegen1(*this, "tilegen1")
 	{ }
 
 	/* memory pointers */
@@ -81,7 +82,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_READ16_MEMBER(dblewing_prot_r);
 	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
@@ -562,8 +563,6 @@ static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 
 void dblewing_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
-
 	save_item(NAME(m_008_data));
 	save_item(NAME(m_104_data));
 	save_item(NAME(m_406_data));

@@ -184,7 +184,6 @@ static const deco16ic_interface dietgo_deco16ic_tilegen1_intf =
 
 void dietgo_state::machine_start()
 {
-	m_deco_tilegen1 = machine().device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( dietgo, dietgo_state )

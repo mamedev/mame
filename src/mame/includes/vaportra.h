@@ -13,6 +13,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen2(*this, "tilegen2"),
 		m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers */
@@ -27,8 +29,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_deco_tilegen1;
-	device_t *m_deco_tilegen2;
+	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
 	DECLARE_READ16_MEMBER(vaportra_control_r);

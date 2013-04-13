@@ -18,7 +18,8 @@ public:
 		m_pktgaldb_sprites(*this, "pktgaldb_spr"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_oki2(*this, "oki2")
+		m_oki2(*this, "oki2"),
+		m_deco_tilegen1(*this, "tilegen1")
 	{ }
 
 	/* memory pointers */
@@ -34,7 +35,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
-	device_t *m_deco_tilegen1;
+	optional_device<deco16ic_device> m_deco_tilegen1;
 	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
 	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
 	DECLARE_WRITE16_MEMBER(pktgaldx_oki_bank_w);
