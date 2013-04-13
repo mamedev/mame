@@ -99,7 +99,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 
 #define NETLIST_MEMREGION(_name)                                                    \
 		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
-#if defined(__GNUC__) && (__GNUC__ >= 3)
+#if defined(__GNUC__) && (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3))
 #if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
 #define ATTR_ALIGN __attribute__ ((aligned(128)))
 #else
