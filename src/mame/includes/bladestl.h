@@ -12,6 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_paletteram(*this, "paletteram"),
 		m_audiocpu(*this, "audiocpu"),
+		m_k007342(*this, "k007342"),
+		m_k007420(*this, "k007420"),
 		m_maincpu(*this, "maincpu"),
 		m_upd7759(*this, "upd") { }
 
@@ -27,8 +29,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_k007342;
-	device_t *m_k007420;
+	required_device<k007342_device> m_k007342;
+	required_device<k007420_device> m_k007420;
 	DECLARE_READ8_MEMBER(trackball_r);
 	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bladestl_sh_irqtrigger_w);
