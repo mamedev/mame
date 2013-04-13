@@ -268,9 +268,9 @@ inline bool jaguar_state::adjust_object_timer(int vc)
 void jaguar_state::update_cpu_irq()
 {
 	if ((m_cpu_irq_state & m_gpu_regs[INT1] & 0x1f) != 0)
-		m_main_cpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		m_main_cpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
+		m_maincpu->set_input_line(m_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 

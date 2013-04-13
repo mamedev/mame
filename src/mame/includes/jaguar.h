@@ -23,7 +23,7 @@ class jaguar_state : public driver_device
 public:
 	jaguar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_main_cpu(*this, "maincpu"),
+			m_maincpu(*this, "maincpu"),
 			m_gpu(*this, "gpu"),
 			m_dsp(*this, "dsp"),
 			m_dac1(*this, "dac1"),
@@ -52,12 +52,11 @@ public:
 			m_main_gpu_wait(NULL),
 			m_joystick_data(0),
 			m_eeprom_bit_count(0),
-			m_protection_check(0) ,
-		m_maincpu(*this, "maincpu"),
+			m_protection_check(0) ,		
 		m_eeprom(*this, "eeprom") { }
 
 	// devices
-	required_device<cpu_device> m_main_cpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<jaguargpu_device> m_gpu;
 	required_device<jaguardsp_device> m_dsp;
 	required_device<dac_device> m_dac1;
@@ -317,6 +316,5 @@ protected:
 	emu_file *jaguar_nvram_fopen( UINT32 openflags);
 	void jaguar_nvram_load();
 	void jaguar_nvram_save();
-	required_device<cpu_device> m_maincpu;
 	optional_device<eeprom_device> m_eeprom;
 };

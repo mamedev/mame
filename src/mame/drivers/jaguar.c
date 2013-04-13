@@ -372,7 +372,7 @@ IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
 void jaguar_state::machine_reset()
 {
 	if (!m_is_cojag)
-		m_main_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(jaguar_state::jaguar_irq_callback),this));
+		m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(jaguar_state::jaguar_irq_callback),this));
 
 	m_protection_check = 0;
 
@@ -380,7 +380,7 @@ void jaguar_state::machine_reset()
 	if (!m_is_r3000)
 	{
 		memcpy(m_shared_ram, m_rom_base, 0x400);    // do not increase, or Doom breaks
-		m_main_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* configure banks for gfx/sound ROMs */
@@ -866,7 +866,7 @@ READ32_MEMBER(jaguar_state::gpu_jump_r)
 
 READ32_MEMBER(jaguar_state::cojagr3k_main_speedup_r)
 {
-	UINT64 curcycles = m_main_cpu->total_cycles();
+	UINT64 curcycles = m_maincpu->total_cycles();
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - m_main_speedup_last_cycles < m_main_speedup_max_cycles)
@@ -940,7 +940,7 @@ READ32_MEMBER(jaguar_state::main_gpu_wait_r)
 
 WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 {
-	UINT64 curcycles = m_main_cpu->total_cycles();
+	UINT64 curcycles = m_maincpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(m_main_speedup);
@@ -974,7 +974,7 @@ WRITE32_MEMBER(jaguar_state::area51_main_speedup_w)
 
 WRITE32_MEMBER(jaguar_state::area51mx_main_speedup_w)
 {
-	UINT64 curcycles = m_main_cpu->total_cycles();
+	UINT64 curcycles = m_maincpu->total_cycles();
 
 	/* store the data */
 	COMBINE_DATA(&m_main_speedup[offset]);
@@ -1737,11 +1737,11 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	m_main_cpu->set_state_int(STATE_GENSP, 0x1000);
+	m_maincpu->set_state_int(STATE_GENSP, 0x1000);
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
-	m_main_cpu->set_pc(quickload_begin);
+	m_maincpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
 	return IMAGE_INIT_PASS;
 }
@@ -1792,7 +1792,7 @@ int jaguar_state::cart_load(device_image_interface &image)
 //  m_cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
-	m_main_cpu->set_pc(m_rom_base[1]);
+	m_maincpu->set_pc(m_rom_base[1]);
 	return IMAGE_INIT_PASS;
 }
 
@@ -2226,13 +2226,13 @@ void jaguar_state::cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
 	m_is_cojag = true;
 
 	/* copy over the ROM */
-	m_is_r3000 = (m_main_cpu->type() == R3041);
+	m_is_r3000 = (m_maincpu->type() == R3041);
 
 	/* install synchronization hooks for GPU */
 	if (m_is_r3000)
-		m_main_cpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
 	else
-		m_main_cpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
 	m_gpu->space(AS_PROGRAM).install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32_delegate(FUNC(jaguar_state::gpu_jump_r), this));
 	m_gpu_jump_address = &m_gpu_ram[gpu_jump_offs/4];
 	m_gpu_spin_pc = 0xf03000 + spin_pc;
@@ -2251,7 +2251,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51a)
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(jaguar_state::area51_main_speedup_w),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(jaguar_state::area51_main_speedup_w),this));
 #endif
 }
 
@@ -2264,7 +2264,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
@@ -2279,7 +2279,7 @@ DRIVER_INIT_MEMBER(jaguar_state,maxforce)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
@@ -2294,7 +2294,7 @@ DRIVER_INIT_MEMBER(jaguar_state,area51mx)
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(jaguar_state::area51mx_main_speedup_w),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(jaguar_state::area51mx_main_speedup_w),this));
 #endif
 }
 
@@ -2310,7 +2310,7 @@ DRIVER_INIT_MEMBER(jaguar_state,a51mxr3k)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
@@ -2323,7 +2323,7 @@ DRIVER_INIT_MEMBER(jaguar_state,fishfren)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 
@@ -2336,8 +2336,8 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0)
-		m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r), this));
-	m_main_gpu_wait = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(jaguar_state::main_gpu_wait_r), this));
+		m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r), this));
+	m_main_gpu_wait = m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(jaguar_state::main_gpu_wait_r), this));
 #endif
 }
 
@@ -2356,7 +2356,7 @@ DRIVER_INIT_MEMBER(jaguar_state,vcircle)
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 50;
-	m_main_speedup = m_main_cpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_main_speedup = m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
 #endif
 }
 

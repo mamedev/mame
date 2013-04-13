@@ -37,9 +37,6 @@ public:
 	optional_shared_ptr<UINT8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	optional_shared_ptr<UINT16> m_shared_ram16;     // Really 8 bit RAM connected to Z180
 
-	device_t *m_main_cpu;
-	device_t *m_sub_cpu;
-
 	UINT16 m_mcu_data;
 	UINT16 m_video_status;
 	INT8 m_old_p1_paddle_h; /* For Ghox */

@@ -369,9 +369,6 @@ To Do / Unknowns:
 
 MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 {
-	m_main_cpu = m_maincpu;
-	m_sub_cpu = m_audiocpu;
-
 	save_item(NAME(m_mcu_data));
 	save_item(NAME(m_video_status));
 	save_item(NAME(m_old_p1_paddle_h));
@@ -384,8 +381,8 @@ static void toaplan2_reset(device_t *device)
 {
 	toaplan2_state *state = device->machine().driver_data<toaplan2_state>();
 
-	if (state->m_sub_cpu != NULL)
-		state->m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	if (state->m_audiocpu != NULL)
+		state->m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -396,7 +393,7 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
 	// This is important for games with common RAM; the RAM test will fail
 	// when leaving service mode if the sound CPU is not reset.
-	m68k_set_reset_callback(m_main_cpu, toaplan2_reset);
+	m68k_set_reset_callback(m_maincpu, toaplan2_reset);
 }
 
 
@@ -479,7 +476,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 
 TIMER_CALLBACK_MEMBER(toaplan2_state::toaplan2_raise_irq)
 {
-	m_main_cpu->execute().set_input_line(param, HOLD_LINE);
+	m_maincpu->set_input_line(param, HOLD_LINE);
 }
 
 void toaplan2_state::toaplan2_vblank_irq(int irq_line)
@@ -575,7 +572,7 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
 	{
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
-		m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -740,7 +737,7 @@ WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 
 WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 {
-	m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -847,7 +844,7 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		m_sub_cpu->execute().set_input_line(0, HOLD_LINE);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -903,7 +900,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
-		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -913,7 +910,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch2_byte_w(space, offset, data & 0xff);
-		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -929,20 +926,20 @@ WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	m_main_cpu->execute().set_input_line(m_sndirq_line, CLEAR_LINE);
+	m_maincpu->set_input_line(m_sndirq_line, CLEAR_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 {
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	m_main_cpu->execute().set_input_line(m_sndirq_line, HOLD_LINE);
+	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
 WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
 {
-	m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -2971,8 +2968,8 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(toaplan2_state::irqhandler)
 {
-	if (m_sub_cpu != NULL)       // wouldn't tekipaki have problem without this? "mcu" is not generally added
-		m_sub_cpu->execute().set_input_line(0, state);
+	if (m_audiocpu != NULL)       // wouldn't tekipaki have problem without this? "mcu" is not generally added
+		m_audiocpu->set_input_line(0, state);
 }
 
 static const ym3812_interface ym3812_config =
