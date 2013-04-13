@@ -1285,8 +1285,8 @@ WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00)
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)
 	AM_RANGE(0x400000, 0x40000f) AM_WRITE(sndcomm68k_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
@@ -1800,11 +1800,11 @@ static MACHINE_CONFIG_START( konamigx, konamigx_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("konami1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("konami2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3624,7 +3624,6 @@ MACHINE_START_MEMBER(konamigx_state,konamigx)
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 {
-	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	konamigx_wrport1_0 = konamigx_wrport1_1 = 0;
@@ -3649,15 +3648,15 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 	if (!strcmp(machine().system().name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
-		for (i=3; i<=7; i++) k054539_2->set_gain(i, 2.0);
+		for (i=3; i<=7; i++) m_k054539_2->set_gain(i, 2.0);
 	}
 	else if ((!strcmp(machine().system().name, "dragoonj")) || (!strcmp(machine().system().name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)
 		{
-			k054539_2->set_gain(i, 0.8);
-			k054539_2->set_gain(i+4, 2.0);
+			m_k054539_2->set_gain(i, 0.8);
+			m_k054539_2->set_gain(i+4, 2.0);
 		}
 	}
 }

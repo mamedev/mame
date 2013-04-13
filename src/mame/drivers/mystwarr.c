@@ -575,9 +575,9 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_device, read, write)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_device, read, write)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
@@ -848,73 +848,65 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
-	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
 	for (i=0; i<=3; i++)
 	{
-		k054539_1->set_gain(i, 0.8);
-		k054539_1->set_gain(i+4, 2.0);
+		m_k054539_1->set_gain(i, 0.8);
+		m_k054539_1->set_gain(i+4, 2.0);
 	}
 
 	// soften percussions(chip 1 channel 0-7)
-	for (i=0; i<=7; i++) k054539_2->set_gain(i, 0.5);
+	for (i=0; i<=7; i++) m_k054539_2->set_gain(i, 0.5);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539_1->set_gain(i, 2.0);
+	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539_1->set_gain(i, 2.0);
+	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
-	k054539_device *k054539_2 = machine().device<k054539_device>("konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
 	for (i=0; i<=3; i++)
 	{
-		k054539_1->set_gain(i,   0.8);
-		k054539_1->set_gain(i+4, 1.8);
-		k054539_2->set_gain(i,   0.8);
-		k054539_2->set_gain(i+4, 0.8);
+		m_k054539_1->set_gain(i,   0.8);
+		m_k054539_1->set_gain(i+4, 1.8);
+		m_k054539_2->set_gain(i,   0.8);
+		m_k054539_2->set_gain(i+4, 0.8);
 	}
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
-	k054539_1->init_flags(k054539_device::REVERSE_STEREO);
+	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) k054539_1->set_gain(i, 1.4);
+	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 {
-	k054539_device *k054539_1 = machine().device<k054539_device>("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)
-	for (i=5; i<=7; i++) k054539_1->set_gain(i, 2.0);
+	for (i=5; i<=7; i++) m_k054539_1->set_gain(i, 2.0);
 }
 
 static const k053252_interface mystwarr_k053252_intf =
@@ -1014,11 +1006,11 @@ static MACHINE_CONFIG_START( mystwarr, mystwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("konami1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 
-	MCFG_K054539_ADD("konami2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)    /* stereo channels are inverted */
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 MACHINE_CONFIG_END
