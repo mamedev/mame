@@ -100,10 +100,6 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 		total_comments += dasmsource.m_device.debug()->comment_count();
 	}
 
-	// initialize
-	if (total_comments > 0)
-		m_right_column = DASM_RIGHTCOL_COMMENTS;
-
 	// configure the view
 	m_total.y = DEFAULT_DASM_LINES;
 	m_supports_cursor = true;

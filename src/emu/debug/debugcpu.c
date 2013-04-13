@@ -2602,33 +2602,10 @@ void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 {
 	// create a new item for the list
 	UINT32 crc = compute_opcode_crc32(addr);
-	dasm_comment *newcomment = auto_alloc(m_device.machine(), dasm_comment(comment, addr, color, crc));
-
-	// figure out where to insert it
-	dasm_comment *prev = NULL;
-	dasm_comment *curr;
-	for (curr = m_comment_list.first(); curr != NULL; prev = curr, curr = curr->next())
-		if (curr->m_address >= addr)
-			break;
-
-	// we could be the new head
-	if (prev == NULL)
-		m_comment_list.prepend(*newcomment);
-
-	// or else we just insert ourselves here
-	else
-	{
-		newcomment->m_next = prev->m_next;
-		prev->m_next = newcomment;
-	}
-
-	// scan forward from here to delete any exact matches
-	for ( ; curr != NULL && curr->m_address == addr; curr = curr->next())
-		if (curr->m_crc == crc)
-		{
-			m_comment_list.remove(*curr);
-			break;
-		}
+    dasm_comment newComment = dasm_comment(comment, addr, color, crc);
+    if (m_comment_set.contains(newComment))
+        m_comment_set.remove(newComment);
+    m_comment_set.insert(newComment);
 
 	// force an update
 	m_comment_change++;
@@ -2644,24 +2621,9 @@ bool device_debug::comment_remove(offs_t addr)
 {
 	// scan the list for a match
 	UINT32 crc = compute_opcode_crc32(addr);
-	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
-	{
-		// if we're past the address, we failed
-		if (curr->m_address > addr)
-			break;
-
-		// find an exact match
-		if (curr->m_address == addr && curr->m_crc == crc)
-		{
-			// remove it and force an update
-			m_comment_list.remove(*curr);
-			m_comment_change++;
-			return true;
-		}
-	}
-
-	// failure is an option
-	return false;
+    bool success = m_comment_set.remove(dasm_comment("", addr, 0xffffffff, crc));
+    if (success) m_comment_change++;
+	return success;
 }
 
 
@@ -2673,19 +2635,9 @@ const char *device_debug::comment_text(offs_t addr) const
 {
 	// scan the list for a match
 	UINT32 crc = compute_opcode_crc32(addr);
-	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
-	{
-		// if we're past the address, we failed
-		if (curr->m_address > addr)
-			break;
-
-		// find an exact match
-		if (curr->m_address == addr && curr->m_crc == crc)
-			return curr->m_text;
-	}
-
-	// failure is an option
-	return NULL;
+    dasm_comment* comment = m_comment_set.find(dasm_comment("", addr, 0, crc));
+    if (comment == NULL) return NULL;
+    return comment->m_text;
 }
 
 
@@ -2698,14 +2650,15 @@ bool device_debug::comment_export(xml_data_node &curnode)
 {
 	// iterate through the comments
 	astring crc_buf;
-	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
+    simple_set_iterator<dasm_comment> iter(m_comment_set);
+    for (dasm_comment* item = iter.first(); item != iter.last(); item = iter.next())
 	{
-		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(curr->m_text));
+		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text));
 		if (datanode == NULL)
 			return false;
-		xml_set_attribute_int(datanode, "address", curr->m_address);
-		xml_set_attribute_int(datanode, "color", curr->m_color);
-		crc_buf.printf("%08X", curr->m_crc);
+		xml_set_attribute_int(datanode, "address", item->m_address);
+		xml_set_attribute_int(datanode, "color", item->m_color);
+		crc_buf.printf("%08X", item->m_crc);
 		xml_set_attribute(datanode, "crc", crc_buf);
 	}
 	return true;
@@ -2725,38 +2678,14 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 		// extract attributes
 		offs_t address = xml_get_attribute_int(datanode, "address", 0);
 		rgb_t color = xml_get_attribute_int(datanode, "color", 0);
+
 		UINT32 crc;
 		sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &crc);
 
 		// add the new comment; we assume they were saved ordered
-		m_comment_list.append(*auto_alloc(m_device.machine(), dasm_comment(datanode->value, address, color, crc)));
+		m_comment_set.insert(dasm_comment(datanode->value, address, color, crc));
 	}
 	return true;
-}
-
-
-//-------------------------------------------------
-//  comment_dump - logs comments to the error.log
-//  at a given address
-//-------------------------------------------------
-
-void device_debug::comment_dump(offs_t addr)
-{
-	// determine the CRC at the given address (if valid)
-	UINT32 crc = (addr == ~0) ? 0 : compute_opcode_crc32(addr);
-
-	// dump everything that matches
-	bool found = false;
-	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
-		if (addr == ~0 || (curr->m_address == addr && curr->m_crc == crc))
-		{
-			found = true;
-			logerror("%08X %08X - %s\n", curr->m_address, curr->m_crc, curr->m_text.cstr());
-		}
-
-	// if nothing found, indicate as much
-	if (!found)
-		logerror("No comment exists for address : 0x%x\n", addr);
 }
 
 

@@ -43,6 +43,7 @@
 #define __DEBUGCPU_H__
 
 #include "express.h"
+#include "simple_set.h"
 
 
 //**************************************************************************
@@ -243,11 +244,10 @@ public:
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
 	const char *comment_text(offs_t addr) const;
-	UINT32 comment_count() const { return m_comment_list.count(); }
+	UINT32 comment_count() const { return m_comment_set.size(); }
 	UINT32 comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
 	bool comment_import(xml_data_node &node);
-	void comment_dump(offs_t addr = ~0);
 	UINT32 compute_opcode_crc32(offs_t address) const;
 
 	// history
@@ -286,11 +286,11 @@ private:
 	static void set_state(symbol_table &table, void *ref, UINT64 value);
 
 	// basic device information
-	device_t &              m_device;                   // device we are attached to
-	device_execute_interface *m_exec;                   // execute interface, if present
-	device_memory_interface *m_memory;                  // memory interface, if present
-	device_state_interface *m_state;                    // state interface, if present
-	device_disasm_interface *m_disasm;                  // disasm interface, if present
+	device_t &                 m_device;                // device we are attached to
+	device_execute_interface * m_exec;                  // execute interface, if present
+	device_memory_interface *  m_memory;                // memory interface, if present
+	device_state_interface *   m_state;                 // state interface, if present
+	device_disasm_interface *  m_disasm;                // disasm interface, if present
 
 	// global state
 	UINT32                  m_flags;                    // debugging flags for this CPU
@@ -375,9 +375,16 @@ private:
 		rgb_t               m_color;                    // color to use
 		UINT32              m_crc;                      // CRC of code
 		astring             m_text;                     // text
+        
+        bool operator < (const dasm_comment& rhs) const          // required to be included in a simple_set
+        {
+            if (m_address == rhs.m_address)
+                return m_crc < rhs.m_crc;
+            return (m_address < rhs.m_address);
+        }
 	};
-	simple_list<dasm_comment> m_comment_list;           // list of comments
-	UINT32                  m_comment_change;           // change counter for comments
+	simple_set<dasm_comment> m_comment_set;             // collection of comments
+	UINT32                   m_comment_change;          // change counter for comments
 
 	// internal flag values
 	static const UINT32 DEBUG_FLAG_OBSERVING        = 0x00000001;       // observing this CPU
