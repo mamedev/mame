@@ -1641,8 +1641,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-7147A" />
 			<feature name="ic1" value="MPR-18563A-S" />
-			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18563a-s.ic1" size="3145728" crc="b2dd857f" sha1="cd3c50b7f9c2f97d7bb0042e4239a05066ae72e0" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+			<!-- Euro dump is confirmed to be 4MB with final 1MB padded with 0xff -->
+				<rom name="mpr-18563a-s.ic1" size="4194304" crc="fa5a79f7" sha1="2886da07d36f770d0a8bf00ee840f0b1bbc9a766" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2349,8 +2350,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A" />
 			<feature name="ic1" value="MPR-15410A-SM" />
-			<dataarea name="rom" size="1572864">
-				<rom name="mpr-15410a-sm.ic1" size="1572864" crc="6f311c83" sha1="31372b2c056eacb747de0a706de3899d224f2c92" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="2097152">
+			<!-- Euro dump is confirmed to be 2MB with final 512KB padded with 0xff -->
+				<rom name="mpr-15410a-sm.ic1" size="2097152" crc="ede60e88" sha1="e9508e7d178d5a6de6a4a78032d97837f37db560" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2363,8 +2365,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A" />
 			<feature name="ic1" value="MPR-15463-T" />
-			<dataarea name="rom" size="1572864">
-				<rom name="mpr-15463-t.ic1" size="1572864" crc="23a9616d" sha1="bce40031f6adab48670c8a2d73e42f3a3dcba97c" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="2097152">
+			<!-- USA dump is confirmed to be 2MB with final 512KB padded with 0xff -->
+				<rom name="mpr-15463-t.ic1" size="2097152" crc="9fefb1ab" sha1="1a44eb9606088692b8559852e8f7b7c1a1472b6e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3297,8 +3300,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670128 REV 1" />
 			<feature name="u1" value="JUSTICE LEAGUE TASK FORCE" />
-			<dataarea name="rom" size="3145728">
-				<rom name="justice league task force.u1" size="3145728" crc="2a60ebe9" sha1="1be166689726b98fc5924028e736fc8007f958ef" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+			<!-- Euro dump is confirmed to be 4MB with final 1MB padded with 0xff -->
+				<rom name="justice league task force.u1" size="4194304" crc="88bb241f" sha1="dac7db32e7a8981ab706ba9cfd6f1576a25bdf9c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3811,8 +3815,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-7147A" />
 			<feature name="ic1" value="MPR-18871-MX, MPR-18871-U" />
-			<dataarea name="rom" size="3145728">
-				<rom name="mpr-18871-mx.ic1" size="3145728" crc="fe3e7e4f" sha1="cca818d624e95c2d07cfc1b22c44eb53e4bdcd02" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+			<!-- Euro dump is confirmed to be 4MB with final 1MB padded with 0xff -->
+				<rom name="mpr-18871-mx.ic1" size="4194304" crc="80174799" sha1="63f556af6678f1dba5a2ee57ec68ad0dff948a90" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4353,8 +4358,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="u1" value="NFL QBC" />
 			<feature name="u2" value="24LC02B/P" />
 			<feature name="u3" value="LZ95A53" />
-			<dataarea name="rom" size="3145728">
-				<rom name="nfl qbc.u1" size="3145728" crc="94542eaf" sha1="60744af955df83278f119df3478baeebd735a26c" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+			<!-- Euro dump is confirmed to be 4MB with final 1MB padded with 0xff -->
+				<rom name="nfl qbc.u1" size="4194304" crc="21979abb" sha1="5c8b6eb2934cb97e35af36efd70c39dae899048f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -4618,8 +4624,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="u1" value="MPR-18484 T58" />   <!-- location not really marked on PCB, using u1 for consistency -->
-			<dataarea name="rom" size="262144">
-				<rom name="mpr-18484 t58.u1" size="262144" crc="3c427882" sha1="47f0f5b49b5f9bc0a22d352486d9488e6c93b167" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+			<!-- Euro dump is confirmed to be 1MB with 768KB padded with 0xff! -->
+				<rom name="mpr-18484 t58.u1" size="1048576" crc="ebd6d5ba" sha1="d12be8da7d72f62a9e1d0e744c75f247f9f0c177" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7159,8 +7166,9 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			<feature name="ic3" value="HD74HC125P" />
 			<feature name="ic4" value="HD74HC74P" />
 			<feature name="ic5" value="X24C01P" />
-			<dataarea name="rom" size="786432">
-				<rom name="mpr-14556-h.ic1" size="786432" crc="1592f5b0" sha1="87a968f773c7e807e647c0737132457b06b78276" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+			<!-- Euro dump is confirmed to be 1MB with final 256KB padded with 0xff -->
+				<rom name="mpr-14556-h.ic1" size="1048576" crc="0d901482" sha1="772c3c71973762eac46e6c180a036c1f3bbd937a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -7863,6 +7871,24 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="aaahh!!! real monsters (usa).bin" size="2097152" crc="fdc80bfc" sha1="fa579a7e47ee4a1bdb080bbdec1eef480a85293e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaahhrmup" cloneof="aaahhrm">
+		<description>AAAHH!!! Real Monsters (USA, Prototype 19950707)</description>
+		<year>1995</year>
+		<publisher>Viacom New Media</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<!-- The PCB contains 4 different ROMs, but it is unknown how the dump should be split (maybe we can reconstruct that from the checksums?)  -->
+			<feature name="pcb" value="" />
+			<feature name="u1" value="MO 1 6/26 56 CE41" />	<!-- The 56 might be a 95 written upside down -->
+			<feature name="u2" value="Real Monsters 7-7-95" />
+			<feature name="u3" value="(unmarked eeprom)" />
+			<feature name="u4" value="MO 2 6/26 56 FD68" />	<!-- The 56 might be a 95 written upside down -->
+			<feature name="u5" value="MC74HC139N" />
+			<dataarea name="rom" size="2097152">
+				<rom name="killertomatoes.5b74.bin" size="2097152" crc="f4b44b82" sha1="b0f1885e74e5aa39872f09444d82c8ebf284eba1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -24525,6 +24551,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_ssf2" />
+			<!-- Dump To Be Split Properly! -->
+			<feature name="pcb" value="171-6837A" />
+			<feature name="ic1" value="MPR-16858-F" />
+			<feature name="ic2" value="MPR-16859-U" />
+			<feature name="ic3" value="MPR-16909 J05" />
+			<feature name="ic4" value="SEGA 315-5709 065" />
 			<dataarea name="rom" size="9437184">
 				<rom name="super street fighter ii - the new challengers (euro).bin" size="5242880" crc="682c192f" sha1="56768a0524fa13fcd76474c8bb89b995bb471847" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -24555,9 +24587,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<!-- Dump To Be Confirmed (and split properly!) -->
 			<feature name="pcb" value="94666-1" />
 			<feature name="ic1" value="SSF-GS-1A" />
-			<feature name="ic2" value="SEGA 215-5779 A24" />
-			<feature name="ic2" value="SSF-GS-2A" />
-			<feature name="ic3" value="SSF-GS-3" />
+			<feature name="ic2" value="SEGA 315-5779 A24" />
+			<feature name="ic3" value="SSF-GS-2A" />
+			<feature name="ic4" value="SSF-GS-3" />
 			<dataarea name="rom" size="9437184">
 				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -28540,8 +28572,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="171-5978BA" />
 			<feature name="u1" value="MPR-18564-F" />   <!-- location not really marked on PCB, using u1 for consistency -->
-			<dataarea name="rom" size="524288">
-				<rom name="mpr-18564-f.u1" size="524288" crc="2fdac6ab" sha1="9914956f974b71d24b65e82ae3c980d0eb23c2e5" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="1048576">
+			<!-- Euro dump is confirmed to be 1MB with second 512KB padded with 0xff -->
+				<rom name="mpr-18564-f.u1" size="1048576" crc="0764139f" sha1="e78adbbb587daa1bdd9a4fd9355de0a5160fbc43" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
