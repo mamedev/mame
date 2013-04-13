@@ -441,8 +441,8 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)      // VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)                  // ??
 	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE_LEGACY("k055555", k055555_long_w)                  // 055555: priority encoder
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00ff00)
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_1", k054539_device, read, write, 0xff00ff00)
+	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("k054539_2", k054539_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
 	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
 	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)                   // light/coin blocker control
@@ -1473,12 +1473,12 @@ static MACHINE_CONFIG_START( djmain, djmain_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("konami1", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_1", 48000, k054539_config)
 	MCFG_SOUND_CONFIG(k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K054539_ADD("konami2", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539_2", 48000, k054539_config)
 	MCFG_SOUND_CONFIG(k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

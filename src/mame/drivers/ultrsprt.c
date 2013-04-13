@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
 	AM_RANGE(0x00200000, 0x00200007) AM_WRITE(K056800_68k_w)
 	AM_RANGE(0x00200008, 0x0020000f) AM_READ(K056800_68k_r)
-	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("konami", k054539_device, read, write, 0xffff)
+	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("k054539", k054539_device, read, write, 0xffff)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -254,7 +254,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K054539_ADD("konami", 48000, k054539_config)
+	MCFG_K054539_ADD("k054539", 48000, k054539_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -272,7 +272,7 @@ ROM_START( fiveside )
 	ROM_REGION(0x20000, "audiocpu", 0)      /* M68K program */
 	ROM_LOAD("479_a05.bin", 0x000000, 0x20000, CRC(251ae299) SHA1(5ffd74357e3c6ddb3a208c39a3b32b53fea90282))
 
-	ROM_REGION(0x100000, "konami", 0)   /* Sound roms */
+	ROM_REGION(0x100000, "k054539", 0)   /* Sound roms */
 	ROM_LOAD("479_a06.bin", 0x000000, 0x80000, CRC(8d6ac8a2) SHA1(7c4b8bd47cddc766cbdb6a486acc9221be55b579))
 	ROM_LOAD("479_a07.bin", 0x080000, 0x80000, CRC(75835df8) SHA1(105b95c16f2ce6902c2e4c9c2fd9f2f7a848c546))
 
