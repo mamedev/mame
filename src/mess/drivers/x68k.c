@@ -919,7 +919,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 	if((m_ppi_prev & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		m_mdctrl.seq1++;
-		m_mdctrl.io_timeout1->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		m_mdctrl.io_timeout1->adjust(m_maincpu->cycles_to_attotime(8192));
 	}
 
 	m_joy.joy2_enable = data & 0x20;
@@ -927,7 +927,7 @@ WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 	if((m_ppi_prev & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		m_mdctrl.seq2++;
-		m_mdctrl.io_timeout2->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8192));
+		m_mdctrl.io_timeout2->adjust(m_maincpu->cycles_to_attotime(8192));
 	}
 	m_ppi_prev = data;
 
@@ -1632,7 +1632,7 @@ READ16_MEMBER(x68k_state::x68k_rom0_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
 	}
 	return 0xff;
 }
@@ -1649,7 +1649,7 @@ WRITE16_MEMBER(x68k_state::x68k_rom0_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xbffffc+offset);
 	}
 }
 
@@ -1665,7 +1665,7 @@ READ16_MEMBER(x68k_state::x68k_emptyram_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
 	}
 	return 0xff;
 }
@@ -1682,7 +1682,7 @@ WRITE16_MEMBER(x68k_state::x68k_emptyram_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(4), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), offset);
 	}
 }
 
@@ -1696,7 +1696,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
@@ -1712,7 +1712,7 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
 //      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }

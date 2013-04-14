@@ -1184,8 +1184,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(equites_state,equites)
 {
-	m_msm = machine().device<msm5232_device>("msm");
-
 	save_item(NAME(m_fg_char_bank));
 	save_item(NAME(m_bgcolor));
 	save_item(NAME(m_splndrbt_bg_scrollx));

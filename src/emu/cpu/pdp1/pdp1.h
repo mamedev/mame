@@ -19,8 +19,8 @@ enum
 	PDP1_IO_COMPLETE    /* hack, do not use directly, use pdp1_pulse_iot_done instead */
 };
 
-#define pdp1_pulse_start_clear(cpudevice)   (cpudevice)->state().set_state_int(PDP1_START_CLEAR, (UINT64)0)
-#define pdp1_pulse_iot_done(cpudevice)      (cpudevice)->state().set_state_int(PDP1_IO_COMPLETE, (UINT64)0)
+#define pdp1_pulse_start_clear(cpudevice)   (cpudevice)->set_state_int(PDP1_START_CLEAR, (UINT64)0)
+#define pdp1_pulse_iot_done(cpudevice)      (cpudevice)->set_state_int(PDP1_IO_COMPLETE, (UINT64)0)
 
 typedef void (*pdp1_extern_iot_func)(device_t *device, int op2, int nac, int mb, int *io, int ac);
 typedef void (*pdp1_read_binary_word_func)(device_t *device);

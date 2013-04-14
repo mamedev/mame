@@ -405,7 +405,7 @@ INPUT_PORTS_END
 */
 INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
 
@@ -614,7 +614,7 @@ UINT32 apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &bit
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, machine().device("maincpu")->state().state_int(APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, m_maincpu->state_int(APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{

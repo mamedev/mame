@@ -193,7 +193,7 @@ static const c6280_interface c6280_config =
 
 WRITE_LINE_MEMBER(ggconnie_state::pce_irq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 

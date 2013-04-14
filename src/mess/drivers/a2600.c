@@ -717,7 +717,7 @@ void a2600_state::mode3E_RAM_switch(UINT16 offset, UINT8 data)
 
 void a2600_state::modeFV_switch(UINT16 offset, UINT8 data)
 {
-	if (!m_FVlocked && ( machine().device("maincpu")->safe_pc() & 0x1F00 ) == 0x1F00 )
+	if (!m_FVlocked && ( m_maincpu->pc() & 0x1F00 ) == 0x1F00 )
 	{
 		m_FVlocked = 1;
 		m_current_bank = m_current_bank ^ 0x01;
@@ -735,7 +735,7 @@ void a2600_state::modeJVP_switch(UINT16 offset, UINT8 data)
 		m_current_bank ^= 1;
 		break;
 	default:
-		printf("%04X: write to unknown mapper address %02X\n", machine().device("maincpu")->safe_pc(), 0xfa0 + offset );
+		printf("%04X: write to unknown mapper address %02X\n", m_maincpu->pc(), 0xfa0 + offset );
 		break;
 	}
 	m_bank_base[1] = m_cart + 0x1000 * m_current_bank;
@@ -876,7 +876,7 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
 	{
 		if ( ! direct.space().debugger_access() )
 		{
-			modeF6_switch_w(machine().device("maincpu")->memory().space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
+			modeF6_switch_w(m_maincpu->space(AS_PROGRAM), ( address & 0x1FFF ) - 0x1FF6, 0 );
 		}
 	}
 	return address;
@@ -892,11 +892,11 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		return data;
 	}
 
-	//logerror("%04X: read from modeSS area offset = %04X\n", machine().device("maincpu")->safe_pc(), offset);
+	//logerror("%04X: read from modeSS area offset = %04X\n", m_maincpu->pc(), offset);
 	/* Check for control register "write" */
 	if ( offset == 0xFF8 )
 	{
-		//logerror("%04X: write to modeSS control register data = %02X\n", machine().device("maincpu")->safe_pc(), m_modeSS_byte);
+		//logerror("%04X: write to modeSS control register data = %02X\n", m_maincpu->pc(), m_modeSS_byte);
 		m_modeSS_write_enabled = m_modeSS_byte & 0x02;
 		m_modeSS_write_delay = m_modeSS_byte >> 5;
 		switch ( m_modeSS_byte & 0x1C )
@@ -951,7 +951,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 	{
 		/* Cassette port read */
 		double tap_val = machine().device<cassette_image_device>(CASSETTE_TAG)->input();
-		//logerror("%04X: Cassette port read, tap_val = %f\n", machine().device("maincpu")->safe_pc(), tap_val);
+		//logerror("%04X: Cassette port read, tap_val = %f\n", m_maincpu->pc(), tap_val);
 		if ( tap_val < 0 )
 		{
 			data = 0x00;
@@ -974,11 +974,11 @@ READ8_MEMBER(a2600_state::modeSS_r)
 				m_modeSS_diff_adjust += 1;
 			}
 
-			int diff = machine().device<cpu_device>("maincpu")->total_cycles() - m_modeSS_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", machine().device("maincpu")->safe_pc(), offset, diff);
+			int diff = m_maincpu->total_cycles() - m_modeSS_byte_started;
+			//logerror("%04X: offset = %04X, %d\n", m_maincpu->pc(), offset, diff);
 			if ( diff - m_modeSS_diff_adjust == 5 )
 			{
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", machine().device("maincpu")->safe_pc(), offset, m_modeSS_byte );
+				//logerror("%04X: RAM write offset = %04X, data = %02X\n", m_maincpu->pc(), offset, m_modeSS_byte );
 				if ( offset & 0x800 )
 				{
 					if ( m_modeSS_high_ram_enabled )
@@ -996,7 +996,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 			else if ( offset < 0x0100 )
 			{
 				m_modeSS_byte = offset;
-				m_modeSS_byte_started = machine().device<cpu_device>("maincpu")->total_cycles();
+				m_modeSS_byte_started = m_maincpu->total_cycles();
 				m_modeSS_diff_adjust = 0;
 			}
 			m_modeSS_last_address = offset;
@@ -1004,7 +1004,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		else if ( offset < 0x0100 )
 		{
 			m_modeSS_byte = offset;
-			m_modeSS_byte_started = machine().device<cpu_device>("maincpu")->total_cycles();
+			m_modeSS_byte_started = m_maincpu->total_cycles();
 			m_modeSS_last_address = offset;
 			m_modeSS_diff_adjust = 0;
 		}
@@ -1072,7 +1072,7 @@ READ8_MEMBER(a2600_state::modeDPC_r)
 	UINT8   data_fetcher = offset & 0x07;
 	UINT8   data = 0xFF;
 
-	logerror("%04X: Read from DPC offset $%02X\n", machine().device("maincpu")->safe_pc(), offset);
+	logerror("%04X: Read from DPC offset $%02X\n", m_maincpu->pc(), offset);
 	if ( offset < 0x08 )
 	{
 		switch( offset & 0x06 )
@@ -1179,13 +1179,13 @@ WRITE8_MEMBER(a2600_state::modeDPC_w)
 		m_dpc.movamt = data;
 		break;
 	case 0x28:          /* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", m_maincpu->pc(), offset, data);
 		break;
 	case 0x30:          /* Random number generator reset */
 		m_dpc.shift_reg = 0;
 		break;
 	case 0x38:          /* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", machine().device("maincpu")->safe_pc(), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", m_maincpu->pc(), offset, data);
 		break;
 	}
 }
@@ -1208,16 +1208,16 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeFE_opbase_handler)
 	/* Still cheating a bit here by looking bit 13 of the address..., but the high byte of the
 	   cpu should be the last byte that was on the data bus and so should determine the bank
 	   we should switch in. */
-	m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( machine().device("maincpu")->safe_pc() & 0x2000 ) ? 0 : 1 );
+	m_bank_base[1] = memregion("user1")->base() + 0x1000 * ( ( m_maincpu->pc() & 0x2000 ) ? 0 : 1 );
 	membank("bank1")->set_base(m_bank_base[1] );
 	/* and restore old opbase handler */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(m_FE_old_opbase_handler);
 	return address;
 }
 
 void a2600_state::modeFE_switch(UINT16 offset, UINT8 data)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 	/* Retrieve last byte read by the cpu (for this mapping scheme this
 	   should be the last byte that was on the data bus
 	*/
@@ -1321,7 +1321,7 @@ void a2600_state::install_banks(int count, unsigned init)
 			"bank4",
 		};
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(
+		m_maincpu->space(AS_PROGRAM).install_read_bank(
 			0x1000 + (i + 0) * 0x1000 / count - 0,
 			0x1000 + (i + 1) * 0x1000 / count - 1, handler[i]);
 
@@ -1368,9 +1368,9 @@ READ8_MEMBER(a2600_state::a2600_get_databus_contents)
 {
 	UINT16  last_address, prev_address;
 	UINT8   last_byte, prev_byte;
-	address_space& prog_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	last_address = machine().device("maincpu")->safe_pc() - 1;
+	last_address = m_maincpu->pc() - 1;
 	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;
@@ -1546,7 +1546,7 @@ unsigned a2600_state::long detect_2600controllers()
 
 void a2600_state::machine_reset()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 	int chip = 0xFF;
 	static const unsigned char snowwhite[] = { 0x10, 0xd0, 0xff, 0xff }; // Snow White Proto
 
@@ -1879,7 +1879,7 @@ void a2600_state::machine_reset()
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 

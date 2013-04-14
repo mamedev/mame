@@ -307,11 +307,11 @@ READ32_MEMBER(gaelco3d_state::eeprom_data32_r)
 	{
 		UINT8 data = gaelco_serial_data_r(machine().device("serial"),space,0);
 		if (LOG)
-			logerror("%06X:read(%02X) = %08X & %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask);
+			logerror("%06X:read(%02X) = %08X & %08X\n", m_maincpu->pc(), offset, data, mem_mask);
 		return  data | 0xffffff00;
 	}
 	else
-		logerror("%06X:read(%02X) = mask %08X\n", machine().device("maincpu")->safe_pc(), offset, mem_mask);
+		logerror("%06X:read(%02X) = mask %08X\n", m_maincpu->pc(), offset, mem_mask);
 
 	return 0xffffffff;
 }

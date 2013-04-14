@@ -425,19 +425,17 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 {
 	if( address == 0x80030000 )
 	{
-		cpu_device *cpu = machine().device<cpu_device>("maincpu");
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
 
-		cpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
-
-		if( load_psxexe( cpu, m_exe_buffer, m_exe_size ) ||
-			load_cpe( cpu, m_exe_buffer, m_exe_size ) ||
-			load_psf( cpu, m_exe_buffer, m_exe_size ) )
+		if( load_psxexe( m_maincpu, m_exe_buffer, m_exe_size ) ||
+			load_cpe( m_maincpu, m_exe_buffer, m_exe_size ) ||
+			load_psf( m_maincpu, m_exe_buffer, m_exe_size ) )
 		{
 /*          DEBUGGER_BREAK; */
 
-			address = cpu->state_int( PSXCPU_PC );
-			cpu->set_state_int( PSXCPU_DELAYR, PSXCPU_DELAYR_PC );
-			cpu->set_state_int( PSXCPU_DELAYV, address );
+			address = m_maincpu->state_int( PSXCPU_PC );
+			m_maincpu->set_state_int( PSXCPU_DELAYR, PSXCPU_DELAYR_PC );
+			m_maincpu->set_state_int( PSXCPU_DELAYV, address );
 		}
 		else
 		{

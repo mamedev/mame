@@ -373,7 +373,7 @@ void pyl601_state::machine_reset()
 	membank("bank5")->set_base(memregion("maincpu")->base() + 0xf000);
 	membank("bank6")->set_base(ram + 0xf000);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 void pyl601_state::video_start()

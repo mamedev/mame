@@ -56,7 +56,7 @@ WRITE8_MEMBER(scramble_state::scramble_protection_w)
 
 READ8_MEMBER(scramble_state::scramble_protection_r)
 {
-	switch (machine().device("maincpu")->safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;

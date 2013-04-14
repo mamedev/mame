@@ -398,7 +398,7 @@ WRITE8_MEMBER(microtan_state::microtan_bffx_w)
 		break;
 	case 1: /* BFF1: write delayed NMI */
 		LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-		machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), timer_expired_delegate(FUNC(microtan_state::microtan_pulse_nmi),this));
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(8), timer_expired_delegate(FUNC(microtan_state::microtan_pulse_nmi),this));
 		break;
 	case 2: /* BFF2: write keypad column write (what is this meant for?) */
 		LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));

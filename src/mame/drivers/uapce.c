@@ -139,7 +139,7 @@ WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 
 	if ( diff & 0x40 )
 	{
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 /* D5 : Connected to a TIP31 which may control the coin meter:

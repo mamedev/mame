@@ -141,7 +141,7 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		/* switch off, CPU goes into standby mode */
 		m_enable_nmi = 0;
 		m_stby_pwr = 1;
-		space.machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		m_maincpu->suspend(SUSPEND_REASON_HALT, 1);
 		break;
 	case 0x100:
 		m_pulse = 1;
@@ -216,11 +216,9 @@ READ8_MEMBER( psion_state::io_r )
 
 INPUT_CHANGED_MEMBER(psion_state::psion_on)
 {
-	cpu_device *cpu = machine().device<cpu_device>("maincpu");
-
 	/* reset the CPU for resume from standby */
-	if (cpu->suspended(SUSPEND_REASON_HALT))
-		cpu->reset();
+	if (m_maincpu->suspended(SUSPEND_REASON_HALT))
+		m_maincpu->reset();
 }
 
 static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)

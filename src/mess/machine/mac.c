@@ -200,7 +200,7 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
 	mac_state *state = machine.driver_data<mac_state>();
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = state->m_maincpu->space(AS_PROGRAM);
 	offs_t memory_mask;
 
 	memory_size = MIN(memory_size, (memory_end + 1 - memory_begin));
@@ -1590,7 +1590,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	data = m_via2->read(space, offset);
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, space.machine().device("maincpu")->safe_pc());
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, m_maincpu->pc());
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1601,7 +1601,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, space.machine().device("maincpu")->safe_pc());
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(space, offset, data & 0xff);
@@ -1893,9 +1893,9 @@ void mac_state::machine_reset()
 	}
 
 	m_scsi_interrupt = 0;
-	if ((machine().device<cpu_device>("maincpu")->debug()) && (m_model < MODEL_MAC_POWERMAC_6100))
+	if ((m_maincpu->debug()) && (m_model < MODEL_MAC_POWERMAC_6100))
 	{
-		machine().device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
+		m_maincpu->debug()->set_dasm_override(mac_dasm_override);
 	}
 
 	m_drive_select = 0;

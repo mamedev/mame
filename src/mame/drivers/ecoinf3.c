@@ -41,45 +41,45 @@ public:
 	int m_optic_pattern;
 	int m_percent_mux;
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b)
 	{
 		int ret = ioport("IN1")->read();
-		logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c)
 	{
 		int ret = ioport("IN5")->read();
-		logerror("%04x - ppi8255_intf_a_(used)read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_a_(used)read_c %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_b)
 	{
 		int ret = ioport("IN2")->read();
-		logerror("%04x - ppi8255_intf_c_(used)read_b %02x (COINS+TEST)\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_c_(used)read_b %02x (COINS+TEST)\n", m_maincpu->pcbase(), ret);
 		return ret;
 	} // changing to 00 gives coin tamper
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c)
 	{
 		int ret = ioport("IN6")->read();
-		logerror("%04x - ppi8255_intf_c_(used)read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_c_(used)read_c %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b)
 	{
 		int ret = ioport("IN7")->read();
-		logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
@@ -94,14 +94,14 @@ public:
 		// | 0x20 = reel 2 fault
 		// | 0x10 = reel 1 fault
 
-		logerror("%04x - ppi8255_intf_d_(used)read_c %02x (Reel Optics)\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_d_(used)read_c %02x (Reel Optics)\n", m_maincpu->pcbase(), ret);
 
 		return ret;
 
 
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b)
 	{   // changing gives no % key error in sphinx
 
@@ -110,46 +110,46 @@ public:
 		if (m_percent_mux==1)
 		{
 			ret = ioport("PERKEY")->read();
-			logerror("%04x - ppi8255_intf_e_(used)read_b (PER KEY) %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+			logerror("%04x - ppi8255_intf_e_(used)read_b (PER KEY) %02x\n", m_maincpu->pcbase(), ret);
 		}
 		else if (m_percent_mux==0x80)
 		{
 			ret = ioport("BUTTONS")->read();
-			logerror("%04x - ppi8255_intf_e_(used)read_b (BUTTONS?) %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+			logerror("%04x - ppi8255_intf_e_(used)read_b (BUTTONS?) %02x\n", m_maincpu->pcbase(), ret);
 		}
 		else
 		{
 			ret = 0x00;
-			logerror("%04x - ppi8255_intf_e_(used)read_b (UNK MUX %02x) %02x\n", machine().device("maincpu")->safe_pcbase(), m_percent_mux, ret);
+			logerror("%04x - ppi8255_intf_e_(used)read_b (UNK MUX %02x) %02x\n", m_maincpu->pcbase(), m_percent_mux, ret);
 		}
 		return ret;
 
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a)
 	{
 		int ret = ioport("IN4")->read();
-		logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_b %02x\n", m_maincpu->pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", m_maincpu->pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_b)
 	{
 		int ret = ioport("IN5")->read();
-		logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", m_maincpu->pcbase(), ret);
 		return ret;
 	}
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", m_maincpu->pcbase(), ret); return ret; }
 
 	void update_lamps(void)
 	{
@@ -167,7 +167,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a_strobedat0)
 	{
-	//  logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	//  logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
 		if (strobe_amount)
 		{
 			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0xff00) | (data & 0x00ff);
@@ -177,7 +177,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b_strobedat1)
 	{
-	//  logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	//  logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", m_maincpu->pcbase(), data);
 		if (strobe_amount)
 		{
 			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0x00ff) | (data << 8);
@@ -188,7 +188,7 @@ public:
 	{
 		if (data>=0xf0)
 		{
-		//  logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		//  logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", m_maincpu->pcbase(), data);
 			strobe_addr = data & 0xf;
 
 			// hack, it writes values for the lamps, then writes 0x00 afterwards, probably giving the bulbs power, then removing the power
@@ -197,20 +197,20 @@ public:
 
 			update_lamps();
 		}
-		else logerror("%04x - ppi8255_intf_a_(used)write_c %02x (UNUSUAL?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		else logerror("%04x - ppi8255_intf_a_(used)write_c %02x (UNUSUAL?)\n", m_maincpu->pcbase(), data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_a) { logerror("%04x - ppi8255_intf_b_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_b) { logerror("%04x - ppi8255_intf_b_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_c) { logerror("%04x - ppi8255_intf_b_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_a) { logerror("%04x - ppi8255_intf_b_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_b) { logerror("%04x - ppi8255_intf_b_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_c) { logerror("%04x - ppi8255_intf_b_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_a) { logerror("%04x - ppi8255_intf_c_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_b) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_c) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_a) { logerror("%04x - ppi8255_intf_c_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_b) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_c) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel01)
 	{
-//      logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+//      logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", m_maincpu->pcbase(), data);
 		stepper_update(0, data&0x0f);
 		stepper_update(1, (data>>4)&0x0f);
 
@@ -225,7 +225,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
 	{
-//      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+//      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", m_maincpu->pcbase(), data);
 
 		stepper_update(2, data&0x0f);
 		stepper_update(3, (data>>4)&0x0f);
@@ -239,28 +239,28 @@ public:
 		awp_draw_reel(3);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data);}
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", m_maincpu->pcbase(), data);}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a_alpha_display);
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", m_maincpu->pcbase(), data); }
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c)
 	{
 		m_percent_mux = data;
 
-		logerror("%04x - ppi8255_intf_e_write_c %02x (INPUT MUX?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		logerror("%04x - ppi8255_intf_e_write_c %02x (INPUT MUX?)\n", m_maincpu->pcbase(), data);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_a) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_b) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_c) { logerror("%04x - ppi8255_intf_f_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_a) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_b) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_c) { logerror("%04x - ppi8255_intf_f_write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_a) { logerror("%04x - ppi8255_intf_g_write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_b) { logerror("%04x - ppi8255_intf_g_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_c) { logerror("%04x - ppi8255_intf_g_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_a) { logerror("%04x - ppi8255_intf_g_write_a %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_b) { logerror("%04x - ppi8255_intf_g_write_b %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_c) { logerror("%04x - ppi8255_intf_g_write_c %02x\n", m_maincpu->pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_a) { logerror("%04x - ppi8255_intf_h_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_b) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_c) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_a) { logerror("%04x - ppi8255_intf_h_(used)write_a %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_b) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", m_maincpu->pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_c) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", m_maincpu->pcbase(), data); }
 
 
 	DECLARE_DRIVER_INIT(ecoinf3);
@@ -398,8 +398,8 @@ void ecoinf3_state::update_display()
 // is the 2 digit bank display part of this, or multiplexed elsewhere
 WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 {
-	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", machine().device("maincpu")->safe_pcbase(), data, data);
-	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", machine().device("maincpu")->safe_pcbase(), data);
+	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", m_maincpu->pcbase(), data, data);
+	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", m_maincpu->pcbase(), data);
 
 	static UINT8 send_buffer = 0;
 	static int count = 0;

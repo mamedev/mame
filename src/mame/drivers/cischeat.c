@@ -1688,10 +1688,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (clears a flag, presumably sprite DMA end)
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( scudhamm, cischeat_state )
@@ -1738,10 +1738,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 120) // timer irq (TODO: timing)
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )

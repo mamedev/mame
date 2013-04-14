@@ -1400,7 +1400,7 @@ WRITE8_MEMBER(nc_state::nc200_uart_control_w)
 	}
 
 	/* bit 5 is used in disk interface */
-	LOG_DEBUG(("bit 5: PC: %04x %02x\n", machine().device("maincpu")->safe_pc(), data & (1 << 5)));
+	LOG_DEBUG(("bit 5: PC: %04x %02x\n", m_maincpu->pc(), data & (1 << 5)));
 }
 
 
@@ -1419,7 +1419,7 @@ WRITE8_MEMBER(nc_state::nc200_uart_control_w)
 WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", machine().device("maincpu")->safe_pc(), data));
+	LOG_DEBUG(("nc200 memory card wait state: PC: %04x %02x\n", m_maincpu->pc(), data));
 #if 0
 	floppy_drive_set_motor_state(0, 1);
 	floppy_drive_set_ready_state(0, 1, 1);
@@ -1432,7 +1432,7 @@ WRITE8_MEMBER(nc_state::nc200_memory_card_wait_state_w)
 /* bit 0 seems to be the same as nc100 */
 WRITE8_MEMBER(nc_state::nc200_poweroff_control_w)
 {
-	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", machine().device("maincpu")->safe_pc(), data));
+	LOG_DEBUG(("nc200 power off: PC: %04x %02x\n", m_maincpu->pc(), data));
 
 	nc200_video_set_backlight(machine(), ((data ^ (1 << 2)) >> 2) & 0x01);
 }

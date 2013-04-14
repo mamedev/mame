@@ -488,7 +488,7 @@ READ8_MEMBER( maygay1b_state::m1_firq_trg_r )
 {
 	static int i = 0xff;
 	i ^= 0xff;
-	space.machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	LOG(("6809 firq\n"));
 	return i;
 }

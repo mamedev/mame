@@ -1378,7 +1378,7 @@ static void voodoo_stall(device_t *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", device->machine().device("maincpu")->safe_pc());
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", state->m_maincpu->pc());
 			state->m_maincpu->spin_until_trigger(45678);
 		}
 	}
