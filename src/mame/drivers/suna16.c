@@ -459,7 +459,7 @@ static INPUT_PORTS_START( bssoccer )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-//	PORT_DIPSETTING(      0x0000, "Hardest?"  ) // Not used / duplicate of "HARD"
+	PORT_DIPSETTING(      0x0000, "Hardest?" ) // duplicate of "HARD" not shown as supported in manual - but possible to set on PCB
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
