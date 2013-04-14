@@ -530,15 +530,15 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
+	ROM16 = (UINT16 *) memregion("gamecart")->base();
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
-	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
+	ROM32 = (UINT32 *) memregion("gamecart_sh2")->base();
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
 
-	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
+	ROM16 = (UINT16 *) memregion("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 

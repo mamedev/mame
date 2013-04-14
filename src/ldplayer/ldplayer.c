@@ -261,7 +261,7 @@ chd_file *ldplayer_state::get_disc()
 
 void ldplayer_state::process_commands()
 {
-	ioport_value controls = machine().root_device().ioport("controls")->read();
+	ioport_value controls = ioport("controls")->read();
 	int number;
 
 	// step backwards
