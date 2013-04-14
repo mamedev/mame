@@ -3175,6 +3175,17 @@ Canceled games (possibly never got to the proto stage)
 	</software>
 
 	<software name="glover2">
+		<description>Glover 2 (Prototype, Newer)</description>
+		<year>1999</year>
+		<publisher>Hasbro Interactive</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="glover 2 - unreleased beta version (new build).bin" size="33554432" crc="57b71a9c" sha1="42ffaa752d2bdc27e524cb402f868c4dd36fc606" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glover2o" cloneof="glover2">
 		<description>Glover 2 (Prototype)</description>
 		<year>1999</year>
 		<publisher>Hasbro Interactive</publisher>
