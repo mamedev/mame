@@ -747,12 +747,12 @@ INPUT_PORTS_END
 static const gfx_layout layout_8x8x4 =
 {
 	8,8,
-	RGN_FRAC(1,2),
+	RGN_FRAC(1,1),
 	4,
-	{ RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+4,  0,4 },
-	{ 3,2,1,0, 11,10,9,8 },
-	{ STEP8(0,16) },
-	8*8*4/2
+	{ 8, 12, 0,4 },
+	{ 3,2,1,0, 19,18,17,16 },
+	{ STEP8(0,32) },
+	8*8*4
 };
 
 static GFXDECODE_START( suna16 )
@@ -1068,15 +1068,54 @@ ROM_START( bssoccer )
 	ROM_LOAD( "12", 0x000000, 0x080000, CRC(6b73b87b) SHA1(52c7dc7da6c21eb7e0dad13deadb1faa94a87bb3) )
 
 	ROM_REGION( 0x300000, "gfx1", ROMREGION_INVERT )    /* Sprites */
-	ROM_LOAD( "05", 0x000000, 0x080000, CRC(a5245bd4) SHA1(d46a8db437e49158c020661536eb0be8a6e2e8b0) )
-	ROM_LOAD( "07", 0x080000, 0x080000, CRC(fdb765c2) SHA1(f9852fd3734d10e18c91cd572ca62e66d74ccb72) )
-	ROM_LOAD( "09", 0x100000, 0x080000, CRC(0e82277f) SHA1(4bdfd0ff310bf8326806a83767a6c98905debbd0) )
-	ROM_LOAD( "06", 0x180000, 0x080000, CRC(d42ce84b) SHA1(3a3d07d571793ecf4c936d3af244c63b9e4b4bb9) )
-	ROM_LOAD( "08", 0x200000, 0x080000, CRC(96cd2136) SHA1(1241859d6c5e64de73898763f0358171ea4aeae3) )
-	ROM_LOAD( "10", 0x280000, 0x080000, CRC(1ca94d21) SHA1(23d892b840e37064a175584f955f25f990d9179d) )
+	ROM_LOAD16_BYTE( "05", 0x000000, 0x080000, CRC(a5245bd4) SHA1(d46a8db437e49158c020661536eb0be8a6e2e8b0) )
+	ROM_LOAD16_BYTE( "06", 0x000001, 0x080000, CRC(d42ce84b) SHA1(3a3d07d571793ecf4c936d3af244c63b9e4b4bb9) )
+	ROM_LOAD16_BYTE( "07", 0x100000, 0x080000, CRC(fdb765c2) SHA1(f9852fd3734d10e18c91cd572ca62e66d74ccb72) )
+	ROM_LOAD16_BYTE( "08", 0x100001, 0x080000, CRC(96cd2136) SHA1(1241859d6c5e64de73898763f0358171ea4aeae3) )
+	ROM_LOAD16_BYTE( "09", 0x200000, 0x080000, CRC(0e82277f) SHA1(4bdfd0ff310bf8326806a83767a6c98905debbd0) )
+	ROM_LOAD16_BYTE( "10", 0x200001, 0x080000, CRC(1ca94d21) SHA1(23d892b840e37064a175584f955f25f990d9179d) )
 ROM_END
 
+/*
+13 and 6 files
 
+11                      unico5                  IDENTICAL
+12                      uc04004                 IDENTICAL
+13                      uc04005                 IDENTICAL
+
+01                      uc16001      [even 1/2] IDENTICAL
+02                      uc16001      [odd 1/2]  IDENTICAL
+03                      uc16001      [even 2/2] IDENTICAL
+04                      uc16001      [odd 2/2]  IDENTICAL
+
+05                      uc16002      [even 1/2] IDENTICAL
+06                      uc16002      [odd 1/2]  IDENTICAL
+07                      uc16002      [even 2/2] IDENTICAL
+08                      uc16002      [odd 2/2]  IDENTICAL
+
+09                      uc08003      [even]     IDENTICAL
+10                      uc08003      [odd]      IDENTICAL
+
+*/
+
+// the content of this is 100% IDENTICAL to the parent, just a different rom layout (larger ROMs) both are official PCBs
+ROM_START( bssoccera )
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "uc16001", 0x000000, 0x200000, CRC(82fa613a) SHA1(451789190017b58b964e676b8e43f3638b4e56ef) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )   /* Z80 #1 - Music */
+	ROM_LOAD( "unico5", 0x000000, 0x010000, CRC(df7ae9bc) SHA1(86660e723b0712c131dc57645b6a659d5100e962) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x080000, "pcm1", 0 )   /* Z80 #2 - PCM */
+	ROM_LOAD( "uc04005", 0x000000, 0x080000, CRC(2b273dca) SHA1(86e1bac9d1e39457c565390b9053986453db95ab) )
+
+	ROM_REGION( 0x080000, "pcm2", 0 )   /* Z80 #3 - PCM */
+	ROM_LOAD( "uc04004", 0x000000, 0x080000, CRC(6b73b87b) SHA1(52c7dc7da6c21eb7e0dad13deadb1faa94a87bb3) )
+
+	ROM_REGION( 0x300000, "gfx1", ROMREGION_INVERT )    /* Sprites */
+	ROM_LOAD( "uc16002", 0x000000, 0x200000, CRC(884f3ecf) SHA1(56306bb20433bf77697eb9d71ba561daec7feedb) )
+	ROM_LOAD( "uc08003", 0x200000, 0x100000, CRC(d17c23f5) SHA1(12bba57f911ae58b2d3ea330e2ade4cdd1379181) )
+ROM_END
 
 /***************************************************************************
 
@@ -1111,10 +1150,10 @@ ROM_START( uballoon )
 	/* There's no Z80 #3 - PCM */
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT )    /* Sprites */
-	ROM_LOAD( "gfx1.rom", 0x000000, 0x080000, CRC(fd2ec297) SHA1(885834d9b58ccfd9a32ecaa51c45e70fbbe935db) )
-	ROM_LOAD( "gfx2.rom", 0x080000, 0x080000, CRC(6307aa60) SHA1(00406eba98ec368e72ee53c08b9111dec4f2552f) )
-	ROM_LOAD( "gfx3.rom", 0x100000, 0x080000, CRC(718f3150) SHA1(5971f006203f86743ebc825e4ab1ed1f811e3165) )
-	ROM_LOAD( "gfx4.rom", 0x180000, 0x080000, CRC(af7e057e) SHA1(67a03b54ffa1483c8ed044f27287b7f3f1150455) )
+	ROM_LOAD16_BYTE( "gfx1.rom", 0x000000, 0x080000, CRC(fd2ec297) SHA1(885834d9b58ccfd9a32ecaa51c45e70fbbe935db) )
+	ROM_LOAD16_BYTE( "gfx3.rom", 0x000001, 0x080000, CRC(718f3150) SHA1(5971f006203f86743ebc825e4ab1ed1f811e3165) )
+	ROM_LOAD16_BYTE( "gfx2.rom", 0x100000, 0x080000, CRC(6307aa60) SHA1(00406eba98ec368e72ee53c08b9111dec4f2552f) )
+	ROM_LOAD16_BYTE( "gfx4.rom", 0x100001, 0x080000, CRC(af7e057e) SHA1(67a03b54ffa1483c8ed044f27287b7f3f1150455) )
 ROM_END
 
 /***************************************************************************
@@ -1149,8 +1188,8 @@ ROM_START( sunaq )
 	/* There's no Z80 #3 - PCM */
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT )    /* Sprites */
-	ROM_LOAD( "gfx1.bin", 0x000000, 0x080000, CRC(0bde5acf) SHA1(a9befb5f9a663bf48537471313f606853ea1f274) )
-	ROM_LOAD( "gfx2.bin", 0x100000, 0x080000, CRC(24b74826) SHA1(cb3f665d1b1f5c9d385a3a3193866c9cae6c7002) )
+	ROM_LOAD16_BYTE( "gfx1.bin", 0x000000, 0x080000, CRC(0bde5acf) SHA1(a9befb5f9a663bf48537471313f606853ea1f274) )
+	ROM_LOAD16_BYTE( "gfx2.bin", 0x000001, 0x080000, CRC(24b74826) SHA1(cb3f665d1b1f5c9d385a3a3193866c9cae6c7002) )
 ROM_END
 
 
@@ -1229,21 +1268,20 @@ ROM_START( bestbest )
 	/* There's no Z80 #3 - PCM */
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT )    /* Sprites (Chip 1) */
-	ROM_LOAD( "9.bin",  0x000000, 0x80000, CRC(b11994ea) SHA1(4ff2250a9dbb2e575982e2ffcad7686347368b5b) )
-	ROM_LOAD( "10.bin", 0x080000, 0x80000, CRC(37b41ef5) SHA1(dd4500663537ffad369ee9415c56df90221bed23) )
-	ROM_LOAD( "7.bin",  0x100000, 0x80000, CRC(16188b73) SHA1(1e67f9b100614466e2ff1169f25c90e34a2e7db9) )
-	ROM_LOAD( "8.bin",  0x180000, 0x80000, CRC(765ce06b) SHA1(6cc6d7c27b49eedd58104c50e4887f86bff9357c) )
+	ROM_LOAD16_BYTE( "9.bin",  0x000000, 0x80000, CRC(b11994ea) SHA1(4ff2250a9dbb2e575982e2ffcad7686347368b5b) )
+	ROM_LOAD16_BYTE( "7.bin",  0x000001, 0x80000, CRC(16188b73) SHA1(1e67f9b100614466e2ff1169f25c90e34a2e7db9) )
+	ROM_LOAD16_BYTE( "10.bin", 0x100000, 0x80000, CRC(37b41ef5) SHA1(dd4500663537ffad369ee9415c56df90221bed23) )
+	ROM_LOAD16_BYTE( "8.bin",  0x100001, 0x80000, CRC(765ce06b) SHA1(6cc6d7c27b49eedd58104c50e4887f86bff9357c) )
 
 	ROM_REGION( 0x400000, "gfx2", ROMREGION_INVERT )    /* Sprites (Chip 2) */
-	ROM_LOAD( "16.bin", 0x000000, 0x80000, CRC(dc46cdea) SHA1(d601f5464894223ce8459093ae53006155a3e680) )
-	ROM_LOAD( "17.bin", 0x080000, 0x80000, CRC(c6fadd57) SHA1(ce9bc4d7a288feebdd19de09d00bec8489346878) )
-	ROM_LOAD( "13.bin", 0x100000, 0x80000, CRC(23283ac4) SHA1(f7aa00f203b17b590f1c43990f3f1c4aba7ba0ad) )
-	ROM_LOAD( "18.bin", 0x180000, 0x80000, CRC(674c4609) SHA1(f1de78c01d26dfb1174203415ccf3c771398d163) )
-
-	ROM_LOAD( "14.bin", 0x200000, 0x80000, CRC(c210fb53) SHA1(3d5a763bffaef922a77c95131b1e41f0f90629a5) )
-	ROM_LOAD( "15.bin", 0x280000, 0x80000, CRC(3b1166c7) SHA1(7f2a0c9131fcf39dd67047b6e697c4076ca37b19) )
-	ROM_LOAD( "11.bin", 0x300000, 0x80000, CRC(323eebc3) SHA1(0e82b583273c9ba5252f7a108538ae58edf39a03) )
-	ROM_LOAD( "12.bin", 0x380000, 0x80000, CRC(ca7c8176) SHA1(1ec99db3e0840b4647d6ccdf6fda118fa9ad4f42) )
+	ROM_LOAD16_BYTE( "16.bin", 0x000000, 0x80000, CRC(dc46cdea) SHA1(d601f5464894223ce8459093ae53006155a3e680) )
+	ROM_LOAD16_BYTE( "14.bin", 0x000001, 0x80000, CRC(c210fb53) SHA1(3d5a763bffaef922a77c95131b1e41f0f90629a5) )
+	ROM_LOAD16_BYTE( "17.bin", 0x100000, 0x80000, CRC(c6fadd57) SHA1(ce9bc4d7a288feebdd19de09d00bec8489346878) )
+	ROM_LOAD16_BYTE( "15.bin", 0x100001, 0x80000, CRC(3b1166c7) SHA1(7f2a0c9131fcf39dd67047b6e697c4076ca37b19) )
+	ROM_LOAD16_BYTE( "13.bin", 0x200000, 0x80000, CRC(23283ac4) SHA1(f7aa00f203b17b590f1c43990f3f1c4aba7ba0ad) )
+	ROM_LOAD16_BYTE( "11.bin", 0x200001, 0x80000, CRC(323eebc3) SHA1(0e82b583273c9ba5252f7a108538ae58edf39a03) )
+	ROM_LOAD16_BYTE( "18.bin", 0x300000, 0x80000, CRC(674c4609) SHA1(f1de78c01d26dfb1174203415ccf3c771398d163) )
+	ROM_LOAD16_BYTE( "12.bin", 0x300001, 0x80000, CRC(ca7c8176) SHA1(1ec99db3e0840b4647d6ccdf6fda118fa9ad4f42) )
 
 	ROM_REGION( 0x200, "proms", 0 ) // ?
 	ROM_LOAD( "82s129.5", 0x000, 0x100, CRC(10bfcebb) SHA1(ae8708db7d3a8984f16e876867ecdbb4445e3378) )  // FIXED BITS (0000xx0x0000xxxx)
@@ -1262,4 +1300,5 @@ ROM_END
 GAME( 1994, bestbest, 0, bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", 0 )
 GAME( 1994, sunaq,    0, sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )   // Date/Version on-screen is 940620-6, but in the program rom it's 1994,6,30  K.H.T  V6.00
 GAME( 1996, bssoccer, 0, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer", 0 )
+GAME( 1996, bssoccera,bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (larger ROMs)", 0 )
 GAME( 1996, uballoon, 0, uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", 0 )
