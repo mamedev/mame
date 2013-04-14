@@ -1509,7 +1509,7 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine &machine)
 		if ( pce_cd.scsi_IO )
 		{
 			pce_cd.scsi_ACK = 1;
-			machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_state::pce_cd_clear_ack),state));
+			machine.scheduler().timer_set(state->m_maincpu->cycles_to_attotime(15), timer_expired_delegate(FUNC(pce_state::pce_cd_clear_ack),state));
 		}
 	}
 	return data;

@@ -804,7 +804,7 @@ static void lynx_blitter(running_machine &machine)
 		}
 	}
 
-	machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(state->m_blitter.memory_accesses), timer_expired_delegate(FUNC(lynx_state::lynx_blitter_timer),state));
+	machine.scheduler().timer_set(state->m_maincpu->cycles_to_attotime(state->m_blitter.memory_accesses), timer_expired_delegate(FUNC(lynx_state::lynx_blitter_timer),state));
 }
 
 

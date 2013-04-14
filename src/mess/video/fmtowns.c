@@ -894,7 +894,7 @@ static void draw_sprites(running_machine &machine, const rectangle* rect)
 		state->m_video.towns_sprite_page = 0;
 
 	state->m_video.towns_sprite_flag = 1;  // we are now drawing
-	state->m_video.sprite_timer->adjust(machine.device<cpu_device>("maincpu")->cycles_to_attotime(128 * (1025-sprite_limit)));
+	state->m_video.sprite_timer->adjust(state->m_maincpu->cycles_to_attotime(128 * (1025-sprite_limit)));
 }
 
 static void towns_crtc_draw_scan_layer_hicolour(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline)

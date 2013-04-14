@@ -21,11 +21,12 @@ class pc_state : public driver_device
 public:
 	pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_dma8237(*this, "dma8237"),
 		m_pc_kbdc(*this, "pc_kbdc"),
 		m_speaker(*this, "speaker") { }
 
-	cpu_device *m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t *m_pic8259;
 	optional_device<am9517a_device> m_dma8237;
 	device_t *m_pit8253;
