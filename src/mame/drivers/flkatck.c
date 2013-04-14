@@ -179,8 +179,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(flkatck_state::volume_callback0)
 {
-	k007232_set_volume(machine().device("k007232"), 0, (data >> 4) * 0x11, 0);
-	k007232_set_volume(machine().device("k007232"), 1, 0, (data & 0x0f) * 0x11);
+	k007232_set_volume(m_k007232, 0, (data >> 4) * 0x11, 0);
+	k007232_set_volume(m_k007232, 1, 0, (data & 0x0f) * 0x11);
 }
 
 static const k007232_interface k007232_config =
@@ -202,7 +202,7 @@ void flkatck_state::machine_start()
 
 void flkatck_state::machine_reset()
 {
-	k007232_set_bank(machine().device("k007232"), 0, 1);
+	k007232_set_bank(m_k007232, 0, 1);
 
 	m_irq_enabled = 0;
 	m_multiply_reg[0] = 0;
