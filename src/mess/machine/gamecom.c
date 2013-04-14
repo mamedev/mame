@@ -562,11 +562,10 @@ DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 
 DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
 {
-	gamecom_state *state = image.device().machine().driver_data<gamecom_state>();
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->m_cartridge1 = state->memregion("cart1")->base();
+	m_cartridge1 = memregion("cart1")->base();
 
 	if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -589,31 +588,30 @@ DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
 
 	if (image.software_entry() == NULL)
 	{
-		if (image.fread( state->m_cartridge1 + load_offset, filesize) != filesize)
+		if (image.fread( m_cartridge1 + load_offset, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
 			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
-		memcpy(state->m_cartridge1 + load_offset, image.get_software_region("rom"), filesize);
+		memcpy(m_cartridge1 + load_offset, image.get_software_region("rom"), filesize);
 
-	if (filesize < 0x010000) { memcpy(state->m_cartridge1 + 0x008000, state->m_cartridge1, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(state->m_cartridge1 + 0x010000, state->m_cartridge1, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(state->m_cartridge1 + 0x020000, state->m_cartridge1, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(state->m_cartridge1 + 0x040000, state->m_cartridge1, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(state->m_cartridge1 + 0x080000, state->m_cartridge1, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(state->m_cartridge1 + 0x100000, state->m_cartridge1, 0x100000); } /* -> >=1.8MB */
+	if (filesize < 0x010000) { memcpy(m_cartridge1 + 0x008000, m_cartridge1, 0x008000); } /* ->64KB */
+	if (filesize < 0x020000) { memcpy(m_cartridge1 + 0x010000, m_cartridge1, 0x010000); } /* ->128KB */
+	if (filesize < 0x040000) { memcpy(m_cartridge1 + 0x020000, m_cartridge1, 0x020000); } /* ->256KB */
+	if (filesize < 0x080000) { memcpy(m_cartridge1 + 0x040000, m_cartridge1, 0x040000); } /* ->512KB */
+	if (filesize < 0x100000) { memcpy(m_cartridge1 + 0x080000, m_cartridge1, 0x080000); } /* ->1MB */
+	if (filesize < 0x1c0000) { memcpy(m_cartridge1 + 0x100000, m_cartridge1, 0x100000); } /* -> >=1.8MB */
 	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
 {
-	gamecom_state *state = image.device().machine().driver_data<gamecom_state>();
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	state->m_cartridge2 = state->memregion("cart2")->base();
+	m_cartridge2 = memregion("cart2")->base();
 
 //  if (image.software_entry() == NULL)
 		filesize = image.length();
@@ -636,7 +634,7 @@ DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
 
 //  if (image.software_entry() == NULL)
 	{
-		if (image.fread( state->m_cartridge2 + load_offset, filesize) != filesize)
+		if (image.fread( m_cartridge2 + load_offset, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
 			return IMAGE_INIT_FAIL;
@@ -645,11 +643,11 @@ DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
 //  else
 //      memcpy(state->m_cartridge2 + load_offset, image.get_software_region("rom"), filesize);
 
-	if (filesize < 0x010000) { memcpy(state->m_cartridge2 + 0x008000, state->m_cartridge2, 0x008000); } /* ->64KB */
-	if (filesize < 0x020000) { memcpy(state->m_cartridge2 + 0x010000, state->m_cartridge2, 0x010000); } /* ->128KB */
-	if (filesize < 0x040000) { memcpy(state->m_cartridge2 + 0x020000, state->m_cartridge2, 0x020000); } /* ->256KB */
-	if (filesize < 0x080000) { memcpy(state->m_cartridge2 + 0x040000, state->m_cartridge2, 0x040000); } /* ->512KB */
-	if (filesize < 0x100000) { memcpy(state->m_cartridge2 + 0x080000, state->m_cartridge2, 0x080000); } /* ->1MB */
-	if (filesize < 0x1c0000) { memcpy(state->m_cartridge2 + 0x100000, state->m_cartridge2, 0x100000); } /* -> >=1.8MB */
+	if (filesize < 0x010000) { memcpy(m_cartridge2 + 0x008000, m_cartridge2, 0x008000); } /* ->64KB */
+	if (filesize < 0x020000) { memcpy(m_cartridge2 + 0x010000, m_cartridge2, 0x010000); } /* ->128KB */
+	if (filesize < 0x040000) { memcpy(m_cartridge2 + 0x020000, m_cartridge2, 0x020000); } /* ->256KB */
+	if (filesize < 0x080000) { memcpy(m_cartridge2 + 0x040000, m_cartridge2, 0x040000); } /* ->512KB */
+	if (filesize < 0x100000) { memcpy(m_cartridge2 + 0x080000, m_cartridge2, 0x080000); } /* ->1MB */
+	if (filesize < 0x1c0000) { memcpy(m_cartridge2 + 0x100000, m_cartridge2, 0x100000); } /* -> >=1.8MB */
 	return IMAGE_INIT_PASS;
 }

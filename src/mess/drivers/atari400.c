@@ -1521,7 +1521,7 @@ DEVICE_IMAGE_LOAD_MEMBER( a400_state, a800_cart )
 
 	m_a800_cart_loaded |= (size > 0x0000) ? 1 : 0;
 
-	logerror("%s loaded left cartridge '%s' size %dK\n", image.device().machine().system().name, image.filename(), size/1024);
+	logerror("%s loaded left cartridge '%s' size %dK\n", machine().system().name, image.filename(), size/1024);
 	return IMAGE_INIT_PASS;
 }
 

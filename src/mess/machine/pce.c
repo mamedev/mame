@@ -136,7 +136,6 @@ WRITE8_MEMBER(pce_state::pce_cartridge_ram_w)
 
 DEVICE_IMAGE_LOAD_MEMBER(pce_state,pce_cart)
 {
-	pce_state *state = image.device().machine().driver_data<pce_state>();
 	UINT32 size;
 	int split_rom = 0, offset = 0;
 	const char *extrainfo = NULL;
@@ -144,7 +143,7 @@ DEVICE_IMAGE_LOAD_MEMBER(pce_state,pce_cart)
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
 
 	/* open file to get size */
-	ROM = state->memregion("user1")->base();
+	ROM = memregion("user1")->base();
 
 	if (image.software_entry() == NULL)
 		size = image.length();
@@ -225,39 +224,39 @@ DEVICE_IMAGE_LOAD_MEMBER(pce_state,pce_cart)
 			memcpy(ROM + 0x080000, ROM, 0x080000);
 	}
 
-	state->membank("bank1")->set_base(ROM);
-	state->membank("bank2")->set_base(ROM + 0x080000);
-	state->membank("bank3")->set_base(ROM + 0x088000);
-	state->membank("bank4")->set_base(ROM + 0x0d0000);
+	membank("bank1")->set_base(ROM);
+	membank("bank2")->set_base(ROM + 0x080000);
+	membank("bank3")->set_base(ROM + 0x088000);
+	membank("bank4")->set_base(ROM + 0x0d0000);
 
 	/* Check for Street fighter 2 */
 	if (size == PCE_ROM_MAXSIZE)
 	{
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),state));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),this));
 	}
 
 	/* Check for Populous */
 	if (!memcmp(ROM + 0x1F26, "POPULOUS", 8))
 	{
-		state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x8000);
-		state->membank("bank2")->set_base(state->m_cartridge_ram);
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
+		m_cartridge_ram = auto_alloc_array(machine(), UINT8, 0x8000);
+		membank("bank2")->set_base(m_cartridge_ram);
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),this));
 	}
 
 	/* Check for CD system card */
-	state->m_sys3_card = 0;
+	m_sys3_card = 0;
 	if (!memcmp(ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23))
 	{
 		/* Check if 192KB additional system card ram should be used */
-		if(!memcmp(ROM + 0x29D1, "VER. 3.", 7))         { state->m_sys3_card = 1; } // JP version
-		else if(!memcmp(ROM + 0x29C4, "VER. 3.", 7 ))   { state->m_sys3_card = 3; } // US version
+		if(!memcmp(ROM + 0x29D1, "VER. 3.", 7))         { m_sys3_card = 1; } // JP version
+		else if(!memcmp(ROM + 0x29C4, "VER. 3.", 7 ))   { m_sys3_card = 3; } // US version
 
-		if(state->m_sys3_card)
+		if(m_sys3_card)
 		{
-			state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x30000);
-			state->membank("bank4")->set_base(state->m_cartridge_ram);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),state),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),state));
+			m_cartridge_ram = auto_alloc_array(machine(), UINT8, 0x30000);
+			membank("bank4")->set_base(m_cartridge_ram);
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),this),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),this));
 		}
 	}
 	return 0;

@@ -676,10 +676,8 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 
 DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,sg1000_cart )
 {
-	running_machine &machine = image.device().machine();
-	sg1000_state *state = machine.driver_data<sg1000_state>();
-	address_space &program = state->m_maincpu->space(AS_PROGRAM);
-	UINT8 *ptr = state->m_rom->base();
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	UINT8 *ptr = m_rom->base();
 	UINT32 ram_size = 0x400;
 	bool install_2000_ram = false;
 	UINT32 size;
@@ -771,7 +769,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,sg1000_cart )
 	}
 
 	/* cartridge ROM banking */
-	state->install_cartridge(ptr, size);
+	install_cartridge(ptr, size);
 
 	if ( install_2000_ram )
 	{
@@ -790,10 +788,8 @@ DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,sg1000_cart )
 
 DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,omv_cart )
 {
-	running_machine &machine = image.device().machine();
-	sg1000_state *state = machine.driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = state->m_rom->base();
+	UINT8 *ptr = m_rom->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -808,7 +804,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,omv_cart )
 	}
 
 	/* cartridge ROM banking */
-	state->install_cartridge(ptr, size);
+	install_cartridge(ptr, size);
 
 	return IMAGE_INIT_PASS;
 }
@@ -847,9 +843,7 @@ void sc3000_state::install_cartridge(UINT8 *ptr, int size)
 
 DEVICE_IMAGE_LOAD_MEMBER( sc3000_state,sc3000_cart )
 {
-	running_machine &machine = image.device().machine();
-	sc3000_state *state = machine.driver_data<sc3000_state>();
-	UINT8 *ptr = state->m_rom->base();
+	UINT8 *ptr = m_rom->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -865,7 +859,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sc3000_state,sc3000_cart )
 	}
 
 	/* cartridge ROM and work RAM banking */
-	state->install_cartridge(ptr, size);
+	install_cartridge(ptr, size);
 
 	return IMAGE_INIT_PASS;
 }

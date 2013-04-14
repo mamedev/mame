@@ -1367,7 +1367,7 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 
 	for (ii = 0; ii < m_ROMBanks; ii++)
 	{
-		if ((m_ROMMap[ii] = auto_alloc_array(image.device().machine(), UINT8, 0x10000)))
+		if ((m_ROMMap[ii] = auto_alloc_array(machine(), UINT8, 0x10000)))
 		{
 			if (image.software_entry() == NULL)
 			{
@@ -1423,7 +1423,7 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 
 	if (m_eeprom.size != 0)
 	{
-		m_eeprom.data = auto_alloc_array(image.device().machine(), UINT8, m_eeprom.size);
+		m_eeprom.data = auto_alloc_array(machine(), UINT8, m_eeprom.size);
 		image.battery_load(m_eeprom.data, m_eeprom.size, 0x00);
 		m_eeprom.page = m_eeprom.data;
 	}

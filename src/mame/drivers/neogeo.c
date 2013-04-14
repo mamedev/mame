@@ -1267,7 +1267,7 @@ INPUT_PORTS_END
 DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 {
 	UINT32 size;
-	device_t* ym = image.device().machine().device("ymsnd");
+	device_t* ym = machine().device("ymsnd");
 
 	// first check software list
 	if(image.software_entry() != NULL)

@@ -520,7 +520,6 @@ void ssem_state::strlower(char *buf)
 
 DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 {
-	ssem_state *state = image.device().machine().driver_data<ssem_state>();
 	const char* image_name = image.filename();
 	char image_ext[5] = { 0 };
 	char image_line[100] = { 0 };
@@ -561,10 +560,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 					}
 				}
 
-				state->m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
-				state->m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
-				state->m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
-				state->m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
+				m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
+				m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
+				m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
+				m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
 			}
 			else if(strcmp(image_ext, ".asm") == 0)
 			{
@@ -615,10 +614,10 @@ DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 					word = 0x00070000 | unsigned_value;
 				}
 
-				state->m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
-				state->m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
-				state->m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
-				state->m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
+				m_store[(line << 2) + 0] = (word >> 24) & 0x000000ff;
+				m_store[(line << 2) + 1] = (word >> 16) & 0x000000ff;
+				m_store[(line << 2) + 2] = (word >>  8) & 0x000000ff;
+				m_store[(line << 2) + 3] = (word >>  0) & 0x000000ff;
 			}
 		}
 	}

@@ -176,7 +176,7 @@ void n64_mess_state::mempak_format(UINT8* pak)
 DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 {
 	int i, length;
-	n64_periphs *periphs = image.device().machine().device<n64_periphs>("rcp");
+	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	UINT8 *cart = memregion("user2")->base();
 
 	if (image.software_entry() == NULL)

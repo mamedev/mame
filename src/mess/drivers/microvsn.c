@@ -455,9 +455,8 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 
 DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 {
-	microvision_state *state = image.device().machine().driver_data<microvision_state>();
-	UINT8 *rom1 = state->memregion("maincpu1")->base();
-	UINT8 *rom2 = state->memregion("maincpu2")->base();
+	UINT8 *rom1 = memregion("maincpu1")->base();
+	UINT8 *rom2 = memregion("maincpu2")->base();
 	UINT32 file_size;
 
 	if (image.software_entry() == NULL)
@@ -490,8 +489,8 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 		memcpy(rom1, image.get_software_region("rom"), file_size);
 
 		// Set default setting for PCB type and RC type
-		state->m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
-		state->m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
+		m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
+		m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
 
 		// Detect settings for PCB type
 		const char *pcb = software_part_get_feature((software_part*)image.part_entry(), "pcb");
@@ -506,11 +505,11 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 					{ "7924952D02", microvision_state::PCB_TYPE_7924952D02 }
 				};
 
-			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && state->m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++ )
+			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++ )
 			{
 				if (!mame_stricmp(pcb, pcb_types[i].pcb_name))
 				{
-					state->m_pcb_type = pcb_types[i].pcbtype;
+					m_pcb_type = pcb_types[i].pcbtype;
 				}
 			}
 		}
@@ -527,11 +526,11 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 					{ "100pf/39.4K", microvision_state::RC_TYPE_100PF_39_4K }
 				};
 
-			for ( int i = 0; i < ARRAY_LENGTH(rc_types) && state->m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++ )
+			for ( int i = 0; i < ARRAY_LENGTH(rc_types) && m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++ )
 			{
 				if (!mame_stricmp(rc, rc_types[i].rc_name))
 				{
-					state->m_rc_type = rc_types[i].rctype;
+					m_rc_type = rc_types[i].rctype;
 				}
 			}
 		}
@@ -547,11 +546,11 @@ DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 	switch ( file_size )
 	{
 		case 1024:
-			state->m_cpu_type = microvision_state::CPU_TYPE_I8021;
+			m_cpu_type = microvision_state::CPU_TYPE_I8021;
 			break;
 
 		case 2048:
-			state->m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
+			m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
 			break;
 	}
 	return IMAGE_INIT_PASS;

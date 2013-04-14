@@ -9942,7 +9942,6 @@ DRIVER_INIT_MEMBER(neogeo_state,mvs)
 // handle protected carts
 void neogeo_state::mvs_install_protection(device_image_interface& image)
 {
-//  neogeo_state *state = image.device().machine().driver_data<neogeo_state>();
 	const char *crypt_feature = image.get_feature( "crypt" );
 
 	if(crypt_feature == NULL)

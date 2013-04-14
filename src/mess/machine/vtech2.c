@@ -314,29 +314,27 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 
 DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, laser_cart )
 {
-	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
 	int size = 0;
 
-	size = image.fread(&state->m_mem[0x30000], 0x10000);
-	state->m_laser_bank_mask &= ~0xf000;
+	size = image.fread(&m_mem[0x30000], 0x10000);
+	m_laser_bank_mask &= ~0xf000;
 	if( size > 0 )
-		state->m_laser_bank_mask |= 0x1000;
+		m_laser_bank_mask |= 0x1000;
 	if( size > 0x4000 )
-		state->m_laser_bank_mask |= 0x2000;
+		m_laser_bank_mask |= 0x2000;
 	if( size > 0x8000 )
-		state->m_laser_bank_mask |= 0x4000;
+		m_laser_bank_mask |= 0x4000;
 	if( size > 0xc000 )
-		state->m_laser_bank_mask |= 0x8000;
+		m_laser_bank_mask |= 0x8000;
 
 	return size > 0 ? IMAGE_INIT_PASS : IMAGE_INIT_FAIL;
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER( vtech2_state, laser_cart )
 {
-	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
-	state->m_laser_bank_mask &= ~0xf000;
+	m_laser_bank_mask &= ~0xf000;
 	/* wipe out the memory contents to be 100% sure */
-	memset(&state->m_mem[0x30000], 0xff, 0x10000);
+	memset(&m_mem[0x30000], 0xff, 0x10000);
 }
 
 static device_t *laser_file(running_machine &machine)
