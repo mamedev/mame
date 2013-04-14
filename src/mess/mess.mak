@@ -2048,6 +2048,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/czk80.o     \
 	$(MESS_DRIVERS)/d6800.o     \
 	$(MESS_DRIVERS)/d6809.o     \
+	$(MESS_DRIVERS)/dagz80.o    \
 	$(MESS_DRIVERS)/digel804.o  \
 	$(MESS_DRIVERS)/dim68k.o    \
 	$(MESS_DRIVERS)/dm7000.o    \
@@ -2212,6 +2213,7 @@ $(MESS_DRIVERS)/coco.o:     $(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/coco3.o:    $(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o: $(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:      $(MESS_LAYOUT)/c80.lh
+$(MESS_DRIVERS)/dagz80.o:   $(MESS_LAYOUT)/dagz80.lh
 $(MESS_DRIVERS)/dectalk.o:  $(MESS_LAYOUT)/dectalk.lh
 $(MESS_DRIVERS)/digel804.o: $(MESS_LAYOUT)/digel804.lh
 $(MESS_DRIVERS)/dmv.o:      $(MESS_LAYOUT)/dmv.lh
