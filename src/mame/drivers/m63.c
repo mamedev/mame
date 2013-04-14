@@ -132,6 +132,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_soundcpu(*this, "soundcpu"),
+		m_samples(*this, "samples"),
 		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT8> m_spriteram;
@@ -160,7 +161,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	device_t *m_ay1;
 	device_t *m_ay2;
-	samples_device *m_samples;
+	optional_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(m63_videoram_w);
 	DECLARE_WRITE8_MEMBER(m63_colorram_w);
 	DECLARE_WRITE8_MEMBER(m63_videoram2_w);
@@ -718,7 +719,6 @@ MACHINE_START_MEMBER(m63_state,m63)
 {
 	m_ay1 = machine().device("ay1");
 	m_ay2 = machine().device("ay2");
-	m_samples = machine().device<samples_device>("samples");
 
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_fg_flag));

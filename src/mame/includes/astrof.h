@@ -14,7 +14,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_astrof_color(*this, "astrof_color"),
 		m_tomahawk_protection(*this, "tomahawk_prot"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples") { }
 
 	/* video-related */
 	required_shared_ptr<UINT8> m_videoram;
@@ -38,7 +39,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	samples_device *m_samples;  // astrof & abattle
+	optional_device<samples_device> m_samples;  // astrof & abattle
 	device_t *m_sn; // tomahawk
 	DECLARE_READ8_MEMBER(irq_clear_r);
 	DECLARE_WRITE8_MEMBER(astrof_videoram_w);

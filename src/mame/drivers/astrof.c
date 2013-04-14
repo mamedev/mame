@@ -467,8 +467,6 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
 
-	m_samples = machine().device<samples_device>("samples");
-
 	/* register for state saving */
 	save_item(NAME(m_red_on));
 	save_item(NAME(m_flipscreen));

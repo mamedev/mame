@@ -38,7 +38,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_chargen(*this, "chargen"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_memory;
@@ -65,7 +66,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	device_t *m_ic8j1;
 	device_t *m_ic8j2;
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
 	DECLARE_WRITE8_MEMBER(m15_ctrl_w);

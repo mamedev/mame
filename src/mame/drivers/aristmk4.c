@@ -276,12 +276,13 @@ class aristmk4_state : public driver_device
 public:
 	aristmk4_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag),
+		m_samples(*this, "samples"),
 		m_mkiv_vram(*this, "mkiv_vram"),
 		m_maincpu(*this, "maincpu") { }
 
 	int m_rtc_address_strobe;
 	int m_rtc_data_strobe;
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	UINT8 *m_shapeRomPtr;
 	UINT8 m_shapeRom[0xc000];
 	required_shared_ptr<UINT8> m_mkiv_vram;
@@ -1641,7 +1642,6 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 
 void aristmk4_state::machine_start()
 {
-	m_samples = machine().device<samples_device>("samples");
 	state_save_register_global_pointer(machine(), m_nvram, 0x1000); // m_nvram
 }
 

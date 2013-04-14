@@ -193,7 +193,6 @@ MACHINE_START_MEMBER(m10_state,m10)
 {
 	m_ic8j1 = machine().device("ic8j1");
 	m_ic8j2 = machine().device("ic8j2");
-	m_samples = machine().device<samples_device>("samples");
 
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));

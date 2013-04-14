@@ -24,7 +24,8 @@ public:
 		m_k053251(*this, "k053251"),
 		m_k053936(*this, "k053936"),
 		m_k054000(*this, "k054000"),
-		m_upd7759(*this, "upd"){ }
+		m_upd7759(*this, "upd"),
+		m_samples(*this, "samples"){ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;
@@ -75,7 +76,7 @@ public:
 	optional_device<k053936_device> m_k053936;
 	optional_device<k054000_device> m_k054000;
 	optional_device<upd7759_device> m_upd7759;
-	samples_device *m_samples;
+	optional_device<samples_device> m_samples;
 
 	/* memory buffers */
 	INT16      m_sampledata[0x40000];

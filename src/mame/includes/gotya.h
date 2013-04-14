@@ -10,6 +10,7 @@ public:
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
 		m_spriteram(*this, "spriteram"),
+		m_samples(*this, "samples"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -27,7 +28,7 @@ public:
 	int      m_theme_playing;
 
 	/* devices */
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(gotya_videoram_w);
 	DECLARE_WRITE8_MEMBER(gotya_colorram_w);
 	DECLARE_WRITE8_MEMBER(gotya_video_control_w);

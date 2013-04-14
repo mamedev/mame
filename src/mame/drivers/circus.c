@@ -263,8 +263,6 @@ GFXDECODE_END
 ***************************************************************************/
 void circus_state::machine_start()
 {
-	m_samples = machine().device<samples_device>("samples");
-
 	save_item(NAME(m_clown_x));
 	save_item(NAME(m_clown_y));
 	save_item(NAME(m_clown_z));

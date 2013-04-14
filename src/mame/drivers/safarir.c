@@ -57,7 +57,8 @@ public:
 	safarir_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bg_scroll(*this, "bg_scroll"),
-		m_ram(*this, "ram") ,
+		m_ram(*this, "ram"),
+		m_samples(*this, "samples"),
 		m_maincpu(*this, "maincpu") { }
 
 	UINT8 *m_ram_1;
@@ -69,7 +70,7 @@ public:
 	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_port_last;
 	UINT8 m_port_last2;
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_bank_w);
@@ -318,7 +319,6 @@ void safarir_state::machine_start()
 	m_ram_2 = auto_alloc_array(machine(), UINT8, m_ram.bytes());
 	m_port_last = 0;
 	m_port_last2 = 0;
-	m_samples = machine().device<samples_device>("samples");
 
 	/* setup for save states */
 	save_pointer(NAME(m_ram_1), m_ram.bytes());

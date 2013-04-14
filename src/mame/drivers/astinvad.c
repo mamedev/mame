@@ -49,7 +49,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
-		m_videoram(*this, "videoram"){ }
+		m_videoram(*this, "videoram"),
+		m_samples(*this, "samples"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device>  m_ppi8255_0;
@@ -64,7 +65,7 @@ public:
 	UINT8      m_flip_yoffs;
 	UINT8      m_color_latch;
 
-	samples_device *m_samples;
+	required_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
 	DECLARE_READ8_MEMBER(kamikaze_ppi_r);
@@ -250,8 +251,6 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-	m_samples = machine().device<samples_device>("samples");
-
 	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamizake_int_gen),this));
 	m_int_timer->adjust(machine().primary_screen->time_until_pos(128), 128);
 
@@ -271,8 +270,6 @@ MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 
 MACHINE_START_MEMBER(astinvad_state,spaceint)
 {
-	m_samples = machine().device<samples_device>("samples");
-
 	save_item(NAME(m_screen_flip));
 	save_item(NAME(m_sound_state));
 }

@@ -2167,8 +2167,6 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 MACHINE_START_MEMBER(tmnt_state,common)
 {
-	m_samples = machine().device<samples_device>("samples");
-
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_last));
 	save_item(NAME(m_tmnt_soundlatch));

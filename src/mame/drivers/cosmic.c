@@ -957,8 +957,6 @@ static const samples_interface cosmicg_samples_interface =
 
 MACHINE_START_MEMBER(cosmic_state,cosmic)
 {
-	m_samples = machine().device<samples_device>("samples");
-
 	save_item(NAME(m_sound_enabled));
 	save_item(NAME(m_march_select));
 	save_item(NAME(m_gun_die_select));

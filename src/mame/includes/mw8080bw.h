@@ -39,7 +39,10 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
 		m_colorram(*this, "colorram"),
-		m_discrete(*this, "discrete")
+		m_discrete(*this, "discrete"),
+		m_samples(*this, "samples"),
+		m_samples1(*this, "samples1"),
+		m_samples2(*this, "samples2")
 	{ }
 
 	/* device/memory pointers */
@@ -73,9 +76,9 @@ public:
 
 	/* other devices */
 	device_t *m_mb14241;
-	samples_device *m_samples;
-	samples_device *m_samples1;
-	samples_device *m_samples2;
+	optional_device<samples_device> m_samples;
+	optional_device<samples_device> m_samples1;
+	optional_device<samples_device> m_samples2;
 	device_t *m_sn1;
 	device_t *m_sn2;
 	device_t *m_sn;
