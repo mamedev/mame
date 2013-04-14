@@ -6,8 +6,6 @@
         23/06/2011 Working [Robbbert]
 
 No diagram has been found. The following is guesswork.
-Another trainer that looks almost identical has been seen. It is called
-the DAG-Z80. Bios dump is needed.
 
 Test sequence: Press -, enter an address, press = to show contents, press
                up/down-arrow to cycle through addresses.
@@ -170,4 +168,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, selz80,  0,       0,     selz80,    selz80, driver_device,   0,       "SEL", "Z80 Trainer", GAME_NO_SOUND_HW)
+COMP( 1985, selz80,  0,       0,     selz80,    selz80, driver_device,   0,       "SEL", "SEL Z80 Trainer", GAME_NO_SOUND_HW)
