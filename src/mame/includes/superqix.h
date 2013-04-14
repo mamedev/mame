@@ -1,3 +1,5 @@
+#include "sound/samples.h"
+
 class superqix_state : public driver_device
 {
 public:
@@ -8,7 +10,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_bitmapram(*this, "bitmapram"),
-		m_bitmapram2(*this, "bitmapram2"){ }
+		m_bitmapram2(*this, "bitmapram2"),
+		m_samples(*this, "samples"){ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
@@ -16,6 +19,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bitmapram;
 	optional_shared_ptr<UINT8> m_bitmapram2;
+	optional_device<samples_device> m_samples;
 
 	INT16 *m_samplebuf;
 	UINT8 m_port1;

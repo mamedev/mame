@@ -28,8 +28,6 @@ void starcrus_state::video_start()
 
 WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	m_s1_sprite = data&0x1f;
 	m_engine1_on = ((data&0x20)>>5)^0x01;
 
@@ -38,7 +36,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
 		if (m_engine_sound_playing == 0)
 		{
 			m_engine_sound_playing = 1;
-			samples->start(0, 0, true); /* engine sample */
+			m_samples->start(0, 0, true); /* engine sample */
 		}
 	}
 	else
@@ -46,15 +44,13 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_1_w)
 		if (m_engine_sound_playing == 1)
 		{
 			m_engine_sound_playing = 0;
-			samples->stop(0);
+			m_samples->stop(0);
 		}
 	}
 }
 
 WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	m_s2_sprite = data&0x1f;
 	set_led_status(machine(), 2,~data & 0x80);          /* game over lamp */
 	coin_counter_w(machine(), 0, ((data&0x40)>>6)^0x01);    /* coin counter */
@@ -65,7 +61,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 		if (m_engine_sound_playing == 0)
 		{
 			m_engine_sound_playing = 1;
-			samples->start(0, 0, true); /* engine sample */
+			m_samples->start(0, 0, true); /* engine sample */
 		}
 	}
 	else
@@ -73,7 +69,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 		if (m_engine_sound_playing == 1)
 		{
 			m_engine_sound_playing = 0;
-			samples->stop(0);
+			m_samples->stop(0);
 		}
 	}
 
@@ -81,8 +77,6 @@ WRITE8_MEMBER(starcrus_state::starcrus_ship_parm_2_w)
 
 WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	m_p1_sprite = data&0x0f;
 	m_launch1_on = ((data&0x20)>>5)^0x01;
 	m_explode1_on = ((data&0x10)>>4)^0x01;
@@ -92,7 +86,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_explode_sound_playing == 0)
 		{
 			m_explode_sound_playing = 1;
-			samples->start(1,1, true);  /* explosion initial sample */
+			m_samples->start(1,1, true);  /* explosion initial sample */
 		}
 	}
 	else
@@ -100,7 +94,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_explode_sound_playing == 1)
 		{
 			m_explode_sound_playing = 0;
-			samples->start(1,2);    /* explosion ending sample */
+			m_samples->start(1,2);    /* explosion ending sample */
 		}
 	}
 
@@ -109,7 +103,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 		if (m_launch1_sound_playing == 0)
 		{
 			m_launch1_sound_playing = 1;
-			samples->start(2,3);    /* launch sample */
+			m_samples->start(2,3);    /* launch sample */
 		}
 	}
 	else
@@ -120,8 +114,6 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_1_w)
 
 WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	m_p2_sprite = data&0x0f;
 	m_launch2_on = ((data&0x20)>>5)^0x01;
 	m_explode2_on = ((data&0x10)>>4)^0x01;
@@ -131,7 +123,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_explode_sound_playing == 0)
 		{
 			m_explode_sound_playing = 1;
-			samples->start(1,1, true);  /* explosion initial sample */
+			m_samples->start(1,1, true);  /* explosion initial sample */
 		}
 	}
 	else
@@ -139,7 +131,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_explode_sound_playing == 1)
 		{
 			m_explode_sound_playing = 0;
-			samples->start(1,2);    /* explosion ending sample */
+			m_samples->start(1,2);    /* explosion ending sample */
 		}
 	}
 
@@ -148,7 +140,7 @@ WRITE8_MEMBER(starcrus_state::starcrus_proj_parm_2_w)
 		if (m_launch2_sound_playing == 0)
 		{
 			m_launch2_sound_playing = 1;
-			samples->start(3,3);    /* launch sample */
+			m_samples->start(3,3);    /* launch sample */
 		}
 	}
 	else

@@ -27,7 +27,8 @@ public:
 		m_orga_ram(*this, "orga_ram"),
 		m_code_ram(*this, "code_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_discrete(*this, "discrete") { }
+		m_discrete(*this, "discrete"),
+		m_samples(*this, "samples") { }
 
 	UINT8 m_cmos[16];
 	UINT8 m_da_latch;
@@ -59,6 +60,7 @@ public:
 	void triplhnt_update_misc(address_space &space, int offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+	required_device<samples_device> m_samples;
 };
 
 

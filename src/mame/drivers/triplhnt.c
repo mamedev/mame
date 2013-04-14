@@ -33,7 +33,6 @@ void triplhnt_state::triplhnt_set_collision(int code)
 
 void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -76,14 +75,14 @@ void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 	bit = ~m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
-	if (!samples->playing(0))
-		samples->start(0, 0, true);
-	if (!samples->playing(1))
-		samples->start(1, 1, true);
+	if (!m_samples->playing(0))
+		m_samples->start(0, 0, true);
+	if (!m_samples->playing(1))
+		m_samples->start(1, 1, true);
 
 	/* bit 6 turns cassette on/off */
-	samples->pause(0,  is_witch_hunt || bit);
-	samples->pause(1, !is_witch_hunt || bit);
+	m_samples->pause(0,  is_witch_hunt || bit);
+	m_samples->pause(1, !is_witch_hunt || bit);
 }
 
 

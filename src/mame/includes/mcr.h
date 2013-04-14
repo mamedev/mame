@@ -10,6 +10,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 #include "audio/midway.h"
+#include "sound/samples.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I      XTAL_19_968MHz
@@ -29,7 +30,8 @@ public:
 		m_turbo_chip_squeak(*this, "tcs"),
 		m_squawk_n_talk(*this, "snt"),
 		m_dpoker_coin_in_timer(*this, "dp_coinin"),
-		m_dpoker_hopper_timer(*this, "dp_hopper")
+		m_dpoker_hopper_timer(*this, "dp_hopper"),
+		m_samples(*this, "samples")
 	{ }
 
 	// these should be required but can't because mcr68 shares with us
@@ -45,6 +47,7 @@ public:
 	optional_device<midway_squawk_n_talk_device> m_squawk_n_talk;
 	optional_device<timer_device> m_dpoker_coin_in_timer;
 	optional_device<timer_device> m_dpoker_hopper_timer;
+	optional_device<samples_device> m_samples;
 
 	DECLARE_WRITE8_MEMBER(mcr_control_port_w);
 	DECLARE_WRITE8_MEMBER(mcr_ipu_laserdisk_w);

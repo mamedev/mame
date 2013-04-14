@@ -1,4 +1,5 @@
 #include "sound/discrete.h"
+#include "sound/samples.h"
 
 class galaga_state : public driver_device
 {
@@ -89,7 +90,8 @@ public:
 		m_xevious_fg_colorram(*this, "fg_colorram"),
 		m_xevious_bg_colorram(*this, "bg_colorram"),
 		m_xevious_fg_videoram(*this, "fg_videoram"),
-		m_xevious_bg_videoram(*this, "bg_videoram") { }
+		m_xevious_bg_videoram(*this, "bg_videoram"),
+		m_samples(*this, "samples") { }
 
 	required_shared_ptr<UINT8> m_xevious_sr1;
 	required_shared_ptr<UINT8> m_xevious_sr2;
@@ -98,6 +100,7 @@ public:
 	required_shared_ptr<UINT8> m_xevious_bg_colorram;
 	required_shared_ptr<UINT8> m_xevious_fg_videoram;
 	required_shared_ptr<UINT8> m_xevious_bg_videoram;
+	optional_device<samples_device> m_samples;
 
 	INT32 m_xevious_bs[2];
 	DECLARE_DRIVER_INIT(xevious);

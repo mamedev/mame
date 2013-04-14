@@ -8,7 +8,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_discrete(*this, "discrete"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	required_device<discrete_device> m_discrete;
@@ -32,6 +33,7 @@ public:
 	INTERRUPT_GEN_MEMBER(blockade_interrupt);
 	DECLARE_WRITE8_MEMBER(blockade_sound_freq_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
 };
 
 /*----------- defined in audio/blockade.c -----------*/

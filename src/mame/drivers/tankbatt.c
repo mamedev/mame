@@ -97,7 +97,7 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_interrupt_enable_w)
 	m_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) machine().device<samples_device>("samples")->stop(2);
+	if (data) m_samples->stop(2);
 }
 
 WRITE8_MEMBER(tankbatt_state::tankbatt_demo_interrupt_enable_w)
@@ -109,30 +109,27 @@ WRITE8_MEMBER(tankbatt_state::tankbatt_sh_expl_w)
 {
 	if (m_sound_enable)
 	{
-		samples_device *samples = machine().device<samples_device>("samples");
-		samples->start(1, 3);
+		m_samples->start(1, 3);
 	}
 }
 
 WRITE8_MEMBER(tankbatt_state::tankbatt_sh_engine_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	if (m_sound_enable)
 	{
 		if (data)
-			samples->start(2, 2, true);
+			m_samples->start(2, 2, true);
 		else
-			samples->start(2, 1, true);
+			m_samples->start(2, 1, true);
 	}
-	else samples->stop(2);
+	else m_samples->stop(2);
 }
 
 WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
 {
 	if (m_sound_enable)
 	{
-		samples_device *samples = machine().device<samples_device>("samples");
-		samples->start(0, 0);
+		m_samples->start(0, 0);
 	}
 }
 

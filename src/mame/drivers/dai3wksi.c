@@ -50,7 +50,8 @@ public:
 	dai3wksi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_dai3wksi_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples") { }
 
 	/* video */
 	required_shared_ptr<UINT8> m_dai3wksi_videoram;
@@ -70,6 +71,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_dai3wksi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
 };
 
 
@@ -203,7 +205,6 @@ UINT32 dai3wksi_state::screen_update_dai3wksi(screen_device &screen, bitmap_rgb3
 #if (USE_SAMPLES)
 WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~m_port_last1;
 
 	m_enabled_sound = data & 0x80;
@@ -211,19 +212,18 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 	if ((rising_bits & 0x20) && m_enabled_sound)
 	{
 		if (data & 0x04)
-			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5);
+			m_samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5);
 		else
-			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5, true);
+			m_samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5, true);
 	}
 	if (!(data & 0x20) && (m_port_last1 & 0x20))
-		samples->stop(CHANNEL_SOUND5);
+		m_samples->stop(CHANNEL_SOUND5);
 
 	m_port_last1 = data;
 }
 
 WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~m_port_last2;
 
 	m_dai3wksi_flipscreen = data & 0x10;
@@ -232,15 +232,15 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 
 	if (m_enabled_sound)
 	{
-		if (rising_bits & 0x01) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1);
-		if (rising_bits & 0x02) samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
-		if (rising_bits & 0x08) samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4);
+		if (rising_bits & 0x01) m_samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1);
+		if (rising_bits & 0x02) m_samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
+		if (rising_bits & 0x08) m_samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4);
 		if (rising_bits & 0x04)
 		{
 			if (!m_sound3_counter)
-				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_1);
+				m_samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_1);
 			else
-				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_2);
+				m_samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_2);
 
 			m_sound3_counter ^= 1;
 		}
@@ -251,14 +251,12 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 
 WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	if (m_enabled_sound)
 	{
 		if (data & 0x40)
-			samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_1);
+			m_samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_1);
 		else if (data & 0x80)
-			samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_2);
+			m_samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_2);
 	}
 }
 

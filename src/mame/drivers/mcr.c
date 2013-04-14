@@ -535,14 +535,12 @@ WRITE8_MEMBER(mcr_state::kroozr_op4_w)
 
 WRITE8_MEMBER(mcr_state::journey_op4_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	/* if we're not playing the sample yet, start it */
-	if (!samples->playing(0))
-		samples->start(0, 0, true);
+	if (!m_samples->playing(0))
+		m_samples->start(0, 0, true);
 
 	/* bit 0 turns cassette on/off */
-	samples->pause(0, ~data & 1);
+	m_samples->pause(0, ~data & 1);
 }
 
 
@@ -555,16 +553,14 @@ WRITE8_MEMBER(mcr_state::journey_op4_w)
 
 WRITE8_MEMBER(mcr_state::twotiger_op4_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	for (int i = 0; i < 2; i++)
 	{
 		/* play tape, and loop it */
-		if (!samples->playing(i))
-			samples->start(i, i, true);
+		if (!m_samples->playing(i))
+			m_samples->start(i, i, true);
 
 		/* bit 1 turns cassette on/off */
-		samples->pause(i, ~data & 2);
+		m_samples->pause(i, ~data & 2);
 	}
 
 	// bit 2: lamp control?

@@ -3,6 +3,7 @@
     Sega Zaxxon hardware
 
 ***************************************************************************/
+#include "sound/samples.h"
 
 class zaxxon_state : public driver_device
 {
@@ -12,7 +13,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -86,6 +88,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask);
 	void zaxxonj_decode(const char *cputag);
 	required_device<cpu_device> m_maincpu;
+	optional_device<samples_device> m_samples;
 };
 
 

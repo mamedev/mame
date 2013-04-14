@@ -1,4 +1,5 @@
 #include "sound/dac.h"
+#include "sound/samples.h"
 
 #define MAX_SAMPLES 0x2f        /* max samples */
 
@@ -25,7 +26,8 @@ public:
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac") { }
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples") { }
 
 	/* memory pointers */
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
@@ -112,4 +114,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_device> m_dac;
+	optional_device<samples_device> m_samples;
 };

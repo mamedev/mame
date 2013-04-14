@@ -3,7 +3,7 @@
     Sega G-80 raster hardware
 
 *************************************************************************/
-
+#include "sound/samples.h"
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 
@@ -17,7 +17,8 @@ public:
 		m_sn1(*this, "sn1"),
 		m_sn2(*this, "sn2"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_samples(*this, "samples") { }
 
 	required_shared_ptr<UINT8> m_mainram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -124,6 +125,7 @@ public:
 	void monsterb_expand_gfx(const char *region);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<samples_device> m_samples;
 };
 
 

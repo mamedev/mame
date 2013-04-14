@@ -204,45 +204,43 @@ WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
 
 WRITE8_MEMBER(astrocde_state::seawolf2_sound_1_w)// Port 40
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
 
-	if (rising_bits & 0x01) samples->start(1, 1);  /* Left Torpedo */
-	if (rising_bits & 0x02) samples->start(0, 0);  /* Left Ship Hit */
-	if (rising_bits & 0x04) samples->start(4, 4);  /* Left Mine Hit */
-	if (rising_bits & 0x08) samples->start(6, 1);  /* Right Torpedo */
-	if (rising_bits & 0x10) samples->start(5, 0);  /* Right Ship Hit */
-	if (rising_bits & 0x20) samples->start(9, 4);  /* Right Mine Hit */
+	if (rising_bits & 0x01) m_samples->start(1, 1);  /* Left Torpedo */
+	if (rising_bits & 0x02) m_samples->start(0, 0);  /* Left Ship Hit */
+	if (rising_bits & 0x04) m_samples->start(4, 4);  /* Left Mine Hit */
+	if (rising_bits & 0x08) m_samples->start(6, 1);  /* Right Torpedo */
+	if (rising_bits & 0x10) m_samples->start(5, 0);  /* Right Ship Hit */
+	if (rising_bits & 0x20) m_samples->start(9, 4);  /* Right Mine Hit */
 }
 
 
 WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
 
-	samples->set_volume(0, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(1, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(3, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(4, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(5, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(6, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(8, (data & 0x80) ? 1.0 : 0.0);
-	samples->set_volume(9, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(0, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(1, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(3, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(4, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(5, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(6, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(8, (data & 0x80) ? 1.0 : 0.0);
+	m_samples->set_volume(9, (data & 0x80) ? 1.0 : 0.0);
 
 	/* dive panning controlled by low 3 bits */
-	samples->set_volume(2, (float)(~data & 0x07) / 7.0);
-	samples->set_volume(7, (float)(data & 0x07) / 7.0);
+	m_samples->set_volume(2, (float)(~data & 0x07) / 7.0);
+	m_samples->set_volume(7, (float)(data & 0x07) / 7.0);
 
 	if (rising_bits & 0x08)
 	{
-		samples->start(2, 2);
-		samples->start(7, 2);
+		m_samples->start(2, 2);
+		m_samples->start(7, 2);
 	}
-	if (rising_bits & 0x10) samples->start(8, 3);  /* Right Sonar */
-	if (rising_bits & 0x20) samples->start(3, 3);  /* Left Sonar */
+	if (rising_bits & 0x10) m_samples->start(8, 3);  /* Right Sonar */
+	if (rising_bits & 0x20) m_samples->start(3, 3);  /* Left Sonar */
 
 	coin_counter_w(machine(), 0, data & 0x40);    /* Coin Counter */
 }
@@ -336,7 +334,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 		case 6:
 			machine().device<astrocade_device>("astrocade1")->set_output_gain(0, data ? 0.0 : 1.0);
 #if USE_FAKE_VOTRAX
-			machine().device<samples_device>("samples")->set_output_gain(0, data ? 1.0 : 0.0);
+			m_samples->set_output_gain(0, data ? 1.0 : 0.0);
 #else
 			machine().device<votrax_sc01_device>("votrax")->set_output_gain(0, data ? 1.0 : 0.0);
 #endif

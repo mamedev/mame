@@ -14,7 +14,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac")	{ }
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples")	{ }
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;
@@ -54,6 +55,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	required_device<cpu_device> m_maincpu;
 	optional_device<dac_device> m_dac;
+	optional_device<samples_device> m_samples;
 };
 
 

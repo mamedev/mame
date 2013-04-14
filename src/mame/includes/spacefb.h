@@ -3,7 +3,7 @@
     Space Firebird hardware
 
 ****************************************************************************/
-
+#include "sound/samples.h"
 /*
  *  SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of
  *  the graphics use a clock half of SPACEFB_PIXEL_CLOCK, thus creating
@@ -31,7 +31,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_samples(*this, "samples") { }
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
@@ -64,6 +65,7 @@ public:
 	void start_interrupt_timer();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<samples_device> m_samples;
 };
 
 /*----------- defined in audio/spacefb.c -----------*/

@@ -1,4 +1,4 @@
-
+#include "sound/samples.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 
@@ -20,7 +20,8 @@ public:
 		m_dac_1(*this, "dac1"),
 		m_dac_2(*this, "dac2"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_samples(*this, "samples") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_bg_videoram;
@@ -125,4 +126,5 @@ public:
 	void unpack_region( const char *region );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<samples_device> m_samples;
 };

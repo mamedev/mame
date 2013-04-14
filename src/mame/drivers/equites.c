@@ -471,18 +471,15 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 WRITE8_MEMBER(equites_state::equites_8910porta_w)
 {
-	device_t *device = machine().device("samples");
-	samples_device *samples = downcast<samples_device *>(device);
-
 	// bongo 1
-	samples->set_volume(0, ((data & 0x30) >> 4) * 0.33);
+	m_samples->set_volume(0, ((data & 0x30) >> 4) * 0.33);
 	if (data & ~m_ay_port_a & 0x80)
-		samples->start(0, 0);
+		m_samples->start(0, 0);
 
 	// bongo 2
-	samples->set_volume(1, (data & 0x03) * 0.33);
+	m_samples->set_volume(1, (data & 0x03) * 0.33);
 	if (data & ~m_ay_port_a & 0x08)
-		samples->start(1, 1);
+		m_samples->start(1, 1);
 
 	m_ay_port_a = data;
 
@@ -493,17 +490,15 @@ popmessage("HH %d(%d) CYM %d(%d)", m_hihat, BIT(m_ay_port_b, 6), m_cymbal, m_ay_
 
 WRITE8_MEMBER(equites_state::equites_8910portb_w)
 {
-	device_t *device = machine().device("samples");
-	samples_device *samples = downcast<samples_device *>(device);
 #if POPDRUMKIT
 if (data & ~m_ay_port_b & 0x08) m_cymbal++;
 if (data & ~m_ay_port_b & 0x04) m_hihat++;
 #endif
 
 	// bongo 3
-	samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
+	m_samples->set_volume(2, ((data & 0x30)>>4) * 0.33);
 	if (data & ~m_ay_port_b & 0x80)
-		samples->start(2, 2);
+		m_samples->start(2, 2);
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.

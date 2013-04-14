@@ -137,196 +137,189 @@ d0      crafts joining
 
 WRITE8_MEMBER(segag80v_state::elim1_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play fireball sample */
 	if (data & 0x02)
-		samples->start(0, 0);
+		m_samples->start(0, 0);
 
 	/* Play explosion samples */
 	if (data & 0x04)
-		samples->start(1, 10);
+		m_samples->start(1, 10);
 	if (data & 0x08)
-		samples->start(1, 9);
+		m_samples->start(1, 9);
 	if (data & 0x10)
-		samples->start(1, 8);
+		m_samples->start(1, 8);
 
 	/* Play bounce sample */
 	if (data & 0x20)
 	{
-		if (samples->playing(2))
-			samples->stop(2);
-		samples->start(2, 1);
+		if (m_samples->playing(2))
+			m_samples->stop(2);
+		m_samples->start(2, 1);
 	}
 
 	/* Play lazer sample */
 	if (data & 0xc0)
 	{
-		if (samples->playing(3))
-			samples->stop(3);
-		samples->start(3, 5);
+		if (m_samples->playing(3))
+			m_samples->stop(3);
+		m_samples->start(3, 5);
 	}
 }
 
 WRITE8_MEMBER(segag80v_state::elim2_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
 	if (data & 0x0f)
-		samples->start(4, 6);
+		m_samples->start(4, 6);
 	else
-		samples->stop(4);
+		m_samples->stop(4);
 
 	/* Play skitter sample */
 	if (data & 0x10)
-		samples->start(5, 2);
+		m_samples->start(5, 2);
 
 	/* Play eliminator sample */
 	if (data & 0x20)
-		samples->start(6, 3);
+		m_samples->start(6, 3);
 
 	/* Play electron samples */
 	if (data & 0x40)
-		samples->start(7, 7);
+		m_samples->start(7, 7);
 	if (data & 0x80)
-		samples->start(7, 4);
+		m_samples->start(7, 4);
 }
 
 
 WRITE8_MEMBER(segag80v_state::zektor1_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	data ^= 0xff;
 
 	/* Play fireball sample */
 	if (data & 0x02)
-				samples->start(0, 0);
+				m_samples->start(0, 0);
 
 	/* Play explosion samples */
 	if (data & 0x04)
-				samples->start(1, 10);
+				m_samples->start(1, 10);
 	if (data & 0x08)
-					samples->start(1, 9);
+					m_samples->start(1, 9);
 	if (data & 0x10)
-					samples->start(1, 8);
+					m_samples->start(1, 8);
 
 	/* Play bounce sample */
 	if (data & 0x20)
 	{
-				if (samples->playing(2))
-						samples->stop(2);
-				samples->start(2, 1);
+				if (m_samples->playing(2))
+						m_samples->stop(2);
+				m_samples->start(2, 1);
 	}
 
 	/* Play lazer sample */
 	if (data & 0xc0)
 	{
-		if (samples->playing(3))
-			samples->stop(3);
-				samples->start(3, 5);
+		if (m_samples->playing(3))
+			m_samples->stop(3);
+				m_samples->start(3, 5);
 	}
 }
 
 WRITE8_MEMBER(segag80v_state::zektor2_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* Play thrust sample */
 	if (data & 0x0f)
-			samples->start(4, 6);
+			m_samples->start(4, 6);
 	else
-		samples->stop(4);
+		m_samples->stop(4);
 
 	/* Play skitter sample */
 	if (data & 0x10)
-				samples->start(5, 2);
+				m_samples->start(5, 2);
 
 	/* Play eliminator sample */
 	if (data & 0x20)
-				samples->start(6, 3);
+				m_samples->start(6, 3);
 
 	/* Play electron samples */
 	if (data & 0x40)
-				samples->start(7, 40);
+				m_samples->start(7, 40);
 	if (data & 0x80)
-				samples->start(7, 41);
+				m_samples->start(7, 41);
 }
 
 
 
 WRITE8_MEMBER(segag80v_state::spacfury1_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft growing */
 	if (data & 0x01)
-		samples->start(1, 0);
+		m_samples->start(1, 0);
 
 	/* craft moving */
 	if (data & 0x02)
 	{
-		if (!samples->playing(2))
-			samples->start(2, 1, true);
+		if (!m_samples->playing(2))
+			m_samples->start(2, 1, true);
 	}
 	else
-		samples->stop(2);
+		m_samples->stop(2);
 
 	/* Thrust */
 	if (data & 0x04)
 	{
-		if (!samples->playing(3))
-			samples->start(3, 4, true);
+		if (!m_samples->playing(3))
+			m_samples->start(3, 4, true);
 	}
 	else
-		samples->stop(3);
+		m_samples->stop(3);
 
 	/* star spin */
 	if (data & 0x40)
-		samples->start(4, 8);
+		m_samples->start(4, 8);
 
 	/* partial warship? */
 	if (data & 0x80)
-		samples->start(4, 9);
+		m_samples->start(4, 9);
 
 }
 
 WRITE8_MEMBER(segag80v_state::spacfury2_sh_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	data ^= 0xff;
 
 	/* craft joining */
 	if (data & 0x01)
-		samples->start(5, 2);
+		m_samples->start(5, 2);
 
 	/* ship firing */
 	if (data & 0x02)
 	{
-		if (samples->playing(6))
-			samples->stop(6);
-		samples->start(6, 3);
+		if (m_samples->playing(6))
+			m_samples->stop(6);
+		m_samples->start(6, 3);
 
 	}
 
 	/* fireball */
 	if (data & 0x04)
-		samples->start(7, 6);
+		m_samples->start(7, 6);
 
 	/* small explosion */
 	if (data & 0x08)
-		samples->start(7, 6);
+		m_samples->start(7, 6);
 	/* large explosion */
 	if (data & 0x10)
-		samples->start(7, 5);
+		m_samples->start(7, 5);
 
 	/* docking bang */
 	if (data & 0x20)
-		samples->start(0, 7);
+		m_samples->start(0, 7);
 
 }

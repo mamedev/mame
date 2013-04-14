@@ -44,9 +44,8 @@ WRITE8_MEMBER(blockade_state::blockade_sound_freq_w)
 
 WRITE8_MEMBER(blockade_state::blockade_env_on_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	if (BLOCKADE_LOG) mame_printf_debug("Boom Start\n");
-	samples->start(0,0);
+	m_samples->start(0,0);
 	return;
 }
 

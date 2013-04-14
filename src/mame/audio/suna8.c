@@ -36,11 +36,9 @@ WRITE8_MEMBER(suna8_state::suna8_samples_number_w)
 
 void suna8_state::play_sample(int index)
 {
-	samples_device *samples = downcast<samples_device *>(machine().device("samples"));
-
 	if (index < m_numsamples)
 	{
-		samples->start_raw(0, &m_samplebuf[SAMPLEN * index], SAMPLEN, FREQ_HZ);
+		m_samples->start_raw(0, &m_samplebuf[SAMPLEN * index], SAMPLEN, FREQ_HZ);
 		logerror("%s: starting sample %02X\n", machine().describe_context(), index);
 	}
 	else

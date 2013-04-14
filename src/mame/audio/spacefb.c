@@ -31,15 +31,13 @@ READ8_MEMBER(spacefb_state::spacefb_audio_t1_r)
 
 WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	m_audiocpu->set_input_line(0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
-	if (!(data & 0x01) && (m_sound_latch & 0x01))  samples->start(0,0);
+	if (!(data & 0x01) && (m_sound_latch & 0x01))  m_samples->start(0,0);
 
 	/* ship fire */
-	if (!(data & 0x40) && (m_sound_latch & 0x40))  samples->start(1,1);
+	if (!(data & 0x40) && (m_sound_latch & 0x40))  m_samples->start(1,1);
 
 	/*
 	 *  Explosion Noise
@@ -53,10 +51,10 @@ WRITE8_MEMBER(spacefb_state::spacefb_port_1_w)
 	{
 		if (data & 0x80)
 			/* play decaying noise */
-			samples->start(2,3);
+			m_samples->start(2,3);
 		else
 			/* start looping noise */
-			samples->start(2,2, true);
+			m_samples->start(2,2, true);
 	}
 
 	m_sound_latch = data;

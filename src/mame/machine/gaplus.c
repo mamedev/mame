@@ -20,9 +20,8 @@
 
 WRITE8_MEMBER(gaplus_state::gaplus_customio_3_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	if ((offset == 0x09) && (data >= 0x0f))
-		samples->start(0,0);
+		m_samples->start(0,0);
 
 	m_customio_3[offset] = data;
 }

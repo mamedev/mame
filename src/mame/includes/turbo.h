@@ -7,7 +7,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/discrete.h"
-
+#include "sound/samples.h"
 /* sprites are scaled in the analog domain; to give a better */
 /* rendition of this, we scale in the X direction by this factor */
 #define TURBO_X_SCALE       2
@@ -28,7 +28,8 @@ public:
 		m_gfx1(*this, "gfx1"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_sprite_position(*this, "spritepos")
+		m_sprite_position(*this, "spritepos"),
+		m_samples(*this, "samples")
 	{ }
 
 	/* device/memory pointers */
@@ -43,6 +44,8 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_sprite_position;
+	
+	required_device<samples_device> m_samples;
 
 	UINT8 *     m_buckrog_bitmap_ram;
 

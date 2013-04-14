@@ -706,7 +706,6 @@ READ8_MEMBER(tnzs_state::kageki_csport_r)
 
 WRITE8_MEMBER(tnzs_state::kageki_csport_w)
 {
-	device_t *device = machine().device("samples");
 	char mess[80];
 
 	if (data > 0x3f)
@@ -716,17 +715,16 @@ WRITE8_MEMBER(tnzs_state::kageki_csport_w)
 	}
 	else
 	{
-		samples_device *samples = downcast<samples_device *>(device);
 		if (data > MAX_SAMPLES)
 		{
 			// stop samples
-			samples->stop(0);
+			m_samples->stop(0);
 			sprintf(mess, "VOICE:%02X STOP", data);
 		}
 		else
 		{
 			// play samples
-			samples->start_raw(0, m_sampledata[data], m_samplesize[data], 7000);
+			m_samples->start_raw(0, m_sampledata[data], m_samplesize[data], 7000);
 			sprintf(mess, "VOICE:%02X PLAY", data);
 		}
 	//  popmessage(mess);

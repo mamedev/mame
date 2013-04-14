@@ -12,7 +12,8 @@ class thief_state : public driver_device
 public:
 	thief_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_samples(*this, "samples") { }
 
 	UINT8 *m_videoram;
 	UINT8 m_input_select;
@@ -42,4 +43,5 @@ public:
 	void tape_set_audio( samples_device *samples, int track, int bOn );
 	void tape_set_motor( samples_device *samples, int bOn );
 	required_device<cpu_device> m_maincpu;
+	required_device<samples_device> m_samples;
 };

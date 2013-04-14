@@ -115,7 +115,6 @@ READ8_HANDLER( gorf_speech_r )
 	UINT8 data = offset >> 8;
 #if USE_FAKE_VOTRAX
 	astrocde_state *state = space.machine().driver_data<astrocde_state>();
-	samples_device *samples = space.machine().device<samples_device>("samples");
 	int Phoneme, Intonation;
 	int i = 0;
 	offset &= 0xff;
@@ -128,7 +127,7 @@ READ8_HANDLER( gorf_speech_r )
 	logerror("Date : %d Speech : %s at intonation %d\n",Phoneme, PhonemeTable[Phoneme],Intonation);
 
 	if(Phoneme==63) {
-		samples->stop(0);
+		state->m_samples->stop(0);
 		if (strlen(state->m_totalword)>2) logerror("Clearing sample %s\n",state->m_totalword);
 		state->m_totalword[0] = 0;                 /* Clear the total word stack */
 		return data;
@@ -141,8 +140,8 @@ READ8_HANDLER( gorf_speech_r )
 		if (state->m_plural != 0) {
 			logerror("found a possible plural at %d\n",state->m_plural-1);
 			if (!strcmp("S",state->m_totalword)) {         /* Plural check */
-				samples->start(0, num_samples-2);      /* play the sample at position of word */
-				samples->set_frequency(0, 11025);    /* play at correct rate */
+				state->m_samples->start(0, num_samples-2);      /* play the sample at position of word */
+				state->m_samples->set_frequency(0, 11025);    /* play at correct rate */
 				state->m_totalword[0] = 0;                 /* Clear the total word stack */
 				state->m_oldword[0] = 0;                   /* Clear the total word stack */
 				return data;
@@ -164,8 +163,8 @@ READ8_HANDLER( gorf_speech_r )
 			} else {
 				state->m_plural=0;
 			}
-			samples->start(0, i);                      /* play the sample at position of word */
-			samples->set_frequency(0, 11025);       /* play at correct rate */
+			state->m_samples->start(0, i);                      /* play the sample at position of word */
+			state->m_samples->set_frequency(0, 11025);       /* play at correct rate */
 			logerror("Playing sample %d",i);
 			state->m_totalword[0] = 0;                 /* Clear the total word stack */
 			return data;

@@ -100,7 +100,6 @@ WRITE8_MEMBER(thief_state::thief_input_select_w)
 
 WRITE8_MEMBER(thief_state::tape_control_w)
 {
-	device_t *device = machine().device("samples");
 	switch( data )
 	{
 	case 0x02: /* coin meter on */
@@ -113,27 +112,27 @@ WRITE8_MEMBER(thief_state::tape_control_w)
 		break;
 
 	case 0x08: /* talk track on */
-		tape_set_audio( downcast<samples_device *>(device), kTalkTrack, 1 );
+		tape_set_audio( m_samples, kTalkTrack, 1 );
 		break;
 
 	case 0x09: /* talk track off */
-		tape_set_audio( downcast<samples_device *>(device), kTalkTrack, 0 );
+		tape_set_audio( m_samples, kTalkTrack, 0 );
 		break;
 
 	case 0x0a: /* motor on */
-		tape_set_motor( downcast<samples_device *>(device), 1 );
+		tape_set_motor( m_samples, 1 );
 		break;
 
 	case 0x0b: /* motor off */
-		tape_set_motor( downcast<samples_device *>(device), 0 );
+		tape_set_motor( m_samples, 0 );
 		break;
 
 	case 0x0c: /* crash track on */
-		tape_set_audio( downcast<samples_device *>(device), kCrashTrack, 1 );
+		tape_set_audio( m_samples, kCrashTrack, 1 );
 		break;
 
 	case 0x0d: /* crash track off */
-		tape_set_audio( downcast<samples_device *>(device), kCrashTrack, 0 );
+		tape_set_audio( m_samples, kCrashTrack, 0 );
 		break;
 	}
 }

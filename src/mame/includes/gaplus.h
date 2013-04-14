@@ -1,3 +1,4 @@
+#include "sound/samples.h"
 #define MAX_STARS           250
 
 struct star {
@@ -16,7 +17,8 @@ public:
 			m_spriteram(*this,"spriteram") ,
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
-		m_subcpu2(*this, "sub2") { }
+		m_subcpu2(*this, "sub2"),
+		m_samples(*this, "samples") { }
 
 	required_shared_ptr<UINT8> m_customio_3;
 	required_shared_ptr<UINT8> m_videoram;
@@ -60,4 +62,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
+	required_device<samples_device> m_samples;
 };

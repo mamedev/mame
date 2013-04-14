@@ -123,7 +123,6 @@ static SAMPLES_START( pbillian_sh_start )
 
 WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 *src = memregion("samples")->base();
 	int len = memregion("samples")->bytes();
 	int start,end;
@@ -134,7 +133,7 @@ WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 	while (end < len && src[end] != 0xff)
 		end++;
 
-	samples->start_raw(0, m_samplebuf + start, end - start, 5000); // 5khz ?
+	m_samples->start_raw(0, m_samplebuf + start, end - start, 5000); // 5khz ?
 }
 
 

@@ -72,7 +72,6 @@ if (!((data >> 4) & 1)) mame_printf_debug("/TRIG4\n");
 WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 {
 #if (!DISCRETE_TEST)
-	samples_device *samples = machine().device<samples_device>("samples");
 #endif
 #if (!DISCRETE_TEST)
 	UINT8 diff = data ^ m_sound_state[0];
@@ -82,31 +81,31 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 #if (!DISCRETE_TEST)
 
 	/* /CRASH.S: channel 0 */
-	if ((diff & 0x01) && !(data & 0x01)) samples->start(0, 5);
+	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 5);
 
 	/* /TRIG1: channel 1 */
-	if ((diff & 0x02) && !(data & 0x02)) samples->start(1, 0);
+	if ((diff & 0x02) && !(data & 0x02)) m_samples->start(1, 0);
 
 	/* /TRIG2: channel 1 */
-	if ((diff & 0x04) && !(data & 0x04)) samples->start(1, 1);
+	if ((diff & 0x04) && !(data & 0x04)) m_samples->start(1, 1);
 
 	/* /TRIG3: channel 1 */
-	if ((diff & 0x08) && !(data & 0x08)) samples->start(1, 2);
+	if ((diff & 0x08) && !(data & 0x08)) m_samples->start(1, 2);
 
 	/* /TRIG4: channel 1 */
-	if ((diff & 0x10) && !(data & 0x10)) samples->start(1, 3);
+	if ((diff & 0x10) && !(data & 0x10)) m_samples->start(1, 3);
 
 	/* OSEL0 */
 	m_turbo_osel = (m_turbo_osel & 6) | ((data >> 5) & 1);
 
 	/* /SLIP: channel 2 */
-	if ((diff & 0x40) && !(data & 0x40)) samples->start(2, 4);
+	if ((diff & 0x40) && !(data & 0x40)) m_samples->start(2, 4);
 
 	/* /CRASH.L: channel 3 */
-	if ((diff & 0x80) && !(data & 0x80)) samples->start(3, 5);
+	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(3, 5);
 
 	/* update any samples */
-	turbo_update_samples(this, samples);
+	turbo_update_samples(this, m_samples);
 
 #else
 
@@ -123,7 +122,6 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 
 WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
@@ -132,21 +130,19 @@ WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 	output_set_value("tachometer", m_turbo_accel);
 
 	/* /AMBU: channel 4 */
-	if ((diff & 0x40) && !(data & 0x40) && !samples->playing(4)) samples->start(4, 8, true);
-	if ((diff & 0x40) &&  (data & 0x40)) samples->stop(4);
+	if ((diff & 0x40) && !(data & 0x40) && !m_samples->playing(4)) m_samples->start(4, 8, true);
+	if ((diff & 0x40) &&  (data & 0x40)) m_samples->stop(4);
 
 	/* /SPIN: channel 2 */
-	if ((diff & 0x80) && !(data & 0x80)) samples->start(2, 6);
+	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(2, 6);
 
 	/* update any samples */
-	turbo_update_samples(this, samples);
+	turbo_update_samples(this, m_samples);
 }
 
 
 WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
-
 	/* OSEL1-2 */
 	m_turbo_osel = (m_turbo_osel & 1) | ((data & 3) << 1);
 
@@ -157,7 +153,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_c_w)
 	output_set_value("speed", (data >> 4) & 0x0f);
 
 	/* update any samples */
-	turbo_update_samples(this, samples);
+	turbo_update_samples(this, m_samples);
 }
 
 
@@ -323,7 +319,6 @@ INLINE void subroc3d_update_volume(samples_device *samples, int leftchan, UINT8 
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
@@ -332,12 +327,12 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 	{
 		m_subroc3d_mdis = m_sound_state[0] & 0x0f;
 		m_subroc3d_mdir = (m_sound_state[0] >> 4) & 0x07;
-		if (!samples->playing(0))
+		if (!m_samples->playing(0))
 		{
-			samples->start(0, 0, true);
-			samples->start(1, 0, true);
+			m_samples->start(0, 0, true);
+			m_samples->start(1, 0, true);
 		}
-		subroc3d_update_volume(samples, 0, m_subroc3d_mdis, m_subroc3d_mdir);
+		subroc3d_update_volume(m_samples, 0, m_subroc3d_mdis, m_subroc3d_mdir);
 	}
 
 	/* bit 1 latches direction/volume for torpedo */
@@ -345,12 +340,12 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 	{
 		m_subroc3d_tdis = m_sound_state[0] & 0x0f;
 		m_subroc3d_tdir = (m_sound_state[0] >> 4) & 0x07;
-		if (!samples->playing(2))
+		if (!m_samples->playing(2))
 		{
-			samples->start(2, 1, true);
-			samples->start(3, 1, true);
+			m_samples->start(2, 1, true);
+			m_samples->start(3, 1, true);
 		}
-		subroc3d_update_volume(samples, 2, m_subroc3d_tdis, m_subroc3d_tdir);
+		subroc3d_update_volume(m_samples, 2, m_subroc3d_tdis, m_subroc3d_tdir);
 	}
 
 	/* bit 2 latches direction/volume for fighter */
@@ -358,12 +353,12 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 	{
 		m_subroc3d_fdis = m_sound_state[0] & 0x0f;
 		m_subroc3d_fdir = (m_sound_state[0] >> 4) & 0x07;
-		if (!samples->playing(4))
+		if (!m_samples->playing(4))
 		{
-			samples->start(4, 2, true);
-			samples->start(5, 2, true);
+			m_samples->start(4, 2, true);
+			m_samples->start(5, 2, true);
 		}
-		subroc3d_update_volume(samples, 4, m_subroc3d_fdis, m_subroc3d_fdir);
+		subroc3d_update_volume(m_samples, 4, m_subroc3d_fdis, m_subroc3d_fdir);
 	}
 
 	/* bit 3 latches direction/volume for hit */
@@ -371,42 +366,41 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 	{
 		m_subroc3d_hdis = m_sound_state[0] & 0x0f;
 		m_subroc3d_hdir = (m_sound_state[0] >> 4) & 0x07;
-		subroc3d_update_volume(samples, 6, m_subroc3d_hdis, m_subroc3d_hdir);
+		subroc3d_update_volume(m_samples, 6, m_subroc3d_hdis, m_subroc3d_hdir);
 	}
 }
 
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_c_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
 	/* /FIRE TRIG */
 	/* FIRE SELECT */
 	if ((diff & 0x01) && (data & 0x01))
-		samples->start(8, (data & 0x02) ? 6 : 5);
+		m_samples->start(8, (data & 0x02) ? 6 : 5);
 
 	/* /SHIP EXP TRIG -> MY SHIP EXP: channel 9 */
 	if ((diff & 0x04) && (data & 0x04))
-		samples->start(9, 7);
+		m_samples->start(9, 7);
 
 	/* /HIT TRIG -> HIT.L/R: channels 6+7 */
 	if ((diff & 0x08) && (data & 0x08))
 	{
-		samples->start(6, (m_sound_state[0] & 0x80) ? 4 : 3);
-		samples->start(7, (m_sound_state[0] & 0x80) ? 4 : 3);
+		m_samples->start(6, (m_sound_state[0] & 0x80) ? 4 : 3);
+		m_samples->start(7, (m_sound_state[0] & 0x80) ? 4 : 3);
 	}
 
 	/* /ALARM TRIG -> ALARM.M: channel 10 */
 	/* ALARM SELECT */
 	if ((diff & 0x10) && (data & 0x10))
-		samples->start(10, (data & 0x20) ? 10 : 9);
+		m_samples->start(10, (data & 0x20) ? 10 : 9);
 
 	/* /PROLOGUE */
-	if (!samples->playing(11))
-		samples->start(11, 8, true);
-	samples->set_volume(11, (data & 0x40) ? 0 : 1.0);
+	if (!m_samples->playing(11))
+		m_samples->start(11, 8, true);
+	m_samples->set_volume(11, (data & 0x40) ? 0 : 1.0);
 
 	/* /GAME START */
 	machine().sound().system_mute(data & 0x80);
@@ -501,64 +495,62 @@ static void buckrog_update_samples(turbo_state *state, samples_device *samples)
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* clock HIT DIS from bits 0-2 */
 	if ((diff & 0x10) && (data & 0x10))
-		samples->set_volume(3, (float)(/*7 - */(data & 7)) / 7.0f);
+		m_samples->set_volume(3, (float)(/*7 - */(data & 7)) / 7.0f);
 
 	/* clock ACC from bits 0-3 */
 	if ((diff & 0x20) && (data & 0x20))
 	{
 		m_buckrog_myship = data & 0x0f;
-		buckrog_update_samples(this, samples);
+		buckrog_update_samples(this, m_samples);
 	}
 
 	/* /ALARM0: channel 0 */
-	if ((diff & 0x40) && !(data & 0x40)) samples->start(0, 0);
+	if ((diff & 0x40) && !(data & 0x40)) m_samples->start(0, 0);
 
 	/* /ALARM1: channel 0 */
-	if ((diff & 0x80) && !(data & 0x80)) samples->start(0, 1);
+	if ((diff & 0x80) && !(data & 0x80)) m_samples->start(0, 1);
 }
 
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 {
-	samples_device *samples = machine().device<samples_device>("samples");
 	UINT8 diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* /ALARM3: channel 0 */
-	if ((diff & 0x01) && !(data & 0x01)) samples->start(0, 2);
+	if ((diff & 0x01) && !(data & 0x01)) m_samples->start(0, 2);
 
 	/* /ALARM4: channel 0 */
-	if ((diff & 0x02) && !(data & 0x02)) samples->start(0, 3);
+	if ((diff & 0x02) && !(data & 0x02)) m_samples->start(0, 3);
 
 	/* /FIRE: channel 1 */
-	if ((diff & 0x04) && !(data & 0x04)) samples->start(1, 5);
+	if ((diff & 0x04) && !(data & 0x04)) m_samples->start(1, 5);
 
 	/* /EXP: channel 2 */
-	if ((diff & 0x08) && !(data & 0x08)) samples->start(2, 4);
+	if ((diff & 0x08) && !(data & 0x08)) m_samples->start(2, 4);
 
 	/* /HIT: channel 3 */
 	if ((diff & 0x10) && !(data & 0x10))
 	{
-		samples->start(3, 7);
-		buckrog_update_samples(this, samples);
+		m_samples->start(3, 7);
+		buckrog_update_samples(this, m_samples);
 	}
 
 	/* /REBOUND: channel 4 */
-	if ((diff & 0x20) && !(data & 0x20)) samples->start(4, 6);
+	if ((diff & 0x20) && !(data & 0x20)) m_samples->start(4, 6);
 
 	/* SHIP: channel 5 */
-	if ((diff & 0x40) &&  (data & 0x40) && !samples->playing(5))
+	if ((diff & 0x40) &&  (data & 0x40) && !m_samples->playing(5))
 	{
-		samples->start(5, 8, true);
-		buckrog_update_samples(this, samples);
+		m_samples->start(5, 8, true);
+		buckrog_update_samples(this, m_samples);
 	}
-	if ((diff & 0x40) && !(data & 0x40) &&  samples->playing(5)) samples->stop(5);
+	if ((diff & 0x40) && !(data & 0x40) &&  m_samples->playing(5)) m_samples->stop(5);
 
 	/* GAME ON */
 	machine().sound().system_enable(data & 0x80);
