@@ -6,7 +6,7 @@
     and Bryan McPhail, Nicola Salmoria, Aaron Giles
 
 ***************************************************************************/
-
+#include "sound/msm5205.h"
 #include "video/vsystem_spr2.h"
 
 class fromance_state : public driver_device
@@ -18,7 +18,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_spr_old(*this, "vsystem_spr_old"),
 		m_subcpu(*this, "sub"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers (used by pipedrm) */
 	optional_shared_ptr<UINT8> m_videoram;
@@ -96,4 +97,5 @@ public:
 	void init_common(  );
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	optional_device<msm5205_device> m_msm;
 };

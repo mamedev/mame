@@ -122,7 +122,6 @@ WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 
 WRITE8_MEMBER(wc90b_state::adpcm_control_w)
 {
-	device_t *device = machine().device("msm");
 	int bankaddress;
 	UINT8 *ROM = memregion("audiocpu")->base();
 
@@ -130,7 +129,7 @@ WRITE8_MEMBER(wc90b_state::adpcm_control_w)
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	membank("bank3")->set_base(&ROM[bankaddress]);
 
-	msm5205_reset_w(device,data & 0x08);
+	msm5205_reset_w(m_msm,data & 0x08);
 }
 
 WRITE8_MEMBER(wc90b_state::adpcm_data_w)
@@ -345,11 +344,11 @@ WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
+		msm5205_data_w(m_msm, (m_msm5205next & 0xf0) >> 4);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0x0f) >> 0);
+		msm5205_data_w(m_msm, (m_msm5205next & 0x0f) >> 0);
 }
 
 static const msm5205_interface msm5205_config =

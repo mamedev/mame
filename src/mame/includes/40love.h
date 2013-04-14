@@ -1,3 +1,4 @@
+#include "sound/msm5232.h"
 class fortyl_state : public driver_device
 {
 public:
@@ -11,7 +12,8 @@ public:
 		m_mcu_ram(*this, "mcu_ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -107,4 +109,5 @@ public:
 	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_mcu;
+	optional_device<msm5232_device> m_msm;
 };

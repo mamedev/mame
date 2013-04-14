@@ -3,6 +3,7 @@
     Karate Champ
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class kchamp_state : public driver_device
 {
@@ -13,7 +14,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_spriteram(*this, "spriteram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -59,4 +61,5 @@ public:
 	UINT8 *decrypt_code();
 	DECLARE_WRITE_LINE_MEMBER(msmint);
 	required_device<cpu_device> m_maincpu;
+	optional_device<msm5205_device> m_msm;
 };

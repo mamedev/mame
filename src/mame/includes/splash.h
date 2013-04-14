@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class splash_state : public driver_device
 {
 public:
@@ -10,7 +12,10 @@ public:
 		m_protdata(*this, "protdata"),
 		m_bitmap_mode(*this, "bitmap_mode"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")  { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2")  { }
 
 	required_shared_ptr<UINT16> m_pixelram;
 	required_shared_ptr<UINT16> m_videoram;
@@ -77,4 +82,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
+	optional_device<msm5205_device> m_msm1;
+	optional_device<msm5205_device> m_msm2;
 };

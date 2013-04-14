@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class spdodgeb_state : public driver_device
 {
 public:
@@ -6,7 +8,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this,"maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2"){ }
 
 	int m_toggle;
 	int m_adpcm_pos[2];
@@ -56,4 +60,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;	
 };

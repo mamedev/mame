@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/upd7759.h"
+#include "sound/msm5205.h"
 
 class combatsc_state : public driver_device
 {
@@ -15,7 +16,8 @@ public:
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
 		m_maincpu(*this, "maincpu"),
-		m_upd7759(*this, "upd") { }
+		m_upd7759(*this, "upd"),
+		m_msm5205(*this, "msm5205") { }
 
 	/* memory pointers */
 	UINT8 *    m_videoram;
@@ -92,4 +94,5 @@ public:
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit );
 	required_device<cpu_device> m_maincpu;
 	optional_device<upd7759_device> m_upd7759;
+	optional_device<msm5205_device> m_msm5205;
 };

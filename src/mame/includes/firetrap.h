@@ -3,6 +3,7 @@
     Fire Trap
 
 ***************************************************************************/
+#include "sound/msm5205.h"
 
 class firetrap_state : public driver_device
 {
@@ -14,7 +15,8 @@ public:
 		m_fgvideoram(*this, "fgvideoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_bg1videoram;
@@ -44,7 +46,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_msm;
+	required_device<msm5205_device> m_msm;
 	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);
 	DECLARE_READ8_MEMBER(firetrap_8751_bootleg_r);

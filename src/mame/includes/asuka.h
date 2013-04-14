@@ -3,6 +3,7 @@
     Asuka & Asuka  (+ Taito/Visco games on similar hardware)
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class asuka_state : public driver_device
 {
@@ -11,7 +12,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cadash_shared_ram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
@@ -37,6 +39,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;	
 	device_t *m_pc090oj;
 	device_t *m_tc0100scn;
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

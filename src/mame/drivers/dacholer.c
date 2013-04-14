@@ -46,7 +46,8 @@ public:
 		m_audiocpu(*this,"audiocpu"),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_fgvideoram(*this, "fgvideoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_msm(*this, "msm"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -55,6 +56,8 @@ public:
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
+	
+	optional_device<msm5205_device> m_msm;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -562,7 +565,7 @@ WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
-		msm5205_data_w(machine().device("msm"), m_msm_data >> 4);
+		msm5205_data_w(m_msm, m_msm_data >> 4);
 		m_msm_data <<= 4;
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)

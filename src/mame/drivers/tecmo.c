@@ -78,9 +78,8 @@ WRITE8_MEMBER(tecmo_state::tecmo_nmi_ack_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_start_w)
 {
-	device_t *device = machine().device("msm");
 	m_adpcm_pos = data << 8;
-	msm5205_reset_w(device, 0);
+	msm5205_reset_w(m_msm, 0);
 }
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
@@ -90,18 +89,17 @@ WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_adpcm_vol_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_set_volume(device,(data & 0x0f) * 100 / 15);
+	msm5205_set_volume(m_msm,(data & 0x0f) * 100 / 15);
 }
 
 WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
 				m_adpcm_pos >= memregion("adpcm")->bytes())
-		msm5205_reset_w(machine().device("msm"),1);
+		msm5205_reset_w(m_msm,1);
 	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(machine().device("msm"),m_adpcm_data & 0x0f);
+		msm5205_data_w(m_msm,m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
@@ -109,7 +107,7 @@ WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
 		m_adpcm_data = ROM[m_adpcm_pos++];
-		msm5205_data_w(machine().device("msm"),m_adpcm_data >> 4);
+		msm5205_data_w(m_msm,m_adpcm_data >> 4);
 	}
 }
 

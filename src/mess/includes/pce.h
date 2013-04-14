@@ -113,13 +113,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cd_ram(*this, "cd_ram"),
 		m_user_ram(*this, "user_ram"),
-		m_huc6260(*this, "huc6260")
+		m_huc6260(*this, "huc6260"),
+		m_msm5205(*this, "msm5205")
 	{ }
 
 	required_device<h6280_device> m_maincpu;
 	required_shared_ptr<UINT8> m_cd_ram;
 	required_shared_ptr<UINT8> m_user_ram;
 	optional_device<huc6260_device> m_huc6260;
+	optional_device<msm5205_device> m_msm5205;
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
 	UINT8 m_acard;

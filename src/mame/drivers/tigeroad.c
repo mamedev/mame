@@ -156,11 +156,10 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 
 WRITE8_MEMBER(tigeroad_state::msm5205_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device,(data>>7)&1);
-	msm5205_data_w(device,data);
-	msm5205_vclk_w(device,1);
-	msm5205_vclk_w(device,0);
+	msm5205_reset_w(m_msm,(data>>7)&1);
+	msm5205_data_w(m_msm,data);
+	msm5205_vclk_w(m_msm,1);
+	msm5205_vclk_w(m_msm,0);
 }
 
 

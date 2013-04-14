@@ -194,15 +194,15 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 	// finished playing sample?
 	if( m_adpcm_data_offs == m_adpcm_data_end )
 	{
-		msm5205_reset_w(machine().device("msm"), 1 );
+		msm5205_reset_w(m_msm, 1 );
 		return;
 	}
 
 	if( m_toggle == 0 )
-		msm5205_data_w(machine().device("msm"), ( adpcm_data >> 4 ) & 0x0f );
+		msm5205_data_w(m_msm, ( adpcm_data >> 4 ) & 0x0f );
 	else
 	{
-		msm5205_data_w(machine().device("msm"), adpcm_data & 0x0f );
+		msm5205_data_w(m_msm, adpcm_data & 0x0f );
 		m_adpcm_data_offs++;
 	}
 
@@ -217,7 +217,7 @@ WRITE8_MEMBER(stfight_state::stfight_adpcm_control_w)
 		m_adpcm_data_end = sampleLimits[data+1];
 	}
 
-	msm5205_reset_w( machine().device("msm"), data & 0x08 ? 1 : 0 );
+	msm5205_reset_w( m_msm, data & 0x08 ? 1 : 0 );
 }
 
 WRITE8_MEMBER(stfight_state::stfight_e800_w)

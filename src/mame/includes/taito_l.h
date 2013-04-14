@@ -1,3 +1,4 @@
+#include "sound/msm5205.h"
 
 #define TAITOL_SPRITERAM_SIZE 0x400
 
@@ -7,7 +8,8 @@ public:
 	taitol_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	UINT8 *       m_shared_ram;
@@ -56,6 +58,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<msm5205_device> m_msm;
 
 	/* memory buffers */
 	UINT8         m_rambanks[0x1000 * 12];

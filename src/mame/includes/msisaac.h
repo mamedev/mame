@@ -1,3 +1,4 @@
+#include "sound/msm5232.h"
 /* Disabled because the mcu dump is currently unavailable. -AS */
 //#define USE_MCU
 
@@ -11,7 +12,8 @@ public:
 		m_videoram3(*this, "videoram3"),
 		m_videoram2(*this, "videoram2"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_spriteram;
@@ -78,4 +80,5 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5232_device> m_msm;
 };

@@ -3,6 +3,7 @@
     Street Fighter
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class sf_state : public driver_device
 {
@@ -12,7 +13,9 @@ public:
 		m_videoram(*this, "videoram"),
 		m_objectram(*this, "objectram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_videoram;
@@ -53,4 +56,6 @@ public:
 	inline int sf_invert( int nb );
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 	void write_dword( address_space &space, offs_t offset, UINT32 data );
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;
 };

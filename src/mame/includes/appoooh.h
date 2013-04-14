@@ -1,4 +1,4 @@
-
+#include "sound/msm5205.h"
 
 class appoooh_state : public driver_device
 {
@@ -11,6 +11,7 @@ public:
 		m_spriteram_2(*this, "spriteram_2"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_colorram(*this, "bg_colorram"),
+		m_msm(*this, "msm"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -32,7 +33,7 @@ public:
 	UINT32   m_adpcm_address;
 
 	/* devices */
-	device_t *m_adpcm;
+	required_device<msm5205_device> m_msm;
 
 	UINT8 m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(appoooh_adpcm_w);

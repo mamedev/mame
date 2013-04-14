@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class gladiatr_state : public driver_device
 {
 public:
@@ -10,7 +12,8 @@ public:
 		m_textram(*this, "textram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_spriteram;
@@ -75,4 +78,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<msm5205_device> m_msm;
 };

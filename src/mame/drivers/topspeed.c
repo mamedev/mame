@@ -683,8 +683,8 @@ void topspeed_state::machine_start()
 	m_pc080sn_1 = machine().device("pc080sn_1");
 	m_pc080sn_2 = machine().device("pc080sn_2");
 
-	m_msm_chip[0] = machine().device("msm1");
-	m_msm_chip[1] = machine().device("msm2");
+	m_msm_chip[0] = m_msm1;
+	m_msm_chip[1] = m_msm2;
 	m_msm_rom[0] = memregion("adpcm")->base();
 	m_msm_rom[1] = memregion("adpcm")->base() + 0x10000;
 

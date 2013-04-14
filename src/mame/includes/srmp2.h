@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 struct iox_t
 {
 	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
@@ -11,7 +13,8 @@ class srmp2_state : public driver_device
 public:
 	srmp2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	int m_color_bank;
 	int m_gfx_bank;
@@ -53,4 +56,5 @@ public:
 	UINT8 iox_key_matrix_calc(UINT8 p_side);
 	DECLARE_WRITE_LINE_MEMBER(srmp2_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
 };

@@ -277,12 +277,11 @@ WRITE_LINE_MEMBER(ashnojoe_state::ym2203_irq_handler)
 
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 {
-	device_t *device = machine().device("msm");
 	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
 	if (data == 0xff)
 		return;
 
-	msm5205_reset_w(device, !(data & 0x01));
+	msm5205_reset_w(m_msm, !(data & 0x01));
 }
 
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
@@ -307,11 +306,11 @@ WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{
-		msm5205_data_w(machine().device("msm"), m_adpcm_byte >> 4);
+		msm5205_data_w(m_msm, m_adpcm_byte >> 4);
 	}
 	else
 	{
-		msm5205_data_w(machine().device("msm"), m_adpcm_byte & 0xf);
+		msm5205_data_w(m_msm, m_adpcm_byte & 0xf);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 

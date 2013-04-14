@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class tehkanwc_state : public driver_device
 {
 public:
@@ -9,7 +11,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_msm(*this, "msm") { }
 
 	int m_track0[2];
 	int m_track1[2];
@@ -57,4 +60,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<msm5205_device> m_msm;
 };

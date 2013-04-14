@@ -559,14 +559,14 @@ WRITE_LINE_MEMBER(taitol_state::champwr_msm5205_vck)
 {
 	if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+		msm5205_data_w(m_msm, m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos];
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0x1ffff;
-		msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
+		msm5205_data_w(m_msm, m_adpcm_data >> 4);
 	}
 }
 
@@ -582,24 +582,18 @@ WRITE8_MEMBER(taitol_state::champwr_msm5205_hi_w)
 
 WRITE8_MEMBER(taitol_state::champwr_msm5205_start_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device, 0);
+	msm5205_reset_w(m_msm, 0);
 }
 
 WRITE8_MEMBER(taitol_state::champwr_msm5205_stop_w)
 {
-	device_t *device = machine().device("msm");
-
-	msm5205_reset_w(device, 1);
+	msm5205_reset_w(m_msm, 1);
 	m_adpcm_pos &= 0x1ff00;
 }
 
 WRITE8_MEMBER(taitol_state::champwr_msm5205_volume_w)
 {
-	device_t *device = machine().device("msm");
-	device_sound_interface *sound;
-	device->interface(sound);
-	sound->set_output_gain(0, data / 255.0);
+	m_msm->set_output_gain(0, data / 255.0);
 }
 
 READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)

@@ -3,6 +3,7 @@
     Top Speed / Full Throttle
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class topspeed_state : public driver_device
 {
@@ -15,7 +16,9 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "subcpu")
+		m_subcpu(*this, "subcpu"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2")
 	{ }
 
 	/* memory pointers */
@@ -41,6 +44,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;
 	device_t *m_pc080sn_1;
 	device_t *m_pc080sn_2;
 	device_t *m_tc0220ioc;

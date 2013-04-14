@@ -205,10 +205,10 @@ WRITE16_MEMBER(gcpinbal_state::ioc_w)
 WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 {
 	if (m_adpcm_idle)
-		msm5205_reset_w(machine().device("msm"), 1);
+		msm5205_reset_w(m_msm, 1);
 	if (m_adpcm_start >= 0x200000 || m_adpcm_start > m_adpcm_end)
 	{
-		//msm5205_reset_w(machine().device("msm"),1);
+		//msm5205_reset_w(m_msm,1);
 		m_adpcm_start = m_msm_start + m_msm_bank;
 		m_adpcm_trigger = 0;
 	}
@@ -217,7 +217,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 		UINT8 *ROM = machine().root_device().memregion("msm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
-		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0xf);
+		msm5205_data_w(m_msm, m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 			m_adpcm_start++;

@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class wc90b_state : public driver_device
 {
 public:
@@ -13,7 +15,8 @@ public:
 		m_scroll_x_lo(*this, "scroll_x_lo"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm") { }
 
 	int m_msm5205next;
 	int m_toggle;
@@ -47,4 +50,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
 };

@@ -526,10 +526,9 @@ READ8_MEMBER(tubep_state::rjammer_soundlatch_r)
 
 WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 {
-	device_t *device = machine().device("msm");
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
-	msm5205_reset_w (device, (data&1)^1 );
+	msm5205_reset_w (m_msm, (data&1)^1 );
 
 	return;
 }
@@ -537,13 +536,12 @@ WRITE8_MEMBER(tubep_state::rjammer_voice_startstop_w)
 
 WRITE8_MEMBER(tubep_state::rjammer_voice_frequency_select_w)
 {
-	device_t *device = machine().device("msm");
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data & 1)
-		msm5205_playmode_w(device, MSM5205_S48_4B); /* 8 KHz */
+		msm5205_playmode_w(m_msm, MSM5205_S48_4B); /* 8 KHz */
 	else
-		msm5205_playmode_w(device, MSM5205_S96_4B); /* 4 KHz */
+		msm5205_playmode_w(m_msm, MSM5205_S96_4B); /* 4 KHz */
 
 	return;
 }
@@ -555,12 +553,12 @@ WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
 
 	if (m_ls74 == 1)
 	{
-		msm5205_data_w(machine().device("msm"), (m_ls377 >> 0) & 15 );
+		msm5205_data_w(m_msm, (m_ls377 >> 0) & 15 );
 		m_soundcpu->set_input_line(0, ASSERT_LINE );
 	}
 	else
 	{
-		msm5205_data_w(machine().device("msm"), (m_ls377 >> 4) & 15 );
+		msm5205_data_w(m_msm, (m_ls377 >> 4) & 15 );
 	}
 
 }

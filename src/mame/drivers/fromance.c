@@ -122,11 +122,10 @@ WRITE8_MEMBER(fromance_state::fromance_rombank_w)
 
 WRITE8_MEMBER(fromance_state::fromance_adpcm_reset_w)
 {
-	device_t *device = machine().device("msm");
 	m_adpcm_reset = (data & 0x01);
 	m_vclk_left = 0;
 
-	msm5205_reset_w(device, !(data & 0x01));
+	msm5205_reset_w(m_msm, !(data & 0x01));
 }
 
 
@@ -146,7 +145,7 @@ WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		msm5205_data_w(machine().device("msm"), (m_adpcm_data >> 4));
+		msm5205_data_w(m_msm, (m_adpcm_data >> 4));
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}

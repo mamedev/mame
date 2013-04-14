@@ -3,6 +3,7 @@
     Rastan
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class rastan_state : public driver_device
 {
@@ -10,7 +11,8 @@ public:
 	rastan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 //  UINT16 *    paletteram; // this currently uses generic palette handlers
@@ -26,6 +28,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
 	device_t *m_pc090oj;
 	device_t *m_pc080sn;
 	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);

@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class stfight_state : public driver_device
 {
 public:
@@ -7,7 +9,8 @@ public:
 		m_text_attr_ram(*this, "text_attr_ram"),
 		m_vh_latch_ram(*this, "vh_latch_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT8> m_text_char_ram;
 	required_shared_ptr<UINT8> m_text_attr_ram;
@@ -54,4 +57,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
 };

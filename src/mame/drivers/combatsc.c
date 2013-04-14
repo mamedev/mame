@@ -399,16 +399,15 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(combatsc_state::combatscb_dac_w)
 {
-	device_t *device = machine().device("msm5205");
 	if(data & 0x60)
 		printf("%02x\n",data);
 
 	membank("bl_abank")->set_entry((data & 0x80) >> 7);
 
-	//msm5205_reset_w(device, (data >> 4) & 1);
-	msm5205_data_w(device, (data & 0x0f));
-	msm5205_vclk_w(device, 1);
-	msm5205_vclk_w(device, 0);
+	//msm5205_reset_w(m_msm5205, (data >> 4) & 1);
+	msm5205_data_w(m_msm5205, (data & 0x0f));
+	msm5205_vclk_w(m_msm5205, 1);
+	msm5205_vclk_w(m_msm5205, 0);
 }
 
 static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )

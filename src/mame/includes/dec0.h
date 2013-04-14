@@ -1,5 +1,6 @@
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
+#include "sound/msm5205.h"
 
 class dec0_state : public driver_device
 {
@@ -16,7 +17,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT16> m_ram;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -98,6 +100,7 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
+	optional_device<msm5205_device> m_msm;
 };
 
 

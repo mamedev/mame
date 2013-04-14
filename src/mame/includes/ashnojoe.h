@@ -3,6 +3,7 @@
     Success Joe / Ashita no Joe
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class ashnojoe_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		m_tileram(*this, "tileram"),
 		m_tilemap_reg(*this, "tilemap_reg"),
 		m_audiocpu(*this, "audiocpu"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	/* memory pointers */
 	UINT16 *    m_tileram_1;
@@ -79,4 +81,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ym2203_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(ashnojoe_vclk_cb);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
 };

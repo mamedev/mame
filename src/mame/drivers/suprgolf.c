@@ -32,7 +32,8 @@ public:
 	suprgolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	tilemap_t *m_tilemap;
 	required_shared_ptr<UINT8> m_videoram;
@@ -73,6 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
 };
 
 TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
@@ -437,16 +439,16 @@ static const ym2203_interface ym2203_config =
 
 WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
 {
-	msm5205_reset_w(machine().device("msm"),0);
+	msm5205_reset_w(m_msm,0);
 	m_toggle ^= 1;
 	if(m_toggle)
 	{
-		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0xf0) >> 4);
+		msm5205_data_w(m_msm, (m_msm5205next & 0xf0) >> 4);
 		if(m_msm_nmi_mask) { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 	}
 	else
 	{
-		msm5205_data_w(machine().device("msm"), (m_msm5205next & 0x0f) >> 0);
+		msm5205_data_w(m_msm, (m_msm5205next & 0x0f) >> 0);
 	}
 }
 

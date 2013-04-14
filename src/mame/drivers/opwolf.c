@@ -430,9 +430,7 @@ void opwolf_state::machine_start()
 {
 	m_pc080sn = machine().device("pc080sn");
 	m_pc090oj = machine().device("pc090oj");
-	m_msm1 = machine().device("msm1");
-	m_msm2 = machine().device("msm2");
-
+	
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 
@@ -453,8 +451,8 @@ MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 	m_sprite_ctrl = 0;
 	m_sprites_flipscreen = 0;
 
-	msm5205_reset_w(machine().device("msm1"), 1);
-	msm5205_reset_w(machine().device("msm2"), 1);
+	msm5205_reset_w(m_msm1, 1);
+	msm5205_reset_w(m_msm2, 1);
 }
 
 void opwolf_state::opwolf_msm5205_vck(device_t *device,int chip)
@@ -475,16 +473,15 @@ void opwolf_state::opwolf_msm5205_vck(device_t *device,int chip)
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
 {
-	opwolf_msm5205_vck(machine().device("msm1"),0);
+	opwolf_msm5205_vck(m_msm1,0);
 }
 WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
 {
-	opwolf_msm5205_vck(machine().device("msm2"),1);
+	opwolf_msm5205_vck(m_msm2,1);
 }
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
-{
-	device_t *device = machine().device("msm1");
+{	
 	int start;
 	int end;
 
@@ -498,7 +495,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 		end   *= 16;
 		m_adpcm_pos[0] = start;
 		m_adpcm_end[0] = end;
-		msm5205_reset_w(device, 0);
+		msm5205_reset_w(m_msm1, 0);
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );
@@ -507,7 +504,6 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 {
-	device_t *device = machine().device("msm2");
 	int start;
 	int end;
 
@@ -521,7 +517,7 @@ WRITE8_MEMBER(opwolf_state::opwolf_adpcm_c_w)
 		end   *= 16;
 		m_adpcm_pos[1] = start;
 		m_adpcm_end[1] = end;
-		msm5205_reset_w(device, 0);
+		msm5205_reset_w(m_msm2, 0);
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,space.device().safe_pc() );

@@ -69,10 +69,9 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(goal92_state::adpcm_control_w)
 {
-	device_t *device = machine().device("msm");
 	membank("bank1")->set_entry(data & 0x01);
 
-	msm5205_reset_w(device, data & 0x08);
+	msm5205_reset_w(m_msm, data & 0x08);
 }
 
 WRITE8_MEMBER(goal92_state::adpcm_data_w)
@@ -227,7 +226,7 @@ static const ym2203_interface ym2203_config =
 
 WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
 {
-	msm5205_data_w(machine().device("msm"), m_msm5205next);
+	msm5205_data_w(m_msm, m_msm5205next);
 	m_msm5205next >>= 4;
 	m_adpcm_toggle^= 1;
 

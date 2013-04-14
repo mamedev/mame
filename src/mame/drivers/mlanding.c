@@ -39,7 +39,8 @@ public:
 		m_mecha_ram(*this, "mecha_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
@@ -87,6 +88,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<msm5205_device> m_msm;
 };
 
 
@@ -294,7 +296,7 @@ WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 	if (m_adpcm_pos >= 0x50000  || m_adpcm_idle)
 	{
 		//m_adpcm_idle = 1;
-		msm5205_reset_w(machine().device("msm"),1);
+		msm5205_reset_w(m_msm,1);
 		m_trigger = 0;
 	}
 	else
@@ -302,7 +304,7 @@ WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(machine().device("msm"),m_adpcm_data & 0xf);
+		msm5205_data_w(m_msm,m_adpcm_data & 0xf);
 		m_trigger^=1;
 		if(m_trigger == 0)
 		{
@@ -529,10 +531,9 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mlanding_state::ml_msm_start_lsb_w)
 {
-	device_t *device = machine().device("msm");
 	m_adpcm_pos = (m_adpcm_pos & 0x0f0000) | ((data & 0xff)<<8) | 0x20;
 	m_adpcm_idle = 0;
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(m_msm,0);
 	m_adpcm_end = (m_adpcm_pos+0x800);
 }
 

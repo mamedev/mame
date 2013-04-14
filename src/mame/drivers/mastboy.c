@@ -449,7 +449,8 @@ public:
 		m_workram(*this, "workram"),
 		m_tileram(*this, "tileram"),
 		m_colram(*this, "colram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT8>  m_nvram;
 	required_shared_ptr<UINT8> m_workram;
@@ -483,6 +484,7 @@ public:
 	INTERRUPT_GEN_MEMBER(mastboy_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(mastboy_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_msm;
 };
 
 
@@ -639,30 +641,25 @@ WRITE8_MEMBER(mastboy_state::backupram_enable_w)
 
 WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit0_w)
 {
-	device_t *adpcm = machine().device("msm");
-
 	m_m5205_sambit0 = data & 1;
-	msm5205_playmode_w(adpcm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
+	msm5205_playmode_w(m_msm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
 WRITE8_MEMBER(mastboy_state::msm5205_mastboy_m5205_sambit1_w)
 {
-	device_t *adpcm = machine().device("msm");
-
 	m_m5205_sambit1 = data & 1;
 
-	msm5205_playmode_w(adpcm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
+	msm5205_playmode_w(m_msm,  (1 << 2) | (m_m5205_sambit1 << 1) | (m_m5205_sambit0) );
 
 	logerror("msm5205 samplerate bit 0, set to %02x\n",data);
 }
 
 WRITE8_MEMBER(mastboy_state::mastboy_msm5205_reset_w)
 {
-	device_t *device = machine().device("msm");
 	m_m5205_part = 0;
-	msm5205_reset_w(device,data&1);
+	msm5205_reset_w(m_msm,data&1);
 }
 
 WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
@@ -672,7 +669,7 @@ WRITE8_MEMBER(mastboy_state::mastboy_msm5205_data_w)
 
 WRITE_LINE_MEMBER(mastboy_state::mastboy_adpcm_int)
 {
-	msm5205_data_w(machine().device("msm"), m_m5205_next);
+	msm5205_data_w(m_msm, m_m5205_next);
 	m_m5205_next >>= 4;
 
 	m_m5205_part ^= 1;
@@ -880,7 +877,7 @@ void mastboy_state::machine_reset()
 	memset( m_vram, 0x00, 0x10000);
 
 	m_m5205_part = 0;
-	msm5205_reset_w(machine().device("msm"),1);
+	msm5205_reset_w(m_msm,1);
 	m_irq0_ack = 0;
 }
 

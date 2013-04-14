@@ -312,10 +312,9 @@ READ8_MEMBER(gsword_state::gsword_fake_1_r)
 
 WRITE8_MEMBER(gsword_state::gsword_adpcm_data_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_data_w (device,data & 0x0f); /* bit 0..3 */
-	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w(device,(data>>4)&1);  /* bit 4    */
+	msm5205_data_w (m_msm,data & 0x0f); /* bit 0..3 */
+	msm5205_reset_w(m_msm,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w(m_msm,(data>>4)&1);  /* bit 4    */
 }
 
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)

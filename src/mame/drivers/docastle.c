@@ -165,17 +165,17 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	if (m_adpcm_pos >= memregion("adpcm")->bytes())
 	{
 		m_adpcm_idle = 1;
-		msm5205_reset_w(machine().device("msm"), 1);
+		msm5205_reset_w(m_msm, 1);
 	}
 	else if (m_adpcm_data != -1)
 	{
-		msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+		msm5205_data_w(m_msm, m_adpcm_data & 0x0f);
 		m_adpcm_data = -1;
 	}
 	else
 	{
 		m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos++];
-		msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
+		msm5205_data_w(m_msm, m_adpcm_data >> 4);
 	}
 }
 
@@ -188,18 +188,16 @@ READ8_MEMBER(docastle_state::idsoccer_adpcm_status_r)
 
 WRITE8_MEMBER(docastle_state::idsoccer_adpcm_w)
 {
-	device_t *device = machine().device("msm");
-
 	if (data & 0x80)
 	{
 		m_adpcm_idle = 1;
-		msm5205_reset_w(device, 1);
+		msm5205_reset_w(m_msm, 1);
 	}
 	else
 	{
 		m_adpcm_pos = (data & 0x7f) * 0x200;
 		m_adpcm_idle = 0;
-		msm5205_reset_w(device, 0);
+		msm5205_reset_w(m_msm, 0);
 	}
 }
 

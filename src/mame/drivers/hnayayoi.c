@@ -69,26 +69,22 @@ WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_data_w(device, data);
+	msm5205_data_w(m_msm, data);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_vclk_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_vclk_w(device, data & 1);
+	msm5205_vclk_w(m_msm, data & 1);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_reset_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device, data & 1);
+	msm5205_reset_w(m_msm, data & 1);
 }
 
 WRITE8_MEMBER(hnayayoi_state::adpcm_reset_inv_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device, ~data & 1);
+	msm5205_reset_w(m_msm, ~data & 1);
 }
 
 
@@ -542,7 +538,7 @@ void hnayayoi_state::machine_start()
 void hnayayoi_state::machine_reset()
 {
 	/* start with the MSM5205 reset */
-	msm5205_reset_w(machine().device("msm"), 1);
+	msm5205_reset_w(m_msm, 1);
 
 	m_palbank = 0;
 	m_blit_layer = 0;

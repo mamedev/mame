@@ -4,8 +4,9 @@
 
 *************************************************************************/
 
-#include <sound/flt_vol.h>
-#include <audio/taitosnd.h>
+#include "sound/flt_vol.h"
+#include "audio/taitosnd.h"
+#include "sound/msm5205.h"
 
 #define DARIUS_VOL_MAX    (3*2 + 2)
 #define DARIUS_PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
@@ -18,7 +19,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_fg_ram(*this, "fg_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm(*this, "msm"){ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -40,6 +42,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
 	device_t *m_cpub;
 	device_t *m_adpcm;
 	tc0140syt_device *m_tc0140syt;

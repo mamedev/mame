@@ -48,7 +48,7 @@ WRITE8_MEMBER(pcktgal_state::pcktgal_sound_w)
 
 WRITE_LINE_MEMBER(pcktgal_state::pcktgal_adpcm_int)
 {
-	msm5205_data_w(machine().device("msm"),m_msm5205next >> 4);
+	msm5205_data_w(m_msm,m_msm5205next >> 4);
 	m_msm5205next<<=4;
 
 	m_toggle = 1 - m_toggle;
@@ -63,8 +63,7 @@ WRITE8_MEMBER(pcktgal_state::pcktgal_adpcm_data_w)
 
 READ8_MEMBER(pcktgal_state::pcktgal_adpcm_reset_r)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device,0);
+	msm5205_reset_w(m_msm,0);
 	return 0;
 }
 

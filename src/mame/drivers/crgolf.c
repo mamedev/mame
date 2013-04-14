@@ -204,7 +204,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 		UINT8 data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		msm5205_data_w(machine().device("msm"), (data >> (4 * (~m_sample_offset & 1))) & 0x0f);
+		msm5205_data_w(m_msm, (data >> (4 * (~m_sample_offset & 1))) & 0x0f);
 		m_sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 
 			/* if we hit 0xff, automatically turn off playback */
 			if (m_sample_count == 0xff)
-				msm5205_reset_w(machine().device("msm"), 1);
+				msm5205_reset_w(m_msm, 1);
 		}
 	}
 }
@@ -222,13 +222,11 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 
 WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 {
-	device_t *device = machine().device("msm");
-
 	switch (offset)
 	{
 		/* offset 0 holds the MSM5205 in reset */
 		case 0:
-			msm5205_reset_w(device, 1);
+			msm5205_reset_w(m_msm, 1);
 			break;
 
 		/* offset 1 is the length/256 nibbles */
@@ -243,7 +241,7 @@ WRITE8_MEMBER(crgolf_state::crgolfhi_sample_w)
 
 		/* offset 3 turns on playback */
 		case 3:
-			msm5205_reset_w(device, 0);
+			msm5205_reset_w(m_msm, 0);
 			break;
 	}
 }

@@ -236,8 +236,6 @@ static const sn76496_config psg_intf =
 
 void drmicro_state::machine_start()
 {
-	m_msm = machine().device("msm");
-
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_pcm_adr));
 	save_item(NAME(m_flipscreen));

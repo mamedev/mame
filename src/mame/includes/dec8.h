@@ -1,4 +1,5 @@
 #include "video/bufsprite.h"
+#include "sound/msm5205.h"
 
 class dec8_state : public driver_device
 {
@@ -11,7 +12,8 @@ public:
 		m_mcu(*this, "mcu"),
 		m_spriteram(*this, "spriteram") ,
 		m_videoram(*this, "videoram"),
-		m_bg_data(*this, "bg_data") { }
+		m_bg_data(*this, "bg_data"),
+		m_msm(*this, "msm") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -23,6 +25,8 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bg_data;
+	
+	optional_device<msm5205_device> m_msm;
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling

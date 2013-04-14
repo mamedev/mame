@@ -182,12 +182,12 @@ void tbowl_state::tbowl_adpcm_int( device_t *device, int num )
 
 WRITE_LINE_MEMBER(tbowl_state::tbowl_adpcm_int_1)
 {
-	tbowl_adpcm_int(machine().device("msm1"), 0);
+	tbowl_adpcm_int(m_msm1, 0);
 }
 
 WRITE_LINE_MEMBER(tbowl_state::tbowl_adpcm_int_2)
 {
-	tbowl_adpcm_int(machine().device("msm2"), 1);
+	tbowl_adpcm_int(m_msm2, 1);
 }
 
 static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )

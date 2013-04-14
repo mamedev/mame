@@ -50,7 +50,8 @@ public:
 			m_v9938(*this, "v9938") ,
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_msm(*this, "msm") { }
 
 	required_device<v9938_device> m_v9938;
 
@@ -81,6 +82,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<msm5205_device> m_msm;
 };
 
 
@@ -172,15 +174,14 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sothello_state::msm_cfg_w)
 {
-	device_t *device = machine().device("msm");
 /*
      bit 0 = RESET
      bit 1 = 4B/3B 0
      bit 2 = S2    1
      bit 3 = S1    2
 */
-	msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
-	msm5205_reset_w(device,data&1);
+	msm5205_playmode_w(m_msm, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	msm5205_reset_w(m_msm,data&1);
 }
 
 WRITE8_MEMBER(sothello_state::msm_data_w)
@@ -335,7 +336,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sothello_state::sothello_interrupt)
 WRITE_LINE_MEMBER(sothello_state::adpcm_int)
 {
 	/* only 4 bits are used */
-	msm5205_data_w(machine().device("msm"), m_msm_data & 0x0f );
+	msm5205_data_w(m_msm, m_msm_data & 0x0f );
 	m_soundcpu->set_input_line(0, ASSERT_LINE );
 }
 

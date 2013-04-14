@@ -178,22 +178,20 @@ WRITE8_MEMBER(sf_state::sound2_bank_w)
 
 WRITE8_MEMBER(sf_state::msm1_5205_w)
 {
-	device_t *device = machine().device("msm1");
-	msm5205_reset_w(device, (data >> 7) & 1);
+	msm5205_reset_w(m_msm1, (data >> 7) & 1);
 	/* ?? bit 6?? */
-	msm5205_data_w(device, data);
-	msm5205_vclk_w(device, 1);
-	msm5205_vclk_w(device, 0);
+	msm5205_data_w(m_msm1, data);
+	msm5205_vclk_w(m_msm1, 1);
+	msm5205_vclk_w(m_msm1, 0);
 }
 
 WRITE8_MEMBER(sf_state::msm2_5205_w)
 {
-	device_t *device = machine().device("msm2");
-	msm5205_reset_w(device, (data >> 7) & 1);
+	msm5205_reset_w(m_msm2, (data >> 7) & 1);
 	/* ?? bit 6?? */
-	msm5205_data_w(device, data);
-	msm5205_vclk_w(device, 1);
-	msm5205_vclk_w(device, 0);
+	msm5205_data_w(m_msm2, data);
+	msm5205_vclk_w(m_msm2, 1);
+	msm5205_vclk_w(m_msm2, 0);
 }
 
 

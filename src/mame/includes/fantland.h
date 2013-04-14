@@ -1,10 +1,14 @@
-
+#include "sound/msm5205.h"
 
 class fantland_state : public driver_device
 {
 public:
 	fantland_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2"),
+		m_msm3(*this, "msm3"),
+		m_msm4(*this, "msm4"),
 		m_spriteram(*this, "spriteram", 0),
 		m_spriteram2(*this, "spriteram2", 0),
 		m_maincpu(*this, "maincpu"),
@@ -26,10 +30,10 @@ public:
 	int        m_adpcm_nibble[4];
 
 	/* devices */
-	device_t *m_msm1;
-	device_t *m_msm2;
-	device_t *m_msm3;
-	device_t *m_msm4;
+	optional_device<msm5205_device> m_msm1;
+	optional_device<msm5205_device> m_msm2;
+	optional_device<msm5205_device> m_msm3;
+	optional_device<msm5205_device> m_msm4;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_spriteram2;
 	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);

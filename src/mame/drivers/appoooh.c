@@ -178,17 +178,17 @@ WRITE_LINE_MEMBER(appoooh_state::appoooh_adpcm_int)
 			UINT8 *RAM = memregion("adpcm")->base();
 
 			m_adpcm_data = RAM[m_adpcm_address++];
-			msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
+			msm5205_data_w(m_msm, m_adpcm_data >> 4);
 
 			if (m_adpcm_data == 0x70)
 			{
 				m_adpcm_address = 0xffffffff;
-				msm5205_reset_w(machine().device("msm"), 1);
+				msm5205_reset_w(m_msm, 1);
 			}
 		}
 		else
 		{
-			msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f );
+			msm5205_data_w(m_msm, m_adpcm_data & 0x0f );
 			m_adpcm_data = -1;
 		}
 	}
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER(appoooh_state::appoooh_adpcm_int)
 WRITE8_MEMBER(appoooh_state::appoooh_adpcm_w)
 {
 	m_adpcm_address = data << 8;
-	msm5205_reset_w(m_adpcm, 0);
+	msm5205_reset_w(m_msm, 0);
 	m_adpcm_data = 0xffffffff;
 }
 
@@ -409,8 +409,6 @@ static const sn76496_config psg_intf =
 
 void appoooh_state::machine_start()
 {
-	m_adpcm = machine().device("msm");
-
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_address));
 }

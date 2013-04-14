@@ -38,7 +38,8 @@ class jangou_state : public driver_device
 {
 public:
 	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_msm(*this, "msm") { }
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -94,6 +95,7 @@ public:
 	UINT8 jangou_gfx_nibble( UINT16 niboffset );
 	void plot_jangou_gfx_pixel( UINT8 pix, int x, int y );
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
+	optional_device<msm5205_device> m_msm;
 };
 
 
@@ -350,10 +352,10 @@ WRITE8_MEMBER(jangou_state::adpcm_w)
 WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 {
 	if (m_msm5205_vclk_toggle == 0)
-		msm5205_data_w(machine().device("msm"), m_adpcm_byte >> 4);
+		msm5205_data_w(m_msm, m_adpcm_byte >> 4);
 	else
 	{
-		msm5205_data_w(machine().device("msm"), m_adpcm_byte & 0xf);
+		msm5205_data_w(m_msm, m_adpcm_byte & 0xf);
 		m_cpu_1->execute().set_input_line(0, HOLD_LINE);
 	}
 

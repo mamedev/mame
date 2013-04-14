@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class gsword_state : public driver_device
 {
 public:
@@ -10,7 +12,8 @@ public:
 		m_cpu2_ram(*this, "cpu2_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT8> m_spritetile_ram;
 	required_shared_ptr<UINT8> m_spritexy_ram;
@@ -55,4 +58,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
+	optional_device<msm5205_device> m_msm;
 };

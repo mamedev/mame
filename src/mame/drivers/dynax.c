@@ -392,7 +392,7 @@ WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 {
-	msm5205_data_w(machine().device("msm"), m_msm5205next >> 4);
+	msm5205_data_w(m_msm, m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle = 1 - m_toggle;
@@ -406,7 +406,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 
 WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
 {
-	msm5205_data_w(machine().device("msm"), m_msm5205next >> 4);
+	msm5205_data_w(m_msm, m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_toggle_cpu1 = 1 - m_toggle_cpu1;
@@ -425,16 +425,15 @@ WRITE8_MEMBER(dynax_state::adpcm_data_w)
 
 WRITE8_MEMBER(dynax_state::adpcm_reset_w)
 {
-	device_t *device = machine().device("msm");
 	m_resetkludge = data & 1;
-	msm5205_reset_w(device, ~data & 1);
+	msm5205_reset_w(m_msm, ~data & 1);
 }
 
 MACHINE_RESET_MEMBER(dynax_state,adpcm)
 {
 	/* start with the MSM5205 reset */
 	m_resetkludge = 0;
-	msm5205_reset_w(machine().device("msm"), 1);
+	msm5205_reset_w(m_msm, 1);
 }
 
 WRITE8_MEMBER(dynax_state::yarunara_layer_half_w)
@@ -4008,7 +4007,7 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 
 MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
-	if (machine().device("msm") != NULL)
+	if (m_msm != NULL)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
 	m_sound_irq = 0;

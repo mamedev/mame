@@ -3,13 +3,14 @@
     Dr. Micro
 
 *************************************************************************/
-
+#include "sound/msm5205.h"
 
 class drmicro_state : public driver_device
 {
 public:
 	drmicro_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_msm(*this, "msm"),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
@@ -25,7 +26,7 @@ public:
 	int            m_pcm_adr;
 
 	/* devices */
-	device_t *m_msm;
+	required_device<msm5205_device> m_msm;
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(pcm_set_w);
 	DECLARE_WRITE8_MEMBER(drmicro_videoram_w);

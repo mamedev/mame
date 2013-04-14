@@ -1,3 +1,5 @@
+#include "sound/msm5205.h"
+
 class tubep_state : public driver_device
 {
 public:
@@ -10,7 +12,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_slave(*this, "slave"),
-		m_mcu(*this, "mcu") { }
+		m_mcu(*this, "mcu"),
+		m_msm(*this, "msm") { }
 
 	UINT8 m_sound_latch;
 	UINT8 m_ls74;
@@ -93,6 +96,7 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
+	optional_device<msm5205_device> m_msm;
 };
 
 

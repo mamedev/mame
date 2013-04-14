@@ -87,8 +87,7 @@ WRITE8_MEMBER(kchamp_state::sound_reset_w)
 
 WRITE8_MEMBER(kchamp_state::sound_control_w)
 {
-	device_t *device = machine().device("msm");
-	msm5205_reset_w(device, !(data & 1));
+	msm5205_reset_w(m_msm, !(data & 1));
 	m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
@@ -348,9 +347,9 @@ INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
 WRITE_LINE_MEMBER(kchamp_state::msmint)
 {
 	if (m_msm_play_lo_nibble)
-		msm5205_data_w(machine().device("msm"), m_msm_data & 0x0f);
+		msm5205_data_w(m_msm, m_msm_data & 0x0f);
 	else
-		msm5205_data_w(machine().device("msm"), (m_msm_data >> 4) & 0x0f);
+		msm5205_data_w(m_msm, (m_msm_data >> 4) & 0x0f);
 
 	m_msm_play_lo_nibble ^= 1;
 

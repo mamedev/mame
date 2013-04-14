@@ -1,3 +1,4 @@
+#include "sound/msm5205.h"
 
 class tbowl_state : public driver_device
 {
@@ -10,7 +11,9 @@ public:
 		m_bg2videoram(*this, "bg2videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2") { }
 
 	int m_adpcm_pos[2];
 	int m_adpcm_end[2];
@@ -62,4 +65,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tbowl_adpcm_int_2);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;		
 };

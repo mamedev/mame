@@ -56,12 +56,11 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
-{
-	device_t *device = machine().device("msm");
+{	
 	m_adpcm_reset = BIT(data, 0);
 	m_vclk_left = 0;
 
-	msm5205_reset_w(device, !m_adpcm_reset);
+	msm5205_reset_w(m_msm, !m_adpcm_reset);
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
@@ -79,7 +78,7 @@ WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
 	/* clock the data through */
 	if (m_vclk_left)
 	{
-		msm5205_data_w(machine().device("msm"), (m_adpcm_data >> 4));
+		msm5205_data_w(m_msm, (m_adpcm_data >> 4));
 		m_adpcm_data <<= 4;
 		m_vclk_left--;
 	}
@@ -787,8 +786,6 @@ static const msm5205_interface msm5205_config =
 
 MACHINE_START_MEMBER(ojankohs_state,common)
 {
-	m_msm = machine().device("msm");
-
 	save_item(NAME(m_gfxreg));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_flipscreen_old));

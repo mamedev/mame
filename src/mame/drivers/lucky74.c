@@ -1426,11 +1426,11 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 			/* transferring 1st nibble */
 			m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-			msm5205_data_w(machine().device("msm"), m_adpcm_data >> 4);
+			msm5205_data_w(m_msm, m_adpcm_data >> 4);
 
 			if (m_adpcm_pos == m_adpcm_end)
 			{
-				msm5205_reset_w(machine().device("msm"), 0);         /* reset the M5205 */
+				msm5205_reset_w(m_msm, 0);         /* reset the M5205 */
 				m_adpcm_reg[05] = 0;     /* clean trigger register */
 				m_adpcm_busy_line = 0x01;    /* deactivate busy flag */
 				logerror("end of sample.\n");
@@ -1439,7 +1439,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		else
 		{
 			/* transferring 2nd nibble */
-			msm5205_data_w(machine().device("msm"), m_adpcm_data & 0x0f);
+			msm5205_data_w(m_msm, m_adpcm_data & 0x0f);
 			m_adpcm_data = -1;
 		}
 	}

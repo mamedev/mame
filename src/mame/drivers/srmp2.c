@@ -160,7 +160,6 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 
 WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
 {
-	device_t *device = machine().device("msm");
 /*
     - Received data may be playing ADPCM number.
     - 0x000000 - 0x0000ff and 0x010000 - 0x0100ff are offset table.
@@ -177,14 +176,13 @@ WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
 	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
-	msm5205_reset_w(device, 0);
+	msm5205_reset_w(m_msm, 0);
 	m_adpcm_data = -1;
 }
 
 
 WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
 {
-	device_t *device = machine().device("msm");
 /*
     - Received data may be playing ADPCM number.
     - 0x000000 - 0x0000ff and 0x010000 - 0x0100ff are offset table.
@@ -201,7 +199,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
 	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
-	msm5205_reset_w(device, 0);
+	msm5205_reset_w(m_msm, 0);
 	m_adpcm_data = -1;
 }
 
@@ -218,25 +216,25 @@ WRITE_LINE_MEMBER(srmp2_state::srmp2_adpcm_int)
 
 			if (m_adpcm_sptr >= m_adpcm_eptr)
 			{
-				msm5205_reset_w(machine().device("msm"), 1);
+				msm5205_reset_w(m_msm, 1);
 				m_adpcm_data = 0;
 				m_adpcm_sptr = 0;
 			}
 			else
 			{
-				msm5205_data_w(machine().device("msm"), ((m_adpcm_data >> 4) & 0x0f));
+				msm5205_data_w(m_msm, ((m_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			msm5205_data_w(machine().device("msm"), ((m_adpcm_data >> 0) & 0x0f));
+			msm5205_data_w(m_msm, ((m_adpcm_data >> 0) & 0x0f));
 			m_adpcm_sptr++;
 			m_adpcm_data = -1;
 		}
 	}
 	else
 	{
-		msm5205_reset_w(machine().device("msm"), 1);
+		msm5205_reset_w(m_msm, 1);
 	}
 }
 

@@ -1271,12 +1271,12 @@ TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadeout_callback)
 	if(pce_cd.adpcm_volume <= 0)
 	{
 		pce_cd.adpcm_volume = 0.0;
-		msm5205_set_volume(machine().device("msm5205"), 0.0);
+		msm5205_set_volume(m_msm5205, 0.0);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(machine().device("msm5205"), pce_cd.adpcm_volume);
+		msm5205_set_volume(m_msm5205, pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1289,12 +1289,12 @@ TIMER_CALLBACK_MEMBER(pce_state::pce_cd_adpcm_fadein_callback)
 	if(pce_cd.adpcm_volume >= 100.0)
 	{
 		pce_cd.adpcm_volume = 100.0;
-		msm5205_set_volume(machine().device("msm5205"), 100.0);
+		msm5205_set_volume(m_msm5205, 100.0);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		msm5205_set_volume(machine().device("msm5205"), pce_cd.adpcm_volume);
+		msm5205_set_volume(m_msm5205, pce_cd.adpcm_volume);
 		pce_cd.adpcm_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
 }
@@ -1418,7 +1418,7 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 		break;
 	case 0x0E:  /* ADPCM playback rate */
 		pce_cd.adpcm_clock_divider = 0x10 - ( data & 0x0F );
-		msm5205_change_clock_w(machine().device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
+		msm5205_change_clock_w(m_msm5205, (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 		break;
 	case 0x0F:  /* ADPCM and CD audio fade timer */
 		/* TODO: timers needs HW tests */

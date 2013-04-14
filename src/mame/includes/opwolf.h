@@ -3,6 +3,7 @@
     Operation Wolf
 
 *************************************************************************/
+#include "sound/msm5205.h"
 
 class opwolf_state : public driver_device
 {
@@ -11,7 +12,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_cchip_ram;
@@ -50,8 +53,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	device_t *m_pc080sn;
 	device_t *m_pc090oj;
-	device_t *m_msm1;
-	device_t *m_msm2;
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;
 	DECLARE_READ16_MEMBER(cchip_r);
 	DECLARE_WRITE16_MEMBER(cchip_w);
 	DECLARE_READ16_MEMBER(opwolf_in_r);

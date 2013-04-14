@@ -320,7 +320,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
 
 WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 {
-	msm5205_data_w(machine().device("msm"), m_msm5205next >> 4);
+	msm5205_data_w(m_msm, m_msm5205next >> 4);
 	m_msm5205next <<= 4;
 
 	m_adpcm_toggle ^= 1;
@@ -589,8 +589,6 @@ void firetrap_state::machine_start()
 {
 	UINT8 *MAIN = memregion("maincpu")->base();
 	UINT8 *SOUND = memregion("audiocpu")->base();
-
-	m_msm = machine().device("msm");
 
 	membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);
 	membank("bank2")->configure_entries(0, 2, &SOUND[0x10000], 0x4000);

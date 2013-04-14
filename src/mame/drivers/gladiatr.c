@@ -278,16 +278,15 @@ WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 
 /*Sound Functions*/
 WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
-{
-	device_t *device = machine().device("msm");
+{	
 	UINT8 *rom = machine().root_device().memregion("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
 	machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
 
-	msm5205_data_w(device,data);         /* bit0..3  */
-	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
-	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
+	msm5205_data_w(m_msm,data);         /* bit0..3  */
+	msm5205_reset_w(m_msm,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (m_msm,(data>>4)&1); /* bit4     */
 }
 
 WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
