@@ -762,15 +762,15 @@ WRITE_LINE_MEMBER(saturn_state::scsp_irq)
 	if (state > 0)
 	{
 		m_scsp_last_line = state;
-		machine().device("audiocpu")->execute().set_input_line(state, ASSERT_LINE);
+		m_audiocpu->set_input_line(state, ASSERT_LINE);
 	}
 	else if (state < 0)
 	{
-		machine().device("audiocpu")->execute().set_input_line(-state, CLEAR_LINE);
+		m_audiocpu->set_input_line(-state, CLEAR_LINE);
 	}
 	else
 	{
-		machine().device("audiocpu")->execute().set_input_line(m_scsp_last_line, CLEAR_LINE);
+		m_audiocpu->set_input_line(m_scsp_last_line, CLEAR_LINE);
 	}
 }
 
