@@ -775,23 +775,20 @@ WRITE8_MEMBER(maygay1b_state::m1_latch_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	device_t *msm6376 = machine().device("msm6376");
-	okim6376_w(msm6376, space, 0, data&0x7f);
-	okim6376_ch2_w(msm6376,data&0x80);
+	okim6376_w(m_msm6376, space, 0, data&0x7f);
+	okim6376_ch2_w(m_msm6376,data&0x80);
 }
 
 //A strange setup this, the address lines are used to move st to the right level
 READ8_MEMBER(maygay1b_state::latch_st_hi)
 {
-	device_t *msm6376 = machine().device("msm6376");
-	okim6376_st_w(msm6376,1);
+	okim6376_st_w(m_msm6376,1);
 	return 0;
 }
 
 READ8_MEMBER(maygay1b_state::latch_st_lo)
 {
-	device_t *msm6376 = machine().device("msm6376");
-	okim6376_st_w(msm6376,0);
+	okim6376_st_w(m_msm6376,0);
 	return 0;
 }
 
