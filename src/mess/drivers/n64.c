@@ -177,7 +177,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 {
 	int i, length;
 	n64_periphs *periphs = image.device().machine().device<n64_periphs>("rcp");
-	UINT8 *cart = image.device().machine().root_device().memregion("user2")->base();
+	UINT8 *cart = memregion("user2")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -230,7 +230,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		UINT8 data[0x30800];
 		battery_image->battery_load(data, 0x30800, 0x00);
 		//memcpy(n64_sram, data, 0x20000);
-		memcpy(image.device().machine().root_device().memshare("sram")->ptr(), data, 0x20000);
+		memcpy(memshare("sram")->ptr(), data, 0x20000);
 		memcpy(periphs->m_save_data.eeprom, data + 0x20000, 0x800);
 		memcpy(periphs->m_save_data.mempak[0], data + 0x20800, 0x8000);
 		memcpy(periphs->m_save_data.mempak[1], data + 0x28800, 0x8000);
@@ -250,7 +250,7 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 {
 	machine_start();
 
-	UINT8 *ipl = machine().root_device().memregion("ddipl")->base();
+	UINT8 *ipl = memregion("ddipl")->base();
 
 	for (int i = 0; i < 0x400000; i += 4)
 	{
@@ -268,7 +268,7 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 {
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
-	periphs->poll_reset_button((machine().root_device().ioport("RESET")->read() & 1) ? true : false);
+	periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
 static MACHINE_CONFIG_START( n64, n64_mess_state )

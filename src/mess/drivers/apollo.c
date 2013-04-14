@@ -1062,7 +1062,7 @@ static void apollo_reset_instr_callback(device_t *device)
  ***************************************************************************/
 
 void apollo_state::machine_start(){
-	memory_share *messram = machine().root_device().memshare("messram");
+	memory_share *messram = memshare("messram");
 	//MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
 
 	// clear ram

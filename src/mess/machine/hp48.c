@@ -302,7 +302,7 @@ static void hp48_update_kdn( running_machine &machine )
 TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
 {
 	/* NMI for ON key */
-	if ( machine().root_device().ioport( "ON" )->read() )
+	if ( ioport( "ON" )->read() )
 	{
 		LOG(( "%f hp48_kbd_cb: keyboard interrupt, on key\n",
 				machine().time().as_double() ));

@@ -250,7 +250,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	printf("megatech_select_game %d\n", param+1);
 
 	sprintf(tempname, "game%d", param);
-	game_region = machine().root_device().memregion(tempname)->base();
+	game_region = memregion(tempname)->base();
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -272,8 +272,8 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	else
 	{
 		/* no cart.. */
-		memset(machine().root_device().memregion("mtbios")->base() + 0x8000, 0x00, 0x8000);
-		memset(machine().root_device().memregion("maincpu")->base(), 0x00, 0x400000);
+		memset(memregion("mtbios")->base() + 0x8000, 0x00, 0x8000);
+		memset(memregion("maincpu")->base(), 0x00, 0x400000);
 	}
 
 	return;

@@ -145,7 +145,7 @@ int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len
 		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
 		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
 
-		memory_share *share = cpu->machine().root_device().memshare("share1");
+		memory_share *share = memshare("share1");
 		p_ram = (UINT8 *)share->ptr();
 		n_ram = share->bytes();
 
@@ -249,7 +249,7 @@ int psx1_state::load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
 						( (int)p_n_file[ n_offset + 7 ] << 24 );
 
-					memory_share *share = cpu->machine().root_device().memshare("share1");
+					memory_share *share = memshare("share1");
 					UINT8 *p_ram = (UINT8 *)share->ptr();
 					UINT32 n_ram = share->bytes();
 

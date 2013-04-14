@@ -47,7 +47,7 @@ static void enterprise_update_memory_page(address_space &space, offs_t page, int
 	case 0x03:
 		space.install_read_bank(start, end, page_num);
 		space.nop_write(start, end);
-		state->membank(page_num)->set_base(space.machine().root_device().memregion("exos")->base() + (index * 0x4000));
+		state->membank(page_num)->set_base(state->memregion("exos")->base() + (index * 0x4000));
 		break;
 
 	case 0x04:
@@ -56,7 +56,7 @@ static void enterprise_update_memory_page(address_space &space, offs_t page, int
 	case 0x07:
 		space.install_read_bank(start, end, page_num);
 		space.nop_write(start, end);
-		state->membank(page_num)->set_base(space.machine().root_device().memregion("cartridges")->base() + ((index - 0x04) * 0x4000));
+		state->membank(page_num)->set_base(state->memregion("cartridges")->base() + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
@@ -128,13 +128,13 @@ READ8_MEMBER(ep_state::enterprise_dave_reg_read)
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(machine().device("custom"), 0x015, machine().root_device().ioport(keynames[keyboard_line])->read());
+			dave_set_reg(machine().device("custom"), 0x015, ioport(keynames[keyboard_line])->read());
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = machine().root_device().ioport("JOY1")->read();
+			int ExternalJoystickPortInput = ioport("JOY1")->read();
 
 			if (keyboard_line <= 4)
 			{

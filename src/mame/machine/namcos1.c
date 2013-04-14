@@ -919,7 +919,7 @@ WRITE8_MEMBER(namcos1_state::namcos1_mcu_bankswitch_w)
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	membank("bank20")->set_base(machine().root_device().memregion("mcu")->base() + addr);
+	membank("bank20")->set_base(memregion("mcu")->base() + addr);
 }
 
 
@@ -1125,7 +1125,7 @@ DRIVER_INIT_MEMBER(namcos1_state,bakutotu)
 		static const UINT8 target[8] = {0x34,0x37,0x35,0x37,0x96,0x00,0x2e,0xed};
 		UINT8 *rombase, *srcptr, *endptr, *scanptr;
 
-		rombase = machine().root_device().memregion("user1")->base();
+		rombase = memregion("user1")->base();
 		srcptr = rombase + 0x1e000;
 		endptr = srcptr + 0xa000;
 

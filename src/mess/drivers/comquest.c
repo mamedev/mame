@@ -205,7 +205,7 @@ GFXDECODE_END
 
 void comquest_state::machine_reset()
 {
-//  UINT8 *mem=machine().root_device().memregion("user1")->base();
+//  UINT8 *mem=memregion("user1")->base();
 //  membank(1)->set_base(mem+0x00000);
 }
 

@@ -21,7 +21,7 @@ READ8_MEMBER(kramermc_state::kramermc_port_b_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return machine().root_device().ioport(keynames[m_key_row])->read();
+	return ioport(keynames[m_key_row])->read();
 }
 
 WRITE8_MEMBER(kramermc_state::kramermc_port_a_w)

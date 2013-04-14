@@ -79,7 +79,7 @@ public:
 
 void paso1600_state::video_start()
 {
-	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 	m_p_pcg = memregion("pcg")->base();
 }
 

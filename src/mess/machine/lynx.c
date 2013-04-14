@@ -1038,7 +1038,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 			value = ioport("PAUSE")->read();
 			break;
 		case RCART:
-			value = *(machine().root_device().memregion("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
+			value = *(memregion("user1")->base() + (m_suzy.high * m_granularity) + m_suzy.low);
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
 			break;
 		//case RCART_BANK1: /* we need bank 1 emulation!!! */
@@ -1969,7 +1969,7 @@ void lynx_state::machine_start()
 	save_pointer(NAME(m_mem_fe00.target()), m_mem_fe00.bytes());
 	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_state::lynx_postload), this));
 
-	membank("bank3")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + 0x0000);
+	membank("bank3")->configure_entry(0, memregion("maincpu")->base() + 0x0000);
 	membank("bank3")->configure_entry(1, m_mem_fe00);
 	membank("bank4")->configure_entry(0, memregion("maincpu")->base() + 0x01fa);
 	membank("bank4")->configure_entry(1, m_mem_fffa);

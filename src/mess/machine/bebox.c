@@ -1040,7 +1040,7 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	address_space &space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
 
 	/* set up boot and flash ROM */
-	membank("bank2")->set_base(machine().root_device().memregion("user2")->base());
+	membank("bank2")->set_base(memregion("user2")->base());
 
 	/* install MESS managed RAM */
 	space_0.install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");

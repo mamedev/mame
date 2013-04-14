@@ -138,11 +138,11 @@ IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 
 TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 {
-	UINT8 val = machine().root_device().ioport("RESET")->read();
+	UINT8 val = ioport("RESET")->read();
 
 	if (BIT(val, 0))
 	{
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
+		membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
 		m_maincpu->reset();
 	}
 

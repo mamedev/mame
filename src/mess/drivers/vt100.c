@@ -130,7 +130,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
 		for(i = 0; i < 16; i++)
 		{
 			sprintf(kbdrow,"LINE%X", i);
-			code =  machine().root_device().ioport(kbdrow)->read();
+			code =  ioport(kbdrow)->read();
 			if (code < 0xff)
 			{
 				m_keyboard_int = 1;

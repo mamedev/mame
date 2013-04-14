@@ -1295,7 +1295,7 @@ READ8_MEMBER(oric_state::telestrat_via2_in_b_func)
 	/* right joystick selected? */
 	if (m_telestrat_via2_port_b_data & (1<<7))
 	{
-		data &= machine().root_device().ioport("JOY1")->read();
+		data &= ioport("JOY1")->read();
 	}
 
 	data |= m_telestrat_via2_port_b_data & ((1<<7) | (1<<6) | (1<<5));

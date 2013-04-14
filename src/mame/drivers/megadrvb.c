@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	 * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
 	 */
 	#if ENERGY_CONSOLE_MODE
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
 	#endif
 
@@ -765,7 +765,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 // after this decode look like intentional changes
 DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
@@ -818,7 +818,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x400000, 0x5fffff, "bank5");
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x400000, 0x5fffff);
 
-	machine().root_device().membank("bank5")->set_base(machine().root_device().memregion( "maincpu" )->base() + 0x400000 );
+	membank("bank5")->set_base(memregion( "maincpu" )->base() + 0x400000 );
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x770070, 0x770075, read16_delegate(FUNC(md_boot_state::ssf2mdb_dsw_r),this));
 
@@ -830,7 +830,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 {
-	UINT8* rom = machine().root_device().memregion("maincpu")->base();
+	UINT8* rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{

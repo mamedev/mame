@@ -275,7 +275,7 @@ with different data and be able to select the other entries - not tested on a re
 and not supported by this driver */
 PALETTE_INIT_MEMBER(amstrad_state,kccomp)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	color_prom = color_prom+0x018000;
@@ -323,7 +323,7 @@ PALETTE_INIT_MEMBER(amstrad_state,aleste)
 	int i;
 
 	/* CPC Colour data is stored in the colour ROM (RFCOLDAT.BIN) at 0x140-0x17f */
-	unsigned char* pal = machine().root_device().memregion("user4")->base();
+	unsigned char* pal = memregion("user4")->base();
 
 	for(i=0; i<32; i++)
 	{

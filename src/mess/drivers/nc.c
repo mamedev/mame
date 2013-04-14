@@ -491,7 +491,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
 	int inputport_10_state;
 	int changed_bits;
 
-	inputport_10_state = machine().root_device().ioport("EXTRA")->read();
+	inputport_10_state = ioport("EXTRA")->read();
 
 	changed_bits = inputport_10_state^m_previous_inputport_10_state;
 

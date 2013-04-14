@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER(gcpinbal_state::gcp_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = machine().root_device().memregion("msm")->base();
+		UINT8 *ROM = memregion("msm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_start] & 0x0f) : (ROM[m_adpcm_start] & 0xf0) >> 4));
 		msm5205_data_w(m_msm, m_adpcm_data & 0xf);

@@ -154,7 +154,7 @@ TIMER_CALLBACK_MEMBER(pc1403_state::pc1403_power_up)
 DRIVER_INIT_MEMBER(pc1403_state,pc1403)
 {
 	int i;
-	UINT8 *gfx=machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfx=memregion("gfx1")->base();
 
 	for (i=0; i<128; i++) gfx[i]=i;
 

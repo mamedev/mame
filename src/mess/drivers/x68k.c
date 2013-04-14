@@ -439,7 +439,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 		{
 			m_mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
-			if(machine().root_device().ioport("options")->read() & 0x01)
+			if(ioport("options")->read() & 0x01)
 			{
 				m_current_vector[6] = 0x4c;
 				m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4c);
@@ -469,7 +469,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 		{
 			m_keyboard.keytime[x] -= 5;
 		}
-		if(!(machine().root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
+		if(!(ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			if(m_keyboard.keyon[x] != 0)
 			{
@@ -483,14 +483,14 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 		// check to see if a key is being held
 		if(m_keyboard.keyon[x] != 0 && m_keyboard.keytime[x] == 0 && m_keyboard.last_pressed == x)
 		{
-			if(machine().root_device().ioport(keynames[m_keyboard.last_pressed / 32])->read() & (1 << (m_keyboard.last_pressed % 32)))
+			if(ioport(keynames[m_keyboard.last_pressed / 32])->read() & (1 << (m_keyboard.last_pressed % 32)))
 			{
 				x68k_keyboard_push_scancode(m_keyboard.last_pressed);
 				m_keyboard.keytime[m_keyboard.last_pressed] = (m_keyboard.repeat^2)*5+30;
 				logerror("KB: Holding key 0x%02x\n",m_keyboard.last_pressed);
 			}
 		}
-		if((machine().root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
+		if((ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			if(m_keyboard.keyon[x] == 0)
 			{
@@ -533,15 +533,15 @@ int x68k_state::x68k_read_mouse()
 	switch(m_mouse.inputtype)
 	{
 	case 0:
-		ipt = machine().root_device().ioport("mouse1")->read();
+		ipt = ioport("mouse1")->read();
 		break;
 	case 1:
-		val = machine().root_device().ioport("mouse2")->read();
+		val = ioport("mouse2")->read();
 		ipt = val - m_mouse.last_mouse_x;
 		m_mouse.last_mouse_x = val;
 		break;
 	case 2:
-		val = machine().root_device().ioport("mouse3")->read();
+		val = ioport("mouse3")->read();
 		ipt = val - m_mouse.last_mouse_y;
 		m_mouse.last_mouse_y = val;
 		break;
@@ -678,7 +678,7 @@ UINT8 x68k_state::md_3button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = machine().root_device().ioport("md3b")->read() & 0xff;
+		UINT8 porta = ioport("md3b")->read() & 0xff;
 		UINT8 portb = (ioport("md3b")->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
@@ -691,8 +691,8 @@ UINT8 x68k_state::md_3button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (machine().root_device().ioport("md3b")->read() >> 16) & 0xff;
-		UINT8 portb = (machine().root_device().ioport("md3b")->read() >> 24) & 0xff;
+		UINT8 porta = (ioport("md3b")->read() >> 16) & 0xff;
+		UINT8 portb = (ioport("md3b")->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -726,8 +726,8 @@ UINT8 x68k_state::md_6button_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = machine().root_device().ioport("md6b")->read() & 0xff;
-		UINT8 portb = (machine().root_device().ioport("md6b")->read() >> 8) & 0xff;
+		UINT8 porta = ioport("md6b")->read() & 0xff;
+		UINT8 portb = (ioport("md6b")->read() >> 8) & 0xff;
 		UINT8 extra = ioport("md6b_extra")->read() & 0x0f;
 
 		switch(m_mdctrl.seq1)
@@ -764,9 +764,9 @@ UINT8 x68k_state::md_6button_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (machine().root_device().ioport("md6b")->read() >> 16) & 0xff;
-		UINT8 portb = (machine().root_device().ioport("md6b")->read() >> 24) & 0xff;
-		UINT8 extra = (machine().root_device().ioport("md6b_extra")->read() >> 4) & 0x0f;
+		UINT8 porta = (ioport("md6b")->read() >> 16) & 0xff;
+		UINT8 portb = (ioport("md6b")->read() >> 24) & 0xff;
+		UINT8 extra = (ioport("md6b_extra")->read() >> 4) & 0x0f;
 
 		switch(m_mdctrl.seq2)
 		{
@@ -814,7 +814,7 @@ UINT8 x68k_state::xpd1lr_r(int port)
 {
 	if(port == 1)
 	{
-		UINT8 porta = machine().root_device().ioport("xpd1lr")->read() & 0xff;
+		UINT8 porta = ioport("xpd1lr")->read() & 0xff;
 		UINT8 portb = (ioport("xpd1lr")->read() >> 8) & 0xff;
 		if(m_mdctrl.mux1 & 0x10)
 		{
@@ -827,8 +827,8 @@ UINT8 x68k_state::xpd1lr_r(int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (machine().root_device().ioport("xpd1lr")->read() >> 16) & 0xff;
-		UINT8 portb = (machine().root_device().ioport("xpd1lr")->read() >> 24) & 0xff;
+		UINT8 porta = (ioport("xpd1lr")->read() >> 16) & 0xff;
+		UINT8 portb = (ioport("xpd1lr")->read() >> 24) & 0xff;
 		if(m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -844,7 +844,7 @@ UINT8 x68k_state::xpd1lr_r(int port)
 // Judging from the XM6 source code, PPI ports A and B are joystick inputs
 READ8_MEMBER(x68k_state::ppi_port_a_r)
 {
-	int ctrl = machine().root_device().ioport("ctrltype")->read() & 0x0f;
+	int ctrl = ioport("ctrltype")->read() & 0x0f;
 
 	switch(ctrl)
 	{
@@ -866,7 +866,7 @@ READ8_MEMBER(x68k_state::ppi_port_a_r)
 
 READ8_MEMBER(x68k_state::ppi_port_b_r)
 {
-	int ctrl = machine().root_device().ioport("ctrltype")->read() & 0xf0;
+	int ctrl = ioport("ctrltype")->read() & 0xf0;
 
 	switch(ctrl)
 	{
@@ -2564,8 +2564,8 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 
 DRIVER_INIT_MEMBER(x68k_state,x68000)
 {
-	unsigned char* rom = machine().root_device().memregion("maincpu")->base();
-	unsigned char* user2 = machine().root_device().memregion("user2")->base();
+	unsigned char* rom = memregion("maincpu")->base();
+	unsigned char* user2 = memregion("user2")->base();
 	//FIXME
 //  m_gvram = auto_alloc_array(machine(), UINT16, 0x080000/sizeof(UINT16));
 //  m_tvram = auto_alloc_array(machine(), UINT16, 0x080000/sizeof(UINT16));

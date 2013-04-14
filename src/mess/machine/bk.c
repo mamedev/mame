@@ -23,7 +23,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 
 	for(i = 1; i < 12; i++)
 	{
-		code =  machine().root_device().ioport(keynames[i-1])->read();
+		code =  ioport(keynames[i-1])->read();
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -34,7 +34,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 					break;
 				}
 			}
-			if ((machine().root_device().ioport("LINE0")->read() & 4) == 4)
+			if ((ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i==6 || i==7)
 				{
@@ -42,7 +42,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 				}
 
 			}
-			if ((machine().root_device().ioport("LINE0")->read() & 4) == 4)
+			if ((ioport("LINE0")->read() & 4) == 4)
 			{
 				if (i>=8 && i<=11)
 				{
@@ -50,7 +50,7 @@ TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
 				}
 			}
 			m_key_pressed = 0x40;
-			if ((machine().root_device().ioport("LINE0")->read() & 2) == 0)
+			if ((ioport("LINE0")->read() & 2) == 0)
 			{
 				m_key_irq_vector = 0x30;
 			}

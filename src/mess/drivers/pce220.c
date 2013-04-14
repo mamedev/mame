@@ -851,7 +851,7 @@ void pce220_state::machine_start()
 	membank("bank3")->configure_entries(0, 8, rom, 0x4000);
 	membank("bank4")->configure_entries(0, 8, rom, 0x4000);
 
-	m_vram = (UINT8*)machine().root_device().memregion("lcd_vram")->base();
+	m_vram = (UINT8*)memregion("lcd_vram")->base();
 
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
@@ -866,7 +866,7 @@ void pcg850v_state::machine_start()
 	membank("bank3")->configure_entries(0, 22, rom, 0x4000);
 	membank("bank4")->configure_entries(0, 22, rom, 0x4000);
 
-	m_vram = (UINT8*)machine().root_device().memregion("lcd_vram")->base();
+	m_vram = (UINT8*)memregion("lcd_vram")->base();
 	machine().device<nvram_device>("nvram")->set_base(ram, m_ram->size());
 }
 
@@ -876,7 +876,7 @@ void pce220_state::machine_reset()
 	space.unmap_write(0x0000, 0x3fff);
 
 	// install the boot code into the first bank
-	membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x0000);
+	membank("bank1")->set_base(memregion("user1")->base() + 0x0000);
 
 	m_lcd_index_row = 0;
 	m_lcd_index_col = 0;

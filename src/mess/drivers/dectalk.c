@@ -303,7 +303,7 @@ static UINT8 duart_input(device_t *device)
 	dectalk_state *state = device->machine().driver_data<dectalk_state>();
 	UINT8 data = 0;
 	data |= state->m_duart_inport&0xF;
-	data |= (device->machine().root_device().ioport("duart_in")->read()&0xF0);
+	data |= (state->ioport("duart_in")->read()&0xF0);
 	if ((state->m_hack_self_test == 1) && (state->ioport("hacks")->read()&0x01)) data |= 0x10; // hack to prevent hang if selftest disable bit is kept low past the first read; i suppose the proper use of this bit was an incremental switch, or perhaps its expecting an interrupt later from serial in or tone in? added a dipswitch to disable the hack for testing
 		state->m_hack_self_test = 1;
 	return data;

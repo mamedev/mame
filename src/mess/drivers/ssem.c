@@ -89,11 +89,11 @@ enum
 
 INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 {
-	UINT8 edit0_state = machine().root_device().ioport("EDIT0")->read();
-	UINT8 edit1_state = machine().root_device().ioport("EDIT1")->read();
-	UINT8 edit2_state = machine().root_device().ioport("EDIT2")->read();
-	UINT8 edit3_state = machine().root_device().ioport("EDIT3")->read();
-	UINT8 misc_state = machine().root_device().ioport("MISC")->read();
+	UINT8 edit0_state = ioport("EDIT0")->read();
+	UINT8 edit1_state = ioport("EDIT1")->read();
+	UINT8 edit2_state = ioport("EDIT2")->read();
+	UINT8 edit3_state = ioport("EDIT3")->read();
+	UINT8 misc_state = ioport("MISC")->read();
 	device_t *ssem_cpu = m_maincpu;
 
 	switch( (int)(FPTR)param )

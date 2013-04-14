@@ -173,7 +173,7 @@ DISCRETE_SOUND_END
 WRITE8_MEMBER(circus_state::circus_clown_z_w)
 {
 	m_clown_z = (data & 0x0f);
-	*(machine().root_device().memregion("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
+	*(memregion("maincpu")->base() + 0x8000) = data; logerror("Z:%02x\n",data); //DEBUG
 
 	/* Bits 4-6 enable/disable trigger different events */
 	switch (m_game_id)

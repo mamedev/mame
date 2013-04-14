@@ -305,11 +305,11 @@ WRITE16_MEMBER( pb1000_state::gatearray_w )
 	m_gatearray[offset] = data&0xff;
 
 	if (m_gatearray[0])
-		membank("bank1")->set_base(machine().root_device().memregion("card1")->base());
+		membank("bank1")->set_base(memregion("card1")->base());
 	else if (m_gatearray[1])
-		membank("bank1")->set_base(machine().root_device().memregion("card2")->base());
+		membank("bank1")->set_base(memregion("card2")->base());
 	else
-		membank("bank1")->set_base(machine().root_device().memregion("rom")->base());
+		membank("bank1")->set_base(memregion("rom")->base());
 }
 
 static void lcd_control(hd61700_cpu_device &device, UINT8 data)
@@ -491,7 +491,7 @@ TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
 
 void pb1000_state::machine_start()
 {
-	membank("bank1")->set_base(machine().root_device().memregion("rom")->base());
+	membank("bank1")->set_base(memregion("rom")->base());
 
 	m_kb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pb1000_state::keyboard_timer),this));
 	m_kb_timer->adjust(attotime::from_hz(192), 0, attotime::from_hz(192));

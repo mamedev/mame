@@ -173,7 +173,7 @@ void tbowl_state::tbowl_adpcm_int( device_t *device, int num )
 	}
 	else
 	{
-		UINT8 *ROM = machine().root_device().memregion("adpcm")->base() + 0x10000 * num;
+		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * num;
 
 		m_adpcm_data[num] = ROM[m_adpcm_pos[num]++];
 		msm5205_data_w(device,m_adpcm_data[num] >> 4);

@@ -545,7 +545,7 @@ GFXDECODE_END
 
 void fp200_state::machine_start()
 {
-	UINT8 *raw_gfx = machine().root_device().memregion("raw_gfx")->base();
+	UINT8 *raw_gfx = memregion("raw_gfx")->base();
 	m_chargen = memregion("chargen")->base();
 
 	for(int i=0;i<0x800;i++)

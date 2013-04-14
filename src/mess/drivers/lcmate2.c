@@ -200,7 +200,7 @@ void lcmate2_state::palette_init()
 
 void lcmate2_state::machine_start()
 {
-	membank("rombank")->configure_entries(0, 0x10, (UINT8*)machine().root_device().memregion("maincpu")->base(), 0x4000);
+	membank("rombank")->configure_entries(0, 0x10, (UINT8*)memregion("maincpu")->base(), 0x4000);
 }
 
 static const gfx_layout lcmate2_charlayout =

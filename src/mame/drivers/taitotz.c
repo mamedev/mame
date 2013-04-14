@@ -2605,7 +2605,7 @@ MACHINE_CONFIG_END
 // Init for BIOS v1.52
 void taitotz_state::init_taitotz_152()
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 }
@@ -2613,7 +2613,7 @@ void taitotz_state::init_taitotz_152()
 // Init for BIOS 1.11a
 void taitotz_state::init_taitotz_111a()
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
 }
 

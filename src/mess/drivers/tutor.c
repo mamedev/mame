@@ -231,7 +231,7 @@ DRIVER_INIT_MEMBER(tutor_state,tutor)
 {
 	m_tape_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tutor_state::tape_interrupt_handler),this));
 
-	membank("bank1")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + basic_base);
+	membank("bank1")->configure_entry(0, memregion("maincpu")->base() + basic_base);
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + cartridge_base);
 	membank("bank1")->set_entry(0);
 }
@@ -301,7 +301,7 @@ READ8_MEMBER( tutor_state::key_r )
 DEVICE_IMAGE_LOAD_MEMBER( tutor_state, tutor_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = image.device().machine().root_device().memregion("maincpu")->base();
+	UINT8 *ptr = memregion("maincpu")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -320,7 +320,7 @@ DEVICE_IMAGE_LOAD_MEMBER( tutor_state, tutor_cart )
 
 DEVICE_IMAGE_UNLOAD_MEMBER( tutor_state, tutor_cart )
 {
-	memset(image.device().machine().root_device().memregion("maincpu")->base() + cartridge_base, 0, 0x6000);
+	memset(memregion("maincpu")->base() + cartridge_base, 0, 0x6000);
 }
 
 /*

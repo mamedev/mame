@@ -309,7 +309,7 @@ READ8_MEMBER( fk1_state::fk1_bank_rom_r )
 {
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
 	space_mem.unmap_write(0x0000, 0x3fff);
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(memregion("maincpu")->base());
 	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000);
 	return 0;
 }
@@ -387,7 +387,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 {
-	if (machine().root_device().ioport("LINE0")->read())
+	if (ioport("LINE0")->read())
 	{
 		m_int_vector = 6;
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -424,7 +424,7 @@ void fk1_state::machine_reset()
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space.unmap_write(0x0000, 0x3fff);
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()); // ROM
+	membank("bank1")->set_base(memregion("maincpu")->base()); // ROM
 	membank("bank2")->set_base(ram + 0x10000); // VRAM
 	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0xc000);

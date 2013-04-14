@@ -404,7 +404,7 @@ void rx78_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 {
-	UINT8 *cart = image.device().machine().root_device().memregion("cart_img")->base();
+	UINT8 *cart = memregion("cart_img")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

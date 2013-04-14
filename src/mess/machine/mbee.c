@@ -756,7 +756,7 @@ QUICKLOAD_LOAD( mbee )
 	device_t *cpu = state->m_maincpu;
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16 i, j;
-	UINT8 data, sw = image.device().machine().root_device().ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = state->ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
 
 	if (!mame_stricmp(image.filetype(), "mwb"))
 	{
@@ -835,7 +835,7 @@ QUICKLOAD_LOAD( mbee_z80bin )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
+		autorun = state->ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		device_t *cpu = state->m_maincpu;
 		address_space &space = state->m_maincpu->space(AS_PROGRAM);

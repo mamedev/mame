@@ -322,14 +322,14 @@ void mboard_state::check_board_buttons()
 
 /* check click on border pieces */
 	i=0;
-	port_input=machine().root_device().ioport("B_BLACK")->read();
+	port_input=ioport("B_BLACK")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input)+6;
 		click_on_border_piece=TRUE;
 	}
 
-	port_input=machine().root_device().ioport("B_WHITE")->read();
+	port_input=ioport("B_WHITE")->read();
 	if (port_input)
 	{
 		i=get_first_bit(port_input);
@@ -366,7 +366,7 @@ void mboard_state::check_board_buttons()
 
 
 /* check click on board */
-	data = machine().root_device().ioport(keynames[board_row])->read_safe(0xff);
+	data = ioport(keynames[board_row])->read_safe(0xff);
 
 	if ((data != 0xff) && (!mouse_down) )
 	{
@@ -412,7 +412,7 @@ void mboard_state::check_board_buttons()
 		mouse_down = 0;
 
 /* check click on border - remove selected piece*/
-	if (machine().root_device().ioport("LINE10")->read_safe(0x01))
+	if (ioport("LINE10")->read_safe(0x01))
 	{
 		if (mouse_hold_piece)
 		{
@@ -432,7 +432,7 @@ void mboard_state::check_board_buttons()
 /* check additional buttons */
 	if (data == 0xff)
 	{
-		port_input=machine().root_device().ioport("B_BUTTONS")->read();
+		port_input=ioport("B_BUTTONS")->read();
 		if (port_input==0x01)
 		{
 			clear_board();

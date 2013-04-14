@@ -900,7 +900,7 @@ DRIVER_INIT_MEMBER(trs80_state,lnw80)
 {
 	m_mode = 0;
 	m_model4 = 0;
-	m_p_gfxram = machine().root_device().memregion("gfx2")->base();
+	m_p_gfxram = memregion("gfx2")->base();
 	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 

@@ -370,8 +370,8 @@ void super80_state::mc6845_cursor_configure()
 
 VIDEO_START_MEMBER(super80_state,super80v)
 {
-	m_p_pcgram = machine().root_device().memregion("maincpu")->base()+0xf000;
-	m_p_videoram = machine().root_device().memregion("videoram")->base();
+	m_p_pcgram = memregion("maincpu")->base()+0xf000;
+	m_p_videoram = memregion("videoram")->base();
 	m_p_colorram = memregion("colorram")->base();
 }
 

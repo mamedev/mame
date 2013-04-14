@@ -333,8 +333,8 @@ void x07_state::t6834_cmd (UINT8 cmd)
 		break;
 	case 0x1c:  //UDC Init
 		{
-			memcpy(m_t6834_ram + 0x200, (UINT8*)machine().root_device().memregion("gfx1")->base() + 0x400, 0x100);
-			memcpy(m_t6834_ram + 0x300, (UINT8*)machine().root_device().memregion("gfx1")->base() + 0x700, 0x100);
+			memcpy(m_t6834_ram + 0x200, (UINT8*)memregion("gfx1")->base() + 0x400, 0x100);
+			memcpy(m_t6834_ram + 0x300, (UINT8*)memregion("gfx1")->base() + 0x700, 0x100);
 		}
 		break;
 
@@ -928,8 +928,8 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 {
 	UINT8 modifier;
-	UINT8 a1 = field.machine().root_device().ioport("A1")->read();
-	UINT8 bz = field.machine().root_device().ioport("BZ")->read();
+	UINT8 a1 = ioport("A1")->read();
+	UINT8 bz = ioport("BZ")->read();
 	UINT8 keycode = (UINT8)(FPTR)param;
 
 	if (m_kb_on && !newval)

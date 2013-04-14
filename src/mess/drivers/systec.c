@@ -94,8 +94,8 @@ INPUT_PORTS_END
 
 void systec_state::machine_reset()
 {
-	UINT8 *m_p_maincpu = machine().root_device().memregion("maincpu")->base();
-	UINT8 *m_p_roms = machine().root_device().memregion("roms")->base();
+	UINT8 *m_p_maincpu = memregion("maincpu")->base();
+	UINT8 *m_p_roms = memregion("roms")->base();
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 

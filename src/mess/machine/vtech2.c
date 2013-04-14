@@ -59,7 +59,7 @@ static const char *const mwa_bank_hard[4] =
 
 DRIVER_INIT_MEMBER(vtech2_state,laser)
 {
-	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
+	UINT8 *gfx = memregion("gfx2")->base();
 	int i;
 
 	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
@@ -200,33 +200,33 @@ int vtech2_state::mra_bank(int bank, int offs)
 	{
 		if( (offs & 0x0300) == 0x0000 ) /* keyboard row A */
 		{
-			if( machine().root_device().ioport("ROWA")->read() != m_row_a )
+			if( ioport("ROWA")->read() != m_row_a )
 			{
-				m_row_a = machine().root_device().ioport("ROWA")->read();
+				m_row_a = ioport("ROWA")->read();
 				data &= m_row_a;
 			}
 		}
 		if( (offs & 0x0300) == 0x0100 ) /* keyboard row B */
 		{
-			if( machine().root_device().ioport("ROWB")->read() != m_row_b )
+			if( ioport("ROWB")->read() != m_row_b )
 			{
-				m_row_b = machine().root_device().ioport("ROWB")->read();
+				m_row_b = ioport("ROWB")->read();
 				data &= m_row_b;
 			}
 		}
 		if( (offs & 0x0300) == 0x0200 ) /* keyboard row C */
 		{
-			if( machine().root_device().ioport("ROWC")->read() != m_row_c )
+			if( ioport("ROWC")->read() != m_row_c )
 			{
-				m_row_c = machine().root_device().ioport("ROWC")->read();
+				m_row_c = ioport("ROWC")->read();
 				data &= m_row_c;
 			}
 		}
 		if( (offs & 0x0300) == 0x0300 ) /* keyboard row D */
 		{
-			if( machine().root_device().ioport("ROWD")->read() != m_row_d )
+			if( ioport("ROWD")->read() != m_row_d )
 			{
-				m_row_d = machine().root_device().ioport("ROWD")->read();
+				m_row_d = ioport("ROWD")->read();
 				data &= m_row_d;
 			}
 		}
@@ -235,21 +235,21 @@ int vtech2_state::mra_bank(int bank, int offs)
 	{
 		/* All Lasers keyboard rows 0 through 7 */
 		if( !(offs & 0x01) )
-			data &= machine().root_device().ioport("ROW0")->read();
+			data &= ioport("ROW0")->read();
 		if( !(offs & 0x02) )
-			data &= machine().root_device().ioport("ROW1")->read();
+			data &= ioport("ROW1")->read();
 		if( !(offs & 0x04) )
-			data &= machine().root_device().ioport("ROW2")->read();
+			data &= ioport("ROW2")->read();
 		if( !(offs & 0x08) )
-			data &= machine().root_device().ioport("ROW3")->read();
+			data &= ioport("ROW3")->read();
 		if( !(offs & 0x10) )
-			data &= machine().root_device().ioport("ROW4")->read();
+			data &= ioport("ROW4")->read();
 		if( !(offs & 0x20) )
-			data &= machine().root_device().ioport("ROW5")->read();
+			data &= ioport("ROW5")->read();
 		if( !(offs & 0x40) )
-			data &= machine().root_device().ioport("ROW6")->read();
+			data &= ioport("ROW6")->read();
 		if( !(offs & 0x80) )
-			data &= machine().root_device().ioport("ROW7")->read();
+			data &= ioport("ROW7")->read();
 	}
 
 	/* what's bit 7 good for? tape input maybe? */

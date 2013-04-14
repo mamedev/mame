@@ -343,8 +343,8 @@ ROM_END
 DRIVER_INIT_MEMBER(alesis_state,hr16)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *orig = machine().root_device().memregion("user1")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *orig = memregion("user1")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];

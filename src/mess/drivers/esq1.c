@@ -180,7 +180,7 @@ static UINT8 esq1_adc_read(device_t *device)
 void esq1_state::machine_reset()
 {
 	// set default OSROM banking
-	membank("osbank")->set_base(machine().root_device().memregion("osrom")->base() );
+	membank("osbank")->set_base(memregion("osrom")->base() );
 
 	m_mapper_state = 0;
 	m_seq_bank = 0;

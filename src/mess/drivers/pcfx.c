@@ -121,7 +121,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 {
 	const char *const padnames[] = { "P1", "P2" };
 
-	m_pad.latch[param] = machine().root_device().ioport(padnames[param])->read();
+	m_pad.latch[param] = ioport(padnames[param])->read();
 	m_pad.status[param] |= 8;
 	m_pad.ctrl[param] &= ~1; // ack TX line
 	// TODO: pad IRQ

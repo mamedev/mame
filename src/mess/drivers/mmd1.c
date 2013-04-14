@@ -466,7 +466,7 @@ DRIVER_INIT_MEMBER(mmd1_state,mmd2)
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
 */
-	UINT8 *p_ram = machine().root_device().memregion("maincpu")->base();
+	UINT8 *p_ram = memregion("maincpu")->base();
 	membank("bank1")->configure_entry(0, &p_ram[0x0000]);
 	membank("bank1")->configure_entry(1, &p_ram[0xd800]);
 	membank("bank1")->configure_entry(2, &p_ram[0x0c00]);

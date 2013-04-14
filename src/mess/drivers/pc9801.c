@@ -3103,9 +3103,9 @@ static I8237_INTERFACE( pc9801rs_dmac_intf )
 *
 ****************************************/
 
-READ8_MEMBER(pc9801_state::ppi_sys_porta_r){ return machine().root_device().ioport("DSW2")->read(); }
-READ8_MEMBER(pc9801_state::ppi_sys_portb_r){ return machine().root_device().ioport("DSW1")->read(); }
-READ8_MEMBER(pc9801_state::ppi_prn_portb_r){ return machine().root_device().ioport("DSW5")->read(); }
+READ8_MEMBER(pc9801_state::ppi_sys_porta_r){ return ioport("DSW2")->read(); }
+READ8_MEMBER(pc9801_state::ppi_sys_portb_r){ return ioport("DSW1")->read(); }
+READ8_MEMBER(pc9801_state::ppi_prn_portb_r){ return ioport("DSW5")->read(); }
 
 WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 {
@@ -3186,8 +3186,8 @@ READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 	return res;
 }
 
-READ8_MEMBER(pc9801_state::ppi_mouse_portb_r) { return machine().root_device().ioport("DSW3")->read(); }
-READ8_MEMBER(pc9801_state::ppi_mouse_portc_r) { return machine().root_device().ioport("DSW4")->read(); }
+READ8_MEMBER(pc9801_state::ppi_mouse_portb_r) { return ioport("DSW3")->read(); }
+READ8_MEMBER(pc9801_state::ppi_mouse_portc_r) { return ioport("DSW4")->read(); }
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
 {
@@ -3452,17 +3452,17 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 	{
 		UINT8 op_mode;
 		UINT8 *ROM;
-		UINT8 *PRG = machine().root_device().memregion("fdc_data")->base();
+		UINT8 *PRG = memregion("fdc_data")->base();
 		int i;
 
-		ROM = machine().root_device().memregion("fdc_bios_2dd")->base();
-		op_mode = (machine().root_device().ioport("ROM_LOAD")->read() & 2) >> 1;
+		ROM = memregion("fdc_bios_2dd")->base();
+		op_mode = (ioport("ROM_LOAD")->read() & 2) >> 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000];
 
-		ROM = machine().root_device().memregion("fdc_bios_2hd")->base();
-		op_mode = machine().root_device().ioport("ROM_LOAD")->read() & 1;
+		ROM = memregion("fdc_bios_2hd")->base();
+		op_mode = ioport("ROM_LOAD")->read() & 1;
 
 		for(i=0;i<0x1000;i++)
 			ROM[i] = PRG[i+op_mode*0x8000+0x10000];
@@ -3478,7 +3478,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
-//  m_has_opna = machine().root_device().ioport("SOUND_CONFIG")->read() & 1;
+//  m_has_opna = ioport("SOUND_CONFIG")->read() & 1;
 	memset(m_work_ram, 0, sizeof(UINT8) * 0xa0000);
 }
 
@@ -4069,10 +4069,10 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	}
 	UINT32 i,j,k;
 	UINT32 pcg_tile;
-	UINT8 *kanji = machine().root_device().memregion("kanji")->base();
-	UINT8 *raw_kanji = machine().root_device().memregion("raw_kanji")->base();
-	UINT8 *new_chargen = machine().root_device().memregion("new_chargen")->base();
-	UINT8 *chargen = machine().root_device().memregion("chargen")->base();
+	UINT8 *kanji = memregion("kanji")->base();
+	UINT8 *raw_kanji = memregion("raw_kanji")->base();
+	UINT8 *new_chargen = memregion("new_chargen")->base();
+	UINT8 *chargen = memregion("chargen")->base();
 
 	/* Convert the ROM bitswap here from the original structure */
 	/* TODO: kanji bitswap should be completely wrong, will check it out once that a dump is remade. */

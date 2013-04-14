@@ -70,7 +70,7 @@ DRIVER_INIT_MEMBER(tx0_state,tx0)
 	};
 
 	/* set up our font */
-	dst = machine().root_device().memregion("gfx1")->base();
+	dst = memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
@@ -1575,7 +1575,7 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 
 
 		/* handle toggle switch register keys */
-		tsr_keys = (machine().root_device().ioport("MSW")->read() << 16) | machine().root_device().ioport("LSW")->read();
+		tsr_keys = (ioport("MSW")->read() << 16) | ioport("LSW")->read();
 
 		/* compute transitions */
 		tsr_transitions = tsr_keys & (~ m_old_tsr_keys);

@@ -60,8 +60,8 @@ DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 		{
 			if (m_beta->started())
 			{
-				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().root_device().memregion("beta:beta")->base());
-				m_bank1->set_base(machine().root_device().memregion("beta:beta")->base());
+				direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("beta:beta")->base());
+				m_bank1->set_base(memregion("beta:beta")->base());
 			}
 		}
 		else

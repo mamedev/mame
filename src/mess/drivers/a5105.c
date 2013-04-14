@@ -276,7 +276,7 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 			prog.unmap_write(0x4000, 0x4000);
 			break;
 		case 1:
-			membank("bank2")->set_base(machine().root_device().memregion("k5651")->base());
+			membank("bank2")->set_base(memregion("k5651")->base());
 			prog.install_read_bank(0x4000, 0x7fff, "bank2");
 			prog.unmap_write(0x4000, 0x4000);
 			break;
@@ -485,7 +485,7 @@ void a5105_state::machine_reset()
 	m_beep->set_frequency(500);
 
 	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
-	m_rom_base = (UINT8*)machine().root_device().memregion("maincpu")->base();
+	m_rom_base = (UINT8*)memregion("maincpu")->base();
 
 	membank("bank1")->set_base(m_rom_base);
 	membank("bank2")->set_base(m_rom_base + 0x4000);

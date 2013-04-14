@@ -2370,11 +2370,11 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
 	address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = machine().root_device().ioport("key1")->read();
-	UINT32 key2 = machine().root_device().ioport("key2")->read();
-	UINT32 key3 = machine().root_device().ioport("key3")->read();
-	UINT32 key4 = machine().root_device().ioport("tenkey")->read();
-	UINT32 f_key = machine().root_device().ioport("f_keys")->read();
+	UINT32 key1 = ioport("key1")->read();
+	UINT32 key2 = ioport("key2")->read();
+	UINT32 key3 = ioport("key3")->read();
+	UINT32 key4 = ioport("tenkey")->read();
+	UINT32 f_key = ioport("f_keys")->read();
 
 	if(m_key_irq_vector)
 	{
@@ -2426,7 +2426,7 @@ TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 
 MACHINE_RESET_MEMBER(x1_state,x1)
 {
-	//UINT8 *ROM = machine().root_device().memregion("x1_cpu")->base();
+	//UINT8 *ROM = memregion("x1_cpu")->base();
 	int i;
 
 	memset(m_gfx_bitmap_ram,0x00,0xc000*2);
@@ -2715,8 +2715,8 @@ ROM_END
 DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 {
 	UINT32 i,j,k,l;
-	UINT8 *kanji = machine().root_device().memregion("kanji")->base();
-	UINT8 *raw_kanji = machine().root_device().memregion("raw_kanji")->base();
+	UINT8 *kanji = memregion("kanji")->base();
+	UINT8 *raw_kanji = memregion("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)

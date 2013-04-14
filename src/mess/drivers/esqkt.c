@@ -93,8 +93,8 @@ public:
 
 void esqkt_state::machine_reset()
 {
-//  m_rom = (UINT32 *)machine().root_device().memregion("osrom")->base();
-//  m_ram = (UINT32 *)machine().root_device().memshare("osram")->ptr();
+//  m_rom = (UINT32 *)memregion("osrom")->base();
+//  m_ram = (UINT32 *)memshare("osram")->ptr();
 
 //  memcpy(m_ram, m_rom, 8);
 //  m_maincpu->reset();
@@ -122,7 +122,7 @@ READ16_MEMBER(esqkt_state::es5510_dsp_r)
 
 WRITE16_MEMBER(esqkt_state::es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)space.machine().root_device().memregion("waverom")->base();
+	UINT8 *snd_mem = (UINT8 *)memregion("waverom")->base();
 
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 
@@ -191,8 +191,8 @@ READ32_MEMBER(esqkt_state::lower_r)
 	// get pointers when 68k resets
 	if (!m_rom)
 	{
-		m_rom = (UINT32 *)machine().root_device().memregion("osrom")->base();
-		m_ram = (UINT32 *)machine().root_device().memshare("osram")->ptr();
+		m_rom = (UINT32 *)memregion("osrom")->base();
+		m_ram = (UINT32 *)memshare("osram")->ptr();
 	}
 
 	if (offset < 0x2000)

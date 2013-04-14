@@ -779,7 +779,7 @@ READ8_MEMBER(pc_state::ibm5160_ppi_porta_r)
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = machine().root_device().ioport("DSW0")->read();
+		data = ioport("DSW0")->read();
 	}
 	else
 	{
@@ -802,13 +802,13 @@ READ8_MEMBER(pc_state::ibm5160_ppi_portc_r)
 	if (m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
+		data = (data & 0xf0) | ((ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (machine().root_device().ioport("DSW0")->read() & 0x0f);
+		data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -872,7 +872,7 @@ READ8_MEMBER(pc_state::pc_ppi_porta_r)
 		 *      01 - color 40x25
 		 * 6-7  The number of floppy disk drives
 		 */
-		data = machine().root_device().ioport("DSW0")->read();
+		data = ioport("DSW0")->read();
 	}
 	else
 	{
@@ -924,18 +924,18 @@ TIMER_CALLBACK_MEMBER(pc_state::mc1502_keyb_signal_callback)
 {
 	UINT8 key = 0;
 
-	key |= machine().root_device().ioport("Y1")->read();
-	key |= machine().root_device().ioport("Y2")->read();
-	key |= machine().root_device().ioport("Y3")->read();
-	key |= machine().root_device().ioport("Y4")->read();
-	key |= machine().root_device().ioport("Y5")->read();
-	key |= machine().root_device().ioport("Y6")->read();
-	key |= machine().root_device().ioport("Y7")->read();
-	key |= machine().root_device().ioport("Y8")->read();
-	key |= machine().root_device().ioport("Y9")->read();
-	key |= machine().root_device().ioport("Y10")->read();
-	key |= machine().root_device().ioport("Y11")->read();
-	key |= machine().root_device().ioport("Y12")->read();
+	key |= ioport("Y1")->read();
+	key |= ioport("Y2")->read();
+	key |= ioport("Y3")->read();
+	key |= ioport("Y4")->read();
+	key |= ioport("Y5")->read();
+	key |= ioport("Y6")->read();
+	key |= ioport("Y7")->read();
+	key |= ioport("Y8")->read();
+	key |= ioport("Y9")->read();
+	key |= ioport("Y10")->read();
+	key |= ioport("Y11")->read();
+	key |= ioport("Y12")->read();
 //  DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
 //      (key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
@@ -1002,18 +1002,18 @@ READ8_MEMBER(pc_state::mc1502_kppi_porta_r)
 {
 	UINT8 key = 0;
 
-	if (mc1502_keyb.mask & 0x0001) { key |= machine().root_device().ioport("Y1")->read(); }
-	if (mc1502_keyb.mask & 0x0002) { key |= machine().root_device().ioport("Y2")->read(); }
-	if (mc1502_keyb.mask & 0x0004) { key |= machine().root_device().ioport("Y3")->read(); }
-	if (mc1502_keyb.mask & 0x0008) { key |= machine().root_device().ioport("Y4")->read(); }
-	if (mc1502_keyb.mask & 0x0010) { key |= machine().root_device().ioport("Y5")->read(); }
-	if (mc1502_keyb.mask & 0x0020) { key |= machine().root_device().ioport("Y6")->read(); }
-	if (mc1502_keyb.mask & 0x0040) { key |= machine().root_device().ioport("Y7")->read(); }
-	if (mc1502_keyb.mask & 0x0080) { key |= machine().root_device().ioport("Y8")->read(); }
-	if (mc1502_keyb.mask & 0x0100) { key |= machine().root_device().ioport("Y9")->read(); }
-	if (mc1502_keyb.mask & 0x0200) { key |= machine().root_device().ioport("Y10")->read(); }
-	if (mc1502_keyb.mask & 0x0400) { key |= machine().root_device().ioport("Y11")->read(); }
-	if (mc1502_keyb.mask & 0x0800) { key |= machine().root_device().ioport("Y12")->read(); }
+	if (mc1502_keyb.mask & 0x0001) { key |= ioport("Y1")->read(); }
+	if (mc1502_keyb.mask & 0x0002) { key |= ioport("Y2")->read(); }
+	if (mc1502_keyb.mask & 0x0004) { key |= ioport("Y3")->read(); }
+	if (mc1502_keyb.mask & 0x0008) { key |= ioport("Y4")->read(); }
+	if (mc1502_keyb.mask & 0x0010) { key |= ioport("Y5")->read(); }
+	if (mc1502_keyb.mask & 0x0020) { key |= ioport("Y6")->read(); }
+	if (mc1502_keyb.mask & 0x0040) { key |= ioport("Y7")->read(); }
+	if (mc1502_keyb.mask & 0x0080) { key |= ioport("Y8")->read(); }
+	if (mc1502_keyb.mask & 0x0100) { key |= ioport("Y9")->read(); }
+	if (mc1502_keyb.mask & 0x0200) { key |= ioport("Y10")->read(); }
+	if (mc1502_keyb.mask & 0x0400) { key |= ioport("Y11")->read(); }
+	if (mc1502_keyb.mask & 0x0800) { key |= ioport("Y12")->read(); }
 	key ^= 0xff;
 //  DBG_LOG(2,"mc1502_kppi_porta_r",("= %02X\n", key));
 	return key;
@@ -1374,8 +1374,8 @@ DRIVER_INIT_MEMBER(pc_state,pcmda)
 
 DRIVER_INIT_MEMBER(pc_state,europc)
 {
-	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
-	UINT8 *rom = &machine().root_device().memregion("maincpu")->base()[0];
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
+	UINT8 *rom = &memregion("maincpu")->base()[0];
 	int i;
 
 	/* just a plain bit pattern for graphics data generation */
@@ -1407,7 +1407,7 @@ DRIVER_INIT_MEMBER(pc_state,t1000hx)
 
 DRIVER_INIT_MEMBER(pc_state,pc200)
 {
-	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	int i;
 
 	/* just a plain bit pattern for graphics data generation */
@@ -1419,7 +1419,7 @@ DRIVER_INIT_MEMBER(pc_state,pc200)
 
 DRIVER_INIT_MEMBER(pc_state,ppc512)
 {
-	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	int i;
 
 	/* just a plain bit pattern for graphics data generation */
@@ -1430,7 +1430,7 @@ DRIVER_INIT_MEMBER(pc_state,ppc512)
 }
 DRIVER_INIT_MEMBER(pc_state,pc1512)
 {
-	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
 	int i;
 
 	/* just a plain bit pattern for graphics data generation */
@@ -1586,7 +1586,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 
 		size = image.get_software_region_length("rom" );
 
-		memcpy( image.device().machine().root_device().memregion("maincpu")->base() + address, cart, size );
+		memcpy( memregion("maincpu")->base() + address, cart, size );
 	}
 	else
 	{
@@ -1615,7 +1615,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 		}
 
 		/* Read the cartridge contents */
-		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().root_device().memregion("maincpu")->base() + address, image_size - 0x200 ) )
+		if ( ( image_size - 0x200 ) != image.fread(memregion("maincpu")->base() + address, image_size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;

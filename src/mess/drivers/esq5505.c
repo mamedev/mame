@@ -221,8 +221,8 @@ IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
 
 void esq5505_state::machine_reset()
 {
-	m_rom = (UINT16 *)(void *)machine().root_device().memregion("osrom")->base();
-	m_ram = (UINT16 *)(void *)machine().root_device().memshare("osram")->ptr();
+	m_rom = (UINT16 *)(void *)memregion("osrom")->base();
+	m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(esq5505_state::maincpu_irq_acknowledge_callback),this));
 }
 
@@ -254,8 +254,8 @@ READ16_MEMBER(esq5505_state::lower_r)
 	// get pointers when 68k resets
 	if (!m_rom)
 	{
-		m_rom = (UINT16 *)(void *)machine().root_device().memregion("osrom")->base();
-		m_ram = (UINT16 *)(void *)machine().root_device().memshare("osram")->ptr();
+		m_rom = (UINT16 *)(void *)memregion("osrom")->base();
+		m_ram = (UINT16 *)(void *)memshare("osram")->ptr();
 	}
 
 	if (m68k_get_fc(m_maincpu) == 0x6)  // supervisor mode = ROM
@@ -882,8 +882,8 @@ DRIVER_INIT_MEMBER(esq5505_state,sq1)
 
 DRIVER_INIT_MEMBER(esq5505_state,denib)
 {
-	UINT8 *pNibbles = (UINT8 *)machine().root_device().memregion("nibbles")->base();
-	UINT8 *pBS0L = (UINT8 *)machine().root_device().memregion("waverom")->base();
+	UINT8 *pNibbles = (UINT8 *)memregion("nibbles")->base();
+	UINT8 *pBS0L = (UINT8 *)memregion("waverom")->base();
 	UINT8 *pBS0H = pBS0L + 0x100000;
 
 	DRIVER_INIT_CALL(common);

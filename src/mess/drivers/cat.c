@@ -343,7 +343,7 @@ public:
 /*
 DRIVER_INIT_MEMBER( cat_state,cat )
 {
-    UINT8 *svrom = machine().root_device().memregion("svrom")->base();
+    UINT8 *svrom = memregion("svrom")->base();
     int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half

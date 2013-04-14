@@ -127,39 +127,39 @@ READ8_MEMBER(ssystem3_state::ssystem3_via_read_a)
 {
 	UINT8 data=0xff;
 #if 1 // time switch
-	if (!(m_porta&0x10)) data&=machine().root_device().ioport("matrix1")->read()|0xf1;
-	if (!(m_porta&0x20)) data&=machine().root_device().ioport("matrix2")->read()|0xf1;
-	if (!(m_porta&0x40)) data&=machine().root_device().ioport("matrix3")->read()|0xf1;
-	if (!(m_porta&0x80)) data&=machine().root_device().ioport("matrix4")->read()|0xf1;
+	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf1;
+	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf1;
+	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf1;
+	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf1;
 #else
-	if (!(m_porta&0x10)) data&=machine().root_device().ioport("matrix1")->read()|0xf0;
-	if (!(m_porta&0x20)) data&=machine().root_device().ioport("matrix2")->read()|0xf0;
-	if (!(m_porta&0x40)) data&=machine().root_device().ioport("matrix3")->read()|0xf0;
-	if (!(m_porta&0x80)) data&=machine().root_device().ioport("matrix4")->read()|0xf0;
+	if (!(m_porta&0x10)) data&=ioport("matrix1")->read()|0xf0;
+	if (!(m_porta&0x20)) data&=ioport("matrix2")->read()|0xf0;
+	if (!(m_porta&0x40)) data&=ioport("matrix3")->read()|0xf0;
+	if (!(m_porta&0x80)) data&=ioport("matrix4")->read()|0xf0;
 #endif
 	if (!(m_porta&1)) {
-	if (!(machine().root_device().ioport("matrix1")->read()&1)) data&=~0x10;
-	if (!(machine().root_device().ioport("matrix2")->read()&1)) data&=~0x20;
-	if (!(machine().root_device().ioport("matrix3")->read()&1)) data&=~0x40;
+	if (!(ioport("matrix1")->read()&1)) data&=~0x10;
+	if (!(ioport("matrix2")->read()&1)) data&=~0x20;
+	if (!(ioport("matrix3")->read()&1)) data&=~0x40;
 	if (!(ioport("matrix4")->read()&1)) data&=~0x80;
 	}
 	if (!(m_porta&2)) {
-	if (!(machine().root_device().ioport("matrix1")->read()&2)) data&=~0x10;
-	if (!(machine().root_device().ioport("matrix2")->read()&2)) data&=~0x20;
-	if (!(machine().root_device().ioport("matrix3")->read()&2)) data&=~0x40;
-	if (!(machine().root_device().ioport("matrix4")->read()&2)) data&=~0x80;
+	if (!(ioport("matrix1")->read()&2)) data&=~0x10;
+	if (!(ioport("matrix2")->read()&2)) data&=~0x20;
+	if (!(ioport("matrix3")->read()&2)) data&=~0x40;
+	if (!(ioport("matrix4")->read()&2)) data&=~0x80;
 	}
 	if (!(m_porta&4)) {
-	if (!(machine().root_device().ioport("matrix1")->read()&4)) data&=~0x10;
-	if (!(machine().root_device().ioport("matrix2")->read()&4)) data&=~0x20;
-	if (!(machine().root_device().ioport("matrix3")->read()&4)) data&=~0x40;
-	if (!(machine().root_device().ioport("matrix4")->read()&4)) data&=~0x80;
+	if (!(ioport("matrix1")->read()&4)) data&=~0x10;
+	if (!(ioport("matrix2")->read()&4)) data&=~0x20;
+	if (!(ioport("matrix3")->read()&4)) data&=~0x40;
+	if (!(ioport("matrix4")->read()&4)) data&=~0x80;
 	}
 	if (!(m_porta&8)) {
-	if (!(machine().root_device().ioport("matrix1")->read()&8)) data&=~0x10;
-	if (!(machine().root_device().ioport("matrix2")->read()&8)) data&=~0x20;
-	if (!(machine().root_device().ioport("matrix3")->read()&8)) data&=~0x40;
-	if (!(machine().root_device().ioport("matrix4")->read()&8)) data&=~0x80;
+	if (!(ioport("matrix1")->read()&8)) data&=~0x10;
+	if (!(ioport("matrix2")->read()&8)) data&=~0x20;
+	if (!(ioport("matrix3")->read()&8)) data&=~0x40;
+	if (!(ioport("matrix4")->read()&8)) data&=~0x80;
 	}
 	//  logerror("%.4x via port a read %02x\n",(int)activecpu_get_pc(), data);
 	return data;

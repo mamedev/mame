@@ -2861,9 +2861,9 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 	mouse_joy_state *state = &m_nimbus_mouse;
 
 
-	state->m_reg0a4 = machine().root_device().ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
-	x = machine().root_device().ioport(MOUSEX_TAG)->read();
-	y = machine().root_device().ioport(MOUSEY_TAG)->read();
+	state->m_reg0a4 = ioport(MOUSE_BUTTON_TAG)->read() | 0xC0;
+	x = ioport(MOUSEX_TAG)->read();
+	y = ioport(MOUSEY_TAG)->read();
 
 	UINT8   mxa;
 	UINT8   mxb;

@@ -48,7 +48,7 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 	{
 		mem.unmap_readwrite (0x0000, 0x3fff);
 		mem.install_read_bank (0x0000, 0x0fff, "bank1");
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+		membank("bank1")->set_base(memregion("maincpu")->base());
 		mem.install_readwrite_handler (0x3000, 0x3fff, read8_delegate(FUNC(kaypro_state::kaypro_videoram_r), this), write8_delegate(FUNC(kaypro_state::kaypro_videoram_w), this));
 	}
 	else
@@ -56,8 +56,8 @@ WRITE8_MEMBER( kaypro_state::common_pio_system_w )
 		mem.unmap_readwrite(0x0000, 0x3fff);
 		mem.install_read_bank (0x0000, 0x3fff, "bank2");
 		mem.install_write_bank (0x0000, 0x3fff, "bank3");
-		membank("bank2")->set_base(machine().root_device().memregion("rambank")->base());
-		membank("bank3")->set_base(machine().root_device().memregion("rambank")->base());
+		membank("bank2")->set_base(memregion("rambank")->base());
+		membank("bank3")->set_base(memregion("rambank")->base());
 	}
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));
@@ -161,15 +161,15 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_system_port_w )
 	{
 		mem.unmap_readwrite (0x0000, 0x3fff);
 		mem.install_read_bank (0x0000, 0x1fff, "bank1");
-		membank("bank1")->set_base(mem.machine().root_device().memregion("maincpu")->base());
+		membank("bank1")->set_base(memregion("maincpu")->base());
 	}
 	else
 	{
 		mem.unmap_readwrite (0x0000, 0x3fff);
 		mem.install_read_bank (0x0000, 0x3fff, "bank2");
 		mem.install_write_bank (0x0000, 0x3fff, "bank3");
-		membank("bank2")->set_base(mem.machine().root_device().memregion("rambank")->base());
-		membank("bank3")->set_base(mem.machine().root_device().memregion("rambank")->base());
+		membank("bank2")->set_base(memregion("rambank")->base());
+		membank("bank3")->set_base(memregion("rambank")->base());
 	}
 
 	wd17xx_dden_w(m_fdc, BIT(data, 5));

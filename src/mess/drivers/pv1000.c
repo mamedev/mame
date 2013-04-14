@@ -240,7 +240,7 @@ void pv1000_state::palette_init()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 {
-	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
+	UINT8 *cart = memregion("cart")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

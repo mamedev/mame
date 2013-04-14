@@ -201,7 +201,7 @@ READ8_MEMBER(pp01_state::pp01_8255_portb_r)
 		"LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE", "LINEF"
 	};
 
-	return (machine().root_device().ioport(keynames[m_key_line])->read() & 0x3F) | (machine().root_device().ioport("LINEALL")->read() & 0xC0);
+	return (ioport(keynames[m_key_line])->read() & 0x3F) | (ioport("LINEALL")->read() & 0xC0);
 }
 WRITE8_MEMBER(pp01_state::pp01_8255_portb_w)
 {

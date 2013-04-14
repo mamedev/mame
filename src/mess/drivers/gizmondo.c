@@ -94,12 +94,12 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 			data = data & ~0x000000F2;
 			// keys
 			data |= 0x00F2;
-			if ((port_c & 0x01) == 0) data &= ~device->machine().root_device().ioport( "PORTF-01")->read();
-			if ((port_c & 0x02) == 0) data &= ~device->machine().root_device().ioport( "PORTF-02")->read();
-			if ((port_c & 0x04) == 0) data &= ~device->machine().root_device().ioport( "PORTF-04")->read();
-			if ((port_c & 0x08) == 0) data &= ~device->machine().root_device().ioport( "PORTF-08")->read();
-			if ((port_c & 0x10) == 0) data &= ~device->machine().root_device().ioport( "PORTF-10")->read();
-			data &= ~device->machine().root_device().ioport( "PORTF")->read();
+			if ((port_c & 0x01) == 0) data &= ~gizmondo->ioport( "PORTF-01")->read();
+			if ((port_c & 0x02) == 0) data &= ~gizmondo->ioport( "PORTF-02")->read();
+			if ((port_c & 0x04) == 0) data &= ~gizmondo->ioport( "PORTF-04")->read();
+			if ((port_c & 0x08) == 0) data &= ~gizmondo->ioport( "PORTF-08")->read();
+			if ((port_c & 0x10) == 0) data &= ~gizmondo->ioport( "PORTF-10")->read();
+			data &= ~gizmondo->ioport( "PORTF")->read();
 		}
 		break;
 		case S3C2440_GPIO_PORT_G :
@@ -107,7 +107,7 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 			data = data & ~0x00008001;
 			// keys
 			data = data | 0x8000;
-			data &= ~device->machine().root_device().ioport( "PORTG")->read();
+			data &= ~gizmondo->ioport( "PORTG")->read();
 			// no sd card inserted
 			data = data | 0x0001;
 		}

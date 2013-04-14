@@ -816,7 +816,7 @@ void m20_state::machine_start()
 
 void m20_state::machine_reset()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 *RAM = (UINT8 *)(m_ram->pointer() + 0x4000);
 
 	if (m_memsize >= 256 * 1024)

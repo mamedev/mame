@@ -200,12 +200,12 @@ WRITE8_MEMBER(chinagat_state::chinagat_video_ctrl_w )
 
 WRITE8_MEMBER(chinagat_state::chinagat_bankswitch_w )
 {
-	space.machine().root_device().membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
+	membank("bank1")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
 WRITE8_MEMBER(chinagat_state::chinagat_sub_bankswitch_w )
 {
-	space.machine().root_device().membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
+	membank("bank4")->set_entry(data & 0x07); // shall we check (data & 7) < 6 (# of banks)?
 }
 
 READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )

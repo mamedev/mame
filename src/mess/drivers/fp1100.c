@@ -358,7 +358,7 @@ void fp1100_state::machine_reset()
 
 	for(i=0;i<8;i++)
 	{
-		slot_type = (machine().root_device().ioport("SLOTS")->read() >> i*2) & 3;
+		slot_type = (ioport("SLOTS")->read() >> i*2) & 3;
 		m_slot[i].id = id_type[slot_type];
 	}
 }

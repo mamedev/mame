@@ -155,13 +155,13 @@ MACHINE_RESET_MEMBER(llc_state,llc2)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.unmap_write(0x0000, 0x3fff);
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(memregion("maincpu")->base());
 
 	space.unmap_write(0x4000, 0x5fff);
-	membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
+	membank("bank2")->set_base(memregion("maincpu")->base() + 0x4000);
 
 	space.unmap_write(0x6000, 0xbfff);
-	membank("bank3")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
+	membank("bank3")->set_base(memregion("maincpu")->base() + 0x6000);
 
 	space.install_write_bank(0xc000, 0xffff, "bank4");
 	membank("bank4")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
@@ -193,7 +193,7 @@ WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 	if (data & 0x02)
 	{
 		mem_space.unmap_write(0x4000, 0x5fff);
-		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
+		membank("bank2")->set_base(memregion("maincpu")->base() + 0x10000);
 	}
 	else
 	{

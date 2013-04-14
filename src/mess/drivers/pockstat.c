@@ -753,7 +753,7 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 
 INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 {
-	UINT32 buttons = machine().root_device().ioport("BUTTONS")->read();
+	UINT32 buttons = ioport("BUTTONS")->read();
 
 	ps_intc_set_interrupt_line(PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
 	ps_intc_set_interrupt_line(PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
@@ -803,7 +803,7 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 	if(m_ps_flash_write_count)
 	{
 		m_ps_flash_write_count--;
-		COMBINE_DATA(&((UINT32*)(*machine().root_device().memregion("flash")))[offset]);
+		COMBINE_DATA(&((UINT32*)(*memregion("flash")))[offset]);
 	}
 }
 
@@ -939,7 +939,7 @@ UINT32 pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb3
 DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 {
 	int i, length;
-	UINT8 *cart = image.device().machine().root_device().memregion("flash")->base();
+	UINT8 *cart = memregion("flash")->base();
 	static const char *gme_id = "123-456-STD";
 
 	length = image.fread( cart, 0x20f40);

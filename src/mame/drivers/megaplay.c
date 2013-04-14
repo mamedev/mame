@@ -444,7 +444,7 @@ READ8_MEMBER(mplay_state::bank_r )
 		}
 		else
 		{
-			return machine().root_device().memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->base()[fulladdress ^ 1];
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
@@ -820,9 +820,9 @@ ROM_END
 
 void mplay_state::mplay_start()
 {
-	UINT8 *src = machine().root_device().memregion("mtbios")->base();
-	UINT8 *instruction_rom = machine().root_device().memregion("user1")->base();
-	UINT8 *game_rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *src = memregion("mtbios")->base();
+	UINT8 *instruction_rom = memregion("user1")->base();
+	UINT8 *game_rom = memregion("maincpu")->base();
 	int offs;
 
 	memmove(src + 0x10000, src + 0x8000, 0x18000); // move bios..

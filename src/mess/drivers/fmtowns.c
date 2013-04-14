@@ -893,7 +893,7 @@ void towns_state::mouse_timeout()
 READ8_MEMBER(towns_state::towns_padport_r)
 {
 	UINT8 ret = 0x00;
-	UINT32 porttype = space.machine().root_device().ioport("ctrltype")->read();
+	UINT32 porttype = ioport("ctrltype")->read();
 	UINT8 extra1;
 	UINT8 extra2;
 	UINT32 state;
@@ -902,12 +902,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	{
 		if((porttype & 0x0f) == 0x01)
 		{
-			extra1 = space.machine().root_device().ioport("joy1_ex")->read();
+			extra1 = ioport("joy1_ex")->read();
 
 			if(m_towns_pad_mask & 0x10)
-				ret |= (space.machine().root_device().ioport("joy1")->read() & 0x3f) | 0x40;
+				ret |= (ioport("joy1")->read() & 0x3f) | 0x40;
 			else
-				ret |= (space.machine().root_device().ioport("joy1")->read() & 0x0f) | 0x30;
+				ret |= (ioport("joy1")->read() & 0x0f) | 0x30;
 
 			if(extra1 & 0x01) // Run button = left+right
 				ret &= ~0x0c;
@@ -921,12 +921,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 		}
 		if((porttype & 0x0f) == 0x04)  // 6-button joystick
 		{
-			extra1 = space.machine().root_device().ioport("6b_joy1_ex")->read();
+			extra1 = ioport("6b_joy1_ex")->read();
 
 			if(m_towns_pad_mask & 0x10)
 				ret |= 0x7f;
 			else
-				ret |= (space.machine().root_device().ioport("6b_joy1")->read() & 0x0f) | 0x70;
+				ret |= (ioport("6b_joy1")->read() & 0x0f) | 0x70;
 
 			if(!(m_towns_pad_mask & 0x10))
 			{
@@ -975,7 +975,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 			}
 
 			// button states are always visible
-			state = space.machine().root_device().ioport("mouse1")->read();
+			state = ioport("mouse1")->read();
 			if(!(state & 0x01))
 				ret |= 0x10;
 			if(!(state & 0x02))
@@ -989,12 +989,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 	{
 		if((porttype & 0xf0) == 0x10)
 		{
-			extra2 = space.machine().root_device().ioport("joy2_ex")->read();
+			extra2 = ioport("joy2_ex")->read();
 
 			if(m_towns_pad_mask & 0x20)
-				ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x3f)) | 0x40;
+				ret |= ((ioport("joy2")->read() & 0x3f)) | 0x40;
 			else
-				ret |= ((space.machine().root_device().ioport("joy2")->read() & 0x0f)) | 0x30;
+				ret |= ((ioport("joy2")->read() & 0x0f)) | 0x30;
 
 			if(extra2 & 0x01)
 				ret &= ~0x0c;
@@ -1008,12 +1008,12 @@ READ8_MEMBER(towns_state::towns_padport_r)
 		}
 		if((porttype & 0xf0) == 0x40)  // 6-button joystick
 		{
-			extra2 = space.machine().root_device().ioport("6b_joy2_ex")->read();
+			extra2 = ioport("6b_joy2_ex")->read();
 
 			if(m_towns_pad_mask & 0x20)
 				ret |= 0x7f;
 			else
-				ret |= ((space.machine().root_device().ioport("6b_joy2")->read() & 0x0f)) | 0x70;
+				ret |= ((ioport("6b_joy2")->read() & 0x0f)) | 0x70;
 
 			if(!(m_towns_pad_mask & 0x10))
 			{
@@ -1062,7 +1062,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 			}
 
 			// button states are always visible
-			state = space.machine().root_device().ioport("mouse1")->read();
+			state = ioport("mouse1")->read();
 			if(!(state & 0x01))
 				ret |= 0x10;
 			if(!(state & 0x02))
@@ -1078,7 +1078,7 @@ READ8_MEMBER(towns_state::towns_padport_r)
 WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 {
 	UINT8 current_x,current_y;
-	UINT32 type = space.machine().root_device().ioport("ctrltype")->read();
+	UINT32 type = ioport("ctrltype")->read();
 
 	m_towns_pad_mask = (data & 0xff);
 	if((type & 0x0f) == 0x02)  // mouse
@@ -1088,8 +1088,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_X_HIGH;
-				current_x = space.machine().root_device().ioport("mouse2")->read();
-				current_y = space.machine().root_device().ioport("mouse3")->read();
+				current_x = ioport("mouse2")->read();
+				current_y = ioport("mouse3")->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1104,8 +1104,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_SYNC;
-				current_x = space.machine().root_device().ioport("mouse2")->read();
-				current_y = space.machine().root_device().ioport("mouse3")->read();
+				current_x = ioport("mouse2")->read();
+				current_y = ioport("mouse3")->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1124,8 +1124,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_X_HIGH;
-				current_x = space.machine().root_device().ioport("mouse2")->read();
-				current_y = space.machine().root_device().ioport("mouse3")->read();
+				current_x = ioport("mouse2")->read();
+				current_y = ioport("mouse3")->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;
@@ -1140,8 +1140,8 @@ WRITE8_MEMBER(towns_state::towns_pad_mask_w)
 			if(m_towns_mouse_output == MOUSE_START)
 			{
 				m_towns_mouse_output = MOUSE_SYNC;
-				current_x = space.machine().root_device().ioport("mouse2")->read();
-				current_y = space.machine().root_device().ioport("mouse3")->read();
+				current_x = ioport("mouse2")->read();
+				current_y = ioport("mouse3")->read();
 				m_towns_mouse_x = m_prev_x - current_x;
 				m_towns_mouse_y = m_prev_y - current_y;
 				m_prev_x = current_x;

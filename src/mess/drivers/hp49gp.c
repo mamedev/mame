@@ -200,13 +200,13 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data & ~0xFF00;
-			if ((data & 0x02) == 0) data |= (device->machine().root_device().ioport( "ROW1")->read() << 8);
-			if ((data & 0x04) == 0) data |= (device->machine().root_device().ioport( "ROW2")->read() << 8);
-			if ((data & 0x08) == 0) data |= (device->machine().root_device().ioport( "ROW3")->read() << 8);
-			if ((data & 0x10) == 0) data |= (device->machine().root_device().ioport( "ROW4")->read() << 8);
-			if ((data & 0x20) == 0) data |= (device->machine().root_device().ioport( "ROW5")->read() << 8);
-			if ((data & 0x40) == 0) data |= (device->machine().root_device().ioport( "ROW6")->read() << 8);
-			if ((data & 0x80) == 0) data |= (device->machine().root_device().ioport( "ROW7")->read() << 8);
+			if ((data & 0x02) == 0) data |= (hp49gp->ioport( "ROW1")->read() << 8);
+			if ((data & 0x04) == 0) data |= (hp49gp->ioport( "ROW2")->read() << 8);
+			if ((data & 0x08) == 0) data |= (hp49gp->ioport( "ROW3")->read() << 8);
+			if ((data & 0x10) == 0) data |= (hp49gp->ioport( "ROW4")->read() << 8);
+			if ((data & 0x20) == 0) data |= (hp49gp->ioport( "ROW5")->read() << 8);
+			if ((data & 0x40) == 0) data |= (hp49gp->ioport( "ROW6")->read() << 8);
+			if ((data & 0x80) == 0) data |= (hp49gp->ioport( "ROW7")->read() << 8);
 		}
 		break;
 		case S3C2410_GPIO_PORT_H :
@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 {
-	UINT8 *rom = (UINT8 *)machine().root_device().memregion( "maincpu")->base();
+	UINT8 *rom = (UINT8 *)memregion( "maincpu")->base();
 	memcpy( m_steppingstone, rom, 1024);
 	lcd_spi_init();
 }

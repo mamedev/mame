@@ -503,7 +503,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 {
-	UINT8 irqs = machine().root_device().ioport( "debug" )->read();
+	UINT8 irqs = ioport( "debug" )->read();
 
 	m_irq_active |= irqs;
 	nakajies_update_irqs(machine());

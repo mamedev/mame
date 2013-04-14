@@ -850,7 +850,7 @@ static WRITE8_HANDLER( gssnd_w )
 		case 1: // data write
 			if (state->m_sndglu_ctrl & 0x40)    // docram access
 			{
-				UINT8 *docram = space.machine().root_device().memregion("es5503")->base();
+				UINT8 *docram = state->memregion("es5503")->base();
 				docram[state->m_sndglu_addr] = data;
 			}
 			else

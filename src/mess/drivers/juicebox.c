@@ -176,7 +176,7 @@ static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
 		case S3C44B0_GPIO_PORT_G :
 		{
 			data = 0x0000009F;
-			data = (data & ~0x1F) | (device->machine().root_device().ioport( "PORTG")->read() & 0x1F);
+			data = (data & ~0x1F) | (juicebox->ioport( "PORTG")->read() & 0x1F);
 			#if defined(JUICEBOX_ENTER_DEBUG_MENU)
 			if (juicebox->port_g_read_count++ < 1)
 			{

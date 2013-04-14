@@ -564,7 +564,7 @@ WRITE_LINE_MEMBER(taitol_state::champwr_msm5205_vck)
 	}
 	else
 	{
-		m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos];
+		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0x1ffff;
 		msm5205_data_w(m_msm, m_adpcm_data >> 4);
 	}

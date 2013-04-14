@@ -345,7 +345,7 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 		case 0: res = m_keyb.data; pic8259_ir4_w(machine().device("pic8259_master"), 0); break; // according to the source, reading there acks the irq
 		case 1: res = m_keyb.status; break;
 		case 2: res = m_keyb.sig; break; // bit 0: CTRL bit 1: function key (or reversed)
-		case 3: res = machine().root_device().ioport("KEY_MOD")->read() & 0xff; break; // sh
+		case 3: res = ioport("KEY_MOD")->read() & 0xff; break; // sh
 	}
 
 	return res;

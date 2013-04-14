@@ -165,7 +165,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		break;
 		case S3C2410_GPIO_PORT_F :
 		{
-			data = (data & ~0xFF) | (device->machine().root_device().ioport( "PORT-F")->read() & 0xFF);
+			data = (data & ~0xFF) | (state->ioport( "PORT-F")->read() & 0xFF);
 		}
 		break;
 		case S3C2410_GPIO_PORT_G :
@@ -220,8 +220,8 @@ static READ32_DEVICE_HANDLER( s3c2410_adc_data_r )
 	{
 		case 0 + 0 : data = 0x2EE + (PALM_Z22_BATTERY_LEVEL * 0xFF / 100); break;
 		case 0 + 1 : data = 0; break;
-		case 2 + 0 : data = space.machine().root_device().ioport( "PENX")->read(); break;
-		case 2 + 1 : data = 0x3FF - space.machine().root_device().ioport( "PENY")->read(); break;
+		case 2 + 0 : data = state->ioport( "PENX")->read(); break;
+		case 2 + 1 : data = 0x3FF - state->ioport( "PENY")->read(); break;
 	}
 	state->verboselog(5,  "s3c2410_adc_data_r %08X\n", data);
 	return data;

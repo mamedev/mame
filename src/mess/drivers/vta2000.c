@@ -56,7 +56,7 @@ void vta2000_state::machine_reset()
 
 void vta2000_state::video_start()
 {
-	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("maincpu")->base()+0x8000;
 }
 

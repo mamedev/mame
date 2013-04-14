@@ -230,7 +230,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 	for (i = 0; i < 4; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		inp = machine().root_device().ioport(kbdrow)->read();
+		inp = ioport(kbdrow)->read();
 
 		for (j = 0; j < 5; j++)
 			if (BIT(inp, j))

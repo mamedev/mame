@@ -753,7 +753,7 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
 			     being pressed on the selected m_column */
-			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
+			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -793,7 +793,7 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 			/* KBD IC4 8 input NAND gate */
 			/* set the value of via_system ca2, by checking for any keys
 			     being pressed on the selected m_column */
-			if ((machine().root_device().ioport(colnames[m_column])->read() | 0x01) != 0xff)
+			if ((ioport(colnames[m_column])->read() | 0x01) != 0xff)
 			{
 				via_0->write_ca2(1);
 			}
@@ -831,7 +831,7 @@ static int bbc_keyboard(address_space &space, int data)
 
 	if (state->m_column < 10)
 	{
-		res = space.machine().root_device().ioport(colnames[state->m_column])->read();
+		res = state->ioport(colnames[state->m_column])->read();
 	}
 	else
 	{
@@ -1155,7 +1155,7 @@ READ8_MEMBER(bbc_state::bbcb_via_system_read_portb)
 
 	//logerror("SYSTEM read portb %d\n",0xf | input_port(machine, "IN0")|(TMSint<<6)|(TMSrdy<<7));
 
-	return (0xf | machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7));
+	return (0xf | ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7));
 }
 
 
@@ -2007,9 +2007,9 @@ MACHINE_START_MEMBER(bbc_state,bbcb)
 	m_mc6850_clock = 0;
 	//removed from here because MACHINE_START can no longer read DIP swiches.
 	//put in MACHINE_RESET instead.
-	//m_DFSType=  (machine().root_device().ioport("BBCCONFIG")->read()>>0)&0x07;
-	//m_SWRAMtype=(machine().root_device().ioport("BBCCONFIG")->read()>>3)&0x03;
-	//m_RAMSize=  (machine().root_device().ioport("BBCCONFIG")->read()>>5)&0x01;
+	//m_DFSType=  (ioport("BBCCONFIG")->read()>>0)&0x07;
+	//m_SWRAMtype=(ioport("BBCCONFIG")->read()>>3)&0x03;
+	//m_RAMSize=  (ioport("BBCCONFIG")->read()>>5)&0x01;
 
 	/*set up the required disc controller*/
 	//switch (m_DFSType) {
@@ -2025,9 +2025,9 @@ MACHINE_START_MEMBER(bbc_state,bbcb)
 MACHINE_RESET_MEMBER(bbc_state,bbcb)
 {
 	UINT8 *ram = m_region_maincpu->base();
-	m_DFSType=    (machine().root_device().ioport("BBCCONFIG")->read() >> 0) & 0x07;
-	m_SWRAMtype = (machine().root_device().ioport("BBCCONFIG")->read() >> 3) & 0x03;
-	m_RAMSize=    (machine().root_device().ioport("BBCCONFIG")->read() >> 5) & 0x01;
+	m_DFSType=    (ioport("BBCCONFIG")->read() >> 0) & 0x07;
+	m_SWRAMtype = (ioport("BBCCONFIG")->read() >> 3) & 0x03;
+	m_RAMSize=    (ioport("BBCCONFIG")->read() >> 5) & 0x01;
 
 	m_bank1->set_base(ram);
 	if (m_RAMSize)

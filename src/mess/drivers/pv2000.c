@@ -380,7 +380,7 @@ void pv2000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
-	UINT8 *cart = image.device().machine().root_device().memregion("maincpu")->base() + 0xC000;
+	UINT8 *cart = memregion("maincpu")->base() + 0xC000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

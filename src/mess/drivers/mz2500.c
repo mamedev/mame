@@ -1809,7 +1809,7 @@ void mz2500_state::machine_reset()
 	machine().device<beep_device>(BEEPER_TAG)->set_frequency(4096);
 	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
-//  m_monitor_type = machine().root_device().ioport("DSW1")->read() & 0x40 ? 1 : 0;
+//  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1966,16 +1966,16 @@ READ8_MEMBER(mz2500_state::mz2500_pio1_porta_r)
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= machine().root_device().ioport(keynames[i])->read();
+			res &= ioport(keynames[i])->read();
 
 		m_pio_latchb = res;
 
 		return res;
 	}
 
-	m_pio_latchb = machine().root_device().ioport(keynames[m_key_mux & 0xf])->read();
+	m_pio_latchb = ioport(keynames[m_key_mux & 0xf])->read();
 
-	return machine().root_device().ioport(keynames[m_key_mux & 0xf])->read();
+	return ioport(keynames[m_key_mux & 0xf])->read();
 }
 
 #if 0

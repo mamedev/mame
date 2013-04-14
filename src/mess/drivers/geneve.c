@@ -745,7 +745,7 @@ void geneve_state::machine_reset()
 
 	m_ready_line = m_ready_line1 = ASSERT_LINE;
 
-	m_peribox->set_genmod(machine().root_device().ioport("MODE")->read()==GENMOD);
+	m_peribox->set_genmod(ioport("MODE")->read()==GENMOD);
 
 	m_joyport->write_port(0x01);    // select Joystick 1
 }

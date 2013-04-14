@@ -327,7 +327,7 @@ void samcoupe_state::machine_reset()
 	m_mouse_data[0] = 0xff;
 	m_mouse_data[1] = 0xff;
 
-	if (machine().root_device().ioport("config")->read() & 0x01)
+	if (ioport("config")->read() & 0x01)
 	{
 		/* install RTC */
 		spaceio.install_readwrite_handler(0xef, 0xef, 0xffff, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));

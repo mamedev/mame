@@ -146,7 +146,7 @@ READ8_MEMBER(mz_state::mz800_bank_0_r)
 	/* switch in cgrom */
 	spc.install_read_bank(0x1000, 0x1fff, "bank2");
 	spc.nop_write(0x1000, 0x1fff);
-	membank("bank2")->set_base(machine().root_device().memregion("monitor")->base() + 0x1000);
+	membank("bank2")->set_base(memregion("monitor")->base() + 0x1000);
 
 	if (m_mz700_mode)
 	{
@@ -250,7 +250,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_2_w)
 
 	spc.install_read_bank(0x0000, 0x0fff, "bank1");
 	spc.nop_write(0x0000, 0x0fff);
-	membank("bank1")->set_base(machine().root_device().memregion("monitor")->base());
+	membank("bank1")->set_base(memregion("monitor")->base());
 }
 
 WRITE8_MEMBER(mz_state::mz700_bank_3_w)
@@ -294,7 +294,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_3_w)
 			/* switch in mz800 monitor rom if not locked */
 			spc.install_read_bank(0xe000, 0xffff, "bank8");
 			spc.nop_write(0xe000, 0xffff);
-			membank("bank8")->set_base(machine().root_device().memregion("monitor")->base() + 0x2000);
+			membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
 			m_mz800_ram_monitor = TRUE;
 		}
 	}
@@ -320,7 +320,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 		/* monitor rom and cgrom */
 		spc.install_read_bank(0x0000, 0x1fff, "bank1");
 		spc.nop_write(0x0000, 0x1fff);
-		membank("bank1")->set_base(machine().root_device().memregion("monitor")->base());
+		membank("bank1")->set_base(memregion("monitor")->base());
 
 		/* ram from 0x2000 to 0x7fff */
 		spc.install_readwrite_bank(0x2000, 0x7fff, "bank3");
@@ -350,7 +350,7 @@ WRITE8_MEMBER(mz_state::mz700_bank_4_w)
 		/* mz800 monitor rom from 0xe000 to 0xffff */
 		spc.install_read_bank(0xe000, 0xffff, "bank8");
 		spc.nop_write(0xe000, 0xffff);
-		membank("bank8")->set_base(machine().root_device().memregion("monitor")->base() + 0x2000);
+		membank("bank8")->set_base(memregion("monitor")->base() + 0x2000);
 		m_mz800_ram_monitor = TRUE;
 
 		m_mz800_ram_lock = FALSE; /* reset lock? */
@@ -436,7 +436,7 @@ READ8_MEMBER(mz_state::pio_port_b_r)
 	for(i=0;i<10;i++)
 	{
 		if(key_line & (1 << i))
-			res |= machine().root_device().ioport(keynames[i])->read();
+			res |= ioport(keynames[i])->read();
 	}
 
 	return res;
@@ -583,7 +583,7 @@ READ8_MEMBER(mz_state::mz800_crtc_r)
 /* port EA */
 READ8_MEMBER(mz_state::mz800_ramdisk_r)
 {
-	UINT8 *mem = space.machine().root_device().memregion("user1")->base();
+	UINT8 *mem = memregion("user1")->base();
 	UINT8 data = mem[m_mz800_ramaddr];
 	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", m_mz800_ramaddr, data),machine());
 	if (m_mz800_ramaddr++ == 0)

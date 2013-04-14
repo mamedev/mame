@@ -270,7 +270,7 @@ void coleco_state::machine_reset()
 
 	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
 
-	memset(&machine().root_device().memregion(Z80_TAG)->base()[0x6000], 0xff, 0x400);   // initialize RAM
+	memset(&memregion(Z80_TAG)->base()[0x6000], 0xff, 0x400);   // initialize RAM
 }
 
 //static int coleco_cart_verify(const UINT8 *cartdata, size_t size)
@@ -288,7 +288,7 @@ void coleco_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( coleco_state,czz50_cart )
 {
-	UINT8 *ptr = image.device().machine().root_device().memregion(Z80_TAG)->base() + 0x8000;
+	UINT8 *ptr = memregion(Z80_TAG)->base() + 0x8000;
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

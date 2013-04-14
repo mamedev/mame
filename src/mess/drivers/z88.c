@@ -547,7 +547,7 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)machine().root_device().memregion("bios")->base();
+	m_bios = (UINT8*)memregion("bios")->base();
 	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// configure the memory banks

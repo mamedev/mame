@@ -154,7 +154,7 @@ WRITE8_MEMBER(electron_state::electron_1mhz_w)
 
 READ8_MEMBER(electron_state::electron_ula_r)
 {
-	UINT8 data = ((UINT8 *)machine().root_device().memregion("user1")->base())[0x43E00 + offset];
+	UINT8 data = ((UINT8 *)memregion("user1")->base())[0x43E00 + offset];
 	switch ( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt status */

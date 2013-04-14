@@ -933,15 +933,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 {
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
 	int i,port_i,scancode;
-	UINT8 shift_mod = machine().root_device().ioport("key_mod")->read() & 1;
-	UINT8 kana_mod = machine().root_device().ioport("key_mod")->read() & 0x10;
+	UINT8 shift_mod = ioport("key_mod")->read() & 1;
+	UINT8 kana_mod = ioport("key_mod")->read() & 0x10;
 	scancode = 0;
 
 	for(port_i=0;port_i<11;port_i++)
 	{
 		for(i=0;i<8;i++)
 		{
-			if((machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
+			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				m_keyb_press = smc777_keytable[shift_mod & 1][scancode];
 				if(kana_mod) { m_keyb_press|=0x80; }

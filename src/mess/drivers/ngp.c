@@ -728,8 +728,8 @@ DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
 
-	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x20), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x21),
-	//        (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x22), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x23));
+	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
+	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
 	m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{

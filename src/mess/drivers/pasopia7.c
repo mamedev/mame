@@ -137,7 +137,7 @@ VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 
 void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -168,7 +168,7 @@ void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 
 void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	UINT8 *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
@@ -226,7 +226,7 @@ void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 
 void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	UINT8 *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;

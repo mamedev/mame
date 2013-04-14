@@ -413,7 +413,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 
 	/* read new state of edit keys */
-	edit_keys = machine().root_device().ioport("data")->read();
+	edit_keys = ioport("data")->read();
 
 	/* toggle data reg according to transitions */
 	m_panel_data_reg ^= edit_keys & (~m_old_edit_keys);
@@ -826,7 +826,7 @@ DRIVER_INIT_MEMBER(apexc_state,apexc)
 		0x00
 	};
 
-	dst = machine().root_device().memregion("chargen")->base();
+	dst = memregion("chargen")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }

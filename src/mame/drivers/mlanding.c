@@ -301,7 +301,7 @@ WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 	}
 	else
 	{
-		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
 		msm5205_data_w(m_msm,m_adpcm_data & 0xf);

@@ -68,19 +68,19 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 	if (!device->started()) return 0;
 
 	if (!(state->m_kb_matrix & 0x01))
-		data &= device->machine().root_device().ioport("KEY0")->read();
+		data &= state->ioport("KEY0")->read();
 	if (!(state->m_kb_matrix & 0x02))
-		data &= device->machine().root_device().ioport("KEY1")->read();
+		data &= state->ioport("KEY1")->read();
 	if (!(state->m_kb_matrix & 0x04))
-		data &= device->machine().root_device().ioport("KEY2")->read();
+		data &= state->ioport("KEY2")->read();
 	if (!(state->m_kb_matrix & 0x08))
-		data &= device->machine().root_device().ioport("KEY3")->read();
+		data &= state->ioport("KEY3")->read();
 	if (!(state->m_kb_matrix & 0x10))
-		data &= device->machine().root_device().ioport("KEY4")->read();
+		data &= state->ioport("KEY4")->read();
 	if (!(state->m_kb_matrix & 0x20))
-		data &= device->machine().root_device().ioport("KEY5")->read();
+		data &= state->ioport("KEY5")->read();
 	if (!(state->m_kb_matrix & 0x40))
-		data &= device->machine().root_device().ioport("KEY6")->read();
+		data &= state->ioport("KEY6")->read();
 	if (!(state->m_kb_matrix & 0x80))
 		data &= state->ioport("KEY7")->read();
 

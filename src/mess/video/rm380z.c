@@ -382,7 +382,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 
 void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 {
-	unsigned char* pChar=machine().root_device().memregion("chargen")->base();
+	unsigned char* pChar=memregion("chargen")->base();
 
 	int lineWidth=0x80;
 	int ncols=80;

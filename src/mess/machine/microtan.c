@@ -163,7 +163,7 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
  **************************************************************/
 READ8_MEMBER(microtan_state::via_0_in_a)
 {
-	int data = machine().root_device().ioport("JOY")->read();
+	int data = ioport("JOY")->read();
 	LOG(("microtan_via_0_in_a %02X\n", data));
 	return data;
 }
@@ -436,12 +436,12 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 
 
 	row = 9;
-	newvar = machine().root_device().ioport("ROW8")->read();
+	newvar = ioport("ROW8")->read();
 	chg = m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = machine().root_device().ioport(keynames[row - 1])->read();
+		newvar = ioport(keynames[row - 1])->read();
 		chg = m_keyrows[--row] ^ newvar;
 	}
 	if (!chg)
@@ -574,7 +574,7 @@ void microtan_state::machine_reset()
 
 	for (i = 1; i < 10;  i++)
 	{
-		m_keyrows[i] = machine().root_device().ioport(keynames[i-1])->read();
+		m_keyrows[i] = ioport(keynames[i-1])->read();
 	}
 	set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }

@@ -100,21 +100,21 @@ READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portb_r)/* keyboard reading */
 {
-	return  ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : machine().root_device().ioport("KEY0")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : machine().root_device().ioport("KEY1")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x04) ? 0xff : machine().root_device().ioport("KEY2")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x08) ? 0xff : machine().root_device().ioport("KEY3")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x10) ? 0xff : machine().root_device().ioport("KEY4")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x20) ? 0xff : machine().root_device().ioport("KEY5")->read()) &
-		((m_ppi_port_outputs[1][0] & 0x40) ? 0xff : machine().root_device().ioport("KEY6")->read()) &
+	return  ((m_ppi_port_outputs[1][0] & 0x01) ? 0xff : ioport("KEY0")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x02) ? 0xff : ioport("KEY1")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x04) ? 0xff : ioport("KEY2")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x08) ? 0xff : ioport("KEY3")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x10) ? 0xff : ioport("KEY4")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x20) ? 0xff : ioport("KEY5")->read()) &
+		((m_ppi_port_outputs[1][0] & 0x40) ? 0xff : ioport("KEY6")->read()) &
 		((m_ppi_port_outputs[1][0] & 0x80) ? 0xff : ioport("KEY7")->read());
 }
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_portc_r)/* keyboard reading */
 {
-	return  ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : machine().root_device().ioport("KEY8")->read()) &
-		((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : machine().root_device().ioport("KEY9" )->read()) &
-		((m_ppi_port_outputs[1][2] & 0x04) ? 0xff : machine().root_device().ioport("KEY10")->read()) &
+	return  ((m_ppi_port_outputs[1][2] & 0x01) ? 0xff : ioport("KEY8")->read()) &
+		((m_ppi_port_outputs[1][2] & 0x02) ? 0xff : ioport("KEY9" )->read()) &
+		((m_ppi_port_outputs[1][2] & 0x04) ? 0xff : ioport("KEY10")->read()) &
 		((m_ppi_port_outputs[1][2] & 0x08) ? 0xff : ioport("KEY11")->read());
 }
 
@@ -177,7 +177,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 		membank("bank1")->set_base(ram);
 		membank("bank2")->set_base(ram + 0x4000);
 		membank("bank3")->set_base(ram + 0x8000);
-		membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000);
+		membank("bank4")->set_base(memregion("maincpu")->base() + 0x010000);
 	}
 	else
 	{

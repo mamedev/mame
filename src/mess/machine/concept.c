@@ -216,7 +216,7 @@ READ8_MEMBER(concept_state::via_in_b)
 {
 	UINT8 status;
 
-	status = ((machine().root_device().ioport("DSW0")->read() & 0x80) >> 1) | ((machine().root_device().ioport("DSW0")->read() & 0x40) << 1);
+	status = ((ioport("DSW0")->read() & 0x80) >> 1) | ((ioport("DSW0")->read() & 0x40) << 1);
 	LOG(("via_in_b: VIA port B (DIP switches, Video, Comm Rate) - status: 0x%2.2x\n", status));
 	return status;
 }

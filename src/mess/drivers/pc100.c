@@ -423,7 +423,7 @@ static const struct pic8259_interface pc100_pic8259_config =
 void pc100_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
-	m_kanji_rom = (UINT16 *)(*machine().root_device().memregion("kanji"));
+	m_kanji_rom = (UINT16 *)(*memregion("kanji"));
 	m_vram = (UINT16 *)(*memregion("vram"));
 }
 

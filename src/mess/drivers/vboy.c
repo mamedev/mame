@@ -1349,12 +1349,11 @@ WRITE32_MEMBER(vboy_state::sram_w)
 
 DEVICE_IMAGE_LOAD_MEMBER( vboy_state, vboy_cart )
 {
-	vboy_state *state = image.device().machine().driver_data<vboy_state>();
 	UINT32 chip = 0;
-	UINT8 *ROM = image.device().machine().root_device().memregion("cartridge")->base();
+	UINT8 *ROM = memregion("cartridge")->base();
 	UINT32 cart_size;
 
-	state->m_nvptr = (UINT8 *)NULL;
+	m_nvptr = (UINT8 *)NULL;
 	if (image.software_entry() == NULL)
 	{
 		cart_size = image.length();
@@ -1372,17 +1371,17 @@ DEVICE_IMAGE_LOAD_MEMBER( vboy_state, vboy_cart )
 
 	if (chip)
 	{
-		state->m_nvptr = (UINT8 *)&state->m_vboy_sram;
+		m_nvptr = (UINT8 *)&m_vboy_sram;
 
-		state->m_maincpu->space(AS_PROGRAM).install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),state));
-		state->m_maincpu->space(AS_PROGRAM).install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),state));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x06000000, 0x0600ffff, read32_delegate(FUNC(vboy_state::sram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x06000000, 0x0600ffff, write32_delegate(FUNC(vboy_state::sram_w),this));
 
-		image.battery_load(state->m_nvptr, 0x10000, 0x00);
-		state->m_nvimage = image;
+		image.battery_load(m_nvptr, 0x10000, 0x00);
+		m_nvimage = image;
 	}
 	else
 	{
-		state->m_nvimage = NULL;
+		m_nvimage = NULL;
 	}
 
 	return IMAGE_INIT_PASS;

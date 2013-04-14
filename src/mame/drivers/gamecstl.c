@@ -225,7 +225,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
+				state->membank("bank1")->set_base(state->memregion("bios")->base() + 0x30000);
 			}
 			break;
 		}

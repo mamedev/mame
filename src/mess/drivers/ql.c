@@ -310,7 +310,7 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 		space.unmap_readwrite(0x0c0000, 0x0fffff);
 
 	// Setup trumcard rom mapped to rom so unlink us
-	space.install_rom(0x010000, 0x018000, &machine().root_device().memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x010000, 0x018000, &memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	return memregion(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];
 }
@@ -318,10 +318,10 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 READ8_MEMBER( ql_state::cart_rom_r )
 {
 	// Setup trumcard rom mapped in at $c0000
-	space.install_rom(0x0c0000, 0x0c8000, &machine().root_device().memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x0c0000, 0x0c8000, &memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	// Setup cart rom to rom handler, so unlink us
-	space.install_rom(0x0c000, 0x0ffff, &machine().root_device().memregion(M68008_TAG)->base()[CART_ROM_BASE]);
+	space.install_rom(0x0c000, 0x0ffff, &memregion(M68008_TAG)->base()[CART_ROM_BASE]);
 
 	return memregion(M68008_TAG)->base()[CART_ROM_BASE+offset];
 }
@@ -949,7 +949,7 @@ void ql_state::machine_reset()
 	{
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
-			program.install_rom(0x0c0000, 0x0c3fff, &machine().root_device().memregion(M68008_TAG)->base()[SANDY_ROM_BASE]);
+			program.install_rom(0x0c0000, 0x0c3fff, &memregion(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program.install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
 			program.install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=SANDY_IO_BASE;

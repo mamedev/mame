@@ -134,7 +134,7 @@ UINT32 mirage_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &b
 void mirage_state::machine_reset()
 {
 	last_sndram_bank = 0;
-	membank("sndbank")->set_base(machine().root_device().memregion("es5503")->base() );
+	membank("sndbank")->set_base(memregion("es5503")->base() );
 }
 
 static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )

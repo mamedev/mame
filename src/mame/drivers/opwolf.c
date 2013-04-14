@@ -466,7 +466,7 @@ void opwolf_state::opwolf_msm5205_vck(device_t *device,int chip)
 	}
 	else
 	{
-		m_adpcm_data[chip] = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos[chip]];
+		m_adpcm_data[chip] = memregion("adpcm")->base()[m_adpcm_pos[chip]];
 		m_adpcm_pos[chip] = (m_adpcm_pos[chip] + 1) & 0x7ffff;
 		msm5205_data_w(device, m_adpcm_data[chip] >> 4);
 	}

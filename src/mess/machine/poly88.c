@@ -140,7 +140,7 @@ TIMER_CALLBACK_MEMBER(poly88_state::poly88_cassette_timer_callback)
 	int data;
 	int current_level;
 
-//  if (!(machine().root_device().ioport("DSW0")->read() & 0x02)) /* V.24 / Tape Switch */
+//  if (!(ioport("DSW0")->read() & 0x02)) /* V.24 / Tape Switch */
 	//{
 		/* tape reading */
 		if (m_cassette->get_state()&CASSETTE_PLAY)

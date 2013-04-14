@@ -132,7 +132,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bios_f0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
+				state->membank("bios_f0000")->set_base(state->memregion("bios")->base() + 0x30000);
 			}
 			break;
 		}
@@ -145,7 +145,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bios_e4000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x24000);
+				state->membank("bios_e4000")->set_base(state->memregion("bios")->base() + 0x24000);
 			}
 
 			if (data & 1)       // enable RAM access to region 0xe0000 - 0xe3fff
@@ -154,7 +154,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bios_e0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x20000);
+				state->membank("bios_e0000")->set_base(state->memregion("bios")->base() + 0x20000);
 			}
 			break;
 		}
@@ -167,7 +167,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bios_ec000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x2c000);
+				state->membank("bios_ec000")->set_base(state->memregion("bios")->base() + 0x2c000);
 			}
 
 			if (data & 1)       // enable RAM access to region 0xe8000 - 0xebfff
@@ -176,7 +176,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bios_e8000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x28000);
+				state->membank("bios_e8000")->set_base(state->memregion("bios")->base() + 0x28000);
 			}
 			break;
 		}

@@ -358,7 +358,7 @@ void thomson_state::thom_set_caps_led( int led )
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = image.device().machine().root_device().memregion("maincpu" )->base() + 0x10000;
+	UINT8* pos = memregion("maincpu" )->base() + 0x10000;
 	offs_t size;
 	char name[129];
 

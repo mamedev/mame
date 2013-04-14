@@ -794,11 +794,11 @@ READ8_MEMBER(namcos2_state::c68_p5_r)
 
 	if (m_player_mux)
 	{
-		rv = space.machine().root_device().ioport("MCUB2")->read();
+		rv = ioport("MCUB2")->read();
 	}
 	else
 	{
-		rv = space.machine().root_device().ioport("MCUB")->read();
+		rv = ioport("MCUB")->read();
 	}
 
 	return rv;

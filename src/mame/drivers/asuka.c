@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
 	}
 	else
 	{
-		m_adpcm_data = machine().root_device().memregion("ymsnd")->base()[m_adpcm_pos];
+		m_adpcm_data = memregion("ymsnd")->base()[m_adpcm_pos];
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(m_msm, m_adpcm_data >> 4);
 	}

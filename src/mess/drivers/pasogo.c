@@ -398,7 +398,7 @@ void pasogo_state::palette_init()
 UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//static int width=-1,height=-1;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base()+0xb8000;
+	UINT8 *rom = memregion("maincpu")->base()+0xb8000;
 	static const UINT16 c[]={ 3, 0 };
 	int x,y;
 //  plot_box(bitmap, 0, 0, 64/*bitmap.width*/, bitmap.height, 0);
@@ -550,7 +550,7 @@ DRIVER_INIT_MEMBER(pasogo_state,pasogo)
 {
 	vg230_init();
 	memset(&m_ems, 0, sizeof(m_ems));
-	membank( "bank27" )->set_base( machine().root_device().memregion("user1")->base() + 0x00000 );
+	membank( "bank27" )->set_base( memregion("user1")->base() + 0x00000 );
 	membank( "bank28" )->set_base( memregion("maincpu")->base() + 0xb8000/*?*/ );
 }
 

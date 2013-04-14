@@ -151,21 +151,19 @@ READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
 READ8_MEMBER(ojankohs_state::ojankohs_ay8910_0_r)
 {
 	// DIPSW 1
-	device_t &root = machine().root_device();
-	return (((root.ioport("DSW1")->read() & 0x01) << 7) | ((root.ioport("DSW1")->read() & 0x02) << 5) |
-			((root.ioport("DSW1")->read() & 0x04) << 3) | ((root.ioport("DSW1")->read() & 0x08) << 1) |
-			((root.ioport("DSW1")->read() & 0x10) >> 1) | ((root.ioport("DSW1")->read() & 0x20) >> 3) |
-			((root.ioport("DSW1")->read() & 0x40) >> 5) | ((root.ioport("DSW1")->read() & 0x80) >> 7));
+	return (((ioport("DSW1")->read() & 0x01) << 7) | ((ioport("DSW1")->read() & 0x02) << 5) |
+			((ioport("DSW1")->read() & 0x04) << 3) | ((ioport("DSW1")->read() & 0x08) << 1) |
+			((ioport("DSW1")->read() & 0x10) >> 1) | ((ioport("DSW1")->read() & 0x20) >> 3) |
+			((ioport("DSW1")->read() & 0x40) >> 5) | ((ioport("DSW1")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(ojankohs_state::ojankohs_ay8910_1_r)
 {
 	// DIPSW 1
-	device_t &root = machine().root_device();
-	return (((root.ioport("DSW2")->read() & 0x01) << 7) | ((root.ioport("DSW2")->read() & 0x02) << 5) |
-			((root.ioport("DSW2")->read() & 0x04) << 3) | ((root.ioport("DSW2")->read() & 0x08) << 1) |
-			((root.ioport("DSW2")->read() & 0x10) >> 1) | ((root.ioport("DSW2")->read() & 0x20) >> 3) |
-			((root.ioport("DSW2")->read() & 0x40) >> 5) | ((root.ioport("DSW2")->read() & 0x80) >> 7));
+	return (((ioport("DSW2")->read() & 0x01) << 7) | ((ioport("DSW2")->read() & 0x02) << 5) |
+			((ioport("DSW2")->read() & 0x04) << 3) | ((ioport("DSW2")->read() & 0x08) << 1) |
+			((ioport("DSW2")->read() & 0x10) >> 1) | ((ioport("DSW2")->read() & 0x20) >> 3) |
+			((ioport("DSW2")->read() & 0x40) >> 5) | ((ioport("DSW2")->read() & 0x80) >> 7));
 }
 
 READ8_MEMBER(ojankohs_state::ccasino_dipsw3_r)

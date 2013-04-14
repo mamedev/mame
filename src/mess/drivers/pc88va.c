@@ -284,7 +284,7 @@ UINT32 pc88va_state::calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 
 void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *tvram = machine().root_device().memregion("tvram")->base();
+	UINT8 *tvram = memregion("tvram")->base();
 	UINT8 *kanji = memregion("kanji")->base();
 	int xi,yi;
 	int x,y;
@@ -527,7 +527,7 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 			return 0xffff;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)(*machine().root_device().memregion("tvram"));
+			UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
 
 			if(((offset*2) & 0x30000) == 0)
 				return tvram[offset];
@@ -536,14 +536,14 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 		}
 		case 4:
 		{
-			UINT16 *gvram = (UINT16 *)(*machine().root_device().memregion("gvram"));
+			UINT16 *gvram = (UINT16 *)(*memregion("gvram"));
 
 			return gvram[offset];
 		}
 		case 8: // kanji ROM
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)(*machine().root_device().memregion("kanji"));
+			UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
 			UINT32 knj_offset;
 
 			knj_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -559,7 +559,7 @@ READ16_MEMBER(pc88va_state::sys_mem_r)
 		case 0xc: // Dictionary ROM
 		case 0xd:
 		{
-			UINT16 *dic_rom = (UINT16 *)(*machine().root_device().memregion("dictionary"));
+			UINT16 *dic_rom = (UINT16 *)(*memregion("dictionary"));
 			UINT32 dic_offset;
 
 			dic_offset = (offset + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -579,7 +579,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 			break;
 		case 1: // TVRAM
 		{
-			UINT16 *tvram = (UINT16 *)(*machine().root_device().memregion("tvram"));
+			UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
 
 			if(((offset*2) & 0x30000) == 0)
 				COMBINE_DATA(&tvram[offset]);
@@ -587,7 +587,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 		break;
 		case 4: // TVRAM
 		{
-			UINT16 *gvram = (UINT16 *)(*machine().root_device().memregion("gvram"));
+			UINT16 *gvram = (UINT16 *)(*memregion("gvram"));
 
 			COMBINE_DATA(&gvram[offset]);
 		}
@@ -595,7 +595,7 @@ WRITE16_MEMBER(pc88va_state::sys_mem_w)
 		case 8: // kanji ROM, backup RAM at 0xb0000 - 0xb3fff
 		case 9:
 		{
-			UINT16 *knj_ram = (UINT16 *)(*machine().root_device().memregion("kanji"));
+			UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
 			UINT32 knj_offset;
 
 			knj_offset = ((offset) + (((m_bank_reg & 0x100) >> 8)*0x20000));
@@ -1170,7 +1170,7 @@ WRITE16_MEMBER(pc88va_state::video_pri_w)
 
 READ8_MEMBER(pc88va_state::backupram_dsw_r)
 {
-	UINT16 *knj_ram = (UINT16 *)(*machine().root_device().memregion("kanji"));
+	UINT16 *knj_ram = (UINT16 *)(*memregion("kanji"));
 
 	if(offset == 0)
 		return knj_ram[(0x50000 + 0x1fc2) / 2] & 0xff;
@@ -1568,11 +1568,11 @@ READ8_MEMBER(pc88va_state::r232_ctrl_porta_r)
 {
 	UINT8 sw5, sw4, sw3, sw2,speed_sw;
 
-	speed_sw = (machine().root_device().ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
-	sw5 = (machine().root_device().ioport("DSW")->read() & 0x10);
-	sw4 = (machine().root_device().ioport("DSW")->read() & 0x08);
-	sw3 = (machine().root_device().ioport("DSW")->read() & 0x04);
-	sw2 = (machine().root_device().ioport("DSW")->read() & 0x02);
+	speed_sw = (ioport("SPEED_SW")->read() & 1) ? 0x20 : 0x00;
+	sw5 = (ioport("DSW")->read() & 0x10);
+	sw4 = (ioport("DSW")->read() & 0x08);
+	sw3 = (ioport("DSW")->read() & 0x04);
+	sw2 = (ioport("DSW")->read() & 0x02);
 
 	return 0xc1 | sw5 | sw4 | sw3 | sw2 | speed_sw;
 }
@@ -1581,7 +1581,7 @@ READ8_MEMBER(pc88va_state::r232_ctrl_portb_r)
 {
 	UINT8 xsw1;
 
-	xsw1 = (machine().root_device().ioport("DSW")->read() & 1) ? 0 : 8;
+	xsw1 = (ioport("DSW")->read() & 1) ? 0 : 8;
 
 	return 0xf7 | xsw1;
 }
@@ -1673,7 +1673,7 @@ void pc88va_state::machine_start()
 
 void pc88va_state::machine_reset()
 {
-	UINT8 *ROM00 = machine().root_device().memregion("rom00")->base();
+	UINT8 *ROM00 = memregion("rom00")->base();
 	UINT8 *ROM10 = memregion("rom10")->base();
 
 	membank("rom10_bank")->set_base(&ROM10[0x00000]);

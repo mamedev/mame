@@ -306,7 +306,7 @@ MACHINE_RESET_MEMBER(pce_state,mess_pce)
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
 	   We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
-	m_acard = machine().root_device().ioport("A_CARD")->read() & 1;
+	m_acard = ioport("A_CARD")->read() & 1;
 }
 
 /* todo: how many input ports does the PCE have? */

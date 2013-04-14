@@ -17,7 +17,7 @@
 
 TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
 {
-	if (machine().root_device().ioport("ON")->read() & 0x01)
+	if (ioport("ON")->read() & 0x01)
 	{
 		if (m_ON_interrupt_mask && !m_ON_pressed)
 		{

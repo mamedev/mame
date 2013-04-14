@@ -325,8 +325,8 @@ READ16_MEMBER(segac2_state::io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && m_sound_banks)
-				return (space.machine().root_device().ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(m_upd7759) << 6);
-			return space.machine().root_device().ioport(portnames[offset])->read();
+				return (ioport(portnames[offset])->read() & 0xbf) | (upd7759_busy_r(m_upd7759) << 6);
+			return ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:

@@ -490,9 +490,9 @@ READ8_MEMBER(mz3500_state::mz3500_io_r)
 	switch(offset)
 	{
 		case 2:
-			return ((machine().root_device().ioport("SYSTEM_DSW")->read() & 0x0f) << 1) | ((machine().root_device().ioport("FD_DSW")->read() & 0x8) >> 3);
+			return ((ioport("SYSTEM_DSW")->read() & 0x0f) << 1) | ((ioport("FD_DSW")->read() & 0x8) >> 3);
 		case 3:
-			return ((machine().root_device().ioport("FD_DSW")->read() & 0x7)<<5) | (m_srdy << 4);
+			return ((ioport("FD_DSW")->read() & 0x7)<<5) | (m_srdy << 4);
 	}
 
 	return 0;

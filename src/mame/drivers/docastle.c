@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER(docastle_state::idsoccer_adpcm_int)
 	}
 	else
 	{
-		m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos++];
+		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos++];
 		msm5205_data_w(m_msm, m_adpcm_data >> 4);
 	}
 }

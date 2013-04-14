@@ -582,7 +582,7 @@ static const tpi6525_interface cdtv_tpi_intf =
 
 READ8_MEMBER(a1200_state::a1200_cia_0_portA_r)
 {
-	UINT8 ret = machine().root_device().ioport("CIA0PORTA")->read() & 0xc0; /* Gameport 1 and 0 buttons */
+	UINT8 ret = ioport("CIA0PORTA")->read() & 0xc0; /* Gameport 1 and 0 buttons */
 	ret |= machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }
@@ -1123,7 +1123,7 @@ DRIVER_INIT_MEMBER(amiga_state,amiga)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine());
@@ -1149,7 +1149,7 @@ DRIVER_INIT_MEMBER(amiga_state,cdtv)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(a1200_state,a1200)
@@ -1171,7 +1171,7 @@ DRIVER_INIT_MEMBER(a1200_state,a1200)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(amiga_state,a3000)
@@ -1193,7 +1193,7 @@ DRIVER_INIT_MEMBER(amiga_state,a3000)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 

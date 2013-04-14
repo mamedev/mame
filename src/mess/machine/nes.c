@@ -41,8 +41,8 @@ void nes_state::init_nes_core()
 	m_vram_chunks = 0;
 	m_pcb_id = NO_BOARD;
 
-	m_rom = machine().root_device().memregion("maincpu")->base();
-	m_ciram = machine().root_device().memregion("ciram")->base();
+	m_rom = memregion("maincpu")->base();
+	m_ciram = memregion("ciram")->base();
 	// other pointers got set in the loading routine
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */

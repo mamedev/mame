@@ -270,7 +270,7 @@ void qx10_state::update_memory_mapping()
 
 	if (!m_memprom)
 	{
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+		membank("bank1")->set_base(memregion("maincpu")->base());
 	}
 	else
 	{

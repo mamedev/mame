@@ -389,7 +389,7 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)machine().root_device().memregion("maincpu")->base();
+		UINT8* rom_base = (UINT8 *)memregion("maincpu")->base();
 
 		membank("rombank")->configure_entry(0, rom_base + 0x8000);
 		membank("rombank")->configure_entries(1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);

@@ -1383,7 +1383,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 		image.fseek(0x2100, SEEK_SET);
 		size -= 0x2100;
 
-		if (size != image.fread( image.device().machine().root_device().memregion("maincpu")->base() + 0x2100, size))
+		if (size != image.fread( memregion("maincpu")->base() + 0x2100, size))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occurred while reading ROM image");
 			return IMAGE_INIT_FAIL;
@@ -1393,7 +1393,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 	{
 		UINT8 *cart_rom = image.get_software_region("rom");
 		UINT32 cart_rom_size = image.get_software_region_length("rom");
-		memcpy(image.device().machine().root_device().memregion("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
+		memcpy(memregion("maincpu")->base() + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
 	}
 
 	return IMAGE_INIT_PASS;

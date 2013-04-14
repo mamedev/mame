@@ -992,7 +992,7 @@ void cxhumax_state::machine_reset()
 	m_i2c0_regs[0x08/4] = 0x08; // SDA high
 	m_i2c2_regs[0x08/4] = 0x08; // SDA high
 
-	UINT8* FLASH = machine().root_device().memregion("flash")->base();
+	UINT8* FLASH = memregion("flash")->base();
 	memcpy(m_ram,FLASH,0x400000);
 
 	m_chipcontrol_regs[PIN_CONFIG_0_REG] =

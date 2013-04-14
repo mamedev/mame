@@ -152,7 +152,7 @@ void socrates_state::socrates_set_rom_bank(  )
 
 void socrates_state::socrates_set_ram_bank(  )
 {
-	membank( "bank2" )->set_base( machine().root_device().memregion("vram")->base() + ( (m_ram_bank&0x3) * 0x4000 )); // window 0
+	membank( "bank2" )->set_base( memregion("vram")->base() + ( (m_ram_bank&0x3) * 0x4000 )); // window 0
 	membank( "bank3" )->set_base( memregion("vram")->base() + ( ((m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
@@ -164,7 +164,7 @@ void socrates_state::socrates_update_kb(  )
 	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
 	if ((m_kb_latch_low[1] != 0) || (m_kb_latch_high[1] != 1)) return;
 	// next check for joypad buttons
-	keyvalue = machine().root_device().ioport("keyboard_jp")->read();
+	keyvalue = ioport("keyboard_jp")->read();
 	if (keyvalue != 0)
 	{
 		m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
@@ -174,11 +174,11 @@ void socrates_state::socrates_update_kb(  )
 	// next check for mouse movement.
 	// this isn't written yet, so write me please!
 	// next check if shift is down
-	shift = machine().root_device().ioport("keyboard_50")->read();
+	shift = ioport("keyboard_50")->read();
 	// find key low and high byte ok keyboard section
 	for (row = 4; row>=0; row--)
 	{
-		keyvalue = machine().root_device().ioport(rownames[row])->read();
+		keyvalue = ioport(rownames[row])->read();
 		if (keyvalue != 0)
 		{
 			for (powerof2 = 9; powerof2 >= 0; powerof2--)
@@ -237,7 +237,7 @@ void socrates_state::machine_reset()
 
 DRIVER_INIT_MEMBER(socrates_state,socrates)
 {
-	UINT8 *gfx = machine().root_device().memregion("vram")->base();
+	UINT8 *gfx = memregion("vram")->base();
 	int i;
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (i = 0; i < 0x10000; i++)

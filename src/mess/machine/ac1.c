@@ -25,13 +25,13 @@ READ8_MEMBER(ac1_state::ac1_port_b_r)
 
 READ8_MEMBER(ac1_state::ac1_port_a_r)
 {
-	UINT8 line0 = machine().root_device().ioport("LINE0")->read();
-	UINT8 line1 = machine().root_device().ioport("LINE1")->read();
-	UINT8 line2 = machine().root_device().ioport("LINE2")->read();
-	UINT8 line3 = machine().root_device().ioport("LINE3")->read();
-	UINT8 line4 = machine().root_device().ioport("LINE4")->read();
-	UINT8 line5 = machine().root_device().ioport("LINE5")->read();
-	UINT8 line6 = machine().root_device().ioport("LINE6")->read();
+	UINT8 line0 = ioport("LINE0")->read();
+	UINT8 line1 = ioport("LINE1")->read();
+	UINT8 line2 = ioport("LINE2")->read();
+	UINT8 line3 = ioport("LINE3")->read();
+	UINT8 line4 = ioport("LINE4")->read();
+	UINT8 line5 = ioport("LINE5")->read();
+	UINT8 line6 = ioport("LINE6")->read();
 
 	UINT8 SH    = BNOT(BIT(line6,0));
 	UINT8 CTRL  = BNOT(BIT(line6,1));

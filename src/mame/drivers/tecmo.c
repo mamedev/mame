@@ -104,7 +104,7 @@ WRITE_LINE_MEMBER(tecmo_state::tecmo_adpcm_int)
 	}
 	else
 	{
-		UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
+		UINT8 *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ROM[m_adpcm_pos++];
 		msm5205_data_w(m_msm,m_adpcm_data >> 4);

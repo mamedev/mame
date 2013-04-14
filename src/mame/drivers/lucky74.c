@@ -1424,7 +1424,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 		if (m_adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			m_adpcm_data = machine().root_device().memregion("adpcm")->base()[m_adpcm_pos];
+			m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
 			m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
 			msm5205_data_w(m_msm, m_adpcm_data >> 4);
 

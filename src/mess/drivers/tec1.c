@@ -237,17 +237,17 @@ TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
 
 	// 74C923 4 by 5 key encoder.
 	// if previous key is still held, bail out
-	if (machine().root_device().ioport(keynames[m_kbd_row])->read())
-		if (tec1_convert_col_to_bin(machine().root_device().ioport(keynames[m_kbd_row])->read(), m_kbd_row) == m_kbd)
+	if (ioport(keynames[m_kbd_row])->read())
+		if (tec1_convert_col_to_bin(ioport(keynames[m_kbd_row])->read(), m_kbd_row) == m_kbd)
 			return;
 
 	m_kbd_row++;
 	m_kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (machine().root_device().ioport(keynames[m_kbd_row])->read())
+	if (ioport(keynames[m_kbd_row])->read())
 	{
-		m_kbd = tec1_convert_col_to_bin(machine().root_device().ioport(keynames[m_kbd_row])->read(), m_kbd_row);
+		m_kbd = tec1_convert_col_to_bin(ioport(keynames[m_kbd_row])->read(), m_kbd_row);
 		m_maincpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
 		m_key_pressed = TRUE;
 	}

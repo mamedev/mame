@@ -545,7 +545,7 @@ READ8_MEMBER(dgn_beta_state::d_pia0_pb_r)
 	{
 		for(Idx=0; Idx<NoKeyrows; Idx++)
 		{
-			m_Keyboard[Idx] = machine().root_device().ioport(keynames[Idx])->read();
+			m_Keyboard[Idx] = ioport(keynames[Idx])->read();
 
 			if(m_Keyboard[Idx] != 0x7F)
 				m_KAny_next = 1;

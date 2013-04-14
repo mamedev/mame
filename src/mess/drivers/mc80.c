@@ -143,7 +143,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);
-		mem.write_word(0xd20+i, machine().root_device().ioport(kbdrow)->read());
+		mem.write_word(0xd20+i, ioport(kbdrow)->read());
 	}
 }
 

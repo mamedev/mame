@@ -190,7 +190,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((machine().root_device().ioport("options")->read() & 0x04))
+					if((ioport("options")->read() & 0x04))
 					{
 						machine().primary_screen->update_partial(scan);
 					}
@@ -205,7 +205,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 				m_scanline_timer->adjust(hsync_time);
 				if(scan != 0)
 				{
-					if((machine().root_device().ioport("options")->read() & 0x04))
+					if((ioport("options")->read() & 0x04))
 					{
 						machine().primary_screen->update_partial(scan);
 					}
@@ -244,7 +244,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 			m_scanline_timer->adjust(hsync_time);
 			if(scan != 0)
 			{
-				if((machine().root_device().ioport("options")->read() & 0x04))
+				if((ioport("options")->read() & 0x04))
 				{
 					machine().primary_screen->update_partial(scan);
 				}
@@ -1117,7 +1117,7 @@ VIDEO_START_MEMBER(x68k_state,x68000)
 			break;
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, machine().root_device().memregion("user1")->base(), 32, 0));
+	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), x68k_pcg_8, memregion("user1")->base(), 32, 0));
 
 	gfx_index++;
 
@@ -1178,7 +1178,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 		rect.max_y = cliprect.max_y;
 
 	// update tiles
-	//rom = machine().root_device().memregion("user1")->base();
+	//rom = memregion("user1")->base();
 	for(x=0;x<256;x++)
 	{
 		if(m_video.tile16_dirty[x] != 0)

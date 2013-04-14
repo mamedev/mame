@@ -1196,8 +1196,8 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 
 		if(m_mouse.phase == 0)
 		{
-			m_mouse.x = machine().root_device().ioport("MOUSEX")->read();
-			m_mouse.y = machine().root_device().ioport("MOUSEY")->read();
+			m_mouse.x = ioport("MOUSEX")->read();
+			m_mouse.y = ioport("MOUSEY")->read();
 		}
 
 		if(data & 0x40 && (new_time - m_mouse.time) > attotime::from_hz(900))
@@ -2515,15 +2515,15 @@ void pc8801_state::machine_reset()
 	m_has_dictionary = 0;
 	m_has_cdrom = 0;
 
-	m_extram_size = extram_type[machine().root_device().ioport("MEM")->read() & 0x0f];
-	m_has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
+	m_extram_size = extram_type[ioport("MEM")->read() & 0x0f];
+	m_has_opna = ioport("BOARD_CONFIG")->read() & 1;
 }
 
 MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 {
 	pc8801_state::machine_reset();
 	m_has_clock_speed = 1;
-	m_clock_setting = machine().root_device().ioport("CFG")->read() & 0x80;
+	m_clock_setting = ioport("CFG")->read() & 0x80;
 
 	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
 	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
@@ -2568,7 +2568,7 @@ void pc8801_state::fdc_irq_w(bool state)
 
 READ8_MEMBER(pc8801_state::opn_porta_r)
 {
-	if(machine().root_device().ioport("BOARD_CONFIG")->read() & 2)
+	if(ioport("BOARD_CONFIG")->read() & 2)
 	{
 		UINT8 shift,res;
 
@@ -2580,9 +2580,9 @@ READ8_MEMBER(pc8801_state::opn_porta_r)
 		return ((res >> shift) & 0x0f) | 0xf0;
 	}
 
-	return machine().root_device().ioport("OPN_PA")->read();
+	return ioport("OPN_PA")->read();
 }
-READ8_MEMBER(pc8801_state::opn_portb_r){ return machine().root_device().ioport("OPN_PB")->read(); }
+READ8_MEMBER(pc8801_state::opn_portb_r){ return ioport("OPN_PB")->read(); }
 
 static const ym2203_interface pc88_ym2203_intf =
 {

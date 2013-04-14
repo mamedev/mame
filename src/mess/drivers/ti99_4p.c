@@ -820,8 +820,8 @@ void ti99_4p_state::machine_start()
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 
-	m_ram = (UINT16*)(*machine().root_device().memregion(SAMSMEM_TAG));
-	m_scratchpad = (UINT16*)(*machine().root_device().memregion(PADMEM_TAG));
+	m_ram = (UINT16*)(*memregion(SAMSMEM_TAG));
+	m_scratchpad = (UINT16*)(*memregion(PADMEM_TAG));
 
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -830,7 +830,7 @@ void ti99_4p_state::machine_start()
 
 	m_ready_line = m_ready_line_dmux = ASSERT_LINE;
 
-	UINT16 *rom = (UINT16*)(*machine().root_device().memregion("maincpu"));
+	UINT16 *rom = (UINT16*)(*memregion("maincpu"));
 	m_rom0  = rom + 0x2000;
 	m_dsr   = rom + 0x6000;
 	m_rom6a = rom + 0x3000;

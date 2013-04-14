@@ -121,14 +121,14 @@ DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
 	m_ROM_paged = 1;
 }
 
-#define TI99_2_32_ROMPAGE0 (machine().root_device().memregion("maincpu")->base()+0x4000)
-#define TI99_2_32_ROMPAGE1 (machine().root_device().memregion("maincpu")->base()+0x10000)
+#define TI99_2_32_ROMPAGE0 (memregion("maincpu")->base()+0x4000)
+#define TI99_2_32_ROMPAGE1 (memregion("maincpu")->base()+0x10000)
 
 void ti99_2_state::machine_reset()
 {
 	m_irq_state = ASSERT_LINE;
 	if (! m_ROM_paged)
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x4000);
+		membank("bank1")->set_base(memregion("maincpu")->base()+0x4000);
 	else
 		membank("bank1")->set_base((memregion("maincpu")->base()+0x4000));
 }

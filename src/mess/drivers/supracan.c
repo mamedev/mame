@@ -412,8 +412,8 @@ void supracan_state::video_start()
 {
 	m_sprite_final_bitmap.allocate(1024, 1024, BITMAP_FORMAT_IND16);
 
-	m_vram = (UINT16*)(*machine().root_device().memregion("ram_gfx"));
-	m_vram_swapped = (UINT16*)(*machine().root_device().memregion("ram_gfx2"));
+	m_vram = (UINT16*)(*memregion("ram_gfx"));
+	m_vram_swapped = (UINT16*)(*memregion("ram_gfx2"));
 	m_vram_addr_swapped = (UINT8*)(*memregion("ram_gfx3")); // hack for 1bpp layer at startup
 
 	m_tilemap_sizes[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(supracan_state::get_supracan_tilemap0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -1728,7 +1728,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 {
-	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
+	UINT8 *cart = memregion("cart")->base();
 	UINT32 size = 0;
 
 	if (image.software_entry() == NULL)

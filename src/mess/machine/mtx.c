@@ -375,7 +375,7 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 	m_cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
-	membank("bank1")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank1")->set_base(memregion("user1")->base());
 	membank("bank2")->configure_entries(0, 8, memregion("user2")->base(), 0x2000);
 	membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
 	membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);

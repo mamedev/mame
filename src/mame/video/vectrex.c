@@ -359,9 +359,7 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 	/* Cartridge bank-switching */
 	if (m_64k_cart && ((data ^ m_via_out[PORTB]) & 0x40))
 	{
-		device_t &root_device = machine().root_device();
-
-		root_device.membank("bank1")->set_base(root_device.memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
+		membank("bank1")->set_base(memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
 	}
 
 	/* Sound */

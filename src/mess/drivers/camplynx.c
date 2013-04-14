@@ -130,8 +130,7 @@ WRITE8_MEMBER( camplynx_state::lynx48k_bank_w )
 WRITE8_MEMBER( camplynx_state::lynx128k_bank_w )
 {
 	/* get address space */
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *base = mem.machine().root_device().memregion("maincpu")->base();
+	UINT8 *base = memregion("maincpu")->base();
 
 	/* Set read banks */
 	UINT8 bank = data & 0x0f;

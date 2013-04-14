@@ -200,7 +200,7 @@ ROM_END
 /* Driver */
 DRIVER_INIT_MEMBER(vt240_state,vt240)
 {
-	UINT8 *ROM = machine().root_device().memregion("ipl")->base();
+	UINT8 *ROM = memregion("ipl")->base();
 
 	/* patch T11 check */
 	ROM[0x09d] = 0x00;

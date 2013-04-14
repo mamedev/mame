@@ -492,7 +492,7 @@ void pdp1_state::machine_reset()
 {
 	int cfg;
 
-	cfg = machine().root_device().ioport("CFG")->read();
+	cfg = ioport("CFG")->read();
 	pdp1_reset_param.extend_support = (cfg >> pdp1_config_extend_bit) & pdp1_config_extend_mask;
 	pdp1_reset_param.hw_mul_div = (cfg >> pdp1_config_hw_mul_div_bit) & pdp1_config_hw_mul_div_mask;
 	pdp1_reset_param.type_20_sbs = (cfg >> pdp1_config_type_20_sbs_bit) & pdp1_config_type_20_sbs_mask;
@@ -650,7 +650,7 @@ void pdp1_state::machine_start()
 	};
 
 	/* set up our font */
-	dst = machine().root_device().memregion("gfx1")->base();
+	dst = memregion("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_state::pdp1_machine_stop),this));
@@ -1805,7 +1805,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 	int ta_transitions;
 
 
-	m_maincpu->set_state_int(PDP1_SS, machine().root_device().ioport("SENSE")->read());
+	m_maincpu->set_state_int(PDP1_SS, ioport("SENSE")->read());
 
 	/* read new state of control keys */
 	control_keys = ioport("CSW")->read();
@@ -1900,7 +1900,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 
 
 		/* handle test word keys */
-		tw_keys = (machine().root_device().ioport("TWDMSB")->read() << 16) | machine().root_device().ioport("TWDLSB")->read();
+		tw_keys = (ioport("TWDMSB")->read() << 16) | ioport("TWDLSB")->read();
 
 		/* compute transitions */
 		tw_transitions = tw_keys & (~ m_old_tw_keys);
@@ -1913,7 +1913,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 
 
 		/* handle address keys */
-		ta_keys = machine().root_device().ioport("TSTADD")->read();
+		ta_keys = ioport("TSTADD")->read();
 
 		/* compute transitions */
 		ta_transitions = ta_keys & (~ m_old_ta_keys);

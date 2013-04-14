@@ -478,7 +478,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 	UINT8 x, y, scancode = 0;
 	UINT16 pressed[9];
 	char kbdrow[3];
-	UINT8 modifiers = machine().root_device().ioport("XX")->read();
+	UINT8 modifiers = ioport("XX")->read();
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
 	m_keyb_press_flag = 0;
 
@@ -486,7 +486,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
 	for (x = 0; x < 9; x++)
 	{
 		sprintf(kbdrow,"X%d",x);
-		pressed[x] = (machine().root_device().ioport(kbdrow)->read());
+		pressed[x] = (ioport(kbdrow)->read());
 	}
 
 	/* find what has changed */

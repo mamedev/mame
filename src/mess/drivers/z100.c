@@ -760,7 +760,7 @@ void z100_state::machine_reset()
 {
 	int i;
 
-	if(machine().root_device().ioport("CONFIG")->read() & 1)
+	if(ioport("CONFIG")->read() & 1)
 	{
 		for(i=0;i<8;i++)
 			palette_set_color_rgb(machine(), i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
@@ -812,7 +812,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(z100_state,z100)
 {
-	UINT8 *ROM = machine().root_device().memregion("ipl")->base();
+	UINT8 *ROM = memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;

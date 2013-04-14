@@ -69,7 +69,7 @@ void cgenie_state::machine_reset()
 	/* wipe out font RAM */
 	memset(&ROM[0x0f400], 0xff, 0x0400);
 
-	if( machine().root_device().ioport("DSW0")->read() & 0x80 )
+	if( ioport("DSW0")->read() & 0x80 )
 	{
 		logerror("cgenie floppy discs enabled\n");
 	}
@@ -79,9 +79,9 @@ void cgenie_state::machine_reset()
 	}
 
 	/* copy DOS ROM, if enabled or wipe out that memory area */
-	if( machine().root_device().ioport("DSW0")->read() & 0x40 )
+	if( ioport("DSW0")->read() & 0x40 )
 	{
-		if ( machine().root_device().ioport("DSW0")->read() & 0x80 )
+		if ( ioport("DSW0")->read() & 0x80 )
 		{
 			space.install_read_bank(0xc000, 0xdfff, "bank10");
 			space.nop_write(0xc000, 0xdfff);
@@ -99,22 +99,22 @@ void cgenie_state::machine_reset()
 	{
 		space.nop_readwrite(0xc000, 0xdfff);
 		logerror("cgenie DOS disabled\n");
-		memset(&machine().root_device().memregion("maincpu")->base()[0x0c000], 0x00, 0x2000);
+		memset(&memregion("maincpu")->base()[0x0c000], 0x00, 0x2000);
 	}
 
 	/* copy EXT ROM, if enabled or wipe out that memory area */
-	if( machine().root_device().ioport("DSW0")->read() & 0x20 )
+	if( ioport("DSW0")->read() & 0x20 )
 	{
 		space.install_rom(0xe000, 0xefff, 0); // mess 0135u3 need to check
 		logerror("cgenie EXT enabled\n");
-		memcpy(&machine().root_device().memregion("maincpu")->base()[0x0e000],
-				&machine().root_device().memregion("maincpu")->base()[0x12000], 0x1000);
+		memcpy(&memregion("maincpu")->base()[0x0e000],
+				&memregion("maincpu")->base()[0x12000], 0x1000);
 	}
 	else
 	{
 		space.nop_readwrite(0xe000, 0xefff);
 		logerror("cgenie EXT disabled\n");
-		memset(&machine().root_device().memregion("maincpu")->base()[0x0e000], 0x00, 0x1000);
+		memset(&memregion("maincpu")->base()[0x0e000], 0x00, 0x1000);
 	}
 
 	m_cass_level = 0;
@@ -279,13 +279,13 @@ READ8_HANDLER( cgenie_psg_port_b_r )
 		/* comparator value */
 		state->m_psg_b_inp = 0x00;
 
-		if( space.machine().root_device().ioport("JOY0")->read() > state->m_psg_a_out )
+		if( state->ioport("JOY0")->read() > state->m_psg_a_out )
 			state->m_psg_b_inp |= 0x80;
 
-		if( space.machine().root_device().ioport("JOY1")->read() > state->m_psg_a_out )
+		if( state->ioport("JOY1")->read() > state->m_psg_a_out )
 			state->m_psg_b_inp |= 0x40;
 
-		if( space.machine().root_device().ioport("JOY2")->read() > state->m_psg_a_out )
+		if( state->ioport("JOY2")->read() > state->m_psg_a_out )
 			state->m_psg_b_inp |= 0x20;
 
 		if( state->ioport("JOY3")->read() > state->m_psg_a_out )
@@ -297,22 +297,22 @@ READ8_HANDLER( cgenie_psg_port_b_r )
 		state->m_psg_b_inp = 0xFF;
 
 		if( !(state->m_psg_a_out & 0x01) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP0")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP0")->read();
 
 		if( !(state->m_psg_a_out & 0x02) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP1")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP1")->read();
 
 		if( !(state->m_psg_a_out & 0x04) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP2")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP2")->read();
 
 		if( !(state->m_psg_a_out & 0x08) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP3")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP3")->read();
 
 		if( !(state->m_psg_a_out & 0x10) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP4")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP4")->read();
 
 		if( !(state->m_psg_a_out & 0x20) )
-			state->m_psg_b_inp &= ~space.machine().root_device().ioport("KP5")->read();
+			state->m_psg_b_inp &= ~state->ioport("KP5")->read();
 	}
 	return state->m_psg_b_inp;
 }

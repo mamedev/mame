@@ -1263,7 +1263,7 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 	/* Right controller port */
 	m_joy2->joy_w( data & 0x0f );
 
-//  switch( machine().root_device().ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
+//  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 //  {
 //  case 0x0a:  /* KidVid voice module */
 //      machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
@@ -1294,7 +1294,7 @@ WRITE_LINE_MEMBER(a2600_state::irq_callback)
 
 READ8_MEMBER(a2600_state::riot_input_port_8_r)
 {
-	return machine().root_device().ioport("SWB")->read();
+	return ioport("SWB")->read();
 }
 
 static const riot6532_interface r6532_interface =

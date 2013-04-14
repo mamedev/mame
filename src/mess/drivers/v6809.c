@@ -169,7 +169,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 
 void v6809_state::video_start()
 {
-	m_p_chargen = machine().root_device().memregion("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 	m_p_videoram = memregion("videoram")->base();
 }
 

@@ -871,7 +871,7 @@ static void fm7_update_psg(running_machine &machine)
 				break;
 			case 0x09:
 				// Joystick port read
-				state->m_psg_data = space.machine().root_device().ioport("joy1")->read();
+				state->m_psg_data = state->ioport("joy1")->read();
 				break;
 		}
 	}
@@ -940,12 +940,12 @@ READ8_MEMBER(fm7_state::fm7_fmirq_r)
 
 READ8_MEMBER(fm7_state::fm77av_joy_1_r)
 {
-	return machine().root_device().ioport("joy1")->read();
+	return ioport("joy1")->read();
 }
 
 READ8_MEMBER(fm7_state::fm77av_joy_2_r)
 {
-	return machine().root_device().ioport("joy2")->read();
+	return ioport("joy2")->read();
 }
 
 READ8_MEMBER(fm7_state::fm7_unknown_r)
@@ -1052,7 +1052,7 @@ static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 	{
 		if(state->m_init_rom_en && (state->m_type == SYS_FM11 || state->m_type == SYS_FM16))
 		{
-			RAM = space.machine().root_device().memregion("init")->base();
+			RAM = state->memregion("init")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x35000);
@@ -1063,7 +1063,7 @@ static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 	{
 		if(state->m_init_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
-			RAM = space.machine().root_device().memregion("init")->base();
+			RAM = state->memregion("init")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x36000);
@@ -1074,7 +1074,7 @@ static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 	{
 		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
-			RAM = space.machine().root_device().memregion("fbasic")->base();
+			RAM = state->memregion("fbasic")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
 			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x38000);
@@ -1290,9 +1290,9 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 	int bit = 0;
 	int mod = 0;
 	UINT32 keys;
-	UINT32 modifiers = machine().root_device().ioport("key_modifiers")->read();
+	UINT32 modifiers = ioport("key_modifiers")->read();
 
-	if(machine().root_device().ioport("key3")->read() & 0x40000)
+	if(ioport("key3")->read() & 0x40000)
 	{
 		m_break_flag = 1;
 		m_maincpu->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
@@ -1321,7 +1321,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 
 	for(x=0;x<3;x++)
 	{
-		keys = machine().root_device().ioport(portnames[x])->read();
+		keys = ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
@@ -1853,8 +1853,8 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 
 MACHINE_START_MEMBER(fm7_state,fm77av)
 {
-	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
-	UINT8* ROM = machine().root_device().memregion("init")->base();
+	UINT8* RAM = memregion("maincpu")->base();
+	UINT8* ROM = memregion("init")->base();
 
 	memset(m_shared_ram,0xff,0x80);
 
@@ -1862,7 +1862,7 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 	memcpy(RAM+0x3fff0,ROM+0x1ff0,16);
 
 	m_video.subrom = 0;  // default sub CPU ROM is type C.
-	RAM = machine().root_device().memregion("subsyscg")->base();
+	RAM = memregion("subsyscg")->base();
 	membank("bank20")->set_base(RAM);
 	RAM = memregion("subsys_c")->base();
 	membank("bank21")->set_base(RAM+0x800);
@@ -1874,7 +1874,7 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 
 MACHINE_START_MEMBER(fm7_state,fm11)
 {
-	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 	UINT8* ROM = memregion("init")->base();
 
 	memset(m_shared_ram,0xff,0x80);
@@ -1894,7 +1894,7 @@ MACHINE_START_MEMBER(fm7_state,fm16)
 
 void fm7_state::machine_reset()
 {
-	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 	UINT8* ROM = memregion("init")->base();
 
 	m_timer->adjust(attotime::from_nsec(2034500),0,attotime::from_nsec(2034500));
@@ -1944,13 +1944,13 @@ void fm7_state::machine_reset()
 	// set boot mode (FM-7 only, AV and later has boot RAM instead)
 	if(m_type == SYS_FM7)
 	{
-		if(!(machine().root_device().ioport("DSW")->read() & 0x02))
+		if(!(ioport("DSW")->read() & 0x02))
 		{  // DOS mode
-			membank("bank17")->set_base(machine().root_device().memregion("dos")->base());
+			membank("bank17")->set_base(memregion("dos")->base());
 		}
 		else
 		{  // BASIC mode
-			membank("bank17")->set_base(machine().root_device().memregion("basic")->base());
+			membank("bank17")->set_base(memregion("basic")->base());
 		}
 	}
 	if(m_type == SYS_FM77AV || m_type == SYS_FM77AV40EX || m_type == SYS_FM11)

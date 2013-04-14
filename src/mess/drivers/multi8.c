@@ -487,7 +487,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(multi8_state::keyboard_callback)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = machine().root_device().ioport("key_modifiers")->read() & 0x1f;
+	UINT8 keymod = ioport("key_modifiers")->read() & 0x1f;
 	scancode = 0;
 
 	m_shift_press_flag = ((keymod & 0x02) >> 1);
@@ -496,7 +496,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(multi8_state::keyboard_callback)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
+			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				//key_flag = 1;
 				if(!m_shift_press_flag)  // shift not pressed
@@ -648,8 +648,8 @@ static const ym2203_interface ym2203_config =
 
 void multi8_state::machine_start()
 {
-	m_p_vram = machine().root_device().memregion("vram")->base();
-	m_p_wram = machine().root_device().memregion("wram")->base();
+	m_p_vram = memregion("vram")->base();
+	m_p_wram = memregion("wram")->base();
 	m_p_kanji = memregion("kanji")->base();
 }
 

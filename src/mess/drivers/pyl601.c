@@ -101,7 +101,7 @@ WRITE8_MEMBER(pyl601_state::rom_page_w)
 	{
 		int chip = (data >> 4) % 5;
 		int page = data & 7;
-		membank("bank2")->set_base(machine().root_device().memregion("romdisk")->base() + chip*0x10000 + page * 0x2000);
+		membank("bank2")->set_base(memregion("romdisk")->base() + chip*0x10000 + page * 0x2000);
 	}
 	else
 	{

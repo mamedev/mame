@@ -252,8 +252,8 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				}
 				#endif
 
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x10000);
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base());
+				state->membank("bank1")->set_base(state->memregion("bios")->base() + 0x10000);
+				state->membank("bank1")->set_base(state->memregion("bios")->base());
 			}
 			break;
 		}
