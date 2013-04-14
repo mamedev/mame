@@ -1098,7 +1098,7 @@ ROM_START( bkrtmaq )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( cgangpzl )
@@ -1108,7 +1108,7 @@ ROM_START( cgangpzl )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( cgangpzlj )
@@ -1118,7 +1118,7 @@ ROM_START( cgangpzlj )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( emeraldaj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
@@ -1130,7 +1130,7 @@ ROM_START( emeraldaj ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
@@ -1142,7 +1142,7 @@ ROM_START( emeraldaja ) /* NA-1 Game PCB, parent is NA-2 version listed below */
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( exvania )
@@ -1157,7 +1157,7 @@ ROM_START( exvania )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( exvaniaj )
@@ -1172,7 +1172,7 @@ ROM_START( exvaniaj )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( fghtatck )
@@ -1189,7 +1189,7 @@ ROM_START( fghtatck )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( fa )
@@ -1206,7 +1206,7 @@ ROM_START( fa )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( swcourt )
@@ -1223,7 +1223,7 @@ ROM_START( swcourt )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( swcourtj )
@@ -1240,7 +1240,7 @@ ROM_START( swcourtj )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 ROM_START( tinklpit )
@@ -1259,7 +1259,7 @@ ROM_START( tinklpit )
 
 	/* M37702 BIOS - labeled as Namco custom C69 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
+	ROM_LOAD( "c69.bin",      0x000000, 0x004000, CRC(349134d9) SHA1(61a4981fc2716c228b6121fedcbf1ed6f34dc2de) )
 ROM_END
 
 
@@ -1277,49 +1277,70 @@ ROM_START( emeralda ) /* NA-2 Game PCB, clones are NA-1 based; see games listed 
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( knckhead )
 	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "kh2-ep0l.bin", 0x080001, 0x080000, CRC(b4b88077) SHA1(9af03d1832ad6c77222e18427f4afca330a41ce6) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "kh2-ep0u.bin", 0x080000, 0x080000, CRC(a578d97e) SHA1(9a5bb6649cca7b98daf538a66c813f61cca2e2ec) )
-	ROM_LOAD16_BYTE( "kh1-ep1l.bin", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
-	ROM_LOAD16_BYTE( "kh1-ep1u.bin", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
+	ROM_LOAD16_BYTE( "kh2-ep0l.6c", 0x080001, 0x080000, CRC(b4b88077) SHA1(9af03d1832ad6c77222e18427f4afca330a41ce6) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "kh2-ep0u.6f", 0x080000, 0x080000, CRC(a578d97e) SHA1(9a5bb6649cca7b98daf538a66c813f61cca2e2ec) )
+	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
+	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
 
-	ROM_LOAD16_BYTE( "kh1-ma0l.bin", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "kh1-ma0u.bin", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
-	ROM_LOAD16_BYTE( "kh1-ma1l.bin", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
-	ROM_LOAD16_BYTE( "kh1-ma1u.bin", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
-	ROM_LOAD16_BYTE( "kh1-ma2l.bin", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
-	ROM_LOAD16_BYTE( "kh1-ma2u.bin", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
-	ROM_LOAD16_BYTE( "kh1-ma3l.bin", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
-	ROM_LOAD16_BYTE( "kh1-ma3u.bin", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( knckheadj )
 	ROM_REGION( 0xa80000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "kh1-ep0l.bin", 0x080001, 0x080000, CRC(94660bec) SHA1(42fa23f759cf66b05f30c2fc03a12fd14ae1f796) ) /* 0xc00000 */
-	ROM_LOAD16_BYTE( "kh1-ep0u.bin", 0x080000, 0x080000, CRC(ad640d69) SHA1(62595a9d1d5952cbe3dd7266cfda9292be51d269) )
-	ROM_LOAD16_BYTE( "kh1-ep1l.bin", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
-	ROM_LOAD16_BYTE( "kh1-ep1u.bin", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
+	ROM_LOAD16_BYTE( "kh1-ep0l.6c", 0x080001, 0x080000, CRC(94660bec) SHA1(42fa23f759cf66b05f30c2fc03a12fd14ae1f796) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "kh1-ep0u.6f", 0x080000, 0x080000, CRC(ad640d69) SHA1(62595a9d1d5952cbe3dd7266cfda9292be51d269) )
+	ROM_LOAD16_BYTE( "kh1-ep1l.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) )
+	ROM_LOAD16_BYTE( "kh1-ep1u.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) )
 
-	ROM_LOAD16_BYTE( "kh1-ma0l.bin", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
-	ROM_LOAD16_BYTE( "kh1-ma0u.bin", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
-	ROM_LOAD16_BYTE( "kh1-ma1l.bin", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
-	ROM_LOAD16_BYTE( "kh1-ma1u.bin", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
-	ROM_LOAD16_BYTE( "kh1-ma2l.bin", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
-	ROM_LOAD16_BYTE( "kh1-ma2u.bin", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
-	ROM_LOAD16_BYTE( "kh1-ma3l.bin", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
-	ROM_LOAD16_BYTE( "kh1-ma3u.bin", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+ROM_END
+
+ROM_START( knckheadjp ) /* Older or possible prototype. Doesn't show rom test at boot up */
+	ROM_REGION( 0xa80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2-10_9o.6c", 0x080001, 0x080000, CRC(600faf17) SHA1(21197ad1d54a68c1510d9ae6999ca41efaaed05d) ) /* handwritten label 2/10 9O */ /* 0xc00000 */
+	ROM_LOAD16_BYTE( "2-10_9e.6f", 0x080000, 0x080000, CRC(16ccc0b0) SHA1(e9b98eae7ee47c7cce2cc3de9dc39428e0648a40) ) /* handwritten label 2/10 9E */
+	ROM_LOAD16_BYTE( "2-10_8o.7c", 0x180001, 0x080000, CRC(27e6ab4e) SHA1(66f397cc2117c1e73652c4800c0937e6d8116380) ) /* handwritten label 2/10 8O */
+	ROM_LOAD16_BYTE( "2-10_8e.7f", 0x180000, 0x080000, CRC(487b2434) SHA1(2d62db85ceac1fca61c39e4db92c96ae80ba3323) ) /* handwritten label 2/10 8E */
+
+	ROM_LOAD16_BYTE( "kh1-ma0l.2c", 0x280001, 0x100000, CRC(7b2db5df) SHA1(ecc392c4683cf0718d986e73336b69952d324548) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "kh1-ma0u.2f", 0x280000, 0x100000, CRC(6983228b) SHA1(5f3eeb780e9d91445b4c11da63d4ca580e654f34) )
+	ROM_LOAD16_BYTE( "kh1-ma1l.3c", 0x480001, 0x100000, CRC(b24f93e6) SHA1(3d8951485dc8a2810da9ddf2f4896efa31779bf4) )
+	ROM_LOAD16_BYTE( "kh1-ma1u.3f", 0x480000, 0x100000, CRC(18a60348) SHA1(298e0e0e7649e872791c3c99c81a19f273e9eb8a) )
+	ROM_LOAD16_BYTE( "kh1-ma2l.4c", 0x680001, 0x100000, CRC(82064ee9) SHA1(0b984565d17e580f49fff982a1621ef90e14c064) )
+	ROM_LOAD16_BYTE( "kh1-ma2u.4f", 0x680000, 0x100000, CRC(17fe8c3d) SHA1(88c45076477725faa5f8a23512e65a40385bb27d) )
+	ROM_LOAD16_BYTE( "kh1-ma3l.5c", 0x880001, 0x100000, CRC(ad9a7807) SHA1(c40f18a68306e76acd89ccb3fc82b8106556912e) )
+	ROM_LOAD16_BYTE( "kh1-ma3u.5f", 0x880000, 0x100000, CRC(efeb768d) SHA1(15d016244549f3ea0d19f5cfb04bcebd65ac6134) )
+
+	/* M37702 BIOS - labeled as Namco custom C70 */
+	ROM_REGION16_LE( 0x4000, "mcu", 0 )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( numanath )
@@ -1340,7 +1361,7 @@ ROM_START( numanath )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( numanathj )
@@ -1361,7 +1382,7 @@ ROM_START( numanathj )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( quiztou )
@@ -1382,7 +1403,7 @@ ROM_START( quiztou )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 ROM_START( xday2 )
@@ -1397,7 +1418,7 @@ ROM_START( xday2 )
 
 	/* M37702 BIOS - labeled as Namco custom C70 */
 	ROM_REGION16_LE( 0x4000, "mcu", 0 )
-		ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
+	ROM_LOAD( "c70.bin",      0x000000, 0x004000, CRC(b4015f23) SHA1(7ce91eda76e86b5cab625e2b67c463b7d143832e) )
 ROM_END
 
 // NA-1 (C69 MCU)
@@ -1415,10 +1436,11 @@ GAME( 1993, emeraldaja, emeralda, namcona1w, namcona1_joy, namcona1_state, emera
 GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy, namcona1_state, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", 0 )
 
 // NA-2 (C70 MCU)
-GAME( 1992, knckhead,  0,        namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", 0 )
-GAME( 1992, knckheadj, knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", 0 )
-GAME( 1993, emeralda,  0,        namcona2,  namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", 0 )
-GAME( 1993, numanath,  0,        namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (World)", 0 )
-GAME( 1993, numanathj, numanath, namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", 0 )
-GAME( 1993, quiztou,   0,        namcona2,  namcona1_quiz, namcona1_state,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", 0 )
-GAME( 1995, xday2,     0,        namcona2,  namcona1_joy, namcona1_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, knckhead,   0,        namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (World)", 0 )
+GAME( 1992, knckheadj,  knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan)", 0 )
+GAME( 1992, knckheadjp, knckhead, namcona2,  namcona1_joy, namcona1_state, knckhead, ROT0, "Namco", "Knuckle Heads (Japan, Prototype?)", 0 )
+GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy, namcona1_state, emeralda, ROT0, "Namco", "Emeraldia (World)", 0 )
+GAME( 1993, numanath,   0,        namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (World)", 0 )
+GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy, namcona1_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", 0 )
+GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona1_state,quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", 0 )
+GAME( 1995, xday2,      0,        namcona2,  namcona1_joy, namcona1_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", GAME_IMPERFECT_GRAPHICS )
