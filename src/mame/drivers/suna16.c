@@ -14,8 +14,9 @@ Year + Game                 By      Board      Hardware
 -------------------------------------------------------------------------------------------
 94  Best Of Best            SunA    KRB-0026   68000 + Z80 x 2 + YM3526 + DAC x 4 + AY-8910
 94  Suna Quiz 6000 Academy  SunA    KRB-0027A  68000 + Z80 x 2 + YM2151 + DAC x 2
-96  Ultra Balloon           SunA               68000 + Z80 x 2 + YM2151 + DAC x 2
-96  Back Street Soccer      SunA               68000 + Z80 x 3 + YM2151 + DAC x 4
+96  Back Street Soccer      SunA    KRB-0031   68000 + Z80 x 3 + YM2151 + DAC x 4
+96  Back Street Soccer      SunA    KRB-0032A  68000 + Z80 x 3 + YM2151 + DAC x 4
+96  Ultra Balloon           SunA    KRB-0033A  68000 + Z80 x 2 + YM2151 + DAC x 2
 -------------------------------------------------------------------------------------------
 
 
@@ -444,8 +445,7 @@ static INPUT_PORTS_START( bssoccer )
 	PORT_START("P4")    /* $a00007.b */
 	JOY(4)
 
-	PORT_START("DSW1")  /* $a00008.w */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
@@ -454,51 +454,51 @@ static INPUT_PORTS_START( bssoccer )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0010, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, "Hardest?"  )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+//	PORT_DIPSETTING(      0x0000, "Hardest?"  ) // Not used / duplicate of "HARD"
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_DIPNAME( 0x0300, 0x0300, "Play Time P1" )
+	PORT_DIPNAME( 0x0300, 0x0300, "Play Time P1" )	PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, "1:30" )
 	PORT_DIPSETTING(      0x0200, "1:45" )
 	PORT_DIPSETTING(      0x0100, "2:00" )
 	PORT_DIPSETTING(      0x0000, "2:15" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Play Time P2" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Play Time P2" )	PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0c00, "1:30" )
 	PORT_DIPSETTING(      0x0800, "1:45" )
 	PORT_DIPSETTING(      0x0400, "2:00" )
 	PORT_DIPSETTING(      0x0000, "2:15" )
-	PORT_DIPNAME( 0x3000, 0x3000, "Play Time P3" )
+	PORT_DIPNAME( 0x3000, 0x3000, "Play Time P3" )	PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x3000, "1:30" )
 	PORT_DIPSETTING(      0x2000, "1:45" )
 	PORT_DIPSETTING(      0x1000, "2:00" )
 	PORT_DIPSETTING(      0x0000, "2:15" )
-	PORT_DIPNAME( 0xc000, 0xc000, "Play Time P4" )
+	PORT_DIPNAME( 0xc000, 0xc000, "Play Time P4" )	PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0xc000, "1:30" )
 	PORT_DIPSETTING(      0x8000, "1:45" )
 	PORT_DIPSETTING(      0x4000, "2:00" )
 	PORT_DIPSETTING(      0x0000, "2:15" )
 
-	PORT_START("DSW2")  /* $a0000b.b */
-	PORT_DIPNAME( 0x0001, 0x0001, "Copyright" )         // these 4 are shown in test mode
+	PORT_START("DSW2")  /* $a0000b.b - JP3, JP6 & JP7 and what else?? */
+	PORT_DIPNAME( 0x0001, 0x0001, "Copyright" )		PORT_DIPLOCATION("Jumper:1")	// these 4 are shown in test mode
 	PORT_DIPSETTING(      0x0001, "Distributer Unico" )
 	PORT_DIPSETTING(      0x0000, "All Rights Reserved" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )  // used!
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )	PORT_DIPLOCATION("Jumper:2")	// used!
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )	PORT_DIPLOCATION("Jumper:3")
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )	PORT_DIPLOCATION("Jumper:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -553,7 +553,7 @@ static INPUT_PORTS_START( uballoon )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW1")  /* $600005.b */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -562,26 +562,26 @@ static INPUT_PORTS_START( uballoon )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(      0x0010, "2" )
 	PORT_DIPSETTING(      0x0018, "3" )
 	PORT_DIPSETTING(      0x0008, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0060, 0x0060, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( Normal )  )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SW1:8" )
 
 	PORT_START("DSW2")  /* $600007.b */
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4,5")
 	PORT_DIPSETTING(      0x001c, "200K" )
 	PORT_DIPSETTING(      0x0010, "300K, 1000K" )
 	PORT_DIPSETTING(      0x0018, "400K" )
@@ -590,13 +590,13 @@ static INPUT_PORTS_START( uballoon )
 	PORT_DIPSETTING(      0x0004, "500K, 3000K" )
 	PORT_DIPSETTING(      0x0014, "600K" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Unknown 1-5*" )
+	PORT_DIPNAME( 0x0020, 0x0020, "Unknown DSW2-6*" )	PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Unknown 1-6*" )
+	PORT_DIPNAME( 0x0040, 0x0040, "Unknown DSW2-7*" )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -697,7 +697,7 @@ static INPUT_PORTS_START( bestbest )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")   /* 500004.w */
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SWA:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -706,32 +706,32 @@ static INPUT_PORTS_START( bestbest )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0018, 0x0010, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0018, 0x0010, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWA:4,5")
 	PORT_DIPSETTING(      0x0018, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Display Combos" )
+	PORT_DIPNAME( 0x0020, 0x0020, "Display Combos" )	PORT_DIPLOCATION("SWA:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_SERVICE_DIPLOC(  0x0040, IP_ACTIVE_LOW, "SWA:7" )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0600, 0x0400, "Play Time" )
+	PORT_DIPNAME( 0x0600, 0x0400, "Play Time" )		PORT_DIPLOCATION("SWB:2,3")
 	PORT_DIPSETTING(      0x0600, "1:10" )
 	PORT_DIPSETTING(      0x0400, "1:20" )
 	PORT_DIPSETTING(      0x0200, "1:30" )
 	PORT_DIPSETTING(      0x0000, "1:40" )
-	PORT_DIPUNUSED( 0x0800, 0x0800 )
-	PORT_DIPUNUSED( 0x1000, 0x1000 )
-	PORT_DIPUNUSED( 0x2000, 0x2000 )
-	PORT_DIPUNUSED( 0x4000, 0x4000 )
-	PORT_DIPUNUSED( 0x8000, 0x8000 )
+	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SWB:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SWB:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SWB:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SWB:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SWB:8" )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -794,18 +794,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 static MACHINE_CONFIG_START( bssoccer, suna16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* ? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)    /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)      /* Z80B */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, 5000000)      /* Z80B */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)      /* Z80B at 5MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MCFG_CPU_ADD("pcm2", Z80, 5000000)      /* Z80B */
+	MCFG_CPU_ADD("pcm2", Z80, XTAL_32MHz/6)      /* Z80B at 5MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
@@ -826,7 +826,7 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)  /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
@@ -852,14 +852,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)	/* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)  /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)	/* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, 5000000)  /* ? */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)	/* Z80B at 5MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
 	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
@@ -884,7 +884,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)	/* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -902,14 +902,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sunaq, suna16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)	/* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, 24000000/4)       /* Z80B */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4)	/* Z80B at 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( sunaq, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 14318000/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)	/* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -968,14 +968,14 @@ static const ay8910_interface bestbest_ay8910_interface =
 static MACHINE_CONFIG_START( bestbest, suna16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)	/* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, 24000000/4)
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4)	/* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
 	MCFG_CPU_IO_MAP(bestbest_pcm_1_iomap)
 
@@ -998,12 +998,12 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/16)	/* 1.5MHz */
 	MCFG_SOUND_CONFIG(bestbest_ay8910_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, 24000000/8)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/8)	/* 3MHz */
 	MCFG_SOUND_CONFIG(bestbest_ym3526_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1034,24 +1034,77 @@ MACHINE_CONFIG_END
 
                             [ Back Street Soccer ]
 
-  68000-10  32MHz
-            14.318MHz
-  01   02                    12
-  03   04                   Z80B
-  6264 6264       YM2151
-                  6116
-                   11      13
-  62256           Z80B    Z80B
-  62256
-  62256   05 06                  SW2
-          07 08                  SW1
-          09 10          6116-45
-                                     6116-45
-                         6116-45     6116-45
+KRB-0031
++------------------------------------------+
+|  6116-45  6116-45          10   09       |
+|  6116-45                   08   07       |
+|           6116-45          05   06  62256|
+|      SW-1                           62256|
+|J JP7 SW-2                 ACTEL     62256|
+|A JP6     Z80B    Z80B     A1020B         |
+|M          13      11 JP3                 |
+|M                 6116                    |
+|A                 YM2151         6264 6264|
+|  YM3012  Z80B                     04  03 |
+|           12                      02  01 |
+|                            32MHz         |
+|  VOL                   14.318MHz 68000-10|
++------------------------------------------+
+
+
+KRB-0032A
++------------------------------------------+
+|  6116-45  6116-45          UC08003       |
+|  6116-45                                 |
+|           6116-45          UC16002  62256|
+|      SW-1                           62256|
+|J JP7 SW-2                 ACTEL     62256|
+|A JP6     Z80B    Z80B     A1020B         |
+|M         UC04005 UNICO5 JP3              |
+|M                 6116                    |
+|A                 YM2151         6264 6264|
+|  YM3012  Z80B                            |
+|3P        UC04004                 UC16001 |
+|4P                          32MHz         |
+|  VOL                   14.318MHz 68000-8 |
++------------------------------------------+
+
+
+  CPU: MC68HC000P8 (or MC68HC000P10) @ 8Mhz
+Video: Actel A1020B PL84C
+Sound: Z0840006PSC Z80B x 3
+       YM2151 & YM3012 (rebadged as CY5002)
+  OSC: 32MHz & 14.31818MHz
+Other: 8 position dipswitch bank x 2
+       Misc JP3, JP6 & JP7 jumper pads
+       CON-2 12 pin connector for Player 3 (3P)
+       CON-2 12 pin connector for Player 4 (4P)
+       VOL volume pot
+
+The data is 100% identical between sets / PCB version, just in different rom types / sizes.
+
+13 and 6 files
+
+11                      unico5                  IDENTICAL
+12                      uc04004                 IDENTICAL
+13                      uc04005                 IDENTICAL
+
+01                      uc16001      [even 1/2] IDENTICAL
+02                      uc16001      [odd 1/2]  IDENTICAL
+03                      uc16001      [even 2/2] IDENTICAL
+04                      uc16001      [odd 2/2]  IDENTICAL
+
+05                      uc16002      [even 1/2] IDENTICAL
+06                      uc16002      [odd 1/2]  IDENTICAL
+07                      uc16002      [even 2/2] IDENTICAL
+08                      uc16002      [odd 2/2]  IDENTICAL
+
+09                      uc08003      [even]     IDENTICAL
+10                      uc08003      [odd]      IDENTICAL
 
 ***************************************************************************/
 
-ROM_START( bssoccer )
+ROM_START( bssoccer ) /* KRB-0031 PCB */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 Code */
 	ROM_LOAD16_BYTE( "02", 0x000000, 0x080000, CRC(32871005) SHA1(b094ee3f4fc24c0521915d565f6e203d51e51f6d) )
 	ROM_LOAD16_BYTE( "01", 0x000001, 0x080000, CRC(ace00db6) SHA1(6bd146f9b44c97be77578b4f0ffa28cbf66283c2) )
@@ -1076,30 +1129,7 @@ ROM_START( bssoccer )
 	ROM_LOAD16_BYTE( "10", 0x200001, 0x080000, CRC(1ca94d21) SHA1(23d892b840e37064a175584f955f25f990d9179d) )
 ROM_END
 
-/*
-13 and 6 files
-
-11                      unico5                  IDENTICAL
-12                      uc04004                 IDENTICAL
-13                      uc04005                 IDENTICAL
-
-01                      uc16001      [even 1/2] IDENTICAL
-02                      uc16001      [odd 1/2]  IDENTICAL
-03                      uc16001      [even 2/2] IDENTICAL
-04                      uc16001      [odd 2/2]  IDENTICAL
-
-05                      uc16002      [even 1/2] IDENTICAL
-06                      uc16002      [odd 1/2]  IDENTICAL
-07                      uc16002      [even 2/2] IDENTICAL
-08                      uc16002      [odd 2/2]  IDENTICAL
-
-09                      uc08003      [even]     IDENTICAL
-10                      uc08003      [odd]      IDENTICAL
-
-*/
-
-// the content of this is 100% IDENTICAL to the parent, just a different rom layout (larger ROMs) both are official PCBs
-ROM_START( bssoccera )
+ROM_START( bssoccera ) /* KRB-0032A PCB */
 	ROM_REGION( 0x200000, "maincpu", 0 )    /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "uc16001", 0x000000, 0x200000, CRC(82fa613a) SHA1(451789190017b58b964e676b8e43f3638b4e56ef) )
 
@@ -1120,40 +1150,65 @@ ROM_END
 /***************************************************************************
 
                             [ Ultra Ballon ]
+KRB-0033A
++------------------------------------+
+| VOL    Z80B    Z80B 14.318MHz 32MHz|
+|        ROM 8   ROM 7               |
+|        YM3012  6116               6|
+|                                   8|
+|  JP2 SW1       YM2151             0|
+|J JP3 SW2                          0|
+|A                                  0|
+|M               ACTEL               |
+|M               A1020B   ROM 2 ROM 1|
+|A                        6264  6264 |
+|                                    |
+|                              62256 |
+|         6116                 62256 |
+|    6116       ROM 6  ROM 5   62256 |
+|    6116 6116  ROM 4  ROM 3         |
++------------------------------------+
 
-the gameplay on this game a like bubble bobble in many ways,it uses a
-68k@8MHz as the main cpu,2 z80's and a ym2151,the names of the rom files
-are just my guess.
+  CPU: MC68HC000P8
+Video: Actel A1020B PL84C
+Sound: Z0840006PSC Z80B x 3
+       YM2151 & YM3012
+  OSC: 32MHz & 14.31818MHz
+Other: 8 position dipswitch bank x 2
+       JP2 & JP3 jumper pads
+       VOL volume pot
 
-prg1.rom      27c040
-prg2.rom      27c040
-gfx1.rom      27c040
-gfx2.rom      27c040
-gfx3.rom      27c040
-gfx4.rom      27c040
-audio1.rom    27c512
-audio2.rom    27c010
+Roms had no labels and were asigned names by the original dumper.
+
+prg1.rom1      27c040
+prg2.rom2      27c040
+gfx3.rom3      27c040
+gfx4.rom4      27c040
+gfx5.rom5      27c040
+gfx6.rom6      27c040
+audio1.rom7    27c512
+audio2.rom8    27c010
 
 ***************************************************************************/
 
 ROM_START( uballoon )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 Code */
-	ROM_LOAD16_BYTE( "prg2.rom", 0x000000, 0x080000, CRC(72ab80ea) SHA1(b755940877cf286559208106dd5e6933aeb72242) )
-	ROM_LOAD16_BYTE( "prg1.rom", 0x000001, 0x080000, CRC(27a04f55) SHA1(a530294b000654db8d84efe4835b72e0dca62819) )
+	ROM_LOAD16_BYTE( "prg1.rom1", 0x000000, 0x080000, CRC(72ab80ea) SHA1(b755940877cf286559208106dd5e6933aeb72242) )
+	ROM_LOAD16_BYTE( "prg2.rom2", 0x000001, 0x080000, CRC(27a04f55) SHA1(a530294b000654db8d84efe4835b72e0dca62819) )
 
 	ROM_REGION( 0x010000, "audiocpu", 0 )   /* Z80 #1 - Music */
-	ROM_LOAD( "audio1.rom", 0x000000, 0x010000, CRC(c771f2b4) SHA1(6da4c526c0ea3be5d5bb055a31bf1171a6ddb51d) )
+	ROM_LOAD( "audio1.rom7", 0x000000, 0x010000, CRC(c771f2b4) SHA1(6da4c526c0ea3be5d5bb055a31bf1171a6ddb51d) )
 
 	ROM_REGION( 0x020000, "pcm1", 0 )   /* Z80 #2 - PCM */
-	ROM_LOAD( "audio2.rom", 0x000000, 0x020000, CRC(c7f75347) SHA1(5bbbd39285c593441c6da6a12f3632d60b103216) )
+	ROM_LOAD( "audio2.rom8", 0x000000, 0x020000, CRC(c7f75347) SHA1(5bbbd39285c593441c6da6a12f3632d60b103216) )
 
 	/* There's no Z80 #3 - PCM */
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_INVERT )    /* Sprites */
-	ROM_LOAD16_BYTE( "gfx1.rom", 0x000000, 0x080000, CRC(fd2ec297) SHA1(885834d9b58ccfd9a32ecaa51c45e70fbbe935db) )
-	ROM_LOAD16_BYTE( "gfx3.rom", 0x000001, 0x080000, CRC(718f3150) SHA1(5971f006203f86743ebc825e4ab1ed1f811e3165) )
-	ROM_LOAD16_BYTE( "gfx2.rom", 0x100000, 0x080000, CRC(6307aa60) SHA1(00406eba98ec368e72ee53c08b9111dec4f2552f) )
-	ROM_LOAD16_BYTE( "gfx4.rom", 0x100001, 0x080000, CRC(af7e057e) SHA1(67a03b54ffa1483c8ed044f27287b7f3f1150455) )
+	ROM_LOAD16_BYTE( "gfx3.rom3", 0x000000, 0x080000, CRC(fd2ec297) SHA1(885834d9b58ccfd9a32ecaa51c45e70fbbe935db) )
+	ROM_LOAD16_BYTE( "gfx4.rom4", 0x000001, 0x080000, CRC(718f3150) SHA1(5971f006203f86743ebc825e4ab1ed1f811e3165) )
+	ROM_LOAD16_BYTE( "gfx5.rom5", 0x100000, 0x080000, CRC(6307aa60) SHA1(00406eba98ec368e72ee53c08b9111dec4f2552f) )
+	ROM_LOAD16_BYTE( "gfx6.rom6", 0x100001, 0x080000, CRC(af7e057e) SHA1(67a03b54ffa1483c8ed044f27287b7f3f1150455) )
 ROM_END
 
 /***************************************************************************
@@ -1297,8 +1352,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest, 0, bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", 0 )
-GAME( 1994, sunaq,    0, sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )   // Date/Version on-screen is 940620-6, but in the program rom it's 1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer, 0, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer", 0 )
-GAME( 1996, bssoccera,bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (larger ROMs)", 0 )
-GAME( 1996, uballoon, 0, uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", 0 )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", 0 )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", 0 )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", 0 )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", 0 )
