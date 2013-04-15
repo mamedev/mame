@@ -93,6 +93,7 @@ public:
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
+	virtual bool call_create(int format_type, option_resolution *format_options);
 
 	// image device
 	virtual iodevice_t image_type() const { return IO_PRINTER; }

@@ -138,7 +138,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 	{
 		sprintf(line, "win_read_socket : %s : %d ", __FILE__,  __LINE__);
 		perror(line);
-		return win_error_to_mame_file_error(errno);
+		return win_error_to_mame_file_error(GetLastError());
 	}
 	else if (FD_ISSET(file->socket, &readfds))
 	{
@@ -174,7 +174,7 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 
 	if (result < 0)
 	{
-		return win_error_to_mame_file_error(errno);
+		return win_error_to_mame_file_error(GetLastError());
 	}
 
 	if (actual != NULL )
@@ -190,7 +190,7 @@ file_error win_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 	result = send(file->socket, (const char*)buffer, count, 0);
 	if (result < 0)
 	{
-		return win_error_to_mame_file_error(errno);
+		return win_error_to_mame_file_error(GetLastError());
 	}
 
 	if (actual != NULL )
