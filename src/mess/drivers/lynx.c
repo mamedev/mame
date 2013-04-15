@@ -138,7 +138,6 @@ ROM_END
 static QUICKLOAD_LOAD( lynx )
 {
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
-	device_t *cpu = state->m_maincpu;
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = state->memregion("maincpu")->base();
@@ -175,7 +174,7 @@ static QUICKLOAD_LOAD( lynx )
 	space.write_byte(0x1fc, start & 0xff);
 	space.write_byte(0x1fd, start >> 8);
 
-	cpu->state().set_pc(start);
+	state->m_maincpu->set_pc(start);
 
 	return IMAGE_INIT_PASS;
 }

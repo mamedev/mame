@@ -271,22 +271,22 @@ static void lviv_setup_snapshot (running_machine &machine,UINT8 * data)
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_BC, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_DE, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_HL, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_AF, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_SP, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	machine.device("maincpu")->state().set_state_int(I8085_PC, (hi << 8) | lo);
+	state->m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
 	memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data+0x0011, 0xc000);
@@ -302,12 +302,13 @@ static void lviv_setup_snapshot (running_machine &machine,UINT8 * data)
 
 static void dump_registers(running_machine &machine)
 {
-	logerror("PC   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_PC));
-	logerror("SP   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_SP));
-	logerror("AF   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_AF));
-	logerror("BC   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_BC));
-	logerror("DE   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_DE));
-	logerror("HL   = %04x\n", (unsigned) machine.device("maincpu")->state().state_int(I8085_HL));
+	lviv_state *state = machine.driver_data<lviv_state>();
+	logerror("PC   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_PC));
+	logerror("SP   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_SP));
+	logerror("AF   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_AF));
+	logerror("BC   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_BC));
+	logerror("DE   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_DE));
+	logerror("HL   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_HL));
 }
 
 static int lviv_verify_snapshot (UINT8 * data, UINT32 size)

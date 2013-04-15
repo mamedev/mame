@@ -753,7 +753,6 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 QUICKLOAD_LOAD( mbee )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
-	device_t *cpu = state->m_maincpu;
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = state->ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
@@ -783,7 +782,7 @@ QUICKLOAD_LOAD( mbee )
 		if (sw)
 		{
 			space.write_word(0xa2,0x801e);  /* fix warm-start vector to get around some copy-protections */
-			cpu->state().set_pc(0x801e);
+			state->m_maincpu->set_pc(0x801e);
 		}
 		else
 			space.write_word(0xa2,0x8517);
@@ -810,7 +809,7 @@ QUICKLOAD_LOAD( mbee )
 			}
 		}
 
-		if (sw) cpu->state().set_pc(0x100);
+		if (sw) state->m_maincpu->set_pc(0x100);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -837,7 +836,6 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = state->ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		device_t *cpu = state->m_maincpu;
 		address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
@@ -845,7 +843,7 @@ QUICKLOAD_LOAD( mbee_z80bin )
 		if (autorun)
 		{
 			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
-			cpu->state().set_pc(execute_address);
+			state->m_maincpu->set_pc(execute_address);
 		}
 		else
 		{

@@ -451,20 +451,20 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 static void decode_dos21(device_t *device,offs_t pc)
 {
-	device_t *cpu = device->machine().device(MAINCPU_TAG);
+	mbc55x_state    *state = device->machine().driver_data<mbc55x_state>();
 
-	UINT16  ax = cpu->state().state_int(I8086_AX);
-	UINT16  bx = cpu->state().state_int(I8086_BX);
-	UINT16  cx = cpu->state().state_int(I8086_CX);
-	UINT16  dx = cpu->state().state_int(I8086_DX);
-	UINT16  cs = cpu->state().state_int(I8086_CS);
-	UINT16  ds = cpu->state().state_int(I8086_DS);
-	UINT16  es = cpu->state().state_int(I8086_ES);
-	UINT16  ss = cpu->state().state_int(I8086_SS);
+	UINT16  ax = state->m_maincpu->state_int(I8086_AX);
+	UINT16  bx = state->m_maincpu->state_int(I8086_BX);
+	UINT16  cx = state->m_maincpu->state_int(I8086_CX);
+	UINT16  dx = state->m_maincpu->state_int(I8086_DX);
+	UINT16  cs = state->m_maincpu->state_int(I8086_CS);
+	UINT16  ds = state->m_maincpu->state_int(I8086_DS);
+	UINT16  es = state->m_maincpu->state_int(I8086_ES);
+	UINT16  ss = state->m_maincpu->state_int(I8086_SS);
 
-	UINT16  si = cpu->state().state_int(I8086_SI);
-	UINT16  di = cpu->state().state_int(I8086_DI);
-	UINT16  bp = cpu->state().state_int(I8086_BP);
+	UINT16  si = state->m_maincpu->state_int(I8086_SI);
+	UINT16  di = state->m_maincpu->state_int(I8086_DI);
+	UINT16  bp = state->m_maincpu->state_int(I8086_BP);
 
 	logerror("=======================================================================\n");
 	logerror("DOS Int 0x21 call at %05X\n",pc);

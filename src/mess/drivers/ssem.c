@@ -94,7 +94,6 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 	UINT8 edit2_state = ioport("EDIT2")->read();
 	UINT8 edit3_state = ioport("EDIT3")->read();
 	UINT8 misc_state = ioport("MISC")->read();
-	device_t *ssem_cpu = m_maincpu;
 
 	switch( (int)(FPTR)param )
 	{
@@ -209,7 +208,7 @@ INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 		case PANEL_HALT:
 			if(misc_state & 0x04)
 			{
-				ssem_cpu->state().set_state_int(SSEM_HALT, 1 - ssem_cpu->state().state_int(SSEM_HALT));
+				m_maincpu->set_state_int(SSEM_HALT, 1 - m_maincpu->state_int(SSEM_HALT));
 			}
 			break;
 	}
@@ -451,8 +450,7 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char 
 UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 line = 0;
-	device_t *ssem_cpu = m_maincpu;
-	UINT32 accum = ssem_cpu->state().state_int(SSEM_A);
+	UINT32 accum = m_maincpu->state_int(SSEM_A);
 	UINT32 bit = 0;
 	UINT32 word = 0;
 
@@ -491,7 +489,7 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 					(m_store[(m_store_line << 2) | 1] << 16) |
 					(m_store[(m_store_line << 2) | 2] <<  8) |
 					(m_store[(m_store_line << 2) | 3] <<  0));
-	glyph_print(bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", m_store_line, word, ssem_cpu->state().state_int(SSEM_HALT));
+	glyph_print(bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
 	return 0;
 }
 

@@ -1874,7 +1874,7 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			pdp1_pulse_start_clear(m_maincpu);    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_PC, (  m_maincpu->state_int(PDP1_TA) & 0170000)
 										|  (m_maincpu->state_int(PDP1_PC) & 0007777));  /* transfer ETA to EPC */
-			/*machine.device("maincpu")->state().set_state_int(PDP1_MA, machine.device("maincpu")->state().state_int(PDP1_PC));*/
+			/*m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));*/
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
 			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);       /* right??? */
 			m_maincpu->set_state_int(PDP1_RUN, (UINT64)0);
