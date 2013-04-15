@@ -343,7 +343,7 @@ void bitbanger_device::device_config_complete(void)
 		m_default_baud = 0;
 		m_default_tune = 0;
 	}
-	update_names(BITBANGER, "bitbngr", "");
+	update_names(BITBANGER, "bitbngr", "bitb");
 }
 
 
