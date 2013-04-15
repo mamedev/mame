@@ -702,7 +702,7 @@ static void lynx_blitter(running_machine &machine)
 
 	int i; int colors;
 
-	state->m_blitter.mem = (UINT8*)machine.device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0x0000);
+	state->m_blitter.mem = (UINT8*)state->m_maincpu->space(AS_PROGRAM).get_read_ptr(0x0000);
 
 	state->m_blitter.busy = 1; // blitter working
 	state->m_blitter.memory_accesses = 0;
@@ -1408,8 +1408,8 @@ static void lynx_timer_signal_irq(running_machine &machine, int which)
 	if ( ( state->m_timer[which].cntrl1 & 0x80 ) && ( which != 4 ) ) // if interrupts are enabled and timer != 4
 	{
 		state->m_mikey.data[0x81] |= ( 1 << which ); // set interupt poll register
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		state->m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
 	switch ( which ) // count down linked timers
 	{

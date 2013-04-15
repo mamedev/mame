@@ -280,12 +280,12 @@ static void nc_update_interrupts(running_machine &machine)
 	{
 		logerror("int set %02x\n", state->m_irq_status & state->m_irq_mask);
 		/* set int */
-		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		state->m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else
 	{
 		/* clear int */
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		state->m_maincpu->set_input_line(0, CLEAR_LINE);
 	}
 }
 
@@ -313,7 +313,7 @@ static const char *const nc_bankhandler_w[]={
 static void nc_refresh_memory_bank_config(running_machine &machine, int bank)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	int mem_type;
 	int mem_bank;
 	char bank1[10];

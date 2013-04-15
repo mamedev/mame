@@ -150,7 +150,7 @@ static void microtan_set_irq_line(running_machine &machine)
 	/* The 6502 IRQ line is active low and probably driven
 	   by open collector outputs (guess). Since MAME/MESS use
 	   a non-0 value for ASSERT_LINE we OR the signals here */
-	machine.device("maincpu")->execute().set_input_line(0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
+	state->m_maincpu->set_input_line(0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
 }
 
 static cassette_image_device *cassette_device_image(running_machine &machine)
@@ -779,7 +779,7 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
 	UINT8 *RAM = state->memregion("maincpu")->base();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
 	via6522_device *via_1 = machine.device<via6522_device>("via6522_1");
 	device_t *ay8910 = machine.device("ay8910.1");

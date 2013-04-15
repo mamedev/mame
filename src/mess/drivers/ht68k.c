@@ -80,7 +80,8 @@ void ht68k_state::machine_reset()
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
+	ht68k_state *drvstate = device->machine().driver_data<ht68k_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

@@ -61,10 +61,11 @@ WRITE8_MEMBER(dai_state::dai_keyboard_w)
 
 static TMS5501_IRQ_CALLBACK(dai_interrupt_callback)
 {
+	dai_state *drvstate = device.machine().driver_data<dai_state>();
 	if (intreq)
-		device.machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, vector);
+		drvstate->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector);
 	else
-		device.machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		drvstate->m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 TMS5501_INTERFACE( dai_tms5501_interface )

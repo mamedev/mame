@@ -53,7 +53,7 @@ int x1_keyboard_device::z80daisy_irq_ack()
 {
 	x1_state *state = machine().driver_data<x1_state>();
 	state->m_key_irq_flag = 0;
-	device().machine().device("x1_cpu")->execute().set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
+	state->m_x1_cpu->set_input_line(INPUT_LINE_IRQ0,CLEAR_LINE);
 	return state->m_key_irq_vector;
 }
 

@@ -1088,11 +1088,11 @@ static void pce_cd_set_irq_line( running_machine &machine, int num, int state )
 	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & 0x7c )
 	{
 		//printf("IRQ PEND = %02x MASK = %02x IRQ ENABLE %02X\n",pce_cd.regs[0x02] & pce_cd.regs[0x03] & 0x7c,pce_cd.regs[0x02] & 0x7c,pce_cd.regs[0x03] & 0x7c);
-		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE );
+		drvstate->m_maincpu->set_input_line(1, ASSERT_LINE );
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE );
+		drvstate->m_maincpu->set_input_line(1, CLEAR_LINE );
 	}
 }
 

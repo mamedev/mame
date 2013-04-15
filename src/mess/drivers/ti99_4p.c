@@ -338,7 +338,7 @@ READ16_MEMBER( ti99_4p_state::memread )
 
 WRITE16_MEMBER( ti99_4p_state::memwrite )
 {
-//  m_cpu->execute().adjust_icount(-4);
+//  m_cpu->adjust_icount(-4);
 
 	int addroff = offset << 1;
 	UINT16 zone = addroff & 0xe000;

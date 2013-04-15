@@ -136,8 +136,7 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
 {
-	device_t *cpu = machine().device( "maincpu" );
-	address_space &mem = cpu->memory().space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	char kbdrow[6];
 	UINT8 i;
 	for (i = 1; i < 8; i++)

@@ -74,7 +74,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
 
 	*/
 	mtx_state *state = machine.driver_data<mtx_state>();
-	address_space &program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
+	address_space &program = state->m_maincpu->space(AS_PROGRAM);
 	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;

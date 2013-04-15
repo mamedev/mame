@@ -169,9 +169,10 @@ void mk1_state::machine_start()
 
 static void mk1_interrupt( device_t *device, UINT16 addr, int level )
 {
-	device->machine().device("maincpu")->execute().set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr );
+	mk1_state *drvstate = device->machine().driver_data<mk1_state>();
+	drvstate->m_maincpu->set_input_line_vector(F8_INPUT_LINE_INT_REQ, addr );
 
-	device->machine().device("maincpu")->execute().set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
+	drvstate->m_maincpu->set_input_line(F8_INPUT_LINE_INT_REQ, level ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

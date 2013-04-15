@@ -249,7 +249,7 @@ READ64_MEMBER(bebox_state::bebox_crossproc_interrupts_r )
 	result = m_crossproc_interrupts;
 
 	/* return a different result depending on which CPU is accessing this handler */
-	if (&space != &space.machine().device("ppc1")->memory().space(AS_PROGRAM))
+	if (&space != &m_ppc1->space(AS_PROGRAM))
 		result |= 0x02000000;
 	else
 		result &= ~0x02000000;
@@ -307,7 +307,7 @@ WRITE64_MEMBER(bebox_state::bebox_processor_resets_w )
 
 	if (b & 0x20)
 	{
-		space.machine().device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		m_ppc2->set_input_line(INPUT_LINE_RESET, (b & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -704,7 +704,7 @@ READ8_MEMBER(bebox_state::bebox_80000480_r)
 
 WRITE_LINE_MEMBER(bebox_state::bebox_dma_hrq_changed)
 {
-	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_ppc1->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	machine().device<i8237_device>("dma8237_1")->i8237_hlda_w( state );
@@ -986,7 +986,7 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
 					if (state->m_scsi53c810_data[5] != 0xFFFFFFF0)
 					{
-						address_space &space = device->machine().device("ppc1")->memory().space(AS_PROGRAM);
+						address_space &space = state->m_ppc1->space(AS_PROGRAM);
 
 						addr = (state->m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
 						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),state), write64_delegate(FUNC(bebox_state::scsi53c810_w),state));
@@ -1021,8 +1021,8 @@ void bebox_state::machine_reset()
 
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(bebox_state::bebox_get_devices),this));
 
-	machine().device("ppc1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	machine().device("ppc2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_ppc1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_ppc2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	memcpy(machine().device<fujitsu_29f016a_device>("flash")->space().get_read_ptr(0),memregion("user1")->base(),0x200000);
 }
@@ -1036,8 +1036,8 @@ void bebox_state::machine_start()
 
 DRIVER_INIT_MEMBER(bebox_state,bebox)
 {
-	address_space &space_0 = machine().device("ppc1")->memory().space(AS_PROGRAM);
-	address_space &space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
+	address_space &space_0 = m_ppc1->space(AS_PROGRAM);
+	address_space &space_1 = m_ppc2->space(AS_PROGRAM);
 
 	/* set up boot and flash ROM */
 	membank("bank2")->set_base(memregion("user2")->base());

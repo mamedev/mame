@@ -388,7 +388,8 @@ MACHINE_RESET_MEMBER(svi318_state,svi328_806)
 
 void svi318_vdp_interrupt(running_machine &machine, int i)
 {
-	machine.device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	svi318_state *drvstate = machine.driver_data<svi318_state>();
+	drvstate->m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 

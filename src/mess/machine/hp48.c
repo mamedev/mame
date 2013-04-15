@@ -82,8 +82,9 @@ static const UINT8 hp48_module_addr_id[6] = { 0x19, 0xf4, 0xf6, 0xf8, 0xf2, 0x00
 
 static void hp48_pulse_irq( running_machine &machine, int irq_line)
 {
-	machine.device("maincpu")->execute().set_input_line(irq_line, ASSERT_LINE );
-	machine.device("maincpu")->execute().set_input_line(irq_line, CLEAR_LINE );
+	hp48_state *state = machine.driver_data<hp48_state>();
+	state->m_maincpu->set_input_line(irq_line, ASSERT_LINE );
+	state->m_maincpu->set_input_line(irq_line, CLEAR_LINE );
 }
 
 

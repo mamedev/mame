@@ -130,24 +130,24 @@ static void pcw_update_irqs(running_machine &machine)
 	pcw_state *state = machine.driver_data<pcw_state>();
 	// set NMI line, remains set until FDC interrupt type is changed
 	if(state->m_nmi_flag != 0)
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary
 	if(state->m_fdc_interrupt_code == 1 && (state->m_system_status & 0x20))
 	{
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		state->m_maincpu->set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
 	if(state->m_timer_irq_flag != 0)
 	{
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		state->m_maincpu->set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	state->m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_timer_pulse)
@@ -221,7 +221,7 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
 static void pcw_update_read_memory_block(running_machine &machine, int block, int bank)
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+1);

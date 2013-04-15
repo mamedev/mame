@@ -214,7 +214,7 @@ void pes_state::machine_reset()
 	m_rsstate = 1;
 
 	m_port3_state = 0; // reset the openbus state of port 3
-	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
+	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // this causes debugger to fail badly if included
 	machine().device("tms5220")->reset(); // reset the 5220
 }
 

@@ -391,7 +391,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(bigbord2_state::bigbord2_interrupt)
 {
-	machine().device(Z80_TAG)->execute().set_input_line(0, state);
+	m_maincpu->set_input_line(0, state);
 }
 
 const z80sio_interface sio_intf =

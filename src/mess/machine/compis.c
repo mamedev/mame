@@ -82,7 +82,7 @@ enum COMPIS_INTERRUPT_REQUESTS
 #ifdef UNUSED_FUNCTION
 void compis_irq_set(UINT8 irq)
 {
-	machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, irq);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, irq);
 }
 #endif
 
@@ -460,7 +460,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	state->m_i186.intr.poll_status = 0x8000 | new_vector;
 	if (!state->m_i186.intr.pending)
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		state->m_maincpu->set_input_line(0, ASSERT_LINE);
 	state->m_i186.intr.pending = 1;
 	machine.scheduler().trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");

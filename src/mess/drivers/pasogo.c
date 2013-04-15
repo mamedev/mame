@@ -455,7 +455,7 @@ UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &b
 
 INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 {
-//  machine.device("maincpu")->execute().set_input_line(UPD7810_INTFE1, PULSE_LINE);
+//  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)

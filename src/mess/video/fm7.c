@@ -39,9 +39,9 @@ WRITE8_MEMBER(fm7_state::fm7_subintf_w)
 	if(data & 0x80)
 		m_video.sub_busy = data & 0x80;
 
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	m_sub->set_input_line(INPUT_LINE_HALT,(data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if(data & 0x40)
-		machine().device("sub")->execute().set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
+		m_sub->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 	//popmessage("Sub CPU Interface write: %02x\n",data);
 }
 
@@ -63,7 +63,7 @@ WRITE8_MEMBER(fm7_state::fm7_sub_busyflag_w)
  */
 READ8_MEMBER(fm7_state::fm7_cancel_ack)
 {
-	machine().device("sub")->execute().set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+	m_sub->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 	return 0x00;
 }
 
@@ -1176,7 +1176,7 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
 			break;
 	}
 	// reset sub CPU, set busy flag, set reset flag
-	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET,PULSE_LINE);
+	m_sub->set_input_line(INPUT_LINE_RESET,PULSE_LINE);
 	m_video.sub_busy = 0x80;
 	m_video.sub_halt = 0;
 	m_video.sub_reset = 1;

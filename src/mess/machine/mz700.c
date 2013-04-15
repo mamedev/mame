@@ -534,7 +534,8 @@ WRITE8_MEMBER(mz_state::pio_port_c_w)
 
 static void mz800_z80pio_irq(device_t *device, int which)
 {
-	device->machine().device("maincpu")->execute().set_input_line(0, which);
+	mz_state *state = device->machine().driver_data<mz_state>();
+	state->m_maincpu->set_input_line(0, which);
 }
 
 READ8_MEMBER(mz_state::mz800_z80pio_port_a_r)

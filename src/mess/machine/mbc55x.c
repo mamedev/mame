@@ -338,7 +338,7 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 static void set_ram_size(running_machine &machine)
 {
 	mbc55x_state    *state      = machine.driver_data<mbc55x_state>();
-	address_space   &space      = machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	address_space   &space      = state->m_maincpu->space( AS_PROGRAM );
 	int             ramsize     = state->m_ram->size();
 	int             nobanks     = ramsize / RAM_BANK_SIZE;
 	char            bank[10];
@@ -387,7 +387,7 @@ void mbc55x_state::machine_reset()
 {
 	set_ram_size(machine());
 	keyboard_reset(machine());
-	machine().device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mbc55x_state::mbc55x_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mbc55x_state::mbc55x_irq_callback),this));
 }
 
 void mbc55x_state::machine_start()

@@ -2369,7 +2369,7 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
-	address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_x1_cpu->space(AS_PROGRAM);
 	UINT32 key1 = ioport("key1")->read();
 	UINT32 key2 = ioport("key2")->read();
 	UINT32 key3 = ioport("key3")->read();
@@ -2387,7 +2387,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 			x1_sub_io_w(space,0,0xe6);
 			m_irq_vector = m_key_irq_vector;
 			m_key_irq_flag = 1;
-			machine().device("x1_cpu")->execute().set_input_line(0,ASSERT_LINE);
+			m_x1_cpu->set_input_line(0,ASSERT_LINE);
 			m_old_key1 = key1;
 			m_old_key2 = key2;
 			m_old_key3 = key3;
@@ -2441,7 +2441,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	m_io_bank_mode = 0;
 
-	//machine().device("x1_cpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x1_state::x1_irq_callback),this));
+	//m_x1_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x1_state::x1_irq_callback),this));
 
 	m_cmt_current_cmd = 0;
 	m_cmt_test = 0;

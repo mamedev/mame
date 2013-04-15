@@ -328,7 +328,7 @@ static void apple3_update_memory(running_machine &machine)
 	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 bank;
 	UINT8 page;
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = state->m_maincpu->space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{

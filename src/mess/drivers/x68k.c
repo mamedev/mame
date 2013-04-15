@@ -453,7 +453,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 		m_keyboard.headpos = 0;
 //      mfp_trigger_irq(MFP_IRQ_RX_ERROR);
 		m_current_vector[6] = 0x4b;
-//      machine.device("maincpu")->execute().set_input_line_and_vector(6,ASSERT_LINE,0x4b);
+//      m_maincpu->set_input_line_and_vector(6,ASSERT_LINE,0x4b);
 	}
 }
 
@@ -1693,7 +1693,7 @@ READ16_MEMBER(x68k_state::x68k_exp_r)
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
-//      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 	return 0xffff;
 }
@@ -1709,7 +1709,7 @@ WRITE16_MEMBER(x68k_state::x68k_exp_w)
 		if(ACCESSING_BITS_0_7)
 			offset++;
 		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(16), timer_expired_delegate(FUNC(x68k_state::x68k_bus_error),this), 0xeafa00+offset);
-//      machine.device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
+//      m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,state->m_current_vector[2]);
 	}
 }
 
@@ -1720,7 +1720,7 @@ static void x68k_dma_irq(running_machine &machine, int channel)
 	state->m_current_vector[3] = hd63450_get_vector(device, channel);
 	state->m_current_irq_line = 3;
 	logerror("DMA#%i: DMA End (vector 0x%02x)\n",channel,state->m_current_vector[3]);
-	machine.device("maincpu")->execute().set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
+	state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
 }
 
 static void x68k_dma_end(running_machine &machine, int channel,int irq)
@@ -1739,7 +1739,7 @@ static void x68k_dma_error(running_machine &machine, int channel, int irq)
 	{
 		state->m_current_vector[3] = hd63450_get_error_vector(device,channel);
 		state->m_current_irq_line = 3;
-		machine.device("maincpu")->execute().set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
+		state->m_maincpu->set_input_line_and_vector(3,ASSERT_LINE,state->m_current_vector[3]);
 	}
 }
 

@@ -89,7 +89,7 @@ static void laser_machine_init(running_machine &machine, int bank_mask, int vide
 	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", state->m_laser_bank_mask, state->m_laser_video_bank, state->m_laser_video_bank * 0x04000);
 
 	for (i = 0; i < ARRAY_LENGTH(state->m_laser_bank); i++)
-		state->laser_bank_select_w(machine.device("maincpu")->memory().space(AS_PROGRAM), i, 0);
+		state->laser_bank_select_w(state->m_maincpu->space(AS_PROGRAM), i, 0);
 }
 
 void vtech2_state::machine_reset()

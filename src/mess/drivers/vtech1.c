@@ -213,7 +213,7 @@ public:
 static SNAPSHOT_LOAD( vtech1 )
 {
 	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = vtech1->m_maincpu->space(AS_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];

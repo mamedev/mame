@@ -105,7 +105,9 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_shared_ram(*this, "shared_ram"),
 	m_boot_ram(*this, "boot_ram"),
-	m_maincpu(*this, "maincpu") { }
+	m_maincpu(*this, "maincpu"),
+	m_sub(*this, "sub"),
+	m_x86(*this, "x86") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
@@ -254,6 +256,8 @@ public:
 	IRQ_CALLBACK_MEMBER(fm7_sub_irq_ack);
 	DECLARE_WRITE_LINE_MEMBER(fm77av_fmirq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_sub;
+	optional_device<cpu_device> m_x86;
 };
 
 #endif /*FM7_H_*/

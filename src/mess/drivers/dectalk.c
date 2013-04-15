@@ -237,6 +237,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_terminal(*this, TERMINAL_TAG) ,
 		m_maincpu(*this, "maincpu"),
+		m_dsp(*this, "dsp"),
 		m_dac(*this, "dac") { }
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
@@ -286,6 +287,7 @@ public:
 	void dectalk_semaphore_w ( UINT16 data );
 	UINT16 dectalk_outfifo_r (  );
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
 	required_device<dac_device> m_dac;
 };
 
@@ -293,9 +295,10 @@ public:
 /* Devices */
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
-	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
-	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
+	dectalk_state *drvstate = device->machine().driver_data<dectalk_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, HOLD_LINE, vector);
 };
 
 static UINT8 duart_input(device_t *device)
@@ -342,9 +345,9 @@ void dectalk_state::dectalk_outfifo_check ()
 {
 	// check if output fifo is full; if it isn't, set the int on the dsp
 	if (((m_outfifo_head_ptr-1)&0xF) != m_outfifo_tail_ptr)
-	machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); // TMS32010 INT
+		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
 	else
-	machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); // TMS32010 INT
+		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
 }
 
 void dectalk_state::dectalk_clear_all_fifos(  )
@@ -423,7 +426,7 @@ static void dectalk_reset(device_t *device)
 	state->dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	state->dectalk_semaphore_w(0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
-	device->machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+	state->m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
 	state->m_tlc_ringdetect = 0; // TODO
 	state->m_tlc_dtmf = 0; // TODO
@@ -518,7 +521,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
 		dectalk_clear_all_fifos();
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
+		m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
 		m_spc_error_latch = 0;
 		dectalk_semaphore_w(0);
@@ -528,7 +531,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01 = 0: initialize speech off, dsp running\n");
 #endif
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
+		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE); // speech reset deassert clears the CLR line on the tms32010
 	}
 	if ((data&0x2) == 0x2) // bit 1 - clear error and semaphore latches
 	{
@@ -679,7 +682,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 #ifdef SPC_LOG_DSP
 	logerror("dsp: SPC outfifo write, data = %04X, fifo head was: %02X; fifo tail: %02X\n", data, m_outfifo_head_ptr, m_outfifo_tail_ptr);
 #endif
-	machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
+	m_dsp->set_input_line(0, CLEAR_LINE); //TMS32010 INT (cleared because LDCK inverts the IR line, clearing int on any outfifo write... for a moment at least.)
 	// if fifo is full (head ptr = tail ptr-1), do not increment the head ptr and do not store the data
 	if (((m_outfifo_tail_ptr-1)&0xF) == m_outfifo_head_ptr)
 	{

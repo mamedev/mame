@@ -381,6 +381,7 @@ private:
 	void x68k_draw_gfx_scanline(bitmap_ind16 &bitmap, rectangle cliprect, UINT8 priority);
 	void x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect);
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
+public:	
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
 };

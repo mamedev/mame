@@ -209,7 +209,7 @@ READ8_MEMBER( ql_state::ipc_port2_r )
 
 //  int irq = (m_ser2_rxd | m_ser1_txd);
 
-//  m_ipc->execute().set_input_line(INPUT_LINE_IRQ0, irq);
+//  m_ipc->set_input_line(INPUT_LINE_IRQ0, irq);
 
 	return (m_comdata << 7);
 }

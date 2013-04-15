@@ -104,7 +104,8 @@ ADDRESS_MAP_END
 static UINT32 scsi53c810_fetch(running_machine &machine, UINT32 dsp)
 {
 	UINT32 result;
-	result = machine.device("ppc1")->memory().space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
+	bebox_state *state = machine.driver_data<bebox_state>();
+	result = state->m_ppc1->space(AS_PROGRAM).read_dword(dsp & 0x7FFFFFFF);
 	return BYTE_REVERSE32(result);
 }
 

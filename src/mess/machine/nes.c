@@ -33,7 +33,7 @@
 
 void nes_state::init_nes_core()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int i;
 	m_prg_chunks = 0;

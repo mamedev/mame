@@ -113,8 +113,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 
-protected:
 	required_device<cpu_device> m_maincpu;
+protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<dac_device> m_dac;
 	required_device<i8255_device> m_ppi;

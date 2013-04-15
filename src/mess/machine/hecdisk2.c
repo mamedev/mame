@@ -56,14 +56,14 @@ void hector_disc2_init( running_machine &machine)
 void hec2hrp_state::disc2_fdc_interrupt(bool state)
 {
 	m_IRQ_current_state = state;
-	machine().device("disc2cpu")->execute().set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
+	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization */
 void hec2hrp_state::disc2_fdc_dma_irq(bool state)
 {
 	m_NMI_current_state = state;
-	machine().device("disc2cpu")->execute().set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
+	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // RESET the disc2 Unit !
@@ -71,7 +71,7 @@ void hector_disc2_reset(running_machine &machine)
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	// Initialization Disc2 unit
-	machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	state->m_disc2cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	machine.device<upd765a_device>("upd765")->reset();
 	// Select ROM memory to cold restart
 	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
@@ -157,6 +157,6 @@ WRITE8_HANDLER( hector_disc2_io50_port_w) /* I/O Port to the stuff of Disc2*/
 
 	/* Authorization interrupt and NMI with RNMI signal*/
 	state->m_hector_disc2_RNMI = BIT(data, 5);
-	space.machine().device("disc2cpu")->execute().set_input_line(INPUT_LINE_IRQ0, state->m_IRQ_current_state && state->m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
-	space.machine().device("disc2cpu")->execute().set_input_line(INPUT_LINE_NMI,  state->m_NMI_current_state && state->m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
+	state->m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state->m_IRQ_current_state && state->m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
+	state->m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state->m_NMI_current_state && state->m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }

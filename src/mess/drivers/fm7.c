@@ -171,7 +171,7 @@ static void main_irq_set_flag(running_machine &machine, UINT8 flag)
 	state->m_irq_flags |= flag;
 
 	if(state->m_irq_flags != 0)
-		machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
+		state->m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
@@ -180,7 +180,7 @@ static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
 	state->m_irq_flags &= ~flag;
 
 	if(state->m_irq_flags == 0)
-		machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+		state->m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 
@@ -821,7 +821,7 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
 static void fm7_update_psg(running_machine &machine)
 {
 	fm7_state *state = machine.driver_data<fm7_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	if(state->m_type == SYS_FM7)
 	{
@@ -1212,7 +1212,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
-		machine().device("sub")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
@@ -1232,7 +1232,7 @@ static void key_press(running_machine &machine, UINT16 scancode)
 	}
 	else
 	{
-		machine.device("sub")->execute().set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+		state->m_sub->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 	}
 	logerror("KEY: sent scancode 0x%03x\n",scancode);
 }
@@ -1345,7 +1345,7 @@ IRQ_CALLBACK_MEMBER(fm7_state::fm7_irq_ack)
 
 IRQ_CALLBACK_MEMBER(fm7_state::fm7_sub_irq_ack)
 {
-	machine().device("sub")->execute().set_input_line(irqline,CLEAR_LINE);
+	m_sub->set_input_line(irqline,CLEAR_LINE);
 	return -1;
 }
 
@@ -1832,7 +1832,7 @@ DRIVER_INIT_MEMBER(fm7_state,fm7)
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm7_keyboard_poll),this));
 	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fm7_state::fm77av_vsync),this));
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_irq_ack),this));
-	machine().device("sub")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_sub_irq_ack),this));
+	m_sub->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fm7_state::fm7_sub_irq_ack),this));
 }
 
 MACHINE_START_MEMBER(fm7_state,fm7)
@@ -1960,7 +1960,7 @@ void fm7_state::machine_reset()
 	if(m_type == SYS_FM11)
 	{
 		// Probably best to halt the 8088, I'm pretty sure it and the main 6809 should not be running at the same time
-		machine().device("x86")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
+		m_x86->set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	}
 
 	memset(m_video_ram, 0, sizeof(UINT8) * 0x18000);

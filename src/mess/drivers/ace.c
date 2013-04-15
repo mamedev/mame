@@ -474,7 +474,7 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(ace_state::set_irq)
 {
-	machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -484,7 +484,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::set_irq)
 
 TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 {
-	machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 

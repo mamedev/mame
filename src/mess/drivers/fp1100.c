@@ -170,7 +170,7 @@ WRITE8_MEMBER( fp1100_state::main_bank_w )
 WRITE8_MEMBER( fp1100_state::irq_mask_w )
 {
 	//if((irq_mask & 0x80) != (data & 0x80))
-	//  machine().device("sub")->execute().set_input_line(UPD7810_INTF2, HOLD_LINE);
+	//  m_subcpu->set_input_line(UPD7810_INTF2, HOLD_LINE);
 
 	irq_mask = data;
 	///printf("%02x\n",data);
@@ -182,7 +182,7 @@ WRITE8_MEMBER( fp1100_state::irq_mask_w )
 WRITE8_MEMBER( fp1100_state::main_to_sub_w )
 {
 	machine().scheduler().synchronize(); // force resync
-	machine().device("sub")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
+	m_subcpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 	m_sub_latch = data;
 }
 
@@ -234,7 +234,7 @@ WRITE8_MEMBER( fp1100_state::fp1100_vram_w )
 READ8_MEMBER( fp1100_state::main_to_sub_r )
 {
 	machine().scheduler().synchronize(); // force resync
-	machine().device("sub")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
+	m_subcpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
 	return m_sub_latch;
 }
 

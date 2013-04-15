@@ -73,8 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(radio86_romdisk_portc_w);
 	DECLARE_WRITE8_MEMBER(mikrosha_8255_font_page_w);
 
-protected:
 	required_device<cpu_device> m_maincpu;
+protected:
 	required_device<cassette_image_device> m_cassette;
 	optional_device<i8257_device> m_dma8257;
 	required_device<i8255_device> m_ppi8255_1;

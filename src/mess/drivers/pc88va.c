@@ -1051,7 +1051,7 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 		case 0x00: // FDC mode register
 			m_fdc_mode = data & 1;
 			#if TEST_SUBFDC
-			machine().device("fdccpu")->execute().set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
+			m_fdccpu->set_input_line(INPUT_LINE_HALT, (m_fdc_mode) ? ASSERT_LINE : CLEAR_LINE);
 			#endif
 			break;
 		/*
@@ -1695,7 +1695,7 @@ void pc88va_state::machine_reset()
 	m_fdc_irq_opcode = 0x00; //0x7f ld a,a !
 
 	#if TEST_SUBFDC
-	machine().device("fdccpu")->execute().set_input_line_vector(0, 0);
+	m_fdccpu->set_input_line_vector(0, 0);
 	#endif
 
 	m_fdc_motor_status[0] = 0;
@@ -1758,7 +1758,7 @@ void pc88va_state::fdc_irq(bool state)
 	}
 	#if TEST_SUBFDC
 	else
-		machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
+		m_fdccpu->set_input_line(0, HOLD_LINE);
 	#endif
 }
 

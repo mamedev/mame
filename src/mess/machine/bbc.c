@@ -1548,7 +1548,7 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 

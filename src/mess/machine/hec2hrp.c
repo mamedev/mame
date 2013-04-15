@@ -867,14 +867,14 @@ void hector_reset(running_machine &machine, int hr, int with_D2 )
 	state->m_hector_flag_hr = hr;
 	state->m_flag_clk = 0;
 	state->m_write_cassette = 0;
-	machine.device("maincpu" )->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	state->m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// Initialization Disc II
 	if (with_D2==1)
 
 	{
 		upd765a_device *fdc = machine.device<upd765a_device>("upd765");
-		machine.device("disc2cpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		state->m_disc2cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		fdc->reset();
 	}
 }

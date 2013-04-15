@@ -1726,9 +1726,9 @@ static void pdp1_keyboard(running_machine &machine)
 			state->m_typewriter.tb = (i << 4) + j;
 			state->m_io_status |= io_st_tyi;
 			#if USE_SBS
-				machine.device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 0);  /* interrupt it, baby */
+				state->m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0);  /* interrupt it, baby */
 			#endif
-			machine.device("maincpu")->state().set_state_int(PDP1_PF1, 1);
+			state->m_maincpu->set_state_int(PDP1_PF1, 1);
 			pdp1_typewriter_drawchar(machine, state->m_typewriter.tb);  /* we want to echo input */
 			break;
 		}
