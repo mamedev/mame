@@ -475,22 +475,22 @@ void ins8250_uart_device::update_msr(int bit, UINT8 state)
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
 {
-	update_msr(3, (state&1));
+	update_msr(3, (state ? 1 : 0));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
 {
-	update_msr(1, (state&1));
+	update_msr(1, (state ? 1 : 0));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
 {
-	update_msr(2, (state&1));
+	update_msr(2, (state ? 1 : 0));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 {
-	update_msr(0, (state&1));
+	update_msr(0, (state ? 1 : 0));
 }
 
 void ins8250_uart_device::device_start()
