@@ -85,14 +85,14 @@ ResetAllSubCPUs( running_machine &machine, int state )
 {
 	namcos2_shared_state *s2state = machine.driver_data<namcos2_shared_state>();
 
-	machine.device("slave")->execute().set_input_line(INPUT_LINE_RESET, state);
+	s2state->m_slave->set_input_line(INPUT_LINE_RESET, state);
 	if (s2state->m_c68)
 	{
-		machine.device("c68")->execute().set_input_line(INPUT_LINE_RESET, state);
+		s2state->m_c68->set_input_line(INPUT_LINE_RESET, state);
 	}
 	else
 	{
-		machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, state);
+		s2state->m_mcu->set_input_line(INPUT_LINE_RESET, state);
 	}
 	switch( machine.driver_data<namcos2_shared_state>()->m_gametype )
 	{
@@ -100,8 +100,8 @@ ResetAllSubCPUs( running_machine &machine, int state )
 	case NAMCOS21_STARBLADE:
 	case NAMCOS21_AIRCOMBAT:
 	case NAMCOS21_CYBERSLED:
-		machine.device("dspmaster")->execute().set_input_line(INPUT_LINE_RESET, state);
-		machine.device("dspslave")->execute().set_input_line(INPUT_LINE_RESET, state);
+		s2state->m_dspmaster->set_input_line(INPUT_LINE_RESET, state);
+		s2state->m_dspslave->set_input_line(INPUT_LINE_RESET, state);
 		break;
 
 //  case NAMCOS21_WINRUN91:

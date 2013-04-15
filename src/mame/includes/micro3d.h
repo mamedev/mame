@@ -21,7 +21,9 @@ public:
 		m_mac_sram(*this, "mac_sram"),
 		m_micro3d_sprite_vram(*this, "sprite_vram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_drmath(*this, "drmath"),
+		m_vgb(*this, "vgb") { }
 
 	required_shared_ptr<UINT16> m_shared_ram;
 	device_t            *m_duart68681;
@@ -123,6 +125,8 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_drmath;
+	required_device<cpu_device> m_vgb;
 };
 
 struct micro3d_vtx

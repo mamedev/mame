@@ -469,13 +469,13 @@ static void init_nbajam_common(running_machine &machine, int te_protection)
 	if (!te_protection)
 	{
 		nbajam_prot_table = nbajam_prot_values;
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
+		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
 	}
 	else
 	{
 		nbajam_prot_table = nbajamte_prot_values;
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
+		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
+		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
 	}
 
 	/* sound chip protection (hidden RAM) */

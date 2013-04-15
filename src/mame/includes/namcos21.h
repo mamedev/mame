@@ -37,8 +37,6 @@ public:
 		m_mpSharedRAM1(*this,"mpsharedram1"),
 		m_mpDualPortRAM(*this,"mpdualportram"),
 		m_master_dsp_code(*this,"master_dsp_code"),
-		m_dspmaster(*this, "dspmaster"),
-		m_dspslave(*this, "dspslave"),
 		m_dsp(*this, "dsp") { }
 
 	optional_shared_ptr<UINT16> m_winrun_dspbios;
@@ -49,8 +47,6 @@ public:
 	required_shared_ptr<UINT8> m_mpDualPortRAM;
 	optional_shared_ptr<UINT16> m_master_dsp_code;
 	
-	optional_device<cpu_device> m_dspmaster;
-	optional_device<cpu_device> m_dspslave;
 	optional_device<cpu_device> m_dsp;
 
 	UINT8 *m_videoram;

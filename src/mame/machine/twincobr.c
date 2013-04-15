@@ -179,14 +179,14 @@ void twincobr_state::twincobr_dsp(int enable)
 	m_dsp_on = enable;
 	if (enable) {
 		LOG(("Turning DSP on and main CPU off\n"));
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
 		LOG(("Turning DSP off\n"));
-		machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -265,14 +265,14 @@ void twincobr_state::toaplan0_coin_dsp_w(address_space &space, int offset, int d
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:  /* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-					machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+					m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
 					m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:  /* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-					machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+					m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+					m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }

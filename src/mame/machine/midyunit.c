@@ -500,12 +500,12 @@ static void term2_init_common(running_machine &machine, write16_delegate hack_w)
 	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
+	state->m_maincpu->space(AS_PROGRAM).install_read_handler(0x01c00000, 0x01c0005f, read16_delegate(FUNC(midyunit_state::term2_input_r),state));
+	state->m_maincpu->space(AS_PROGRAM).install_write_handler(0x01e00000, 0x01e0001f, write16_delegate(FUNC(midyunit_state::term2_sound_w),state));
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	state->m_t2_hack_mem = machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
+	state->m_t2_hack_mem = state->m_maincpu->space(AS_PROGRAM).install_write_handler(0x010aa0e0, 0x010aa0ff, hack_w);
 }
 
 DRIVER_INIT_MEMBER(midyunit_state,term2)    { term2_init_common(machine(), write16_delegate(FUNC(midyunit_state::term2_hack_w),this)); }

@@ -22,11 +22,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_zram0(*this, "zram0"),
 		m_zram1(*this, "zram1"),
-		m_alpha(*this, "alpha"){ }
+		m_alpha(*this, "alpha"),
+		m_gamma(*this, "gamma"){ }
 
 	required_shared_ptr<UINT8> m_zram0;
 	required_shared_ptr<UINT8> m_zram1;
 	required_device<cpu_device> m_alpha;
+	optional_device<cpu_device> m_gamma;
 	UINT8 m_alpha_data;
 	UINT8 m_alpha_rcvd;
 	UINT8 m_alpha_xmtd;

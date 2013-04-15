@@ -169,7 +169,7 @@ static void midxunit_dcs_output_full(running_machine &machine, int state)
 	midxunit_state *drvstate = machine.driver_data<midxunit_state>();
 	/* only signal if not in loopback state */
 	if (drvstate->m_uart[1] != 0x66)
-		machine.device("maincpu")->execute().set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
+		drvstate->m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

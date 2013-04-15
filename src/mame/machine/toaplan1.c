@@ -134,15 +134,15 @@ void toaplan1_state::demonwld_dsp(int enable)
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -305,9 +305,8 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n", space.device().safe_pcbase(), data);
 		machine().device("ymsnd")->reset();
-		device_t *audiocpu = m_audiocpu;
-		if (audiocpu != NULL && audiocpu->type() == Z80)
-			audiocpu->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		if (m_audiocpu != NULL && m_audiocpu->type() == Z80)
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

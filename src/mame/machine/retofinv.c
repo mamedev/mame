@@ -51,7 +51,7 @@ WRITE8_MEMBER(retofinv_state::retofinv_68705_portB_w)
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
 		m_portA_in = m_from_main;
-		if (m_main_sent) machine().device("68705")->execute().set_input_line(0, CLEAR_LINE);
+		if (m_main_sent) m_68705->set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 //logerror("read command %02x from main cpu\n",m_portA_in);
 	}
@@ -107,7 +107,7 @@ WRITE8_MEMBER(retofinv_state::retofinv_mcu_w)
 logerror("%04x: mcu_w %02x\n",space.device().safe_pc(),data);
 	m_from_main = data;
 	m_main_sent = 1;
-	machine().device("68705")->execute().set_input_line(0, ASSERT_LINE);
+	m_68705->set_input_line(0, ASSERT_LINE);
 }
 
 READ8_MEMBER(retofinv_state::retofinv_mcu_r)

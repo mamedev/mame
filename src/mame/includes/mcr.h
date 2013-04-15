@@ -22,6 +22,7 @@ public:
 	mcr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ipu(*this, "ipu"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
 		m_ssio(*this, "ssio"),
@@ -37,6 +38,7 @@ public:
 	// these should be required but can't because mcr68 shares with us
 	// once the sound boards are properly device-ified, fix this
 	optional_device<z80_device> m_maincpu;
+	optional_device<cpu_device> m_ipu;
 	optional_shared_ptr<UINT8> m_spriteram;
 	optional_shared_ptr<UINT8> m_videoram;
 

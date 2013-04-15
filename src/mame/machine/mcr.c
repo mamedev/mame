@@ -122,7 +122,7 @@ Z80PIO_INTERFACE( nflfoot_pio_intf )
 
 WRITE_LINE_MEMBER(mcr_state::ipu_ctc_interrupt)
 {
-	machine().device("ipu")->execute().set_input_line(0, state);
+	m_ipu->set_input_line(0, state);
 }
 
 
@@ -239,7 +239,7 @@ WRITE8_MEMBER(mcr_state::mcr_ipu_laserdisk_w)
 TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
 {
 	logerror("ipu_watchdog_reset\n");
-	machine().device("ipu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_ipu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	machine().device("ipu_ctc")->reset();
 	machine().device("ipu_pio0")->reset();
 	machine().device("ipu_pio1")->reset();
