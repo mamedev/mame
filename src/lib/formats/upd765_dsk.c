@@ -154,12 +154,12 @@ floppy_image_format_t::desc_e* upd765_format::get_desc_fm(const format &f, int &
 floppy_image_format_t::desc_e* upd765_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
 {
 	static floppy_image_format_t::desc_e desc[29] = {
-		/* 00 */ { MFM, 0x4e, f.gap_4a },
+		/* 00 */ { MFM, 0x4e, 0 },
 		/* 01 */ { MFM, 0x00, 12 },
 		/* 02 */ { RAW, 0x5224, 3 },
 		/* 03 */ { MFM, 0xfc, 1 },
-		/* 04 */ { MFM, 0x4e, f.gap_1 },
-		/* 05 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
+		/* 04 */ { MFM, 0x4e, 0 },
+		/* 05 */ { SECTOR_LOOP_START, 0, 0 },
 		/* 06 */ {   MFM, 0x00, 12 },
 		/* 07 */ {   CRC_CCITT_START, 1 },
 		/* 08 */ {     RAW, 0x4489, 3 },
@@ -170,7 +170,7 @@ floppy_image_format_t::desc_e* upd765_format::get_desc_mfm(const format &f, int 
 		/* 13 */ {     SIZE_ID },
 		/* 14 */ {   CRC_END, 1 },
 		/* 15 */ {   CRC, 1 },
-		/* 16 */ {   MFM, 0x4e, f.gap_2 },
+		/* 16 */ {   MFM, 0x4e, 0 },
 		/* 17 */ {   MFM, 0x00, 12 },
 		/* 18 */ {   CRC_CCITT_START, 2 },
 		/* 19 */ {     RAW, 0x4489, 3 },
@@ -178,12 +178,18 @@ floppy_image_format_t::desc_e* upd765_format::get_desc_mfm(const format &f, int 
 		/* 21 */ {     SECTOR_DATA, -1 },
 		/* 22 */ {   CRC_END, 2 },
 		/* 23 */ {   CRC, 2 },
-		/* 24 */ {   MFM, 0x4e, f.gap_3 },
+		/* 24 */ {   MFM, 0x4e, 0 },
 		/* 25 */ { SECTOR_LOOP_END },
 		/* 26 */ { MFM, 0x4e, 0 },
 		/* 27 */ { RAWBITS, 0x9254, 0 },
 		/* 28 */ { END }
 	};
+
+	desc[0].p2  = f.gap_4a;
+	desc[4].p2  = f.gap_1;
+	desc[5].p2  = f.sector_count-1;
+	desc[16].p2 = f.gap_2;
+	desc[24].p2 = f.gap_3;
 
 	current_size = (f.gap_4a+12+3+1+f.gap_1)*16;
 	if(f.sector_base_size)

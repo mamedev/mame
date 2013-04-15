@@ -62,6 +62,6 @@ file_error win_close_ptty(osd_file *file)
 	FlushFileBuffers(file->handle);
 	DisconnectNamedPipe(file->handle);
 	CloseHandle(file->handle);
-	osd_free(file);
+	free(file);
 	return FILERR_NONE;
 }
