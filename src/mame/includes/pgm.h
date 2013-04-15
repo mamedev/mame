@@ -306,7 +306,6 @@ public:
 	void kov2_latch_init();
 	DECLARE_WRITE32_MEMBER( martmast_arm_region_w );
 	DECLARE_WRITE32_MEMBER( kov2_arm_region_w );
-	DECLARE_WRITE32_MEMBER( ddp2_arm_region_w );
 	DECLARE_READ32_MEMBER( ddp2_speedup_r );
 	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
 };

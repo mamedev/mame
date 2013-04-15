@@ -9268,6 +9268,7 @@ puzlstar        // (c) 1999 Puzzle Star
 olds            // (c) 1999 Oriental Legend Super / Special
 olds100         //
 olds100a        //
+olds103t		//
 kov2            // (c) 2000 Knights of Valor 2
 kov2106         //
 kov2103         //
@@ -9277,8 +9278,23 @@ kov2100         //
 kov2p           // (c) 2000 Knights of Valor 2 Nine Dragons
 kov2p205        //
 ddp2            // (c) 2001 DoDonPachi 2 - Bee Storm
-ddp2100         //
 ddp2101         //
+ddp2100         //
+ddp2hk			//
+ddp2101hk		//
+ddp2100hk		//
+ddp2k			//
+ddp2101k		//
+ddp2100k		//
+ddp2j			//
+ddp2101j		//
+ddp2100j		//
+ddp2t			//
+ddp2101t		//
+ddp2100t		//
+ddp2c			//
+ddp2101c		//
+ddp2100c		//
 puzzli2         // (c) 1999 Puzzli 2
 puzzli2s        // (c) 2001 Puzzli 2 Super
 martmast        // (c) 2001 Martial Masters

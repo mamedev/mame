@@ -224,13 +224,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,martmast)
 }
 
 
-WRITE32_MEMBER(pgm_arm_type2_state::ddp2_arm_region_w )
-{
-	int pc = space.device().safe_pc();
-	int regionhack = ioport("RegionHack")->read();
-	if (pc==0x0174 && regionhack != 0xff) data = (data & 0x0000ffff) | (regionhack << 16);
-	COMBINE_DATA(&m_arm7_shareram[0x0]);
-}
+
 
 READ32_MEMBER(pgm_arm_type2_state::ddp2_speedup_r )
 {
@@ -271,9 +265,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,ddp2)
 	pgm_ddp2_decrypt(machine());
 	kov2_latch_init();
 
-	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine().device("prot")->memory().space(AS_PROGRAM).install_write_handler(0x48000000, 0x48000003, write32_delegate(FUNC(pgm_arm_type2_state::ddp2_arm_region_w),this));
-
 	machine().device("prot")->memory().space(AS_PROGRAM).install_read_handler(0x1800300c, 0x1800300f, read32_delegate(FUNC(pgm_arm_type2_state::ddp2_speedup_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80ee54, 0x80ee55, read16_delegate(FUNC(pgm_arm_type2_state::ddp2_main_speedup_r),this));
 }
@@ -293,19 +284,7 @@ DRIVER_INIT_MEMBER(pgm_arm_type2_state,dwpc)
 	pgm_mm_decrypt(machine()); // encryption is the same as martial masters
 }
 
-INPUT_PORTS_START( ddp2 )
-	PORT_INCLUDE ( pgm )
 
-	PORT_START("RegionHack")    /* Region - actually supplied by protection device */
-	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Cave license)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
-INPUT_PORTS_END
 
 INPUT_PORTS_START( kov2 )
 	PORT_INCLUDE ( pgm )
