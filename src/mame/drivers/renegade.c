@@ -310,7 +310,7 @@ DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 	m_mcu_encrypt_table = kuniokun_xor_table;
 	m_mcu_encrypt_table_len = 0x2a;
 
-	machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_DISABLE, 1);
+	m_mcu->suspend(SUSPEND_REASON_DISABLE, 1);
 }
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokunb)

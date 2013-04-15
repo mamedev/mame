@@ -56,20 +56,20 @@ WRITE16_MEMBER(lockon_state::adrst_w)
 	m_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	m_ground->execute().set_input_line(INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	m_object->execute().set_input_line(INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	m_ground->set_input_line(INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	m_object->set_input_line(INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ16_MEMBER(lockon_state::main_gnd_r)
 {
-	address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
+	address_space &gndspace = m_ground->space(AS_PROGRAM);
 	return gndspace.read_word(V30_GND_ADDR | offset * 2);
 }
 
 WRITE16_MEMBER(lockon_state::main_gnd_w)
 {
-	address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
+	address_space &gndspace = m_ground->space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
@@ -79,13 +79,13 @@ WRITE16_MEMBER(lockon_state::main_gnd_w)
 
 READ16_MEMBER(lockon_state::main_obj_r)
 {
-	address_space &objspace = m_object->memory().space(AS_PROGRAM);
+	address_space &objspace = m_object->space(AS_PROGRAM);
 	return objspace.read_word(V30_OBJ_ADDR | offset * 2);
 }
 
 WRITE16_MEMBER(lockon_state::main_obj_w)
 {
-	address_space &objspace =m_object->memory().space(AS_PROGRAM);
+	address_space &objspace =m_object->space(AS_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		objspace.write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
@@ -97,8 +97,8 @@ WRITE16_MEMBER(lockon_state::tst_w)
 {
 	if (offset < 0x800)
 	{
-		address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
-		address_space &objspace = m_object->memory().space(AS_PROGRAM);
+		address_space &gndspace = m_ground->space(AS_PROGRAM);
+		address_space &objspace = m_object->space(AS_PROGRAM);
 
 		if (ACCESSING_BITS_0_7)
 			gndspace.write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
@@ -451,8 +451,6 @@ static const ym2203_interface ym2203_config =
 
 void lockon_state::machine_start()
 {
-	m_ground = machine().device("ground");
-	m_object = machine().device("object");
 	m_f2203_1l = machine().device<filter_volume_device>("f2203.1l");
 	m_f2203_2l = machine().device<filter_volume_device>("f2203.2l");
 	m_f2203_3l = machine().device<filter_volume_device>("f2203.3l");

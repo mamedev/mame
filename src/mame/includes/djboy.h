@@ -13,7 +13,10 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_paletteram(*this, "paletteram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_cpu1(*this, "cpu1"),
+		m_cpu2(*this, "cpu2"),
+		m_beast(*this, "beast") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -41,10 +44,10 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	device_t *m_cpu1;
-	device_t *m_cpu2;
+	required_device<cpu_device> m_cpu1;
+	required_device<cpu_device> m_cpu2;
 	device_t *m_pandora;
-	device_t *m_beast;
+	required_device<cpu_device> m_beast;
 	DECLARE_WRITE8_MEMBER(beast_data_w);
 	DECLARE_READ8_MEMBER(beast_data_r);
 	DECLARE_READ8_MEMBER(beast_status_r);

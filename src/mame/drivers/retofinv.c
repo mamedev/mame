@@ -49,8 +49,8 @@ WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
 WRITE8_MEMBER(retofinv_state::mcu_reset_w)
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (machine().device("68705") != NULL)
-		machine().device("68705")->execute().set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	if (m_68705 != NULL)
+		m_68705->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)

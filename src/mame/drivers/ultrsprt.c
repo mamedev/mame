@@ -25,6 +25,7 @@ public:
 		m_vram(*this, "vram"),
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_k056800(*this, "k056800") { }
 
 	required_shared_ptr<UINT32> m_vram;
@@ -40,6 +41,7 @@ public:
 	UINT32 screen_update_ultrsprt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ultrsprt_vblank);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<k056800_device> m_k056800;
 };
 
@@ -212,10 +214,11 @@ INTERRUPT_GEN_MEMBER(ultrsprt_state::ultrsprt_vblank)
 
 static void sound_irq_callback(running_machine &machine, int irq)
 {
+	ultrsprt_state *state = machine.driver_data<ultrsprt_state>();
 	if (irq == 0)
 		/*generic_pulse_irq_line(machine.device("audiocpu"), INPUT_LINE_IRQ5, 1)*/;
 	else
-		machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_IRQ6, HOLD_LINE);
+		state->m_audiocpu->set_input_line(INPUT_LINE_IRQ6, HOLD_LINE);
 }
 
 static const k056800_interface ultrsprt_k056800_interface =

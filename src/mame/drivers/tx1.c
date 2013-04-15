@@ -88,13 +88,13 @@ INTERRUPT_GEN_MEMBER(tx1_state::z80_irq)
 
 READ16_MEMBER(tx1_state::z80_shared_r)
 {
-	address_space &cpu2space = machine().device("audio_cpu")->memory().space(AS_PROGRAM);
+	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
 	return cpu2space.read_byte(offset);
 }
 
 WRITE16_MEMBER(tx1_state::z80_shared_w)
 {
-	address_space &cpu2space = machine().device("audio_cpu")->memory().space(AS_PROGRAM);
+	address_space &cpu2space = m_audiocpu->space(AS_PROGRAM);
 	cpu2space.write_byte(offset, data & 0xff);
 }
 

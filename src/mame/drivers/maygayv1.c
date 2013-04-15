@@ -940,8 +940,9 @@ INPUT_PORTS_END
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(5, state, vector);
-//  device->machine().device("maincpu")->execute().set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
+	maygayv1_state *drvstate = device->machine().driver_data<maygayv1_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(5, state, vector);
+//  drvstate->m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 };
 
 

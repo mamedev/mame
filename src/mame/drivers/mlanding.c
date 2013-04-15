@@ -40,6 +40,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
+		m_dsp(*this, "dsp"),
 		m_msm(*this, "msm") { }
 
 	required_shared_ptr<UINT16> m_g_ram;
@@ -88,6 +89,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_dsp;
 	required_device<msm5205_device> m_msm;
 };
 
@@ -346,7 +348,7 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 
 	if(!(data & 0x80)) // unknown line used
 	{
-		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		m_dsp_HOLD_signal = data & 0x80;
 	}
 }
@@ -751,7 +753,7 @@ void mlanding_state::machine_reset()
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;
 	m_adpcm_idle = 1;

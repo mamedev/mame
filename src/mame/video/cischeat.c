@@ -370,8 +370,8 @@ WRITE16_MEMBER(cischeat_state::bigrun_vregs_w)
 		case 0x2208/2   : break;    // watchdog reset
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   m_cpu2->set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							m_cpu3->set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							m_soundcpu->set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
@@ -462,8 +462,8 @@ WRITE16_MEMBER(cischeat_state::cischeat_vregs_w)
 							break;
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   m_cpu2->set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							m_cpu3->set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							m_soundcpu->set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
@@ -593,8 +593,8 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x2208/2   : break;    // watchdog reset
 
 		/* Not sure about this one. Values: $10 then 0, $7 then 0 */
-		case 0x2308/2   :   machine().device("cpu2")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
-							machine().device("cpu3")->execute().set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :   m_cpu2->set_input_line(INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+							m_cpu3->set_input_line(INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
 							m_soundcpu->set_input_line(INPUT_LINE_RESET, (new_data & 4) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
@@ -616,9 +616,9 @@ WRITE16_MEMBER(cischeat_state::f1gpstr2_vregs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				if((old_data & 4) && ((new_data & 4) == 0))
-					machine().device("cpu5")->execute().set_input_line(4, HOLD_LINE);
+					m_cpu5->set_input_line(4, HOLD_LINE);
 				if((old_data & 2) && ((new_data & 2) == 0))
-					machine().device("cpu5")->execute().set_input_line(2, HOLD_LINE);
+					m_cpu5->set_input_line(2, HOLD_LINE);
 			}
 			break;
 

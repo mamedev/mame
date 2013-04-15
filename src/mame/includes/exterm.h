@@ -14,6 +14,7 @@ public:
 		m_slave_videoram(*this, "slave_videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audioslave(*this, "audioslave"),
 		m_slave(*this, "slave"),
 		m_dac(*this, "dac") { }
 
@@ -44,6 +45,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audioslave;
 	required_device<cpu_device> m_slave;
 	required_device<dac_device> m_dac;
 };

@@ -59,7 +59,9 @@ public:
 			m_adsp_control_regs(*this,"adsp_regs"),
 			m_adsp_fastram_base(*this,"adsp_fastram") ,
 		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_adsp(*this, "adsp"),
+		m_eeprom(*this, "eeprom"),
+		m_tms(*this, "tms") { }
 
 	required_shared_ptr<UINT32> m_adsp_ram_base;
 	required_shared_ptr<UINT16> m_m68k_ram_base;
@@ -124,5 +126,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
 	void gaelco3d_render(screen_device &screen);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_adsp;
 	required_device<eeprom_device> m_eeprom;
+	required_device<cpu_device> m_tms;
 };

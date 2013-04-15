@@ -23,6 +23,9 @@ public:
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_tgp_program(*this, "tgp_program"),
 		m_audiocpu(*this, "audiocpu"),
+		m_tgp(*this, "tgp"),
+		m_dsp(*this, "dsp"),
+		m_drivecpu(*this, "drivecpu"),
 		m_eeprom(*this, "eeprom") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -174,6 +177,9 @@ public:
 	void model2_exit();
 	DECLARE_WRITE_LINE_MEMBER(scsp_irq);
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_tgp;
+	optional_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_drivecpu;
 	required_device<eeprom_device> m_eeprom;
 };
 

@@ -343,7 +343,7 @@ ADDRESS_MAP_END
 CUSTOM_INPUT_MEMBER(mhavoc_state::clock_r)
 {
 	/* 2.4kHz (divide 2.5MHz by 1024) */
-	return (machine().device<cpu_device>("alpha")->total_cycles() & 0x400) ? 0 : 1;
+	return (m_alpha->total_cycles() & 0x400) ? 0 : 1;
 }
 
 

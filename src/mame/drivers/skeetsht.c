@@ -26,7 +26,8 @@ public:
 	skeetsht_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
-		m_tms_vram(*this, "tms_vram"){ }
+		m_tms_vram(*this, "tms_vram"),
+		m_68hc11(*this, "68hc11"){ }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_tms_vram;
@@ -45,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_w);
 	virtual void machine_reset();
 	virtual void video_start();
+	required_device<cpu_device> m_68hc11;
 };
 
 
@@ -117,7 +119,8 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 
 static void skeetsht_tms_irq(device_t *device, int state)
 {
-	device->machine().device("68hc11")->execute().set_input_line(MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	skeetsht_state *drvstate = device->machine().driver_data<skeetsht_state>();
+	drvstate->m_68hc11->set_input_line(MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

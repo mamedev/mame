@@ -213,7 +213,7 @@ READ8_MEMBER(chinagat_state::saiyugoub1_mcu_command_r )
 #if 0
 	if (m_mcu_command == 0x78)
 	{
-		space.machine().device<cpu_device>("mcu")->suspend(SUSPEND_REASON_HALT, 1); /* Suspend (speed up) */
+		m_mcu->suspend(SUSPEND_REASON_HALT, 1); /* Suspend (speed up) */
 	}
 #endif
 	return m_mcu_command;
@@ -225,7 +225,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_mcu_command_w )
 #if 0
 	if (data != 0x78)
 	{
-		space.machine().device<cpu_device>("mcu")->resume(SUSPEND_REASON_HALT); /* Wake up */
+		m_mcu->resume(SUSPEND_REASON_HALT); /* Wake up */
 	}
 #endif
 }

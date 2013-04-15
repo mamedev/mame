@@ -250,16 +250,16 @@ WRITE32_MEMBER(polygonet_state::dsp_w_lines)
 	if ((data >> 24) & 0x01)
 	{
 //      logerror("RESET CLEARED\n");
-		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_RESET, CLEAR_LINE);
+		m_dsp->set_input_line(DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 //      logerror("RESET ASSERTED\n");
-		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
+		m_dsp->set_input_line(DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
-		machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
+		m_dsp->set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+		m_dsp->set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the COMBNK line - it switches who has access to the shared RAM - the dsp or the 68020 */
@@ -604,9 +604,9 @@ void polygonet_state::machine_start()
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
 	         Not a big deal - it's hacked in dsp_w_lines. */
-	//machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
-	//machine().device("dsp")->execute().set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
+	//m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//m_dsp->set_input_line(DSP56K_IRQ_MODA, ASSERT_LINE);
+	//m_dsp->set_input_line(DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
 static const k053936_interface polygonet_k053936_intf =

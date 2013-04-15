@@ -144,7 +144,7 @@ void darius_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
 	   if cpu B is disabled !! */
-	m_cpub->execute().set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	m_cpub->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(darius_state::cpua_ctrl_w)
@@ -487,7 +487,7 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
 {
 	if (m_nmi_enable)
-		m_adpcm->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -821,8 +821,6 @@ void darius_state::machine_start()
 	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
 	membank("bank1")->set_entry(4);
 
-	m_cpub = machine().device("cpub");
-	m_adpcm = machine().device("adpcm");
 	m_pc080sn = machine().device("pc080sn");
 	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 

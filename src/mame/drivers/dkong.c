@@ -402,8 +402,6 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
 
 void dkong_state::dkong_init_device_driver_data(  )
 {
-	m_dev_n2a03a = machine().device("n2a03a");
-	m_dev_n2a03b = machine().device("n2a03b");
 	m_dev_6h = machine().device("ls259.6h");
 	m_dev_vp2 = machine().device("virtual_p2");
 }
@@ -697,13 +695,13 @@ WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 {
 	if (data & 1)
 	{
-		m_dev_n2a03a->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		m_dev_n2a03b->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_n2a03a->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dev_n2a03b->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		m_dev_n2a03a->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_dev_n2a03b->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_n2a03a->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_dev_n2a03b->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 

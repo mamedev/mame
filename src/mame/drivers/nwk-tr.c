@@ -234,6 +234,7 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "dsp"),
 		m_k001604(*this, "k001604")  { }
 
 	UINT8 m_led_reg0;
@@ -262,6 +263,7 @@ public:
 	void lanc2_init();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
 	required_device<k001604_device> m_k001604;
 };
 
@@ -278,7 +280,8 @@ WRITE32_MEMBER(nwktr_state::paletteram32_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, param);
+	nwktr_state *drvstate = device->machine().driver_data<nwktr_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
 
@@ -682,7 +685,7 @@ static void sound_irq_callback(running_machine &machine, int irq)
 	nwktr_state *state = machine.driver_data<nwktr_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
 	state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
 }
 
@@ -712,7 +715,7 @@ static const k001604_interface thrilld_k001604_intf =
 
 void nwktr_state::machine_reset()
 {
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const voodoo_config voodoo_intf =

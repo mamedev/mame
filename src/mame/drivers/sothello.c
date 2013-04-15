@@ -113,12 +113,12 @@ WRITE8_MEMBER(sothello_state::bank_w)
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
 {
-	machine().device<cpu_device>("sub")->suspend(SUSPEND_REASON_HALT, 1);
+	m_subcpu->suspend(SUSPEND_REASON_HALT, 1);
 }
 
 TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
 {
-	machine().device<cpu_device>("sub")->resume(SUSPEND_REASON_HALT);
+	m_subcpu->resume(SUSPEND_REASON_HALT);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -225,7 +225,7 @@ ADDRESS_MAP_END
 static void unlock_shared_ram(address_space &space)
 {
 	sothello_state *state = space.machine().driver_data<sothello_state>();
-	if(!space.machine().device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
+	if(!state->m_subcpu->suspended(SUSPEND_REASON_HALT))
 	{
 		state->m_subcpu_status|=1;
 	}

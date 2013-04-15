@@ -334,6 +334,9 @@ public:
 			m_sharc_dataram1(*this, "sharc_dataram1") ,
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gn680(*this, "gn680"),
+		m_dsp(*this, "dsp"),
+		m_dsp2(*this, "dsp2"),
 		m_eeprom(*this, "eeprom"),
 		m_k037122_1(*this, "k037122_1"),
 		m_k037122_2(*this, "k037122_2" ) { }
@@ -382,6 +385,9 @@ public:
 	void jamma_jvs_cmd_exec();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_gn680;
+	required_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_dsp2;
 	required_device<eeprom_device> m_eeprom;
 	optional_device<k037122_device> m_k037122_1;
 	optional_device<k037122_device> m_k037122_2;
@@ -429,7 +435,8 @@ WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, param);
+	hornet_state *drvstate = device->machine().driver_data<hornet_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
@@ -633,7 +640,7 @@ WRITE32_MEMBER(hornet_state::gun_w)
 	if (mem_mask == 0xffff0000)
 	{
 		m_gn680_latch = data>>16;
-		machine().device("gn680")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
+		m_gn680->set_input_line(M68K_IRQ_6, HOLD_LINE);
 	}
 }
 
@@ -684,7 +691,7 @@ WRITE16_MEMBER(hornet_state::gn680_sysctrl)
 
 READ16_MEMBER(hornet_state::gn680_latch_r)
 {
-	machine().device("gn680")->execute().set_input_line(M68K_IRQ_6, CLEAR_LINE);
+	m_gn680->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 
 	return m_gn680_latch;
 }
@@ -920,7 +927,7 @@ void hornet_state::machine_reset()
 		membank("bank1")->set_entry(0);
 	}
 
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		membank("bank5")->set_base(usr5);
@@ -952,7 +959,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	hornet_state *state = machine.driver_data<hornet_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
 	state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
 }
 
@@ -1055,8 +1062,8 @@ MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
 		membank("bank1")->set_entry(0);
 	}
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 	{

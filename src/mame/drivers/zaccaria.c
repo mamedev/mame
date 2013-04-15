@@ -178,7 +178,7 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_port1b_w)
 WRITE8_MEMBER(zaccaria_state::sound_command_w)
 {
 	soundlatch_byte_w(space, 0, data);
-	machine().device("audio2")->execute().set_input_line(0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	m_audio2->set_input_line(0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE8_MEMBER(zaccaria_state::sound1_command_w)

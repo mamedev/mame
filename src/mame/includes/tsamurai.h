@@ -8,7 +8,9 @@ public:
 		m_bg_videoram(*this, "bg_videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_audio2(*this, "audio2"),
+		m_audio3(*this, "audio3") { }
 
 	int m_nmi_enabled;
 	int m_sound_command1;
@@ -66,4 +68,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audio2;
+	optional_device<cpu_device> m_audio3;
 };

@@ -277,7 +277,7 @@ CUSTOM_INPUT_MEMBER(cidelsa_state::cdp1869_pcb_r)
 
 INPUT_CHANGED_MEMBER(cidelsa_state::ef_w)
 {
-	machine().device(CDP1802_TAG)->execute().set_input_line((int)(FPTR)param, newval);
+	m_maincpu->set_input_line((int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( destryer )

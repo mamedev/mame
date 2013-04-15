@@ -20,7 +20,9 @@ public:
 		m_fg_ram(*this, "fg_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_msm(*this, "msm"){ }
+		m_msm(*this, "msm"),
+		m_cpub(*this, "cpub"),
+		m_adpcm(*this, "adpcm") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -43,8 +45,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm;
-	device_t *m_cpub;
-	device_t *m_adpcm;
+	required_device<cpu_device> m_cpub;
+	required_device<cpu_device> m_adpcm;
 	tc0140syt_device *m_tc0140syt;
 	device_t *m_pc080sn;
 

@@ -85,13 +85,13 @@ WRITE8_MEMBER(tsamurai_state::sound_command1_w)
 WRITE8_MEMBER(tsamurai_state::sound_command2_w)
 {
 	m_sound_command2 = data;
-	machine().device("audio2")->execute().set_input_line(0, HOLD_LINE );
+	m_audio2->set_input_line(0, HOLD_LINE );
 }
 
 WRITE8_MEMBER(tsamurai_state::sound_command3_w)
 {
 	m_sound_command3 = data;
-	machine().device("audio3")->execute().set_input_line(0, HOLD_LINE );
+	m_audio3->set_input_line(0, HOLD_LINE );
 }
 
 WRITE8_MEMBER(tsamurai_state::flip_screen_w)

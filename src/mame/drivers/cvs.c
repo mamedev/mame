@@ -225,11 +225,11 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 }
 
 
-static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
+static void cvs_slave_cpu_interrupt( cpu_device *cpu, int state )
 {
-	cpu->execute().set_input_line_vector(0, 0x03);
-	//cpu->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	cpu->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	cpu->set_input_line_vector(0, 0x03);
+	//cpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

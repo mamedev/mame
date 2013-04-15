@@ -403,8 +403,9 @@ INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 
 static SOUND_RESET( f3 )
 {
+	taito_f3_state *state = machine.driver_data<taito_f3_state>();
 	SOUND_RESET_CALL( taito_en_soundsystem_reset );
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

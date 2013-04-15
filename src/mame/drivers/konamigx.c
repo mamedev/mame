@@ -831,11 +831,12 @@ READ32_MEMBER(konamigx_state::sound020_r)
 
 INLINE void write_snd_020(running_machine &machine, int reg, int val)
 {
+	konamigx_state *state = machine.driver_data<konamigx_state>();
 	sndto000[reg] = val;
 
 	if (reg == 7)
 	{
-		machine.device("soundcpu")->execute().set_input_line(1, HOLD_LINE);
+		state->m_soundcpu->set_input_line(1, HOLD_LINE);
 	}
 }
 
@@ -1256,28 +1257,28 @@ INTERRUPT_GEN_MEMBER(konamigx_state::tms_sync)
 
 READ16_MEMBER(konamigx_state::tms57002_data_word_r)
 {
-	return machine().device<tms57002_device>("dasp")->data_r(space, 0);
+	return m_dasp->data_r(space, 0);
 }
 
 WRITE16_MEMBER(konamigx_state::tms57002_data_word_w)
 {
 	if (ACCESSING_BITS_0_7)
-		machine().device<tms57002_device>("dasp")->data_w(space, 0, data);
+		m_dasp->data_w(space, 0, data);
 }
 
 READ16_MEMBER(konamigx_state::tms57002_status_word_r)
 {
-	return (machine().device<tms57002_device>("dasp")->dready_r(space, 0) ? 4 : 0) |
-		(machine().device<tms57002_device>("dasp")->empty_r(space, 0) ? 1 : 0);
+	return (m_dasp->dready_r(space, 0) ? 4 : 0) |
+		(m_dasp->empty_r(space, 0) ? 1 : 0);
 }
 
 WRITE16_MEMBER(konamigx_state::tms57002_control_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device<tms57002_device>("dasp")->pload_w(space, 0, data & 4);
-		machine().device<tms57002_device>("dasp")->cload_w(space, 0, data & 8);
-		machine().device("dasp")->execute().set_input_line(INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
+		m_dasp->pload_w(space, 0, data & 4);
+		m_dasp->cload_w(space, 0, data & 8);
+		m_dasp->set_input_line(INPUT_LINE_RESET, !(data & 16) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -3643,7 +3644,7 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 
 	// sound CPU initially disabled?
 	m_soundcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine().device("dasp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dasp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (!strcmp(machine().system().name, "tkmmpzdm"))
 	{

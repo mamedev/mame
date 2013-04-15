@@ -1,4 +1,5 @@
 #include "sound/k054539.h"
+#include "cpu/tms57002/tms57002.h"
 
 class konamigx_state : public driver_device
 {
@@ -16,7 +17,8 @@ public:
 		m_konamigx_type3_psac2_bank(*this,"psac2_bank"),
 		m_k054539_1(*this,"k054539_1"),
 		m_k054539_2(*this,"k054539_2"),
-		m_soundcpu(*this, "soundcpu")
+		m_soundcpu(*this, "soundcpu"),
+		m_dasp(*this, "dasp")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -94,6 +96,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_hbinterrupt);
 	optional_device<cpu_device> m_soundcpu;
+	optional_device<tms57002_device> m_dasp;
 };
 
 

@@ -224,7 +224,8 @@ WRITE16_MEMBER(tmaster_state::tmaster_oki_bank_w)
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(4, state, vector);
+	tmaster_state *drvstate = device->machine().driver_data<tmaster_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(4, state, vector);
 };
 
 static void duart_tx(device_t *device, int channel, UINT8 data)

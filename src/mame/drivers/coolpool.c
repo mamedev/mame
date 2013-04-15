@@ -134,8 +134,6 @@ static void coolpool_from_shiftreg(address_space &space, UINT32 address, UINT16 
 
 MACHINE_RESET_MEMBER(coolpool_state,amerdart)
 {
-	m_dsp = machine().device("dsp");
-
 	m_nvram_write_enable = 0;
 }
 
@@ -204,8 +202,8 @@ WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
 {
-	m_dsp->execute().set_input_line(0, ASSERT_LINE);
-	m_dsp->execute().set_input_line(0, CLEAR_LINE);
+	m_dsp->set_input_line(0, ASSERT_LINE);
+	m_dsp->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -218,7 +216,7 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 
 	/* bits 10-15 are counted down over time */
 
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
@@ -432,7 +430,7 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 	coin_counter_w(machine(), 0, ~data & 0x0001);
 	coin_counter_w(machine(), 1, ~data & 0x0002);
 
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -448,9 +446,9 @@ TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
 {
 	m_iop_cmd = param;
 	m_cmd_pending = 1;
-	machine().device("dsp")->execute().set_input_line(0, HOLD_LINE);    /* ???  I have no idea who should generate this! */
-															/* the DSP polls the status bit so it isn't strictly */
-															/* necessary to also have an IRQ */
+	m_dsp->set_input_line(0, HOLD_LINE);    /* ???  I have no idea who should generate this! */
+											/* the DSP polls the status bit so it isn't strictly */
+											/* necessary to also have an IRQ */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
 
@@ -1163,7 +1161,7 @@ DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 
 DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
-	machine().device("dsp")->memory().space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
+	m_dsp->space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
 	register_state_save(machine());
 }

@@ -2618,7 +2618,6 @@ void marty_state::driver_start()
 
 void towns_state::machine_reset()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	m_dma_1 = machine().device("dma_1");
 	m_dma_2 = machine().device("dma_2");

@@ -15,6 +15,8 @@ public:
 		m_videoram2(*this, "videoram2"),
 		m_colorram2(*this, "colorram2"),
 		m_spriteram(*this, "spriteram"),
+		m_video_cpu(*this, "video"),
+		m_sprite_cpu(*this, "sprite"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu") { }
 
@@ -35,8 +37,8 @@ public:
 	int        m_nmi_enable;
 
 	/* devices */
-	device_t *m_video_cpu;
-	device_t *m_sprite_cpu;
+	required_device<cpu_device> m_video_cpu;
+	required_device<cpu_device> m_sprite_cpu;
 	DECLARE_WRITE8_MEMBER(video_interrupt_w);
 	DECLARE_WRITE8_MEMBER(sprite_interrupt_w);
 	DECLARE_WRITE8_MEMBER(scroll_interrupt_w);

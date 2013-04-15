@@ -109,7 +109,7 @@ WRITE8_MEMBER(exzisus_state::exzisus_sharedram_ac_w)
 // is it ok that cpub_reset refers to cpuc?
 WRITE8_MEMBER(exzisus_state::exzisus_cpub_reset_w)
 {
-	machine().device("cpuc")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+	m_cpuc->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0

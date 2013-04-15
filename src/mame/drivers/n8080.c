@@ -451,11 +451,10 @@ WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
 
 WRITE8_MEMBER(n8080_state::n8080_status_callback)
 {
-	device_t *device = m_maincpu;
 	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
-		device->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 

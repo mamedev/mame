@@ -644,15 +644,15 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 		/* disable:
 		    the QSound CPU for glpracr as it doesn't have any roms &
 		    the link cpu for glprac2l as the h/w is not emulated yet. */
-		machine().device<cpu_device>( "audiocpu" )->suspend(SUSPEND_REASON_DISABLE, 1 );
+		m_audiocpu->suspend(SUSPEND_REASON_DISABLE, 1 );
 	}
 }
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
-	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-	membank( "bank3" )->set_base( memregion( "user3" )->base() ); /* country rom */
+	membank("bank1")->set_base(memregion("user2")->base()); /* fixed game rom */
+	membank("bank2")->set_base(memregion("user2")->base()+ 0x400000 ); /* banked game rom */
+	membank("bank3")->set_base(memregion("user3")->base()); /* country rom */
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )

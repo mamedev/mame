@@ -635,7 +635,7 @@ IRQ_CALLBACK_MEMBER(gammagic_state::irq_callback)
 static MACHINE_START(gammagic)
 {
 	gammagic_state *state = machine.driver_data<gammagic_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),state));
+	state->m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),state));
 
 	state->m_pit8254 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );
@@ -749,7 +749,8 @@ static const struct pit8253_config gammagic_pit8254_config =
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_A20, a20);
+	gammagic_state *drvstate = machine.driver_data<gammagic_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int state)

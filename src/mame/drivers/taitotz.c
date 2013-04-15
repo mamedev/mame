@@ -1931,7 +1931,7 @@ WRITE64_MEMBER(taitotz_state::ppc_common_w)
 		else
 		{
 			// normally just raise INT0 on TLCS and let it handle the command
-			machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, ASSERT_LINE);
+			m_iocpu->set_input_line(TLCS900_INT0, ASSERT_LINE);
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			// The PPC always goes to busy loop waiting for TLCS here, so we can free up the timeslice.
@@ -2019,21 +2019,21 @@ WRITE8_MEMBER(taitotz_state::tlcs_common_w)
 #endif
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		machine().device("iocpu")->execute().set_input_line(TLCS900_INT0, CLEAR_LINE);
+		m_iocpu->set_input_line(TLCS900_INT0, CLEAR_LINE);
 
-		machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, CLEAR_LINE);
+		m_iocpu->set_input_line(TLCS900_INT3, CLEAR_LINE);
 
 		// The PPC is now free to continue running
 		//machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
-		//machine().device("iocpu")->execute().yield();
+		//m_iocpu->yield();
 	}
 
 	if (offset == 0x1ffe)
 	{
 		if (m_io_share_ram[0xfff] == 0 && m_io_share_ram[0xffe] == 0x1012)
 		{
-			//machine().device("iocpu")->execute().spin_until_trigger(TLCS_PPC_COMM_TRIGGER);
-			machine().device("iocpu")->execute().yield();
+			//m_iocpu->spin_until_trigger(TLCS_PPC_COMM_TRIGGER);
+			m_iocpu->yield();
 			machine().scheduler().trigger(PPC_TLCS_COMM_TRIGGER);
 		}
 	}
@@ -2543,12 +2543,12 @@ void taitotz_state::machine_start()
 
 INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
 {
-	machine().device("iocpu")->execute().set_input_line(TLCS900_INT3, ASSERT_LINE);
+	m_iocpu->set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 {
-	machine().device("iocpu")->execute().set_input_line(TLCS900_INT2, state);
+	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
 static const powerpc_config ppc603e_config =

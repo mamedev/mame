@@ -1430,7 +1430,7 @@ WRITE32_MEMBER(firebeat_state::comm_uart_w )
 static void comm_uart_irq_callback(running_machine &machine, int channel, int value)
 {
 	// TODO
-	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1504,20 +1504,20 @@ static void midi_uart_irq_callback(running_machine &machine, int channel, int va
 		if ((state->m_extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
 			state->m_extend_board_irq_active |= 0x02;
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 	else
 	{
 		if ((state->m_extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
 			state->m_extend_board_irq_active |= 0x01;
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
+			state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
 

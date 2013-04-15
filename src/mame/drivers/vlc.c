@@ -336,7 +336,8 @@ static  NVRAM_HANDLER( nevada )
 
 static void duart18_irq_handler(device_t *device, int state, UINT8 vector )
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(4, state, vector);
+	nevada_state *drvstate = device->machine().driver_data<nevada_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(4, state, vector);
 };
 
 /***************************************************************************/
@@ -368,7 +369,8 @@ static UINT8 duart18_input( device_t *device )
 
 static void duart39_irq_handler( device_t *device, int state, UINT8 vector )
 {
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(3, state, vector);
+	nevada_state *drvstate = device->machine().driver_data<nevada_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(3, state, vector);
 };
 
 /***************************************************************************/
@@ -407,7 +409,8 @@ static UINT8 duart39_input( device_t *device )
 static void duart40_irq_handler( device_t *device, int state, UINT8 vector )
 {
 /* Todo  , just for sample */
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(5, state, vector);
+	nevada_state *drvstate = device->machine().driver_data<nevada_state>();
+	drvstate->m_maincpu->set_input_line_and_vector(5, state, vector);
 };
 
 /***************************************************************************/
@@ -448,7 +451,8 @@ static UINT8 duart40_input( device_t *device )
 /***************************************************************************/
 static WRITE_LINE_DEVICE_HANDLER(nevada_rtc_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc interrupt on INT1
+	nevada_state *drvstate = device->machine().driver_data<nevada_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc interrupt on INT1
 }
 
 /***************************************************************************/

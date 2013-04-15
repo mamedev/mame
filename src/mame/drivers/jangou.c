@@ -39,6 +39,9 @@ class jangou_state : public driver_device
 public:
 	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_cpu_0(*this, "cpu0"),
+		m_cpu_1(*this, "cpu1"),
+		m_nsc(*this, "nsc"),
 		m_msm(*this, "msm") { }
 
 	/* sound-related */
@@ -56,10 +59,10 @@ public:
 	UINT8        m_z80_latch;
 
 	/* devices */
-	device_t *m_cpu_0;
-	device_t *m_cpu_1;
+	required_device<cpu_device> m_cpu_0;
+	optional_device<cpu_device> m_cpu_1;
 	device_t *m_cvsd;
-	device_t *m_nsc;
+	optional_device<cpu_device> m_nsc;
 
 	/* video-related */
 	UINT8        m_pen_data[0x10];
@@ -316,12 +319,12 @@ READ8_MEMBER(jangou_state::input_system_r)
 WRITE8_MEMBER(jangou_state::sound_latch_w)
 {
 	soundlatch_byte_w(space, 0, data & 0xff);
-	m_cpu_1->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_cpu_1->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(jangou_state::sound_latch_r)
 {
-	m_cpu_1->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_cpu_1->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
 }
 
@@ -339,7 +342,7 @@ TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
 
 	/* Trigger an IRQ for every 8 shifted bits */
 	if ((++m_cvsd_shift_cnt & 7) == 0)
-		m_cpu_1->execute().set_input_line(0, HOLD_LINE);
+		m_cpu_1->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -356,7 +359,7 @@ WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
 	else
 	{
 		msm5205_data_w(m_msm, m_adpcm_byte & 0xf);
-		m_cpu_1->execute().set_input_line(0, HOLD_LINE);
+		m_cpu_1->set_input_line(0, HOLD_LINE);
 	}
 
 	m_msm5205_vclk_toggle ^= 1;
@@ -376,7 +379,7 @@ READ8_MEMBER(jangou_state::master_com_r)
 
 WRITE8_MEMBER(jangou_state::master_com_w)
 {
-	m_nsc->execute().set_input_line(0, HOLD_LINE);
+	m_nsc->set_input_line(0, HOLD_LINE);
 	m_nsc_latch = data;
 }
 
@@ -918,10 +921,7 @@ static SOUND_START( jangou )
 
 MACHINE_START_MEMBER(jangou_state,common)
 {
-	m_cpu_0 = machine().device("cpu0");
-	m_cpu_1 = machine().device("cpu1");
 	m_cvsd = machine().device("cvsd");
-	m_nsc = machine().device("nsc");
 
 	save_item(NAME(m_pen_data));
 	save_item(NAME(m_blit_data));
@@ -1356,7 +1356,7 @@ READ8_MEMBER(jangou_state::jngolady_rng_r)
 
 DRIVER_INIT_MEMBER(jangou_state,jngolady)
 {
-	machine().device("nsc")->memory().space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
+	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8_delegate(FUNC(jangou_state::jngolady_rng_r),this) );
 }
 
 DRIVER_INIT_MEMBER(jangou_state,luckygrl)

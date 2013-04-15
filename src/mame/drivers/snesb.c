@@ -650,7 +650,8 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET( ffight2b )
 {
-	address_space &cpu0space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	snesb_state *state = machine.driver_data<snesb_state>();
+	address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
 	MACHINE_RESET_CALL( snes );
 
 	/* Hack: avoid starting with 55 credits. It's either a work RAM init fault or MCU clears it by his own, hard to tell ... */

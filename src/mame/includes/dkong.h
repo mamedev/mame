@@ -83,6 +83,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this,"video_ram"),
 		m_sprite_ram(*this,"sprite_ram"),
+		m_dev_n2a03a(*this, "n2a03a"),
+		m_dev_n2a03b(*this, "n2a03b"),
 		m_vidhw(DKONG_BOARD),
 		m_discrete(*this, "discrete"),
 		m_maincpu(*this, "maincpu"),
@@ -94,8 +96,8 @@ public:
 	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* devices */
-	device_t *m_dev_n2a03a;
-	device_t *m_dev_n2a03b;
+	optional_device<cpu_device> m_dev_n2a03a;
+	optional_device<cpu_device> m_dev_n2a03b;
 	device_t *m_dev_vp2;        /* virtual port 2 */
 	device_t *m_dev_6h;
 

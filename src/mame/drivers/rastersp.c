@@ -160,8 +160,8 @@ void rastersp_state::machine_start()
 	membank("bank3")->set_base(&m_dram[0x300000/4]);
 
 #if USE_SPEEDUP_HACK
-	machine().device("dsp")->memory().space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32_delegate(FUNC(rastersp_state::dsp_speedup_r), this));
-	machine().device("dsp")->memory().space(AS_PROGRAM).install_write_handler(0x809923, 0x809923, write32_delegate(FUNC(rastersp_state::dsp_speedup_w), this));
+	m_dsp->space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32_delegate(FUNC(rastersp_state::dsp_speedup_r), this));
+	m_dsp->space(AS_PROGRAM).install_write_handler(0x809923, 0x809923, write32_delegate(FUNC(rastersp_state::dsp_speedup_w), this));
 #endif
 }
 
@@ -833,12 +833,14 @@ INPUT_PORTS_END
 
 static UINT32 ncr53c700_r(running_machine &machine, bool io, offs_t addr)
 {
-	return machine.device("maincpu")->memory().space(io ? AS_IO : AS_PROGRAM).read_dword(addr);
+	rastersp_state *state = machine.driver_data<rastersp_state>();
+	return state->m_maincpu->space(io ? AS_IO : AS_PROGRAM).read_dword(addr);
 }
 
 static void ncr53c700_w(running_machine &machine, bool io, offs_t addr, UINT32 data, UINT32 mem_mask)
 {
-	machine.device("maincpu")->memory().space(io ? AS_IO : AS_PROGRAM).write_dword(addr, data, mem_mask);
+	rastersp_state *state = machine.driver_data<rastersp_state>();
+	state->m_maincpu->space(io ? AS_IO : AS_PROGRAM).write_dword(addr, data, mem_mask);
 }
 
 static const struct NCR53C7XXinterface ncr53c700_intf =

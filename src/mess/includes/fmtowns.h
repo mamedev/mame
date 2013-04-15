@@ -78,13 +78,14 @@ class towns_state : public driver_device
 	public:
 	towns_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16")
 	{ }
 
 	/* devices */
-	cpu_device* m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	device_t* m_dma_1;
 	device_t* m_dma_2;
 	device_t* m_fdc;

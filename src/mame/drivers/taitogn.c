@@ -337,7 +337,8 @@ public:
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
-		m_maincpu(*this, "maincpu") {
+		m_maincpu(*this, "maincpu"),
+		m_mn10200(*this, "mn10200") {
 	}
 
 	required_device<znsec_device> m_znsec0;
@@ -399,6 +400,7 @@ public:
 	void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
 	void install_handlers(int mode);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mn10200;
 };
 
 
@@ -797,7 +799,7 @@ MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 	card->ide_set_gnet_readlock(1);
 
 	// halt sound CPU since it has no valid program at start
-	machine().device("mn10200")->execute().set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	m_mn10200->set_input_line(INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )

@@ -218,7 +218,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 	membank("bank1")->set_entry(0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
-	machine().device("tms")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_tms->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	for (i = 0; i < SOUND_CHANNELS; i++)
 	{
@@ -358,7 +358,7 @@ TIMER_CALLBACK_MEMBER(gaelco3d_state::delayed_sound_w)
 	if (LOG)
 		logerror("delayed_sound_w(%02X)\n", param);
 	m_sound_data = param;
-	machine().device("adsp")->execute().set_input_line(ADSP2115_IRQ2, ASSERT_LINE);
+	m_adsp->set_input_line(ADSP2115_IRQ2, ASSERT_LINE);
 }
 
 
@@ -375,7 +375,7 @@ READ16_MEMBER(gaelco3d_state::sound_data_r)
 {
 	if (LOG)
 		logerror("sound_data_r(%02X)\n", m_sound_data);
-	machine().device("adsp")->execute().set_input_line(ADSP2115_IRQ2, CLEAR_LINE);
+	m_adsp->set_input_line(ADSP2115_IRQ2, CLEAR_LINE);
 	return m_sound_data;
 }
 
@@ -496,7 +496,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_reset_w)
 	/* it does not ever appear to be touched after that */
 	if (LOG)
 		logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
-		machine().device("tms")->execute().set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		m_tms->set_input_line(INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -507,7 +507,7 @@ WRITE16_MEMBER(gaelco3d_state::tms_irq_w)
 	if (LOG)
 		logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", space.device().safe_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		machine().device("tms")->execute().set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_tms->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -617,10 +617,8 @@ WRITE16_MEMBER(gaelco3d_state::adsp_rombank_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 {
-	cpu_device *adsp = machine().device<cpu_device>("adsp");
-
 	/* get the index register */
-	int reg = adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
+	int reg = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", m_adsp_ireg, reg, m_adsp_incs, m_adsp_size);
@@ -637,11 +635,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
 		reg = m_adsp_ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		generic_pulse_irq_line(*adsp, ADSP2105_IRQ1, 1);
+		generic_pulse_irq_line(m_adsp, ADSP2105_IRQ1, 1);
 	}
 
 	/* store it */
-	adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
+	m_adsp->set_state_int(ADSP2100_I0 + m_adsp_ireg, reg);
 }
 
 

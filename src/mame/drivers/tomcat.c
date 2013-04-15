@@ -43,7 +43,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_tms(*this, "tms"),
 		m_shared_ram(*this, "shared_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dsp(*this, "dsp") { }
 
 	required_device<tms5220n_device> m_tms;
 	int m_control_num;
@@ -81,6 +82,7 @@ public:
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp;
 };
 
 
@@ -187,7 +189,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresl_w)
 {
 	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
@@ -195,7 +197,7 @@ WRITE16_MEMBER(tomcat_state::tomcat_mresh_w)
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
 	m_dsp_BIO = 0;
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(tomcat_state::tomcat_irqclr_w)

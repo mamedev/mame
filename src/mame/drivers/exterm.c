@@ -175,7 +175,7 @@ TIMER_CALLBACK_MEMBER(exterm_state::sound_delayed_w)
 	/* data is latched independently for both sound CPUs */
 	m_master_sound_latch = m_slave_sound_latch = param;
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine().device("audioslave")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	m_audioslave->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -231,7 +231,7 @@ READ8_MEMBER(exterm_state::sound_master_latch_r)
 READ8_MEMBER(exterm_state::sound_slave_latch_r)
 {
 	/* read latch and clear interrupt */
-	machine().device("audioslave")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_audioslave->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	return m_slave_sound_latch;
 }
 
@@ -247,7 +247,7 @@ WRITE8_MEMBER(exterm_state::sound_slave_dac_w)
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	machine().device("audioslave")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_audioslave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 

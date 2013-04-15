@@ -280,8 +280,8 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 
 TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 {
-	m_ground->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
-	m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -609,7 +609,7 @@ WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 
 READ16_MEMBER(lockon_state::lockon_obj_4000_r)
 {
-	m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	m_object->set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 

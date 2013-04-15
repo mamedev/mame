@@ -893,7 +893,8 @@ void calchase_state::machine_reset()
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_A20, a20);
+	calchase_state *drvstate = machine.driver_data<calchase_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int state)

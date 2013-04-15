@@ -27,7 +27,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_m68k_ram(*this, "m68k_ram"),
 		m_screen_ram(*this, "screen_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_dsp0(*this, "dsp0"),
+		m_dsp1(*this, "dsp1") { }
 
 	UINT8 m_r_color_table[256];
 	UINT8 m_g_color_table[256];
@@ -68,6 +70,8 @@ public:
 	void load_ldafile(address_space &space, const UINT8 *file);
 	void load_hexfile(address_space &space, const UINT8 *file);
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_dsp0;
+	optional_device<cpu_device> m_dsp1;
 };
 
 
@@ -572,8 +576,8 @@ READ16_MEMBER(atarisy4_state::dsp0_status_r)
 
 WRITE16_MEMBER(atarisy4_state::dsp0_control_w)
 {
-	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("dsp0")->execute().set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_dsp0->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	m_dsp0->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	m_csr[0] = data;
 }
@@ -606,8 +610,8 @@ READ16_MEMBER(atarisy4_state::dsp1_status_r)
 
 WRITE16_MEMBER(atarisy4_state::dsp1_control_w)
 {
-	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
-	machine().device("dsp1")->execute().set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
+	m_dsp1->set_input_line(INPUT_LINE_RESET, data & 0x01 ? CLEAR_LINE : ASSERT_LINE);
+	m_dsp1->set_input_line(0, data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 
 	m_csr[1] = data;
 }
@@ -983,7 +987,7 @@ DRIVER_INIT_MEMBER(atarisy4_state,laststar)
 	/* Set up the DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
 	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
-	load_ldafile(machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
 DRIVER_INIT_MEMBER(atarisy4_state,airrace)
@@ -998,23 +1002,23 @@ DRIVER_INIT_MEMBER(atarisy4_state,airrace)
 	/* Set up the first DSP */
 	membank("dsp0_bank0")->set_base(m_shared_ram[0]);
 	membank("dsp0_bank1")->set_base(&m_shared_ram[0][0x800]);
-	load_ldafile(machine().device("dsp0")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(m_dsp0->space(AS_PROGRAM), memregion("dsp")->base());
 
 	/* Set up the second DSP */
 	membank("dsp1_bank0")->set_base(m_shared_ram[1]);
 	membank("dsp1_bank1")->set_base(&m_shared_ram[1][0x800]);
-	load_ldafile(machine().device("dsp1")->memory().space(AS_PROGRAM), memregion("dsp")->base());
+	load_ldafile(m_dsp1->space(AS_PROGRAM), memregion("dsp")->base());
 }
 
 void atarisy4_state::machine_reset()
 {
-	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 MACHINE_RESET_MEMBER(atarisy4_state,airrace)
 {
-	machine().device("dsp0")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

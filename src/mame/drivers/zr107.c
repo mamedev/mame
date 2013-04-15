@@ -185,6 +185,7 @@ public:
 		m_workram(*this, "workram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "dsp"),
 		m_k001604(*this, "k001604"),
 		m_k056832(*this, "k056832") { }
 
@@ -216,6 +217,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
 	optional_device<k001604_device> m_k001604;
 	optional_device<k056832_device> m_k056832;
 };
@@ -696,7 +698,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	zr107_state *state = machine.driver_data<zr107_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
 	machine.scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(zr107_state::irq_off),state), line);
 }
 
@@ -734,7 +736,7 @@ INTERRUPT_GEN_MEMBER(zr107_state::zr107_vblank)
 
 void zr107_state::machine_reset()
 {
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( zr107, zr107_state )

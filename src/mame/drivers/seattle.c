@@ -661,7 +661,8 @@ static void ethernet_interrupt(device_t *device, int state)
 
 static void ioasic_irq(running_machine &machine, int state)
 {
-	machine.device("maincpu")->execute().set_input_line(IOASIC_IRQ_NUM, state);
+	seattle_state *drvstate = machine.driver_data<seattle_state>();
+	drvstate->m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
 
 

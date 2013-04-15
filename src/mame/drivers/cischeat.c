@@ -1530,13 +1530,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("cpu1")->execute().set_input_line(4, HOLD_LINE);
+		m_cpu1->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 154)
-		machine().device("cpu1")->execute().set_input_line(2, HOLD_LINE);
+		m_cpu1->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 69)
-		machine().device("cpu1")->execute().set_input_line(1, HOLD_LINE);
+		m_cpu1->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -2473,7 +2473,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state,wildplt)
 {
-	machine().device("cpu1")->memory().space(AS_PROGRAM).install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),this));
+	m_cpu1->space(AS_PROGRAM).install_read_handler(0x080000, 0x087fff, read16_delegate(FUNC(cischeat_state::wildplt_vregs_r),this));
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

@@ -1314,8 +1314,10 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
 void genesis_vdp_sndirqline_callback_segac2(running_machine &machine, bool state)
 {
+	segac2_state *drvstate = machine.driver_data<segac2_state>();
+	
 	if (state==true)
-		machine.device("maincpu")->execute().set_input_line(6, HOLD_LINE);
+		drvstate->m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
@@ -1327,10 +1329,11 @@ void genesis_vdp_lv6irqline_callback_segac2(running_machine &machine, bool state
 // the scanline interrupt seems connected as usual
 void genesis_vdp_lv4irqline_callback_segac2(running_machine &machine, bool state)
 {
+	segac2_state *drvstate = machine.driver_data<segac2_state>();
 	if (state==true)
-		machine.device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		drvstate->m_maincpu->set_input_line(4, HOLD_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(4, CLEAR_LINE);
+		drvstate->m_maincpu->set_input_line(4, CLEAR_LINE);
 }
 
 static const sega315_5124_interface sms_vdp_ntsc_intf =

@@ -137,7 +137,8 @@ static const ptm6840_interface ptm_intf =
 
 static void tms_interrupt(running_machine &machine, int state)
 {
-	machine.device("maincpu")->execute().set_input_line(INT_TMS34061, state);
+	guab_state *drvstate = machine.driver_data<guab_state>();
+	drvstate->m_maincpu->set_input_line(INT_TMS34061, state);
 }
 
 static const struct tms34061_interface tms34061intf =

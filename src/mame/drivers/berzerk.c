@@ -587,8 +587,8 @@ READ8_MEMBER(berzerk_state::berzerk_audio_r)
 
 static SOUND_RESET(berzerk)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_IO);
 	berzerk_state *state = machine.driver_data<berzerk_state>();
+	address_space &space = state->m_maincpu->space(AS_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
 	state->berzerk_audio_w(space, 4, 0x40);
 }

@@ -902,15 +902,13 @@ READ8_MEMBER(x68k_state::ppi_port_c_r)
 WRITE8_MEMBER(x68k_state::ppi_port_c_w)
 {
 	// ADPCM / Joystick control
-	okim6258_device *oki = machine().device<okim6258_device>("okim6258");
-
 	m_ppi_port[2] = data;
 	if((data & 0x0f) != (m_ppi_prev & 0x0f))
 	{
 		m_adpcm.pan = data & 0x03;
 		m_adpcm.rate = data & 0x0c;
 		x68k_set_adpcm();
-		oki->set_divider((data >> 2) & 3);
+		m_okim6258->set_divider((data >> 2) & 3);
 	}
 
 	// The joystick enable bits also handle the multiplexer for various controllers
@@ -1077,15 +1075,13 @@ READ16_MEMBER(x68k_state::x68k_fm_r)
 
 WRITE8_MEMBER(x68k_state::x68k_ct_w)
 {
-	okim6258_device *okim = space.machine().device<okim6258_device>("okim6258");
-
 	// CT1 and CT2 bits from YM2151 port 0x1b
 	// CT1 - ADPCM clock - 0 = 8MHz, 1 = 4MHz
 	// CT2 - 1 = Set ready state of FDC
 	m_fdc.fdc->ready_w(data & 0x01);
 	m_adpcm.clock = data & 0x02;
 	x68k_set_adpcm();
-	okim->set_clock(data & 0x02 ? 4000000 : 8000000);
+	m_okim6258->set_clock(data & 0x02 ? 4000000 : 8000000);
 }
 
 /*
@@ -1776,14 +1772,13 @@ READ8_MEMBER( x68k_state::mfp_gpio_r )
 
 WRITE8_MEMBER(x68k_state::x68030_adpcm_w)
 {
-	okim6258_device *device = machine().device<okim6258_device>("okim6258");
 	switch(offset)
 	{
 		case 0x00:
-			device->okim6258_ctrl_w(space,0,data);
+			m_okim6258->okim6258_ctrl_w(space,0,data);
 			break;
 		case 0x01:
-			device->okim6258_data_w(space,0,data);
+			m_okim6258->okim6258_data_w(space,0,data);
 			break;
 	}
 }

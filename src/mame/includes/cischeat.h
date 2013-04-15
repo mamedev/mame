@@ -12,6 +12,10 @@ public:
 		m_roadram(*this, "roadram"),
 		m_f1gpstr2_ioready(*this, "ioready"),
 		m_maincpu(*this, "maincpu"),
+		m_cpu1(*this, "cpu1"),
+		m_cpu2(*this, "cpu2"),
+		m_cpu3(*this, "cpu3"),
+		m_cpu5(*this, "cpu5"),
 		m_soundcpu(*this, "soundcpu"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"){ }
@@ -101,6 +105,10 @@ public:
 	void bigrun_draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
 	void cischeat_untangle_sprites(const char *region);
 	optional_device<cpu_device> m_maincpu; // some are called cpu1
+	optional_device<cpu_device> m_cpu1;
+	optional_device<cpu_device> m_cpu2;
+	optional_device<cpu_device> m_cpu3;
+	optional_device<cpu_device> m_cpu5;
 	optional_device<cpu_device> m_soundcpu;
 	required_device<okim6295_device> m_oki1;
 	required_device<okim6295_device> m_oki2;

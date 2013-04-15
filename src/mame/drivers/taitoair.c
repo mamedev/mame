@@ -237,7 +237,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 
 	m_dsp_hold_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	m_dsp->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
@@ -666,7 +666,6 @@ void taitoair_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	m_dsp = machine().device("dsp");
 	m_tc0080vco = machine().device("tc0080vco");
 
 	save_item(NAME(m_banknum));

@@ -91,7 +91,8 @@ public:
 		m_xevious_bg_colorram(*this, "bg_colorram"),
 		m_xevious_fg_videoram(*this, "fg_videoram"),
 		m_xevious_bg_videoram(*this, "bg_videoram"),
-		m_samples(*this, "samples") { }
+		m_samples(*this, "samples"),
+		m_subcpu3(*this, "sub3") { }
 
 	required_shared_ptr<UINT8> m_xevious_sr1;
 	required_shared_ptr<UINT8> m_xevious_sr2;
@@ -147,6 +148,8 @@ public:
 	char m_battles_customio_command_count;
 	char m_battles_customio_data;
 	char m_battles_sound_played;
+	
+	optional_device<cpu_device> m_subcpu3;
 };
 
 

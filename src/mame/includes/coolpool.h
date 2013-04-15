@@ -10,6 +10,7 @@ public:
 		m_vram_base(*this, "vram_base"),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
+		m_dsp(*this, "dsp"),
 		m_dac(*this, "dac"){ }
 
 	optional_device<tlc34076_device> m_tlc34076;
@@ -32,7 +33,7 @@ public:
 	UINT16 m_lastresult;
 
 	required_device<cpu_device> m_maincpu;
-	device_t *m_dsp;
+	required_device<cpu_device> m_dsp;
 	UINT16 m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
 	UINT8 m_nvram_write_enable;
 	UINT8 m_old_cmd;

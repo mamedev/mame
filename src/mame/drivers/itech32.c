@@ -447,8 +447,8 @@ MACHINE_RESET_MEMBER(itech32_state,drivedge)
 {
 	itech32_state::machine_reset();
 
-	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine(), 0);
 	STOP_TMS_SPINNING(machine(), 1);
 }
@@ -782,8 +782,8 @@ WRITE8_MEMBER(itech32_state::firq_clear_w)
 
 WRITE32_MEMBER(itech32_state::tms_reset_assert_w)
 {
-	machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -792,12 +792,12 @@ WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
 	/* kludge to prevent crash on first boot */
 	if ((m_tms1_ram[0] & 0xff000000) == 0)
 	{
-		machine().device("dsp1")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp1->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 0);
 	}
 	if ((m_tms2_ram[0] & 0xff000000) == 0)
 	{
-		machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp2->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine(), 1);
 	}
 }
@@ -4151,8 +4151,8 @@ DRIVER_INIT_MEMBER(itech32_state,drivedge)
 	m_planes = 1;
 	m_is_drivedge = 1;
 
-	machine().device("dsp1")->memory().space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),this));
-	machine().device("dsp2")->memory().space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),this));
+	m_dsp1->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),this));
+	m_dsp2->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),this));
 }
 
 

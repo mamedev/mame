@@ -437,7 +437,7 @@ READ32_MEMBER(metalmx_state::dsp32c_2_r)
 
 WRITE32_MEMBER(metalmx_state::host_gsp_w)
 {
-	address_space &gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
 
 	gsp_space.write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
 	gsp_space.write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
@@ -445,7 +445,7 @@ WRITE32_MEMBER(metalmx_state::host_gsp_w)
 
 READ32_MEMBER(metalmx_state::host_gsp_r)
 {
-	address_space &gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space &gsp_space = m_gsp->space(AS_PROGRAM);
 	UINT32 val;
 
 	val  = gsp_space.read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
@@ -482,7 +482,8 @@ WRITE32_MEMBER(metalmx_state::host_vram_w)
 
 static void tms_interrupt(device_t *device, int state)
 {
-	device->machine().device("maincpu")->execute().set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
+	metalmx_state *drvstate = device->machine().driver_data<metalmx_state>();
+	drvstate->m_maincpu->set_input_line(4, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

@@ -420,9 +420,9 @@ static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x02: // POS IRQ level/enable
 		if(state->m_pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			machine.device("maincpu")->execute().set_input_line(prev & 0xf, CLEAR_LINE);
+			state->m_maincpu->set_input_line(prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				machine.device("maincpu")->execute().set_input_line(data & 0xf, ASSERT_LINE);
+				state->m_maincpu->set_input_line(data & 0xf, ASSERT_LINE);
 			else
 				state->m_pos_irq_active = 0;
 		}
@@ -430,9 +430,9 @@ static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK IRQ level/enable
 		if(state->m_vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
-			machine.device("maincpu")->execute().set_input_line(prev & 0xf, CLEAR_LINE);
+			state->m_maincpu->set_input_line(prev & 0xf, CLEAR_LINE);
 			if(data & 0xf0)
-				machine.device("maincpu")->execute().set_input_line(data & 0xf, ASSERT_LINE);
+				state->m_maincpu->set_input_line(data & 0xf, ASSERT_LINE);
 			else
 				state->m_vblank_irq_active = 0;
 		}
@@ -440,14 +440,14 @@ static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x07: // POS ack
 		if(state->m_pos_irq_active) {
-			machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
+			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
 			state->m_pos_irq_active = 0;
 		}
 		break;
 
 	case 0x09: // VBLANK ack
 		if(state->m_vblank_irq_active) {
-			machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
+			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
 			state->m_vblank_irq_active = 0;
 		}
 		break;
@@ -457,11 +457,11 @@ static void namconb1_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x18: // C75 Control
 		if(data & 1) {
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		} else
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		break;
 	}
 }
@@ -487,9 +487,9 @@ static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 	switch(reg) {
 	case 0x00: // VBLANK IRQ level
 		if(state->m_vblank_irq_active && (prev != data)) {
-			machine.device("maincpu")->execute().set_input_line(prev, CLEAR_LINE);
+			state->m_maincpu->set_input_line(prev, CLEAR_LINE);
 			if(data)
-				machine.device("maincpu")->execute().set_input_line(data, ASSERT_LINE);
+				state->m_maincpu->set_input_line(data, ASSERT_LINE);
 			else
 				state->m_vblank_irq_active = 0;
 		}
@@ -497,9 +497,9 @@ static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x02: // POS IRQ level
 		if(state->m_pos_irq_active && (prev != data)) {
-			machine.device("maincpu")->execute().set_input_line(prev, CLEAR_LINE);
+			state->m_maincpu->set_input_line(prev, CLEAR_LINE);
 			if(data)
-				machine.device("maincpu")->execute().set_input_line(data, ASSERT_LINE);
+				state->m_maincpu->set_input_line(data, ASSERT_LINE);
 			else
 				state->m_pos_irq_active = 0;
 		}
@@ -507,14 +507,14 @@ static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x04: // VBLANK ack
 		if(state->m_vblank_irq_active) {
-			machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x00], CLEAR_LINE);
+			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x00], CLEAR_LINE);
 			state->m_vblank_irq_active = 0;
 		}
 		break;
 
 	case 0x06: // POS ack
 		if(state->m_pos_irq_active) {
-			machine.device("maincpu")->execute().set_input_line(state->m_namconb_cpureg[0x02], CLEAR_LINE);
+			state->m_maincpu->set_input_line(state->m_namconb_cpureg[0x02], CLEAR_LINE);
 			state->m_pos_irq_active = 0;
 		}
 		break;
@@ -524,11 +524,11 @@ static void namconb2_cpureg8_w(running_machine &machine, int reg, UINT8 data)
 
 	case 0x16: // C75 Control
 		if(data & 1) {
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		} else {
-			machine.device("mcu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+			state->m_mcu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		break;
 	}

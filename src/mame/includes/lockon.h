@@ -28,7 +28,9 @@ public:
 		m_ground_ram(*this, "ground_ram"),
 		m_object_ram(*this, "object_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_ground(*this, "ground"),
+		m_object(*this, "object") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_char_ram;
@@ -70,8 +72,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_ground;
-	device_t *m_object;
+	required_device<cpu_device> m_ground;
+	required_device<cpu_device> m_object;
 	filter_volume_device *m_f2203_1l;
 	filter_volume_device *m_f2203_2l;
 	filter_volume_device *m_f2203_3l;

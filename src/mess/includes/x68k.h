@@ -11,6 +11,8 @@
 
 #include "machine/rp5c15.h"
 #include "machine/upd765.h"
+#include "sound/okim6258.h"
+
 
 #define MC68901_TAG     "mc68901"
 #define RP5C15_TAG      "rp5c15"
@@ -52,7 +54,8 @@ public:
 			m_tvram16(*this, "tvram16"),
 			m_gvram32(*this, "gvram32"),
 			m_tvram32(*this, "tvram32"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_okim6258(*this, "okim6258") { }
 
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
@@ -379,6 +382,7 @@ private:
 	void x68k_draw_gfx(bitmap_ind16 &bitmap,rectangle cliprect);
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6258_device> m_okim6258;
 };
 
 

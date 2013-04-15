@@ -28,7 +28,9 @@ public:
 		m_tms1_ram(*this, "tms1_ram"),
 		m_tms2_ram(*this, "tms2_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu"),
+		m_dsp1(*this, "dsp1"),
+		m_dsp2(*this, "dsp2") { }
 
 	optional_shared_ptr<UINT16> m_main_ram;
 	optional_shared_ptr<UINT16> m_nvram;
@@ -187,4 +189,6 @@ public:
 	void init_gt_common();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_dsp1;
+	optional_device<cpu_device> m_dsp2;
 };

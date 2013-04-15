@@ -243,6 +243,8 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_dsp(*this, "dsp"),
+		m_dsp2(*this, "dsp2"),
 		m_eeprom(*this, "eeprom")  { }
 
 	required_shared_ptr<UINT32> m_work_ram;
@@ -272,6 +274,8 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_off);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_dsp;
+	optional_device<cpu_device> m_dsp2;
 	required_device<eeprom_device> m_eeprom;
 };
 
@@ -285,12 +289,14 @@ WRITE32_MEMBER(gticlub_state::paletteram32_w)
 
 static void voodoo_vblank_0(device_t *device, int param)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
+	gticlub_state *state = device->machine().driver_data<gticlub_state>();
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void voodoo_vblank_1(device_t *device, int param)
 {
-	device->machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
+	gticlub_state *state = device->machine().driver_data<gticlub_state>();
+	state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
@@ -722,7 +728,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	gticlub_state *state = machine.driver_data<gticlub_state>();
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
-	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
+	state->m_audiocpu->set_input_line(line, ASSERT_LINE);
 	machine.scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(gticlub_state::irq_off),state), line);
 }
 
@@ -809,7 +815,7 @@ static const k001604_interface hangplt_k001604_intf_r =
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 {
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( gticlub, gticlub_state )
@@ -890,8 +896,8 @@ static const k033906_interface hangplt_k033906_intf_1 =
 
 MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 {
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const voodoo_config voodoo_l_intf =

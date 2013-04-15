@@ -479,7 +479,8 @@ void maygay1b_state::machine_reset()
 // IRQ from Duart (hopper?)
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
+	maygay1b_state *drvstate = device->machine().driver_data<maygay1b_state>();
+	drvstate->m_maincpu->set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
 	LOG(("6809 irq%d \n",state));
 }
 

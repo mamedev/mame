@@ -11,6 +11,7 @@ public:
 		m_spriteram2(*this, "spriteram2"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audio2(*this, "audio2"),
 		m_dac2(*this, "dac2") { }
 
 	int m_dsw;
@@ -55,5 +56,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audio2;
 	required_device<dac_device> m_dac2;
 };

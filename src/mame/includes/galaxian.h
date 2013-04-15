@@ -41,6 +41,7 @@ public:
 			m_videoram(*this, "videoram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_audio2(*this, "audio2"),
 			m_dac(*this, "dac") { }
 
 	optional_device<i8255_device>  m_ppi8255_0;
@@ -290,5 +291,6 @@ public:
 		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audio2;
 	optional_device<dac_device> m_dac;
 };

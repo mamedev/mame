@@ -875,7 +875,7 @@ void namcos11_state::namcos11_init_common(int n_daughterboard)
 	if (C76_SPEEDUP)
 	{
 		save_item( NAME(m_su_83) );
-		machine().device("c76")->memory().space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),this), write16_delegate(FUNC(namcos11_state::c76_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),this), write16_delegate(FUNC(namcos11_state::c76_speedup_w),this));
 	}
 
 	if (!n_daughterboard)
@@ -961,8 +961,8 @@ DRIVER_INIT_MEMBER(namcos11_state,danceyes)
 
 DRIVER_INIT_MEMBER(namcos11_state,pocketrc)
 {
-	machine().device("c76")->memory().space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),this));
-	machine().device("c76")->memory().space(AS_IO).install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),this));
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),this));
 	namcos11_init_common(32);

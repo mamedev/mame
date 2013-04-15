@@ -8,7 +8,8 @@ public:
 		m_sharedram_ac(*this, "sharedram_ac"),
 		m_sharedram_ab(*this, "sharedram_ab"),
 		m_objectram0(*this, "objectram0"),
-		m_videoram0(*this, "videoram0"){ }
+		m_videoram0(*this, "videoram0"),
+		m_cpuc(*this, "cpuc"){ }
 
 	required_shared_ptr<UINT8> m_objectram1;
 	required_shared_ptr<UINT8> m_videoram1;
@@ -16,7 +17,8 @@ public:
 	required_shared_ptr<UINT8> m_sharedram_ab;
 	required_shared_ptr<UINT8> m_objectram0;
 	required_shared_ptr<UINT8> m_videoram0;
-
+	required_device<cpu_device> m_cpuc;
+	
 	int m_cpua_bank;
 	int m_cpub_bank;
 

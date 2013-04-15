@@ -477,11 +477,12 @@ WRITE32_MEMBER(midzeus_state::analog_w)
 
 static void update_gun_irq(running_machine &machine)
 {
+	midzeus_state *state = machine.driver_data<midzeus_state>();
 	/* low 2 bits of gun_control seem to enable IRQs */
 	if (gun_irq_state & gun_control & 0x03)
-		machine.device("maincpu")->execute().set_input_line(3, ASSERT_LINE);
+		state->m_maincpu->set_input_line(3, ASSERT_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(3, CLEAR_LINE);
+		state->m_maincpu->set_input_line(3, CLEAR_LINE);
 }
 
 

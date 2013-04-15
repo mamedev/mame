@@ -63,14 +63,14 @@ WRITE8_MEMBER(shangkid_state::shangkid_maincpu_bank_w)
 
 WRITE8_MEMBER(shangkid_state::shangkid_bbx_enable_w)
 {
-	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, data?0:1 );
+	m_bbx->set_input_line(INPUT_LINE_HALT, data?0:1 );
 }
 
 WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
 {
 	if( data == 0 )
 	{
-		machine().device("bbx")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_bbx->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
@@ -137,12 +137,12 @@ DRIVER_INIT_MEMBER(shangkid_state,shangkid)
 
 MACHINE_RESET_MEMBER(shangkid_state,chinhero)
 {
-	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
+	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
 }
 
 MACHINE_RESET_MEMBER(shangkid_state,shangkid)
 {
-	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
+	m_bbx->set_input_line(INPUT_LINE_HALT, 1 );
 
 	membank("bank1")->set_entry(0);
 	membank("bank2")->set_entry(0);

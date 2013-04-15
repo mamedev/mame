@@ -104,10 +104,10 @@ MACHINE_RESET_MEMBER(atarigt_state,atarigt)
 static void cage_irq_callback(running_machine &machine, int reason)
 {
 	atarigen_state *atarigen = machine.driver_data<atarigen_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = atarigen->m_maincpu->space(AS_PROGRAM);
 
 	if (reason)
-		atarigen->sound_int_gen(*machine.device("maincpu"));
+		atarigen->sound_int_gen(atarigen->m_maincpu);
 	else
 		atarigen->sound_int_ack_w(space,0,0);
 }

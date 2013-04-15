@@ -344,7 +344,7 @@ MACHINE_RESET_MEMBER(model2_state,model2o)
 	MACHINE_RESET_CALL_MEMBER(model2_common);
 
 	// hold TGP in halt until we have code
-	machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_dsp_type = DSP_TYPE_TGP;
 }
@@ -366,7 +366,7 @@ MACHINE_RESET_MEMBER(model2_state,model2)
 	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
 	// hold TGP in halt until we have code
-	machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_tgp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_dsp_type = DSP_TYPE_TGP;
 }
@@ -376,12 +376,12 @@ MACHINE_RESET_MEMBER(model2_state,model2b)
 	MACHINE_RESET_CALL_MEMBER(model2_common);
 	MACHINE_RESET_CALL_MEMBER(model2_scsp);
 
-	machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
+	m_dsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	machine().device("dsp")->execute().set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+	m_dsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
 
 	m_dsp_type = DSP_TYPE_SHARC;
 }
@@ -569,7 +569,7 @@ WRITE32_MEMBER(model2_state::srallyc_devices_w)
 	if(mem_mask == 0x000000ff || mem_mask == 0x0000ffff)
 	{
 		m_driveio_comm_data = data & 0xff;
-		machine().device("drivecpu")->execute().set_input_line(0, HOLD_LINE);
+		m_drivecpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -610,9 +610,9 @@ WRITE32_MEMBER(model2_state::copro_ctl1_w)
 			if (m_dsp_type != DSP_TYPE_TGPX4)
 			{
 				if (m_dsp_type == DSP_TYPE_SHARC)
-					machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 				else
-					machine().device("tgp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+					m_tgp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -736,7 +736,7 @@ WRITE32_MEMBER(model2_state::geo_sharc_ctl1_w)
 		else
 		{
 			logerror("Boot geo, %d dwords\n", m_geocnt);
-			machine().device("dsp2")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+			m_dsp2->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			//space.device().execute().spin_until_time(attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
 		}
 	}

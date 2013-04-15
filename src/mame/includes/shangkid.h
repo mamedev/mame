@@ -7,7 +7,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_videoreg(*this, "videoreg"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_bbx(*this, "bbx") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
@@ -40,4 +41,5 @@ public:
 	void dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_bbx;
 };

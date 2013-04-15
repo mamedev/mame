@@ -80,7 +80,8 @@ public:
 		m_colorram(*this, "colorram"),
 		m_mastercpu(*this, "master"),
 		m_slavecpu(*this, "slave"),
-		m_soundcpu(*this, "soundcpu"){ }
+		m_mermaid(*this, "mermaid"),
+		m_soundcpu(*this, "soundcpu") { }
 
 	/* Video */
 	required_shared_ptr<UINT8> m_videoram;
@@ -101,7 +102,7 @@ public:
 	/* Devices */
 	required_device<cpu_device> m_mastercpu;
 	required_device<cpu_device> m_slavecpu;
-	device_t    *m_mermaid;
+	required_device<cpu_device> m_mermaid;
 	device_t    *m_pandora;
 	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
 	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
@@ -131,7 +132,7 @@ public:
 	UINT32 screen_update_hvyunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_hvyunit(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_scanline);
-	required_device<cpu_device> m_soundcpu;
+	required_device<cpu_device> m_soundcpu;	
 };
 
 
@@ -143,7 +144,6 @@ public:
 
 void hvyunit_state::machine_start()
 {
-	m_mermaid = machine().device("mermaid");
 	m_pandora = machine().device("pandora");
 
 	// TODO: Save state
@@ -225,7 +225,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
 	m_data_to_mermaid = data;
 	m_z80_to_mermaid_full = 1;
 	m_mermaid_int0_l = 0;
-	m_mermaid->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_mermaid->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_data_r)
@@ -346,7 +346,7 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 	if (data == 0xff)
 	{
 		m_mermaid_int0_l = 1;
-		m_mermaid->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_mermaid->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	m_mermaid_p[1] = data;

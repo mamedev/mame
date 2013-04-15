@@ -229,8 +229,8 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 		printf("enabling SMS Z80\n");
 		m_current_game_is_sms = 1;
 		megatech_set_genz80_as_sms_standard_map(machine(), "genesis_snd_z80", MAPPER_STANDARD);
-		//machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine().device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
@@ -238,7 +238,7 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_run_state )
 		m_current_game_is_sms = 0;
 		megatech_set_megadrive_z80_as_megadrive_z80("genesis_snd_z80");
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -253,9 +253,9 @@ TIMER_CALLBACK_MEMBER(mtech_state::megatech_z80_stop_state )
 	game_region = memregion(tempname)->base();
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	//machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	//machine.device("genesis_snd_z80")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_z80snd->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	//m_z80snd->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	machine().device("ymsnd")->reset();
 
 	megadriv_stop_scanline_timer();// stop the scanline timer for the genesis vdp... it can be restarted in video eof when needed

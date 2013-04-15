@@ -791,7 +791,7 @@ WRITE8_MEMBER(galaxian_state::sfx_sample_control_w)
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		machine().device("audio2")->execute().set_input_line(0, HOLD_LINE);
+		m_audio2->set_input_line(0, HOLD_LINE);
 }
 
 

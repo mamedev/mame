@@ -181,7 +181,8 @@ public:
 			m_vfd0(*this, "vfd0"),
 			m_vfd1(*this, "vfd1"),
 			m_maincpu(*this, "maincpu"),
-			m_upd7759(*this, "upd") { }
+			m_upd7759(*this, "upd"),
+			m_adder2(*this, "adder2") { }
 
 	optional_device<bfm_bd1_t> m_vfd0;
 	optional_device<bfm_bd1_t> m_vfd1;
@@ -318,6 +319,7 @@ public:
 	void sc2awpdmd_common_init(int reels, int decrypt);
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7759_device> m_upd7759;
+	optional_device<cpu_device> m_adder2;
 };
 
 
@@ -1028,7 +1030,7 @@ WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
 WRITE8_MEMBER(bfm_sc2_state::vid_uart_tx_w)
 {
 	adder2_send(data);
-	machine().device("adder2")->execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE );
+	m_adder2->set_input_line(M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
