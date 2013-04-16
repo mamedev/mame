@@ -501,9 +501,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 {
-	m_left_screen = machine().device("lscreen");
-	m_right_screen = machine().device("rscreen");
-
 	save_item(NAME(m_portselect));
 	save_item(NAME(m_sndcpu_nmi_flag));
 	save_item(NAME(m_datalatch1));
