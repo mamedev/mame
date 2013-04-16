@@ -32,22 +32,32 @@ class mlanding_state : public driver_device
 public:
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_g_ram(*this, "g_ram"),
-		m_ml_tileram(*this, "ml_tileram"),
-		m_dma_ram(*this, "dma_ram"),
-		m_ml_dotram(*this, "ml_dotram"),
-		m_mecha_ram(*this, "mecha_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_dsp(*this, "dsp"),
-		m_msm(*this, "msm") { }
+		m_msm(*this, "msm"),
+		m_tc0140syt(*this, "tc0140syt"),
+		m_g_ram(*this, "g_ram"),
+		m_ml_tileram(*this, "ml_tileram"),
+		m_dma_ram(*this, "dma_ram"),
+		m_ml_dotram(*this, "ml_dotram"),
+		m_mecha_ram(*this, "mecha_ram")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_subcpu;
+	required_device<cpu_device> m_dsp;
+	required_device<msm5205_device> m_msm;
+	required_device<tc0140syt_device> m_tc0140syt;
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
 	required_shared_ptr<UINT16> m_dma_ram;
 	required_shared_ptr<UINT16> m_ml_dotram;
 	required_shared_ptr<UINT8> m_mecha_ram;
+
 	UINT32 m_adpcm_pos;
 	UINT32 m_adpcm_end;
 	int m_adpcm_data;
@@ -86,11 +96,6 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	int start_dma();
 	DECLARE_WRITE_LINE_MEMBER(ml_msm5205_vck);
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_subcpu;
-	required_device<cpu_device> m_dsp;
-	required_device<msm5205_device> m_msm;
 };
 
 
@@ -355,25 +360,23 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 
 WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 {
-	tc0140syt_device *tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 	if (offset == 0)
-		tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
+		m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
+		m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
 	}
 }
 
 WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 {
-	tc0140syt_device *tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 	if (offset == 0)
-		tc0140syt->tc0140syt_slave_port_w(space, 0, data & 0xff);
+		m_tc0140syt->tc0140syt_slave_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		tc0140syt->tc0140syt_slave_comm_w(space, 0, data & 0xff);
+		m_tc0140syt->tc0140syt_slave_comm_w(space, 0, data & 0xff);
 	}
 }
 
@@ -778,7 +781,7 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,12000000)          /* 12 MHz ??? */
+	MCFG_CPU_ADD("dsp", TMS32025,24000000)          /* 24 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
@@ -794,8 +797,6 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mlanding_state, screen_update_mlanding)
 
 	MCFG_PALETTE_LENGTH(512*16)
-
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
