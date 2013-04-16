@@ -16,7 +16,7 @@
      TMS5220C multi-rate feature added by Lord Nightmare
      Massive rewrite and reorganization by Lord Nightmare
      Additional IP, PC, subcycle timing rewrite by Lord Nightmare
-     Updated based on the chip decaps by digshadow
+     Updated based on the chip decaps done by digshadow
 
      Much information regarding the lpc encoding used here comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
@@ -468,19 +468,16 @@ static void tms5220_set_variant(tms5220_state *tms, int variant)
 {
 	switch (variant)
 	{
-		case TMS5220_IS_5220C:
-			tms->coeff = &tms5220c_coeff;
-			break;
 		case TMS5220_IS_5200:
 			tms->coeff = &tms5200_coeff;
 			break;
+		case TMS5220_IS_5220C:
 		case TMS5220_IS_5220:
 			tms->coeff = &tms5220_coeff;
 			break;
 		default:
 			fatalerror("Unknown variant in tms5220_set_variant\n");
 	}
-
 	tms->variant = variant;
 }
 
@@ -1294,7 +1291,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			break;
 
 		case 0x00: case 0x20: /* set rate (tms5220c only), otherwise NOP */
-			if (tms->variant == SUBTYPE_TMS5220C)
+			if (tms->variant == TMS5220_IS_5220C)
 			{
 				tms->tms5220c_rate = cmd&0x0F;
 			}
@@ -1385,7 +1382,7 @@ static void parse_frame(tms5220_state *tms)
 
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
 	has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
-	if ((tms->variant == SUBTYPE_TMS5220C) && (tms->tms5220c_rate & 0x04))
+	if ((tms->variant == TMS5220_IS_5220C) && (tms->tms5220c_rate & 0x04))
 	{
 		indx = extract_bits(tms, 2);
 #ifdef DEBUG_PARSE_FRAME_DUMP
@@ -1685,7 +1682,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 		tms->rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (tms->variant == SUBTYPE_TMS5220C)
+			if (tms->variant == TMS5220_IS_5220C)
 				device->reset();
 #ifdef DEBUG_RS_WS
 			else
@@ -1738,7 +1735,7 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		tms->rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (tms->variant == SUBTYPE_TMS5220C)
+			if (tms->variant == TMS5220_IS_5220C)
 				device->reset();
 #ifdef DEBUG_RS_WS
 			else
@@ -2095,7 +2092,7 @@ tms5220n_device::tms5220n_device(const machine_config &mconfig, const char *tag,
 }
 
 tms5220cn_device::tms5220cn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms52xx_device(mconfig, TMS5220CN, "TMS5220CN", tag, &tms5220c_coeff, TMS5220_IS_5220C, owner, clock)
+	: tms52xx_device(mconfig, TMS5220CN, "TMS5220CN", tag, &tms5220_coeff, TMS5220_IS_5220C, owner, clock)
 {
 }
 
@@ -2726,7 +2723,7 @@ void tms52xx_device::process_command(unsigned char cmd)
 
 	case 0x00:
 	case 0x20: // set rate (tms5220c only), otherwise NOP
-		if (m_variant == SUBTYPE_TMS5220C)
+		if (m_variant == TMS5220_IS_5220C)
 		{
 			m_tms5220c_rate = cmd & 0x0F;
 		}
@@ -2821,7 +2818,7 @@ void tms52xx_device::parse_frame()
 
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
 	 * has a 2 bit rate preceding it, grab two bits here and store them as the rate; */
-	if ((m_variant == SUBTYPE_TMS5220C) && (m_tms5220c_rate & 0x04))
+	if ((m_variant == TMS5220_IS_5220C) && (m_tms5220c_rate & 0x04))
 	{
 		indx = extract_bits(2);
 #ifdef DEBUG_PARSE_FRAME_DUMP
@@ -3157,7 +3154,7 @@ WRITE_LINE_MEMBER( tms52xx_device::rsq_w )
 		m_rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (m_variant == SUBTYPE_TMS5220C)
+			if (m_variant == TMS5220_IS_5220C)
 				reset();
 #ifdef DEBUG_RS_WS
 			else
@@ -3213,7 +3210,7 @@ WRITE_LINE_MEMBER( tms52xx_device::wsq_w )
 		m_rs_ws = new_val;
 		if (new_val == 0)
 		{
-			if (m_variant == SUBTYPE_TMS5220C)
+			if (m_variant == TMS5220_IS_5220C)
 				reset();
 #ifdef DEBUG_RS_WS
 			else
