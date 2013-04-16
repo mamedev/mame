@@ -4,7 +4,7 @@
 
 *************************************************************************/
 
-#include <audio/taitosnd.h>
+#include "audio/taitosnd.h"
 
 class wgp_state : public driver_device
 {
@@ -18,7 +18,9 @@ public:
 		m_sharedram(*this, "sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_tc0100scn(*this, "tc0100scn"),
+		m_tc0140syt(*this, "tc0140syt") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spritemap;
@@ -48,8 +50,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	device_t *m_tc0100scn;
-	tc0140syt_device *m_tc0140syt;
+	required_device<tc0100scn_device> m_tc0100scn;
+	required_device<tc0140syt_device> m_tc0140syt;
 	DECLARE_READ16_MEMBER(sharedram_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);

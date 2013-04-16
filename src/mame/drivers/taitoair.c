@@ -666,8 +666,6 @@ void taitoair_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	m_tc0080vco = machine().device("tc0080vco");
-
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_q.col));
 	save_item(NAME(m_q.pcount));

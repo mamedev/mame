@@ -822,9 +822,6 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 
 void asuka_state::machine_start()
 {
-	m_pc090oj = machine().device("pc090oj");
-	m_tc0100scn = machine().device("tc0100scn");
-
 	/* configure the banks */
 	membank("bank1")->configure_entry(0, memregion("audiocpu")->base());
 	membank("bank1")->configure_entries(1, 3, memregion("audiocpu")->base() + 0x10000, 0x04000);

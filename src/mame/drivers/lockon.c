@@ -451,13 +451,6 @@ static const ym2203_interface ym2203_config =
 
 void lockon_state::machine_start()
 {
-	m_f2203_1l = machine().device<filter_volume_device>("f2203.1l");
-	m_f2203_2l = machine().device<filter_volume_device>("f2203.2l");
-	m_f2203_3l = machine().device<filter_volume_device>("f2203.3l");
-	m_f2203_1r = machine().device<filter_volume_device>("f2203.1r");
-	m_f2203_2r = machine().device<filter_volume_device>("f2203.2r");
-	m_f2203_3r = machine().device<filter_volume_device>("f2203.3r");
-
 	save_item(NAME(m_ground_ctrl));
 	save_item(NAME(m_scroll_h));
 	save_item(NAME(m_scroll_v));

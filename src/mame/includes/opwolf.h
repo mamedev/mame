@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/msm5205.h"
+#include "video/taitoic.h"
 
 class opwolf_state : public driver_device
 {
@@ -13,6 +14,8 @@ public:
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_pc080sn(*this, "pc080sn"),
+		m_pc090oj(*this, "pc090oj"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2") { }
 
@@ -51,8 +54,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_pc080sn;
-	device_t *m_pc090oj;
+	required_device<pc080sn_device> m_pc080sn;
+	required_device<pc090oj_device> m_pc090oj;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
 	DECLARE_READ16_MEMBER(cchip_r);

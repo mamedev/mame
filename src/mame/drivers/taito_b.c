@@ -2003,9 +2003,6 @@ void taitob_state::machine_start()
 {
 	m_mb87078 = machine().device("mb87078");
 	m_ym = machine().device("ymsnd");
-	m_tc0180vcu = machine().device("tc0180vcu");
-	m_tc0640fio = machine().device("tc0640fio");
-	m_tc0220ioc = machine().device("tc0220ioc");
 
 	save_item(NAME(m_eep_latch));
 	save_item(NAME(m_coin_word));

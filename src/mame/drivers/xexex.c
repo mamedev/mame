@@ -449,11 +449,6 @@ void xexex_state::machine_start()
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	membank("bank2")->set_entry(0);
 
-	m_filter1l = machine().device<filter_volume_device>("filter1l");
-	m_filter1r = machine().device<filter_volume_device>("filter1r");
-	m_filter2l = machine().device<filter_volume_device>("filter2l");
-	m_filter2r = machine().device<filter_volume_device>("filter2r");
-
 	save_item(NAME(m_cur_alpha));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

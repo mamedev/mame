@@ -936,9 +936,6 @@ void wgp_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-	m_tc0100scn = machine().device("tc0100scn");
-
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_port_sel));

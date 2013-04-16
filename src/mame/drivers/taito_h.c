@@ -525,9 +525,6 @@ void taitoh_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	m_tc0220ioc = machine().device("tc0220ioc");
-	m_tc0080vco = machine().device("tc0080vco");
-
 	save_item(NAME(m_banknum));
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitoh_state::reset_sound_region), this));
 }

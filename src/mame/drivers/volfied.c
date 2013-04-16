@@ -233,8 +233,6 @@ static const ym2203_interface ym2203_config =
 void volfied_state::machine_start()
 {
 	volfied_cchip_init();
-
-	m_pc090oj = machine().device("pc090oj");
 }
 
 void volfied_state::machine_reset()

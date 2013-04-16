@@ -516,11 +516,6 @@ void slapshot_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-	m_tc0480scp = machine().device("tc0480scp");
-	m_tc0360pri = machine().device("tc0360pri");
-	m_tc0640fio = machine().device("tc0640fio");
-
 	m_banknum = 0;
 	save_item(NAME(m_banknum));
 	machine().save().register_postload(save_prepost_delegate(FUNC(slapshot_state::reset_sound_region), this));

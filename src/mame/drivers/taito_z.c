@@ -3029,12 +3029,6 @@ void taitoz_state::taitoz_postload()
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
 {
-	m_tc0100scn = machine().device("tc0100scn");
-	m_tc0150rod = machine().device("tc0150rod");
-	m_tc0480scp = machine().device("tc0480scp");
-	m_tc0220ioc = machine().device("tc0220ioc");
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-
 	save_item(NAME(m_cpua_ctrl));
 
 	/* these are specific to various games: we ought to split the inits */

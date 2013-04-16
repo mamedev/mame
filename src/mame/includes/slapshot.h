@@ -4,7 +4,9 @@
 
 *************************************************************************/
 
-#include <audio/taitosnd.h>
+#include "audio/taitosnd.h"
+#include "video/taitoic.h"
+#include "machine/taitoio.h"
 
 struct slapshot_tempsprite
 {
@@ -25,7 +27,11 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_spriteext(*this,"spriteext"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_tc0140syt(*this, "tc0140syt"),
+		m_tc0480scp(*this, "tc0480scp"),
+		m_tc0360pri(*this, "tc0360pri"),
+		m_tc0640fio(*this, "tc0640fio") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_color_ram;
@@ -53,10 +59,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;	
-	tc0140syt_device *m_tc0140syt;
-	device_t *m_tc0480scp;
-	device_t *m_tc0360pri;
-	device_t *m_tc0640fio;
+	required_device<tc0140syt_device> m_tc0140syt;
+	required_device<tc0480scp_device> m_tc0480scp;
+	required_device<tc0360pri_device> m_tc0360pri;
+	required_device<tc0640fio_device> m_tc0640fio;
 	DECLARE_READ16_MEMBER(color_ram_word_r);
 	DECLARE_WRITE16_MEMBER(color_ram_word_w);
 	DECLARE_READ16_MEMBER(slapshot_service_input_r);

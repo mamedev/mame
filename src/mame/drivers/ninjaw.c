@@ -796,16 +796,6 @@ void ninjaw_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-	m_tc0100scn_1 = machine().device("tc0100scn_1");
-	m_tc0100scn_2 = machine().device("tc0100scn_2");
-	m_tc0100scn_3 = machine().device("tc0100scn_3");
-
-	m_2610_1l = machine().device<filter_volume_device>("2610.1.l");
-	m_2610_1r = machine().device<filter_volume_device>("2610.1.r");
-	m_2610_2l = machine().device<filter_volume_device>("2610.2.l");
-	m_2610_2r = machine().device<filter_volume_device>("2610.2.r");
-
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_pandata));

@@ -664,17 +664,6 @@ void othunder_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	m_tc0220ioc = machine().device("tc0220ioc");
-	m_tc0100scn = machine().device("tc0100scn");
-	m_tc0110pcr = machine().device("tc0110pcr");
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-	m_2610_0l = machine().device<filter_volume_device>("2610.0l");
-	m_2610_0r = machine().device<filter_volume_device>("2610.0r");
-	m_2610_1l = machine().device<filter_volume_device>("2610.1l");
-	m_2610_1r = machine().device<filter_volume_device>("2610.1r");
-	m_2610_2l = machine().device<filter_volume_device>("2610.2l");
-	m_2610_2r = machine().device<filter_volume_device>("2610.2r");
-
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_ad_irq));
 	save_item(NAME(m_banknum));

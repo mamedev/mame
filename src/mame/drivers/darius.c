@@ -821,30 +821,6 @@ void darius_state::machine_start()
 	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
 	membank("bank1")->set_entry(4);
 
-	m_pc080sn = machine().device("pc080sn");
-	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
-
-	m_filter0_0l = machine().device<filter_volume_device>("filter0.0l");
-	m_filter0_0r = machine().device<filter_volume_device>("filter0.0r");
-	m_filter0_1l = machine().device<filter_volume_device>("filter0.1l");
-	m_filter0_1r = machine().device<filter_volume_device>("filter0.1r");
-	m_filter0_2l = machine().device<filter_volume_device>("filter0.2l");
-	m_filter0_2r = machine().device<filter_volume_device>("filter0.2r");
-	m_filter0_3l = machine().device<filter_volume_device>("filter0.3l");
-	m_filter0_3r = machine().device<filter_volume_device>("filter0.3r");
-
-	m_filter1_0l = machine().device<filter_volume_device>("filter1.0l");
-	m_filter1_0r = machine().device<filter_volume_device>("filter1.0r");
-	m_filter1_1l = machine().device<filter_volume_device>("filter1.1l");
-	m_filter1_1r = machine().device<filter_volume_device>("filter1.1r");
-	m_filter1_2l = machine().device<filter_volume_device>("filter1.2l");
-	m_filter1_2r = machine().device<filter_volume_device>("filter1.2r");
-	m_filter1_3l = machine().device<filter_volume_device>("filter1.3l");
-	m_filter1_3r = machine().device<filter_volume_device>("filter1.3r");
-
-	m_msm5205_l = machine().device<filter_volume_device>("msm5205.l");
-	m_msm5205_r = machine().device<filter_volume_device>("msm5205.r");
-
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_coin_word));
 

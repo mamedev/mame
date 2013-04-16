@@ -678,11 +678,7 @@ void topspeed_state::topspeed_postload()
 void topspeed_state::machine_start()
 {
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
-
-	m_tc0220ioc = machine().device("tc0220ioc");
-	m_pc080sn_1 = machine().device("pc080sn_1");
-	m_pc080sn_2 = machine().device("pc080sn_2");
-
+	
 	m_msm_chip[0] = m_msm1;
 	m_msm_chip[1] = m_msm2;
 	m_msm_rom[0] = memregion("adpcm")->base();

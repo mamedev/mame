@@ -5,7 +5,8 @@
 
 *************************************************************************/
 
-#include <audio/taitosnd.h>
+#include "machine/taitoio.h"
+#include "audio/taitosnd.h"
 #include "machine/eeprom.h"
 
 class taitoz_state : public driver_device
@@ -17,8 +18,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_eeprom(*this, "eeprom")
-	{ }
+		m_eeprom(*this, "eeprom"),
+		m_tc0480scp(*this, "tc0480scp"),
+		m_tc0150rod(*this, "tc0150rod"),
+		m_tc0100scn(*this, "tc0100scn"),
+		m_tc0220ioc(*this, "tc0220ioc"),
+		m_tc0140syt(*this, "tc0140syt") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -39,11 +44,11 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	optional_device<eeprom_device> m_eeprom;
-	device_t *m_tc0480scp;
-	device_t *m_tc0150rod;
-	device_t *m_tc0100scn;
-	device_t *m_tc0220ioc;
-	tc0140syt_device *m_tc0140syt;
+	optional_device<tc0480scp_device> m_tc0480scp;
+	optional_device<tc0150rod_device> m_tc0150rod;
+	optional_device<tc0100scn_device> m_tc0100scn;
+	optional_device<tc0220ioc_device> m_tc0220ioc;
+	required_device<tc0140syt_device> m_tc0140syt;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);

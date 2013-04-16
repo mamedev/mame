@@ -3011,13 +3011,6 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 
 MACHINE_START_MEMBER(taitof2_state,common)
 {
-	m_tc0100scn = machine().device("tc0100scn");;
-	m_tc0100scn_1 = machine().device("tc0100scn_1");;
-	m_tc0100scn_2 = machine().device("tc0100scn_2");;
-	m_tc0360pri = machine().device("tc0360pri");;
-	m_tc0280grd = machine().device("tc0280grd");;
-	m_tc0430grw = machine().device("tc0430grw");;
-	m_tc0480scp = machine().device("tc0480scp");;
 }
 
 MACHINE_START_MEMBER(taitof2_state,f2)

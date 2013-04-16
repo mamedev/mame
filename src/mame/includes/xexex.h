@@ -4,8 +4,8 @@
 
 *************************************************************************/
 
-#include <video/k053250.h>
-#include <sound/flt_vol.h>
+#include "video/k053250.h"
+#include "sound/flt_vol.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 
@@ -17,8 +17,12 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
+		m_audiocpu(*this, "audiocpu"),		
 		m_k054539(*this, "k054539"),
+		m_filter1l(*this, "filter1l"),
+		m_filter1r(*this, "filter1r"),
+		m_filter2l(*this, "filter2l"),
+		m_filter2r(*this, "filter2r"),
 		m_k056832(*this, "k056832"),
 		m_k053246(*this, "k053246"),
 		m_k053250(*this, "k053250"),
@@ -50,10 +54,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k054539_device> m_k054539;
-	filter_volume_device *m_filter1l;
-	filter_volume_device *m_filter1r;
-	filter_volume_device *m_filter2l;
-	filter_volume_device *m_filter2r;
+	required_device<filter_volume_device> m_filter1l;
+	required_device<filter_volume_device> m_filter1r;
+	required_device<filter_volume_device> m_filter2l;
+	required_device<filter_volume_device> m_filter2r;
 	required_device<k056832_device> m_k056832;
 	required_device<k053247_device> m_k053246;
 	required_device<k053250_device> m_k053250;

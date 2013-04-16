@@ -1,4 +1,3 @@
-
 #include "sound/okim6295.h"
 
 struct f2_tempsprite
@@ -20,7 +19,14 @@ public:
 			m_cchip2_ram(*this, "cchip2_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
-			m_oki(*this, "oki") { }
+			m_oki(*this, "oki"),
+			m_tc0100scn(*this, "tc0100scn"),
+			m_tc0100scn_1(*this, "tc0100scn_1"),
+			m_tc0100scn_2(*this, "tc0100scn_2"),
+			m_tc0360pri(*this, "tc0360pri"),
+			m_tc0280grd(*this, "tc0280grd"),
+			m_tc0430grw(*this, "tc0430grw"),
+			m_tc0480scp(*this, "tc0480scp") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_sprite_extension;
@@ -76,13 +82,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
-	device_t *m_tc0100scn;
-	device_t *m_tc0100scn_1;
-	device_t *m_tc0100scn_2;
-	device_t *m_tc0360pri;
-	device_t *m_tc0280grd;
-	device_t *m_tc0430grw;
-	device_t *m_tc0480scp;
+	optional_device<tc0100scn_device> m_tc0100scn;
+	optional_device<tc0100scn_device> m_tc0100scn_1;
+	optional_device<tc0100scn_device> m_tc0100scn_2;
+	optional_device<tc0360pri_device> m_tc0360pri;
+	optional_device<tc0280grd_device> m_tc0280grd;
+	optional_device<tc0280grd_device> m_tc0430grw;
+	optional_device<tc0480scp_device> m_tc0480scp;
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
 	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);

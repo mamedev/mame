@@ -3,6 +3,7 @@
     Taito H system
 
 *************************************************************************/
+#include "video/taitoic.h"
 
 class taitoh_state : public driver_device
 {
@@ -11,7 +12,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_m68000_mainram(*this, "m68000_mainram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"){ }
+		m_audiocpu(*this, "audiocpu"),
+		m_tc0080vco(*this, "tc0080vco"),
+		m_tc0220ioc(*this, "tc0220ioc") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_m68000_mainram;
@@ -23,8 +26,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	device_t *m_tc0080vco;
-	device_t *m_tc0220ioc;
+	required_device<tc0080vco_device> m_tc0080vco;
+	required_device<tc0220ioc_device> m_tc0220ioc;
 	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	virtual void machine_start();

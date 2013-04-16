@@ -4,8 +4,8 @@
 
 *************************************************************************/
 
-#include <sound/flt_vol.h>
-#include <audio/taitosnd.h>
+#include "sound/flt_vol.h"
+#include "audio/taitosnd.h"
 
 class ninjaw_state : public driver_device
 {
@@ -15,7 +15,15 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_subcpu(*this, "sub"){ }
+		m_subcpu(*this, "sub"),
+		m_tc0140syt(*this, "tc0140syt"),
+		m_tc0100scn_1(*this, "tc0100scn_1"),
+		m_tc0100scn_2(*this, "tc0100scn_2"),
+		m_tc0100scn_3(*this, "tc0100scn_3"),
+		m_2610_1l(*this, "2610.1.l"),
+		m_2610_1r(*this, "2610.1.r"),
+		m_2610_2l(*this, "2610.2.l"),
+		m_2610_2r(*this, "2610.2.r") { }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -29,14 +37,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	tc0140syt_device *m_tc0140syt;
-	device_t *m_tc0100scn_1;
-	device_t *m_tc0100scn_2;
-	device_t *m_tc0100scn_3;
-	filter_volume_device *m_2610_1l;
-	filter_volume_device *m_2610_1r;
-	filter_volume_device *m_2610_2l;
-	filter_volume_device *m_2610_2r;
+	required_device<tc0140syt_device> m_tc0140syt;
+	required_device<tc0100scn_device> m_tc0100scn_1;
+	required_device<tc0100scn_device> m_tc0100scn_2;
+	required_device<tc0100scn_device> m_tc0100scn_3;
+	required_device<filter_volume_device> m_2610_1l;
+	required_device<filter_volume_device> m_2610_1r;
+	required_device<filter_volume_device> m_2610_2l;
+	required_device<filter_volume_device> m_2610_2r;
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(ninjaw_sound_w);

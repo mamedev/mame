@@ -428,9 +428,6 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
-	m_pc080sn = machine().device("pc080sn");
-	m_pc090oj = machine().device("pc090oj");
-	
 	save_item(NAME(m_sprite_ctrl));
 	save_item(NAME(m_sprites_flipscreen));
 

@@ -6,6 +6,9 @@
 
 **************************************************************************/
 
+#ifndef _TAITOIC_H_
+#define _TAITOIC_H_
+
 #include "devlegcy.h"
 
 /***************************************************************************
@@ -524,3 +527,4 @@ DECLARE_WRITE16_DEVICE_HANDLER( tc0180vcu_scroll_w );
 DECLARE_READ16_DEVICE_HANDLER( tc0180vcu_word_r );
 DECLARE_WRITE16_DEVICE_HANDLER( tc0180vcu_word_w );
 void tc0180vcu_tilemap_draw(device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, int plane);
+#endif
