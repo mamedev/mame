@@ -5362,6 +5362,26 @@ WRITE16_MEMBER(mach8_device::mach8_linedraw_w)
 	logerror("ATI: Linedraw register write %04x, mode %i\n",data,mach8.linedraw);
 }
 
+READ16_MEMBER(mach8_device::mach8_sourcex_r)
+{
+	return ibm8514.dest_x;
+}
+
+READ16_MEMBER(mach8_device::mach8_sourcey_r)
+{
+	return ibm8514.dest_y;
+}
+
+WRITE16_MEMBER(mach8_device::mach8_ext_leftscissor_w)
+{
+	// TODO
+}
+
+WRITE16_MEMBER(mach8_device::mach8_ext_topscissor_w)
+{
+	// TODO
+}
+
 READ16_MEMBER(mach8_device::mach8_scratch0_r)
 {
 	return mach8.scratch0;

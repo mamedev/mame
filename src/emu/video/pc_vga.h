@@ -384,6 +384,10 @@ public:
 	WRITE16_MEMBER(mach8_scratch1_w);
 	READ16_MEMBER(mach8_config1_r);
 	READ16_MEMBER(mach8_config2_r);
+	READ16_MEMBER(mach8_sourcex_r);
+	READ16_MEMBER(mach8_sourcey_r);
+	WRITE16_MEMBER(mach8_ext_leftscissor_w);
+	WRITE16_MEMBER(mach8_ext_topscissor_w);
 protected:
 	virtual void device_start();
 	struct
