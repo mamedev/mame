@@ -41,9 +41,8 @@
 #define SUBTYPE_TMS5110         4
 #define SUBTYPE_TMS5200         8
 #define SUBTYPE_TMS5220         16
-#define SUBTYPE_TMS5220C        32
-#define SUBTYPE_PAT4335277      64
-#define SUBTYPE_VLM5030         128
+#define SUBTYPE_PAT4335277      32
+#define SUBTYPE_VLM5030         64
 
 /* coefficient defines */
 #define MAX_K                   10
@@ -428,21 +427,13 @@ static const struct tms5100_coeffs tms5200_coeff =
 
 /*
 The TMS5220NL was decapped and imaged by digshadow in April, 2013.
-The LPC table is not yet verified from the decap (it comes from a PROMOUT
-programmatic read of the chip from April, 2011)
+The LPC table table is verified to match the decap.
 The chirp table is verified to match the decap. (sum = 0x3da)
 Note that all the LPC K* values match the TMS5110a table (as read via PROMOUT)
 exactly.
-Note: The coefficients match those from the datasheet, and its addendum, with
-the exception of the energy table. The energy table on the datasheet (and in
-the QV5220.COD from qboxpro) lists it in RMS notation which doesn't help us
-since I(Lord Nightmare) can't figure out the proper formula TI used for
-converting energy to RMS (the obvious 'take all the values in the chirp ROM,
-multiply them by 1/2/3/4/etc, square each one, sum them up, divide by 51,
-which is # of ROM entries in chirp ROM, and take the square root of the
-result', doesn't QUITE work. It almost does, if you add 16 to the result, for
-the first 4 entries, but beyond that the entries become farther and farther
-offset).
+The TMS5220CNL was decapped and imaged by digshadow in April, 2013.
+The LPC table table is verified to match the decap and exactly matches TMS5220NL.
+The chirp table is verified to match the decap. (sum = 0x3da)
 */
 static const struct tms5100_coeffs tms5220_coeff =
 {
@@ -496,92 +487,6 @@ static const struct tms5100_coeffs tms5220_coeff =
 		{ -256, -176,  -96,  -15,   65,  146,  226,  307  },
 		/* K10 */
 		{ -205, -132,  -59,   14,   87,  160,  234,  307  },
-	},
-	/* Chirp table */
-	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
-		0x25, 0x26, 0x4C, 0x44, 0x1A, 0x32, 0x3B, 0x13,
-		0x37, 0x1A, 0x25, 0x1F, 0x1D, 0x00, 0x00, 0x00,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0 },
-	/* interpolation coefficients */
-	{ 0, 3, 3, 3, 2, 2, 1, 1 }
-};
-
-/*
-The TMS5220CNL was decapped and imaged by digshadow in April, 2013.
-The LPC table here is not yet verified from the decap (it comes from QBOXPRO)
-The chirp table is verified to match the decap. (sum = 0x3da)
-*/
-/* The following TMS5220C coefficients come from the tables in QBOXPRO, a
-program written at least in part by George "Larry" Brantingham of Quadravox,
-formerly of Texas Instruments, who had laid out the silicon for the
-TMS5100/TMC0280/CD2801. It is the same as the TMS5220 but has a change in
-the DAC layout which improves the sound quality, as well as having a proper
-external reset (pull /WS and /RS low at once) and having support for 4
-different frame lengths (either the usual 8 interpolations, or shorter frames
-with 6,4,or 2 interpolations only).
-Note: the energy table in QV5220.COD is also in RMS and was not used (it also may well be incorrect; the values in QV5220.COD have an offset by one index which looks wrong), instead the table from the 5200/5220 is used here.
-Note: the Kx tables are taken directly from QV5220.COD but with /64 added to each value as the values are stored ranging from -32768 to 32767 in QBOXPRO instead of -512 to 511 as on the real chip.
-***These values have not yet been verified against a real TMS5220C, see below as for why***
-This has not yet been verified against a real TMS5220C, and doing so will require decapping one as the TMS5220C, unlike the TMS5220, has a nonfunctional PROMOUT pin. This makes reading the internal LPC tables out electronically (via PROMOUT) impossible.
-This decapping has now been accomplished, but the verification has not been completed yet.
-*/
-static const struct tms5100_coeffs tms5220c_coeff =
-{
-	/* subtype */
-	SUBTYPE_TMS5220C,
-	10,
-	4,
-	6,
-	{ 5, 5, 4, 4, 4, 4, 4, 3, 3, 3 },
-	/* E   */
-	{ 0,   1,   2,   3,   4,   6,   8,  11,
-		16,  23,  33,  47,  63,  85, 114,  0 }, // verified from decap
-	//{ 0x0d,  0x16,  0x20,  0x2d,  0x40,  0x5b,  0x81,  0xb6,
-	// 0x101, 0x16c, 0x202, 0x2d6, 0x402, 0x5a9, 0x7ff, 0 }, /* values from 5220_10.bin code for the tms50c10 */
-	/* P   */
-	{ 0,  15,  16,  17,  18,  19,  20,  21,
-		22,  23,  24,  25,  26,  27,  28,  29,
-		30,  31,  32,  33,  34,  35,  36,  37,
-		38,  39,  40,  41,  42,  44,  46,  48,
-		50,  52,  53,  56,  58,  60,  62,  65,
-		68,  70,  72,  76,  78,  80,  84,  86,
-		91,  94,  98, 101, 105, 109, 114, 118,
-	122, 127, 132, 137, 142, 148, 153, 159 },
-	{
-		/* K1  */
-		{ -32062/64,-31872/64,-31806/64,-31679/64,-31551/64,-31423/64,-31230/64,-30846/64,
-			-30591/64,-30335/64,-30014/64,-29693/64,-29375/64,-28926/64,-28477/64,-27966/64,
-			-26351/64,-24266/64,-21632/64,-18387/64,-14514/64,-10061/64, -5155/64,    -1/64,
-			5152/64, 10058/64, 14511/64, 18385/64, 21630/64, 24265/64, 26349/64, 27966/64 },
-		/* K2  */
-		{ -20970/64,-19332/64,-17530/64,-15566/64,-13447/64,-11183/64, -8791/64, -6294/64,
-			-3719/64, -1096/64,  1540/64,  4158/64,  6722/64,  9203/64, 11574/64, 13815/64,
-			15909/64, 17846/64, 19620/64, 21231/64, 22683/64, 23982/64, 25136/64, 26157/64,
-			27054/64, 27840/64, 28525/64, 29121/64, 29638/64, 30084/64, 30469/64, 32383/64 },
-		/* K3  */
-		{ -28179/64,-24728/64,-21276/64,-17825/64,-14373/64,-10922/64, -7470/64, -4019/64,
-			-567/64,  2883/64,  6334/64,  9786/64, 13237/64, 16689/64, 20140/64, 23592/64 },
-		/* K4  */
-		{ -20970/64,-17414/64,-13856/64,-10299/64, -6743/64, -3185/64,   370/64,  3927/64,
-			7484/64, 11041/64, 14598/64, 18155/64, 21712/64, 25269/64, 28826/64, 32383/64 },
-		/* K5  */
-		{ -20970/64,-17999/64,-15029/64,-12058/64, -9087/64, -6116/64, -3145/64,  -174/64,
-			2796/64,  5766/64,  8737/64, 11708/64, 14679/64, 17650/64, 20621/64, 23592/64 },
-		/* K6  */
-		{ -16383/64,-13543/64,-10703/64, -7864/64, -5024/64, -2184/64,   655/64,  3495/64,
-			6334/64,  9174/64, 12014/64, 14854/64, 17694/64, 20534/64, 23373/64, 26213/64 },
-		/* K7  */
-		{ -19660/64,-16602/64,-13543/64,-10485/64, -7427/64, -4368/64, -1310/64,  1747/64,
-			4805/64,  7864/64, 10922/64, 13980/64, 17038/64, 20096/64, 23155/64, 26213/64 },
-		/* K8  */
-		{ -16383/64,-10298/64, -4212/64,  1872/64,  7957/64, 14042/64, 20128/64, 26213/64 },
-		/* K9  */
-		{ -16383/64,-11234/64, -6085/64,  -936/64,  4212/64,  9361/64, 14511/64, 19660/64 },
-		/* K10 */
-		{ -13106/64, -8425/64, -3744/64,   936/64,  5617/64, 10298/64, 14979/64, 19660/64 },
 	},
 	/* Chirp table */
 	{   0x00, 0x03, 0x0F, 0x28, 0x4C, 0x6C, 0x71, 0x50,
