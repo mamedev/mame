@@ -3,6 +3,7 @@
     Taito H system
 
 *************************************************************************/
+#include "machine/taitoio.h"
 #include "video/taitoic.h"
 
 class taitoh_state : public driver_device
