@@ -416,7 +416,7 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			counter++;
 		}
 	}
-	return FALSE;
+	return true;
 }
 
 const floppy_format_type FLOPPY_DSK_FORMAT = &floppy_image_format_creator<dsk_format>;
