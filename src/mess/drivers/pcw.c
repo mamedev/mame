@@ -341,7 +341,11 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 static int pcw_get_sys_status(running_machine &machine)
 {
 	pcw_state *state = machine.driver_data<pcw_state>();
-	return state->m_interrupt_counter | (machine.root_device().ioport("EXTRA")->read() & (0x040 | 0x010)) | (state->m_system_status & 0x20);
+	return
+		state->m_interrupt_counter
+		| (state->m_screen->vblank() ? 0x40 : 0x00)
+		| (machine.root_device().ioport("EXTRA")->read() & 0x010)
+		| (state->m_system_status & 0x20);
 }
 
 READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
@@ -950,7 +954,7 @@ WRITE8_MEMBER(pcw_state::pcw9512_parallel_w)
 
 static ADDRESS_MAP_START(pcw_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_MIRROR(0xfe) AM_DEVICE("upd765", upd765a_device, map)
+	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(                                pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,    pcw_bank_force_selection_w)
@@ -966,7 +970,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcw9512_io, AS_IO, 8, pcw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000, 0x07f) AM_MIRROR(0xfe) AM_DEVICE("upd765", upd765a_device, map)
+	AM_RANGE(0x000, 0x001) AM_MIRROR(0x7e) AM_DEVICE("upd765",      upd765a_device, map)
 	AM_RANGE(0x080, 0x0ef) AM_READWRITE(pcw_expansion_r,            pcw_expansion_w)
 	AM_RANGE(0x0f0, 0x0f3) AM_WRITE(                                pcw_bank_select_w)
 	AM_RANGE(0x0f4, 0x0f4) AM_READWRITE(pcw_interrupt_counter_r,    pcw_bank_force_selection_w)
@@ -1005,6 +1009,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 void pcw_state::machine_start()
 {
 	m_fdc_interrupt_code = 2;
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pcw_state::pcw_fdc_interrupt), this));
 }
 
 void pcw_state::machine_reset()
@@ -1218,8 +1223,6 @@ static INPUT_PORTS_START(pcw)
 
 	/* from here on are the pretend dipswitches for machine config etc */
 	PORT_START("EXTRA")
-	/* vblank */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 	/* frame rate option */
 	PORT_DIPNAME( 0x10, 0x010, "50/60Hz Frame Rate Option")
 	PORT_DIPSETTING(    0x00, "60Hz")

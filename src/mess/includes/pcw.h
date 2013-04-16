@@ -25,7 +25,10 @@ class pcw_state : public driver_device
 public:
 	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		  m_maincpu(*this, "maincpu"),
+		  m_screen(*this, "screen"),
+		  m_fdc(*this, "upd765")
+	{ }
 
 	int m_boot;
 	int m_system_status;
@@ -108,6 +111,8 @@ public:
 
 	void pcw_fdc_interrupt(bool state);
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<upd765a_device> m_fdc;
 };
 
 #endif /* PCW_H_ */
