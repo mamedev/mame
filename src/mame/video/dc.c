@@ -1961,7 +1961,7 @@ static void render_tri(running_machine &machine, bitmap_rgb32 &bitmap, texinfo *
 static void render_to_accumulation_buffer(running_machine &machine,bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	dc_state *state = machine.driver_data<dc_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
 #if 0
