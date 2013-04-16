@@ -104,7 +104,8 @@ class jantotsu_state : public driver_device
 public:
 	jantotsu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_adpcm(*this, "adpcm") { }
 
 	/* sound-related */
 	UINT32   m_adpcm_pos;
@@ -134,6 +135,7 @@ public:
 	UINT32 screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
 	required_device<cpu_device> m_maincpu;
+	required_device<msm5205_device> m_adpcm;
 };
 
 
@@ -270,14 +272,12 @@ READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
 
 WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
 {
-	device_t *device = machine().device("adpcm");
-
 	switch (offset)
 	{
 		case 0:
 			m_adpcm_pos = (data & 0xff) * 0x100;
 			m_adpcm_idle = 0;
-			msm5205_reset_w(device, 0);
+			msm5205_reset_w(m_adpcm, 0);
 			/* I don't think that this will ever happen, it's there just to be sure
 			   (i.e. I'll probably never do a "nagare" in my entire life ;-) ) */
 			if(data & 0x20)
@@ -287,7 +287,7 @@ WRITE8_MEMBER(jantotsu_state::jan_adpcm_w)
 		/*same write as port 2? MSM sample ack? */
 		case 1:
 //          m_adpcm_idle = 1;
-//          msm5205_reset_w(device, 1);
+//          msm5205_reset_w(m_adpcm, 1);
 //          printf("%02x 1\n", data);
 			break;
 	}
@@ -298,7 +298,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
 		//m_adpcm_idle = 1;
-		msm5205_reset_w(machine().device("adpcm"), 1);
+		msm5205_reset_w(m_adpcm, 1);
 		m_adpcm_trigger = 0;
 	}
 	else
@@ -306,7 +306,7 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
 		UINT8 *ROM = memregion("adpcm")->base();
 
 		m_adpcm_data = ((m_adpcm_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
-		msm5205_data_w(machine().device("adpcm"), m_adpcm_data & 0xf);
+		msm5205_data_w(m_adpcm, m_adpcm_data & 0xf);
 		m_adpcm_trigger ^= 1;
 		if (m_adpcm_trigger == 0)
 		{

@@ -149,9 +149,6 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	m_adpcm_1 = machine().device("adpcm1");
-	m_adpcm_2 = machine().device("adpcm2");
-
 	/* register for save states */
 	save_item(NAME(m_dd_sub_cpu_busy));
 	save_item(NAME(m_scrollx_hi));
@@ -410,8 +407,8 @@ WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 
 WRITE8_MEMBER(ddragon_state::dd_adpcm_w)
 {
-	device_t *adpcm = (offset & 1) ? m_adpcm_2 : m_adpcm_1;
-	int chip = (adpcm == m_adpcm_1) ? 0 : 1;
+	device_t *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
+	int chip = (adpcm == m_adpcm1) ? 0 : 1;
 
 	switch (offset / 2)
 	{
@@ -458,12 +455,12 @@ void ddragon_state::dd_adpcm_int( device_t *device, int chip )
 
 WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
 {
-	dd_adpcm_int(m_adpcm_1,0);
+	dd_adpcm_int(m_adpcm1,0);
 }
 
 WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
 {
-	dd_adpcm_int(m_adpcm_2,0);
+	dd_adpcm_int(m_adpcm2,0);
 }
 
 

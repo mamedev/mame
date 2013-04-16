@@ -3,7 +3,7 @@
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
-
+#include "sound/msm5205.h"
 
 class ddragon_state : public driver_device
 {
@@ -19,7 +19,9 @@ public:
 		m_darktowr_mcu_ports(*this, "darktowr_mcu"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_subcpu(*this, "sub") { }
+		m_subcpu(*this, "sub"),
+		m_adpcm1(*this, "adpcm1"),
+		m_adpcm2(*this, "adpcm2") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_rambase;
@@ -65,8 +67,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	optional_device<cpu_device> m_subcpu;
-	device_t *m_adpcm_1;
-	device_t *m_adpcm_2;
+	optional_device<msm5205_device> m_adpcm1;
+	optional_device<msm5205_device> m_adpcm2;
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
