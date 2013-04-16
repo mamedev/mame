@@ -50,10 +50,6 @@ public:
 	tc0140syt_device *m_tc0140syt;
 	device_t *m_pc080sn;
 
-	device_t *m_lscreen;
-	device_t *m_mscreen;
-	device_t *m_rscreen;
-
 	filter_volume_device *m_filter0_0l;
 	filter_volume_device *m_filter0_0r;
 	filter_volume_device *m_filter0_1l;

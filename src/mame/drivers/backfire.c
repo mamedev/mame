@@ -35,8 +35,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
-		m_lscreen(*this, "lscreen"),
-		m_rscreen(*this, "rscreen"),
 		m_eeprom(*this, "eeprom"),
 		m_io_in0(*this, "IN0"),
 		m_io_in1(*this, "IN1"),
@@ -62,8 +60,6 @@ public:
 	required_device<device_t> m_deco_tilegen1;
 	required_device<device_t> m_deco_tilegen2;
 
-	required_device<device_t> m_lscreen;
-	required_device<device_t> m_rscreen;
 	required_device<eeprom_device> m_eeprom;
 
 	/* memory */

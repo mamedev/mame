@@ -801,10 +801,6 @@ void ninjaw_state::machine_start()
 	m_tc0100scn_2 = machine().device("tc0100scn_2");
 	m_tc0100scn_3 = machine().device("tc0100scn_3");
 
-	m_lscreen = machine().device("lscreen");
-	m_mscreen = machine().device("mscreen");
-	m_rscreen = machine().device("rscreen");
-
 	m_2610_1l = machine().device<filter_volume_device>("2610.1.l");
 	m_2610_1r = machine().device<filter_volume_device>("2610.1.r");
 	m_2610_2l = machine().device<filter_volume_device>("2610.2.l");

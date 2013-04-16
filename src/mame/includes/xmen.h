@@ -44,8 +44,6 @@ public:
 	required_device<k052109_device> m_k052109;
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
-	device_t *m_lscreen;
-	device_t *m_rscreen;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
 	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE16_MEMBER(sound_cmd_w);

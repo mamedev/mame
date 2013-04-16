@@ -33,9 +33,6 @@ public:
 	device_t *m_tc0100scn_1;
 	device_t *m_tc0100scn_2;
 	device_t *m_tc0100scn_3;
-	device_t *m_lscreen;
-	device_t *m_mscreen;
-	device_t *m_rscreen;
 	filter_volume_device *m_2610_1l;
 	filter_volume_device *m_2610_1r;
 	filter_volume_device *m_2610_2l;

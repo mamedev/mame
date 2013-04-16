@@ -824,10 +824,6 @@ void darius_state::machine_start()
 	m_pc080sn = machine().device("pc080sn");
 	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 
-	m_lscreen = machine().device("lscreen");
-	m_mscreen = machine().device("mscreen");
-	m_rscreen = machine().device("rscreen");
-
 	m_filter0_0l = machine().device<filter_volume_device>("filter0.0l");
 	m_filter0_0r = machine().device<filter_volume_device>("filter0.0r");
 	m_filter0_1l = machine().device<filter_volume_device>("filter0.1l");
