@@ -7,6 +7,7 @@
 #ifndef PCW_H_
 #define PCW_H_
 
+#include "machine/upd765.h"
 
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8
