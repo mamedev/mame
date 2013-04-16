@@ -110,6 +110,8 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	void pcw_fdc_interrupt(bool state);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
