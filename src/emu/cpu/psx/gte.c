@@ -275,17 +275,33 @@ void gte::setcp2cr( UINT32 pc, int reg, UINT32 value )
 	m_cp2cr[ reg ].d = value;
 }
 
-INT64 gte::BOUNDS( INT64 value, INT64 max, int max_flag, INT64 min, int min_flag )
+INLINE INT64 gte_shift( INT64 a, int sf )
 {
-	if( value > max )
+	if( sf > 0 )
+	{
+		return a >> 12;
+	}
+	else if( sf < 0 )
+	{
+		return a << 12;
+	}
+
+	return a;
+}
+
+INT32 gte::BOUNDS( acc value, int max_flag, int min_flag )
+{
+	if( value.positive_overflow() )
 	{
 		FLAG |= max_flag;
 	}
-	else if( value < min )
+	
+	if( value.negative_overflow() )
 	{
 		FLAG |= min_flag;
 	}
-	return value;
+
+	return gte_shift( value.value(), m_sf );
 }
 
 static const UINT16 reciprocals[ 32768 ]=
@@ -2361,25 +2377,11 @@ INLINE UINT32 gte_divide( INT16 numerator, UINT16 denominator )
 	return 0xffffffff;
 }
 
-INLINE INT64 gte_shift( INT64 a, int sf )
-{
-	if( sf > 0 )
-	{
-		return a >> 12;
-	}
-	else if( sf < 0 )
-	{
-		return a << 12;
-	}
-
-	return a;
-}
-
 /* Setting bits 12 & 19-22 in FLAG does not set bit 31 */
 
-INT64 gte::A1( INT64 a ) { m_mac1 = BOUNDS( a, U64(0x7ffffffffff), ( 1 << 31 ) | ( 1 << 30 ), U64(-0x80000000000), ( 1 << 31 ) | ( 1 << 27 ) ); return gte_shift( m_mac1, m_sf ); }
-INT64 gte::A2( INT64 a ) { m_mac2 = BOUNDS( a, U64(0x7ffffffffff), ( 1 << 31 ) | ( 1 << 29 ), U64(-0x80000000000), ( 1 << 31 ) | ( 1 << 26 ) ); return gte_shift( m_mac2, m_sf ); }
-INT64 gte::A3( INT64 a ) { m_mac3 = BOUNDS( a, U64(0x7ffffffffff), ( 1 << 31 ) | ( 1 << 28 ), U64(-0x80000000000), ( 1 << 31 ) | ( 1 << 25 ) ); return gte_shift( m_mac3, m_sf ); }
+INT32 gte::A1( acc a ) { m_mac1 = a.value(); return BOUNDS( a, ( 1 << 31 ) | ( 1 << 30 ), ( 1 << 31 ) | ( 1 << 27 ) ); }
+INT32 gte::A2( acc a ) { m_mac2 = a.value(); return BOUNDS( a, ( 1 << 31 ) | ( 1 << 29 ), ( 1 << 31 ) | ( 1 << 26 ) ); }
+INT32 gte::A3( acc a ) { m_mac3 = a.value(); return BOUNDS( a, ( 1 << 31 ) | ( 1 << 28 ), ( 1 << 31 ) | ( 1 << 25 ) ); }
 INT32 gte::Lm_B1( INT32 a, int lm ) { return LIM( a, 0x7fff, -0x8000 * !lm, ( 1 << 31 ) | ( 1 << 24 ) ); }
 INT32 gte::Lm_B2( INT32 a, int lm ) { return LIM( a, 0x7fff, -0x8000 * !lm, ( 1 << 31 ) | ( 1 << 23 ) ); }
 INT32 gte::Lm_B3( INT32 a, int lm ) { return LIM( a, 0x7fff, -0x8000 * !lm, ( 1 << 22 ) ); }
@@ -2428,7 +2430,7 @@ UINT32 gte::Lm_E( UINT32 result )
 	return result;
 }
 
-INT64 gte::F( INT64 a ) { m_mac0 = BOUNDS( a, U64(0x7fffffff), ( 1 << 31 ) | ( 1 << 16 ), U64(-0x80000000), ( 1 << 31 ) | ( 1 << 15 ) ); return m_mac0; }
+INT32 gte::F( INT64 a ) { m_mac0 = a; if( a > S64( 0x7fffffff ) ) FLAG |= ( 1 << 31 ) | ( 1 << 16 ); if( a < S64(-0x80000000) ) FLAG |= ( 1 << 31 ) | ( 1 << 15 ); return a; }
 INT32 gte::Lm_G1( INT32 a ) { return LIM( a, 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 14 ) ); }
 INT32 gte::Lm_G2( INT32 a ) { return LIM( a, 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 13 ) ); }
 
@@ -2569,9 +2571,9 @@ int gte::docop2( UINT32 pc, int gteop )
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
-		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2592,9 +2594,9 @@ int gte::docop2( UINT32 pc, int gteop )
 	case 0x14:
 		GTELOG( pc, "%08x CDP", gteop );
 
-		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2623,9 +2625,9 @@ int gte::docop2( UINT32 pc, int gteop )
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
-			MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-			MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-			MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+			MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+			MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+			MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
@@ -2653,9 +2655,9 @@ int gte::docop2( UINT32 pc, int gteop )
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
-		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2676,9 +2678,9 @@ int gte::docop2( UINT32 pc, int gteop )
 	case 0x1c:
 		GTELOG( pc, "%08x CC", gteop );
 
-		MAC1 = A1( ( ( (INT64) RBK ) << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( ( (INT64) GBK ) << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( ( (INT64) BBK ) << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( acc( ( (INT64) RBK ) << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( acc( ( (INT64) GBK ) << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( acc( ( (INT64) BBK ) << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2705,9 +2707,9 @@ int gte::docop2( UINT32 pc, int gteop )
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
-		MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-		MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-		MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+		MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+		MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+		MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2730,9 +2732,9 @@ int gte::docop2( UINT32 pc, int gteop )
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
-			MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-			MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-			MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+			MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+			MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+			MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
@@ -2877,9 +2879,9 @@ int gte::docop2( UINT32 pc, int gteop )
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
-			MAC1 = A1( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
-			MAC2 = A2( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
-			MAC3 = A3( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
+			MAC1 = A1( acc( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) );
+			MAC2 = A2( acc( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) );
+			MAC3 = A3( acc( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) );
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );

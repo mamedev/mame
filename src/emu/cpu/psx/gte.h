@@ -34,11 +34,58 @@ public:
 	int docop2( UINT32 pc, int gteop );
 
 protected:
+	class acc
+	{
+	public:
+		acc( INT64 value ) :
+			m_value( value ),
+			m_positive_overflow( value > S64( 0x7ffffffffff ) ),
+			m_negative_overflow( value < S64( -0x80000000000 ) )
+		{
+		}
+
+		acc( INT64 value, bool positive_overflow, bool negative_overflow ) :
+			m_value( value ),
+			m_positive_overflow( positive_overflow ),
+			m_negative_overflow( negative_overflow )
+		{
+		}
+
+		acc operator+( INT64 add )
+		{
+			INT64 value = ( ( m_value + add ) << 20 ) >> 20;
+
+			return acc( value,
+				m_positive_overflow || ( value < 0 && m_value >= 0 && add >= 0 ),
+				m_negative_overflow || ( value >= 0 && m_value < 0 && add < 0 ) );
+		}
+
+		bool positive_overflow()
+		{
+			return m_positive_overflow;
+		}
+
+		bool negative_overflow()
+		{
+			return m_negative_overflow;
+		}
+
+		INT64 value()
+		{
+			return m_value;
+		}
+
+	private:
+		INT64 m_value;
+		bool m_positive_overflow;
+		bool m_negative_overflow;
+	};
+
 	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
-	INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag );
-	INT64 A1( INT64 a );
-	INT64 A2( INT64 a );
-	INT64 A3( INT64 a );
+	INT32 BOUNDS( acc a, int max_flag, int min_flag );
+	INT32 A1( acc a );
+	INT32 A2( acc a );
+	INT32 A3( acc a );
 	INT32 Lm_B1( INT32 a, int lm );
 	INT32 Lm_B2( INT32 a, int lm );
 	INT32 Lm_B3( INT32 a, int lm );
@@ -48,7 +95,7 @@ protected:
 	INT32 Lm_C3( INT32 a );
 	INT32 Lm_D( INT64 a, int sf );
 	UINT32 Lm_E( UINT32 result );
-	INT64 F( INT64 a );
+	INT32 F( INT64 a );
 	INT32 Lm_G1( INT32 a );
 	INT32 Lm_G2( INT32 a );
 	INT32 Lm_H( INT64 value, int sf );
