@@ -3270,7 +3270,7 @@ void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
 		m_vga->mem_linear_w(space,offset,0xff,0xff);
 		break;
 	case 0x0003:
-		// change nothing, pixel is unchanged
+		m_vga->mem_linear_w(space,offset,dst,0xff);
 		break;
 	case 0x0004:
 		m_vga->mem_linear_w(space,offset,~src,0xff);
@@ -3353,7 +3353,7 @@ void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 		m_vga->mem_linear_w(space,offset,0xff,0xff);
 		break;
 	case 0x0003:
-		// change nothing, pixel is unchanged
+		m_vga->mem_linear_w(space,offset,dst,0xff);
 		break;
 	case 0x0004:
 		m_vga->mem_linear_w(space,offset,~src,0xff);
