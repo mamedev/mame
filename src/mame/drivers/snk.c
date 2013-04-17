@@ -115,6 +115,14 @@ Notes:
   setting. For the avid golfer, a more challenging style of swing.".
   This feature only exists when "Language" Dip Swicth is set to "English"
 
+- fitegolfu:  An "SNK Fighting Golf Program Update" notice published in a trade
+  journal outlines 3 improvements which is supposed to allow game players a bit
+  more time at cruicial points in the game.
+
+  1) Shot time: The 12/10 seconds dip has been changed to 15/12 seconds.
+  2) Power/Swing guage moves slower when the ball is on the green.
+  3) Hit Check area around the cup is enlarged for easier putting.
+
 - there are two versions of the Ikari Warriors board, one has the standard JAMMA
   connector while the other has the custom SNK connector. The video and audio
   PCBs are the same, only the CPU PCB changes.
@@ -2414,6 +2422,17 @@ static INPUT_PORTS_START( fitegolf )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( fitegolfu )
+        PORT_INCLUDE( fitegolf )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Shot Time" )                 PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x00, "Short (12 sec)" )
+	PORT_DIPSETTING(    0x01, "Long (15 sec)" )
+INPUT_PORTS_END
+
+
+
 static INPUT_PORTS_START( countryc )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, 0)
@@ -4611,7 +4630,7 @@ ROM_START( fitegolf )
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
-ROM_START( fitegolfu )
+ROM_START( fitegolfu )	/*  Later US version containing enhancements to make the game a little easier */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "np45.128", 0x0000, 0x4000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
 	ROM_LOAD( "mn45.256", 0x4000, 0x8000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )
@@ -6273,8 +6292,8 @@ GAME( 1985, tnk3,     0,        tnk3,     tnk3, driver_device,     0,        ROT
 GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3, driver_device,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,   0,        athena,   athena, driver_device,   0,        ROT0,   "SNK", "Athena", 0 )
 GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
-GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
-GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc, ROT0,   "SNK", "Country Club", 0 )
+GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
+GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc,     ROT0,   "SNK", "Country Club", 0 )
 
 GAME( 1986, ikari,    0,        ikari,    ikari, driver_device,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 )
 GAME( 1986, ikaria,   ikari,    ikari,    ikaria, driver_device,   0,        ROT270, "SNK", "Ikari Warriors (US)", 0 )
