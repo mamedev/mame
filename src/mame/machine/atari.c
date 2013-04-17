@@ -168,7 +168,7 @@ POKEY_KEYBOARD_HANDLER(atari_a800_keyboard)
 	{
 	case pokey_device::POK_KEY_BREAK:
 		/* special case ... */
-		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x04) ? 0x02 : 0x00);
+		ret |= ((device->machine().root_device().ioport(tag[0])->read_safe(0) & 0x08) ? 0x02 : 0x00);
 		break;
 	case pokey_device::POK_KEY_CTRL:
 		/* CTRL */
