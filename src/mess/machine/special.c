@@ -56,7 +56,7 @@ READ8_MEMBER( special_state::specialist_8255_portb_r )
 	dat = (dat  << 2) ^0xff;
 	if (m_io_line12->read()!=0xff) dat ^= 0x02;
 
-	level = m_cass->input();
+	level = m_cassette->input();
 	if (level >=  0)
 			dat ^= 0x01;
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER( special_state::specialist_8255_portc_w )
 {
 	m_specialist_8255_portc = data;
 
-	m_cass->output(BIT(data, 7) ? 1 : -1);
+	m_cassette->output(BIT(data, 7) ? 1 : -1);
 
 	m_dac->write_unsigned8(BIT(data, 5)); //beeper
 }

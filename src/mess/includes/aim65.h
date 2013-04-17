@@ -36,8 +36,8 @@ public:
 	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass1(*this, CASSETTE_TAG),
-	m_cass2(*this, CASSETTE2_TAG)
+	m_cassette1(*this, "cassette"),
+	m_cassette2(*this, "cassette2")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
@@ -54,8 +54,8 @@ public:
 	UINT8 m_pb_save;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass1;
-	required_device<cassette_image_device> m_cass2;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
 	virtual void machine_start();
 	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 };

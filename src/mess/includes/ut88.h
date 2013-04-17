@@ -20,7 +20,7 @@ class ut88_state : public driver_device
 public:
 	ut88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ppi(*this, "ppi8255"),
 		m_dac(*this, "dac"),
 		m_p_videoram(*this, "p_videoram"),
@@ -38,7 +38,7 @@ public:
 		m_io_line8(*this, "LINE8") ,
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	optional_device<i8255_device> m_ppi;
 	optional_device<dac_device> m_dac;
 	DECLARE_READ8_MEMBER(ut88_keyboard_r);

@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_PC_JOY_ADD("joy")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765", false, false)
 
@@ -1382,7 +1382,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 //  MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)             /* TODO: non-standard */
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, mc1502_cassette_interface )    // has no motor control
+	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )    // has no motor control
 
 	MCFG_FD1793x_ADD("vg93", XTAL_8MHz / 8) // clock?
 	MCFG_FLOPPY_DRIVE_ADD("fd0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)

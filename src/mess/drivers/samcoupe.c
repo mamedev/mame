@@ -210,7 +210,6 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_midi_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 {
-	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
@@ -236,7 +235,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 	data |= 1 << 5;
 
 	/* bit 6, cassette input */
-	data |= ((cassette)->input() > 0 ? 1 : 0) << 6;
+	data |= (m_cassette->input() > 0 ? 1 : 0) << 6;
 
 	/* bit 7, external memory */
 	data |= 1 << 7;
@@ -246,11 +245,10 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 
 WRITE8_MEMBER(samcoupe_state::samcoupe_border_w)
 {
-	cassette_image_device *cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 	m_border = data;
 
 	/* bit 3, cassette output */
-	cassette->output( BIT(data, 3) ? -1.0 : +1.0);
+	m_cassette->output( BIT(data, 3) ? -1.0 : +1.0);
 
 	/* bit 4, beep */
 	speaker_level_w(m_speaker, BIT(data, 4));
@@ -537,7 +535,7 @@ static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
 	MCFG_CENTRONICS_PRINTER_ADD("lpt1", standard_centronics)
 	MCFG_CENTRONICS_PRINTER_ADD("lpt2", standard_centronics)
 	MCFG_MSM6242_ADD("sambus_clock", samcoupe_rtc_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, samcoupe_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", samcoupe_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","samcoupe_cass")
 
 	MCFG_WD1772x_ADD("wd1772", SAMCOUPE_XTAL_X1/3)

@@ -126,8 +126,8 @@ public:
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass1(*this, CASSETTE_TAG),
-	m_cass2(*this, CASSETTE2_TAG),
+	m_cass1(*this, "cassette"),
+	m_cass2(*this, "cassette2"),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s"),
 	m_p_videoram(*this, "videoram"),
@@ -136,7 +136,9 @@ public:
 	m_iop_s1(*this, "S1"),
 	m_iop_s2(*this, "S2"),
 	m_iop_s3(*this, "S3"),
-	m_iop_s4(*this, "S4")
+	m_iop_s4(*this, "S4"),
+	m_cassette1(*this, "cassette"),
+	m_cassette2(*this, "cassette2")
 	{ }
 
 	DECLARE_READ8_MEMBER( sol20_f8_r );
@@ -177,6 +179,8 @@ private:
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
 public:
 	DECLARE_DRIVER_INIT(sol20);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
@@ -191,9 +195,9 @@ public:
 cassette_image_device *sol20_state::cassette_device_image()
 {
 	if (m_sol20_fa & 0x40)
-		return machine().device<cassette_image_device>(CASSETTE2_TAG);
+		return m_cassette2;
 	else
-		return machine().device<cassette_image_device>(CASSETTE_TAG);
+		return m_cassette1;
 }
 
 
@@ -734,14 +738,14 @@ static MACHINE_CONFIG_START( sol20, sol20_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, CASSETTE2_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, sol20_cassette_interface )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sol20_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", sol20_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette2", sol20_cassette_interface )
 	MCFG_AY31015_ADD( "uart", sol20_ay31015_config )
 	MCFG_AY31015_ADD( "uart_s", sol20_ay31015_config )
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)

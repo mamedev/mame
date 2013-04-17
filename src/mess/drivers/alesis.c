@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 
 	MCFG_PALETTE_LENGTH(2)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hr16_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hr16_cassette_interface )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)

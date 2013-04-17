@@ -362,7 +362,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( mz700, mz_state )
 	MCFG_I8255_ADD("ppi8255", mz700_ppi8255_interface)
 	MCFG_TTL74145_ADD("ls145", default_ttl74145)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, mz700_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", mz700_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mz700_cass")
 
 	/* internal ram */

@@ -438,9 +438,9 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass1 speaker
-	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, CASSETTE2_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE2_TAG, "cassette2")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // cass2 speaker
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75) // speaker or music card on parallel port
@@ -454,8 +454,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)
 	MCFG_QUICKLOAD_ADD("quickload", sorcerer, "bin", 3)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, sorcerer_cassette_interface )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, sorcerer_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", sorcerer_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette2", sorcerer_cassette_interface )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

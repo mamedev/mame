@@ -174,11 +174,6 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
 	}
 }
 
-static cassette_image_device *vtech2_cassette_image(running_machine &machine)
-{
-	return machine.device<cassette_image_device>(CASSETTE_TAG);
-}
-
 /*************************************************
  * memory mapped I/O read
  * bit  function
@@ -253,7 +248,7 @@ int vtech2_state::mra_bank(int bank, int offs)
 	}
 
 	/* what's bit 7 good for? tape input maybe? */
-	level = (vtech2_cassette_image(machine()))->input() * 65536.0;
+	level = m_cassette->input() * 65536.0;
 	if( level < m_level_old - 511 )
 		m_cassette_bit = 0x00;
 	if( level > m_level_old + 511 )

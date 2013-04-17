@@ -375,7 +375,7 @@ static MACHINE_CONFIG_START( lc80, lc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", lc80_cassette_interface)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1K")
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( lc80_2, lc80_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 900000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 900000, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, lc80_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", lc80_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

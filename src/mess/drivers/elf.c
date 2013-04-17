@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 	MCFG_CDP1861_ADD(CDP1861_TAG, XTAL_3_579545MHz/2, elf2_cdp1861_intf)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, elf_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", elf_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", elf, "bin", 0)
 
 	/* internal ram */

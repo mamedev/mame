@@ -65,7 +65,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_subcpu(*this, "sub"),
-	//m_cass(*this, CASSETTE_TAG),
+	//m_cass(*this, "cassette"),
 	//m_wave(*this, WAVE_TAG),
 	//m_speaker(*this, "speaker"),
 	//m_printer(*this, "centronics"),

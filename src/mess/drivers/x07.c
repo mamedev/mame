@@ -1511,7 +1511,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
 	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.50 )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* printer */
@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START( x07, x07_state )
 	MCFG_CARTSLOT_INTERFACE("x07_card")
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, x07_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", x07_cassette_interface )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("card_list", "x07_card")

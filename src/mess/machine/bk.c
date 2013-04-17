@@ -101,7 +101,7 @@ READ16_MEMBER(bk_state::bk_vid_scrool_r)
 
 READ16_MEMBER(bk_state::bk_key_press_r)
 {
-	double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double level = m_cassette->input();
 	UINT16 cas;
 	if (level < 0)
 	{

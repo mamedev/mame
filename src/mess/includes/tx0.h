@@ -7,7 +7,7 @@
 #ifndef TX0_H_
 #define TX0_H_
 
-#include <video/crt.h>
+#include "video/crt.h"
 
 enum state_t
 {

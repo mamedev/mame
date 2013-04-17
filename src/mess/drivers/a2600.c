@@ -54,7 +54,8 @@ public:
 		m_banking_mode(0xff),
 		m_joy1(*this, CONTROL1_TAG),
 		m_joy2(*this, CONTROL2_TAG) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	dpc_t m_dpc;
 	memory_region* m_extra_RAM;
@@ -169,6 +170,7 @@ protected:
 	int detect_super_chip();
 	unsigned long detect_2600controllers();
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 
@@ -950,7 +952,7 @@ READ8_MEMBER(a2600_state::modeSS_r)
 	else if ( offset == 0xFF9 )
 	{
 		/* Cassette port read */
-		double tap_val = machine().device<cassette_image_device>(CASSETTE_TAG)->input();
+		double tap_val = m_cassette->input();
 		//logerror("%04X: Cassette port read, tap_val = %f\n", m_maincpu->pc(), tap_val);
 		if ( tap_val < 0 )
 		{
@@ -1266,7 +1268,7 @@ WRITE8_MEMBER(a2600_state::switch_A_w)
 //  switch( ioport("CONTROLLERS")->read() % CATEGORY_SELECT )
 //  {
 //  case 0x0a:  /* KidVid voice module */
-//      machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+//      m_cassette->change_state(( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
 //      break;
 //  }
 }
@@ -1815,7 +1817,7 @@ void a2600_state::machine_reset()
 		m_modeSS_write_enabled = 0;
 		m_modeSS_byte_started = 0;
 		/* The Supercharger has no motor control so just enable it */
-		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:
@@ -1945,7 +1947,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_NTSC/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -1956,7 +1958,7 @@ static MACHINE_CONFIG_START( a2600, a2600_state )
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", a2600_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -1982,7 +1984,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_TIA_ADD("tia", MASTER_CLOCK_PAL/114)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -1993,7 +1995,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 
 	MCFG_FRAGMENT_ADD(a2600_cartslot)
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, a2600_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", a2600_cassette_interface )
 MACHINE_CONFIG_END
 
 

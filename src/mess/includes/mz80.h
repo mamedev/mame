@@ -23,7 +23,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit8253"),
 		m_ppi(*this, "ppi8255"),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_speaker(*this, "speaker"),
 		m_p_ram(*this, "p_ram"),
 		m_p_videoram(*this, "p_videoram"){ }
@@ -31,7 +31,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER(mz80k_strobe_r);
 	DECLARE_WRITE8_MEMBER(mz80k_strobe_w);

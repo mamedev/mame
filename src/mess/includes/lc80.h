@@ -25,7 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pio2(*this, Z80PIO2_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),

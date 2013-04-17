@@ -181,24 +181,24 @@ WRITE8_MEMBER( aim65_state::aim65_pb_w )
 
 	if (BIT(bits, 7))
 	{
-		m_cass1->output(BIT(data, 7) ? -1.0 : +1.0);
-		m_cass2->output(BIT(data, 7) ? -1.0 : +1.0);
+		m_cassette1->output(BIT(data, 7) ? -1.0 : +1.0);
+		m_cassette2->output(BIT(data, 7) ? -1.0 : +1.0);
 	}
 
 	if (BIT(bits, 5))
 	{
 		if (BIT(data, 5))
-			m_cass2->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette2->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		else
-			m_cass2->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			m_cassette2->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	}
 
 	if (BIT(bits, 4))
 	{
 		if (BIT(data, 4))
-			m_cass1->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette1->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 		else
-			m_cass1->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			m_cassette1->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 	}
 }
 
@@ -212,7 +212,7 @@ READ8_MEMBER( aim65_state::aim65_pb_r )
 */
 
 	UINT8 data = ioport("switches")->read();
-	data |= (m_cass1->input() > +0.03) ? 0x80 : 0;
+	data |= (m_cassette1->input() > +0.03) ? 0x80 : 0;
 	data |= 0x40; // TTY must be H if not used.
 	data |= m_pb_save & 0x37;
 	return data;

@@ -11,13 +11,6 @@
 
 
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define CASSETTE_TAG    "cassette"
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -47,7 +40,7 @@ const cassette_interface cbm_cassette_interface =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c2n )
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface )
+	MCFG_CASSETTE_ADD("cassette", cbm_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -74,14 +67,14 @@ machine_config_constructor c2n_device::device_mconfig_additions() const
 c2n_device::c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_pet_datassette_port_interface(mconfig, *this),
-		m_cassette(*this, CASSETTE_TAG)
+		m_cassette(*this, "cassette")
 {
 }
 
 c2n_device::c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, C2N, "C2N", tag, owner, clock, "c2n", __FILE__),
 		device_pet_datassette_port_interface(mconfig, *this),
-		m_cassette(*this, CASSETTE_TAG)
+		m_cassette(*this, "cassette")
 {
 }
 

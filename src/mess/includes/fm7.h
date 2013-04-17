@@ -1,3 +1,5 @@
+#include "imagedev/cassette.h"
+
 /*
  *
  *  FM-7 header file
@@ -103,11 +105,12 @@ class fm7_state : public driver_device
 public:
 	fm7_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_shared_ram(*this, "shared_ram"),
-	m_boot_ram(*this, "boot_ram"),
-	m_maincpu(*this, "maincpu"),
-	m_sub(*this, "sub"),
-	m_x86(*this, "x86") { }
+		m_shared_ram(*this, "shared_ram"),
+		m_boot_ram(*this, "boot_ram"),
+		m_maincpu(*this, "maincpu"),
+		m_sub(*this, "sub"),
+		m_x86(*this, "x86"),
+		m_cassette(*this, "cassette") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
@@ -258,6 +261,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_sub;
 	optional_device<cpu_device> m_x86;
+	required_device<cassette_image_device> m_cassette;
 };
 
 #endif /*FM7_H_*/

@@ -176,13 +176,13 @@ static MACHINE_CONFIG_START( vector06, vector06_state )
 	MCFG_PALETTE_LENGTH(16)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_I8255_ADD("ppi8255", vector06_ppi8255_interface)
 	MCFG_I8255_ADD("ppi8255_2", vector06_ppi8255_2_interface)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, vector_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", vector_cassette_interface)
 	MCFG_FD1793_ADD("wd1793", vector06_wd17xx_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vector_floppy_interface)
 

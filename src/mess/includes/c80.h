@@ -21,7 +21,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pio1(*this, Z80PIO1_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_row0(*this, "ROW0"),
 			m_row1(*this, "ROW1"),
 			m_row2(*this, "ROW2")

@@ -18,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cdp1802(*this, CDP1802_TAG),
 		m_cdp1869(*this, CDP1869_TAG),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),

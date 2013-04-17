@@ -9,6 +9,7 @@
 
 #include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
+#include "imagedev/cassette.h"
 
 typedef short termchar_t;
 
@@ -32,7 +33,8 @@ class apple1_state : public driver_device
 public:
 	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;
@@ -57,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dspout);
 	DECLARE_WRITE8_MEMBER(apple1_pia0_dsp_write_signal);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

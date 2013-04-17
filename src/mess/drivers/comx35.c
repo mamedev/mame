@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	// peripheral hardware
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_PAL / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	// peripheral hardware
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_NTSC / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)

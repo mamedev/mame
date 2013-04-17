@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc2000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", tmc2000_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

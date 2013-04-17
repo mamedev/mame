@@ -729,7 +729,7 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 	// bit 1: printer error
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
-	double data = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double data = m_cassette->input();
 	centronics_device* centronics = machine().device<centronics_device>("lpt");
 	UINT8 pdata;
 	int x;
@@ -737,7 +737,7 @@ READ8_MEMBER(fm7_state::fm7_cassette_printer_r)
 	if(data > 0.03)
 		ret |= 0x80;
 
-	if(machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MOTOR_DISABLED)
+	if(m_cassette->get_state() & CASSETTE_MOTOR_DISABLED)
 		ret |= 0x80;  // cassette input is high when not in use.
 
 	ret |= 0x70;
@@ -784,9 +784,9 @@ WRITE8_MEMBER(fm7_state::fm7_cassette_printer_w)
 		// bit 1: cassette motor
 		// bit 0: cassette output
 			if((data & 0x01) != (m_cp_prev & 0x01))
-				machine().device<cassette_image_device>(CASSETTE_TAG)->output((data & 0x01) ? +1.0 : -1.0);
+				m_cassette->output((data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (m_cp_prev & 0x02))
-				machine().device<cassette_image_device>(CASSETTE_TAG)->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+				m_cassette->change_state((data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 			centronics->strobe_w(!(data & 0x40));
 			m_cp_prev = data;
 			break;
@@ -2035,7 +2035,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
@@ -2052,7 +2052,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_PALETTE_LENGTH(8)
 
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2077,7 +2077,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm7)
@@ -2094,7 +2094,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_PALETTE_LENGTH(8)
 
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2120,7 +2120,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm77av)
@@ -2136,7 +2136,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_PALETTE_LENGTH(8 + 4096)
 
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2166,7 +2166,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm11)
@@ -2183,7 +2183,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_PALETTE_LENGTH(8)
 
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 
@@ -2207,7 +2207,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
 
 	MCFG_MACHINE_START_OVERRIDE(fm7_state,fm16)
@@ -2224,7 +2224,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_PALETTE_LENGTH(8)
 
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, fm7_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", fm7_cassette_interface)
 
 	MCFG_MB8877_ADD("fdc",fm7_mb8877a_interface)
 

@@ -28,7 +28,7 @@ READ8_MEMBER( vector06_state::vector06_8255_portc_r )
 {
 	UINT8 ret = ioport("LINE8")->read();
 
-	if (m_cass->input() > 0)
+	if (m_cassette->input() > 0)
 		ret |= 0x10;
 
 	return ret;

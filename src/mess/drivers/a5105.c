@@ -39,7 +39,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_hgdc(*this, "upd7220"),
-			m_cass(*this, CASSETTE_TAG),
+			m_cass(*this, "cassette"),
 			m_beep(*this, BEEPER_TAG),
 			m_fdc(*this, "upd765a"),
 			m_floppy0(*this, "upd765a:0"),
@@ -599,7 +599,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_15MHz / 4, a5105_ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765a", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)

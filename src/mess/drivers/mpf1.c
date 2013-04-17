@@ -369,7 +369,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1)
@@ -393,7 +393,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_3_579545MHz/2, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_3_579545MHz/2, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1b)
@@ -424,7 +424,7 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, 2500000, mpf1_pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, 2500000, mpf1_ctc_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi8255_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mpf1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mpf1_cassette_interface)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

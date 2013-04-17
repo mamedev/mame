@@ -12,12 +12,6 @@
 #include "sound/beep.h"
 #include "imagedev/cassette.h"
 
-
-static cassette_image_device *cassette_device_image( running_machine &machine )
-{
-	return machine.device<cassette_image_device>(CASSETTE_TAG);
-}
-
 void electron_state::electron_tape_start()
 {
 	if (m_ula.tape_running )
@@ -46,7 +40,7 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 	if ( m_ula.cassette_motor_mode )
 	{
 		double tap_val;
-		tap_val = cassette_device_image(machine())->input();
+		tap_val = m_cassette->input();
 		if ( tap_val < -0.5 )
 		{
 			m_ula.tape_value = ( m_ula.tape_value << 8 ) | TAPE_LOW;
@@ -267,7 +261,7 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		m_ula.vram = (UINT8 *)space.get_read_ptr(m_ula.screen_base );
 		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
 		m_ula.cassette_motor_mode = ( data >> 6 ) & 0x01;
-		cassette_device_image(machine())->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
+		m_cassette->change_state(m_ula.cassette_motor_mode ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MOTOR_DISABLED );
 		m_ula.capslock_mode = ( data >> 7 ) & 0x01;
 		break;
 	case 0x08: case 0x0A: case 0x0C: case 0x0E:

@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, lviv_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", lviv_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
 
 	/* internal ram */

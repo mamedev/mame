@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
 	/* devices */
 	MCFG_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", eti660_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

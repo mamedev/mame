@@ -53,15 +53,15 @@ static void super80_cassette_motor( running_machine &machine, UINT8 data )
 {
 	super80_state *state = machine.driver_data<super80_state>();
 	if (data)
-		state->m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 	else
-		state->m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 
 	/* does user want to hear the sound? */
 	if BIT(state->m_io_config->read(), 3)
-		state->m_cass->change_state(CASSETTE_SPEAKER_ENABLED,CASSETTE_MASK_SPEAKER);
+		state->m_cassette->change_state(CASSETTE_SPEAKER_ENABLED,CASSETTE_MASK_SPEAKER);
 	else
-		state->m_cass->change_state(CASSETTE_SPEAKER_MUTED,CASSETTE_MASK_SPEAKER);
+		state->m_cassette->change_state(CASSETTE_SPEAKER_MUTED,CASSETTE_MASK_SPEAKER);
 }
 
 /********************************************* TIMER ************************************************/
@@ -90,7 +90,7 @@ TIMER_CALLBACK_MEMBER(super80_state::super80_timer)
 	UINT8 cass_ws=0;
 
 	m_cass_data[1]++;
-	cass_ws = ((m_cass)->input() > +0.03) ? 4 : 0;
+	cass_ws = ((m_cassette)->input() > +0.03) ? 4 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{
@@ -185,7 +185,7 @@ WRITE8_MEMBER( super80_state::super80_f0_w )
 	m_shared = data;
 	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));  /* bit 1 - cassette motor */
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
+	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 
 	m_last_data = data;
 }
@@ -196,7 +196,7 @@ WRITE8_MEMBER( super80_state::super80r_f0_w )
 	m_shared = data | 0x14;
 	speaker_level_w(m_speaker, BIT(data, 3));               /* bit 3 - speaker */
 	if (BIT(bits, 1)) super80_cassette_motor(machine(), BIT(data, 1));  /* bit 1 - cassette motor */
-	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
+	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);    /* bit 0 - cass out */
 
 	m_last_data = data;
 }

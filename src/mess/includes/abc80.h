@@ -67,7 +67,7 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_pio(*this, Z80PIO_TAG),
 			m_psg(*this, SN76477_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_bus(*this, ABCBUS_TAG),
 			m_kb(*this, ABC80_KEYBOARD_TAG),
 			m_ram(*this, RAM_TAG),

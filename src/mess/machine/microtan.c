@@ -153,11 +153,6 @@ static void microtan_set_irq_line(running_machine &machine)
 	state->m_maincpu->set_input_line(0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
 }
 
-static cassette_image_device *cassette_device_image(running_machine &machine)
-{
-	return machine.device<cassette_image_device>(CASSETTE_TAG);
-}
-
 /**************************************************************
  * VIA callback functions for VIA #0
  **************************************************************/
@@ -212,7 +207,7 @@ WRITE8_MEMBER(microtan_state::via_0_out_b)
 {
 	LOG(("microtan_via_0_out_b %02X\n", data));
 	/* bit #7 is the cassette output signal */
-	cassette_device_image(machine())->output(data & 0x80 ? +1.0 : -1.0);
+	m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
 WRITE8_MEMBER(microtan_state::via_0_out_ca2)
@@ -333,7 +328,7 @@ const via6522_interface microtan_via6522_1 =
 
 TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
 {
-	double level = (cassette_device_image(machine()))->input();
+	double level = m_cassette->input();
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));

@@ -269,7 +269,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -278,7 +278,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SNAPSHOT_ADD("snapshot", primo, "pss", 0)
 	MCFG_QUICKLOAD_ADD("quickload", primo, "pp", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, primo_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", primo_cassette_interface )
 
 	/* floppy from serial bus */
 	MCFG_CBM_IEC_ADD(NULL)

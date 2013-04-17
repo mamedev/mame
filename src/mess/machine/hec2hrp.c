@@ -56,8 +56,6 @@
 static void Mise_A_Jour_Etat(running_machine &machine, int Adresse, int Value );
 static void Update_Sound(address_space &space, UINT8 data);
 
-static cassette_image_device *cassette_device_image(running_machine &machine);
-
 /* machine List
 hec2hrp
 victor
@@ -334,7 +332,7 @@ READ8_MEMBER(hec2hrp_state::hector_cassette_r)
 		if (m_write_cassette == 0)
 		{
 			/* Accee a la cassette*/
-			level = (cassette_device_image(machine())->input());
+			level = m_cassette->input();
 
 			/* Travail du 741 en trigger*/
 			if  (level < -0.08)
@@ -375,15 +373,15 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
 		if (m_write_cassette==0)
 		{
-				cassette_device_image(machine())->change_state(
+				m_cassette->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
-			// cassette_device_image(machine())->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
+			// m_cassette->set_state((cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED ));
 		}
 	}
 	else
 	{   /* stop motor*/
-		cassette_device_image(machine())->set_state(CASSETTE_STOPPED);
+		m_cassette->set_state(CASSETTE_STOPPED);
 		m_write_cassette=0;
 		m_counter_write =0;
 	}
@@ -398,15 +396,15 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 			m_counter_write = 6;
 			if (m_write_cassette==0)
 			{   /* C'est la 1er fois => record*/
-							cassette_device_image(machine())->change_state(
+							m_cassette->change_state(
 						CASSETTE_MOTOR_ENABLED ,
 						CASSETTE_MASK_MOTOR);
-				cassette_device_image(machine())->set_state(CASSETTE_RECORD);
+				m_cassette->set_state(CASSETTE_RECORD);
 				m_write_cassette=1;
 			}
 		}
 		/* cassette data */
-		cassette_device_image(machine())->output(((data & 0x80) == 0x80) ? -1.0 : +1.0);
+		m_cassette->output(((data & 0x80) == 0x80) ? -1.0 : +1.0);
 	}
 
 	/* Other bit : color definition*/
@@ -427,16 +425,6 @@ WRITE8_MEMBER(hec2hrp_state::hector_color_b_w)
 
 	/* Play bit*/
 	discrete_sound_w(discrete, space, NODE_01,  (data & 0x80) ? 0:1 );
-}
-
-
-/******************************************************************************
- Cassette Handling
-******************************************************************************/
-
-static cassette_image_device *cassette_device_image(running_machine &machine)
-{
-	return machine.device<cassette_image_device>(CASSETTE_TAG);
 }
 
 

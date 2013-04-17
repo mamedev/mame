@@ -314,10 +314,10 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
 	MCFG_SOUND_CONFIG(spc1000_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, spc1000_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", spc1000_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

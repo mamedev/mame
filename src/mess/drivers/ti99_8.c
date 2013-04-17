@@ -221,7 +221,8 @@ class ti99_8_state : public driver_device
 {
 public:
 	ti99_8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_cassette(*this, "cassette") { }
 
 	// CRU (Communication Register Unit) handling
 	DECLARE_READ8_MEMBER(cruread);
@@ -273,6 +274,7 @@ private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
 	//int     m_alphalock_line;
+	required_device<cassette_image_device> m_cassette;
 };
 
 /*
@@ -580,7 +582,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		// bit 26: high
 		// bit 27: tape input
 		answer = 4;
-		if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
+		if (m_cassette->input() > 0)
 			answer |= 8;
 		break;
 	}
@@ -642,8 +644,7 @@ WRITE_LINE_MEMBER( ti99_8_state::PTGEN )
 */
 WRITE_LINE_MEMBER( ti99_8_state::cassette_motor )
 {
-	cassette_image_device *img = machine().device<cassette_image_device>(CASSETTE_TAG);
-	img->change_state(state==ASSERT_LINE? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(state==ASSERT_LINE? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 }
 
 /*
@@ -663,7 +664,7 @@ WRITE_LINE_MEMBER( ti99_8_state::audio_gate )
 */
 WRITE_LINE_MEMBER( ti99_8_state::cassette_output )
 {
-	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state==ASSERT_LINE? +1 : -1);
+	m_cassette->output(state==ASSERT_LINE? +1 : -1);
 }
 
 WRITE8_MEMBER( ti99_8_state::tms9901_interrupt )
@@ -978,8 +979,8 @@ static MACHINE_CONFIG_START( ti99_8_60hz, ti99_8_state )
 
 	/* Cassette drives */
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* Console GROMs */
@@ -1021,8 +1022,8 @@ static MACHINE_CONFIG_START( ti99_8_50hz, ti99_8_state )
 
 	/* Cassette drives */
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	/* Console GROMs */

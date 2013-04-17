@@ -25,7 +25,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_pio(*this, "z80pio"),
-			m_cass(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_wave(*this, WAVE_TAG),
 			m_speaker(*this, "speaker"),
 			m_centronics(*this, "centronics"),
@@ -96,7 +96,7 @@ public:
 	TIMER_CALLBACK_MEMBER(super80_halfspeed);
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;

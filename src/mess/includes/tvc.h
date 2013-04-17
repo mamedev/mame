@@ -83,7 +83,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, RAM_TAG),
 			m_sound(*this, "custom"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG)
 		{ }
 

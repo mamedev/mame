@@ -31,7 +31,7 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
 			m_pia(*this, MC6821_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_pa0(*this, "PA0"),
 			m_pa1(*this, "PA1"),
 			m_pa2(*this, "PA2"),

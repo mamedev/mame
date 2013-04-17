@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( coco3, coco3_state )
 	// devices
 	MCFG_PIA6821_ADD(PIA0_TAG, coco_state::pia0_config)
 	MCFG_PIA6821_ADD(PIA1_TAG, coco_state::pia1_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, coco_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
 	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "fdcv11", NULL)
 	MCFG_COCO_VHD_ADD(VHD0_TAG)

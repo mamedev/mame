@@ -45,7 +45,7 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
 			m_led(*this, DM9368_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),

@@ -363,7 +363,7 @@ static MACHINE_CONFIG_START( phc25, phc25_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, phc25_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", phc25_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */

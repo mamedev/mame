@@ -41,7 +41,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_v9938(*this, "v9938"),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ay8910(*this, "ay8910"),
 		m_ym(*this, "ym2413"),
 		m_k051649(*this, "k051649"),
@@ -139,7 +139,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<device_t> m_ay8910;
 	required_device<ym2413_device> m_ym;
 	optional_device<k051649_device> m_k051649;

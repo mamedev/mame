@@ -644,11 +644,11 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, jtc_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", jtc_cassette_interface)
 
 	/* printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

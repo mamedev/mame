@@ -876,7 +876,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_I8271_ADD(I8271_TAG, fdc_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
 	MCFG_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cartridge */
@@ -945,7 +945,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_VIA6522_ADD(R6522_TAG, X2/4, via_intf)
 	MCFG_I8255_ADD(INS8255_TAG, ppi_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

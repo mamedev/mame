@@ -27,7 +27,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vdc(*this, CDP1861_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),
 			m_run(*this, "RUN")
@@ -63,7 +63,7 @@ public:
 	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_rom(*this, CDP1802_TAG),
 			m_run(*this, "RUN")
 	{ }
@@ -95,7 +95,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),
 			m_colorram(*this, "color_ram"),
@@ -162,7 +162,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),
 			m_ny0(*this, "NY0"),

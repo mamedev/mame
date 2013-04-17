@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 
 	MCFG_FRAGMENT_ADD(pecom_video)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, pecom_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", pecom_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom_cass")
 
 	/* internal ram */

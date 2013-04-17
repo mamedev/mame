@@ -708,7 +708,7 @@ static const cassette_interface ibm5150_cassette_interface =
 static MACHINE_CONFIG_FRAGMENT( ibm5150_mb_config )
 	MCFG_FRAGMENT_ADD(ibm5160_mb_config)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", ibm5150_cassette_interface )
 MACHINE_CONFIG_END
 
 
@@ -732,7 +732,7 @@ machine_config_constructor ibm5150_mb_device::device_mconfig_additions() const
 
 ibm5150_mb_device::ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ibm5160_mb_device(mconfig, tag, owner, clock),
-		m_cassette(*this, CASSETTE_TAG)
+		m_cassette(*this, "cassette")
 {
 }
 

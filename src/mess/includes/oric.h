@@ -75,7 +75,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay8912(*this, "ay8912"),
 		m_centronics(*this, "centronics"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_via6522_0(*this, "via6522_0"),
 		m_region_maincpu(*this, "maincpu"),
 		m_bank1(*this, "bank1"),

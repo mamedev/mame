@@ -88,7 +88,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_printer(*this, "centronics"),
-	m_cass(*this, CASSETTE_TAG)
+	m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port10_w);
@@ -296,11 +296,11 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_10_738635MHz/3) // guess
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
 	/* cartridge */
 //  MCFG_CARTSLOT_ADD("cart")

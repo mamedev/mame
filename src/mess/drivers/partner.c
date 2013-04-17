@@ -212,12 +212,12 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_PALETTE_INIT_OVERRIDE(partner_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, partner_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, partner_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", partner_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
 
 	MCFG_FD1793_ADD("wd1793", partner_wd17xx_interface )

@@ -144,7 +144,7 @@ static MACHINE_CONFIG_START( dragon_base, dragon_state )
 	MCFG_PIA6821_ADD(PIA0_TAG, dragon_state::pia0_config)
 	MCFG_PIA6821_ADD(PIA1_TAG, dragon_state::pia1_config)
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_4_433619MHz, dragon_state::sam6883_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, dragon_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", dragon_state::coco_cassette_interface)
 	MCFG_PRINTER_ADD(PRINTER_TAG)
 
 	// video hardware

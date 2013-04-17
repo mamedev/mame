@@ -206,12 +206,12 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_I8255A_ADD( "ppi8255", ut88_ppi8255_interface )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", ut88_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
@@ -228,9 +228,9 @@ static MACHINE_CONFIG_START( ut88mini, ut88_state )
 
 	/* Cassette */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", ut88_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 

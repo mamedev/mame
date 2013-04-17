@@ -31,7 +31,7 @@ public:
 			m_vdg(*this, MC6847_TAG),
 			m_crtc(*this, MC6845_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
 			m_mc6845_video_ram(*this, "mc6845_vram"),

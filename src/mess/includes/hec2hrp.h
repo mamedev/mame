@@ -40,6 +40,7 @@
 #include "machine/upd765.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
+#include "imagedev/cassette.h"
 
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
@@ -72,10 +73,11 @@ class hec2hrp_state : public driver_device
 public:
 	hec2hrp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_videoram(*this,"videoram"),
-			m_hector_videoram(*this,"hector_videoram") ,
+		m_videoram(*this,"videoram"),
+		m_hector_videoram(*this,"hector_videoram") ,
 		m_maincpu(*this, "maincpu"),
-		m_disc2cpu(*this, "disc2cpu") { }
+		m_disc2cpu(*this, "disc2cpu"),
+		m_cassette(*this, "cassette") { }
 
 	optional_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_hector_videoram;
@@ -145,6 +147,7 @@ public:
 	void disc2_fdc_dma_irq(bool state);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/

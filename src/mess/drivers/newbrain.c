@@ -1392,8 +1392,8 @@ static MACHINE_CONFIG_START( newbrain_a, newbrain_state )
 	MCFG_FRAGMENT_ADD(newbrain_video)
 
 	// devices
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, newbrain_cassette_interface)
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG, newbrain_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", newbrain_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette2", newbrain_cassette_interface)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

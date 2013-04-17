@@ -43,8 +43,8 @@ public:
 	sorcerer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass1(*this, CASSETTE_TAG),
-	m_cass2(*this, CASSETTE2_TAG),
+	m_cassette1(*this, "cassette"),
+	m_cassette2(*this, "cassette2"),
 	m_wave1(*this, WAVE_TAG),
 	m_wave2(*this, WAVE2_TAG),
 	m_dac(*this, "dac"),
@@ -72,8 +72,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass1;
-	required_device<cassette_image_device> m_cass2;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
 	required_device<wave_device> m_wave1;
 	required_device<wave_device> m_wave2;
 	required_device<dac_device> m_dac;

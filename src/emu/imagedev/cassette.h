@@ -124,9 +124,6 @@ typedef device_type_iterator<&device_creator<cassette_image_device>, cassette_im
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define CASSETTE_TAG        "cassette"
-#define CASSETTE2_TAG       "cassette2"
-
 #define MCFG_CASSETTE_ADD(_tag, _config)    \
 	MCFG_DEVICE_ADD(_tag, CASSETTE, 0)          \
 	MCFG_DEVICE_CONFIG(_config)

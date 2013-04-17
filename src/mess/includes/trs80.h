@@ -31,7 +31,7 @@ public:
 		m_ay31015(*this, "tr1602"),
 		m_fdc(*this, "wd179x"),
 		m_speaker(*this, "speaker"),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_p_videoram(*this, "p_videoram"),
 		m_region_maincpu(*this, "maincpu"),
 		m_io_config(*this, "CONFIG"),
@@ -67,7 +67,7 @@ public:
 	optional_device<ay31015_device> m_ay31015;
 	optional_device<fd1793_device> m_fdc;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	DECLARE_WRITE8_MEMBER ( trs80_ff_w );
 	DECLARE_WRITE8_MEMBER ( lnw80_fe_w );
 	DECLARE_WRITE8_MEMBER ( sys80_fe_w );

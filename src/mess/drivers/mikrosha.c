@@ -223,12 +223,12 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_PALETTE_INIT_OVERRIDE(mikrosha_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, mikrosha_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", mikrosha_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
 MACHINE_CONFIG_END
 

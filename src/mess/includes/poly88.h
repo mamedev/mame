@@ -20,7 +20,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_uart(*this, "uart"),
 		m_sercas(*this, "sercas"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_linec(*this, "LINEC"),
 		m_line0(*this, "LINE0"),
 		m_line1(*this, "LINE1"),

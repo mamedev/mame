@@ -18,7 +18,7 @@ public:
 		m_cursor_ram(*this, "cursor_ram"),
 		m_video_ram(*this, "video_ram"),
 		m_ppi8255(*this, "ppi8255"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
 		m_bank1(*this, "bank1"),

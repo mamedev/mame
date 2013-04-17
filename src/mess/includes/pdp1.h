@@ -7,7 +7,7 @@
 #ifndef PDP1_H_
 #define PDP1_H_
 
-#include <video/crt.h>
+#include "video/crt.h"
 
 /* defines for each bit and mask in input port "CSW" */
 enum

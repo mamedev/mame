@@ -1310,8 +1310,7 @@ static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
 
 TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 {
-	double dev_val;
-	dev_val=machine().device<cassette_image_device>(CASSETTE_TAG)->input();
+	double dev_val = m_cassette->input();
 
 	// look for rising edges on the cassette wave
 	if (((dev_val>=0.0) && (m_last_dev_val<0.0)) || ((dev_val<0.0) && (m_last_dev_val>=0.0)))
@@ -1371,12 +1370,12 @@ static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
 	bbc_state *state = machine.driver_data<bbc_state>();
 	if (status)
 	{
-		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		machine.device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		state->m_tape_timer->reset();
 		state->m_len0 = 0;
 		state->m_len1 = 0;

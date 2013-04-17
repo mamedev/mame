@@ -79,7 +79,7 @@ public:
 			m_dart(*this, Z80DART_TAG),
 			m_sio(*this, Z80SIO_TAG),
 			m_discrete(*this, "discrete"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, Z80_TAG),
 			m_video_ram(*this, "video_ram"),

@@ -159,7 +159,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_mc6847(*this, "mc6847"),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu") { }
 
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_CONFIG(vtech1_speaker_interface)
@@ -987,7 +987,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	/* snapshot/quickload */
 	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, laser_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", laser_cassette_interface )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

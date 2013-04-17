@@ -26,7 +26,7 @@ public:
 	vector06_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cassette(*this, "cassette"),
 	m_fdc(*this, "wd1793"),
 	m_ppi(*this, "ppi8255"),
 	m_ppi2(*this, "ppi8255_2"),
@@ -34,7 +34,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<fd1793_device> m_fdc;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;

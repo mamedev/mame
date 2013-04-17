@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( exp85, exp85_state )
 	/* devices */
 	MCFG_I8155_ADD(I8155_TAG, XTAL_6_144MHz/2, i8155_intf)
 	MCFG_I8355_ADD(I8355_TAG, XTAL_6_144MHz/2, i8355_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, exp85_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", exp85_cassette_interface)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf,9600)
 
 	/* internal ram */

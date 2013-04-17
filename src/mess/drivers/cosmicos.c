@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cosmicos_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", cosmicos_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

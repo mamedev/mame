@@ -983,7 +983,7 @@ READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
 {
 	int timer2_output = pit8253_get_output( machine().device("pit8253"), 2 );
 	int data = 0xff;
-	double tap_val = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double tap_val = m_cassette->input();
 
 //  0x80 -- serial RxD
 //  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
@@ -1046,7 +1046,7 @@ WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
 	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
 	pc_speaker_set_spkrdata( machine(), data & 0x02 );
 
-	machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 }
 
 
@@ -1086,7 +1086,7 @@ READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( m_ppi_portb & 0x08 ) )
 	{
-		double tap_val = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double tap_val = m_cassette->input();
 
 		if ( tap_val < 0 )
 		{

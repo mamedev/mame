@@ -25,7 +25,7 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_ppi(*this, I8255_TAG),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG),
 		m_video_ram(*this, "video_ram"),

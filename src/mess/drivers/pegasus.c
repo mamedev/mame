@@ -51,7 +51,7 @@ public:
 	pegasus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cass(*this, "cassette"),
 	m_pia_s(*this, "pia_s"),
 	m_pia_u(*this, "pia_u"),
 	m_p_videoram(*this, "p_videoram"){ }
@@ -515,7 +515,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
@@ -536,7 +536,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_CARTSLOT_ADD("cart5")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_5)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, pegasus_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", pegasus_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )

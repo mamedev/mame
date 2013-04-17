@@ -369,12 +369,12 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_PALETTE_INIT_OVERRIDE(radio86_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, radio86_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", radio86_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","radio86")
 MACHINE_CONFIG_END
 

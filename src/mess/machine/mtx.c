@@ -135,7 +135,7 @@ WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
 
 WRITE8_MEMBER(mtx_state::mtx_cst_w)
 {
-	dynamic_cast<cassette_image_device *>(machine().device(CASSETTE_TAG))->output( BIT(data, 0) ? -1 : 1);
+	m_cassette->output( BIT(data, 0) ? -1 : 1);
 }
 
 /*-------------------------------------------------
@@ -372,7 +372,6 @@ MACHINE_START_MEMBER(mtx_state,mtx512)
 	/* find devices */
 	m_z80ctc = machine().device<z80ctc_device>(Z80CTC_TAG);
 	m_z80dart = machine().device(Z80DART_TAG);
-	m_cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
 	membank("bank1")->set_base(memregion("user1")->base());

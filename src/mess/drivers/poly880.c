@@ -290,7 +290,7 @@ static MACHINE_CONFIG_START( poly880, poly880_state )
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, XTAL_7_3728MHz/16, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, XTAL_7_3728MHz/16, pio2_intf)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", poly880_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

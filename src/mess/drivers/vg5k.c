@@ -66,7 +66,7 @@ public:
 			m_ef9345(*this, "ef9345"),
 			m_dac(*this, "dac"),
 			m_printer(*this, "printer"),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, "cassette")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -399,10 +399,10 @@ static MACHINE_CONFIG_START( vg5k, vg5k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cassette */
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, vg5k_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", vg5k_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

@@ -300,7 +300,7 @@ static MACHINE_CONFIG_START( tmc600, tmc600_state )
 
 	/* devices */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, tmc600_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", tmc600_cassette_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tmc600_floppy_interface)
 
 	/* internal ram */

@@ -24,7 +24,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
 		m_screen(*this, "screen"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),

@@ -711,7 +711,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -719,7 +719,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	/* devices */
 	MCFG_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
 	MCFG_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, spectrum_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", spectrum_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","spectrum_cass")
 
 	/* cartridge */

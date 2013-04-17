@@ -303,7 +303,7 @@ public:
 			m_fdccpu(*this, "fdccpu"),
 			m_pic(*this, I8214_TAG),
 			m_rtc(*this, UPD1990A_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -2679,7 +2679,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	#endif
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8801_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", pc8801_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)

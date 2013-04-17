@@ -72,7 +72,7 @@ public:
 	m_speaker(*this, "speaker"),
 	m_pia0(*this, "pia_0"),
 	m_pia1(*this, "pia_1"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cass(*this, "cassette"),
 	m_fdc(*this, "wd179x")
 	,
 		m_p_videoram(*this, "p_videoram"){ }
@@ -703,7 +703,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	//MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( apf_imagination, apf_state )
 	/* Devices */
 	MCFG_PIA6821_ADD( "pia_0", apf_m1000_pia_interface )
 	MCFG_PIA6821_ADD( "pia_1", apf_imagination_pia_interface )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apf_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apf_cassette_interface )
 	MCFG_FD1793_ADD("wd179x", default_wd17xx_interface ) // TODO confirm type
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(apfimag_floppy_interface)
 MACHINE_CONFIG_END
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_DERIVED( apf_m1000, apf_imagination )
 	MCFG_DEVICE_REMOVE( "pia_1" )
 
 //  MCFG_DEVICE_REMOVE( WAVE_TAG )
-	MCFG_DEVICE_REMOVE( CASSETTE_TAG )
+	MCFG_DEVICE_REMOVE( "cassette" )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_REMOVE()
 
 	MCFG_CARTSLOT_ADD("cart")

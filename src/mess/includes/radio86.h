@@ -19,7 +19,7 @@ public:
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_dma8257(*this, "dma8257"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_ppi8255_2(*this, "ppi8255_2"),

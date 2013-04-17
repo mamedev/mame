@@ -30,7 +30,7 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_ctc(*this, Z80CTC_TAG),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_pc0(*this, "PC0"),
 			m_pc1(*this, "PC1"),
 			m_pc2(*this, "PC2"),

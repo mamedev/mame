@@ -90,7 +90,7 @@ READ8_MEMBER(primo_state::primo_be_1_r)
 	// bit 3 - I3 (external bus)
 
 	// bit 2 - cassette
-	data |= ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() < 0.1) ? 0x04 : 0x00;
+	data |= (m_cassette->input() < 0.1) ? 0x04 : 0x00;
 
 	// bit 1 - reset button
 	data |= (ioport("RESET")->read()) ? 0x02 : 0x00;
@@ -155,14 +155,14 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 	switch (data & 0x03)
 	{
 		case 0:
-			machine().device<cassette_image_device>(CASSETTE_TAG)->output(-1.0);
+			m_cassette->output(-1.0);
 			break;
 		case 1:
 		case 2:
-			machine().device<cassette_image_device>(CASSETTE_TAG)->output(0.0);
+			m_cassette->output(0.0);
 			break;
 		case 3:
-			machine().device<cassette_image_device>(CASSETTE_TAG)->output(1.0);
+			m_cassette->output(1.0);
 			break;
 	}
 }

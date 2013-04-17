@@ -10,15 +10,17 @@
 #include "imagedev/snapquik.h"
 #include "machine/cbmiec.h"
 #include "sound/speaker.h"
+#include "imagedev/cassette.h"
 
 class primo_state : public driver_device
 {
 public:
 	primo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_iec(*this, CBM_IEC_TAG),
-			m_maincpu(*this, "maincpu"),
-			m_speaker(*this, "speaker") { }
+		m_iec(*this, CBM_IEC_TAG),
+		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette") { }
 
 	required_device<cbm_iec_device> m_iec;
 
@@ -39,6 +41,7 @@ public:
 	INTERRUPT_GEN_MEMBER(primo_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

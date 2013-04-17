@@ -42,7 +42,7 @@ WRITE8_MEMBER( mbee_state::pio_port_b_w )
     d1 cass out and (on 256tc) keyboard irq
     d0 cass in */
 
-	m_cass->output((data & 0x02) ? -1.0 : +1.0);
+	m_cassette->output((data & 0x02) ? -1.0 : +1.0);
 
 	speaker_level_w(m_speaker, BIT(data, 6));
 };
@@ -51,7 +51,7 @@ READ8_MEMBER( mbee_state::pio_port_b_r )
 {
 	UINT8 data = 0;
 
-	if (m_cass->input() > 0.03) data |= 1;
+	if (m_cassette->input() > 0.03) data |= 1;
 
 	data |= m_clock_pulse;
 	data |= m_mbee256_key_available;

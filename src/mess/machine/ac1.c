@@ -114,5 +114,4 @@ DRIVER_INIT_MEMBER(ac1_state,ac1)
 
 void ac1_state::machine_reset()
 {
-	m_cassette = machine().device<cassette_image_device>(CASSETTE_TAG);
 }

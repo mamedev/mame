@@ -952,7 +952,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", crvision_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	// sound hardware
@@ -961,7 +961,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge
@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", lasr2001_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware
@@ -1027,7 +1027,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 
 	// cartridge

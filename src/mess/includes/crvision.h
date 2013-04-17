@@ -33,7 +33,7 @@ public:
 			m_maincpu(*this, M6502_TAG),
 			m_pia(*this, PIA6821_TAG),
 			m_psg(*this, SN76489_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG)
 	{ }

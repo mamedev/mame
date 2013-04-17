@@ -87,7 +87,7 @@ public:
 	camplynx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	//m_cass(*this, CASSETTE_TAG),
+	//m_cass(*this, "cassette"),
 	//m_wave(*this, WAVE_TAG),
 	//m_printer(*this, "centronics"),
 	m_crtc(*this, "crtc")

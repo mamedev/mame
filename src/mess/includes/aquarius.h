@@ -21,7 +21,7 @@ public:
 	aquarius_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_screen(*this, "screen"),
 			m_ram(*this, RAM_TAG),

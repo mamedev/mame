@@ -28,7 +28,7 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_vdg(*this, MC6847_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_video_ram(*this, "video_ram")
 	{ }
 

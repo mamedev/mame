@@ -6,7 +6,7 @@
 
 #ifndef BK_H_
 #define BK_H_
-
+#include "imagedev/cassette.h"
 
 class bk_state : public driver_device
 {
@@ -14,7 +14,8 @@ public:
 	bk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_bk0010_video_ram(*this, "video_ram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	UINT16 m_scrool;
 	required_shared_ptr<UINT16> m_bk0010_video_ram;
@@ -41,6 +42,7 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 #endif /* BK_H_ */

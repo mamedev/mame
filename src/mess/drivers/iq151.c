@@ -69,7 +69,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_pic(*this, "pic8259"),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 
 	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, iq151_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", iq151_cassette_interface )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", iq151_state, cassette_timer, attotime::from_hz(2000))
 
 	/* cartridge */

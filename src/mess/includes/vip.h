@@ -26,7 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vdc(*this, CDP1861_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_beeper(*this, DISCRETE_TAG),
 			m_byteio(*this, VIP_BYTEIO_PORT_TAG),
 			m_exp(*this, VIP_EXPANSION_SLOT_TAG),

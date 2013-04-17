@@ -24,7 +24,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_colorram(*this, "colorram"),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),

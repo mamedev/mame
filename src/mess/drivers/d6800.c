@@ -53,7 +53,7 @@ public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cass(*this, CASSETTE_TAG),
+		m_cass(*this, "cassette"),
 		m_pia(*this, "pia"),
 		m_dac(*this, "dac"),
 		m_videoram(*this, "videoram"),
@@ -390,14 +390,14 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, d6800_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", d6800_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */

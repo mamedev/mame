@@ -221,7 +221,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", DAI_SOUND, 0)
@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( dai, dai_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, dai_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", dai_cassette_interface )
 
 	/* tms5501 */
 	MCFG_TMS5501_ADD( "tms5501", 2000000, dai_tms5501_interface )

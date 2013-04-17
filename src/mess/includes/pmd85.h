@@ -20,7 +20,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_sercas(*this, "sercas"),
 		m_pit8253(*this, "pit8253"),
 		m_uart(*this, "uart"),

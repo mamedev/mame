@@ -207,10 +207,10 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", galaxy_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
@@ -246,10 +246,10 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, XTAL/4)
 	MCFG_SOUND_CONFIG(galaxy_ay_interface)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", galaxy_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */

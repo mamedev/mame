@@ -408,13 +408,13 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
 
@@ -483,11 +483,11 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", special_cassette_interface )
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 

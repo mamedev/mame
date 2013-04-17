@@ -46,7 +46,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_framecnt(0),
 	m_beeper(*this, BEEPER_TAG),
-	m_cass(*this, CASSETTE_TAG),
+	m_cass(*this, "cassette"),
 	m_p_colorram(*this, "colorram"),
 	m_p_videoram(*this, "videoram"){ }
 
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
 	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_9_8304MHz / 4, ctc_intf )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */

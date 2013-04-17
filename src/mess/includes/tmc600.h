@@ -29,7 +29,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_char_rom(*this, "chargen"),
 			m_page_ram(*this, "page_ram"),

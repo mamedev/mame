@@ -62,7 +62,7 @@ public:
 			m_z80ctc(*this, "z80ctc"),
 			m_ram(*this, RAM_TAG),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

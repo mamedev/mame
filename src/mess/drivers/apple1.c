@@ -310,7 +310,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, apple1_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", apple1_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","apple1")
 
 	/* Note that because we always include 4K of RAM at $E000-$EFFF,

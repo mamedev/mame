@@ -44,7 +44,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, SY6502_TAG),
 			m_vdg(*this, MC6847_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, "speaker"),
 			m_extrom(*this, EXTROM_TAG),

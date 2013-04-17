@@ -43,7 +43,7 @@ public:
 	m_ef9345(*this, "ef9345"),
 	m_dac(*this, "dac"),
 	m_ram(*this, RAM_TAG),
-	m_cassette(*this, CASSETTE_TAG),
+	m_cassette(*this, "cassette"),
 	m_printer(*this, "printer")
 	{ }
 
@@ -518,7 +518,7 @@ static MACHINE_CONFIG_START( mc10, mc10_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mc10_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mc10_cassette_interface)
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, alice32_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", alice32_cassette_interface)
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

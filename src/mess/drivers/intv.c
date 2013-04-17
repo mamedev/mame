@@ -864,7 +864,7 @@ static MACHINE_CONFIG_DERIVED( intvecs, intv )
 	MCFG_MACHINE_RESET_OVERRIDE(intv_state, intvecs )
 
 	/* cassette */
-	//MCFG_CASSETTE_ADD( CASSETTE_TAG, ecs_cassette_interface )
+	//MCFG_CASSETTE_ADD( "cassette", ecs_cassette_interface )
 
 MACHINE_CONFIG_END
 

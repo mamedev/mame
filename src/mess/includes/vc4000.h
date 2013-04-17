@@ -73,7 +73,7 @@ class vc4000_state : public driver_device
 public:
 	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_maincpu(*this, "maincpu"),
 		m_keypad1_1(*this, "KEYPAD1_1"),
 		m_keypad1_2(*this, "KEYPAD1_2"),
@@ -109,7 +109,7 @@ public:
 	UINT8 m_objects[512];
 	UINT8 m_irq_pause;
 	bitmap_ind16 *m_bitmap;
-	optional_device<cassette_image_device> m_cass;
+	optional_device<cassette_image_device> m_cassette;
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

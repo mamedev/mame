@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( aquarius, aquarius_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, aquarius_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", aquarius_cassette_interface )
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")

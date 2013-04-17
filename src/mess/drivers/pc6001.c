@@ -143,7 +143,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, "ram"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_region_maincpu(*this, "maincpu"),
 		m_region_gfx1(*this, "gfx1"),
 		m_region_cas(*this, "cas"),
@@ -2388,8 +2388,8 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 
-//  MCFG_CASSETTE_ADD(CASSETTE_TAG,pc6001_cassette_interface)
-	MCFG_CARTSLOT_ADD(CASSETTE_TAG)
+//  MCFG_CASSETTE_ADD("cassette",pc6001_cassette_interface)
+	MCFG_CARTSLOT_ADD("cassette")
 	MCFG_CARTSLOT_EXTENSION_LIST("cas,p6")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pc6001_cass")
@@ -2399,7 +2399,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)
 	MCFG_SOUND_CONFIG(pc6001_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+//  MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* TODO: accurate timing on this */

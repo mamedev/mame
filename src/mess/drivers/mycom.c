@@ -68,7 +68,7 @@ public:
 	m_ppi0(*this, "ppi8255_0"),
 	m_ppi1(*this, "ppi8255_1"),
 	m_ppi2(*this, "ppi8255_2"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cass(*this, "cassette"),
 	m_wave(*this, WAVE_TAG),
 	m_crtc(*this, "crtc"),
 	m_fdc(*this, "fdc"),
@@ -607,7 +607,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 	MCFG_MC6845_ADD("crtc", MC6845, 1008000, mc6845_intf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("sn1", SN76489, XTAL_10MHz / 4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
@@ -615,7 +615,7 @@ static MACHINE_CONFIG_START( mycom, mycom_state )
 
 	/* Devices */
 	MCFG_MSM5832_ADD(MSM5832RS_TAG, XTAL_32_768kHz)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_FD1771_ADD("fdc", wd1771_intf)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mycom_floppy_interface)
 

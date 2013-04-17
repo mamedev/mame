@@ -723,7 +723,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_TVC64_EXPANSION_ADD("exp4", tvc_exp_interface, tvc_exp , NULL, NULL)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, tvc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", tvc_cassette_interface )
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", tvc64, "cas", 6)

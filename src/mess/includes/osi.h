@@ -31,7 +31,7 @@ public:
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, M6502_TAG),
-	m_cassette(*this, CASSETTE_TAG),
+	m_cassette(*this, "cassette"),
 	m_discrete(*this, DISCRETE_TAG),
 	m_ram(*this, RAM_TAG),
 	m_video_ram(*this, "video_ram"),

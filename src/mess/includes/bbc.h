@@ -19,6 +19,7 @@
 #include "video/mc6845.h"
 #include "video/saa5050.h"
 #include "sound/sn76496.h"
+#include "imagedev/cassette.h"
 
 class bbc_state : public driver_device
 {
@@ -29,7 +30,8 @@ public:
 		m_mc6845(*this, "mc6845"),
 		m_sn(*this, "sn76489"),
 		m_trom(*this, "saa505x"),
-		m_ACCCON_IRR(CLEAR_LINE),
+		m_cassette(*this, "cassette"),
+		m_ACCCON_IRR(CLEAR_LINE),		
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
 		m_acia_irq(CLEAR_LINE),
@@ -49,6 +51,7 @@ public:
 	required_device<mc6845_device> m_mc6845;
 	optional_device<sn76489_device> m_sn;
 	required_device<saa5050_device> m_trom;
+	required_device<cassette_image_device> m_cassette;
 
 	void check_interrupts();
 

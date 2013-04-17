@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_16MHz / 16)
 	MCFG_SOUND_CONFIG(ay8912_interface)
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
 
 	MCFG_CPC_EXPANSION_SLOT_ADD("exp",cpc_exp_intf,cpc_exp_cards,NULL,NULL)
@@ -936,7 +936,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay", AY8912, XTAL_40MHz / 40)
 	MCFG_SOUND_CONFIG(ay8912_interface)
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	/* snapshot */
 	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, amstrad_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 

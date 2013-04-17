@@ -13,7 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, I8085A_TAG),
 			m_terminal(*this, TERMINAL_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_rom(*this, I8085A_TAG)
 	{ }

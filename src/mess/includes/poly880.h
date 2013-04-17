@@ -24,7 +24,7 @@ public:
 	poly880_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ki1(*this, "KI1"),
 			m_ki2(*this, "KI2"),
 			m_ki3(*this, "KI3")

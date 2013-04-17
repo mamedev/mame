@@ -22,7 +22,7 @@ class amu880_state : public driver_device
 public:
 	amu880_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_kb_rom(*this, "keyboard"),
 			m_char_rom(*this, "chargen"),
 			m_video_ram(*this, "video_ram"),

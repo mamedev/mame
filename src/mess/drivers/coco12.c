@@ -256,7 +256,7 @@ MACHINE_CONFIG_FRAGMENT( coco_sound )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( coco, coco12_state )
 	MCFG_PIA6821_ADD(PIA0_TAG, coco_state::pia0_config)
 	MCFG_PIA6821_ADD(PIA1_TAG, coco_state::pia1_config)
 	MCFG_SAM6883_ADD(SAM_TAG, XTAL_3_579545MHz, coco12_state::sam6883_config)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, coco_state::coco_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", coco_state::coco_cassette_interface)
 	MCFG_BITBANGER_ADD(BITBANGER_TAG, coco_state::coco_bitbanger_config)
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, coco_state::cartridge_config, coco_cart, "pak", NULL)
 

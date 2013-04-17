@@ -76,7 +76,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
 		m_upd765(*this, "upd765"),

@@ -546,7 +546,7 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 {
 	UINT8 data;
 
-	data = (m_cass->input() > 0.0038 ? 0x80 : 0);
+	data = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 
 	if ( (m_psg_b ^ m_io_dsw->read() ) & 0x40)
 	{
@@ -770,11 +770,11 @@ WRITE8_MEMBER( msx_state::msx_ppi_port_c_w )
 
 	/* cassette motor on/off */
 	if ( BIT(m_port_c_old ^ data, 4) )
-		m_cass->change_state(BIT(data, 4) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(BIT(data, 4) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette signal write */
 	if ( BIT(m_port_c_old ^ data, 5) )
-		m_cass->output(BIT(data, 5) ? -1.0 : 1.0);
+		m_cassette->output(BIT(data, 5) ? -1.0 : 1.0);
 
 	m_port_c_old = data;
 }

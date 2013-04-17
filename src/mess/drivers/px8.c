@@ -822,7 +822,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	/* cartridge */
@@ -834,7 +834,7 @@ static MACHINE_CONFIG_START( px8, px8_state )
 
 	/* devices */
 	MCFG_I8251_ADD(I8251_TAG, i8251_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, px8_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", px8_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

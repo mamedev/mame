@@ -24,7 +24,7 @@ public:
 	jtc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, UB8830D_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_speaker(*this, "speaker"),
 			m_centronics(*this, CENTRONICS_TAG),
 		m_video_ram(*this, "video_ram"){ }

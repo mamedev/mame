@@ -29,7 +29,8 @@ public:
 	mtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
-		m_sn(*this, SN76489A_TAG)
+		m_sn(*this, SN76489A_TAG),
+		m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -48,7 +49,7 @@ public:
 	/* devices */
 	z80ctc_device *m_z80ctc;
 	device_t *m_z80dart;
-	cassette_image_device *m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	centronics_device *m_centronics;
 
 	/* timers */

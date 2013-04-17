@@ -44,7 +44,7 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_vis(*this, CDP1869_TAG),
 			m_kbe(*this, CDP1871_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_ram(*this, RAM_TAG),
 			m_exp(*this, EXPANSION_TAG),
 			m_rom(*this, CDP1802_TAG),

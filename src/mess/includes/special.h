@@ -32,7 +32,7 @@ public:
 		m_ppi(*this, "ppi8255"),
 		m_fdc(*this, "fd1793"),
 		m_dac(*this, "dac"),
-		m_cass(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_p_videoram(*this, "p_videoram"),
 		m_region_maincpu(*this, "maincpu"),
@@ -94,7 +94,7 @@ public:
 	optional_device<i8255_device> m_ppi;
 	optional_device<fd1793_t> m_fdc;
 	optional_device<dac_device> m_dac;
-	optional_device<cassette_image_device> m_cass;
+	optional_device<cassette_image_device> m_cassette;
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<UINT8> m_p_videoram;
 	int m_drive;

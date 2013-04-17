@@ -393,7 +393,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8912", AY8912, 1000000)
 	MCFG_SOUND_CONFIG(oric_ay_interface)
@@ -403,7 +403,7 @@ static MACHINE_CONFIG_START( oric, oric_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", oric_centronics_config)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, oric_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", oric_cassette_interface )
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_0", 1000000, oric_6522_interface )

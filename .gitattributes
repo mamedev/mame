@@ -6416,7 +6416,6 @@ src/mess/includes/busicom.h svneol=native#text/plain
 src/mess/includes/bw12.h svneol=native#text/plain
 src/mess/includes/bw2.h svneol=native#text/plain
 src/mess/includes/c128.h svneol=native#text/plain
-src/mess/includes/c16.h svneol=native#text/plain
 src/mess/includes/c64.h svneol=native#text/plain
 src/mess/includes/c65.h svneol=native#text/plain
 src/mess/includes/c80.h svneol=native#text/plain

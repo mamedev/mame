@@ -8,6 +8,7 @@
 #define CGENIE_H_
 
 #include "machine/wd17xx.h"
+#include "imagedev/cassette.h"
 
 // CRTC 6845
 struct CRTC6845
@@ -41,7 +42,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_fontram(*this, "fontram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	required_shared_ptr<UINT8> m_colorram;
 	required_shared_ptr<UINT8> m_fontram;
@@ -79,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(cgenie_sh_control_port_r);
 	DECLARE_WRITE8_MEMBER(cgenie_sh_control_port_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

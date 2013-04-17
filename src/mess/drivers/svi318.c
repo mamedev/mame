@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
 	MCFG_SOUND_CONFIG(svi318_ay8910_interface)
@@ -339,7 +339,7 @@ static MACHINE_CONFIG_START( svi318, svi318_state )
 	/* printer */
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", svi318_cassette_interface )
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("ay8910", AY8910, 1789773)
 	MCFG_SOUND_CONFIG(svi318_ay8910_interface)
@@ -468,7 +468,7 @@ static MACHINE_CONFIG_START( svi328_806, svi318_state )
 	/* printer */
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, svi318_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", svi318_cassette_interface )
 
 	MCFG_FD1793_ADD("wd179x", svi_wd17xx_interface )
 

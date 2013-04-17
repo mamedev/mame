@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 
 	/* Sound - wave sound only */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* other devices */
@@ -281,8 +281,8 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_VIA6522_ADD("via6522_1", 0, aim65_user_via)
 	MCFG_PIA6821_ADD("pia6821", aim65_pia_config)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, aim65_1_cassette_interface )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, aim65_2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette2", aim65_2_cassette_interface )
 
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("z26")

@@ -34,7 +34,7 @@
 
 TIMER_CALLBACK_MEMBER(cgenie_state::handle_cassette_input)
 {
-	UINT8 new_level = ( (machine().device<cassette_image_device>(CASSETTE_TAG)->input()) > 0.0 ) ? 1 : 0;
+	UINT8 new_level = ( (m_cassette->input()) > 0.0 ) ? 1 : 0;
 
 	if ( new_level != m_cass_level )
 	{
@@ -175,7 +175,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	cgenie_state *state = space.machine().driver_data<cgenie_state>();
 	int port_ff_changed = state->m_port_ff ^ data;
 
-	space.machine().device<cassette_image_device>(CASSETTE_TAG)->output(data & 0x01 ? -1.0 : 1.0 );
+	state->m_cassette->output(data & 0x01 ? -1.0 : 1.0 );
 
 	/* background bits changed ? */
 	if( port_ff_changed & FF_BGD )

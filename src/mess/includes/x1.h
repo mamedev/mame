@@ -76,14 +76,14 @@ public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_x1_cpu(*this,"x1_cpu"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cassette(*this, "cassette"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
 	m_ctc(*this, "ctc")
 	{ }
 
 	required_device<cpu_device> m_x1_cpu;
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;

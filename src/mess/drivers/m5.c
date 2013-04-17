@@ -658,7 +658,7 @@ static MACHINE_CONFIG_START( m5, m5_state )
 	// devices
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_14_31818MHz/4, ctc_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
+	MCFG_CASSETTE_ADD("cassette", cassette_intf)
 	MCFG_I8255_ADD(I8255A_TAG, ppi_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", m5_floppies, "525dd", 0, m5_state::floppy_formats)

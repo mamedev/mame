@@ -185,12 +185,12 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_PALETTE_INIT_OVERRIDE(apogee_state,radio86)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apogee_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apogee_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","apogee")
 MACHINE_CONFIG_END
 

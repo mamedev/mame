@@ -460,7 +460,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mc1000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mc1000_cassette_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */

@@ -567,11 +567,11 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, pmd85_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", pmd85_cassette_interface )
 
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)

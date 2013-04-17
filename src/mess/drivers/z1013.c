@@ -61,7 +61,7 @@ public:
 	z1013_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_cass(*this, CASSETTE_TAG),
+	m_cass(*this, "cassette"),
 	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -411,12 +411,12 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_1MHz, z1013_z80pio_intf )
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, z1013_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", z1013_cassette_interface )
 	MCFG_SNAPSHOT_ADD("snapshot", z1013, "z80", 0)
 MACHINE_CONFIG_END
 

@@ -162,7 +162,7 @@ public:
 			m_printer(*this, "printer"),
 			m_beep(*this, BEEPER_TAG),
 			m_ram(*this, RAM_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, "cassette")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

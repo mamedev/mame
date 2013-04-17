@@ -61,7 +61,8 @@ class ti99_4p_state : public driver_device
 {
 public:
 	ti99_4p_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_cassette(*this, "cassette") { }
 
 	DECLARE_WRITE_LINE_MEMBER( console_ready );
 	DECLARE_WRITE_LINE_MEMBER( console_ready_dmux );
@@ -103,7 +104,7 @@ public:
 	tms9901_device*         m_tms9901;
 	ti_sound_system_device* m_sound;
 	ti_exp_video_device*    m_video;
-	cassette_image_device*  m_cassette;
+	required_device<cassette_image_device> m_cassette;
 	peribox_device*         m_peribox;
 	joyport_device*         m_joyport;
 
@@ -816,7 +817,6 @@ void ti99_4p_state::machine_start()
 	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
 	m_sound = static_cast<ti_sound_system_device*>(machine().device(TISOUND_TAG));
 	m_video = static_cast<ti_exp_video_device*>(machine().device(VIDEO_SYSTEM_TAG));
-	m_cassette = static_cast<cassette_image_device*>(machine().device(CASSETTE_TAG));
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 	m_joyport = static_cast<joyport_device*>(machine().device(JOYPORT_TAG));
 
@@ -900,9 +900,9 @@ static MACHINE_CONFIG_START( ti99_4p_60hz, ti99_4p_state )
 
 	// Cassette drives
 	MCFG_SPEAKER_STANDARD_MONO("cass_out")
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "cass_out", 0.25)
 
 	// Joystick port

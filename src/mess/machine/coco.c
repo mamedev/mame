@@ -87,7 +87,7 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 	m_wave(*this, WAVE_TAG),
 	m_cococart(*this, CARTRIDGE_TAG),
 	m_ram(*this, RAM_TAG),
-	m_cassette(*this, CASSETTE_TAG),
+	m_cassette(*this, "cassette"),
 	m_bitbanger(*this, BITBANGER_TAG),
 	m_vhd_0(*this, VHD0_TAG),
 	m_vhd_1(*this, VHD1_TAG)

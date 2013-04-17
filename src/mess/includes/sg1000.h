@@ -84,7 +84,7 @@ class sc3000_state : public sg1000_state
 public:
 	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sg1000_state(mconfig, type, tag),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_pa0(*this, "PA0"),
 			m_pa1(*this, "PA1"),
 			m_pa2(*this, "PA2"),

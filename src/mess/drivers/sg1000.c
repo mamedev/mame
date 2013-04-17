@@ -1143,7 +1143,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	/* devices */
 	MCFG_I8255_ADD(UPD9255_TAG, sc3000_ppi_intf)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1189,7 +1189,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", 0, sf7000_state::floppy_formats)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", sc3000_cassette_interface)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("flop_list","sf7000")

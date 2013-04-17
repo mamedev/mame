@@ -101,7 +101,7 @@ public:
 		m_screen(*this, "screen"),
 		m_ppi(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_exp(*this, "exp"),
 		m_rtc(*this, "rtc"),

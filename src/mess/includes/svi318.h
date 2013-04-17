@@ -59,7 +59,7 @@ public:
 		m_pcart(NULL),
 		m_pcart_rom_size(0),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, CASSETTE_TAG),
+		m_cassette(*this, "cassette"),
 		m_dac(*this, "dac"),
 		m_ppi(*this, "ppi8255"),
 		m_ram(*this, RAM_TAG),

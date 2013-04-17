@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("z80ctc_timer", mtx_state, ctc_tick, attotime::from_hz(XTAL_4MHz/13))
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SNAPSHOT_ADD("snapshot", mtx, "mtb", 0.5)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, mtx_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", mtx_cassette_interface)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", mtx_state, cassette_tick, attotime::from_hz(44100))
 
 	/* internal ram */

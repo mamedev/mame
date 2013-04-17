@@ -48,7 +48,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
-	//m_cass(*this, CASSETTE_TAG),
+	//m_cass(*this, "cassette"),
 	m_beep(*this, BEEPER_TAG)
 	{ }
 

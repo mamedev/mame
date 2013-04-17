@@ -403,10 +403,10 @@ static MACHINE_CONFIG_START( zx80, zx_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)   /* Used by pc8300/lambda/pow3000 */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, zx80_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", zx80_cassette_interface )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -421,7 +421,7 @@ static MACHINE_CONFIG_DERIVED( zx81, zx80 )
 
 	MCFG_GFXDECODE(zx81)
 
-	MCFG_CASSETTE_MODIFY( CASSETTE_TAG, zx81_cassette_interface )
+	MCFG_CASSETTE_MODIFY( "cassette", zx81_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ts1000, zx81 )

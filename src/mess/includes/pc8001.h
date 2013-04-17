@@ -34,7 +34,7 @@ public:
 			m_rtc(*this, UPD1990A_TAG),
 			m_dma(*this, I8257_TAG),
 			m_crtc(*this, UPD3301_TAG),
-			m_cassette(*this, CASSETTE_TAG),
+			m_cassette(*this, "cassette"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, "speaker"),
 			m_ram(*this, RAM_TAG),

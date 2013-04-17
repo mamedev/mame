@@ -697,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
@@ -723,7 +723,7 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
 
 	// IIe and later have no physical slot 0, the "language card" is built into the motherboard
 	MCFG_A2BUS_SLOT_REMOVE("sl0")
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 	MCFG_RAM_DEFAULT_VALUE(0x00)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, apple2_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", apple2_cassette_interface )
 
 	// TK2000 doesn't have slots, and it doesn't emulate a language card
 	// C05A maps RAM from C100-FFFF, C05B maps ROM

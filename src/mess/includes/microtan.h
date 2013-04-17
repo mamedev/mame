@@ -17,7 +17,7 @@
 
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
-
+#include "imagedev/cassette.h"
 
 class microtan_state : public driver_device
 {
@@ -25,7 +25,8 @@ public:
 	microtan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	UINT8 m_chunky_graphics;
@@ -79,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_0_irq);
 	DECLARE_WRITE_LINE_MEMBER(via_1_irq);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

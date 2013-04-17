@@ -53,10 +53,11 @@ class dai_state : public driver_device
 public:
 	dai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_pit(*this, "pit8253"),
-			m_tms5501(*this, "tms5501"),
-			m_sound(*this, "custom"),
-		m_maincpu(*this, "maincpu") { }
+		m_pit(*this, "pit8253"),
+		m_tms5501(*this, "tms5501"),
+		m_sound(*this, "custom"),
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette") { }
 
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
@@ -84,6 +85,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dai_bootstrap_callback);
 	TIMER_CALLBACK_MEMBER(dai_timer);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

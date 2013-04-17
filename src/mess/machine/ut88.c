@@ -96,13 +96,13 @@ WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
 WRITE8_MEMBER( ut88_state::ut88_sound_w )
 {
 	m_dac->write_unsigned8(data); //beeper
-	m_cass->output(BIT(data, 0) ? 1 : -1);
+	m_cassette->output(BIT(data, 0) ? 1 : -1);
 }
 
 
 READ8_MEMBER( ut88_state::ut88_tape_r )
 {
-	double level = m_cass->input();
+	double level = m_cassette->input();
 	return (level <  0) ? 0 : 0xff;
 }
 

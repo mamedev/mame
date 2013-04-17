@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( c80, c80_state )
 	/* devices */
 	MCFG_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
 	MCFG_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_interface)
+	MCFG_CASSETTE_ADD("cassette", c80_cassette_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -295,7 +295,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -304,7 +304,7 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	MCFG_I8255_ADD( "ppi8255", mz80k_8255_int )
 	MCFG_PIT8253_ADD( "pit8253", mz80k_pit8253_config )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tempo", mz80_state, ne555_tempo_callback, attotime::from_hz(34))
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, mz80k_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", mz80k_cassette_interface )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mz80kj, mz80k )

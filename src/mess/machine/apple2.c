@@ -1812,11 +1812,6 @@ WRITE8_MEMBER ( apple2_state::apple2_c05x_w )
   apple2_c06x_r
 ***************************************************************************/
 
-static cassette_image_device *cassette_device_image(running_machine &machine)
-{
-	return machine.device<cassette_image_device>(CASSETTE_TAG);
-}
-
 READ8_MEMBER ( apple2_state::apple2_c06x_r )
 {
 	int result = 0;
@@ -1827,11 +1822,9 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 			case 0x00:
 				/* Cassette input */
 				{
-					cassette_image_device *dev = cassette_device_image(space.machine());
-
-					if (dev)
+					if (m_cassette)
 					{
-						result = dev->input() > 0.0 ? 0x80 : 0;
+						result = m_cassette->input() > 0.0 ? 0x80 : 0;
 					}
 					else
 					{

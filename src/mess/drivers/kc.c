@@ -149,7 +149,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( kc85_3, kc_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
 	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, "m011", NULL)
@@ -201,7 +201,7 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( kc85_4, kc85_4_state )
 	/* devices */
 	MCFG_QUICKLOAD_ADD("quickload", kc, "kcc", 2)
 
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, kc_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", kc_cassette_interface )
 
 	/* cartridge slot */
 	MCFG_KC85_CARTRIDGE_ADD("m8", "mc", kc85_exp_interface, kc85_cart, NULL, NULL)

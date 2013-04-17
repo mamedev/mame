@@ -12,6 +12,7 @@
 #include "machine/mc146818.h"
 #include "machine/ram.h"
 #include "sound/beep.h"
+#include "imagedev/cassette.h"
 
 #define SCREEN_TAG      "screen"
 #define Z80_TAG         "z80"
@@ -37,7 +38,8 @@ public:
 		m_bit4(*this, "BIT4"),
 		m_bit5(*this, "BIT5"),
 		m_backbattery(*this, "BACKBATTERY"),
-		m_mainbattery(*this, "MAINBATTERY") { }
+		m_mainbattery(*this, "MAINBATTERY"),
+		m_cassette(*this, "cassette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
@@ -80,6 +82,7 @@ protected:
 	required_ioport m_bit5;
 	required_ioport m_backbattery;
 	required_ioport m_mainbattery;
+	optional_device<cassette_image_device> m_cassette;
 };
 
 #endif

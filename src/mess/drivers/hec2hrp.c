@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( hec2hr, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -495,7 +495,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -507,7 +507,7 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -562,7 +562,7 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -600,7 +600,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -612,7 +612,7 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -648,7 +648,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -660,7 +660,7 @@ static MACHINE_CONFIG_START( hec2mdhrx, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// Gestion cassette
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")
@@ -699,7 +699,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)// Sound level for cassette, as it is in mono => output channel=0
 
 	MCFG_SOUND_ADD("sn76477", SN76477, 0)
@@ -711,7 +711,7 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Gestion cassette*/
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, hector_cassette_interface )
+	MCFG_CASSETTE_ADD( "cassette", hector_cassette_interface )
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

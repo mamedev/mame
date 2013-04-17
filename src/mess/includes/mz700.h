@@ -16,6 +16,7 @@
 #include "machine/pit8253.h"
 #include "machine/z80pio.h"
 #include "sound/speaker.h"
+#include "imagedev/cassette.h"
 
 class mz_state : public driver_device
 {
@@ -23,7 +24,8 @@ public:
 	mz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_speaker(*this, "speaker") { }
+		m_speaker(*this, "speaker"),
+		m_cassette(*this, "cassette") { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -95,6 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_z80pio_port_a_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

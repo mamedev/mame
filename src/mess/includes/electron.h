@@ -11,6 +11,7 @@
 #ifndef ELECTRON_H_
 #define ELECTRON_H_
 
+#include "imagedev/cassette.h"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -56,7 +57,8 @@ class electron_state : public driver_device
 public:
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_cassette(*this, "cassette")	{ }
 
 	ULA m_ula;
 	emu_timer *m_tape_timer;
@@ -81,6 +83,7 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 };
 
 

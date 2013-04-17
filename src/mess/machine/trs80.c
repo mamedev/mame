@@ -27,7 +27,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
 
-	double new_val = (m_cass->input());
+	double new_val = (m_cassette->input());
 
 	/* Check for HI-LO transition */
 	if ( m_old_cassette_val > -0.2 && new_val < -0.2 )
@@ -483,7 +483,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_ec_w )
 
 	m_mode = (m_mode & 0xde) | ((data & 4) ? 1 : 0) | ((data & 8) ? 0x20 : 0);
 
-	m_cass->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
+	m_cassette->change_state(( data & 2 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
 
 	m_port_ec = data & 0x7e;
 }
@@ -594,8 +594,8 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
 
-	m_cass->change_state(( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
-	m_cass->output(levels[data & 3]);
+	m_cassette->change_state(( data & 4 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
+	m_cassette->output(levels[data & 3]);
 	m_cassette_data &= ~0x80;
 
 	m_mode = (m_mode & 0xfe) | ((data & 8) >> 3);
@@ -611,7 +611,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_ff_w )
     d1, d0 Cassette output */
 
 	static const double levels[4] = { 0.0, -1.0, 0.0, 1.0 };
-	m_cass->output(levels[data & 3]);
+	m_cassette->output(levels[data & 3]);
 	m_cassette_data &= ~0x80;
 }
 
