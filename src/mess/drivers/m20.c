@@ -420,8 +420,8 @@ void m20_state::install_memory()
 	pspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
 	dspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
 	/* <2>8000 */
-	pspace.install_readwrite_bank(0x28000, 0x28fff, 0x3fff, 0, "dram0_1c000");
-	dspace.install_readwrite_bank(0x28000, 0x28fff, 0x3fff, 0, "dram0_1c000");
+	pspace.install_readwrite_bank(0x28000, 0x2bfff, 0x3fff, 0, "dram0_1c000");
+	dspace.install_readwrite_bank(0x28000, 0x2bfff, 0x3fff, 0, "dram0_1c000");
 	/* <2>c000 empty*/
 	/* <3>0000 (video buffer)
 	pspace.install_readwrite_bank(0x30000, 0x33fff, 0x3fff, 0, "dram0_0000");
@@ -489,7 +489,7 @@ void m20_state::install_memory()
 			*/
 			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
 			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_4000");
-			pspace.install_readwrite_bank(0xa8000, 0xaffff, 0x3fff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
 
 			/*
 			  data
@@ -900,7 +900,8 @@ static unsigned char kbxlat[] =
 	'o',   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
 	'4',   '5', '6', '7', '8', '9', '-', '^', '@', '[', ';', ':', ']', ',', '.', '/',
 	0x00,  '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-	'O',   'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+	'O',   'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', '!', '"', '#',
+	'$',   '%', '&', '\'','(', ')', '=', 'x', 'x', '{', '+', '*', '}'
 };
 
 WRITE8_MEMBER( m20_state::kbd_put )
@@ -910,7 +911,6 @@ WRITE8_MEMBER( m20_state::kbd_put )
 		else if (data == 0x20) data = 0xc0;
 		else if (data == 8) data = 0x69; /* ^H */
 		else if (data == 3) data = 0x64; /* ^C */
-		else if (data >= '0' && data <= '9') data += 0x1c - '0';
 		else {
 			int i;
 			for (i = 0; i < sizeof(kbxlat); i++)
@@ -974,6 +974,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("160K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
 
 #if 0

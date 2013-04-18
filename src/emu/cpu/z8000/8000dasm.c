@@ -47,6 +47,9 @@
 #include "emu.h"
 #include "z8000.h"
 #include "z8000cpu.h"
+#include "debugger.h"
+#include "debug/debugvw.h"
+#include "debug/debugcon.h"
 
 static int n[16];   /* opcode nibbles */
 static int b[8];    /* opcode bytes */
@@ -78,6 +81,48 @@ static const char *const ints[4] = {
 	"",    "vi",  "nvi",   "vi,nvi"
 };
 
+int z8k_segm;								/* Current disassembler mode: 0 - non-segmented, 1 - segmented */
+int z8k_segm_mode = Z8K_SEGM_MODE_AUTO;		/* User disassembler mode setting: segmented, non-segmented, auto */
+
+void z8k_disass_mode(running_machine &machine, int ref, int params, const char *param[])
+{
+	size_t len;
+	if (params == 1)
+	{
+		len = strlen(param[0]);
+		if (!mame_strnicmp(param[0], "segmented", len) || !mame_stricmp(param[0], "z8001")) {
+			z8k_segm = true;
+			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
+			debug_console_printf(machine, "Disassembler mode set to Z8001/segmented\n");
+		}
+		else if (!mame_strnicmp(param[0], "non-segmented", len) || !mame_stricmp(param[0], "z8002")) {
+			z8k_segm = false;
+			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
+			debug_console_printf(machine, "Disassembler mode set to Z8002/non-segmented\n");
+		}
+		else if (!mame_strnicmp(param[0], "automatic", len)) {
+			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
+			debug_console_printf(machine, "Disassembler mode set to automatic\n");
+		}
+		else
+			goto usage;
+	}
+	else if (params > 1) {
+	usage:
+		debug_console_printf(machine, "Usage: z8k_disass_mode <mode>\n");
+		debug_console_printf(machine, "       set disassembler mode\n");
+		debug_console_printf(machine, "       mode: \"segmented\" or \"z8001\"     - Z8001 mode\n");
+		debug_console_printf(machine, "             \"non-segmented\" or \"z8002\" - Z8002 mode\n");
+		debug_console_printf(machine, "             \"automatic\"                  - automatic mode\n");
+	}
+	else {
+		debug_console_printf(machine, "Current disassembler mode: ");
+		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
+			debug_console_printf(machine, "automatic, currently ");
+		debug_console_printf(machine, "%s\n", z8k_segm ? "Z8001/segmented" : "Z8002/non-segmented");
+	}
+}
+
 CPU_DISASSEMBLE( z8000 )
 {
 	int new_pc = pc, i, j, tmp;
@@ -86,8 +131,6 @@ CPU_DISASSEMBLE( z8000 )
 	Z8000_exec *o;
 	UINT32 flags = 0;
 	UINT32 old_w;
-
-	int segm = device->type() == Z8001;
 
 	/* already initialized? */
 	if(z8000_exec == NULL)
@@ -228,7 +271,7 @@ CPU_DISASSEMBLE( z8000 )
 						/* address */
 						src++;
 						i = *src++ - '0';
-						if (segm) {
+						if (z8k_segm) {
 							if (w[i] & 0x8000) {
 								old_w = w[i];
 								for (j = i; j < o->size; j++)
@@ -277,7 +320,7 @@ CPU_DISASSEMBLE( z8000 )
 								tmp = 0;
 								abort();
 						}
-						if (segm)
+						if (z8k_segm)
 							dst += sprintf(dst, "<%%%02X>%%%04X", (tmp >> 16) & 0xff, tmp & 0xffff);
 						else
 							dst += sprintf(dst, "%%%04x", tmp);

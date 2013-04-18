@@ -32,39 +32,37 @@
  ******************************************/
 INLINE void CHANGE_FCW(z8000_state *cpustate, UINT16 fcw)
 {
-	if (fcw & F_S_N) {          /* system mode now? */
-		if (!(cpustate->fcw & F_S_N)) { /* and not before? */
-			if (cpustate->device->type() == Z8001) {
-				UINT16 tmp = cpustate->RW(15);
-				cpustate->RW(15) = cpustate->nspoff;
-				cpustate->nspoff = tmp;
+	UINT16 tmp;
+	if ((fcw ^ cpustate->fcw) & F_S_N) {          /* system/user mode change? */
+		tmp = cpustate->RW(15);
+		cpustate->RW(15) = cpustate->nspoff;
+		cpustate->nspoff = tmp;
+	}
+	if (cpustate->device->type() == Z8001) {
+		/* User mode R14 is used in user mode and non-segmented system mode.
+		   System mode R14 is only used in segmented system mode.
+		   There is no transition from user mode to non-segmented system mode,
+		   so this doesn't need to be handled here. */
+		if (fcw & F_S_N) {  /* new mode is system mode */
+			if (!(cpustate->fcw & F_S_N)                /* old mode was user mode */
+				|| ((fcw ^ cpustate->fcw) & F_SEG)) {   /* or switch between segmented and non-segmented */
 				tmp = cpustate->RW(14);
 				cpustate->RW(14) = cpustate->nspseg;
 				cpustate->nspseg = tmp;
-			}
-			else {
-				UINT16 tmp = cpustate->RW(SP);
-				cpustate->RW(SP) = cpustate->nspoff;
-				cpustate->nspoff = tmp;
 			}
 		}
-	} else {                    /* user mode now */
-		if (cpustate->fcw & F_S_N) {        /* and not before? */
-			if (cpustate->device->type() == Z8001) {
-				UINT16 tmp = cpustate->RW(15);
-				cpustate->RW(15) = cpustate->nspoff;
-				cpustate->nspoff = tmp;
+		else {  /* new mode is user mode */
+			if (cpustate->fcw & F_S_N          /* old mode was system mode */
+				&& cpustate->fcw & F_SEG) {    /* and was segmented */
 				tmp = cpustate->RW(14);
 				cpustate->RW(14) = cpustate->nspseg;
 				cpustate->nspseg = tmp;
-			}
-			else {
-				UINT16 tmp = cpustate->RW(SP);
-				cpustate->RW(SP) = cpustate->nspoff;
-				cpustate->nspoff = tmp;
 			}
 		}
 	}
+	else
+		fcw &= ~F_SEG;  /* never set segmented mode bit on Z8002 */
+
 	if (!(cpustate->fcw & F_NVIE) && (fcw & F_NVIE) && (cpustate->irq_state[0] != CLEAR_LINE))
 		cpustate->irq_req |= Z8000_NVI;
 	if (!(cpustate->fcw & F_VIE) && (fcw & F_VIE) && (cpustate->irq_state[1] != CLEAR_LINE))
@@ -2462,7 +2460,7 @@ static void Z39_ssN0_0000(z8000_state *cpustate)
 		fcw = RDMEM_W(cpustate, AS_DATA,  cpustate->RW(src));
 		set_pc(cpustate, RDMEM_W(cpustate, AS_DATA, (UINT16)(cpustate->RW(src) + 2)));
 	}
-	if ((fcw ^ cpustate->fcw) & F_SEG) printf("ldps 1 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", cpustate->pc, (fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
+	if ((fcw ^ cpustate->fcw) & F_SEG) printf("ldps 1 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", cpustate->pc, (cpustate->fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
 	CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
 }
 
@@ -4606,7 +4604,6 @@ static void Z7B_0000_0000(z8000_state *cpustate)
 		set_pc(cpustate, segmented_addr(POPL(cpustate, SP)));
 	else
 		cpustate->pc    = POPW(cpustate, SP);   /* get cpustate->pc   */
-	cpustate->irq_srv &= ~tag;    /* remove IRQ serviced flag */
 	CHANGE_FCW(cpustate, fcw);       /* check for user/system mode change */
 	LOG(("Z8K '%s' IRET tag $%04x, fcw $%04x, pc $%04x\n", cpustate->device->tag(), tag, fcw, cpustate->pc));
 }
@@ -6685,6 +6682,17 @@ static void ZBF_imm8(z8000_state *cpustate)
 		(void)imm8;
 	}
 	(void)imm8;
+}
+
+/******************************************
+ ldb     rbd,imm8   (long version)
+ flags:  ------
+ ******************************************/
+static void  Z20_0000_dddd_imm8(z8000_state *cpustate)
+{
+	GET_DST(OP0,NIB3);
+	GET_IMM8(OP1);
+	cpustate->RB(dst) = imm8;
 }
 
 /******************************************

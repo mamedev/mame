@@ -49,6 +49,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "debug/debugcon.h"
 #include "z8000.h"
 
 #define VERBOSE 0
@@ -76,7 +77,6 @@ struct z8000_state
 	UINT16  nspseg;     /* system stack pointer, segment (Z8001 only) */
 	UINT16  nspoff;     /* system stack pointer, offset */
 	UINT16  irq_req;    /* CPU is halted, interrupt or trap request */
-	UINT16  irq_srv;    /* serviced interrupt request */
 	UINT16  irq_vec;    /* interrupt vector */
 	unsigned int op_valid;  /* bit field indicating if given op[] field is already initialized */
 	z8000_reg_file regs;/* registers */
@@ -211,7 +211,6 @@ INLINE UINT32 get_raw_addr_operand (z8000_state *cpustate, int opnum)
 INLINE UINT32 adjust_addr_for_nonseg_mode(z8000_state *cpustate, UINT32 addr)
 {
 	if (cpustate->device->type() == Z8001 && !(cpustate->fcw & F_SEG))
-		/*return (addr & 0xffff) | (cpustate->pc & 0xffff0000);*/
 		return (addr & 0xffff) | (cpustate->pc & 0x7f0000);
 	else
 		return addr;
@@ -372,33 +371,21 @@ INLINE void set_irq(z8000_state *cpustate, int type)
 	switch ((type >> 8) & 255)
 	{
 		case Z8000_EPU >> 8:
-			if (cpustate->irq_srv >= Z8000_EPU)
-				return;
 			cpustate->irq_req = type;
 			break;
 		case Z8000_TRAP >> 8:
-			if (cpustate->irq_srv >= Z8000_TRAP)
-				return; /* double TRAP.. very bad :( */
 			cpustate->irq_req = type;
 			break;
 		case Z8000_NMI >> 8:
-			if (cpustate->irq_srv >= Z8000_NMI)
-				return; /* no NMIs inside trap */
 			cpustate->irq_req = type;
 			break;
 		case Z8000_SEGTRAP >> 8:
-			if (cpustate->irq_srv >= Z8000_SEGTRAP)
-				return; /* no SEGTRAPs inside NMI/TRAP */
 			cpustate->irq_req = type;
 			break;
 		case Z8000_NVI >> 8:
-			if (cpustate->irq_srv >= Z8000_NVI)
-				return; /* no NVIs inside SEGTRAP/NMI/TRAP */
 			cpustate->irq_req = type;
 			break;
 		case Z8000_VI >> 8:
-			if (cpustate->irq_srv >= Z8000_VI)
-				return; /* no VIs inside NVI/SEGTRAP/NMI/TRAP */
 			cpustate->irq_req = type;
 			break;
 		case Z8000_SYSCALL >> 8:
@@ -446,8 +433,7 @@ INLINE void Interrupt(z8000_state *cpustate)
 		CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
-		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
+		PUSHW(cpustate, SP, RDMEM_W(cpustate, AS_PROGRAM, cpustate->ppc));  /* for internal traps, the 1st word of the instruction is pushed */
 		cpustate->irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(cpustate, GET_FCW(EPU));
 		cpustate->pc = GET_PC(EPU);
@@ -459,8 +445,7 @@ INLINE void Interrupt(z8000_state *cpustate)
 		CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
-		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
+		PUSHW(cpustate, SP, RDMEM_W(cpustate, AS_PROGRAM, cpustate->ppc));  /* for internal traps, the 1st word of the instruction is pushed */
 		cpustate->irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(cpustate, GET_FCW(TRAP));
 		cpustate->pc = GET_PC(TRAP);
@@ -472,8 +457,7 @@ INLINE void Interrupt(z8000_state *cpustate)
 		CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
-		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
+		PUSHW(cpustate, SP, RDMEM_W(cpustate, AS_PROGRAM, cpustate->ppc));  /* for internal traps, the 1st word of the instruction is pushed */
 		cpustate->irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(cpustate, GET_FCW(SYSCALL));
 		cpustate->pc = GET_PC(SYSCALL);
@@ -486,7 +470,6 @@ INLINE void Interrupt(z8000_state *cpustate)
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
 		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
 		cpustate->irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(cpustate, GET_FCW(SEGTRAP));
 		cpustate->pc = GET_PC(SEGTRAP);
@@ -499,7 +482,6 @@ INLINE void Interrupt(z8000_state *cpustate)
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
 		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
 		cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, NMI);
 		cpustate->irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(cpustate, GET_FCW(NMI));
@@ -513,7 +495,6 @@ INLINE void Interrupt(z8000_state *cpustate)
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
 		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
 		cpustate->pc = GET_PC(NVI);
 		cpustate->irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(cpustate, GET_FCW(NVI));
@@ -526,14 +507,12 @@ INLINE void Interrupt(z8000_state *cpustate)
 		PUSH_PC();
 		PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
 		PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
-		cpustate->irq_srv = cpustate->irq_req;
 		if (cpustate->device->type() == Z8001)
 			cpustate->pc =  segmented_addr(RDMEM_L(cpustate, AS_PROGRAM, VEC00 + 4 * (cpustate->irq_req & 0xff)));
 		else
 			cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, VEC00 + 2 * (cpustate->irq_req & 0xff));
 		cpustate->irq_req &= ~Z8000_VI;
 		CHANGE_FCW(cpustate, GET_FCW(VI));
-		//printf ("z8k VI (vec 0x%x)\n", cpustate->irq_req & 0xff);
 		LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpustate->device->tag(), cpustate->irq_vec, VEC00 + (cpustate->device->type() == Z8001 ? 4 : 2) * (cpustate->irq_req & 0xff), cpustate->fcw, cpustate->pc));
 	}
 }
@@ -559,6 +538,11 @@ static CPU_INIT( z8001 )
 	/* already initialized? */
 	if(z8000_exec == NULL)
 		z8000_init_tables();
+
+	if (device->machine().debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(device->machine(), "z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, z8k_disass_mode);
+
+	z8k_segm = true;
 }
 
 static CPU_INIT( z8002 )
@@ -582,6 +566,8 @@ static CPU_INIT( z8002 )
 	/* already initialized? */
 	if(z8000_exec == NULL)
 		z8000_init_tables();
+
+	z8k_segm = false;
 }
 
 static CPU_RESET( z8001 )
@@ -597,6 +583,7 @@ static CPU_RESET( z8001 )
 	{
 		cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, 4); /* get reset cpustate->pc  */
 	}
+	cpustate->ppc = cpustate->pc;
 }
 
 static CPU_RESET( z8002 )
@@ -605,6 +592,7 @@ static CPU_RESET( z8002 )
 
 	cpustate->fcw = RDMEM_W(cpustate, AS_PROGRAM, 2); /* get reset cpustate->fcw */
 	cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, 4); /* get reset cpustate->pc  */
+	cpustate->ppc = cpustate->pc;
 }
 
 static CPU_EXIT( z8000 )
@@ -622,6 +610,9 @@ static CPU_EXECUTE( z8000 )
 		if (cpustate->irq_req)
 			Interrupt(cpustate);
 
+		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
+			z8k_segm = (cpustate->fcw & F_SEG_Z8001) ? 1 : 0;
+
 		debugger_instruction_hook(device, cpustate->pc);
 
 		if (cpustate->irq_req & Z8000_HALT)
@@ -632,6 +623,7 @@ static CPU_EXECUTE( z8000 )
 		{
 			Z8000_exec *exec;
 
+			cpustate->ppc = cpustate->pc;
 			cpustate->op[0] = RDOP(cpustate);
 			cpustate->op_valid = 1;
 			exec = &z8000_exec[cpustate->op[0]];
@@ -655,8 +647,6 @@ static void set_irq_line(z8000_state *cpustate, int irqline, int state)
 
 		if (state != CLEAR_LINE)
 		{
-			if (cpustate->irq_srv >= Z8000_NMI) /* no NMIs inside trap */
-				return;
 			cpustate->irq_req = Z8000_NMI;
 			cpustate->irq_vec = NMI;
 		}
@@ -710,15 +700,18 @@ static CPU_SET_INFO( z8002 )
 		case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(cpustate, 0, info->i);             break;
 		case CPUINFO_INT_INPUT_STATE + 1:               set_irq_line(cpustate, 1, info->i);             break;
 
+		case CPUINFO_INT_PREVIOUSPC:                    cpustate->ppc = info->i;                            break;
+		case CPUINFO_INT_REGISTER + Z8000_PPC:          cpustate->ppc = info->i;                         break;
 		case CPUINFO_INT_PC:                            cpustate->pc = info->i;                             break;
 		case CPUINFO_INT_REGISTER + Z8000_PC:           cpustate->pc = info->i;                         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + Z8000_NSP:          cpustate->nspoff = info->i;                         break;
+		case CPUINFO_INT_REGISTER + Z8000_NSPOFF:       cpustate->nspoff = info->i;                         break;
+		case CPUINFO_INT_REGISTER + Z8000_NSPSEG:       cpustate->nspseg = info->i;                         break;
 		case CPUINFO_INT_REGISTER + Z8000_FCW:          cpustate->fcw = info->i;                            break;
-		case CPUINFO_INT_REGISTER + Z8000_PSAP:         cpustate->psapoff = info->i;                            break;
+		case CPUINFO_INT_REGISTER + Z8000_PSAPOFF:      cpustate->psapoff = info->i;                            break;
+		case CPUINFO_INT_REGISTER + Z8000_PSAPSEG:      cpustate->psapseg = info->i;                            break;
 		case CPUINFO_INT_REGISTER + Z8000_REFRESH:      cpustate->refresh = info->i;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_IRQ_REQ:      cpustate->irq_req = info->i;                        break;
-		case CPUINFO_INT_REGISTER + Z8000_IRQ_SRV:      cpustate->irq_srv = info->i;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_IRQ_VEC:      cpustate->irq_vec = info->i;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_R0:           cpustate->RW( 0) = info->i;                     break;
 		case CPUINFO_INT_REGISTER + Z8000_R1:           cpustate->RW( 1) = info->i;                     break;
@@ -777,17 +770,19 @@ CPU_GET_INFO( z8002 )
 		case CPUINFO_INT_INPUT_STATE + 0:               info->i = cpustate->irq_state[0];               break;  /* NVI */
 		case CPUINFO_INT_INPUT_STATE + 1:               info->i = cpustate->irq_state[1];               break;  /* VI */
 
+		case CPUINFO_INT_REGISTER + Z8000_PPC:
 		case CPUINFO_INT_PREVIOUSPC:                    info->i = cpustate->ppc;                            break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + Z8000_PC:           info->i = cpustate->pc;                         break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + Z8000_NSP:          info->i = cpustate->nspoff;                         break;
+		case CPUINFO_INT_REGISTER + Z8000_NSPOFF:       info->i = cpustate->nspoff;                         break;
+		case CPUINFO_INT_REGISTER + Z8000_NSPSEG:       info->i = cpustate->nspseg;                         break;
 		case CPUINFO_INT_REGISTER + Z8000_FCW:          info->i = cpustate->fcw;                            break;
-		case CPUINFO_INT_REGISTER + Z8000_PSAP:         info->i = cpustate->psapoff;                            break;
+		case CPUINFO_INT_REGISTER + Z8000_PSAPOFF:      info->i = cpustate->psapoff;                        break;
+		case CPUINFO_INT_REGISTER + Z8000_PSAPSEG:      info->i = cpustate->psapseg;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_REFRESH:      info->i = cpustate->refresh;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_IRQ_REQ:      info->i = cpustate->irq_req;                        break;
-		case CPUINFO_INT_REGISTER + Z8000_IRQ_SRV:      info->i = cpustate->irq_srv;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_IRQ_VEC:      info->i = cpustate->irq_vec;                        break;
 		case CPUINFO_INT_REGISTER + Z8000_R0:           info->i = cpustate->RW( 0);                     break;
 		case CPUINFO_INT_REGISTER + Z8000_R1:           info->i = cpustate->RW( 1);                     break;
@@ -825,31 +820,33 @@ CPU_GET_INFO( z8002 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-				cpustate->fcw & 0x8000 ? 's':'.',
-				cpustate->fcw & 0x4000 ? 'n':'.',
-				cpustate->fcw & 0x2000 ? 'e':'.',
-				cpustate->fcw & 0x1000 ? '2':'.',
-				cpustate->fcw & 0x0800 ? '1':'.',
+				cpustate->fcw & 0x8000 ? 'S':'s',
+				cpustate->fcw & 0x4000 ? 'n':'N',
+				cpustate->fcw & 0x2000 ? 'E':'e',
+				cpustate->fcw & 0x1000 ? 'V':'v',
+				cpustate->fcw & 0x0800 ? 'N':'n',
 				cpustate->fcw & 0x0400 ? '?':'.',
 				cpustate->fcw & 0x0200 ? '?':'.',
 				cpustate->fcw & 0x0100 ? '?':'.',
-				cpustate->fcw & 0x0080 ? 'C':'.',
-				cpustate->fcw & 0x0040 ? 'Z':'.',
-				cpustate->fcw & 0x0020 ? 'S':'.',
-				cpustate->fcw & 0x0010 ? 'V':'.',
-				cpustate->fcw & 0x0008 ? 'D':'.',
-				cpustate->fcw & 0x0004 ? 'H':'.',
+				cpustate->fcw & 0x0080 ? 'C':'c',
+				cpustate->fcw & 0x0040 ? 'Z':'z',
+				cpustate->fcw & 0x0020 ? 'S':'s',
+				cpustate->fcw & 0x0010 ? 'V':'v',
+				cpustate->fcw & 0x0008 ? 'D':'d',
+				cpustate->fcw & 0x0004 ? 'H':'h',
 				cpustate->fcw & 0x0002 ? '?':'.',
 				cpustate->fcw & 0x0001 ? '?':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + Z8000_PC:           sprintf(info->s, "pc :%08X", cpustate->pc);     break;
-		case CPUINFO_STR_REGISTER + Z8000_NSP:          sprintf(info->s, "SP :%04X", cpustate->nspoff); break;
-		case CPUINFO_STR_REGISTER + Z8000_FCW:          sprintf(info->s, "fcw:%04X", cpustate->fcw);    break;
-		case CPUINFO_STR_REGISTER + Z8000_PSAP:         sprintf(info->s, "psapoff:%04X", cpustate->psapoff);    break;
+		case CPUINFO_STR_REGISTER + Z8000_PPC:          sprintf(info->s, "prev PC :%08X", cpustate->ppc);     break;
+		case CPUINFO_STR_REGISTER + Z8000_PC:           sprintf(info->s, "PC :%08X", cpustate->pc);     break;
+		case CPUINFO_STR_REGISTER + Z8000_NSPOFF:       sprintf(info->s, "NSPOFF :%04X", cpustate->nspoff); break;
+		case CPUINFO_STR_REGISTER + Z8000_NSPSEG:       sprintf(info->s, "NSPSEG :%04X", cpustate->nspseg); break;
+		case CPUINFO_STR_REGISTER + Z8000_FCW:          sprintf(info->s, "FCW:%04X", cpustate->fcw);    break;
+		case CPUINFO_STR_REGISTER + Z8000_PSAPOFF:      sprintf(info->s, "PSAPOFF:%04X", cpustate->psapoff);    break;
+		case CPUINFO_STR_REGISTER + Z8000_PSAPSEG:      sprintf(info->s, "PSAPSEG:%04X", cpustate->psapseg);    break;
 		case CPUINFO_STR_REGISTER + Z8000_REFRESH:      sprintf(info->s, "REFR:%04X", cpustate->refresh); break;
 		case CPUINFO_STR_REGISTER + Z8000_IRQ_REQ:      sprintf(info->s, "IRQR:%04X", cpustate->irq_req); break;
-		case CPUINFO_STR_REGISTER + Z8000_IRQ_SRV:      sprintf(info->s, "IRQS:%04X", cpustate->irq_srv); break;
 		case CPUINFO_STR_REGISTER + Z8000_IRQ_VEC:      sprintf(info->s, "IRQV:%04X", cpustate->irq_vec); break;
 		case CPUINFO_STR_REGISTER + Z8000_R0:           sprintf(info->s, "R0 :%04X", cpustate->RW(0)); break;
 		case CPUINFO_STR_REGISTER + Z8000_R1:           sprintf(info->s, "R1 :%04X", cpustate->RW(1)); break;

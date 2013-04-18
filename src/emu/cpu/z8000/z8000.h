@@ -6,7 +6,9 @@
 
 enum
 {
-	Z8000_PC=1, Z8000_NSP, Z8000_FCW, Z8000_PSAP, Z8000_REFRESH,
+	Z8000_PC=1,
+	Z8000_PPC, Z8000_NSPSEG, Z8000_NSPOFF, Z8000_FCW,
+	Z8000_PSAPSEG, Z8000_PSAPOFF, Z8000_REFRESH,
 	Z8000_IRQ_REQ, Z8000_IRQ_SRV, Z8000_IRQ_VEC,
 	Z8000_R0, Z8000_R1, Z8000_R2, Z8000_R3,
 	Z8000_R4, Z8000_R5, Z8000_R6, Z8000_R7,
@@ -29,5 +31,14 @@ DECLARE_LEGACY_CPU_DEVICE(Z8001, z8001);
 DECLARE_LEGACY_CPU_DEVICE(Z8002, z8002);
 
 CPU_DISASSEMBLE( z8000 );
+
+extern int z8k_segm;
+extern int z8k_segm_mode;
+extern void z8k_disass_mode(running_machine &machine, int ref, int params, const char *param[]);
+
+/* possible values for z8k_segm_mode */
+#define Z8K_SEGM_MODE_NONSEG 0
+#define Z8K_SEGM_MODE_SEG	 1
+#define Z8K_SEGM_MODE_AUTO	 2
 
 #endif /* __Z8000_H__ */

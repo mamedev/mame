@@ -59,7 +59,7 @@
 
 #define PSA_ADDR (cpustate->device->type() == Z8001 ? segmented_addr((cpustate->psapseg << 16) | cpustate->psapoff) : cpustate->psapoff)
 
-/* these vectors are based on cpustate->psap @@@*/
+/* these vectors are based on cpustate->psap */
 #define RST     (PSA_ADDR + 0)  /* start up cpustate->fcw and cpustate->pc */
 #define EPU     (PSA_ADDR + (cpustate->device->type() == Z8001 ? 0x0008 : 0x0004))  /* extension processor unit? trap */
 #define TRAP    (PSA_ADDR + (cpustate->device->type() == Z8001 ? 0x0010 : 0x0008))  /* privilege violation trap */
