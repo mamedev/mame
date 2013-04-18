@@ -108,50 +108,43 @@ void tc0140syt_device::interrupt_controller( )
 WRITE8_MEMBER( tc0140syt_device::tc0140syt_port_w )
 {
 	data &= 0x0f;
-
 	m_mainmode = data;
-	//logerror("taitosnd: Master cpu mode [%02x]\n", data);
+
 	if (data > 4)
 	{
 		logerror("tc0140syt : error Master entering unknown mode[%02x]\n", data);
 	}
 }
 
-
 WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 {
-	data &= 0x0f;   /*this is important, otherwise ballbros won't work*/
+	data &= 0x0f; /* this is important, otherwise ballbros won't work */
 
 	switch (m_mainmode)
 	{
-		case 0x00:      // mode #0
-			m_slavedata[m_mainmode ++] = data;
-			//logerror("taitosnd: Master cpu written port 0, data %01x\n", data);
+		case 0x00: // mode #0
+			m_slavedata[m_mainmode++] = data;
 			break;
 
-		case 0x01:      // mode #1
-			m_slavedata[m_mainmode ++] = data;
+		case 0x01: // mode #1
+			m_slavedata[m_mainmode++] = data;
 			m_status |= TC0140SYT_PORT01_FULL;
 			m_nmi_req = 1;
 			interrupt_controller();
-			//logerror("taitosnd: Master cpu sends 0/1 : %01x%01x\n", m_slavedata[1], m_slavedata[0]);
 			break;
 
-		case 0x02:      // mode #2
-			m_slavedata[m_mainmode ++] = data;
-			//logerror("taitosnd: Master cpu written port 2, data %01\n", data);
+		case 0x02: // mode #2
+			m_slavedata[m_mainmode++] = data;
 			break;
 
-		case 0x03:      // mode #3
-			m_slavedata[m_mainmode ++] = data;
+		case 0x03: // mode #3
+			m_slavedata[m_mainmode++] = data;
 			m_status |= TC0140SYT_PORT23_FULL;
 			m_nmi_req = 1;
 			interrupt_controller();
-			//logerror("taitosnd: Master cpu sends 2/3 : %01x%01x\n", m_slavedata[3], m_slavedata[2]);
 			break;
 
-		case 0x04:      // port status
-			//logerror("taitosnd: Master issued control value %02x (PC = %08x) \n",data, space.device().safe_pc() );
+		case 0x04: // port status
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
 				m_slavecpu->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -163,102 +156,101 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 			break;
 
 		default:
-			//logerror("taitosnd: Master cpu written in mode [%02x] data[%02x]\n", m_mainmode, data);
 			break;
 	}
 }
 
-
 READ8_MEMBER( tc0140syt_device::tc0140syt_comm_r )
 {
-	switch( m_mainmode )
+	UINT8 res = 0;
+
+	switch (m_mainmode)
 	{
-		case 0x00:      // mode #0
-			//logerror("taitosnd: Master cpu read portdata %01x\n", m_masterdata[0]);
-			return m_masterdata[m_mainmode ++];
+		case 0x00: // mode #0
+			res = m_masterdata[m_mainmode++];
+			break;
 
-		case 0x01:      // mode #1
-			//logerror("taitosnd: Master cpu receives 0/1 : %01x%01x\n", m_masterdata[1], m_masterdata[0]);
+		case 0x01: // mode #1
 			m_status &= ~TC0140SYT_PORT01_FULL_MASTER;
-			return m_masterdata[m_mainmode ++];
+			res = m_masterdata[m_mainmode++];
+			break;
 
-		case 0x02:      // mode #2
-			//logerror("taitosnd: Master cpu read masterdata %01x\n", m_masterdata[2]);
-			return m_masterdata[m_mainmode ++];
+		case 0x02: // mode #2
+			res = m_masterdata[m_mainmode++];
+			break;
 
-		case 0x03:      // mode #3
-			//logerror("taitosnd: Master cpu receives 2/3 : %01x%01x\n", m_masterdata[3], m_masterdata[2]);
+		case 0x03: // mode #3
 			m_status &= ~TC0140SYT_PORT23_FULL_MASTER;
-			return m_masterdata[m_mainmode ++];
+			res = m_masterdata[m_mainmode++];
+			break;
 
-		case 0x04:      // port status
-			//logerror("tc0140syt : Master cpu read status : %02x\n", m_status);
-			return m_status;
+		case 0x04: // port status
+			res = m_status;
+			break;
 
 		default:
-			//logerror("tc0140syt : Master cpu read in mode [%02x]\n", m_mainmode);
-			return 0;
+			break;
 	}
+
+	return res;
 }
 
+
 //-------------------------------------------------
-//SLAVE SIDE
+//  SLAVE SIDE
 //-------------------------------------------------
 
 WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_port_w )
 {
 	data &= 0x0f;
 	m_submode = data;
-	//logerror("taitosnd: Slave cpu mode [%02x]\n", data);
+
 	if (data > 6)
+	{
 		logerror("tc0140syt error : Slave cpu unknown mode[%02x]\n", data);
+	}
 }
 
 WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
 {
 	data &= 0x0f;
+
 	switch (m_submode)
 	{
-		case 0x00:      // mode #0
-			m_masterdata[m_submode ++] = data;
-			//logerror("taitosnd: Slave cpu written port 0, data %01x\n", data);
+		case 0x00: // mode #0
+			m_masterdata[m_submode++] = data;
 			break;
 
-		case 0x01:      // mode #1
-			m_masterdata[m_submode ++] = data;
+		case 0x01: // mode #1
+			m_masterdata[m_submode++] = data;
 			m_status |= TC0140SYT_PORT01_FULL_MASTER;
-			//logerror("taitosnd: Slave cpu sends 0/1 : %01x%01x\n" , m_masterdata[1] , m_masterdata[0]);
 			m_slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
-		case 0x02:      // mode #2
-			//logerror("taitosnd: Slave cpu written port 2, data %01x\n", data);
-			m_masterdata[m_submode ++] = data;
+		case 0x02: // mode #2
+			m_masterdata[m_submode++] = data;
 			break;
 
-		case 0x03:      // mode #3
-			m_masterdata[m_submode ++] = data;
+		case 0x03: // mode #3
+			m_masterdata[m_submode++] = data;
 			m_status |= TC0140SYT_PORT23_FULL_MASTER;
-			//logerror("taitosnd: Slave cpu sends 2/3 : %01x%01x\n" , m_masterdata[3] , m_masterdata[2]);
 			m_slavecpu->execute().spin(); /* writing should take longer than emulated, so spin */
 			break;
 
-		case 0x04:      // port status
+		case 0x04: // port status
 			//m_status = TC0140SYT_SET_OK;
-			//logerror("tc0140syt : Slave cpu status ok.\n");
 			break;
 
-		case 0x05:      // nmi disable
+		case 0x05: // nmi disable
 			m_nmi_enabled = 0;
 			break;
 
-		case 0x06:      // nmi enable
+		case 0x06: // nmi enable
 			m_nmi_enabled = 1;
 			interrupt_controller();
 			break;
 
 		default:
-			//logerror("tc0140syt: Slave cpu written in mode [%02x] data[%02x]\n" , m_submode, data & 0xff);
 			break;
 	}
 }
@@ -267,38 +259,31 @@ READ8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_r )
 {
 	UINT8 res = 0;
 
-	switch ( m_submode )
+	switch (m_submode)
 	{
-		case 0x00:      // mode #0
-			//logerror("taitosnd: Slave cpu read slavedata %01x\n", m_slavedata[0]);
-			res = m_slavedata[m_submode ++];
+		case 0x00: // mode #0
+			res = m_slavedata[m_submode++];
 			break;
 
-		case 0x01:      // mode #1
-			//logerror("taitosnd: Slave cpu receives 0/1 : %01x%01x PC=%4x\n", m_slavedata[1] , m_slavedata[0],space.device().safe_pc());
+		case 0x01: // mode #1
 			m_status &= ~TC0140SYT_PORT01_FULL;
-			res = m_slavedata[m_submode ++];
+			res = m_slavedata[m_submode++];
 			break;
 
-		case 0x02:      // mode #2
-			//logerror("taitosnd: Slave cpu read slavedata %01x\n", m_slavedata[2]);
-			res = m_slavedata[m_submode ++];
+		case 0x02: // mode #2
+			res = m_slavedata[m_submode++];
 			break;
 
-		case 0x03:      // mode #3
-			//logerror("taitosnd: Slave cpu receives 2/3 : %01x%01x\n", m_slavedata[3] , m_slavedata[2]);
+		case 0x03: // mode #3
 			m_status &= ~TC0140SYT_PORT23_FULL;
-			res = m_slavedata[m_submode ++];
+			res = m_slavedata[m_submode++];
 			break;
 
-		case 0x04:      // port status
-			//logerror("tc0140syt : Slave cpu read status : %02x\n", m_status);
+		case 0x04: // port status
 			res = m_status;
 			break;
 
 		default:
-			//logerror("tc0140syt : Slave cpu read in mode [%02x]\n", m_submode);
-			res = 0;
 			break;
 	}
 
