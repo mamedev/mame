@@ -1140,7 +1140,7 @@ void bbc_state::bbc_TMSint(int status)
 {
 	TMSint=(!status)&1;
 	TMSrdy=(!tms5220_readyq_r())&1;
-	via_0_portb_w(0,(0xf | machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
+	via_0_portb_w(0,(0xf | ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
 }
 #endif
 

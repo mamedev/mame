@@ -50,15 +50,15 @@ void primo_state::primo_update_memory()
 	{
 		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x10000);
+			membank("bank1")->set_base(memregion("maincpu")->base()+0x10000);
 			break;
 		case 0x01:  /* EPROM extension 1 */
 			space.unmap_write(0x0000, 0x3fff);
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x14000);
+			membank("bank1")->set_base(memregion("maincpu")->base()+0x14000);
 			break;
 		case 0x02:  /* RAM */
 			space.install_write_bank(0x0000, 0x3fff, "bank1");
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 		case 0x03:  /* EPROM extension 2 */
 			space.unmap_write(0x0000, 0x3fff);
@@ -235,10 +235,10 @@ DRIVER_INIT_MEMBER(primo_state,primo64)
 
 void primo_state::primo_common_machine_init ()
 {
-	if (machine().root_device().ioport("MEMORY_EXPANSION")->read())
+	if (ioport("MEMORY_EXPANSION")->read())
 		m_port_FD = 0x00;
 	primo_update_memory();
-	machine().device("maincpu")->set_clock_scale(machine().root_device().ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
+	machine().device("maincpu")->set_clock_scale(ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_reset()

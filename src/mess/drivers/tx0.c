@@ -1465,7 +1465,7 @@ void tx0_state::tx0_keyboard()
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = machine().root_device().ioport(twrnames[i])->read();
+		typewriter_keys[i] = ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)

@@ -259,8 +259,8 @@ UINT8 samcoupe_state::samcoupe_mouse_r()
 	if (m_mouse_index == 2)
 	{
 		/* update values */
-		int mouse_x = machine().root_device().ioport("mouse_x")->read();
-		int mouse_y = machine().root_device().ioport("mouse_y")->read();
+		int mouse_x = ioport("mouse_x")->read();
+		int mouse_y = ioport("mouse_y")->read();
 
 		int mouse_dx = m_mouse_x - mouse_x;
 		int mouse_dy = m_mouse_y - mouse_y;
@@ -269,7 +269,7 @@ UINT8 samcoupe_state::samcoupe_mouse_r()
 		m_mouse_y = mouse_y;
 
 		/* button state */
-		m_mouse_data[2] = machine().root_device().ioport("mouse_buttons")->read();
+		m_mouse_data[2] = ioport("mouse_buttons")->read();
 
 		/* y-axis */
 		m_mouse_data[3] = (mouse_dy & 0xf00) >> 8;

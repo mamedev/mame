@@ -327,7 +327,7 @@ READ8_MEMBER( cgenie_state::cgenie_status_r )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0 */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0;
 	return wd17xx_status_r(fdc, space, offset);
 }
@@ -336,7 +336,7 @@ READ8_MEMBER( cgenie_state::cgenie_track_r )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_track_r(fdc, space, offset);
 }
@@ -345,7 +345,7 @@ READ8_MEMBER( cgenie_state::cgenie_sector_r )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_sector_r(fdc, space, offset);
 }
@@ -354,7 +354,7 @@ READ8_MEMBER( cgenie_state::cgenie_data_r )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, return 0xff */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return 0xff;
 	return wd17xx_data_r(fdc, space, offset);
 }
@@ -363,7 +363,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_command_w )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, return immediately */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
 	wd17xx_command_w(fdc, space, offset, data);
 }
@@ -372,7 +372,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_track_w )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
 	wd17xx_track_w(fdc, space, offset, data);
 }
@@ -381,7 +381,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_sector_w )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
 	wd17xx_sector_w(fdc, space, offset, data);
 }
@@ -390,7 +390,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_data_w )
 {
 	device_t *fdc = machine().device("wd179x");
 	/* If the floppy isn't emulated, ignore the write */
-	if( (machine().root_device().ioport("DSW0")->read() & 0x80) == 0 )
+	if( (ioport("DSW0")->read() & 0x80) == 0 )
 		return;
 	wd17xx_data_w(fdc, space, offset, data);
 }
@@ -472,33 +472,33 @@ WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
 /*************************************
  *      Keyboard                     *
  *************************************/
-	READ8_MEMBER( cgenie_state::cgenie_keyboard_r )
+READ8_MEMBER( cgenie_state::cgenie_keyboard_r )
 {
 	int result = 0;
 
 	if( offset & 0x01 )
-		result |= machine().root_device().ioport("ROW0")->read();
+		result |= ioport("ROW0")->read();
 
 	if( offset & 0x02 )
-		result |= machine().root_device().ioport("ROW1")->read();
+		result |= ioport("ROW1")->read();
 
 	if( offset & 0x04 )
-		result |= machine().root_device().ioport("ROW2")->read();
+		result |= ioport("ROW2")->read();
 
 	if( offset & 0x08 )
-		result |= machine().root_device().ioport("ROW3")->read();
+		result |= ioport("ROW3")->read();
 
 	if( offset & 0x10 )
-		result |= machine().root_device().ioport("ROW4")->read();
+		result |= ioport("ROW4")->read();
 
 	if( offset & 0x20 )
-		result |= machine().root_device().ioport("ROW5")->read();
+		result |= ioport("ROW5")->read();
 
 	if( offset & 0x40 )
-		result |= machine().root_device().ioport("ROW6")->read();
+		result |= ioport("ROW6")->read();
 
 	if( offset & 0x80 )
-		result |= machine().root_device().ioport("ROW7")->read();
+		result |= ioport("ROW7")->read();
 
 	return result;
 }
@@ -576,7 +576,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_fontram_w )
 
 INTERRUPT_GEN_MEMBER(cgenie_state::cgenie_frame_interrupt)
 {
-	if( m_tv_mode != (machine().root_device().ioport("DSW0")->read() & 0x10) )
+	if( m_tv_mode != (ioport("DSW0")->read() & 0x10) )
 	{
 		m_tv_mode = ioport("DSW0")->read() & 0x10;
 		/* force setting of background color */

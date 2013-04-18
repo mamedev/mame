@@ -134,7 +134,7 @@ UINT8 microtan_state::read_dsw()
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
-			result = machine().root_device().ioport("DSW")->read();
+			result = ioport("DSW")->read();
 			break;
 
 		default:

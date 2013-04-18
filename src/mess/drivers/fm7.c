@@ -1233,12 +1233,12 @@ void fm7_state::fm7_keyboard_poll_scan()
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
-	UINT32 modifiers = machine().root_device().ioport("key_modifiers")->read();
+	UINT32 modifiers = ioport("key_modifiers")->read();
 	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
-		keys = machine().root_device().ioport(portnames[x])->read();
+		keys = ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{

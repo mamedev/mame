@@ -944,7 +944,7 @@ void dgn_beta_state::ScanInKeyboard(void)
 	for(Idx=0; Idx<NoKeyrows; Idx++)
 	{
 		if (Idx < 10)
-			Row = machine().root_device().ioport(keynames[Idx])->read();
+			Row = ioport(keynames[Idx])->read();
 
 		else
 			Row = 0x7f;

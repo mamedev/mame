@@ -1565,7 +1565,7 @@ UINT8 *apple2gs_state::apple2gs_getslotmem(offs_t address)
 	assert(address <= 0xCFFF);
 
 	rom = m_rom;
-	rom += 0x030000 % machine().root_device().memregion("maincpu")->bytes();
+	rom += 0x030000 % memregion("maincpu")->bytes();
 	return &rom[address];
 }
 

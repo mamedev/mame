@@ -43,11 +43,11 @@ void c65_state::c65_nmi(  )
 	device_t *cia_1 = machine().device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (m_nmilevel != (machine().root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)   /* KEY_RESTORE */
+	if (m_nmilevel != (ioport("SPECIAL")->read() & 0x80) || cia1irq)   /* KEY_RESTORE */
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (machine().root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
-		m_nmilevel = (machine().root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
+		m_nmilevel = (ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -372,7 +372,7 @@ int c65_state::c65_6511_port_r( int offset )
 
 	if (offset == 7)
 	{
-		if (machine().root_device().ioport("SPECIAL")->read() & 0x20)
+		if (ioport("SPECIAL")->read() & 0x20)
 			data &= ~1;
 	}
 	DBG_LOG(machine(), 2, "r6511 read", ("%.2x\n", offset));

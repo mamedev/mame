@@ -205,39 +205,39 @@ int c65_state::c64_paddle_read( device_t *device, address_space &space, int whic
 {
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(machine().device("cia_0"), space, 0);
-	int controller1 = machine().root_device().ioport("CTRLSEL")->read() & 0x07;
-	int controller2 = machine().root_device().ioport("CTRLSEL")->read() & 0x70;
+	int controller1 = ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = ioport("CTRLSEL")->read() & 0x70;
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = machine().root_device().ioport("PADDLE2")->read();
+				pot2 = ioport("PADDLE2")->read();
 			else
-				pot1 = machine().root_device().ioport("PADDLE1")->read();
+				pot1 = ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = machine().root_device().ioport("TRACKY")->read();
+				pot2 = ioport("TRACKY")->read();
 			else
-				pot1 = machine().root_device().ioport("TRACKX")->read();
+				pot1 = ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (machine().root_device().ioport("JOY1_2B")->read() & 0x20))  /* Joy1 Button 2 */
+			if (which && (ioport("JOY1_2B")->read() & 0x20))  /* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = machine().root_device().ioport("LIGHTY")->read();
+				pot2 = ioport("LIGHTY")->read();
 			else
-				pot1 = machine().root_device().ioport("LIGHTX")->read();
+				pot1 = ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (machine().root_device().ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
+			if (which && (ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
 				pot2 = 0x00;
 			break;
 
@@ -254,32 +254,32 @@ int c65_state::c64_paddle_read( device_t *device, address_space &space, int whic
 	{
 		case 0x10:
 			if (which)
-				pot4 = machine().root_device().ioport("PADDLE4")->read();
+				pot4 = ioport("PADDLE4")->read();
 			else
-				pot3 = machine().root_device().ioport("PADDLE3")->read();
+				pot3 = ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = machine().root_device().ioport("TRACKY")->read();
+				pot4 = ioport("TRACKY")->read();
 			else
-				pot3 = machine().root_device().ioport("TRACKX")->read();
+				pot3 = ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (machine().root_device().ioport("JOY2_2B")->read() & 0x20))  /* Joy2 Button 2 */
+			if (which && (ioport("JOY2_2B")->read() & 0x20))  /* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = machine().root_device().ioport("LIGHTY")->read();
+				pot4 = ioport("LIGHTY")->read();
 			else
-				pot3 = machine().root_device().ioport("LIGHTX")->read();
+				pot3 = ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (machine().root_device().ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
+			if (which && (ioport("OTHER")->read() & 0x04))    /* Lightpen Signal */
 				pot4 = 0x00;
 			break;
 
@@ -292,7 +292,7 @@ int c65_state::c64_paddle_read( device_t *device, address_space &space, int whic
 			break;
 	}
 
-	if (machine().root_device().ioport("CTRLSEL")->read() & 0x80)     /* Swap */
+	if (ioport("CTRLSEL")->read() & 0x80)     /* Swap */
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -345,17 +345,17 @@ UINT32 c65_state::screen_update_c65(screen_device &screen, bitmap_ind16 &bitmap,
 
 READ8_MEMBER(c65_state::c65_lightpen_x_cb)
 {
-	return machine().root_device().ioport("LIGHTX")->read() & ~0x01;
+	return ioport("LIGHTX")->read() & ~0x01;
 }
 
 READ8_MEMBER(c65_state::c65_lightpen_y_cb)
 {
-	return machine().root_device().ioport("LIGHTY")->read() & ~0x01;
+	return ioport("LIGHTY")->read() & ~0x01;
 }
 
 READ8_MEMBER(c65_state::c65_lightpen_button_cb)
 {
-	return machine().root_device().ioport("OTHER")->read() & 0x04;
+	return ioport("OTHER")->read() & 0x04;
 }
 
 READ8_MEMBER(c65_state::c65_c64_mem_r)

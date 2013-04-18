@@ -371,7 +371,7 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 				membank(bank1)->set_base(addr);
 
 				/* write enabled? */
-				if (machine().root_device().ioport("EXTRA")->read() & 0x02)
+				if (ioport("EXTRA")->read() & 0x02)
 				{
 					/* yes */
 					membank(bank5)->set_base(addr);
@@ -534,7 +534,7 @@ void nc_state::nc_common_init_machine()
 	m_memory_config[2] = 0;
 	m_memory_config[3] = 0;
 
-	m_previous_inputport_10_state = machine().root_device().ioport("EXTRA")->read();
+	m_previous_inputport_10_state = ioport("EXTRA")->read();
 
 	/* setup reset state ints are masked */
 	m_irq_mask = 0;

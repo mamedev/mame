@@ -141,7 +141,7 @@ void concept_state::poll_keyboard()
 
 	for(i = 0; (i < /*4*/3) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = machine().root_device().ioport(keynames[2*i])->read() | (machine().root_device().ioport(keynames[2*i + 1])->read() << 16);
+		keystate = ioport(keynames[2*i])->read() | (ioport(keynames[2*i + 1])->read() << 16);
 		key_transitions = keystate ^ m_KeyStateSave[i];
 		if(key_transitions)
 		{

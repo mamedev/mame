@@ -58,7 +58,7 @@ void ssystem3_state::ssystem3_playfield_reset()
 {
 	memset(&m_playfield, 0, sizeof(m_playfield));
 	m_playfield.signal=FALSE;
-	//  m_playfield.on=TRUE; //machine().root_device().ioport("Configuration")->read()&1;
+	//  m_playfield.on=TRUE; //ioport("Configuration")->read()&1;
 }
 
 void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
@@ -108,7 +108,7 @@ void ssystem3_state::ssystem3_playfield_write(int reset, int signal)
 
 void ssystem3_state::ssystem3_playfield_read(int *on, int *ready)
 {
-	*on=!(machine().root_device().ioport("Configuration")->read()&1);
+	*on=!(ioport("Configuration")->read()&1);
 	//  *on=!m_playfield.on;
 	*ready=FALSE;
 }

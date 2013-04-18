@@ -438,7 +438,7 @@ void apple3_state::apple3_update_memory()
 	else
 		space.install_write_bank(0xF000, 0xFFFF, "bank7");
 	if (m_via_0_a & 0x01)
-		membank("bank7")->set_base(machine().root_device().memregion("maincpu")->base());
+		membank("bank7")->set_base(memregion("maincpu")->base());
 	else
 		apple3_setbank("bank7", ~0, 0x7000);
 

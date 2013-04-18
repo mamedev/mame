@@ -2037,7 +2037,7 @@ void mac_state::mac_driver_init(model_t model)
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-			machine().root_device().memregion("bootrom")->bytes(), machine().root_device().memregion("bootrom")->base(), TRUE, "bank3");
+			memregion("bootrom")->bytes(), memregion("bootrom")->base(), TRUE, "bank3");
 	}
 
 	m_overlay = -1;

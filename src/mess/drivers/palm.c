@@ -145,7 +145,7 @@ void palm_state::machine_start()
 void palm_state::machine_reset()
 {
 	// Copy boot ROM
-	UINT8* bios = machine().root_device().memregion("bios")->base();
+	UINT8* bios = memregion("bios")->base();
 	memset(m_ram->pointer(), 0, m_ram->size());
 	memcpy(m_ram->pointer(), bios, 0x20000);
 

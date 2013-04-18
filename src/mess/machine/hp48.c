@@ -250,18 +250,18 @@ int hp48_state::hp48_get_in(  )
 	int in = 0;
 
 	/* regular keys */
-	if ( (m_out >> 0) & 1 ) in |= machine().root_device().ioport( "LINE0" )->read();
-	if ( (m_out >> 1) & 1 ) in |= machine().root_device().ioport( "LINE1" )->read();
-	if ( (m_out >> 2) & 1 ) in |= machine().root_device().ioport( "LINE2" )->read();
-	if ( (m_out >> 3) & 1 ) in |= machine().root_device().ioport( "LINE3" )->read();
-	if ( (m_out >> 4) & 1 ) in |= machine().root_device().ioport( "LINE4" )->read();
-	if ( (m_out >> 5) & 1 ) in |= machine().root_device().ioport( "LINE5" )->read();
-	if ( (m_out >> 6) & 1 ) in |= machine().root_device().ioport( "LINE6" )->read();
-	if ( (m_out >> 7) & 1 ) in |= machine().root_device().ioport( "LINE7" )->read();
-	if ( (m_out >> 8) & 1 ) in |= machine().root_device().ioport( "LINE8" )->read();
+	if ( (m_out >> 0) & 1 ) in |= ioport( "LINE0" )->read();
+	if ( (m_out >> 1) & 1 ) in |= ioport( "LINE1" )->read();
+	if ( (m_out >> 2) & 1 ) in |= ioport( "LINE2" )->read();
+	if ( (m_out >> 3) & 1 ) in |= ioport( "LINE3" )->read();
+	if ( (m_out >> 4) & 1 ) in |= ioport( "LINE4" )->read();
+	if ( (m_out >> 5) & 1 ) in |= ioport( "LINE5" )->read();
+	if ( (m_out >> 6) & 1 ) in |= ioport( "LINE6" )->read();
+	if ( (m_out >> 7) & 1 ) in |= ioport( "LINE7" )->read();
+	if ( (m_out >> 8) & 1 ) in |= ioport( "LINE8" )->read();
 
 	/* on key */
-	in |= machine().root_device().ioport( "ON" )->read();
+	in |= ioport( "ON" )->read();
 
 	return in;
 }

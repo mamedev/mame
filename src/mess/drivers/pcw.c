@@ -328,7 +328,7 @@ void pcw_state::pcw_update_mem(int block, int data)
     {
         unsigned char *FakeROM;
 
-        FakeROM = &machine().root_device().memregion("maincpu")->base()[0x010000];
+        FakeROM = &memregion("maincpu")->base()[0x010000];
 
         membank("bank1")->set_base(FakeROM);
     }*/
@@ -340,7 +340,7 @@ int pcw_state::pcw_get_sys_status()
 	return
 		m_interrupt_counter
 		| (m_screen->vblank() ? 0x40 : 0x00)
-		| (machine().root_device().ioport("EXTRA")->read() & 0x010)
+		| (ioport("EXTRA")->read() & 0x010)
 		| (m_system_status & 0x20);
 }
 

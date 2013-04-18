@@ -1705,7 +1705,7 @@ void pdp1_state::pdp1_keyboard()
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = machine().root_device().ioport(twrnames[i])->read();
+		typewriter_keys[i] = ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
@@ -1735,9 +1735,9 @@ void pdp1_state::pdp1_lightpen()
 	int x_delta, y_delta;
 	int current_state;
 
-	m_lightpen.active = (machine().root_device().ioport("CFG")->read() >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
+	m_lightpen.active = (ioport("CFG")->read() >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
 
-	current_state = machine().root_device().ioport("LIGHTPEN")->read();
+	current_state = ioport("LIGHTPEN")->read();
 
 	/* update pen down state */
 	m_lightpen.down = m_lightpen.active && (current_state & pdp1_lightpen_down);
@@ -1759,8 +1759,8 @@ void pdp1_state::pdp1_lightpen()
 	m_old_lightpen = current_state;
 
 	/* update pen position */
-	x_delta = machine().root_device().ioport("LIGHTX")->read();
-	y_delta = machine().root_device().ioport("LIGHTY")->read();
+	x_delta = ioport("LIGHTX")->read();
+	y_delta = ioport("LIGHTY")->read();
 
 	if (x_delta >= 0x80)
 		x_delta -= 0x100;
