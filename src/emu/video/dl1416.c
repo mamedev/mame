@@ -48,7 +48,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SEG_UNDEF  (-2)
+#define SEG_UNDEF  (0xfffe)
 #define SEG_BLANK  (0)
 #define SEG_CURSOR (0xffff)
 #define CURSOR_ON  (1)
