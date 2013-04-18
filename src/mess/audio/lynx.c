@@ -178,13 +178,13 @@ static void lynx_audio_shift(device_t *device, LYNX_AUDIO *channel)
 		if(out_temp < -128) out_temp = -128;
 		channel->reg.output = (INT16)out_temp;
 	}
-
+	lynx_state *drvstate = device->machine().driver_data<lynx_state>();
 	switch (channel_number)
 	{
 		case 0: lynx_audio_count_down(device, 1); break;
 		case 1: lynx_audio_count_down(device, 2); break;
 		case 2: lynx_audio_count_down(device, 3); break;
-		case 3: lynx_timer_count_down(device->machine(), 1); break;
+		case 3: drvstate->lynx_timer_count_down(1); break;
 		default: logerror("Invalid channel number %d\n", channel_number); break;
 	}
 }

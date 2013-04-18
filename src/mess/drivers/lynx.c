@@ -149,7 +149,7 @@ static QUICKLOAD_LOAD( lynx )
 		return IMAGE_INIT_FAIL;
 
 	/* Check the image */
-	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
+	if (state->lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
 		return IMAGE_INIT_FAIL;
 
 	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu

@@ -130,6 +130,7 @@ public:
 	DECLARE_READ8_MEMBER(suzy_read);
 	DECLARE_WRITE8_MEMBER(suzy_write);
 	DECLARE_WRITE8_MEMBER(lynx_uart_w);
+	DECLARE_READ8_MEMBER(lynx_uart_r);
 	DECLARE_READ8_MEMBER(mikey_read);
 	DECLARE_WRITE8_MEMBER(mikey_write);
 	DECLARE_READ8_MEMBER(lynx_memory_config_r);
@@ -148,16 +149,24 @@ public:
 	void lynx_postload();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
 	required_device<cpu_device> m_maincpu;
+	UINT8 lynx_read_ram(UINT16 address);
+	void lynx_write_ram(UINT16 address, UINT8 data);
+	inline void lynx_plot_pixel(const int mode, const INT16 x, const int y, const int color);
+	void lynx_blit_do_work(const int y, const int xdir, const int bits_per_pixel, const int mask );
+	void lynx_blit_rle_do_work(  const INT16 y, const int xdir, const int bits_per_pixel, const int mask );
+	void lynx_blit_lines();
+	void lynx_blitter();
+	void lynx_draw_line();
+	void lynx_timer_init(int which);
+	void lynx_timer_signal_irq(int which);
+	void lynx_timer_count_down(int which);
+	UINT32 lynx_time_factor(int val);
+	void lynx_uart_reset();
+	int lynx_verify_cart (char *header, int kind);
 };
 
 
 /*----------- defined in machine/lynx.c -----------*/
-
-void lynx_timer_count_down(running_machine &machine, int nr);
-
-/* These functions are also needed for the Quickload */
-int lynx_verify_cart (char *header, int kind);
-void lynx_crc_keyword(device_image_interface &image);
 
 MACHINE_CONFIG_EXTERN( lynx_cartslot );
 

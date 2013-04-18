@@ -36,12 +36,12 @@
  * the output of S4 is linked out to a 0v supply by link S25 to just access the 16K memory area.
  ************************************************************************/
 
-unsigned int calculate_video_address(bbc_state *state,int ma,int ra)
+unsigned int bbc_state::calculate_video_address(int ma,int ra)
 {
 	// ma = output from IC2 6845 MA address
 
-	int c0=state->m_b4_video0; // output from IC32 74LS259 bits 4 and 5
-	int c1=state->m_b5_video1;
+	int c0=m_b4_video0; // output from IC32 74LS259 bits 4 and 5
+	int c1=m_b5_video1;
 
 	/* the 4 bit input port b on IC39 are produced by 4 NAND gates.
 	these NAND gates take their
@@ -81,7 +81,7 @@ unsigned int calculate_video_address(bbc_state *state,int ma,int ra)
 		// IC 8 and IC 9
 		m=((ma&0xff)<<3)|(s<<11)|(ra&0x7);
 	}
-	if (state->m_memorySize==16)
+	if (m_memorySize==16)
 		return  m & 0x3fff;
 
 	return m;
@@ -160,32 +160,9 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 	}
 }
 
-// VideoULA Internal Cursor controls
-
-/*
-void bbc_state::set_cursor(bbc_state *state)
-{
-    m_cursor_state=m_VideoULA_CR?0:7;
-}
-
-void bbc_state::BBC_Clock_CR(bbc_state *state)
-{
-    if (m_VideoULA_CR)
-    {
-        m_VideoULA_CR_counter-=1;
-        if (m_VideoULA_CR_counter<=0) {
-            m_VideoULA_CR=0;
-            set_cursor(state);
-        }
-    }
-}
-*/
 /************************************************************************
  * BBC circuits controlled by 6845 Outputs
  ************************************************************************/
-
-int returned_pixel_count;
-int returned_pixels[6];
 
 static MC6845_UPDATE_ROW( vid_update_row )
 {
@@ -205,8 +182,6 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			//Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
 			//Teletext Latch bit 7 goes to LOSE on the Teletext chip
 
-			returned_pixel_count=0;
-
 			state->m_trom->write((state->m_Teletext_Latch&0x3f)|(state->m_Teletext_Latch&0x40));
 
 			state->m_trom->f1_w(1);
@@ -216,7 +191,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 			{
 				state->m_Teletext_Latch=0;
 			} else {
-				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,ma+x_pos,ra)]);
+				state->m_Teletext_Latch=(state->m_BBC_Video_RAM[state->calculate_video_address(ma+x_pos,ra)]);
 			}
 			for(int pixelno=0;pixelno<6;pixelno++)
 			{
@@ -250,7 +225,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 		{
 			for(int x_pos=0; x_pos<x_count; x_pos++)
 			{
-				int vmem=calculate_video_address(state,ma+x_pos,ra);
+				int vmem=state->calculate_video_address(ma+x_pos,ra);
 				unsigned char i=state->m_BBC_Video_RAM[vmem];
 
 				for(int pixelno=0;pixelno<state->m_pixels_per_byte;pixelno++)
@@ -380,275 +355,3 @@ VIDEO_START_MEMBER(bbc_state,bbcm)
 {
 	common_init(32);
 }
-
-
-/*
-
-Old removed BBC mc6845 video code.
-This has now all been replaced by MAMEs mc6845 code.
-
-
-
-static void BBC_draw_hi_res(running_machine &machine);
-static void BBC_draw_teletext(running_machine &machine);
-
-
-
-
-void bbc_state::BBC_draw_teletext()
-{
-
-    //Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
-    //Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
-    //Teletext Latch bit 7 goes to LOSE on the Teletext chip
-
-    teletext_LOSE_w(m_saa505x, 0, (m_Teletext_Latch>>7)&1);
-
-    teletext_F1(m_saa505x);
-
-    teletext_data_w(m_saa505x, 0, (m_Teletext_Latch&0x3f)|((m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
-
-    int meml=m6845_memory_address_r(0);
-
-    if (((meml>>13)&1)==0)
-    {
-        m_Teletext_Latch=0;
-    } else {
-        m_Teletext_Latch=(m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
-    }
-
-}
-
-
-
-
-
-// This is the actual output of the Video ULA this fuction does all the output to the screen in the BBC emulator
-
-void bbc_state::BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels)
-{
-    int pixel_count;
-    int pixel_temp;
-    if ((m_BBC_display>=m_BBC_display_left) && ((m_BBC_display+number_of_pixels)<m_BBC_display_right))
-    {
-
-        pixel_temp=col^m_cursor_state;
-        for(pixel_count=0;pixel_count<number_of_pixels;pixel_count++)
-        {
-            *(m_BBC_display++) = pixel_temp;
-        }
-    } else {
-        m_BBC_display += number_of_pixels;
-    }
-}
-
-
-// the Video ULA hi-res shift registers, pallette lookup and display enabled circuits
-
-
-
-
-
-static const struct m6845_interface BBC6845 =
-{
-    0,// Memory Address register
-    0,// Row Address register
-    BBC_Set_HSync,// Horizontal status
-    BBC_Set_VSync,// Vertical status
-    0,// Display Enabled status
-    0,// Cursor status
-    BBC_Set_CRE, // Cursor status Emulation
-};
-
-
-
-void bbc_state::BBC_draw_hi_res()
-{
-    int meml;
-    unsigned char i=0;
-    int sc1;
-
-    // this is IC38 and IC41 takes 6845 DisplayEnabled and 6845 RA3
-    int DE=m6845_display_enabled_r(0) && (!(m6845_row_address_r(0)&8));
-
-    if (DE)
-    {
-        // read the memory location for the next screen location.
-        meml=calculate_video_address(state,m6845_memory_address_r(0));
-
-        i=m_BBC_Video_RAM[meml];
-
-        for(sc1=0;sc1<m_pixels_per_byte;sc1++)
-        {
-            BBC_ula_drawpixel(state, m_videoULA_pallet_lookup[m_pixel_bits[i]], m_emulation_pixels_per_real_pixel);
-            i=(i<<1)|1;
-        }
-
-    } else {
-        // if the display is not enable, just draw a blank area.
-        BBC_ula_drawpixel(state, 0, m_emulation_pixels_per_byte);
-    }
-}
-
-
-// RGB input to the Video ULA from the Teletext IC
-// Just pass on the output at the correct pixel size.
-void bbc_draw_RGB_in(device_t *device, int offset,int data)
-{
-    bbc_state *state = device->machine().driver_data<bbc_state>();
-    BBC_ula_drawpixel(state, data, state->m_emulation_pixels_per_real_pixel);
-}
-
-
-
-
-
-
-// called when the 6845 changes the HSync
-void bbc_state::BBC_Set_HSync(int offset, int data)
-{
-    // catch the falling edge
-    if((!data)&&(m_BBC_HSync))
-    {
-        m_y_screen_pos+=1;
-
-        if ((m_y_screen_pos>=0) && (m_y_screen_pos<300))
-        {
-            m_BBC_display_left = &m_BBC_bitmap->pix16(m_y_screen_pos);
-            m_BBC_display_right = m_BBC_display_left + 800;
-
-        } else {
-            m_BBC_display_left = &m_BBC_bitmap->pix16(0);
-            m_BBC_display_right = m_BBC_display_left;
-        }
-
-        m_BBC_display = m_BBC_display_left + m_x_screen_offset;
-
-    }
-    m_BBC_HSync=data;
-}
-
-// called when the 6845 changes the VSync
-void bbc_state::BBC_Set_VSync(int offset, int data)
-{
-    // catch the falling edge
-    if ((!data)&&(m_BBC_VSync))
-    {
-        m_y_screen_pos=m_y_screen_offset;
-
-        if ((m_y_screen_pos>=0) && (m_y_screen_pos<300))
-        {
-            m_BBC_display_left = &m_BBC_bitmap->pix16(m_y_screen_pos);
-            m_BBC_display_right = m_BBC_display_left + 800;
-
-        } else {
-            m_BBC_display_left = &m_BBC_bitmap->pix16(0);
-            m_BBC_display_right = m_BBC_display_left;
-        }
-
-        m_BBC_display = m_BBC_display_left + m_x_screen_offset;
-
-        teletext_DEW(m_saa505x);
-    }
-    m_BBC_VSync=data;
-
-}
-
-// called when the 6845 changes the Cursor Enabled
-void bbc_state::BBC_Set_CRE(int offset, int data)
-{
-    if (data&2) {
-        m_VideoULA_CR_counter=m_emulation_cursor_size;
-        m_VideoULA_CR=1;
-        // set the pallet on
-        if (data&1) set_cursor(state);
-    }
-}
-
-
-
-
-
-WRITE8_MEMBER(bbc_state::bbc_6845_w)
-{
-    switch(offset & 1)
-    {
-        case 0 :
-            m_mc6845->address_w(space,0,data);
-            break;
-        case 1 :
-            m_mc6845->register_w(space,0,data);
-            break;
-    }
-}
-
-
- READ8_HANDLER (bbc_6845_r)
-{
-    switch (offset&1)
-    {
-        case 0: return m_mc6845->status_r(space,0); break;
-        case 1: return m_mc6845->register_r(space,0); break;
-    }
-    return 0;
-}
-
-
-
-
-
-UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-
-    m_mc6845->update( bitmap, cliprect);
-
-    return 0;
-
-
-
-    long c;
-
-    //logerror ("Box %d by %d \n",cliprect.min_y,cliprect.max_y);
-
-    c = 0; // this is used to time out the screen redraw, in the case that the 6845 is in some way out state.
-
-
-    m_BBC_bitmap=bitmap;
-
-    m_BBC_display_left=&m_BBC_bitmap->pix16(0);
-    m_BBC_display_right=m_BBC_display_left;
-    m_BBC_display=m_BBC_display_left;
-
-    // loop until the end of the Vertical Sync pulse
-    // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-    while((m_BBC_VSync)&&(c<60000))
-    {
-        // Clock the 6845
-        m6845_clock(machine());
-        c++;
-    }
-
-
-    // loop until the Vertical Sync pulse goes high
-    // or until a timeout (this catches the 6845 with silly register values that would not give a VSYNC signal)
-    while((!m_BBC_VSync)&&(c<60000))
-    {
-        if ((m_y_screen_pos>=cliprect.min_y) && (m_y_screen_pos<=cliprect.max_y)) (m_draw_function)(machine());
-
-        // and check the cursor
-        if (m_VideoULA_CR) BBC_Clock_CR(this);
-
-        // Clock the 6845
-        m6845_clock(machine());
-        c++;
-    }
-
-    return 0;
-}
-
-void bbc_state::bbc_frameclock()
-{
-    m6845_frameclock();
-}
-
-*/

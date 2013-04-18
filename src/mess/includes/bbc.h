@@ -356,6 +356,8 @@ protected:
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_fdq_int(int state);
+public:	
+	unsigned int calculate_video_address(int ma,int ra);
 };
 
 
