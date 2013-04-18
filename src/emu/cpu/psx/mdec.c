@@ -507,6 +507,11 @@ void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 					mdec_yuv2_to_rgb24();
 				}
 				n_offset = 0;
+				while((psxreadword( p_n_psxram, n_0_address ) == 0xfe00) && n_0_size)
+				{
+					n_0_address += 2;  // eat up 0xfe00
+					n_0_size -= 2;
+				}
 			}
 
 			n_this = n_decoded;
@@ -531,7 +536,8 @@ void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 	{
 		mame_printf_debug( "mdec1_read no conversion :%08x:%08x:\n", n_0_command, n_0_size );
 	}
-	n_1_status &= ~( 1L << 29 );
+	if((int)n_0_size <= 0)
+		n_1_status &= ~( 1L << 29 );
 }
 
 WRITE32_MEMBER( psxmdec_device::write )
