@@ -192,8 +192,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dgn_beta_page_w);
 
 	/*  WD2797 FDC */
-	DECLARE_READ8_HANDLER(dgnbeta_wd2797_r);
-	DECLARE_WRITE8_HANDLER(dgnbeta_wd2797_w);
+	DECLARE_READ8_MEMBER(dgnbeta_wd2797_r);
+	DECLARE_WRITE8_MEMBER(dgnbeta_wd2797_w);
 	required_device<cpu_device> m_maincpu;
 	void dgnbeta_vid_set_gctrl(int data);
 	void UpdateBanks(int first, int last);
