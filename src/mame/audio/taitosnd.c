@@ -133,6 +133,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 			m_slavedata[m_mainmode ++] = data;
 			m_status |= TC0140SYT_PORT01_FULL;
 			m_nmi_req = 1;
+			interrupt_controller();
 			//logerror("taitosnd: Master cpu sends 0/1 : %01x%01x\n", m_slavedata[1], m_slavedata[0]);
 			break;
 
@@ -145,6 +146,7 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 			m_slavedata[m_mainmode ++] = data;
 			m_status |= TC0140SYT_PORT23_FULL;
 			m_nmi_req = 1;
+			interrupt_controller();
 			//logerror("taitosnd: Master cpu sends 2/3 : %01x%01x\n", m_slavedata[3], m_slavedata[2]);
 			break;
 
@@ -164,7 +166,6 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_comm_w )
 			//logerror("taitosnd: Master cpu written in mode [%02x] data[%02x]\n", m_mainmode, data);
 			break;
 	}
-
 }
 
 
@@ -253,15 +254,13 @@ WRITE8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_w )
 
 		case 0x06:      // nmi enable
 			m_nmi_enabled = 1;
+			interrupt_controller();
 			break;
 
 		default:
 			//logerror("tc0140syt: Slave cpu written in mode [%02x] data[%02x]\n" , m_submode, data & 0xff);
 			break;
 	}
-
-	interrupt_controller();
-
 }
 
 READ8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_r )
@@ -302,8 +301,6 @@ READ8_MEMBER( tc0140syt_device::tc0140syt_slave_comm_r )
 			res = 0;
 			break;
 	}
-
-	interrupt_controller();
 
 	return res;
 }
