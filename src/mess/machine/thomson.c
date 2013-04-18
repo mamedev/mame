@@ -1189,7 +1189,7 @@ void thomson_state::to7_midi_ready_to_send_cb(  )
 
 
 
-READ8_HANDLER ( to7_midi_r )
+READ8_MEMBER( thomson_state::to7_midi_r )
 {
 	/* ACIA 6850 registers */
 
@@ -1226,7 +1226,7 @@ READ8_HANDLER ( to7_midi_r )
 						to7_midi_overrun = 0;
 						LOG_MIDI(( "%s %f to7_midi_r: read data $%02X\n",
 									space.machine().describe_context(), space.machine().time().as_double(), data ));
-						to7_midi_update_irq( space.machine() );
+						to7_midi_update_irq();
 				}
 				return data;
 	}
@@ -1241,7 +1241,7 @@ READ8_HANDLER ( to7_midi_r )
 
 
 
-WRITE8_HANDLER ( to7_midi_w )
+WRITE8_MEMBER( thomson_state::to7_midi_w )
 {
 	/* ACIA 6850 registers */
 
@@ -1278,7 +1278,7 @@ WRITE8_HANDLER ( to7_midi_w )
 						(to7_midi_intr & 3) ? 1 : 0));
 			}
 		}
-		to7_midi_update_irq( space.machine() );
+		to7_midi_update_irq( );
 		break;
 
 
