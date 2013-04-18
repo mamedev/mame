@@ -7,6 +7,47 @@
 #ifndef EUROPC_H_
 #define EUROPC_H_
 
+#include "includes/pc.h"
+#include "video/pc_aga.h"
+
+class europc_pc_state : public pc_state
+{
+public:
+	europc_pc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc_state(mconfig, type, tag),
+		  m_jim_state(0),
+		  m_port61(0) { }
+
+	DECLARE_WRITE8_MEMBER( europc_pio_w );
+	DECLARE_READ8_MEMBER( europc_pio_r );
+
+	DECLARE_WRITE8_MEMBER ( europc_jim_w );
+	DECLARE_READ8_MEMBER ( europc_jim_r );
+	DECLARE_READ8_MEMBER ( europc_jim2_r );
+
+	DECLARE_READ8_MEMBER( europc_rtc_r );
+	DECLARE_WRITE8_MEMBER( europc_rtc_w );
+	
+	TIMER_CALLBACK_MEMBER(europc_rtc_timer);
+	
+	DECLARE_DRIVER_INIT(europc);
+
+	void europc_rtc_set_time();
+	void europc_rtc_init();
+	void europc_rtc_load_stream(emu_file *file);
+	void europc_rtc_save_stream(emu_file *file);
+
+	UINT8 m_jim_data[16];
+	UINT8 m_jim_state;
+	AGA_MODE m_jim_mode;
+	int m_port61; // bit 0,1 must be 0 for startup; reset?
+	UINT8 m_rtc_data[0x10];
+	int m_rtc_reg;
+	int m_rtc_state;
+	emu_timer *m_rtc_timer;
+};
+
+extern NVRAM_HANDLER( europc_rtc );
 
 /*
 layout of an uk europc
@@ -130,23 +171,6 @@ i am not sure if keypad enter delivers the mf2 keycode
 		\
 	PORT_START("pc_keyboard_7") /* IN11 */\
 	PORT_BIT ( 0xffff, 0x0000, IPT_UNUSED )
-
-
-/*----------- defined in machine/europc.c -----------*/
-
-DECLARE_WRITE8_HANDLER( europc_pio_w );
-	DECLARE_READ8_HANDLER( europc_pio_r );
-
-extern DECLARE_WRITE8_HANDLER ( europc_jim_w );
-extern  DECLARE_READ8_HANDLER ( europc_jim_r );
-extern  DECLARE_READ8_HANDLER ( europc_jim2_r );
-
-extern  DECLARE_READ8_HANDLER( europc_rtc_r );
-extern DECLARE_WRITE8_HANDLER( europc_rtc_w );
-extern NVRAM_HANDLER( europc_rtc );
-
-void europc_rtc_set_time(running_machine &machine);
-void europc_rtc_init(running_machine &machine);
 
 
 #endif /* EUROPC_H_ */

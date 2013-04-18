@@ -735,7 +735,6 @@ $(MESSOBJ)/ascii.a:             \
 
 $(MESSOBJ)/at.a:                \
 	$(MESS_MACHINE)/at_keybc.o  \
-	$(MESS_MACHINE)/ps2.o       \
 	$(MESS_MACHINE)/cs4031.o    \
 	$(MESS_MACHINE)/cs8221.o    \
 	$(MESS_MACHINE)/at.o        \
@@ -1500,7 +1499,6 @@ $(MESSOBJ)/pc9801.a:            \
 	$(MESS_MACHINE)/pc9801_kbd.o\
 
 $(MESSOBJ)/pcshare.a:           \
-	$(MESS_MACHINE)/pc_turbo.o  \
 	$(MESS_MACHINE)/pc_fdc.o    \
 	$(MESS_MACHINE)/pc_joy.o    \
 	$(MESS_MACHINE)/pc_keyboards.o \

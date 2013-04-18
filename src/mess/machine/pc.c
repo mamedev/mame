@@ -18,7 +18,6 @@
 #include "machine/ins8250.h"
 #include "machine/mc146818.h"
 #include "machine/pic8259.h"
-#include "machine/pc_turbo.h"
 
 #include "video/pc_vga.h"
 #include "video/pc_cga.h"
@@ -31,7 +30,6 @@
 #include "machine/pc_fdc.h"
 #include "machine/upd765.h"
 #include "includes/amstr_pc.h"
-#include "includes/europc.h"
 #include "machine/pcshare.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
@@ -1158,7 +1156,7 @@ void pc_state::fdc_dma_drq(bool state)
 	m_dma8237->dreq2_w( state );
 }
 
-static void pc_set_irq_line(running_machine &machine,int irq, int state)
+void pc_set_irq_line(running_machine &machine,int irq, int state)
 {
 	pc_state *st = machine.driver_data<pc_state>();
 
@@ -1175,7 +1173,7 @@ static void pc_set_irq_line(running_machine &machine,int irq, int state)
 	}
 }
 
-static void pc_set_keyb_int(running_machine &machine, int state)
+void pc_set_keyb_int(running_machine &machine, int state)
 {
 	pc_set_irq_line( machine, 1, state );
 }
@@ -1360,7 +1358,7 @@ DRIVER_INIT_MEMBER(pc_state,pccga)
 DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcmda)
@@ -1368,74 +1366,11 @@ DRIVER_INIT_MEMBER(pc_state,pcmda)
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
-DRIVER_INIT_MEMBER(pc_state,europc)
-{
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
-	UINT8 *rom = &memregion("maincpu")->base()[0];
-	int i;
-
-	/* just a plain bit pattern for graphics data generation */
-	for (i = 0; i < 256; i++)
-		gfx[i] = i;
-
-	/*
-	  fix century rom bios bug !
-	  if year <79 month (and not CENTURY) is loaded with 0x20
-	*/
-	if (rom[0xff93e]==0xb6){ // mov dh,
-		UINT8 a;
-		rom[0xff93e]=0xb5; // mov ch,
-		for (i=0xf8000, a=0; i<0xfffff; i++ ) a+=rom[i];
-		rom[0xfffff]=256-a;
-	}
-
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-
-	europc_rtc_init(machine());
-//  europc_rtc_set_time(machine());
-}
-
 DRIVER_INIT_MEMBER(pc_state,t1000hx)
 {
 	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	pc_turbo_setup(4.77/12, 1);
 }
-
-DRIVER_INIT_MEMBER(pc_state,pc200)
-{
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
-	int i;
-
-	/* just a plain bit pattern for graphics data generation */
-	for (i = 0; i < 256; i++)
-		gfx[i] = i;
-
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-}
-
-DRIVER_INIT_MEMBER(pc_state,ppc512)
-{
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
-	int i;
-
-	/* just a plain bit pattern for graphics data generation */
-	for (i = 0; i < 256; i++)
-		gfx[i] = i;
-
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-}
-DRIVER_INIT_MEMBER(pc_state,pc1512)
-{
-	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
-	int i;
-
-	/* just a plain bit pattern for graphics data generation */
-	for (i = 0; i < 256; i++)
-		gfx[i] = i;
-
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-}
-
 
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
@@ -1447,15 +1382,6 @@ DRIVER_INIT_MEMBER(pc_state,mc1502)
 	mess_init_pc_common(0, NULL, pc_set_irq_line);
 }
 
-DRIVER_INIT_MEMBER(pc_state,pc1640)
-{
-	address_space &io_space = machine().firstcpu->space( AS_IO );
-
-	io_space.install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
-	io_space.install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
-
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-}
 
 IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 {
@@ -1813,4 +1739,26 @@ READ8_MEMBER(pc_state::pc_EXP_r)
 	}
 	//DBG_LOG(1,"EXP_unit_r",("%.2x $%02x\n", offset, data));
 	return data;
+}
+
+
+TIMER_CALLBACK_MEMBER(pc_state::pc_turbo_callback)
+{
+	int val;
+
+	val = ioport("DSW2")->read() & 0x02;
+
+	if (val != m_turbo_cur_val)
+	{
+		m_turbo_cur_val = val;
+		m_maincpu->set_clock_scale(val ? m_turbo_on_speed : m_turbo_off_speed);
+	}
+}
+
+void pc_state::pc_turbo_setup(double off_speed, double on_speed)
+{
+	m_turbo_cur_val = -1;
+	m_turbo_off_speed = off_speed;
+	m_turbo_on_speed = on_speed;
+	machine().scheduler().timer_pulse(attotime::from_msec(100), timer_expired_delegate(FUNC(pc_state::pc_turbo_callback),this));	
 }

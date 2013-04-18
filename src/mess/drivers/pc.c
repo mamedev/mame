@@ -310,7 +310,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, pc_state )
+static ADDRESS_MAP_START( europc_map, AS_PROGRAM, 8, europc_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
@@ -321,16 +321,16 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(europc_io, AS_IO, 8, pc_state )
+static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE_LEGACY(europc_pio_r,          europc_pio_w)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r,          europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
-	AM_RANGE(0x0250, 0x025f) AM_READWRITE_LEGACY(europc_jim_r,          europc_jim_w)
+	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r,          europc_jim_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w)
-	AM_RANGE(0x02e0, 0x02e0) AM_READ_LEGACY(europc_jim2_r)
+	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE_LEGACY("lpt_1", pc_lpt_r, pc_lpt_w)
@@ -1038,12 +1038,12 @@ static GFXDECODE_START( europc )
 	GFXDECODE_ENTRY( "gfx1", 0x0800, europc_16_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( europc, pc_state )
+static MACHINE_CONFIG_START( europc, europc_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(europc, europc, I8088, 4772720*2, pc_frame_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
-	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_START_OVERRIDE(europc_pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(europc_pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -2337,7 +2337,7 @@ ROM_END
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
 COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
 COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell, pc_state,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
-COMP( 1988, europc,     ibm5150,    0,          europc,     europc, pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
+COMP( 1988, europc,     ibm5150,    0,          europc,     europc, europc_pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
 COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-1" , GAME_NOT_WORKING)
 COMP( 1987, pc10iii,    ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-10 III" , GAME_NOT_WORKING)
 

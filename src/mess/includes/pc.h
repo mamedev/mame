@@ -80,18 +80,13 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_READ8_MEMBER(ec1841_memboard_r);
 	DECLARE_WRITE8_MEMBER(ec1841_memboard_w);
-	DECLARE_DRIVER_INIT(europc);
 	DECLARE_DRIVER_INIT(mc1502);
 	DECLARE_DRIVER_INIT(bondwell);
 	DECLARE_DRIVER_INIT(pcjr);
 	DECLARE_DRIVER_INIT(pccga);
 	DECLARE_DRIVER_INIT(t1000hx);
-	DECLARE_DRIVER_INIT(ppc512);
-	DECLARE_DRIVER_INIT(pc200);
 	DECLARE_DRIVER_INIT(ibm5150);
 	DECLARE_DRIVER_INIT(pcmda);
-	DECLARE_DRIVER_INIT(pc1512);
-	DECLARE_DRIVER_INIT(pc1640);
 	DECLARE_MACHINE_START(pc);
 	DECLARE_MACHINE_RESET(pc);
 	DECLARE_MACHINE_RESET(tandy1000rl);
@@ -161,7 +156,18 @@ public:
 	void pcjr_keyb_init();
 	void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
 	void pc_rtc_init();
+	
+	TIMER_CALLBACK_MEMBER(pc_turbo_callback);
+	void pc_turbo_setup(double off_speed, double on_speed);
+	
+	int m_turbo_cur_val;
+	double m_turbo_off_speed;
+	double m_turbo_on_speed;
+
 };
+
+void pc_set_irq_line(running_machine &machine,int irq, int state);
+void pc_set_keyb_int(running_machine &machine, int state);
 
 /*----------- defined in machine/pc.c -----------*/
 

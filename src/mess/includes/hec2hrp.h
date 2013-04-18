@@ -161,41 +161,26 @@ public:
 	void Init_Hector_Palette();
 	void hector_80c(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 	void hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
-	
+	/*----------- defined in machine/hecdisk2.c -----------*/
+
+	// disc2 handling
+	DECLARE_READ8_MEMBER(  hector_disc2_io00_port_r);
+	DECLARE_WRITE8_MEMBER( hector_disc2_io00_port_w);
+	DECLARE_READ8_MEMBER(  hector_disc2_io20_port_r);
+	DECLARE_WRITE8_MEMBER( hector_disc2_io20_port_w);
+	DECLARE_READ8_MEMBER(  hector_disc2_io30_port_r);
+	DECLARE_WRITE8_MEMBER( hector_disc2_io30_port_w);
+	DECLARE_READ8_MEMBER(  hector_disc2_io40_port_r);
+	DECLARE_WRITE8_MEMBER( hector_disc2_io40_port_w);
+	DECLARE_READ8_MEMBER(  hector_disc2_io50_port_r);
+	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
+
+	void hector_disc2_reset();
+	void hector_disc2_init();
 };
-
-/*----------- defined in machine/hec2hrp.c -----------*/
-
-/* Protoype of memory Handler*/
-DECLARE_WRITE8_HANDLER( hector_switch_bank_rom_w );
-
-/* Prototype of I/O Handler*/
-DECLARE_READ8_HANDLER( hector_mx_io_port_r );
-/*----------- defined in video/hec2video.c -----------*/
-
-
-
 
 /* Sound function*/
 extern const sn76477_interface hector_sn76477_interface;
-
-/*----------- defined in machine/hecdisk2.c -----------*/
-
-// disc2 handling
-DECLARE_READ8_HANDLER(  hector_disc2_io00_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io00_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io20_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io20_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io30_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io30_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io40_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io40_port_w);
-DECLARE_READ8_HANDLER(  hector_disc2_io50_port_r);
-DECLARE_WRITE8_HANDLER( hector_disc2_io50_port_w);
-
-void hector_disc2_reset( running_machine &machine);
-void hector_disc2_init( running_machine &machine);
-void hector_minidisc_init( running_machine &machine);
 
 extern const wd17xx_interface hector_wd17xx_interface;  // Special for minidisc
 extern const floppy_interface minidisc_floppy_interface;

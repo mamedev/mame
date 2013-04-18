@@ -1,9 +1,7 @@
 #include "emu.h"
 #include "includes/europc.h"
-#include "includes/pc.h"
 #include "machine/pcshare.h"
 #include "machine/pit8253.h"
-#include "video/pc_aga.h"
 #include "coreutil.h"
 
 /*
@@ -72,11 +70,6 @@
   46a: 00 jim 250 01 jim 350
  */
 
-static struct {
-	UINT8 data[16];
-	UINT8 state;
-	AGA_MODE mode;
-} europc_jim = { { 0 } } ;
 
 /*
   250..253 write only 00 be 00 10
@@ -94,7 +87,7 @@ static struct {
   254..257 r/w memory ? JIM asic? ram behaviour
 
 */
-WRITE8_HANDLER ( europc_jim_w )
+WRITE8_MEMBER( europc_pc_state::europc_jim_w )
 {
 	switch (offset)
 	{
@@ -104,18 +97,18 @@ WRITE8_HANDLER ( europc_jim_w )
 			switch (data)
 			{
 			case 0x1f:
-			case 0x0b: europc_jim.mode = AGA_MONO; break;
+			case 0x0b: m_jim_mode = AGA_MONO; break;
 			case 0xe: //80 columns?
 			case 0xd: //40 columns?
 			case 0x18:
-			case 0x1a: europc_jim.mode = AGA_COLOR; break;
-			default: europc_jim.mode = AGA_OFF; break;
+			case 0x1a: m_jim_mode = AGA_COLOR; break;
+			default: m_jim_mode = AGA_OFF; break;
 			}
 		}
 //      mode= data&0x10?AGA_COLOR:AGA_MONO;
 //      mode= data&0x10?AGA_COLOR:AGA_OFF;
-		pc_aga_set_mode(space.machine(), europc_jim.mode);
-		if (data & 0x80) europc_jim.state = 0;
+		pc_aga_set_mode(space.machine(), m_jim_mode);
+		if (data & 0x80) m_jim_state = 0;
 		break;
 	case 4:
 		switch(data & 0xc0)
@@ -130,30 +123,30 @@ WRITE8_HANDLER ( europc_jim_w )
 		return;
 	}
 	logerror("jim write %.2x %.2x\n", offset, data);
-	europc_jim.data[offset] = data;
+	m_jim_data[offset] = data;
 }
 
-READ8_HANDLER ( europc_jim_r )
+READ8_MEMBER( europc_pc_state::europc_jim_r )
 {
 	int data = 0;
 	switch(offset)
 	{
-	case 4: case 5: case 6: case 7: data = europc_jim.data[offset]; break;
+	case 4: case 5: case 6: case 7: data = m_jim_data[offset]; break;
 	case 0: case 1: case 2: case 3: data = 0; break;
 	case 0xa: return europc_rtc_r(space, 0);
 	}
 	return data;
 }
 
-READ8_HANDLER ( europc_jim2_r )
+READ8_MEMBER( europc_pc_state::europc_jim2_r )
 {
-	switch (europc_jim.state)
+	switch (m_jim_state)
 	{
-	case 0: europc_jim.state++; return 0;
-	case 1: europc_jim.state++; return 0x80;
+	case 0: m_jim_state++; return 0;
+	case 1: m_jim_state++; return 0x80;
 	case 2:
-		europc_jim.state = 0;
-		switch (europc_jim.mode)
+		m_jim_state = 0;
+		switch (m_jim_mode)
 		{
 		case AGA_COLOR: return 0x87; // for color;
 		case AGA_MONO: return 0x90; //for mono
@@ -166,21 +159,18 @@ READ8_HANDLER ( europc_jim2_r )
 
 /* port 2e0 polling!? at fd6e1 */
 
-static struct {
-	int port61; // bit 0,1 must be 0 for startup; reset?
-} europc_pio= { 0 };
 
-WRITE8_HANDLER( europc_pio_w )
+
+WRITE8_MEMBER( europc_pc_state::europc_pio_w )
 {
-	pc_state *state = space.machine().driver_data<pc_state>();
 	switch (offset)
 	{
 	case 1:
-		europc_pio.port61=data;
+		m_port61=data;
 //      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
 //      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
 		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
-		state->pc_speaker_set_spkrdata(BIT(data, 1));
+		pc_speaker_set_spkrdata(BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;
 	}
@@ -189,17 +179,17 @@ WRITE8_HANDLER( europc_pio_w )
 }
 
 
-	READ8_HANDLER( europc_pio_r )
+READ8_MEMBER( europc_pc_state::europc_pio_r )
 {
 	int data = 0;
 	switch (offset)
 	{
 	case 0:
-		if (!(europc_pio.port61&0x80))
+		if (!(m_port61&0x80))
 			data = pc_keyb_read();
 		break;
 	case 1:
-		data = europc_pio.port61;
+		data = m_port61;
 		break;
 	case 2:
 		if (pit8253_get_output(space.machine().device("pit8253"), 2))
@@ -210,78 +200,72 @@ WRITE8_HANDLER( europc_pio_w )
 }
 
 // realtime clock and nvram
-static struct {
-	/*
-	   reg 0: seconds
-	   reg 1: minutes
-	   reg 2: hours
-	   reg 3: day 1 based
-	   reg 4: month 1 based
-	   reg 5: year bcd (no century, values bigger 88? are handled as 1900, else 2000)
-	   reg 6:
-	   reg 7:
-	   reg 8:
-	   reg 9:
-	   reg a:
-	   reg b: 0x10 written
-	    bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
-	    bit 2: internal video on
-	    bit 4: color
-	    bit 6,7: clock
-	   reg c:
-	    bit 0,1: language/country
-	   reg d: xor checksum
-	   reg e:
-	   reg 0f: 01 status ok, when not 01 written
-	*/
-	UINT8 data[0x10];
-	int reg;
-	int state;
-	emu_timer *timer;
-} europc_rtc;
+/*
+   reg 0: seconds
+   reg 1: minutes
+   reg 2: hours
+   reg 3: day 1 based
+   reg 4: month 1 based
+   reg 5: year bcd (no century, values bigger 88? are handled as 1900, else 2000)
+   reg 6:
+   reg 7:
+   reg 8:
+   reg 9:
+   reg a:
+   reg b: 0x10 written
+	bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
+	bit 2: internal video on
+	bit 4: color
+	bit 6,7: clock
+   reg c:
+	bit 0,1: language/country
+   reg d: xor checksum
+   reg e:
+   reg 0f: 01 status ok, when not 01 written
+*/
 
-void europc_rtc_set_time(running_machine &machine)
+void europc_pc_state::europc_rtc_set_time()
 {
 	system_time systime;
 
 	/* get the current date/time from the core */
-	machine.current_datetime(systime);
+	machine().current_datetime(systime);
 
-	europc_rtc.data[0] = dec_2_bcd(systime.utc_time.second);
-	europc_rtc.data[1] = dec_2_bcd(systime.utc_time.minute);
-	europc_rtc.data[2] = dec_2_bcd(systime.utc_time.hour);
+	m_rtc_data[0] = dec_2_bcd(systime.utc_time.second);
+	m_rtc_data[1] = dec_2_bcd(systime.utc_time.minute);
+	m_rtc_data[2] = dec_2_bcd(systime.utc_time.hour);
 
-	europc_rtc.data[3] = dec_2_bcd(systime.utc_time.mday);
-	europc_rtc.data[4] = dec_2_bcd(systime.utc_time.month + 1);
-	europc_rtc.data[5] = dec_2_bcd(systime.utc_time.year % 100);
+	m_rtc_data[3] = dec_2_bcd(systime.utc_time.mday);
+	m_rtc_data[4] = dec_2_bcd(systime.utc_time.month + 1);
+	m_rtc_data[5] = dec_2_bcd(systime.utc_time.year % 100);
 }
 
-static TIMER_CALLBACK(europc_rtc_timer)
+TIMER_CALLBACK_MEMBER(europc_pc_state::europc_rtc_timer)
 {
 	int month, year;
-	europc_rtc.data[0]=bcd_adjust(europc_rtc.data[0]+1);
-	if (europc_rtc.data[0]>=0x60)
+	m_rtc_data[0]=bcd_adjust(m_rtc_data[0]+1);
+	if (m_rtc_data[0]>=0x60)
 	{
-		europc_rtc.data[0]=0;
-		europc_rtc.data[1]=bcd_adjust(europc_rtc.data[1]+1);
-		if (europc_rtc.data[1]>=0x60)
+		m_rtc_data[0]=0;
+		m_rtc_data[1]=bcd_adjust(m_rtc_data[1]+1);
+		if (m_rtc_data[1]>=0x60)
 		{
-			europc_rtc.data[1]=0;
-			europc_rtc.data[2]=bcd_adjust(europc_rtc.data[2]+1);
-			if (europc_rtc.data[2]>=0x24)
+			m_rtc_data[1]=0;
+			m_rtc_data[2]=bcd_adjust(m_rtc_data[2]+1);
+			if (m_rtc_data[2]>=0x24)
 			{
-				europc_rtc.data[2]=0;
-				europc_rtc.data[3]=bcd_adjust(europc_rtc.data[3]+1);
-				month=bcd_2_dec(europc_rtc.data[4]);
-				year=bcd_2_dec(europc_rtc.data[5])+2000; // save for julian_days_in_month_calculation
-				if (europc_rtc.data[3]> gregorian_days_in_month(month, year))
+				m_rtc_data[2]=0;
+				m_rtc_data[3]=bcd_adjust(m_rtc_data[3]+1);
+				month=bcd_2_dec(m_rtc_data[4]);
+				year=bcd_2_dec(m_rtc_data[5])+2000; // save for julian_days_in_month_calculation
+				if (m_rtc_data[3]> gregorian_days_in_month(month, year))
 				{
-					europc_rtc.data[3]=1;
-					europc_rtc.data[4]=bcd_adjust(europc_rtc.data[4]+1);
-					if (europc_rtc.data[4]>0x12)
+					m_rtc_data[3]=1;
+					m_rtc_data[4]=bcd_adjust(m_rtc_data[4]+1);
+					if (m_rtc_data[4]>0x12)
 					{
-						europc_rtc.data[4]=1;
-						europc_rtc.data[5]=bcd_adjust(europc_rtc.data[5]+1)&0xff;
+						m_rtc_data[4]=1;
+						m_rtc_data[5]=bcd_adjust(m_rtc_data[5]+1)&0xff;
 					}
 				}
 			}
@@ -289,65 +273,68 @@ static TIMER_CALLBACK(europc_rtc_timer)
 	}
 }
 
-void europc_rtc_init(running_machine &machine)
+void europc_pc_state::europc_rtc_init()
 {
-	memset(&europc_rtc,0,sizeof(europc_rtc));
-	europc_rtc.data[0xf]=1;
+	memset(&m_rtc_data,0,sizeof(m_rtc_data));
+	m_rtc_reg = 0;
+	m_rtc_state = 0;
+	m_rtc_data[0xf]=1;
 
-	europc_rtc.timer = machine.scheduler().timer_alloc(FUNC(europc_rtc_timer));
-	europc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
+	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(europc_pc_state::europc_rtc_timer),this));
+	m_rtc_timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 
-	READ8_HANDLER( europc_rtc_r )
+READ8_MEMBER( europc_pc_state::europc_rtc_r )
 {
 	int data=0;
-	switch (europc_rtc.state)
+	switch (m_rtc_state)
 	{
 	case 1:
-		data=(europc_rtc.data[europc_rtc.reg]&0xf0)>>4;
-		europc_rtc.state++;
+		data=(m_rtc_data[m_rtc_reg]&0xf0)>>4;
+		m_rtc_state++;
 		break;
 	case 2:
-		data=europc_rtc.data[europc_rtc.reg]&0xf;
-		europc_rtc.state=0;
-//      logerror("rtc read %x %.2x\n",europc_rtc.reg, europc_rtc.data[europc_rtc.reg]);
+		data=m_rtc_data[m_rtc_reg]&0xf;
+		m_rtc_state=0;
+//      logerror("rtc read %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
 		break;
 	}
 	return data;
 }
 
-WRITE8_HANDLER( europc_rtc_w )
+WRITE8_MEMBER( europc_pc_state::europc_rtc_w )
 {
-	switch (europc_rtc.state)
+	switch (m_rtc_state)
 	{
 	case 0:
-		europc_rtc.reg=data;
-		europc_rtc.state=1;
+		m_rtc_reg=data;
+		m_rtc_state=1;
 		break;
 	case 1:
-		europc_rtc.data[europc_rtc.reg]=(europc_rtc.data[europc_rtc.reg]&~0xf0)|((data&0xf)<<4);
-		europc_rtc.state++;
+		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf0)|((data&0xf)<<4);
+		m_rtc_state++;
 		break;
 	case 2:
-		europc_rtc.data[europc_rtc.reg]=(europc_rtc.data[europc_rtc.reg]&~0xf)|(data&0xf);
-		europc_rtc.state=0;
-//      logerror("rtc written %x %.2x\n",europc_rtc.reg, europc_rtc.data[europc_rtc.reg]);
+		m_rtc_data[m_rtc_reg]=(m_rtc_data[m_rtc_reg]&~0xf)|(data&0xf);
+		m_rtc_state=0;
+//      logerror("rtc written %x %.2x\n",m_rtc_reg, m_rtc_data[m_rtc_reg]);
 		break;
 	}
 }
 
-static void europc_rtc_load_stream(emu_file *file)
+void europc_pc_state::europc_rtc_load_stream(emu_file *file)
 {
-	file->read(europc_rtc.data, sizeof(europc_rtc.data));
+	file->read(m_rtc_data, sizeof(m_rtc_data));
 }
 
-static void europc_rtc_save_stream(emu_file *file)
+void europc_pc_state::europc_rtc_save_stream(emu_file *file)
 {
-	file->write(europc_rtc.data, sizeof(europc_rtc.data));
+	file->write(m_rtc_data, sizeof(m_rtc_data));
 }
 
 NVRAM_HANDLER( europc_rtc )
 {
+	europc_pc_state *state = machine.driver_data<europc_pc_state>();
 	if (file == NULL)
 	{
 		/* init only */
@@ -355,11 +342,38 @@ NVRAM_HANDLER( europc_rtc )
 	}
 	else if (read_or_write)
 	{
-		europc_rtc_save_stream(file);
+		state->europc_rtc_save_stream(file);
 	}
 	else
 	{
-		europc_rtc_load_stream(file);
-		europc_rtc_set_time(machine);
+		state->europc_rtc_load_stream(file);
+		state->europc_rtc_set_time();
 	}
+}
+
+DRIVER_INIT_MEMBER(europc_pc_state,europc)
+{
+	UINT8 *gfx = &memregion("gfx1")->base()[0x8000];
+	UINT8 *rom = &memregion("maincpu")->base()[0];
+	int i;
+
+	/* just a plain bit pattern for graphics data generation */
+	for (i = 0; i < 256; i++)
+		gfx[i] = i;
+
+	/*
+	  fix century rom bios bug !
+	  if year <79 month (and not CENTURY) is loaded with 0x20
+	*/
+	if (rom[0xff93e]==0xb6){ // mov dh,
+		UINT8 a;
+		rom[0xff93e]=0xb5; // mov ch,
+		for (i=0xf8000, a=0; i<0xfffff; i++ ) a+=rom[i];
+		rom[0xfffff]=256-a;
+	}
+
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+
+	europc_rtc_init();
+//  europc_rtc_set_time();
 }

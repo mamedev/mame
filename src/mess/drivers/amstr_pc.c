@@ -61,7 +61,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 
 #include "machine/ram.h"
 
-static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, pc_state )
+static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, amstrad_pc_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x80000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( ppc512_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, pc_state )
+static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, amstrad_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -79,27 +79,27 @@ static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
+static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8_LEGACY(pc1640_port60_r, pc1640_port60_w, 0xffff)
+	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r, pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8_LEGACY(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8_LEGACY(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_xt_device, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16, pc_state )
+static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16, amstrad_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xbffff) AM_NOP
 	AM_RANGE(0xc0000, 0xc7fff) AM_ROM
@@ -108,19 +108,19 @@ static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16, pc_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pc200_io, AS_IO, 16, pc_state )
+static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x0065) AM_READWRITE8_LEGACY(pc1640_port60_r, pc1640_port60_w, 0xffff)
-	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
-	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
+	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
+	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
+	AM_RANGE(0x007a, 0x007b) AM_READWRITE8(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r, pc_page_w, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
-	AM_RANGE(0x0278, 0x027b) AM_READ8_LEGACY(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x0278, 0x027b) AM_READ8(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r,  ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0378, 0x037b) AM_READ8_LEGACY(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
+	AM_RANGE(0x0378, 0x037b) AM_READ8(pc200_port378_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_1", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0x00ff)
 	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_xt_device, map, 0xffff)
@@ -237,7 +237,7 @@ SLOT_INTERFACE_END
 	MCFG_CPU_ADD("maincpu", type, clock)                \
 	MCFG_CPU_PROGRAM_MAP(mem##_map) \
 	MCFG_CPU_IO_MAP(port##_io)  \
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, vblankfunc, "screen", 0, 1) \
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, vblankfunc, "screen", 0, 1) \
 	MCFG_CPU_CONFIG(i86_address_mask)
 
 
@@ -258,12 +258,12 @@ static GFXDECODE_START( pc200 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc200_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pc200, pc_state )
+static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(pc200, pc200, I8086, 8000000, pc_frame_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
-	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_START_OVERRIDE(amstrad_pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -328,15 +328,15 @@ static GFXDECODE_START( pc1512 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc1512_charlayout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ppc512, pc_state )
+static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc512_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pc_state, pc_frame_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", amstrad_pc_state, pc_frame_interrupt, "screen", 0, 1)
 
-	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
-	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_START_OVERRIDE(amstrad_pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(amstrad_pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -505,9 +505,9 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
-COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, pc_state,    pc200,  "Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )
+COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, amstrad_pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, amstrad_pc_state,    ppc512, "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,    pc2086,     ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
+COMP(  1990,    pc3086,     ibm5150,    0,  pc200,      pc200, amstrad_pc_state,    pc200,  "Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )

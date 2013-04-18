@@ -17,6 +17,9 @@
     ROM_LOAD("hercules.chr", 0x00000, 0x1000, CRC(7e8c9d76))
 
 */
+#ifndef __PC_AGA__
+#define __PC_AGA__
+
 
 #define AGA_SCREEN_NAME "screen"
 #define AGA_MC6845_NAME "mc6845_aga"
@@ -40,3 +43,5 @@ DECLARE_READ8_HANDLER( pc200_cga_r );
 DECLARE_WRITE8_HANDLER( pc200_cga_w );
 DECLARE_READ16_HANDLER( pc200_cga16le_r );
 DECLARE_WRITE16_HANDLER( pc200_cga16le_w );
+
+#endif

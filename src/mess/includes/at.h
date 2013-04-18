@@ -35,7 +35,6 @@
 #include "machine/idectrl.h"
 #include "machine/isa_aha1542.h"
 #include "machine/at_keybc.h"
-#include "includes/ps2.h"
 
 #include "imagedev/harddriv.h"
 #include "machine/am9517a.h"

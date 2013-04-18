@@ -98,13 +98,13 @@ static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// ROM Page managing
-	AM_RANGE(0x000,0x00f) AM_READWRITE_LEGACY(hector_disc2_io00_port_r, hector_disc2_io00_port_w )
+	AM_RANGE(0x000,0x00f) AM_READWRITE(hector_disc2_io00_port_r, hector_disc2_io00_port_w )
 	// RS232 - 8251 managing
-	AM_RANGE(0x020,0x02f) AM_READWRITE_LEGACY(hector_disc2_io20_port_r, hector_disc2_io20_port_w )
+	AM_RANGE(0x020,0x02f) AM_READWRITE(hector_disc2_io20_port_r, hector_disc2_io20_port_w )
 	// Hector communication managing
-	AM_RANGE(0x030,0x03f) AM_READWRITE_LEGACY(hector_disc2_io30_port_r, hector_disc2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE_LEGACY(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE_LEGACY(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
+	AM_RANGE(0x030,0x03f) AM_READWRITE(hector_disc2_io30_port_r, hector_disc2_io30_port_w )
+	AM_RANGE(0x040,0x04f) AM_READWRITE(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
+	AM_RANGE(0x050,0x05f) AM_READWRITE(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
 	// uPD765 link:
 	AM_RANGE(0x060,0x061) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765", upd765a_device, mdma_r, mdma_w)
@@ -330,7 +330,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
 	hector_init();
-	hector_disc2_init(machine()); // Init of the Disc II !
+	hector_disc2_init(); // Init of the Disc II !
 }
 /*****************************************************************************/
 MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
@@ -368,7 +368,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 
 	// Machines init
 	hector_reset(1, 1);
-	hector_disc2_reset(machine());
+	hector_disc2_reset();
 }
 //minidisc
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)

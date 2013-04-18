@@ -251,7 +251,7 @@ READ8_MEMBER(hec2hrp_state::hector_keyboard_r)
 					}
 				//RESET DISC II unit
 				if (isHectorWithDisc2() )
-					hector_disc2_reset(machine());
+					hector_disc2_reset();
 
 				/* floppy md master reset */
 				if (isHectorWithMiniDisc())
