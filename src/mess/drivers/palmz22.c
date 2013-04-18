@@ -90,6 +90,15 @@ public:
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	DECLARE_WRITE8_MEMBER( s3c2410_nand_command_w );
+	DECLARE_WRITE8_MEMBER( s3c2410_nand_address_w );
+	DECLARE_READ8_MEMBER( s3c2410_nand_data_r );
+	DECLARE_WRITE8_MEMBER( s3c2410_nand_data_w );
+	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
+	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
+	DECLARE_READ32_MEMBER(s3c2410_core_pin_r);
+	DECLARE_READ32_MEMBER(s3c2410_adc_data_r );
+
 };
 
 
@@ -112,50 +121,46 @@ inline void ATTR_PRINTF(3,4) palmz22_state::verboselog( int n_level, const char 
 
 // NAND
 
-static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
+WRITE8_MEMBER( palmz22_state::s3c2410_nand_command_w )
 {
-	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	state->verboselog(9, "s3c2410_nand_command_w %02X\n", data);
-	state->m_nand->command_w(data);
+	verboselog(9, "s3c2410_nand_command_w %02X\n", data);
+	m_nand->command_w(data);
 }
 
-static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
+WRITE8_MEMBER( palmz22_state::s3c2410_nand_address_w )
 {
-	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	state->verboselog(9, "s3c2410_nand_address_w %02X\n", data);
-	state->m_nand->address_w(data);
+	verboselog(9, "s3c2410_nand_address_w %02X\n", data);
+	m_nand->address_w(data);
 }
 
-static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
+READ8_MEMBER( palmz22_state::s3c2410_nand_data_r )
 {
-	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	UINT8 data = state->m_nand->data_r();
-	state->verboselog(9, "s3c2410_nand_data_r %02X\n", data);
+	UINT8 data = m_nand->data_r();
+	verboselog(9, "s3c2410_nand_data_r %02X\n", data);
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
+WRITE8_MEMBER( palmz22_state::s3c2410_nand_data_w )
 {
-	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	state->verboselog(9, "s3c2410_nand_data_w %02X\n", data);
-	state->m_nand->data_w(data);
+	verboselog(9, "s3c2410_nand_data_w %02X\n", data);
+	m_nand->data_w(data);
 }
 
-ATTR_UNUSED static READ8_DEVICE_HANDLER( s3c2410_nand_busy_r )
+/*
+READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
 {
-	palmz22_state *state = device->machine().driver_data<palmz22_state>();
-	UINT8 data = state->m_nand->is_busy();
-	state->verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
+	UINT8 data = m_nand->is_busy();
+	verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
 	return data;
 }
+*/
 
 // GPIO
 
-static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
+READ32_MEMBER(palmz22_state::s3c2410_gpio_port_r)
 {
-	palmz22_state *state = device->machine().driver_data<palmz22_state>();
-	UINT32 data = state->m_port[port];
-	switch (port)
+	UINT32 data = m_port[offset];
+	switch (offset)
 	{
 		case S3C2410_GPIO_PORT_E :
 		{
@@ -165,7 +170,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		break;
 		case S3C2410_GPIO_PORT_F :
 		{
-			data = (data & ~0xFF) | (state->ioport( "PORT-F")->read() & 0xFF);
+			data = (data & ~0xFF) | (ioport( "PORT-F")->read() & 0xFF);
 		}
 		break;
 		case S3C2410_GPIO_PORT_G :
@@ -178,10 +183,9 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
+WRITE32_MEMBER(palmz22_state::s3c2410_gpio_port_w)
 {
-	palmz22_state *state = device->machine().driver_data<palmz22_state>();
-	state->m_port[port] = data;
+	m_port[offset] = data;
 }
 
 // CORE
@@ -198,10 +202,10 @@ NCON : NAND flash memory address step selection
 
 */
 
-static int s3c2410_core_pin_r( device_t *device, int pin)
+READ32_MEMBER(palmz22_state::s3c2410_core_pin_r)
 {
 	int data = 0;
-	switch (pin)
+	switch (offset)
 	{
 		case S3C2410_CORE_PIN_NCON : data = 0; break;
 		case S3C2410_CORE_PIN_OM0  : data = 0; break;
@@ -212,18 +216,17 @@ static int s3c2410_core_pin_r( device_t *device, int pin)
 
 // ADC
 
-static READ32_DEVICE_HANDLER( s3c2410_adc_data_r )
+READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 {
-	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	UINT32 data = 0;
 	switch (offset)
 	{
 		case 0 + 0 : data = 0x2EE + (PALM_Z22_BATTERY_LEVEL * 0xFF / 100); break;
 		case 0 + 1 : data = 0; break;
-		case 2 + 0 : data = state->ioport( "PENX")->read(); break;
-		case 2 + 1 : data = 0x3FF - state->ioport( "PENY")->read(); break;
+		case 2 + 0 : data = ioport( "PENX")->read(); break;
+		case 2 + 1 : data = 0x3FF - ioport( "PENY")->read(); break;
 	}
-	state->verboselog(5,  "s3c2410_adc_data_r %08X\n", data);
+	verboselog(5,  "s3c2410_adc_data_r %08X\n", data);
 	return data;
 }
 
@@ -275,17 +278,17 @@ DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 static S3C2410_INTERFACE( palmz22_s3c2410_intf )
 {
 	// CORE (pin read / pin write)
-	{ s3c2410_core_pin_r, NULL },
+	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_core_pin_r), DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
+	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_gpio_port_w)},
 	// I2C (scl write / sda read / sda write)
-	{ NULL, NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	// ADC (data read)
-	{ s3c2410_adc_data_r },
+	{ DEVCB_DRIVER_MEMBER32(palmz22_state,s3c2410_adc_data_r) },
 	// I2S (data write)
-	{ NULL },
+	{ DEVCB_NULL },
 	// NAND (command write / address write / data read / data write)
-	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w },
+	{ DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_command_w), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_address_w), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_data_r), DEVCB_DRIVER_MEMBER(palmz22_state,s3c2410_nand_data_w) },
 	// LCD (flags)
 	{ 0 }
 };

@@ -136,9 +136,9 @@ static void s3c24xx_reset( device_t *device)
 INLINE int iface_core_pin_r( device_t *device, int pin)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->core.pin_r)
+	if (!s3c24xx->pin_r.isnull())
 	{
-		return (s3c24xx->iface->core.pin_r)( device, pin);
+		return (s3c24xx->pin_r)(pin);
 	}
 	else
 	{
@@ -1872,9 +1872,9 @@ static void s3c24xx_gpio_reset( device_t *device)
 INLINE UINT32 iface_gpio_port_r( device_t *device, int port, UINT32 mask)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->gpio.port_r)
+	if (!s3c24xx->port_r.isnull())
 	{
-		return (s3c24xx->iface->gpio.port_r)( device, port, mask);
+		return (s3c24xx->port_r)( port, mask);
 	}
 	else
 	{
@@ -1885,9 +1885,9 @@ INLINE UINT32 iface_gpio_port_r( device_t *device, int port, UINT32 mask)
 INLINE void iface_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->gpio.port_w)
+	if (!s3c24xx->port_w.isnull())
 	{
-		(s3c24xx->iface->gpio.port_w)( device, port, mask, data);
+		(s3c24xx->port_w)( port, data, mask );
 	}
 }
 
@@ -2437,27 +2437,27 @@ static void s3c24xx_iic_reset( device_t *device)
 INLINE void iface_i2c_scl_w( device_t *device, int state)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->i2c.scl_w)
+	if (!s3c24xx->scl_w.isnull())
 	{
-		(s3c24xx->iface->i2c.scl_w)( device, state);
+		(s3c24xx->scl_w)( state);
 	}
 }
 
 INLINE void iface_i2c_sda_w( device_t *device, int state)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->i2c.sda_w)
+	if (!s3c24xx->sda_w.isnull())
 	{
-		(s3c24xx->iface->i2c.sda_w)( device, state);
+		(s3c24xx->sda_w)(state);
 	}
 }
 
 INLINE int iface_i2c_sda_r( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->i2c.sda_r)
+	if (!s3c24xx->sda_r.isnull())
 	{
-		return (s3c24xx->iface->i2c.sda_r)( device);
+		return (s3c24xx->sda_r)();
 	}
 	else
 	{
@@ -2684,9 +2684,9 @@ static void s3c24xx_iis_reset( device_t *device)
 INLINE void iface_i2s_data_w( device_t *device, int ch, UINT16 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->i2s.data_w)
+	if (!s3c24xx->i2s_data_w.isnull())
 	{
-		(s3c24xx->iface->i2s.data_w)( device, device->machine().driver_data()->generic_space(), ch, data, 0);
+		(s3c24xx->i2s_data_w)( ch, data, 0);
 	}
 }
 
@@ -2940,7 +2940,7 @@ static void s3c24xx_adc_reset( device_t *device)
 static UINT32 iface_adc_data_r( device_t *device, int ch)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->adc.data_r)
+	if (!s3c24xx->adc_data_r.isnull())
 	{
 		int offs = ch;
 		#if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
@@ -2949,7 +2949,7 @@ static UINT32 iface_adc_data_r( device_t *device, int ch)
 			offs += 2;
 		}
 		#endif
-		return (s3c24xx->iface->adc.data_r)( device, device->machine().driver_data()->generic_space(), offs, 0);
+		return (s3c24xx->adc_data_r)(offs, 0);
 	}
 	else
 	{
@@ -3179,27 +3179,27 @@ static void s3c24xx_nand_reset( device_t *device)
 INLINE void iface_nand_command_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->nand.command_w)
+	if (!s3c24xx->command_w.isnull())
 	{
-		(s3c24xx->iface->nand.command_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
+		(s3c24xx->command_w)( 0, data, 0xff);
 	}
 }
 
 INLINE void iface_nand_address_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->nand.address_w)
+	if (!s3c24xx->address_w.isnull())
 	{
-		(s3c24xx->iface->nand.address_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
+		(s3c24xx->address_w)( 0, data, 0xff);
 	}
 }
 
 INLINE UINT8 iface_nand_data_r( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->nand.data_r)
+	if (!s3c24xx->nand_data_r.isnull())
 	{
-		return (s3c24xx->iface->nand.data_r)( device, device->machine().driver_data()->generic_space(), 0, 0xff);
+		return (s3c24xx->nand_data_r)( 0, 0xff);
 	}
 	else
 	{
@@ -3210,9 +3210,9 @@ INLINE UINT8 iface_nand_data_r( device_t *device)
 INLINE void iface_nand_data_w( device_t *device, UINT8 data)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	if (s3c24xx->iface->nand.data_w)
+	if (!s3c24xx->nand_data_w.isnull())
 	{
-		(s3c24xx->iface->nand.data_w)( device, device->machine().driver_data()->generic_space(), 0, data, 0xff);
+		(s3c24xx->nand_data_w)(0, data, 0xff);
 	}
 }
 
@@ -3684,6 +3684,21 @@ static DEVICE_START( s3c24xx )
 
 	verboselog( device->machine(), 1, "s3c24xx device start\n");
 	s3c24xx->iface = (const s3c24xx_interface *)device->static_config();
+	s3c24xx->pin_r.resolve(s3c24xx->iface->core.pin_r, *device);
+	s3c24xx->pin_w.resolve(s3c24xx->iface->core.pin_w, *device);
+	s3c24xx->port_r.resolve(s3c24xx->iface->gpio.port_r, *device);
+	s3c24xx->port_w.resolve(s3c24xx->iface->gpio.port_w, *device);
+	s3c24xx->scl_w.resolve(s3c24xx->iface->i2c.scl_w, *device);
+	s3c24xx->sda_r.resolve(s3c24xx->iface->i2c.sda_r, *device);
+	s3c24xx->sda_w.resolve(s3c24xx->iface->i2c.sda_w, *device);
+	s3c24xx->adc_data_r.resolve(s3c24xx->iface->adc.data_r, *device);
+	s3c24xx->i2s_data_w.resolve(s3c24xx->iface->i2s.data_w, *device);
+	#if !defined(DEVICE_S3C2400)
+	s3c24xx->command_w.resolve(s3c24xx->iface->nand.command_w, *device);
+	s3c24xx->address_w.resolve(s3c24xx->iface->nand.address_w, *device);
+	s3c24xx->nand_data_r.resolve(s3c24xx->iface->nand.data_r, *device);
+	s3c24xx->nand_data_w.resolve(s3c24xx->iface->nand.data_w, *device);
+	#endif
 	for (int i = 0; i < 5; i++)
 	{
 		s3c24xx->pwm.timer[i] = device->machine().scheduler().timer_alloc( FUNC(s3c24xx_pwm_timer_exp), (void*)device);

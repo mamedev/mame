@@ -60,30 +60,27 @@ extern const device_type S3C44B0;
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c44b0_gpio_port_r_func)( device_t *device, int port);
-typedef void (*s3c44b0_gpio_port_w_func)( device_t *device, int port, UINT32 data);
-
 struct s3c44b0_interface_gpio
 {
-	s3c44b0_gpio_port_r_func port_r;
-	s3c44b0_gpio_port_w_func port_w;
+	devcb_read32 port_r;
+	devcb_write32 port_w;
 };
 
 struct s3c44b0_interface_i2c
 {
-	write_line_device_func scl_w;
-	read_line_device_func sda_r;
-	write_line_device_func sda_w;
+	devcb_write_line scl_w;
+	devcb_read_line sda_r;
+	devcb_write_line sda_w;
 };
 
 struct s3c44b0_interface_adc
 {
-	read32_device_func data_r;
+	devcb_read32 data_r;
 };
 
 struct s3c44b0_interface_i2s
 {
-	write16_device_func data_w;
+	devcb_write16 data_w;
 };
 
 struct s3c44b0_interface
@@ -695,6 +692,13 @@ struct s3c44b0_t
 	s3c44b0_rtc_t rtc;
 	s3c44b0_adc_t adc;
 	s3c44b0_cpuwrap_t cpuwrap;
+	devcb_resolved_read32 port_r;
+	devcb_resolved_write32 port_w;
+	devcb_resolved_write_line scl_w;
+	devcb_resolved_read_line sda_r;
+	devcb_resolved_write_line sda_w;
+	devcb_resolved_read32 adc_data_r;
+	devcb_resolved_write16 i2s_data_w;
 };
 
 #endif

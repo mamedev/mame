@@ -35,6 +35,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	DECLARE_READ32_MEMBER(s3c2410_gpio_port_r);
+	DECLARE_WRITE32_MEMBER(s3c2410_gpio_port_w);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
 	void lcd_spi_reset( );
 	void lcd_spi_init( );
@@ -167,11 +169,10 @@ int hp49gp_state::lcd_spi_line_r( int line)
 
 // I/O PORT
 
-static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
+READ32_MEMBER(hp49gp_state::s3c2410_gpio_port_r)
 {
-	hp49gp_state *hp49gp = device->machine().driver_data<hp49gp_state>();
-	UINT32 data = hp49gp->m_port[port];
-	switch (port)
+	UINT32 data = m_port[offset];
+	switch (offset)
 	{
 		case S3C2410_GPIO_PORT_C :
 		{
@@ -182,9 +183,9 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		{
 			data = data | 0x0008;
 			data = data & ~0x3200;
-			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_1) ? 1 : 0) << 9;
-			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_DATA) ? 1 : 0) << 12;
-			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_3) ? 1 : 0) << 13;
+			data |= (lcd_spi_line_r( LCD_SPI_LINE_1) ? 1 : 0) << 9;
+			data |= (lcd_spi_line_r( LCD_SPI_LINE_DATA) ? 1 : 0) << 12;
+			data |= (lcd_spi_line_r( LCD_SPI_LINE_3) ? 1 : 0) << 13;
 		}
 		break;
 		case S3C2410_GPIO_PORT_E :
@@ -200,13 +201,13 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data & ~0xFF00;
-			if ((data & 0x02) == 0) data |= (hp49gp->ioport( "ROW1")->read() << 8);
-			if ((data & 0x04) == 0) data |= (hp49gp->ioport( "ROW2")->read() << 8);
-			if ((data & 0x08) == 0) data |= (hp49gp->ioport( "ROW3")->read() << 8);
-			if ((data & 0x10) == 0) data |= (hp49gp->ioport( "ROW4")->read() << 8);
-			if ((data & 0x20) == 0) data |= (hp49gp->ioport( "ROW5")->read() << 8);
-			if ((data & 0x40) == 0) data |= (hp49gp->ioport( "ROW6")->read() << 8);
-			if ((data & 0x80) == 0) data |= (hp49gp->ioport( "ROW7")->read() << 8);
+			if ((data & 0x02) == 0) data |= (ioport( "ROW1")->read() << 8);
+			if ((data & 0x04) == 0) data |= (ioport( "ROW2")->read() << 8);
+			if ((data & 0x08) == 0) data |= (ioport( "ROW3")->read() << 8);
+			if ((data & 0x10) == 0) data |= (ioport( "ROW4")->read() << 8);
+			if ((data & 0x20) == 0) data |= (ioport( "ROW5")->read() << 8);
+			if ((data & 0x40) == 0) data |= (ioport( "ROW6")->read() << 8);
+			if ((data & 0x80) == 0) data |= (ioport( "ROW7")->read() << 8);
 		}
 		break;
 		case S3C2410_GPIO_PORT_H :
@@ -218,17 +219,16 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 	return data;
 }
 
-static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
+WRITE32_MEMBER(hp49gp_state::s3c2410_gpio_port_w)
 {
-	hp49gp_state *hp49gp = device->machine().driver_data<hp49gp_state>();
-	hp49gp->m_port[port] = data;
-	switch (port)
+	m_port[offset] = data;
+	switch (offset)
 	{
 		case S3C2410_GPIO_PORT_D :
 		{
-			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_1, BIT( data, 9) ? 1 : 0);
-			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_DATA, BIT( data, 12) ? 1 : 0);
-			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_3, BIT( data, 13) ? 1 : 0);
+			lcd_spi_line_w( LCD_SPI_LINE_1, BIT( data, 9) ? 1 : 0);
+			lcd_spi_line_w( LCD_SPI_LINE_DATA, BIT( data, 12) ? 1 : 0);
+			lcd_spi_line_w( LCD_SPI_LINE_3, BIT( data, 13) ? 1 : 0);
 		}
 		break;
 	}
@@ -279,17 +279,17 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 static S3C2410_INTERFACE( hp49gp_s3c2410_intf )
 {
 	// CORE (pin read / pin write)
-	{ NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
+	{ DEVCB_DRIVER_MEMBER32(hp49gp_state,s3c2410_gpio_port_r), DEVCB_DRIVER_MEMBER32(hp49gp_state,s3c2410_gpio_port_w) },
 	// I2C (scl write / sda read / sda write)
-	{ NULL, NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	// ADC (data read)
-	{ NULL },
+	{DEVCB_NULL },
 	// I2S (data write)
-	{ NULL },
+	{ DEVCB_NULL },
 	// NAND (command write / address write / data read / data write)
-	{ NULL, NULL, NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	// LCD (flags)
 	{ S3C24XX_INTERFACE_LCD_REVERSE }
 };

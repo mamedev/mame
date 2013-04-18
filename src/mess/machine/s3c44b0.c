@@ -875,27 +875,27 @@ static TIMER_CALLBACK( s3c44b0_pwm_timer_exp )
 INLINE void iface_i2c_scl_w( device_t *device, int state)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->i2c.scl_w)
+	if (!s3c44b0->scl_w.isnull())
 	{
-		(s3c44b0->iface->i2c.scl_w)( device, state);
+		(s3c44b0->scl_w)( state);
 	}
 }
 
 INLINE void iface_i2c_sda_w( device_t *device, int state)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->i2c.sda_w)
+	if (!s3c44b0->sda_w.isnull())
 	{
-		(s3c44b0->iface->i2c.sda_w)( device, state);
+		(s3c44b0->sda_w)( state);
 	}
 }
 
 INLINE int iface_i2c_sda_r( device_t *device)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->i2c.sda_r)
+	if (!s3c44b0->sda_r.isnull())
 	{
-		return (s3c44b0->iface->i2c.sda_r)( device);
+		return (s3c44b0->sda_r)();
 	}
 	else
 	{
@@ -1115,9 +1115,9 @@ static TIMER_CALLBACK( s3c44b0_iic_timer_exp )
 INLINE UINT32 iface_gpio_port_r( device_t *device, int port)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->gpio.port_r)
+	if (!s3c44b0->port_r.isnull())
 	{
-		return (s3c44b0->iface->gpio.port_r)( device, port);
+		return (s3c44b0->port_r)(port);
 	}
 	else
 	{
@@ -1128,9 +1128,9 @@ INLINE UINT32 iface_gpio_port_r( device_t *device, int port)
 INLINE void iface_gpio_port_w( device_t *device, int port, UINT32 data)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->gpio.port_w)
+	if (!s3c44b0->port_w.isnull())
 	{
-		(s3c44b0->iface->gpio.port_w)( device, port, data);
+		(s3c44b0->port_w)( port, data);
 	}
 }
 
@@ -1604,9 +1604,9 @@ static TIMER_CALLBACK( s3c44b0_sio_timer_exp )
 INLINE void iface_i2s_data_w( device_t *device, address_space &space, int ch, UINT16 data)
 {
 	s3c44b0_t *s3c44b0 = get_token( device);
-	if (s3c44b0->iface->i2s.data_w)
+	if (!s3c44b0->i2s_data_w.isnull())
 	{
-		(s3c44b0->iface->i2s.data_w)( device, space, ch, data, 0);
+		(s3c44b0->i2s_data_w)( ch, data, 0);
 	}
 }
 
@@ -2004,6 +2004,15 @@ DEVICE_START( s3c44b0 )
 	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
 	s3c44b0_t *s3c44b0 = get_token( device);
 	s3c44b0->iface = (const s3c44b0_interface *)device->static_config();
+	s3c44b0->port_r.resolve(s3c44b0->iface->gpio.port_r, *device);
+	s3c44b0->port_w.resolve(s3c44b0->iface->gpio.port_w, *device);
+	s3c44b0->scl_w.resolve(s3c44b0->iface->i2c.scl_w, *device);
+	s3c44b0->sda_r.resolve(s3c44b0->iface->i2c.sda_r, *device);
+	s3c44b0->sda_w.resolve(s3c44b0->iface->i2c.sda_w, *device);
+	s3c44b0->adc_data_r.resolve(s3c44b0->iface->adc.data_r, *device);
+	s3c44b0->i2s_data_w.resolve(s3c44b0->iface->i2s.data_w, *device);
+	
+	
 	s3c44b0->space = &space;
 	s3c44b0->cpu = downcast<cpu_device *>(device->machine().device( "maincpu"));
 	for (int i = 0; i < 6; i++) s3c44b0->pwm.timer[i] = machine.scheduler().timer_alloc(FUNC(s3c44b0_pwm_timer_exp), (void*)device);

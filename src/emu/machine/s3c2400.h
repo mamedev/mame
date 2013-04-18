@@ -59,39 +59,33 @@ extern const device_type S3C2400;
     TYPE DEFINITIONS
 *******************************************************************************/
 
-typedef UINT32 (*s3c24xx_gpio_port_r_func)( device_t *device, int port, UINT32 mask);
-typedef void (*s3c24xx_gpio_port_w_func)( device_t *device, int port, UINT32 mask, UINT32 data);
-
-typedef int (*s3c24xx_core_pin_r_func)( device_t *device, int pin);
-typedef void (*s3c24xx_core_pin_w_func)( device_t *device, int pin, int data);
-
 struct s3c2400_interface_core
 {
-	s3c24xx_core_pin_r_func pin_r;
-	s3c24xx_core_pin_w_func pin_w;
+	devcb_read32 pin_r;
+	devcb_write32 pin_w;
 };
 
 struct s3c2400_interface_gpio
 {
-	s3c24xx_gpio_port_r_func port_r;
-	s3c24xx_gpio_port_w_func port_w;
+	devcb_read32 port_r;
+	devcb_write32 port_w;
 };
 
 struct s3c2400_interface_i2c
 {
-	write_line_device_func scl_w;
-	read_line_device_func sda_r;
-	write_line_device_func sda_w;
+	devcb_write_line scl_w;
+	devcb_read_line sda_r;
+	devcb_write_line sda_w;
 };
 
 struct s3c2400_interface_adc
 {
-	read32_device_func data_r;
+	devcb_read32 data_r;
 };
 
 struct s3c2400_interface_i2s
 {
-	write16_device_func data_w;
+	devcb_write16 data_w;
 };
 
 struct s3c2400_interface_lcd
@@ -746,6 +740,20 @@ struct s3c24xx_t
 	s3c24xx_spi_t spi[S3C24XX_SPI_COUNT];
 	s3c24xx_mmc_t mmc;
 	device_t *m_cpu;
+	devcb_resolved_read32 pin_r;
+	devcb_resolved_write32 pin_w;
+	devcb_resolved_read32 port_r;
+	devcb_resolved_write32 port_w;
+	devcb_resolved_write_line scl_w;
+	devcb_resolved_read_line sda_r;
+	devcb_resolved_write_line sda_w;
+	devcb_resolved_read32 adc_data_r;
+	devcb_resolved_write16 i2s_data_w;
+	devcb_resolved_write8 command_w;
+	devcb_resolved_write8 address_w;
+	devcb_resolved_read8  nand_data_r;
+	devcb_resolved_write8 nand_data_w;
+	
 };
 
 #endif

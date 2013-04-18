@@ -40,6 +40,16 @@ public:
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	DECLARE_READ32_MEMBER(s3c2440_gpio_port_r);
+	DECLARE_WRITE32_MEMBER(s3c2440_gpio_port_w);
+	DECLARE_READ32_MEMBER(s3c2440_core_pin_r);
+	DECLARE_WRITE8_MEMBER(s3c2440_nand_command_w );
+	DECLARE_WRITE8_MEMBER(s3c2440_nand_address_w );
+	DECLARE_READ8_MEMBER(s3c2440_nand_data_r );
+	DECLARE_WRITE8_MEMBER(s3c2440_nand_data_w );
+	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
+	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
+	
 };
 
 inline void ATTR_PRINTF(3,4) mini2440_state::verboselog( int n_level, const char *s_fmt, ...)
@@ -61,11 +71,10 @@ inline void ATTR_PRINTF(3,4) mini2440_state::verboselog( int n_level, const char
 
 // GPIO
 
-static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
+READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	UINT32 data = state->m_port[port];
-	switch (port)
+	UINT32 data = m_port[offset];
+	switch (offset)
 	{
 		case S3C2440_GPIO_PORT_G :
 		{
@@ -79,15 +88,14 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 	return data;
 }
 
-static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32 data)
+WRITE32_MEMBER(mini2440_state::s3c2440_gpio_port_w)
 {
-	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	state->m_port[port] = data;
-	switch (port)
+	m_port[offset] = data;
+	switch (offset)
 	{
 		case S3C2440_GPIO_PORT_B :
 		{
-			state->verboselog(5,  "LED %d %d %d %d\n", BIT( data, 5), BIT( data, 6), BIT( data, 7), BIT( data, 8));
+			verboselog(5,  "LED %d %d %d %d\n", BIT( data, 5), BIT( data, 6), BIT( data, 7), BIT( data, 8));
 		}
 		break;
 	}
@@ -105,10 +113,10 @@ NCON: NAND flash memory selection (Normal / Advance)
 
 */
 
-static int s3c2440_core_pin_r( device_t *device, int pin)
+READ32_MEMBER(mini2440_state::s3c2440_core_pin_r)
 {
 	int data = 0;
-	switch (pin)
+	switch (offset)
 	{
 		case S3C2440_CORE_PIN_NCON : data = 1; break;
 		case S3C2440_CORE_PIN_OM0  : data = 0; break;
@@ -119,54 +127,47 @@ static int s3c2440_core_pin_r( device_t *device, int pin)
 
 // NAND
 
-static WRITE8_DEVICE_HANDLER( s3c2440_nand_command_w )
+WRITE8_MEMBER(mini2440_state::s3c2440_nand_command_w )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-	state->m_nand->command_w(data);
+	m_nand->command_w(data);
 }
 
-static WRITE8_DEVICE_HANDLER( s3c2440_nand_address_w )
+WRITE8_MEMBER(mini2440_state::s3c2440_nand_address_w )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-	state->m_nand->address_w(data);
+	m_nand->address_w(data);
 }
 
-static READ8_DEVICE_HANDLER( s3c2440_nand_data_r )
+READ8_MEMBER(mini2440_state::s3c2440_nand_data_r )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-	return state->m_nand->data_r();
+	return m_nand->data_r();
 }
 
-static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
+WRITE8_MEMBER(mini2440_state::s3c2440_nand_data_w )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-	state->m_nand->data_w(data);
+	m_nand->data_w(data);
 }
 
 // I2S
 
-static WRITE16_DEVICE_HANDLER( s3c2440_i2s_data_w )
+WRITE16_MEMBER(mini2440_state::s3c2440_i2s_data_w )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
 	if ( offset )
-		state->m_dac1->write_signed16(data + 0x8000);
+		m_dac1->write_signed16(data + 0x8000);
 	else
-		state->m_dac2->write_signed16(data + 0x8000);
+		m_dac2->write_signed16(data + 0x8000);
 }
 
 // ADC
 
-static READ32_DEVICE_HANDLER( s3c2440_adc_data_r )
+READ32_MEMBER(mini2440_state::s3c2440_adc_data_r )
 {
-	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-
 	UINT32 data = 0;
 	switch (offset)
 	{
-		case 2 + 0 : data = state->m_penx->read(); break;
-		case 2 + 1 : data = 915 - state->m_peny->read() + 90; break;
+		case 2 + 0 : data = m_penx->read(); break;
+		case 2 + 1 : data = 915 - m_peny->read() + 90; break;
 	}
-	state->verboselog(5,  "s3c2440_adc_data_r %08X\n", data);
+	verboselog(5,  "s3c2440_adc_data_r %08X\n", data);
 	return data;
 }
 
@@ -211,17 +212,17 @@ DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 static S3C2440_INTERFACE( mini2440_s3c2440_intf )
 {
 	// CORE (pin read / pin write)
-	{ s3c2440_core_pin_r, NULL },
+	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_core_pin_r), DEVCB_NULL },
 	// GPIO (port read / port write)
-	{ s3c2440_gpio_port_r, s3c2440_gpio_port_w },
+	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_r), DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_gpio_port_w) },
 	// I2C (scl write / sda read / sda write)
-	{ NULL, NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	// ADC (data read)
-	{ s3c2440_adc_data_r },
+	{ DEVCB_DRIVER_MEMBER32(mini2440_state,s3c2440_adc_data_r) },
 	// I2S (data write)
-	{ s3c2440_i2s_data_w },
+	{ DEVCB_DRIVER_MEMBER16(mini2440_state,s3c2440_i2s_data_w) },
 	// NAND (command write / address write / data read / data write)
-	{ s3c2440_nand_command_w, s3c2440_nand_address_w, s3c2440_nand_data_r, s3c2440_nand_data_w }
+	{ DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_command_w), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_address_w), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_data_r), DEVCB_DRIVER_MEMBER(mini2440_state,s3c2440_nand_data_w) }
 };
 
 static NAND_INTERFACE( mini2440_nand_intf )

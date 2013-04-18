@@ -52,6 +52,9 @@ public:
 	void smc_init( );
 	UINT8 smc_read( );
 	void smc_write( UINT8 data);
+	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
+	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
+	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 };
 
 inline void ATTR_PRINTF(3,4)  juicebox_state::verboselog( int n_level, const char *s_fmt, ...)
@@ -128,11 +131,10 @@ void juicebox_state::smc_write( UINT8 data)
 	}
 }
 
-static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
+READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 {
-	juicebox_state *juicebox = device->machine().driver_data<juicebox_state>();
-	UINT32 data = juicebox->port[port];
-	switch (port)
+	UINT32 data = port[offset];
+	switch (offset)
 	{
 		case S3C44B0_GPIO_PORT_A :
 		{
@@ -168,22 +170,22 @@ static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
 			data = data | (0 << 7);
 			data = 0x0000009F;
 			data &= ~0xE0;
-			if (juicebox->smc.cmd_latch) data = data | 0x00000020;
-			if (juicebox->smc.add_latch) data = data | 0x00000040;
-			if (!juicebox->smc.busy) data = data | 0x00000080;
+			if (smc.cmd_latch) data = data | 0x00000020;
+			if (smc.add_latch) data = data | 0x00000040;
+			if (!smc.busy) data = data | 0x00000080;
 		}
 		break;
 		case S3C44B0_GPIO_PORT_G :
 		{
 			data = 0x0000009F;
-			data = (data & ~0x1F) | (juicebox->ioport( "PORTG")->read() & 0x1F);
+			data = (data & ~0x1F) | (ioport( "PORTG")->read() & 0x1F);
 			#if defined(JUICEBOX_ENTER_DEBUG_MENU)
-			if (juicebox->port_g_read_count++ < 1)
+			if (port_g_read_count++ < 1)
 			{
 				data = 0x00000095; // PLAY + REVERSE
 			}
 			#elif defined(JUICEBOX_DISPLAY_ROM_ID)
-			if (juicebox->port_g_read_count++ < 3)
+			if (port_g_read_count++ < 3)
 			{
 				data = 0x0000008A; // RETURN + FORWARD + STAR
 			}
@@ -195,17 +197,16 @@ static UINT32 s3c44b0_gpio_port_r( device_t *device, int port)
 	return data;
 }
 
-static void s3c44b0_gpio_port_w( device_t *device, int port, UINT32 data)
+WRITE32_MEMBER(juicebox_state::s3c44b0_gpio_port_w)
 {
-	juicebox_state *juicebox = device->machine().driver_data<juicebox_state>();
-	juicebox->port[port] = data;
-	switch (port)
+	port[offset] = data;
+	switch (offset)
 	{
 		case S3C44B0_GPIO_PORT_F :
 		{
-			juicebox->smc.cmd_latch = ((data & 0x00000020) != 0);
-			juicebox->smc.add_latch = ((data & 0x00000040) != 0);
-			juicebox->verboselog( 5, "s3c44b0_gpio_port_w - nand cle %d ale %d\n", (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0);
+			smc.cmd_latch = ((data & 0x00000020) != 0);
+			smc.add_latch = ((data & 0x00000040) != 0);
+			verboselog( 5, "s3c44b0_gpio_port_w - nand cle %d ale %d\n", (data & 0x20) ? 1 : 0, (data & 0x40) ? 1 : 0);
 		}
 		break;
 	}
@@ -235,10 +236,9 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 
 // I2S
 
-static WRITE16_DEVICE_HANDLER( s3c44b0_i2s_data_w )
+WRITE16_MEMBER(juicebox_state::s3c44b0_i2s_data_w )
 {
-	juicebox_state *juicebox = space.machine().driver_data<juicebox_state>();
-	juicebox->dac->write_signed16(data ^ 0x8000);
+	dac->write_signed16(data ^ 0x8000);
 }
 
 // ...
@@ -285,13 +285,13 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 static S3C44B0_INTERFACE( juicebox_s3c44b0_intf )
 {
 	// GPIO (port read / port write)
-	{ s3c44b0_gpio_port_r, s3c44b0_gpio_port_w },
+	{ DEVCB_DRIVER_MEMBER32(juicebox_state,s3c44b0_gpio_port_r), DEVCB_DRIVER_MEMBER32(juicebox_state,s3c44b0_gpio_port_w) },
 	// I2C (scl write / sda read / sda write)
-	{ NULL, NULL, NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	// ADC (data read)
-	{ NULL },
+	{ DEVCB_NULL },
 	// I2S (data write)
-	{ s3c44b0_i2s_data_w }
+	{ DEVCB_DRIVER_MEMBER16(juicebox_state,s3c44b0_i2s_data_w) }
 };
 
 static MACHINE_CONFIG_START( juicebox, juicebox_state )
