@@ -29,6 +29,7 @@ public:
 	NICK_STATE *nick;
 	DECLARE_READ8_MEMBER(exdos_card_r);
 	DECLARE_WRITE8_MEMBER(exdos_card_w);
+	DECLARE_WRITE8_MEMBER(epnick_reg_w);
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
@@ -39,10 +40,30 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_drq_w);
 	required_device<cpu_device> m_maincpu;
 	void enterprise_update_memory_page(address_space &space, offs_t page, int index);
+	char Nick_FetchByte(unsigned long Addr);
+	void nick_write_pixel(int ci);
+	void Nick_CalcVisibleClocks(int Width);
+	void Nick_Init();
+	void Nick_WriteBorder(int Clocks);
+	void Nick_DoLeftMargin();
+	void Nick_DoRightMargin();
+	int Nick_GetColourIndex(int PenIndex);
+	void Nick_WritePixels2Colour(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte);
+	void Nick_WritePixels2ColourLPIXEL(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte);
+	void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex);
+	void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharIndex);
+	void Nick_DoPixel(int ClocksVisible);
+	void Nick_DoLPixel(int ClocksVisible);
+	void Nick_DoAttr(int ClocksVisible);
+	void Nick_DoCh256(int ClocksVisible);
+	void Nick_DoCh128(int ClocksVisible);
+	void Nick_DoCh64(int ClocksVisible);
+	void Nick_DoDisplay();
+	void Nick_UpdateLPT();
+	void Nick_ReloadLPT();
+	void Nick_DoLine();
+	void Nick_DoScreen(bitmap_ind16 &bm);	
 };
 
-
-/*----------- defined in video/epnick.c -----------*/
-DECLARE_WRITE8_HANDLER( epnick_reg_w );
 
 #endif /* __ENTERP_H__ */

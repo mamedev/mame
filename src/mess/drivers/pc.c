@@ -342,7 +342,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, pc_state )
+static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, tandy_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -355,16 +355,16 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, pc_state )
+static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE_LEGACY(tandy1000_pio_r,           tandy1000_pio_w)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,           tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,                pc_page_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", ncr7496_device, write)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,         pc_t1t_p37x_w)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE("fdc", pc_fdc_interface, map)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
@@ -385,25 +385,25 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, pc_state )
+static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(tandy1000_pio_r,          tandy1000_pio_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,          tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",    ncr7496_device, write, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,            pc_t1t_p37x_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,            pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8_LEGACY(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
+	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, pc_state )
+static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, tandy_pc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x000fffff)
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
@@ -417,23 +417,23 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, pc_state )
+static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(tandy1000_pio_r,         tandy1000_pio_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,         tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", ncr7496_device, write, 0xffff)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_DEVICE8("fdc", pc_fdc_interface, map, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pc_state )
+static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, tandy_pc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM
 	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
+static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x00f4, 0x00f5) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
-	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,         pc_t1t_p37x_w)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE("ins8250_0", ins8250_device, ins8250_r, ins8250_w)
 ADDRESS_MAP_END
@@ -1090,11 +1090,11 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( t1000hx, pc_state )
+static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000, tandy1000, I8088, 8000000, pc_frame_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
+	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
 	MCFG_MACHINE_RESET_OVERRIDE(pc_state,pc)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
@@ -1144,12 +1144,12 @@ static MACHINE_CONFIG_DERIVED( t1000sx, t1000hx )
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( t1000_16, pc_state )
+static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000_16, tandy1000_16, I8086, XTAL_28_63636MHz / 3, pc_frame_interrupt)
 
-	MCFG_MACHINE_START_OVERRIDE(pc_state,pc)
-	MCFG_MACHINE_RESET_OVERRIDE(pc_state,tandy1000rl)
+	MCFG_MACHINE_START_OVERRIDE(tandy_pc_state,pc)
+	MCFG_MACHINE_RESET_OVERRIDE(tandy_pc_state,tandy1000rl)
 
 	MCFG_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
 
@@ -1193,7 +1193,7 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( t1000_286, pc_state )
+static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
 
@@ -1264,7 +1264,7 @@ static const cassette_interface mc1502_cassette_interface =
 	NULL
 };
 
-static MACHINE_CONFIG_START( ibmpcjr, pc_state )
+static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(ibmpcjr, ibmpcjr, I8088, 4900000, pcjr_frame_interrupt) /* TODO: Get correct cpu frequency, probably XTAL_14_31818MHz/3 */
 

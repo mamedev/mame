@@ -142,14 +142,14 @@ struct NICK_STATE
 
 // MESS specific
 /* fetch a byte from "video ram" at Addr specified */
-static char Nick_FetchByte(NICK_STATE *nick, unsigned long Addr)
+char ep_state::Nick_FetchByte(unsigned long Addr)
 {
 	return nick->videoram[Addr & 0x0ffff];
 }
 
 // MESS specific
 /* 8-bit pixel write! */
-static void nick_write_pixel(NICK_STATE *nick, int ci)
+void ep_state::nick_write_pixel(int ci)
 {
 	if (nick->dest_pos < nick->dest_max_pos)
 	{
@@ -182,7 +182,7 @@ void ep_state::palette_init()
 #define NICK_TOTAL_CLOCKS_PER_LINE  64
 
 /* we align based on the clocks */
-static void Nick_CalcVisibleClocks(NICK_STATE *nick, int Width)
+void ep_state::Nick_CalcVisibleClocks(int Width)
 {
 	/* number of clocks we can see */
 	int NoOfVisibleClocks = Width/NICK_PIXELS_PER_CLOCK;
@@ -194,7 +194,7 @@ static void Nick_CalcVisibleClocks(NICK_STATE *nick, int Width)
 }
 
 
-static void Nick_Init(NICK_STATE *nick)
+void ep_state::Nick_Init()
 {
 	int i;
 
@@ -219,26 +219,26 @@ static void Nick_Init(NICK_STATE *nick)
 		nick->PenIndexLookup_16Colour[i] = PenIndex;
 	}
 
-	Nick_CalcVisibleClocks(nick, ENTERPRISE_SCREEN_WIDTH);
+	Nick_CalcVisibleClocks(ENTERPRISE_SCREEN_WIDTH);
 
 	//nick->BORDER = 0;
 	//nick->FIXBIAS = 0;
 }
 
 /* write border colour */
-static void Nick_WriteBorder(NICK_STATE *nick, int Clocks)
+void ep_state::Nick_WriteBorder(int Clocks)
 {
 	int i;
 	int ColIndex = nick->BORDER;
 
 	for (i=0; i<(Clocks<<4); i++)
 	{
-		nick_write_pixel(nick, ColIndex);
+		nick_write_pixel(ColIndex);
 	}
 }
 
 
-static void Nick_DoLeftMargin(NICK_STATE *nick)
+void ep_state::Nick_DoLeftMargin()
 {
 	unsigned char LeftMargin;
 
@@ -252,11 +252,11 @@ static void Nick_DoLeftMargin(NICK_STATE *nick)
 		LeftMarginVisible = LeftMargin-nick->FirstVisibleClock;
 
 		/* render the border */
-		Nick_WriteBorder(nick, LeftMarginVisible);
+		Nick_WriteBorder(LeftMarginVisible);
 	}
 }
 
-static void Nick_DoRightMargin(NICK_STATE *nick)
+void ep_state::Nick_DoRightMargin()
 {
 	unsigned char RightMargin;
 
@@ -270,11 +270,11 @@ static void Nick_DoRightMargin(NICK_STATE *nick)
 		RightMarginVisible = nick->LastVisibleClock - RightMargin;
 
 		/* render the border */
-		Nick_WriteBorder(nick, RightMarginVisible);
+		Nick_WriteBorder(RightMarginVisible);
 	}
 }
 
-static int Nick_GetColourIndex(NICK_STATE *nick, int PenIndex)
+int ep_state::Nick_GetColourIndex(int PenIndex)
 {
 	if (PenIndex & 0x08)
 	{
@@ -286,7 +286,7 @@ static int Nick_GetColourIndex(NICK_STATE *nick, int PenIndex)
 	}
 }
 
-static void Nick_WritePixels2Colour(NICK_STATE *nick, unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
+void ep_state::Nick_WritePixels2Colour(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
 {
 	int i;
 	int ColIndex[2];
@@ -295,20 +295,20 @@ static void Nick_WritePixels2Colour(NICK_STATE *nick, unsigned char Pen0, unsign
 
 	Data = DataByte;
 
-	ColIndex[0] = Nick_GetColourIndex(nick, Pen0);
-	ColIndex[1] = Nick_GetColourIndex(nick, Pen1);
+	ColIndex[0] = Nick_GetColourIndex(Pen0);
+	ColIndex[1] = Nick_GetColourIndex(Pen1);
 
 	for (i=0; i<8; i++)
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		nick_write_pixel(nick, PenIndex);
+		nick_write_pixel(PenIndex);
 
 		Data = Data<<1;
 	}
 }
 
-static void Nick_WritePixels2ColourLPIXEL(NICK_STATE *nick, unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
+void ep_state::Nick_WritePixels2ColourLPIXEL(unsigned char Pen0, unsigned char Pen1, unsigned char DataByte)
 {
 	int i;
 	int ColIndex[2];
@@ -317,22 +317,22 @@ static void Nick_WritePixels2ColourLPIXEL(NICK_STATE *nick, unsigned char Pen0, 
 
 	Data = DataByte;
 
-	ColIndex[0] = Nick_GetColourIndex(nick, Pen0);
-	ColIndex[1] = Nick_GetColourIndex(nick, Pen1);
+	ColIndex[0] = Nick_GetColourIndex(Pen0);
+	ColIndex[1] = Nick_GetColourIndex(Pen1);
 
 	for (i=0; i<8; i++)
 	{
 		PenIndex = ColIndex[(Data>>7) & 0x01];
 
-		nick_write_pixel(nick, PenIndex);
-		nick_write_pixel(nick, PenIndex);
+		nick_write_pixel(PenIndex);
+		nick_write_pixel(PenIndex);
 
 		Data = Data<<1;
 	}
 }
 
 
-static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned char CharIndex)
+void ep_state::Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 {
 	int i;
 
@@ -391,7 +391,7 @@ static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned 
 #endif
 
 
-			Nick_WritePixels2Colour(nick, PenOffset,
+			Nick_WritePixels2Colour(PenOffset,
 				(PenOffset|0x01), Data);
 		}
 		break;
@@ -417,8 +417,8 @@ static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned 
 				PenIndex = nick->PenIndexLookup_4Colour[Data];
 				PalIndex = nick->LPT.COL[PenIndex & 0x03];
 
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
 
 				Data = Data<<1;
 			}
@@ -445,12 +445,12 @@ static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned 
 			{
 				PenIndex = nick->PenIndexLookup_16Colour[Data];
 
-				PalIndex = Nick_GetColourIndex(nick, PenIndex);
+				PalIndex = Nick_GetColourIndex(PenIndex);
 
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
 
 				Data = Data<<1;
 			}
@@ -473,14 +473,14 @@ static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned 
 
 			PalIndex = Data;
 
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
 
 
 		}
@@ -488,7 +488,7 @@ static void Nick_WritePixels(NICK_STATE *nick, unsigned char DataByte, unsigned 
 	}
 }
 
-static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, unsigned char CharIndex)
+void ep_state::Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharIndex)
 {
 	int i;
 
@@ -547,7 +547,7 @@ static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, uns
 #endif
 
 
-			Nick_WritePixels2ColourLPIXEL(nick, PenOffset,(PenOffset|0x01), Data);
+			Nick_WritePixels2ColourLPIXEL(PenOffset,(PenOffset|0x01), Data);
 		}
 		break;
 
@@ -572,10 +572,10 @@ static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, uns
 				PenIndex = nick->PenIndexLookup_4Colour[Data];
 				PalIndex = nick->LPT.COL[PenIndex & 0x03];
 
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
 
 				Data = Data<<1;
 			}
@@ -602,16 +602,16 @@ static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, uns
 			{
 				PenIndex = nick->PenIndexLookup_16Colour[Data];
 
-				PalIndex = Nick_GetColourIndex(nick, PenIndex);
+				PalIndex = Nick_GetColourIndex(PenIndex);
 
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
-				nick_write_pixel(nick, PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
+				nick_write_pixel(PalIndex);
 
 				Data = Data<<1;
 			}
@@ -634,23 +634,23 @@ static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, uns
 
 			PalIndex = Data;
 
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
 
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
-			nick_write_pixel(nick, PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
+			nick_write_pixel(PalIndex);
 
 
 		}
@@ -659,109 +659,109 @@ static void Nick_WritePixelsLPIXEL(NICK_STATE *nick, unsigned char DataByte, uns
 }
 
 
-static void Nick_DoPixel(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoPixel(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
 
-		Buf2 = Nick_FetchByte(nick, nick->LD1);
+		Buf2 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
 
-		Nick_WritePixels(nick, Buf1, Buf1);
+		Nick_WritePixels(Buf1, Buf1);
 
-		Nick_WritePixels(nick, Buf2, Buf1);
+		Nick_WritePixels(Buf2, Buf1);
 	}
 }
 
 
-static void Nick_DoLPixel(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoLPixel(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
 
-		Nick_WritePixelsLPIXEL(nick, Buf1, Buf1);
+		Nick_WritePixelsLPIXEL(Buf1, Buf1);
 	}
 }
 
-static void Nick_DoAttr(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoAttr(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
 
-		Buf2 = Nick_FetchByte(nick, nick->LD2);
+		Buf2 = Nick_FetchByte(nick->LD2);
 		nick->LD2++;
 
 		{
 			unsigned char BackgroundColour = ((Buf1>>4) & 0x0f);
 			unsigned char ForegroundColour = (Buf1 & 0x0f);
 
-			Nick_WritePixels2ColourLPIXEL(nick, BackgroundColour, ForegroundColour, Buf2);
+			Nick_WritePixels2ColourLPIXEL(BackgroundColour, ForegroundColour, Buf2);
 		}
 	}
 }
 
-static void Nick_DoCh256(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoCh256(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
-		Buf2 = Nick_FetchByte(nick, ADDR_CH256(nick->LD2, Buf1));
+		Buf2 = Nick_FetchByte(ADDR_CH256(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
+		Nick_WritePixelsLPIXEL(Buf2, Buf1);
 	}
 }
 
-static void Nick_DoCh128(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoCh128(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
-		Buf2 = Nick_FetchByte(nick, ADDR_CH128(nick->LD2, Buf1));
+		Buf2 = Nick_FetchByte(ADDR_CH128(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
+		Nick_WritePixelsLPIXEL(Buf2, Buf1);
 	}
 }
 
-static void Nick_DoCh64(NICK_STATE *nick, int ClocksVisible)
+void ep_state::Nick_DoCh64(int ClocksVisible)
 {
 	int i;
 	unsigned char Buf1, Buf2;
 
 	for (i=0; i<ClocksVisible; i++)
 	{
-		Buf1 = Nick_FetchByte(nick, nick->LD1);
+		Buf1 = Nick_FetchByte(nick->LD1);
 		nick->LD1++;
-		Buf2 = Nick_FetchByte(nick, ADDR_CH64(nick->LD2, Buf1));
+		Buf2 = Nick_FetchByte(ADDR_CH64(nick->LD2, Buf1));
 
-		Nick_WritePixelsLPIXEL(nick, Buf2, Buf1);
+		Nick_WritePixelsLPIXEL(Buf2, Buf1);
 	}
 }
 
 
-static void Nick_DoDisplay(NICK_STATE *nick)
+void ep_state::Nick_DoDisplay()
 {
 	LPT_ENTRY *pLPT = &nick->LPT;
 	unsigned char ClocksVisible;
@@ -828,40 +828,40 @@ static void Nick_DoDisplay(NICK_STATE *nick)
 		{
 			case NICK_PIXEL_MODE:
 			{
-				Nick_DoPixel(nick,ClocksVisible);
+				Nick_DoPixel(ClocksVisible);
 			}
 			break;
 
 			case NICK_ATTR_MODE:
 			{
 				//mame_printf_info("attr mode\r\n");
-				Nick_DoAttr( nick,ClocksVisible);
+				Nick_DoAttr(ClocksVisible);
 			}
 			break;
 
 			case NICK_CH256_MODE:
 			{
 				//mame_printf_info("ch256 mode\r\n");
-				Nick_DoCh256(nick,ClocksVisible);
+				Nick_DoCh256(ClocksVisible);
 			}
 			break;
 
 			case NICK_CH128_MODE:
 			{
-				Nick_DoCh128(nick,ClocksVisible);
+				Nick_DoCh128(ClocksVisible);
 			}
 			break;
 
 			case NICK_CH64_MODE:
 			{
 				//mame_printf_info("ch64 mode\r\n");
-				Nick_DoCh64(nick,ClocksVisible);
+				Nick_DoCh64(ClocksVisible);
 			}
 			break;
 
 			case NICK_LPIXEL_MODE:
 			{
-				Nick_DoLPixel(nick,ClocksVisible);
+				Nick_DoLPixel(ClocksVisible);
 			}
 			break;
 
@@ -871,7 +871,7 @@ static void Nick_DoDisplay(NICK_STATE *nick)
 	}
 }
 
-static void Nick_UpdateLPT(NICK_STATE *nick)
+void ep_state::Nick_UpdateLPT()
 {
 	unsigned long CurLPT;
 
@@ -882,7 +882,7 @@ static void Nick_UpdateLPT(NICK_STATE *nick)
 }
 
 
-static void Nick_ReloadLPT(NICK_STATE *nick)
+void ep_state::Nick_ReloadLPT()
 {
 	unsigned long LPT_Addr;
 
@@ -890,26 +890,26 @@ static void Nick_ReloadLPT(NICK_STATE *nick)
 		LPT_Addr = ((nick->LPL & 0x0ff)<<4) | ((nick->LPH & 0x0f)<<(8+4));
 
 		/* update internal LPT state */
-		nick->LPT.SC = Nick_FetchByte(nick,LPT_Addr);
-		nick->LPT.MB = Nick_FetchByte(nick,LPT_Addr+1);
-		nick->LPT.LM = Nick_FetchByte(nick,LPT_Addr+2);
-		nick->LPT.RM = Nick_FetchByte(nick,LPT_Addr+3);
-		nick->LPT.LD1L = Nick_FetchByte(nick,LPT_Addr+4);
-		nick->LPT.LD1H = Nick_FetchByte(nick,LPT_Addr+5);
-		nick->LPT.LD2L = Nick_FetchByte(nick,LPT_Addr+6);
-		nick->LPT.LD2H = Nick_FetchByte(nick,LPT_Addr+7);
-		nick->LPT.COL[0] = Nick_FetchByte(nick,LPT_Addr+8);
-		nick->LPT.COL[1] = Nick_FetchByte(nick,LPT_Addr+9);
-		nick->LPT.COL[2] = Nick_FetchByte(nick,LPT_Addr+10);
-		nick->LPT.COL[3] = Nick_FetchByte(nick,LPT_Addr+11);
-		nick->LPT.COL[4] = Nick_FetchByte(nick,LPT_Addr+12);
-		nick->LPT.COL[5] = Nick_FetchByte(nick,LPT_Addr+13);
-		nick->LPT.COL[6] = Nick_FetchByte(nick,LPT_Addr+14);
-		nick->LPT.COL[7] = Nick_FetchByte(nick,LPT_Addr+15);
+		nick->LPT.SC = Nick_FetchByte(LPT_Addr);
+		nick->LPT.MB = Nick_FetchByte(LPT_Addr+1);
+		nick->LPT.LM = Nick_FetchByte(LPT_Addr+2);
+		nick->LPT.RM = Nick_FetchByte(LPT_Addr+3);
+		nick->LPT.LD1L = Nick_FetchByte(LPT_Addr+4);
+		nick->LPT.LD1H = Nick_FetchByte(LPT_Addr+5);
+		nick->LPT.LD2L = Nick_FetchByte(LPT_Addr+6);
+		nick->LPT.LD2H = Nick_FetchByte(LPT_Addr+7);
+		nick->LPT.COL[0] = Nick_FetchByte(LPT_Addr+8);
+		nick->LPT.COL[1] = Nick_FetchByte(LPT_Addr+9);
+		nick->LPT.COL[2] = Nick_FetchByte(LPT_Addr+10);
+		nick->LPT.COL[3] = Nick_FetchByte(LPT_Addr+11);
+		nick->LPT.COL[4] = Nick_FetchByte(LPT_Addr+12);
+		nick->LPT.COL[5] = Nick_FetchByte(LPT_Addr+13);
+		nick->LPT.COL[6] = Nick_FetchByte(LPT_Addr+14);
+		nick->LPT.COL[7] = Nick_FetchByte(LPT_Addr+15);
 }
 
 /* call here to render a line of graphics */
-static void Nick_DoLine(NICK_STATE *nick)
+void ep_state::Nick_DoLine()
 {
 	unsigned char ScanLineCount;
 
@@ -920,17 +920,17 @@ static void Nick_DoLine(NICK_STATE *nick)
 		nick->LPL = nick->Reg[2];
 		nick->LPH = nick->Reg[3];
 
-		Nick_ReloadLPT(nick);
+		Nick_ReloadLPT();
 	}
 
 	/* left border */
-	Nick_DoLeftMargin(nick);
+	Nick_DoLeftMargin();
 
 	/* do visible part */
-	Nick_DoDisplay(nick);
+	Nick_DoDisplay();
 
 	/* right border */
-	Nick_DoRightMargin(nick);
+	Nick_DoRightMargin();
 
 	// 0x0f7 is first!
 	/* scan line count for this LPT */
@@ -949,27 +949,15 @@ static void Nick_DoLine(NICK_STATE *nick)
 
 		nick->ScanLineCount = 0;
 
-		Nick_UpdateLPT(nick);
-		Nick_ReloadLPT(nick);
+		Nick_UpdateLPT();
+		Nick_ReloadLPT();
 
 
 	}
 }
 
-/* MESS specific */
-#ifdef UNUSED_FUNCTION
-READ8_HANDLER( nick_reg_r )
+WRITE8_MEMBER( ep_state::epnick_reg_w )
 {
-	/* read from a nick register - return floating bus,
-	because the registers are not readable! */
-	return 0x0ff;
-}
-#endif
-
-WRITE8_HANDLER( epnick_reg_w )
-{
-	ep_state *state = space.machine().driver_data<ep_state>();
-	NICK_STATE *nick = state->nick;
 	//mame_printf_info("Nick write %02x %02x\r\n",offset, data);
 
 	/* write to a nick register */
@@ -986,7 +974,7 @@ WRITE8_HANDLER( epnick_reg_w )
 			nick->LPL = nick->Reg[2];
 			nick->LPH = nick->Reg[3];
 
-			Nick_ReloadLPT(nick);
+			Nick_ReloadLPT();
 		}
 	}
 
@@ -1001,7 +989,7 @@ WRITE8_HANDLER( epnick_reg_w )
 	}
 }
 
-static void Nick_DoScreen(NICK_STATE *nick, bitmap_ind16 &bm)
+void ep_state::Nick_DoScreen(bitmap_ind16 &bm)
 {
 	int line = 0;
 
@@ -1013,7 +1001,7 @@ static void Nick_DoScreen(NICK_STATE *nick, bitmap_ind16 &bm)
 		nick->dest_max_pos = bm.width();
 
 		/* write line */
-		Nick_DoLine(nick);
+		Nick_DoLine();
 
 		/* next line */
 		line++;
@@ -1028,14 +1016,14 @@ void ep_state::video_start()
 	nick = auto_alloc_clear(machine(), NICK_STATE);
 
 	nick->videoram = machine().device<ram_device>(RAM_TAG)->pointer();
-	Nick_Init(nick);
+	Nick_Init();
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 
 UINT32 ep_state::screen_update_epnick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	Nick_DoScreen(nick,m_bitmap);
+	Nick_DoScreen(m_bitmap);
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

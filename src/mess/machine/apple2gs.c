@@ -487,7 +487,7 @@ UINT8 apple2gs_state::adb_read_datareg()
 			break;
 
 		default:
-			result = 0; //state->m_adb_latent_result & 0x7f;
+			result = 0; //m_adb_latent_result & 0x7f;
 			break;
 	}
 
@@ -788,39 +788,38 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
  * ----------------------------------------------------------------------- */
 
 
-static READ8_HANDLER( gssnd_r )
+READ8_MEMBER( apple2gs_state::gssnd_r )
 {
-	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
 	UINT8 ret = 0;
 
 	switch (offset)
 	{
 		case 0: // control
-			ret = state->m_sndglu_ctrl;
+			ret = m_sndglu_ctrl;
 			break;
 		case 1: // data read
-			ret = state->m_sndglu_dummy_read;
+			ret = m_sndglu_dummy_read;
 
-			if (state->m_sndglu_ctrl & 0x40)    // docram access
+			if (m_sndglu_ctrl & 0x40)    // docram access
 			{
-				UINT8 *docram = state->memregion("es5503")->base();
-				state->m_sndglu_dummy_read = docram[state->m_sndglu_addr];
+				UINT8 *docram = memregion("es5503")->base();
+				m_sndglu_dummy_read = docram[m_sndglu_addr];
 			}
 			else
 			{
-				state->m_sndglu_dummy_read = state->m_es5503->read(space, state->m_sndglu_addr);
+				m_sndglu_dummy_read = m_es5503->read(space, m_sndglu_addr);
 			}
 
-			if (state->m_sndglu_ctrl & 0x20)    // auto-increment
+			if (m_sndglu_ctrl & 0x20)    // auto-increment
 			{
-				state->m_sndglu_addr++;
+				m_sndglu_addr++;
 			}
 			break;
 		case 2: // addr l
-			ret = state->m_sndglu_addr & 0xff;
+			ret = m_sndglu_addr & 0xff;
 			break;
 		case 3: // addr h
-			ret = (state->m_sndglu_addr >> 8) & 0xff;
+			ret = (m_sndglu_addr >> 8) & 0xff;
 			break;
 	}
 
@@ -829,41 +828,40 @@ static READ8_HANDLER( gssnd_r )
 
 
 
-static WRITE8_HANDLER( gssnd_w )
+WRITE8_MEMBER( apple2gs_state::gssnd_w )
 {
-	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
 	switch (offset)
 	{
 		case 0: // control
-			state->m_sndglu_ctrl = data & 0x7f; // make sure DOC is never busy
-			if (!(state->m_sndglu_ctrl & 0x40)) // clear hi byte of address pointer on DOC access
+			m_sndglu_ctrl = data & 0x7f; // make sure DOC is never busy
+			if (!(m_sndglu_ctrl & 0x40)) // clear hi byte of address pointer on DOC access
 			{
-				state->m_sndglu_addr &= 0xff;
+				m_sndglu_addr &= 0xff;
 			}
 			break;
 		case 1: // data write
-			if (state->m_sndglu_ctrl & 0x40)    // docram access
+			if (m_sndglu_ctrl & 0x40)    // docram access
 			{
-				UINT8 *docram = state->memregion("es5503")->base();
-				docram[state->m_sndglu_addr] = data;
+				UINT8 *docram = memregion("es5503")->base();
+				docram[m_sndglu_addr] = data;
 			}
 			else
 			{
-				state->m_es5503->write(space, state->m_sndglu_addr, data);
+				m_es5503->write(space, m_sndglu_addr, data);
 			}
 
-			if (state->m_sndglu_ctrl & 0x20)    // auto-increment
+			if (m_sndglu_ctrl & 0x20)    // auto-increment
 			{
-				state->m_sndglu_addr++;
+				m_sndglu_addr++;
 			}
 			break;
 		case 2: // addr l
-			state->m_sndglu_addr &= 0xff00;
-			state->m_sndglu_addr |= data;
+			m_sndglu_addr &= 0xff00;
+			m_sndglu_addr |= data;
 			break;
 		case 3: // addr h
-			state->m_sndglu_addr &= 0x00ff;
-			state->m_sndglu_addr |= data<<8;
+			m_sndglu_addr &= 0x00ff;
+			m_sndglu_addr |= data<<8;
 			break;
 	}
 }
@@ -1774,50 +1772,46 @@ DIRECT_UPDATE_MEMBER(apple2gs_state::apple2gs_opbase)
 
 
 
-static READ8_HANDLER( apple2gs_00Cxxx_r ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); return state->apple2gs_xxCxxx_r(space, offset | 0x00C000); }
-static READ8_HANDLER( apple2gs_01Cxxx_r ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); return state->apple2gs_xxCxxx_r(space, offset | 0x01C000); }
-static READ8_HANDLER( apple2gs_E0Cxxx_r ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); return state->apple2gs_xxCxxx_r(space, offset | 0xE0C000); }
-static READ8_HANDLER( apple2gs_E1Cxxx_r ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); return state->apple2gs_xxCxxx_r(space, offset | 0xE1C000); }
+READ8_MEMBER( apple2gs_state::apple2gs_00Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0x00C000); }
+READ8_MEMBER( apple2gs_state::apple2gs_01Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0x01C000); }
+READ8_MEMBER( apple2gs_state::apple2gs_E0Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0xE0C000); }
+READ8_MEMBER( apple2gs_state::apple2gs_E1Cxxx_r ) { return apple2gs_xxCxxx_r(space, offset | 0xE1C000); }
 
-static WRITE8_HANDLER( apple2gs_00Cxxx_w ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); state->apple2gs_xxCxxx_w(space, offset | 0x00C000, data); }
-static WRITE8_HANDLER( apple2gs_01Cxxx_w ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); state->apple2gs_xxCxxx_w(space, offset | 0x01C000, data); }
-static WRITE8_HANDLER( apple2gs_E0Cxxx_w ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); state->apple2gs_xxCxxx_w(space, offset | 0xE0C000, data); }
-static WRITE8_HANDLER( apple2gs_E1Cxxx_w ) { apple2gs_state *state = space.machine().driver_data<apple2gs_state>(); state->apple2gs_xxCxxx_w(space, offset | 0xE1C000, data); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_00Cxxx_w ) { apple2gs_xxCxxx_w(space, offset | 0x00C000, data); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_01Cxxx_w ) { apple2gs_xxCxxx_w(space, offset | 0x01C000, data); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E0Cxxx_w ) { apple2gs_xxCxxx_w(space, offset | 0xE0C000, data); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E1Cxxx_w ) { apple2gs_xxCxxx_w(space, offset | 0xE1C000, data); }
 
-static WRITE8_HANDLER( apple2gs_Exxxxx_w )
+WRITE8_MEMBER( apple2gs_state::apple2gs_Exxxxx_w )
 {
-	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
-	state->m_slowmem[offset] = data;
+	m_slowmem[offset] = data;
 }
 
-static WRITE8_HANDLER( apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x00400, data, mem_mask); }
-static WRITE8_HANDLER( apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x02000, data, mem_mask); }
-static WRITE8_HANDLER( apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x10400, data, mem_mask); }
-static WRITE8_HANDLER( apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data, mem_mask); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E004xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x00400, data, mem_mask); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E02xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x02000, data, mem_mask); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, offset + 0x10400, data, mem_mask); }
+WRITE8_MEMBER( apple2gs_state::apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data, mem_mask); }
 
-static WRITE8_HANDLER( apple2gs_slowmem_w )
-{
-	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
-	state->m_slowmem[offset] = data;
+WRITE8_MEMBER( apple2gs_state::apple2gs_slowmem_w )
+{	
+	m_slowmem[offset] = data;
 
 	if ((offset >= 0x19e00) && (offset < 0x19fff))
 	{
 		int color = (offset - 0x19e00) >> 1;
 
 		palette_set_color_rgb(space.machine(), color + 16,
-			((state->m_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
-			((state->m_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
-			((state->m_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
+			((m_slowmem[0x19E00 + (color * 2) + 1] >> 0) & 0x0F) * 17,
+			((m_slowmem[0x19E00 + (color * 2) + 0] >> 4) & 0x0F) * 17,
+			((m_slowmem[0x19E00 + (color * 2) + 0] >> 0) & 0x0F) * 17);
 	}
 }
 
 // Because the bank address multiplexes on the 65816 data bus, reading a memory area
 // which doesn't drive the bus results in reading back the bank number.
-static READ8_HANDLER(apple2gs_bank_echo_r)
-{
-	apple2gs_state *state = space.machine().driver_data<apple2gs_state>();
-
-	return state->m_echo_bank + (offset>>16);
+READ8_MEMBER(apple2gs_state::apple2gs_bank_echo_r)
+{	
+	return m_echo_bank + (offset>>16);
 }
 
 void apple2gs_state::apple2gs_setup_memory()
@@ -1841,7 +1835,7 @@ void apple2gs_state::apple2gs_setup_memory()
 		space.install_readwrite_bank(0x010000, ramsize - 1, "bank1");
 		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
-		space.install_legacy_read_handler( ramsize, 0xdfffff, FUNC(apple2gs_bank_echo_r));
+		space.install_read_handler( ramsize, 0xdfffff, read8_delegate(FUNC(apple2gs_state::apple2gs_bank_echo_r),this));
 		m_echo_bank = (ramsize >> 16);
 	}
 	else
@@ -1852,17 +1846,17 @@ void apple2gs_state::apple2gs_setup_memory()
 		space.install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
 		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x010000);
 
-		space.install_legacy_read_handler( ramsize + 0x10000, 0xdfffff, FUNC(apple2gs_bank_echo_r));
+		space.install_read_handler( ramsize + 0x10000, 0xdfffff, read8_delegate(FUNC(apple2gs_state::apple2gs_bank_echo_r),this));
 		m_echo_bank = (ramsize+0x10000) >> 16;
 	}
 
 	/* install hi memory */
 	space.install_read_bank(0xe00000, 0xe1ffff, "bank2");
-	space.install_legacy_write_handler(0xe00000, 0xe1ffff, FUNC(apple2gs_slowmem_w));
-	space.install_legacy_write_handler(0xe00400, 0xe007ff, FUNC(apple2gs_E004xx_w));
-	space.install_legacy_write_handler(0xe02000, 0xe03fff, FUNC(apple2gs_E02xxx_w));
-	space.install_legacy_write_handler(0xe10400, 0xe107ff, FUNC(apple2gs_E104xx_w));
-	space.install_legacy_write_handler(0xe12000, 0xe13fff, FUNC(apple2gs_E12xxx_w));
+	space.install_write_handler(0xe00000, 0xe1ffff, write8_delegate(FUNC(apple2gs_state::apple2gs_slowmem_w),this));
+	space.install_write_handler(0xe00400, 0xe007ff, write8_delegate(FUNC(apple2gs_state::apple2gs_E004xx_w),this));
+	space.install_write_handler(0xe02000, 0xe03fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E02xxx_w),this));
+	space.install_write_handler(0xe10400, 0xe107ff, write8_delegate(FUNC(apple2gs_state::apple2gs_E104xx_w),this));
+	space.install_write_handler(0xe12000, 0xe13fff, write8_delegate(FUNC(apple2gs_state::apple2gs_E12xxx_w),this));
 	membank("bank2")->set_base(m_slowmem);
 
 	/* install alternate ROM bank */
@@ -1872,14 +1866,14 @@ void apple2gs_state::apple2gs_setup_memory()
 	membank("bank3")->set_base(m_rom);
 
 	/* install new xxC000-xxCFFF handlers */
-	space.install_legacy_read_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_r));
-	space.install_legacy_write_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_w));
-	space.install_legacy_read_handler(0x01c000, 0x01cfff, FUNC(apple2gs_01Cxxx_r));
-	space.install_legacy_write_handler(0x01c000, 0x01cfff, FUNC(apple2gs_01Cxxx_w));
-	space.install_legacy_read_handler(0xe0c000, 0xe0cfff, FUNC(apple2gs_E0Cxxx_r));
-	space.install_legacy_write_handler(0xe0c000, 0xe0cfff, FUNC(apple2gs_E0Cxxx_w));
-	space.install_legacy_read_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_r));
-	space.install_legacy_write_handler(0xe1c000, 0xe1cfff, FUNC(apple2gs_E1Cxxx_w));
+	space.install_read_handler(0x00c000, 0x00cfff, read8_delegate(FUNC(apple2gs_state::apple2gs_00Cxxx_r),this));
+	space.install_write_handler(0x00c000, 0x00cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_00Cxxx_w),this));
+	space.install_read_handler(0x01c000, 0x01cfff, read8_delegate(FUNC(apple2gs_state::apple2gs_01Cxxx_r),this));
+	space.install_write_handler(0x01c000, 0x01cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_01Cxxx_w),this));
+	space.install_read_handler(0xe0c000, 0xe0cfff, read8_delegate(FUNC(apple2gs_state::apple2gs_E0Cxxx_r),this));
+	space.install_write_handler(0xe0c000, 0xe0cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_E0Cxxx_w),this));
+	space.install_read_handler(0xe1c000, 0xe1cfff, read8_delegate(FUNC(apple2gs_state::apple2gs_E1Cxxx_r),this));
+	space.install_write_handler(0xe1c000, 0xe1cfff, write8_delegate(FUNC(apple2gs_state::apple2gs_E1Cxxx_w),this));
 	space.set_direct_update_handler(direct_update_delegate(FUNC(apple2gs_state::apple2gs_opbase), this));
 
 

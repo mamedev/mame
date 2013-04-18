@@ -238,6 +238,24 @@ public:
 	UINT8 apple2gs_xxCxxx_r(address_space &space, offs_t address);
 	void apple2gs_xxCxxx_w(address_space &space, offs_t address, UINT8 data);
 	void apple2gs_setup_memory();
+	
+	DECLARE_READ8_MEMBER( gssnd_r );
+	DECLARE_WRITE8_MEMBER( gssnd_w );
+	DECLARE_READ8_MEMBER( apple2gs_00Cxxx_r );
+	DECLARE_READ8_MEMBER( apple2gs_01Cxxx_r );
+	DECLARE_READ8_MEMBER( apple2gs_E0Cxxx_r );
+	DECLARE_READ8_MEMBER( apple2gs_E1Cxxx_r );
+	DECLARE_WRITE8_MEMBER( apple2gs_00Cxxx_w ); 
+	DECLARE_WRITE8_MEMBER( apple2gs_01Cxxx_w ); 
+	DECLARE_WRITE8_MEMBER( apple2gs_E0Cxxx_w ); 
+	DECLARE_WRITE8_MEMBER( apple2gs_E1Cxxx_w ); 
+	DECLARE_WRITE8_MEMBER( apple2gs_Exxxxx_w );
+	DECLARE_WRITE8_MEMBER( apple2gs_E004xx_w );
+	DECLARE_WRITE8_MEMBER( apple2gs_E02xxx_w );
+	DECLARE_WRITE8_MEMBER( apple2gs_E104xx_w );
+	DECLARE_WRITE8_MEMBER( apple2gs_E12xxx_w );
+	DECLARE_WRITE8_MEMBER( apple2gs_slowmem_w );
+	DECLARE_READ8_MEMBER(apple2gs_bank_echo_r);	
 };
 
 
