@@ -66,6 +66,7 @@ public:
 	DECLARE_READ32_MEMBER(znsecsel_r);
 	DECLARE_WRITE32_MEMBER(znsecsel_w);
 	DECLARE_READ32_MEMBER(boardconfig_r);
+	DECLARE_READ32_MEMBER(boardconfig_8M_r);
 	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(capcom_kickharness_r);
@@ -369,6 +370,37 @@ READ32_MEMBER(zn_state::boardconfig_r)
 	}
 }
 
+READ32_MEMBER(zn_state::boardconfig_8M_r)
+{
+	/*
+	------00 mem=4M
+	------01 mem=4M
+	------10 mem=8M
+	------11 mem=16M
+	-----0-- smem=hM
+	-----1-- smem=2M
+	----0--- vmem=1M
+	----1--- vmem=2M
+	000----- rev=-2
+	001----- rev=-1
+	010----- rev=0
+	011----- rev=1
+	100----- rev=2
+	101----- rev=3
+	110----- rev=4
+	111----- rev=5
+	*/
+
+	if( machine().primary_screen->height() == 1024 )
+	{
+		return 64|32|8|2;
+	}
+	else
+	{
+		return 64|32|2;
+	}
+}
+
 READ32_MEMBER(zn_state::unknown_r)
 {
 	verboselog(0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
@@ -411,6 +443,29 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x80400000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( zn_8M_map, AS_PROGRAM, 32, zn_state )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram */
+	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
+	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
+	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
+	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
+	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
+	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_8M_r)
+	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
+	AM_RANGE(0x1fa20000, 0x1fa20003) AM_WRITE(coin_w)
+	AM_RANGE(0x1fa30000, 0x1fa30003) AM_NOP /* ?? */
+	AM_RANGE(0x1fa40000, 0x1fa40003) AM_READNOP /* ?? */
+	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
+	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
+	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
+	AM_RANGE(0x80000000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
+	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
@@ -1368,12 +1423,11 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 {
 	device_t *ide = machine().device("ide");
 
-	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
+//	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
-	if (n_address < 0xe0000)
+	if (n_address < 0x10000)
 	{
-		// protect kernel+program space (what should we really do here?)
-		logerror( "skip read to low memory\n" );
+		logerror( "skip read to BIOS area\n" );
 		return;
 	}
 
@@ -1414,6 +1468,9 @@ MACHINE_RESET_MEMBER(zn_state,coh1000w)
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zn_8M_map)
+
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
