@@ -11,14 +11,12 @@
 #include "isa_finalchs.h"
 #include "cpu/m6502/m65c02.h"
 
-static UINT8 FCH_latch_data = 0;
-
-static WRITE8_HANDLER( io7ff8_write )
+WRITE8_MEMBER( isa8_finalchs_device::io7ff8_write )
 {
-	FCH_latch_data = data;
+	m_FCH_latch_data = data;
 }
 
-static READ8_HANDLER( io7ff8_read )
+READ8_MEMBER( isa8_finalchs_device::io7ff8_read )
 {
 	static unsigned char table[] = { 0xff, 0xfd, 0xfe };
 	static int i = -1;
@@ -27,22 +25,22 @@ static READ8_HANDLER( io7ff8_read )
 	return table[i];  // exercise the NMI handler for now with known commands
 }
 
-static READ8_HANDLER( io6000_read )
+READ8_MEMBER( isa8_finalchs_device::io6000_read )
 {
 	return 0x55;
 }
 
-static WRITE8_HANDLER( io6000_write )
+WRITE8_MEMBER( isa8_finalchs_device::io6000_write )
 {
-	FCH_latch_data = data;
+	m_FCH_latch_data = data;
 }
 
 static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8, isa8_finalchs_device)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ_LEGACY(io7ff8_read)
-	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE_LEGACY(io7ff8_write)
-	AM_RANGE( 0x6000, 0x6000 ) AM_READ_LEGACY(io6000_read)
-	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE_LEGACY(io6000_write)
+	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ(io7ff8_read)
+	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)
+	AM_RANGE( 0x6000, 0x6000 ) AM_READ(io6000_read)
+	AM_RANGE( 0x6000, 0x6000 ) AM_WRITE(io6000_write)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -114,6 +112,7 @@ void isa8_finalchs_device::device_start()
 
 void isa8_finalchs_device::device_reset()
 {
+	m_FCH_latch_data = 0;
 }
 
 //-------------------------------------------------

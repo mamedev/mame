@@ -22,6 +22,12 @@ public:
 
 		DECLARE_READ8_MEMBER(finalchs_r);
 		DECLARE_WRITE8_MEMBER(finalchs_w);
+
+		DECLARE_WRITE8_MEMBER( io7ff8_write );
+		DECLARE_READ8_MEMBER( io7ff8_read );
+		DECLARE_READ8_MEMBER( io6000_read );
+		DECLARE_WRITE8_MEMBER( io6000_write );
+
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const;
 		virtual const rom_entry *device_rom_region() const;
@@ -32,6 +38,7 @@ protected:
 
 private:
 		// internal state
+		UINT8 m_FCH_latch_data;
 };
 
 
