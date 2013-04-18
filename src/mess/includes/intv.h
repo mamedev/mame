@@ -262,6 +262,8 @@ protected:
 	void render_background(bitmap_ind16 &bitmap);
 	void draw_borders(bitmap_ind16 &bm);
 	void intv_stic_screenrefresh();
+	void draw_background(bitmap_ind16 &bitmap, int transparency);
+	void draw_sprites(bitmap_ind16 &bitmap, int behind_foreground);
 };
 
 #endif /* INTV_H_ */

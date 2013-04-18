@@ -288,6 +288,7 @@ protected:
 	void kccomp_reset_machine();
 	void update_psg();
 	void amstrad_common_init();
+	unsigned char kccomp_get_colour_element(int colour_value);
 };
 
 

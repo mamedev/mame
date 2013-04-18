@@ -114,56 +114,55 @@
 static const UINT8 half_step_table[4] = { 0x01, 0x02, 0x04, 0x08 };
 static const UINT8 full_step_table[4] = { 0x03, 0x06, 0x0c, 0x09 };
 
-static void pcw_update_interrupt_counter(pcw_state *state)
+void pcw_state::pcw_update_interrupt_counter()
 {
 	/* never increments past 15! */
-	if (state->m_interrupt_counter==0x0f)
+	if (m_interrupt_counter==0x0f)
 		return;
 
 	/* increment count */
-	state->m_interrupt_counter++;
+	m_interrupt_counter++;
 }
 
 
 // set/reset INT and NMI lines
-static void pcw_update_irqs(running_machine &machine)
+void pcw_state::pcw_update_irqs()
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	// set NMI line, remains set until FDC interrupt type is changed
-	if(state->m_nmi_flag != 0)
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if(m_nmi_flag != 0)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	// set IRQ line, timer pulses IRQ line, all other devices hold it as necessary
-	if(state->m_fdc_interrupt_code == 1 && (state->m_system_status & 0x20))
+	if(m_fdc_interrupt_code == 1 && (m_system_status & 0x20))
 	{
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
-	if(state->m_timer_irq_flag != 0)
+	if(m_timer_irq_flag != 0)
 	{
-		state->m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 		return;
 	}
 
-	state->m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_timer_pulse)
 {
 	m_timer_irq_flag = 0;
-	pcw_update_irqs(machine());
+	pcw_update_irqs();
 }
 
 /* callback for 1/300ths of a second interrupt */
 TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 {
-	pcw_update_interrupt_counter(this);
+	pcw_update_interrupt_counter();
 
 	m_timer_irq_flag = 1;
-	pcw_update_irqs(machine());
+	pcw_update_irqs();
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(pcw_state::pcw_timer_pulse),this));
 }
 
@@ -219,10 +218,9 @@ READ8_MEMBER(pcw_state::pcw_keyboard_data_r)
  * PCW Banking
  * ----------------------------------------------------------------------- */
 
-static void pcw_update_read_memory_block(running_machine &machine, int block, int bank)
+void pcw_state::pcw_update_read_memory_block(int block, int bank)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+1);
@@ -232,7 +230,7 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 		/* when upper 16 bytes are accessed use keyboard read
 		   handler */
 		space.install_read_handler(
-			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),state));
+			block * 0x04000 + 0x3ff0, block * 0x04000 + 0x3fff, read8_delegate(FUNC(pcw_state::pcw_keyboard_data_r),this));
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
 	else
@@ -241,18 +239,17 @@ static void pcw_update_read_memory_block(running_machine &machine, int block, in
 		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	state->membank(block_name)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
+	membank(block_name)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine().device<ram_device>(RAM_TAG)->size()));
 }
 
 
 
-static void pcw_update_write_memory_block(running_machine &machine, int block, int bank)
+void pcw_state::pcw_update_write_memory_block(int block, int bank)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	state->membank(block_name)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine.device<ram_device>(RAM_TAG)->size()));
+	membank(block_name)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine().device<ram_device>(RAM_TAG)->size()));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -262,9 +259,8 @@ static void pcw_update_write_memory_block(running_machine &machine, int block, i
 /* &F4 O  b7-b4: when set, force memory reads to access the same bank as
 writes for &C000, &0000, &8000, and &4000 respectively */
 
-static void pcw_update_mem(running_machine &machine, int block, int data)
+void pcw_state::pcw_update_mem(int block, int data)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	/* expansion ram select.
 	    if block is 0-7, selects internal ram instead for read/write
 	    */
@@ -275,8 +271,8 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 		/* same bank for reading and writing */
 		bank = data & 0x7f;
 
-		pcw_update_read_memory_block(machine, block, bank);
-		pcw_update_write_memory_block(machine, block, bank);
+		pcw_update_read_memory_block(block, bank);
+		pcw_update_write_memory_block(block, bank);
 	}
 	else
 	{
@@ -312,7 +308,7 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 			break;
 		}
 
-		if (state->m_bank_force & mask)
+		if (m_bank_force & mask)
 		{
 			read_bank = data & 0x07;
 		}
@@ -321,32 +317,31 @@ static void pcw_update_mem(running_machine &machine, int block, int data)
 			read_bank = (data>>4) & 0x07;
 		}
 
-		pcw_update_read_memory_block(machine, block, read_bank);
+		pcw_update_read_memory_block(block, read_bank);
 
 		write_bank = data & 0x07;
-		pcw_update_write_memory_block(machine, block, write_bank);
+		pcw_update_write_memory_block(block, write_bank);
 	}
 
 	/* if boot is active, page in fake ROM */
-/*  if ((state->m_boot) && (block==0))
+/*  if ((m_boot) && (block==0))
     {
         unsigned char *FakeROM;
 
-        FakeROM = &machine.root_device().memregion("maincpu")->base()[0x010000];
+        FakeROM = &machine().root_device().memregion("maincpu")->base()[0x010000];
 
-        state->membank("bank1")->set_base(FakeROM);
+        membank("bank1")->set_base(FakeROM);
     }*/
 }
 
 /* from Jacob Nevins docs */
-static int pcw_get_sys_status(running_machine &machine)
+int pcw_state::pcw_get_sys_status()
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	return
-		state->m_interrupt_counter
-		| (state->m_screen->vblank() ? 0x40 : 0x00)
-		| (machine.root_device().ioport("EXTRA")->read() & 0x010)
-		| (state->m_system_status & 0x20);
+		m_interrupt_counter
+		| (m_screen->vblank() ? 0x40 : 0x00)
+		| (machine().root_device().ioport("EXTRA")->read() & 0x010)
+		| (m_system_status & 0x20);
 }
 
 READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
@@ -356,11 +351,11 @@ READ8_MEMBER(pcw_state::pcw_interrupt_counter_r)
 	/* from Jacob Nevins docs */
 
 	/* get data */
-	data = pcw_get_sys_status(machine());
+	data = pcw_get_sys_status();
 	/* clear int counter */
 	m_interrupt_counter = 0;
 	/* check interrupts */
-	pcw_update_irqs(machine());
+	pcw_update_irqs();
 	/* return data */
 	//LOG(("SYS: IRQ counter read, returning %02x\n",data));
 	return data;
@@ -372,7 +367,7 @@ WRITE8_MEMBER(pcw_state::pcw_bank_select_w)
 	//LOG(("BANK: %2x %x\n",offset, data));
 	m_banks[offset] = data;
 
-	pcw_update_mem(machine(), offset, data);
+	pcw_update_mem(offset, data);
 //  popmessage("RAM Banks: %02x %02x %02x %02x Lock:%02x",m_banks[0],m_banks[1],m_banks[2],m_banks[3],m_bank_force);
 }
 
@@ -380,10 +375,10 @@ WRITE8_MEMBER(pcw_state::pcw_bank_force_selection_w)
 {
 	m_bank_force = data;
 
-	pcw_update_mem(machine(), 0, m_banks[0]);
-	pcw_update_mem(machine(), 1, m_banks[1]);
-	pcw_update_mem(machine(), 2, m_banks[2]);
-	pcw_update_mem(machine(), 3, m_banks[3]);
+	pcw_update_mem(0, m_banks[0]);
+	pcw_update_mem(1, m_banks[1]);
+	pcw_update_mem(2, m_banks[2]);
+	pcw_update_mem(3, m_banks[3]);
 }
 
 
@@ -421,7 +416,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		case 0:
 		{
 			m_boot = 0;
-			pcw_update_mem(machine(), 0, m_banks[0]);
+			pcw_update_mem(0, m_banks[0]);
 		}
 		break;
 
@@ -445,7 +440,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 			{
 				/* yes */
 
-				pcw_update_irqs(machine());
+				pcw_update_irqs();
 			}
 
 		}
@@ -470,7 +465,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 			}
 
 			/* re-issue interrupt */
-			pcw_update_irqs(machine());
+			pcw_update_irqs();
 		}
 		break;
 
@@ -490,7 +485,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 				/* Clear NMI */
 				m_nmi_flag = 0;
 			}
-			pcw_update_irqs(machine());
+			pcw_update_irqs();
 
 		}
 		break;
@@ -567,7 +562,7 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 READ8_MEMBER(pcw_state::pcw_system_status_r)
 {
 	/* from Jacob Nevins docs */
-	UINT8 ret = pcw_get_sys_status(machine());
+	UINT8 ret = pcw_get_sys_status();
 
 	return ret;
 }
@@ -628,21 +623,20 @@ WRITE8_MEMBER(pcw_state::pcw_expansion_w)
 	logerror("pcw expansion w: %04x %02x\n",offset+0x080, data);
 }
 
-static void pcw_printer_fire_pins(running_machine &machine, UINT16 pins)
+void pcw_state::pcw_printer_fire_pins(UINT16 pins)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
 	int x,line;
-	INT32 feed = (state->m_paper_feed / 2);
+	INT32 feed = (m_paper_feed / 2);
 
 	for(x=feed+PCW_PRINTER_HEIGHT-16;x<feed+PCW_PRINTER_HEIGHT-7;x++)
 	{
 		line = x % PCW_PRINTER_HEIGHT;
 		if((pins & 0x01) == 0)
-			state->m_prn_output->pix16(line, state->m_printer_headpos) = (UINT16)(pins & 0x01);
+			m_prn_output->pix16(line, m_printer_headpos) = (UINT16)(pins & 0x01);
 		pins >>= 1;
 	}
-//  if(state->m_printer_headpos < PCW_PRINTER_WIDTH)
-//      state->m_printer_headpos++;
+//  if(m_printer_headpos < PCW_PRINTER_WIDTH)
+//      m_printer_headpos++;
 }
 
 WRITE8_MEMBER(pcw_state::pcw_printer_data_w)
@@ -763,7 +757,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 {
-	pcw_printer_fire_pins(machine(),m_printer_pins);
+	pcw_printer_fire_pins(m_printer_pins);
 	m_printer_p2 |= 0x40;
 }
 
@@ -1026,10 +1020,10 @@ void pcw_state::machine_reset()
 	m_banks[2] = 0x82;
 	m_banks[3] = 0x83;
 
-	pcw_update_mem(machine(), 0, m_banks[0]);
-	pcw_update_mem(machine(), 1, m_banks[1]);
-	pcw_update_mem(machine(), 2, m_banks[2]);
-	pcw_update_mem(machine(), 3, m_banks[3]);
+	pcw_update_mem(0, m_banks[0]);
+	pcw_update_mem(1, m_banks[1]);
+	pcw_update_mem(2, m_banks[2]);
+	pcw_update_mem(3, m_banks[3]);
 
 	m_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 

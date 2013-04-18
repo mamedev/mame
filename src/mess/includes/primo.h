@@ -42,6 +42,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	void primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline);
+	void primo_update_memory();
+	void primo_common_driver_init (primo_state *state);
+	void primo_common_machine_init ();
+	void primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size);
+	void primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size);
 };
 
 

@@ -88,13 +88,13 @@ TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
 				//logerror( "++ Read stop bit: %d\n", m_ula.stop_bit );
 				if ( m_ula.start_bit && m_ula.stop_bit && m_ula.tape_byte == 0xFF && ! m_ula.high_tone_set )
 				{
-					electron_interrupt_handler( machine(), INT_SET, INT_HIGH_TONE );
+					electron_interrupt_handler( INT_SET, INT_HIGH_TONE );
 					m_ula.high_tone_set = 1;
 				}
 				else if ( ! m_ula.start_bit && m_ula.stop_bit )
 				{
 					//logerror( "-- Byte read from tape: %02x\n", m_ula.tape_byte );
-					electron_interrupt_handler( machine(), INT_SET, INT_RECEIVE_FULL );
+					electron_interrupt_handler( INT_SET, INT_RECEIVE_FULL );
 				}
 				else
 				{
@@ -158,7 +158,7 @@ READ8_MEMBER(electron_state::electron_ula_r)
 	case 0x01:  /* Unknown */
 		break;
 	case 0x04:  /* Casette data shift register */
-		electron_interrupt_handler(machine(), INT_CLEAR, INT_RECEIVE_FULL );
+		electron_interrupt_handler(INT_CLEAR, INT_RECEIVE_FULL );
 		data = m_ula.tape_byte;
 		break;
 	}
@@ -214,15 +214,15 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		}
 		if ( data & 0x10 )
 		{
-			electron_interrupt_handler( machine(), INT_CLEAR, INT_DISPLAY_END );
+			electron_interrupt_handler( INT_CLEAR, INT_DISPLAY_END );
 		}
 		if ( data & 0x20 )
 		{
-			electron_interrupt_handler( machine(), INT_CLEAR, INT_RTC );
+			electron_interrupt_handler( INT_CLEAR, INT_RTC );
 		}
 		if ( data & 0x40 )
 		{
-			electron_interrupt_handler( machine(), INT_CLEAR, INT_HIGH_TONE );
+			electron_interrupt_handler( INT_CLEAR, INT_HIGH_TONE );
 		}
 		if ( data & 0x80 )
 		{
@@ -281,26 +281,25 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 	}
 }
 
-void electron_interrupt_handler(running_machine &machine, int mode, int interrupt)
+void electron_state::electron_interrupt_handler(int mode, int interrupt)
 {
-	electron_state *state = machine.driver_data<electron_state>();
 	if ( mode == INT_SET )
 	{
-		state->m_ula.interrupt_status |= interrupt;
+		m_ula.interrupt_status |= interrupt;
 	}
 	else
 	{
-		state->m_ula.interrupt_status &= ~interrupt;
+		m_ula.interrupt_status &= ~interrupt;
 	}
-	if ( state->m_ula.interrupt_status & state->m_ula.interrupt_control & ~0x83 )
+	if ( m_ula.interrupt_status & m_ula.interrupt_control & ~0x83 )
 	{
-		state->m_ula.interrupt_status |= 0x01;
-		state->m_maincpu->set_input_line(0, ASSERT_LINE );
+		m_ula.interrupt_status |= 0x01;
+		m_maincpu->set_input_line(0, ASSERT_LINE );
 	}
 	else
 	{
-		state->m_ula.interrupt_status &= ~0x01;
-		state->m_maincpu->set_input_line(0, CLEAR_LINE );
+		m_ula.interrupt_status &= ~0x01;
+		m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
 }
 

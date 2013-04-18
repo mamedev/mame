@@ -252,7 +252,7 @@ Green value, Red value, Blue value: 0 = 0%, 01/10 = 50%, 11 = 100%.
 The 01 case is not used, it is unknown if this produces a different amount of colour.
 */
 
-static unsigned char kccomp_get_colour_element(int colour_value)
+unsigned char amstrad_state::kccomp_get_colour_element(int colour_value)
 {
 	switch (colour_value)
 	{

@@ -338,6 +338,24 @@ protected:
 	void bbcbp_setvideoshadow(int vdusel);
 	void common_init(int memorySize);
 	void set_pixel_lookup();
+	void set_cursor(bbc_state *state);
+	void BBC_Clock_CR(bbc_state *state);
+	void BBC_draw_teletext();
+	void BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels);
+	void BBC_draw_hi_res();
+	void BBC_Set_HSync(int offset, int data);
+	void BBC_Set_VSync(int offset, int data);
+	void BBC_Set_CRE(int offset, int data);
+	void bbc_frameclock();
+	int vdudriverset();
+	int bbcm_vdudriverset();
+	int bbc_keyboard(address_space &space, int data);
+	void bbcb_IC32_initialise(bbc_state *state);
+	void MC146818_set(address_space &space);
+	void bbc_TMSint(int status);
+	void MC6850_Receive_Clock(int new_clock);
+	void BBC_Cassette_motor(unsigned char status);
+	void bbc_update_fdq_int(int state);
 };
 
 

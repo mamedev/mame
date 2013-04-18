@@ -10,7 +10,7 @@
 #include "includes/pcw.h"
 #include "machine/ram.h"
 
-INLINE void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void pcw_state::pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }

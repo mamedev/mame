@@ -215,6 +215,29 @@ public:
 	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
 	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
 	#endif
+	void process_clock();
+	const char *apple2gs_irq_name(UINT16 irq_mask);
+	void apple2gs_add_irq(UINT16 irq_mask);
+	void apple2gs_remove_irq(UINT16 irq_mask);
+	UINT8 adb_read_memory(UINT32 address);
+	void adb_write_memory(UINT32 address, UINT8 data);
+	void adb_set_mode(UINT8 mode);
+	void adb_set_config(UINT8 b1, UINT8 b2, UINT8 b3);
+	void adb_post_response(const UINT8 *bytes, size_t length);
+	void adb_post_response_1(UINT8 b);
+	void adb_post_response_2(UINT8 b1, UINT8 b2);
+	void adb_do_command();
+	void adb_write_datareg(UINT8 data);
+	void adb_write_kmstatus(UINT8 data);
+	UINT8 adb_read_mousedata();
+	INT8 seven_bit_diff(UINT8 v1, UINT8 v2);
+	void adb_check_mouse();
+	void apple2gs_set_scanint(UINT8 data);
+	int apple2gs_get_vpos();
+	UINT8 *apple2gs_getslotmem(offs_t address);
+	UINT8 apple2gs_xxCxxx_r(address_space &space, offs_t address);
+	void apple2gs_xxCxxx_w(address_space &space, offs_t address, UINT8 data);
+	void apple2gs_setup_memory();
 };
 
 

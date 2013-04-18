@@ -236,7 +236,7 @@ WRITE8_HANDLER( cgenie_port_ff_w )
 	/* graphics mode changed ? */
 	if( port_ff_changed & FF_FGR )
 	{
-		cgenie_mode_select(space.machine(), data & FF_FGR);
+		state->cgenie_mode_select(data & FF_FGR);
 	}
 
 	state->m_port_ff = data;
@@ -253,7 +253,7 @@ READ8_HANDLER( cgenie_port_ff_r )
 	return data;
 }
 
-int cgenie_port_xx_r( int offset )
+int cgenie_state::cgenie_port_xx_r( int offset )
 {
 	return 0xff;
 }
@@ -515,10 +515,9 @@ WRITE8_HANDLER( cgenie_motor_w )
  *      Video RAM                    *
  *************************************/
 
-int cgenie_videoram_r( running_machine &machine, int offset )
+int cgenie_state::cgenie_videoram_r( int offset )
 {
-	cgenie_state *state = machine.driver_data<cgenie_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	return videoram[offset];
 }
 
@@ -550,7 +549,7 @@ WRITE8_HANDLER( cgenie_colorram_w )
 	/* set new value */
 	state->m_colorram[offset] = data;
 	/* make offset relative to video frame buffer offset */
-	offset = (offset + (cgenie_get_register(space.machine(), 12) << 8) + cgenie_get_register(space.machine(), 13)) & 0x3ff;
+	offset = (offset + (state->cgenie_get_register(12) << 8) + state->cgenie_get_register(13)) & 0x3ff;
 }
 
 	READ8_HANDLER( cgenie_fontram_r )

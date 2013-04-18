@@ -18,25 +18,24 @@ WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
 	m_video_write_mode = data & 0x0f;
 }
 
-static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
+void pp01_state::pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
-	pp01_state *state = machine.driver_data<pp01_state>();
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	if (BIT(state->m_video_write_mode,3)) {
+	if (BIT(m_video_write_mode,3)) {
 		// Copy mode
-		if(BIT(state->m_video_write_mode,0)) {
+		if(BIT(m_video_write_mode,0)) {
 			ram[0x6000+offset+addroffset] = data;
 		} else {
 			ram[0x6000+offset+addroffset] = 0;
 		}
-		if(BIT(state->m_video_write_mode,1)) {
+		if(BIT(m_video_write_mode,1)) {
 			ram[0xa000+offset+addroffset] = data;
 		} else {
 			ram[0xa000+offset+addroffset] = 0;
 		}
-		if(BIT(state->m_video_write_mode,2)) {
+		if(BIT(m_video_write_mode,2)) {
 			ram[0xe000+offset+addroffset] = data;
 		} else {
 			ram[0xe000+offset+addroffset] = 0;
@@ -56,36 +55,35 @@ static void pp01_video_w(running_machine &machine,UINT8 block,UINT16 offset,UINT
 
 WRITE8_MEMBER(pp01_state::pp01_video_r_1_w)
 {
-	pp01_video_w(machine(),0,offset,data,0);
+	pp01_video_w(0,offset,data,0);
 }
 WRITE8_MEMBER(pp01_state::pp01_video_g_1_w)
 {
-	pp01_video_w(machine(),1,offset,data,0);
+	pp01_video_w(1,offset,data,0);
 }
 WRITE8_MEMBER(pp01_state::pp01_video_b_1_w)
 {
-	pp01_video_w(machine(),2,offset,data,0);
+	pp01_video_w(2,offset,data,0);
 }
 
 WRITE8_MEMBER(pp01_state::pp01_video_r_2_w)
 {
-	pp01_video_w(machine(),0,offset,data,1);
+	pp01_video_w(0,offset,data,1);
 }
 WRITE8_MEMBER(pp01_state::pp01_video_g_2_w)
 {
-	pp01_video_w(machine(),1,offset,data,1);
+	pp01_video_w(1,offset,data,1);
 }
 WRITE8_MEMBER(pp01_state::pp01_video_b_2_w)
 {
-	pp01_video_w(machine(),2,offset,data,1);
+	pp01_video_w(2,offset,data,1);
 }
 
 
-static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
+void pp01_state::pp01_set_memory(UINT8 block, UINT8 data)
 {
-	pp01_state *state = machine.driver_data<pp01_state>();
-	UINT8 *mem = state->memregion("maincpu")->base();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	UINT8 *mem = memregion("maincpu")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 startaddr = block*0x1000;
 	UINT16 endaddr   = ((block+1)*0x1000)-1;
 	UINT8  blocknum  = block + 1;
@@ -96,22 +94,22 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 		space.install_read_bank (startaddr, endaddr, bank);
 		switch(data) {
 			case 0xe6 :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_1_w),this));
 					break;
 			case 0xe7 :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_r_2_w),this));
 					break;
 			case 0xea :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_1_w),this));
 					break;
 			case 0xeb :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_g_2_w),this));
 					break;
 			case 0xee :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_1_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_1_w),this));
 					break;
 			case 0xef :
-					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_2_w),state));
+					space.install_write_handler(startaddr, endaddr, write8_delegate(FUNC(pp01_state::pp01_video_b_2_w),this));
 					break;
 
 			default :
@@ -119,11 +117,11 @@ static void pp01_set_memory(running_machine &machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		state->membank(bank)->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
+		membank(bank)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		space.install_read_bank (startaddr, endaddr, bank);
 		space.unmap_write(startaddr, endaddr);
-		state->membank(bank)->set_base(mem + ((data & 0x0F)-8)* 0x1000+0x10000);
+		membank(bank)->set_base(mem + ((data & 0x0F)-8)* 0x1000+0x10000);
 	} else {
 		logerror("%02x %02x\n",block,data);
 		space.unmap_readwrite (startaddr, endaddr);
@@ -136,14 +134,14 @@ void pp01_state::machine_reset()
 	memset(m_memory_block,0xff,16);
 	for(i=0;i<16;i++) {
 		m_memory_block[i] = 0xff;
-		pp01_set_memory(machine(), i, 0xff);
+		pp01_set_memory(i, 0xff);
 	}
 }
 
 WRITE8_MEMBER(pp01_state::pp01_mem_block_w)
 {
 	m_memory_block[offset] = data;
-	pp01_set_memory(machine(), offset, data);
+	pp01_set_memory(offset, data);
 }
 
 READ8_MEMBER(pp01_state::pp01_mem_block_r)

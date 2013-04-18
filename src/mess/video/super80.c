@@ -51,20 +51,20 @@ static const UINT8 super80_comp_palette[16*3] =
 	0x00, 0x00, 0x00,   /* 15 Black     */
 };
 
-static void palette_set_colors_rgb(running_machine &machine, const UINT8 *colors)
+void super80_state::palette_set_colors_rgb(const UINT8 *colors)
 {
 	UINT8 r, b, g, color_count = 16;
 
 	while (color_count--)
 	{
 		r = *colors++; g = *colors++; b = *colors++;
-		palette_set_color(machine, 15-color_count, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 15-color_count, MAKE_RGB(r, g, b));
 	}
 }
 
 PALETTE_INIT_MEMBER(super80_state,super80m)
 {
-	palette_set_colors_rgb(machine(), super80_rgb_palette);
+	palette_set_colors_rgb(super80_rgb_palette);
 }
 
 
@@ -81,9 +81,9 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 		{
 			m_current_palette = chosen_palette;                 // save new palette
 			if (!m_current_palette)
-				palette_set_colors_rgb(machine(), super80_comp_palette);        // composite colour
+				palette_set_colors_rgb(super80_comp_palette);        // composite colour
 			else
-				palette_set_colors_rgb(machine(), super80_rgb_palette);     // rgb and b&w
+				palette_set_colors_rgb(super80_rgb_palette);     // rgb and b&w
 		}
 	}
 }

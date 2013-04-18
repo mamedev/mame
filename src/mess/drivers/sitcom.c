@@ -51,6 +51,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sod_led);
 	DECLARE_READ_LINE_MEMBER(sid_line);
 	virtual void machine_reset();
+	DECLARE_WRITE16_MEMBER(sitcom_update_ds0);
+	DECLARE_WRITE16_MEMBER(sitcom_update_ds1);
 };
 
 static ADDRESS_MAP_START( sitcom_mem, AS_PROGRAM, 8, sitcom_state )
@@ -81,24 +83,24 @@ void sitcom_state::machine_reset()
 	dl1416_cu_w(m_ds1, 1);
 }
 
-void sitcom_update_ds0(device_t *device, int digit, int data)
+WRITE16_MEMBER(sitcom_state::sitcom_update_ds0)
 {
-	output_set_digit_value(digit, data);
+	output_set_digit_value(offset, data);
 }
 
-void sitcom_update_ds1(device_t *device, int digit, int data)
+WRITE16_MEMBER(sitcom_state::sitcom_update_ds1)
 {
-	output_set_digit_value(4 + digit, data);
+	output_set_digit_value(4 + offset, data);
 }
 
 const dl1416_interface sitcom_ds0_intf =
 {
-	sitcom_update_ds0
+	DEVCB_DRIVER_MEMBER16(sitcom_state, sitcom_update_ds0)
 };
 
 const dl1416_interface sitcom_ds1_intf =
 {
-	sitcom_update_ds1
+	DEVCB_DRIVER_MEMBER16(sitcom_state, sitcom_update_ds1)
 };
 
 // SID line used as serial input from a pc

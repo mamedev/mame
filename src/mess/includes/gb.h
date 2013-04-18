@@ -230,6 +230,7 @@ protected:
 	void gbc_hdma(UINT16 length);
 	void gb_increment_scanline();
 	void gb_lcd_switch_on();
+	inline void gb_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 };
 
 

@@ -28,6 +28,10 @@ public:
 	DECLARE_MACHINE_RESET(partner);
 	DECLARE_WRITE_LINE_MEMBER(partner_wd17xx_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void partner_window_1(UINT8 bank_num, UINT16 offset,UINT8 *rom);
+	void partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom);
+	void partner_iomap_bank(UINT8 *rom);
+	void partner_bank_switch();
 };
 
 

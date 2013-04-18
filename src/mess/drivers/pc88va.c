@@ -146,6 +146,8 @@ public:
 //  void m_fdc_dma_w(running_machine &machine, UINT16 data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
+	DECLARE_READ16_MEMBER(fdc_dma_r);
+	DECLARE_WRITE16_MEMBER(fdc_dma_w);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
@@ -1794,18 +1796,16 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 }
 
 
-static UINT16 m_fdc_dma_r(running_machine &machine)
+READ16_MEMBER(pc88va_state::fdc_dma_r)
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	printf("R DMA\n");
-	return state->m_fdc->dma_r();
+	return m_fdc->dma_r();
 }
 
-static void m_fdc_dma_w(running_machine &machine, UINT16 data)
+WRITE16_MEMBER(pc88va_state::fdc_dma_w)
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	printf("W DMA %08x\n",data);
-	state->m_fdc->dma_w(data);
+	m_fdc->dma_w(data);
 }
 
 
@@ -1816,8 +1816,8 @@ static const upd71071_intf pc88va_dma_config =
 	8000000,
 	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_hlda_w),
 	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_tc_w),
-	{ 0, 0, m_fdc_dma_r, 0 },
-	{ 0, 0, m_fdc_dma_w, 0 },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER16(pc88va_state, fdc_dma_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER16(pc88va_state, fdc_dma_w), DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 

@@ -48,7 +48,7 @@ static const rgb_t pcw16_palette[PCW16_NUM_COLOURS] =
 };
 
 
-INLINE void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -64,7 +64,7 @@ void pcw16_state::video_start()
 }
 
 /* 640, 1 bit per pixel */
-static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int local_byte;
@@ -73,8 +73,8 @@ static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_ind16 &bitmap, int 
 
 	local_byte = byte;
 
-	cols[0] = state->m_colour_palette[0];
-	cols[1] = state->m_colour_palette[1];
+	cols[0] = m_colour_palette[0];
+	cols[1] = m_colour_palette[1];
 
 	px = x;
 	for (b=0; b<8; b++)
@@ -87,7 +87,7 @@ static void pcw16_vh_decode_mode0(pcw16_state *state, bitmap_ind16 &bitmap, int 
 }
 
 /* 320, 2 bits per pixel */
-static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int b;
 	int px;
@@ -96,7 +96,7 @@ static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_ind16 &bitmap, int 
 
 	for (b=0; b<3; b++)
 	{
-		cols[b] = state->m_colour_palette[b];
+		cols[b] = m_colour_palette[b];
 	}
 
 	local_byte = byte;
@@ -118,15 +118,15 @@ static void pcw16_vh_decode_mode1(pcw16_state *state, bitmap_ind16 &bitmap, int 
 }
 
 /* 160, 4 bits per pixel */
-static void pcw16_vh_decode_mode2(pcw16_state *state, bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
+void pcw16_state::pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte)
 {
 	int px;
 	int b;
 	int local_byte;
 	int cols[2];
 
-	cols[0] = state->m_colour_palette[0];
-	cols[1] = state->m_colour_palette[1];
+	cols[0] = m_colour_palette[0];
+	cols[1] = m_colour_palette[1];
 	local_byte = byte;
 
 	px = x;
@@ -233,20 +233,20 @@ UINT32 pcw16_state::screen_update_pcw16(screen_device &screen, bitmap_ind16 &bit
 				{
 					case 0:
 					{
-						pcw16_vh_decode_mode0(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode0(bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 1:
 					{
-						pcw16_vh_decode_mode1(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode1(bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 
 					case 3:
 					case 2:
 					{
-						pcw16_vh_decode_mode2(this, bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
+						pcw16_vh_decode_mode2(bitmap, x, y+PCW16_BORDER_HEIGHT, byte);
 					}
 					break;
 				}

@@ -381,12 +381,6 @@ or both IOT incompletely, or screw up completely.  I insist that such an error c
 by a pdp-1 programming error, even if there is no emulator error. */
 #define LOG_IOT_OVERLAP 0
 
-
-static int tape_read(pdp1_state *state, UINT8 *reply);
-
-
-
-
 static void pdp1_tape_read_binary(device_t *device);
 static void pdp1_io_sc_callback(device_t *device);
 
@@ -503,7 +497,7 @@ void pdp1_state::machine_reset()
 	m_lightpen.active = m_lightpen.down = 0;
 	m_lightpen.x = m_lightpen.y = 0;
 	m_lightpen.radius = 10; /* ??? */
-	pdp1_update_lightpen_state(machine(), &m_lightpen);
+	pdp1_update_lightpen_state(&m_lightpen);
 }
 
 
@@ -859,9 +853,9 @@ void pdp1_readtape_image_device::call_unload()
 /*
     Read a byte from perforated tape
 */
-static int tape_read(pdp1_state *state, UINT8 *reply)
+int pdp1_state::tape_read(UINT8 *reply)
 {
-	if (state->m_tape_reader.fd && (state->m_tape_reader.fd->fread(reply, 1) == 1))
+	if (m_tape_reader.fd && (m_tape_reader.fd->fread(reply, 1) == 1))
 		return 0;   /* unit OK */
 	else
 		return 1;   /* unit not ready */
@@ -871,28 +865,28 @@ static int tape_read(pdp1_state *state, UINT8 *reply)
 /*
     common code for tape read commands (RPA, RPB, and read-in mode)
 */
-static void begin_tape_read(pdp1_state *state, int binary, int nac)
+void pdp1_state::begin_tape_read( int binary, int nac)
 {
-	state->m_tape_reader.rb = 0;
-	state->m_tape_reader.rcl = 1;
-	state->m_tape_reader.rc = (binary) ? 1 : 3;
-	state->m_tape_reader.rby = (binary) ? 1 : 0;
-	state->m_tape_reader.rcp = nac;
+	m_tape_reader.rb = 0;
+	m_tape_reader.rcl = 1;
+	m_tape_reader.rc = (binary) ? 1 : 3;
+	m_tape_reader.rby = (binary) ? 1 : 0;
+	m_tape_reader.rcp = nac;
 
 	if (LOG_IOT_OVERLAP)
 	{
-		if (state->m_tape_reader.timer->enable(0))
+		if (m_tape_reader.timer->enable(0))
 			logerror("Error: overlapped perforated tape reads (Read-in mode, RPA/RPB instruction)\n");
 	}
 	/* set up delay if tape is advancing */
-	if (state->m_tape_reader.motor_on && state->m_tape_reader.rcl)
+	if (m_tape_reader.motor_on && m_tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		state->m_tape_reader.timer->enable(1);
+		m_tape_reader.timer->enable(1);
 	}
 	else
 	{
-		state->m_tape_reader.timer->enable(0);
+		m_tape_reader.timer->enable(0);
 	}
 }
 
@@ -906,7 +900,7 @@ TIMER_CALLBACK_MEMBER(pdp1_state::reader_callback)
 
 	if (m_tape_reader.rc)
 	{
-		not_ready = tape_read(this, & data);
+		not_ready = tape_read(& data);
 		if (not_ready)
 		{
 			m_tape_reader.motor_on = 0; /* let us stop the motor */
@@ -955,7 +949,7 @@ TIMER_CALLBACK_MEMBER(pdp1_state::reader_callback)
 void pdp1_tape_read_binary(device_t *device)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
-	begin_tape_read(state, 1, 1);
+	state->begin_tape_read(1, 1);
 }
 
 /*
@@ -991,7 +985,7 @@ static void iot_rpa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_EXTRA)
 		logerror("Warning, RPA instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
-	begin_tape_read(state, 0, nac);
+	state->begin_tape_read(0, nac);
 }
 
 /*
@@ -1029,7 +1023,7 @@ static void iot_rpb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_EXTRA)
 		logerror("Warning, RPB instruction not fully emulated: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
-	begin_tape_read(state, 1, nac);
+	state->begin_tape_read(1, nac);
 }
 
 /*
@@ -1067,10 +1061,10 @@ void pdp1_punchtape_image_device::call_unload()
 /*
     Write a byte to perforated tape
 */
-static void tape_write(pdp1_state *state, UINT8 data)
+void pdp1_state::tape_write(UINT8 data)
 {
-	if (state->m_tape_puncher.fd)
-		state->m_tape_puncher.fd->fwrite(& data, 1);
+	if (m_tape_puncher.fd)
+		m_tape_puncher.fd->fwrite(& data, 1);
 }
 
 /*
@@ -1106,7 +1100,7 @@ static void iot_ppa(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_EXTRA)
 		logerror("PPA instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
-	tape_write(state, *io & 0377);
+	state->tape_write(*io & 0377);
 	state->m_io_status &= ~io_st_ptp;
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
@@ -1135,7 +1129,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_EXTRA)
 		logerror("PPB instruction: mb=0%06o, (%s)\n", (unsigned) mb, device->machine().describe_context());
 
-	tape_write(state, (*io >> 12) | 0200);
+	state->tape_write((*io >> 12) | 0200);
 	state->m_io_status &= ~io_st_ptp;
 	/* delay is approximately 1/63.3 second */
 	if (LOG_IOT_OVERLAP)
@@ -1177,16 +1171,15 @@ void pdp1_printer_image_device::call_unload()
 /*
     Write a character to typewriter
 */
-static void typewriter_out(running_machine &machine, UINT8 data)
+void pdp1_state::typewriter_out(UINT8 data)
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	if (LOG_IOT_EXTRA)
 		logerror("typewriter output %o\n", data);
 
-	pdp1_typewriter_drawchar(machine, data);
-	if (state->m_typewriter.fd)
+	pdp1_typewriter_drawchar(data);
+	if (m_typewriter.fd)
 #if 1
-		state->m_typewriter.fd->fwrite(& data, 1);
+		m_typewriter.fd->fwrite(& data, 1);
 #else
 	{
 		static const char ascii_table[2][64] =
@@ -1238,7 +1231,7 @@ static void typewriter_out(running_machine &machine, UINT8 data)
 			//color = color_typewriter_black;
 			{
 				static const char black[5] = { '\033', '[', '3', '0', 'm' };
-				image_fwrite(state->m_typewriter.fd, black, sizeof(black));
+				image_fwrite(m_typewriter.fd, black, sizeof(black));
 			}
 			break;
 
@@ -1247,25 +1240,25 @@ static void typewriter_out(running_machine &machine, UINT8 data)
 			//color = color_typewriter_red;
 			{
 				static const char red[5] = { '\033', '[', '3', '1', 'm' };
-				image_fwrite(state->m_typewriter.fd, red, sizeof(red));
+				image_fwrite(m_typewriter.fd, red, sizeof(red));
 			}
 			break;
 
 		case 072:
 			/* Lower case */
-			state->m_case_shift = 0;
+			m_case_shift = 0;
 			break;
 
 		case 074:
 			/* Upper case */
-			state->m_case_shift = 1;
+			m_case_shift = 1;
 			break;
 
 		case 077:
 			/* Carriage Return */
 			{
 				static const char line_end[2] = { '\r', '\n' };
-				image_fwrite(state->m_typewriter.fd, line_end, sizeof(line_end));
+				image_fwrite(m_typewriter.fd, line_end, sizeof(line_end));
 			}
 			break;
 
@@ -1274,7 +1267,7 @@ static void typewriter_out(running_machine &machine, UINT8 data)
 
 			if ((data != 040) && (data != 056)) /* 040 and 056 are non-spacing characters: don't try to print right now */
 				/* print character (lookup ASCII equivalent in table) */
-				image_fwrite(state->m_typewriter.fd, & ascii_table[state->m_case_shift][data], 1);
+				image_fwrite(m_typewriter.fd, & ascii_table[m_case_shift][data], 1);
 
 			break;
 		}
@@ -1308,7 +1301,7 @@ static void iot_tyo(device_t *device, int op2, int nac, int mb, int *io, int ac)
 
 	ch = (*io) & 077;
 
-	typewriter_out(device->machine(), ch);
+	state->typewriter_out(ch);
 	state->m_io_status &= ~io_st_tyo;
 
 	/* compute completion delay (source: maintainance manual 9-12, 9-13 and 9-14) */
@@ -1427,7 +1420,7 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
 
 	x = ((ac+0400000) & 0777777) >> 8;
 	y = (((*io)+0400000) & 0777777) >> 8;
-	pdp1_plot(device->machine(), x, y);
+	state->pdp1_plot(x, y);
 
 	/* light pen 32 support */
 	state->m_io_status &= ~io_st_pen;
@@ -1459,16 +1452,16 @@ static void iot_dpy(device_t *device, int op2, int nac, int mb, int *io, int ac)
     MIT parallel drum (variant of type 23)
 */
 
-static void parallel_drum_set_il(pdp1_state *state, int il)
+void pdp1_state::parallel_drum_set_il(int il)
 {
 	attotime il_phase;
 
-	state->m_parallel_drum.il = il;
+	m_parallel_drum.il = il;
 
-	il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - state->m_parallel_drum.rotation_timer->elapsed());
+	il_phase = ((PARALLEL_DRUM_WORD_TIME * il) - m_parallel_drum.rotation_timer->elapsed());
 	if (il_phase < attotime::zero)
 		il_phase = il_phase + PARALLEL_DRUM_ROTATION_TIME;
-	state->m_parallel_drum.il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
+	m_parallel_drum.il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1481,12 +1474,12 @@ TIMER_CALLBACK_MEMBER(pdp1_state::il_timer_callback)
 	}
 }
 
-static void parallel_drum_init(pdp1_state *state)
+void pdp1_state::parallel_drum_init(pdp1_state *state)
 {
-	state->m_parallel_drum.rotation_timer = machine.scheduler().timer_alloc();
-	state->m_parallel_drum.rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
+	m_parallel_drum.rotation_timer = machine().scheduler().timer_alloc();
+	m_parallel_drum.rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	state->m_parallel_drum.il_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::il_timer_callback),this));
+	m_parallel_drum.il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::il_timer_callback),this));
 	parallel_drum_set_il(0);
 }
 #endif
@@ -1513,7 +1506,7 @@ static void iot_dia(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	state->m_parallel_drum.wfb = ((*io) & 0370000) >> 12;
-	parallel_drum_set_il(state, (*io) & 0007777);
+	state->parallel_drum_set_il((*io) & 0007777);
 
 	state->m_parallel_drum.dba = 0; /* right? */
 }
@@ -1522,7 +1515,7 @@ static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac)
 {
 	pdp1_state *state = device->machine().driver_data<pdp1_state>();
 	state->m_parallel_drum.wfb = ((*io) & 0370000) >> 12;
-	parallel_drum_set_il(state, (*io) & 0007777);
+	state->parallel_drum_set_il((*io) & 0007777);
 
 	state->m_parallel_drum.dba = 1;
 }
@@ -1530,12 +1523,12 @@ static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     Read a word from drum
 */
-static UINT32 drum_read(pdp1_state *state, int field, int position)
+UINT32 pdp1_state::drum_read(int field, int position)
 {
 	int offset = (field*4096+position)*3;
 	UINT8 buf[3];
 
-	if (state->m_parallel_drum.fd && (!state->m_parallel_drum.fd->fseek(offset, SEEK_SET)) && (state->m_parallel_drum.fd->fread( buf, 3) == 3))
+	if (m_parallel_drum.fd && (!m_parallel_drum.fd->fseek(offset, SEEK_SET)) && (m_parallel_drum.fd->fread( buf, 3) == 3))
 		return ((buf[0] << 16) | (buf[1] << 8) | buf[2]) & 0777777;
 
 	return 0;
@@ -1544,19 +1537,19 @@ static UINT32 drum_read(pdp1_state *state, int field, int position)
 /*
     Write a word to drum
 */
-static void drum_write(pdp1_state *state, int field, int position, UINT32 data)
+void pdp1_state::drum_write(int field, int position, UINT32 data)
 {
 	int offset = (field*4096+position)*3;
 	UINT8 buf[3];
 
-	if (state->m_parallel_drum.fd)
+	if (m_parallel_drum.fd)
 	{
 		buf[0] = data >> 16;
 		buf[1] = data >> 8;
 		buf[2] = data;
 
-		state->m_parallel_drum.fd->fseek(offset, SEEK_SET);
-		state->m_parallel_drum.fd->fwrite( buf, 3);
+		m_parallel_drum.fd->fseek(offset, SEEK_SET);
+		m_parallel_drum.fd->fwrite( buf, 3);
 	}
 }
 
@@ -1581,12 +1574,12 @@ static void iot_dcc(device_t *device, int op2, int nac, int mb, int *io, int ac)
 	{
 		if ((state->m_parallel_drum.wfb >= 1) && (state->m_parallel_drum.wfb <= 22))
 		{
-			drum_write(state, state->m_parallel_drum.wfb-1, dc, (signed)state->m_maincpu->space(AS_PROGRAM).read_dword(state->m_parallel_drum.wcl<<2));
+			state->drum_write(state->m_parallel_drum.wfb-1, dc, (signed)state->m_maincpu->space(AS_PROGRAM).read_dword(state->m_parallel_drum.wcl<<2));
 		}
 
 		if ((state->m_parallel_drum.rfb >= 1) && (state->m_parallel_drum.rfb <= 22))
 		{
-			state->m_maincpu->space(AS_PROGRAM).write_dword(state->m_parallel_drum.wcl<<2, drum_read(state, state->m_parallel_drum.rfb-1, dc));
+			state->m_maincpu->space(AS_PROGRAM).write_dword(state->m_parallel_drum.wcl<<2, state->drum_read(state->m_parallel_drum.rfb-1, dc));
 		}
 
 		state->m_parallel_drum.wc = (state->m_parallel_drum.wc+1) & 07777;
@@ -1699,9 +1692,8 @@ void pdp1_io_sc_callback(device_t *device)
 /*
     typewriter keyboard handler
 */
-static void pdp1_keyboard(running_machine &machine)
+void pdp1_state::pdp1_keyboard()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int i;
 	int j;
 
@@ -1713,82 +1705,81 @@ static void pdp1_keyboard(running_machine &machine)
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = machine.root_device().ioport(twrnames[i])->read();
+		typewriter_keys[i] = machine().root_device().ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_transitions = typewriter_keys[i] & (~ state->m_old_typewriter_keys[i]);
+		typewriter_transitions = typewriter_keys[i] & (~ m_old_typewriter_keys[i]);
 		if (typewriter_transitions)
 		{
 			for (j=0; (((typewriter_transitions >> j) & 1) == 0) /*&& (j<16)*/; j++)
 				;
-			state->m_typewriter.tb = (i << 4) + j;
-			state->m_io_status |= io_st_tyi;
+			m_typewriter.tb = (i << 4) + j;
+			m_io_status |= io_st_tyi;
 			#if USE_SBS
-				state->m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0);  /* interrupt it, baby */
+				m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0);  /* interrupt it, baby */
 			#endif
-			state->m_maincpu->set_state_int(PDP1_PF1, 1);
-			pdp1_typewriter_drawchar(machine, state->m_typewriter.tb);  /* we want to echo input */
+			m_maincpu->set_state_int(PDP1_PF1, 1);
+			pdp1_typewriter_drawchar(m_typewriter.tb);  /* we want to echo input */
 			break;
 		}
 	}
 
 	for (i=0; i<4; i++)
-		state->m_old_typewriter_keys[i] = typewriter_keys[i];
+		m_old_typewriter_keys[i] = typewriter_keys[i];
 }
 
-static void pdp1_lightpen(running_machine &machine)
+void pdp1_state::pdp1_lightpen()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	int x_delta, y_delta;
 	int current_state;
 
-	state->m_lightpen.active = (machine.root_device().ioport("CFG")->read() >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
+	m_lightpen.active = (machine().root_device().ioport("CFG")->read() >> pdp1_config_lightpen_bit) & pdp1_config_lightpen_mask;
 
-	current_state = machine.root_device().ioport("LIGHTPEN")->read();
+	current_state = machine().root_device().ioport("LIGHTPEN")->read();
 
 	/* update pen down state */
-	state->m_lightpen.down = state->m_lightpen.active && (current_state & pdp1_lightpen_down);
+	m_lightpen.down = m_lightpen.active && (current_state & pdp1_lightpen_down);
 
 	/* update size of pen tip hole */
-	if ((current_state & ~state->m_old_lightpen) & pdp1_lightpen_smaller)
+	if ((current_state & ~m_old_lightpen) & pdp1_lightpen_smaller)
 	{
-		state->m_lightpen.radius --;
-		if (state->m_lightpen.radius < 0)
-			state->m_lightpen.radius = 0;
+		m_lightpen.radius --;
+		if (m_lightpen.radius < 0)
+			m_lightpen.radius = 0;
 	}
-	if ((current_state & ~state->m_old_lightpen) & pdp1_lightpen_larger)
+	if ((current_state & ~m_old_lightpen) & pdp1_lightpen_larger)
 	{
-		state->m_lightpen.radius ++;
-		if (state->m_lightpen.radius > 32)
-			state->m_lightpen.radius = 32;
+		m_lightpen.radius ++;
+		if (m_lightpen.radius > 32)
+			m_lightpen.radius = 32;
 	}
 
-	state->m_old_lightpen = current_state;
+	m_old_lightpen = current_state;
 
 	/* update pen position */
-	x_delta = machine.root_device().ioport("LIGHTX")->read();
-	y_delta = machine.root_device().ioport("LIGHTY")->read();
+	x_delta = machine().root_device().ioport("LIGHTX")->read();
+	y_delta = machine().root_device().ioport("LIGHTY")->read();
 
 	if (x_delta >= 0x80)
 		x_delta -= 0x100;
 	if (y_delta >= 0x80)
 		y_delta -= 256;
 
-	state->m_lightpen.x += x_delta;
-	state->m_lightpen.y += y_delta;
+	m_lightpen.x += x_delta;
+	m_lightpen.y += y_delta;
 
-	if (state->m_lightpen.x < 0)
-		state->m_lightpen.x = 0;
-	if (state->m_lightpen.x > 1023)
-		state->m_lightpen.x = 1023;
-	if (state->m_lightpen.y < 0)
-		state->m_lightpen.y = 0;
-	if (state->m_lightpen.y > 1023)
-		state->m_lightpen.y = 1023;
+	if (m_lightpen.x < 0)
+		m_lightpen.x = 0;
+	if (m_lightpen.x > 1023)
+		m_lightpen.x = 1023;
+	if (m_lightpen.y < 0)
+		m_lightpen.y = 0;
+	if (m_lightpen.y > 1023)
+		m_lightpen.y = 1023;
 
-	pdp1_update_lightpen_state(machine, &state->m_lightpen);
+	pdp1_update_lightpen_state(&m_lightpen);
 }
 
 /*
@@ -1931,10 +1922,10 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		m_old_tw_keys = 0;
 		m_old_ta_keys = 0;
 
-		pdp1_keyboard(machine());
+		pdp1_keyboard();
 	}
 
-	pdp1_lightpen(machine());
+	pdp1_lightpen();
 }
 
 

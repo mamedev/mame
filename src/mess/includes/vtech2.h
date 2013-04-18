@@ -77,6 +77,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	void laser_machine_init(int bank_mask, int video_mask);
+	void laser_get_track();
+	void laser_put_track();
 };
 
 

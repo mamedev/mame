@@ -127,14 +127,14 @@ static const char keyboard[8][9][8] = {
 	},
 };
 
-static UINT8 read_dsw(running_machine &machine)
+UINT8 microtan_state::read_dsw()
 {
 	UINT8 result;
-	switch(machine.phase())
+	switch(machine().phase())
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
-			result = machine.root_device().ioport("DSW")->read();
+			result = machine().root_device().ioport("DSW")->read();
 			break;
 
 		default:
@@ -144,13 +144,12 @@ static UINT8 read_dsw(running_machine &machine)
 	return result;
 }
 
-static void microtan_set_irq_line(running_machine &machine)
+void microtan_state::microtan_set_irq_line()
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
 	/* The 6502 IRQ line is active low and probably driven
 	   by open collector outputs (guess). Since MAME/MESS use
 	   a non-0 value for ASSERT_LINE we OR the signals here */
-	state->m_maincpu->set_input_line(0, state->m_via_0_irq_line | state->m_via_1_irq_line | state->m_kbd_irq_line);
+	m_maincpu->set_input_line(0, m_via_0_irq_line | m_via_1_irq_line | m_kbd_irq_line);
 }
 
 /**************************************************************
@@ -224,7 +223,7 @@ WRITE_LINE_MEMBER(microtan_state::via_0_irq)
 {
 	LOG(("microtan_via_0_irq %d\n", state));
 	m_via_0_irq_line = state;
-	microtan_set_irq_line(machine());
+	microtan_set_irq_line();
 }
 
 /**************************************************************
@@ -296,7 +295,7 @@ WRITE_LINE_MEMBER(microtan_state::via_1_irq)
 {
 	LOG(("microtan_via_1_irq %d\n", state));
 	m_via_1_irq_line = state;
-	microtan_set_irq_line(machine());
+	microtan_set_irq_line();
 }
 
 /**************************************************************
@@ -389,7 +388,7 @@ WRITE8_MEMBER(microtan_state::microtan_bffx_w)
 		LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
 		m_keyboard_ascii &= ~0x80;
 		m_kbd_irq_line = CLEAR_LINE;
-		microtan_set_irq_line(machine());
+		microtan_set_irq_line();
 		break;
 	case 1: /* BFF1: write delayed NMI */
 		LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
@@ -405,13 +404,12 @@ WRITE8_MEMBER(microtan_state::microtan_bffx_w)
 	}
 }
 
-static void store_key(running_machine &machine, int key)
+void microtan_state::store_key(int key)
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
 	LOG(("microtan: store key '%c'\n", key));
-	state->m_keyboard_ascii = key | 0x80;
-	state->m_kbd_irq_line = ASSERT_LINE;
-	microtan_set_irq_line(machine);
+	m_keyboard_ascii = key | 0x80;
+	m_kbd_irq_line = ASSERT_LINE;
+	microtan_set_irq_line();
 }
 
 INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
@@ -483,11 +481,11 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 			if( m_key )   /* normal key */
 			{
 				m_repeater = 30;
-				store_key(machine(), m_key);
+				store_key(m_key);
 			}
 			else
 			if( (row == 0) && (chg == 0x04) ) /* Ctrl-@ (NUL) */
-				store_key(machine(), 0);
+				store_key(0);
 			m_keyrows[row] |= newvar;
 		}
 		else
@@ -499,7 +497,7 @@ INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
 	else
 	if ( m_key && (m_keyrows[m_lastrow] & m_mask) && m_repeat == 0 )
 	{
-		store_key(machine(), m_key);
+		store_key(m_key);
 	}
 }
 
@@ -545,7 +543,7 @@ DRIVER_INIT_MEMBER(microtan_state,microtan)
 		dst += 4;
 	}
 
-	switch (read_dsw(machine()) & 3)
+	switch (read_dsw() & 3)
 	{
 		case 0:  // 1K only :)
 			space.nop_readwrite(0x0400, 0xbbff);
@@ -574,7 +572,7 @@ void microtan_state::machine_reset()
 	set_led_status(machine(), 1, (m_keyrows[3] & 0x80) ? 0 : 1);
 }
 
-static int microtan_verify_snapshot(UINT8 *data, int size)
+int microtan_state::microtan_verify_snapshot(UINT8 *data, int size)
 {
 	if (size == 8263)
 	{
@@ -593,7 +591,7 @@ static int microtan_verify_snapshot(UINT8 *data, int size)
 	return IMAGE_VERIFY_FAIL;
 }
 
-static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
+int microtan_state::parse_intel_hex(UINT8 *snapshot_buff, char *src)
 {
 	char line[128];
 	int /*row = 0,*/ column = 0, last_addr = 0, last_size = 0;
@@ -674,7 +672,7 @@ static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
 	return IMAGE_INIT_PASS;
 }
 
-static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
+int microtan_state::parse_zillion_hex(UINT8 *snapshot_buff, char *src)
 {
 	char line[128];
 	int parsing = 0, /*row = 0,*/ column = 0;
@@ -757,28 +755,26 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
 	return IMAGE_INIT_PASS;
 }
 
-static void microtan_set_cpu_regs(running_machine &machine,const UINT8 *snapshot_buff, int base)
+void microtan_state::microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base)
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
 	logerror("microtan_snapshot_copy: PC:%02X%02X P:%02X A:%02X X:%02X Y:%02X SP:1%02X",
 		snapshot_buff[base+1], snapshot_buff[base+0], snapshot_buff[base+2], snapshot_buff[base+3],
 		snapshot_buff[base+4], snapshot_buff[base+5], snapshot_buff[base+6]);
-	state->m_maincpu->set_state_int(M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
-	state->m_maincpu->set_state_int(M6502_P, snapshot_buff[base+2]);
-	state->m_maincpu->set_state_int(M6502_A, snapshot_buff[base+3]);
-	state->m_maincpu->set_state_int(M6502_X, snapshot_buff[base+4]);
-	state->m_maincpu->set_state_int(M6502_Y, snapshot_buff[base+5]);
-	state->m_maincpu->set_state_int(M6502_S, snapshot_buff[base+6]);
+	m_maincpu->set_state_int(M6502_PC, snapshot_buff[base+0] + 256 * snapshot_buff[base+1]);
+	m_maincpu->set_state_int(M6502_P, snapshot_buff[base+2]);
+	m_maincpu->set_state_int(M6502_A, snapshot_buff[base+3]);
+	m_maincpu->set_state_int(M6502_X, snapshot_buff[base+4]);
+	m_maincpu->set_state_int(M6502_Y, snapshot_buff[base+5]);
+	m_maincpu->set_state_int(M6502_S, snapshot_buff[base+6]);
 }
 
-static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buff, int snapshot_size)
+void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size)
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	via6522_device *via_1 = machine.device<via6522_device>("via6522_1");
-	device_t *ay8910 = machine.device("ay8910.1");
+	UINT8 *RAM = memregion("maincpu")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
+	device_t *ay8910 = machine().device("ay8910.1");
 
 	/* check for .DMP file format */
 	if (snapshot_size == 8263)
@@ -798,10 +794,10 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 		/* 64 bytes of chunky graphics info */
 		for (i = 0; i < 32*16; i++)
 		{
-			state->m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+			m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
 		}
 		base += 64;
-		microtan_set_cpu_regs(machine, snapshot_buff, base);
+		microtan_set_cpu_regs(snapshot_buff, base);
 	}
 	else
 	{
@@ -845,53 +841,55 @@ static void microtan_snapshot_copy(running_machine &machine, UINT8 *snapshot_buf
 		{
 			RAM[0xbff0+i] = snapshot_buff[base++];
 			if (i < 4)
-				state->microtan_bffx_w(space, i, RAM[0xbff0+i]);
+				microtan_bffx_w(space, i, RAM[0xbff0+i]);
 		}
 
-		state->microtan_sound_w(space, 0, snapshot_buff[base++]);
-		state->m_chunky_graphics = snapshot_buff[base++];
+		microtan_sound_w(space, 0, snapshot_buff[base++]);
+		m_chunky_graphics = snapshot_buff[base++];
 
 		/* first set of AY8910 registers */
 		for (i = 0; i < 16; i++ )
 		{
-			ay8910_address_w(ay8910, state->generic_space(), 0, i);
-			ay8910_data_w(ay8910, state->generic_space(), 0, snapshot_buff[base++]);
+			ay8910_address_w(ay8910, generic_space(), 0, i);
+			ay8910_data_w(ay8910, generic_space(), 0, snapshot_buff[base++]);
 		}
 
 		/* second set of AY8910 registers */
 		for (i = 0; i < 16; i++ )
 		{
-			ay8910_address_w(ay8910, state->generic_space(), 0, i);
-			ay8910_data_w(ay8910, state->generic_space(), 0, snapshot_buff[base++]);
+			ay8910_address_w(ay8910, generic_space(), 0, i);
+			ay8910_data_w(ay8910, generic_space(), 0, snapshot_buff[base++]);
 		}
 
 		for (i = 0; i < 32*16; i++)
 		{
-			state->m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
+			m_chunky_buffer[i] = (snapshot_buff[base+i/8] >> (i&7)) & 1;
 		}
 		base += 64;
 
-		microtan_set_cpu_regs(machine, snapshot_buff, base);
+		microtan_set_cpu_regs(snapshot_buff, base);
 	}
 }
 
 SNAPSHOT_LOAD( microtan )
 {
+	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	UINT8 *snapshot_buff;
 
 	snapshot_buff = (UINT8*)image.ptr();
 	if (!snapshot_buff)
 		return IMAGE_INIT_FAIL;
 
-	if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
+	if (state->microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
 		return IMAGE_INIT_FAIL;
 
-	microtan_snapshot_copy(image.device().machine(), snapshot_buff, snapshot_size);
+	state->microtan_snapshot_copy(snapshot_buff, snapshot_size);
 	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD( microtan )
 {
+	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	int snapshot_size;
 	UINT8 *snapshot_buff;
 	char *buff;
@@ -918,11 +916,11 @@ QUICKLOAD_LOAD( microtan )
 	buff[quickload_size] = '\0';
 
 	if (buff[0] == ':')
-		rc = parse_intel_hex(snapshot_buff, buff);
+		rc = state->parse_intel_hex(snapshot_buff, buff);
 	else
-		rc = parse_zillion_hex(snapshot_buff, buff);
+		rc = state->parse_zillion_hex(snapshot_buff, buff);
 	if (rc == IMAGE_INIT_PASS)
-		microtan_snapshot_copy(image.device().machine(), snapshot_buff, snapshot_size);
+		state->microtan_snapshot_copy(snapshot_buff, snapshot_size);
 	free(snapshot_buff);
 	return rc;
 }

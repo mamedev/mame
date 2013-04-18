@@ -36,13 +36,13 @@ static void apple3_update_drives(device_t *device);
 /* ----------------------------------------------------------------------- */
 
 
-static void apple3_profile_init(void)
+void apple3_state::apple3_profile_init(void)
 {
 }
 
 
 
-static void apple3_profile_statemachine(void)
+void apple3_state::apple3_profile_statemachine(void)
 {
 }
 
@@ -164,7 +164,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			break;
 
 		case 0xDB:
-			apple3_write_charmem(machine());
+			apple3_write_charmem();
 			break;
 
 		case 0xE0: case 0xE1: case 0xE2: case 0xE3:
@@ -228,7 +228,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			break;
 
 		case 0xDB:
-			apple3_write_charmem(machine());
+			apple3_write_charmem();
 			break;
 
 		case 0xE0: case 0xE1: case 0xE2: case 0xE3:
@@ -258,35 +258,34 @@ INTERRUPT_GEN_MEMBER(apple3_state::apple3_interrupt)
 
 
 
-static UINT8 *apple3_bankaddr(running_machine &machine,UINT16 bank, offs_t offset)
+UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
 {
 	if (bank != (UINT16) ~0)
 	{
-		bank %= machine.device<ram_device>(RAM_TAG)->size() / 0x8000;
-		if ((bank + 1) == (machine.device<ram_device>(RAM_TAG)->size() / 0x8000))
+		bank %= machine().device<ram_device>(RAM_TAG)->size() / 0x8000;
+		if ((bank + 1) == (machine().device<ram_device>(RAM_TAG)->size() / 0x8000))
 			bank = 0x02;
 	}
 	offset += ((offs_t) bank) * 0x8000;
-	offset %= machine.device<ram_device>(RAM_TAG)->size();
-	return &machine.device<ram_device>(RAM_TAG)->pointer()[offset];
+	offset %= machine().device<ram_device>(RAM_TAG)->size();
+	return &machine().device<ram_device>(RAM_TAG)->pointer()[offset];
 }
 
 
 
-static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT16 bank, offs_t offset)
+void apple3_state::apple3_setbank(const char *mame_bank, UINT16 bank, offs_t offset)
 {
 	UINT8 *ptr;
-	apple3_state *state = machine.driver_data<apple3_state>();
-	ptr = apple3_bankaddr(machine,bank, offset);
-	state->membank(mame_bank)->set_base(ptr);
+	ptr = apple3_bankaddr(bank, offset);
+	membank(mame_bank)->set_base(ptr);
 
 	#if 0
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
+		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine().device<ram_device>(RAM_TAG)->pointer());
 		#else
-		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine.device<ram_device>(RAM_TAG)->pointer());
+		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine().device<ram_device>(RAM_TAG)->pointer());
 		#endif
 	}
 	#endif
@@ -294,66 +293,64 @@ static void apple3_setbank(running_machine &machine,const char *mame_bank, UINT1
 
 
 
-static UINT8 *apple3_get_zpa_addr(running_machine &machine,offs_t offset)
+UINT8 *apple3_state::apple3_get_zpa_addr(offs_t offset)
 {
-	apple3_state *state = machine.driver_data<apple3_state>();
-	state->m_zpa = (((offs_t) state->m_via_0_b) * 0x100) + offset;
+	m_zpa = (((offs_t) m_via_0_b) * 0x100) + offset;
 
-	if (state->m_via_0_b < 0x20)
-		return apple3_bankaddr(machine,~0, state->m_zpa);
-	else if (state->m_via_0_b > 0x9F)
-		return apple3_bankaddr(machine,~0, state->m_zpa - 0x8000);
+	if (m_via_0_b < 0x20)
+		return apple3_bankaddr(~0, m_zpa);
+	else if (m_via_0_b > 0x9F)
+		return apple3_bankaddr(~0, m_zpa - 0x8000);
 	else
-		return apple3_bankaddr(machine,state->m_via_1_a, state->m_zpa - 0x2000);
+		return apple3_bankaddr(m_via_1_a, m_zpa - 0x2000);
 }
 
 
 
 READ8_MEMBER(apple3_state::apple3_00xx_r)
 {
-	return *apple3_get_zpa_addr(machine(),offset);
+	return *apple3_get_zpa_addr(offset);
 }
 
 
 
 WRITE8_MEMBER(apple3_state::apple3_00xx_w)
 {
-	*apple3_get_zpa_addr(machine(),offset) = data;
+	*apple3_get_zpa_addr(offset) = data;
 }
 
 
 
-static void apple3_update_memory(running_machine &machine)
+void apple3_state::apple3_update_memory()
 {
-	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT16 bank;
 	UINT8 page;
-	address_space& space = state->m_maincpu->space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	if (LOG_MEMORY)
 	{
-		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", state->m_via_0_b, state->m_via_1_a);
+		logerror("apple3_update_memory(): via_0_b=0x%02x via_1_a=0x0x%02x\n", m_via_0_b, m_via_1_a);
 	}
 
-	machine.device("maincpu")->set_unscaled_clock((state->m_via_0_a & 0x80) ? 1000000 : 2000000);
+	machine().device("maincpu")->set_unscaled_clock((m_via_0_a & 0x80) ? 1000000 : 2000000);
 
 	/* bank 2 (0100-01FF) */
-	if (!(state->m_via_0_a & 0x04))
+	if (!(m_via_0_a & 0x04))
 	{
-		if (state->m_via_0_b < 0x20)
+		if (m_via_0_b < 0x20)
 		{
 			bank = ~0;  /* system bank */
-			page = state->m_via_0_b ^ 0x01;
+			page = m_via_0_b ^ 0x01;
 		}
-		else if (state->m_via_0_b >= 0xA0)
+		else if (m_via_0_b >= 0xA0)
 		{
 			bank = ~0;  /* system bank */
-			page = (state->m_via_0_b ^ 0x01) - 0x80;
+			page = (m_via_0_b ^ 0x01) - 0x80;
 		}
 		else
 		{
-			bank = state->m_via_1_a;
-			page = (state->m_via_0_b ^ 0x01) - 0x20;
+			bank = m_via_1_a;
+			page = (m_via_0_b ^ 0x01) - 0x20;
 		}
 	}
 	else
@@ -361,94 +358,94 @@ static void apple3_update_memory(running_machine &machine)
 		bank = ~0;
 		page = 0x01;
 	}
-	apple3_setbank(machine,"bank2", bank, ((offs_t) page) * 0x100);
+	apple3_setbank("bank2", bank, ((offs_t) page) * 0x100);
 
 	/* bank 3 (0200-1FFF) */
-	apple3_setbank(machine,"bank3", ~0, 0x0200);
+	apple3_setbank("bank3", ~0, 0x0200);
 
 	/* bank 4 (2000-9FFF) */
-	apple3_setbank(machine,"bank4", state->m_via_1_a, 0x0000);
+	apple3_setbank("bank4", m_via_1_a, 0x0000);
 
 	/* bank 5 (A000-BFFF) */
-	apple3_setbank(machine,"bank5", ~0, 0x2000);
+	apple3_setbank("bank5", ~0, 0x2000);
 
 	/* install bank 8 (C000-CFFF) */
-	if (state->m_via_0_a & 0x40)
+	if (m_via_0_a & 0x40)
 	{
-		space.install_read_handler(0xC000, 0xC0FF, read8_delegate(FUNC(apple3_state::apple3_c0xx_r),state));
-		space.install_write_handler(0xC000, 0xC0FF, write8_delegate(FUNC(apple3_state::apple3_c0xx_w),state));
+		space.install_read_handler(0xC000, 0xC0FF, read8_delegate(FUNC(apple3_state::apple3_c0xx_r),this));
+		space.install_write_handler(0xC000, 0xC0FF, write8_delegate(FUNC(apple3_state::apple3_c0xx_w),this));
 	}
 	else
 	{
 		space.install_read_bank(0xC000, 0xC0FF, "bank8");
-		if (state->m_via_0_a & 0x08)
+		if (m_via_0_a & 0x08)
 			space.unmap_write(0xC000, 0xC0FF);
 		else
 			space.install_write_bank(0xC000, 0xC0FF, "bank8");
-		apple3_setbank(machine,"bank8", ~0, 0x4000);
+		apple3_setbank("bank8", ~0, 0x4000);
 	}
 
 	/* install bank 9 (C100-C4FF) */
-	if (state->m_via_0_a & 0x40)
+	if (m_via_0_a & 0x40)
 	{
 		space.nop_readwrite(0xC100, 0xC4FF);
 	}
 	else
 	{
 		space.install_read_bank(0xC100, 0xC4FF, "bank9");
-		if (state->m_via_0_a & 0x08)
+		if (m_via_0_a & 0x08)
 			space.unmap_write(0xC100, 0xC4FF);
 		else
 			space.install_write_bank(0xC100, 0xC4FF, "bank9");
-		apple3_setbank(machine,"bank9", ~0, 0x4100);
+		apple3_setbank("bank9", ~0, 0x4100);
 	}
 
 	/* install bank 10 (C500-C7FF) */
 	space.install_read_bank(0xC500, 0xC7FF, "bank10");
-	if (state->m_via_0_a & 0x08)
+	if (m_via_0_a & 0x08)
 		space.unmap_write(0xC500, 0xC7FF);
 	else
 		space.install_write_bank(0xC500, 0xC7FF, "bank10");
-	apple3_setbank(machine,"bank10", ~0, 0x4500);
+	apple3_setbank("bank10", ~0, 0x4500);
 
 	/* install bank 11 (C800-CFFF) */
-	if (state->m_via_0_a & 0x40)
+	if (m_via_0_a & 0x40)
 	{
 		space.nop_readwrite(0xC800, 0xCFFF);
 	}
 	else
 	{
 		space.install_read_bank(0xC800, 0xCFFF, "bank11");
-		if (state->m_via_0_a & 0x08)
+		if (m_via_0_a & 0x08)
 			space.unmap_write(0xC800, 0xCFFF);
 		else
 			space.install_write_bank(0xC800, 0xCFFF, "bank11");
-		apple3_setbank(machine,"bank11", ~0, 0x4800);
+		apple3_setbank("bank11", ~0, 0x4800);
 	}
 
 	/* install bank 6 (D000-EFFF) */
 	space.install_read_bank(0xD000, 0xEFFF, "bank6");
-	if (state->m_via_0_a & 0x08)
+	if (m_via_0_a & 0x08)
 		space.unmap_write(0xD000, 0xEFFF);
 	else
 		space.install_write_bank(0xD000, 0xEFFF, "bank6");
-	apple3_setbank(machine,"bank6", ~0, 0x5000);
+	apple3_setbank("bank6", ~0, 0x5000);
 
 	/* install bank 7 (F000-FFFF) */
 	space.install_read_bank(0xF000, 0xFFFF, "bank7");
-	if (state->m_via_0_a & 0x09)
+	if (m_via_0_a & 0x09)
 		space.unmap_write(0xF000, 0xFFFF);
 	else
 		space.install_write_bank(0xF000, 0xFFFF, "bank7");
-	if (state->m_via_0_a & 0x01)
-		state->membank("bank7")->set_base(machine.root_device().memregion("maincpu")->base());
+	if (m_via_0_a & 0x01)
+		membank("bank7")->set_base(machine().root_device().memregion("maincpu")->base());
 	else
-		apple3_setbank(machine,"bank7", ~0, 0x7000);
+		apple3_setbank("bank7", ~0, 0x7000);
 
 	/* reinstall VIA handlers */
 	{
-		via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
-		via6522_device *via_1 = space.machine().device<via6522_device>("via6522_1");
+		via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
+		via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 
 		space.install_readwrite_handler(0xFFD0, 0xFFDF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_0), write8_delegate(FUNC(via6522_device::write),via_0));
 		space.install_readwrite_handler(0xFFE0, 0xFFEF, 0, 0, read8_delegate(FUNC(via6522_device::read),via_1), write8_delegate(FUNC(via6522_device::write),via_1));
@@ -457,12 +454,12 @@ static void apple3_update_memory(running_machine &machine)
 
 
 
-static void apple3_via_out(running_machine &machine, UINT8 *var, UINT8 data)
+void apple3_state::apple3_via_out(UINT8 *var, UINT8 data)
 {
 	if (*var != data)
 	{
 		*var = data;
-		apple3_update_memory(machine);
+		apple3_update_memory();
 	}
 }
 
@@ -473,22 +470,22 @@ READ8_MEMBER(apple3_state::apple3_via_1_in_b){ return ~0; }
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_a)
 {
-	apple3_via_out(machine(), &m_via_0_a, data);
+	apple3_via_out(&m_via_0_a, data);
 }
 
 WRITE8_MEMBER(apple3_state::apple3_via_0_out_b)
 {
-	apple3_via_out(machine(), &m_via_0_b, data);
+	apple3_via_out(&m_via_0_b, data);
 }
 
 WRITE8_MEMBER(apple3_state::apple3_via_1_out_a)
 {
-	apple3_via_out(machine(), &m_via_1_a, data);
+	apple3_via_out(&m_via_1_a, data);
 }
 
 WRITE8_MEMBER(apple3_state::apple3_via_1_out_b)
 {
-	apple3_via_out(machine(), &m_via_1_b, data);
+	apple3_via_out(&m_via_1_b, data);
 }
 
 WRITE_LINE_MEMBER(apple3_state::apple2_via_1_irq_func)
@@ -543,22 +540,21 @@ MACHINE_RESET_MEMBER(apple3_state,apple3)
 
 
 
-static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
+UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 {
-	apple3_state *state = machine.driver_data<apple3_state>();
 	UINT8 n;
 	UINT8 *result = NULL;
 
-	if ((state->m_via_0_b >= 0x18) && (state->m_via_0_b <= 0x1F))
+	if ((m_via_0_b >= 0x18) && (m_via_0_b <= 0x1F))
 	{
-		n = *apple3_bankaddr(machine,~0, state->m_zpa ^ 0x0C00);
+		n = *apple3_bankaddr(~0, m_zpa ^ 0x0C00);
 
 		if (LOG_INDXADDR)
 		{
-			if (state->m_last_n != n)
+			if (m_last_n != n)
 			{
-				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", state->m_zpa, n);
-				state->m_last_n = n;
+				logerror("indxaddr: zpa=0x%04x n=0x%02x\n", m_zpa, n);
+				m_last_n = n;
 			}
 		}
 
@@ -566,42 +562,42 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 		{
 			/* get at that special ram under the VIAs */
 			if ((offset >= 0xFFD0) && (offset <= 0xFFEF))
-				result = apple3_bankaddr(machine,~0, offset & 0x7FFF);
+				result = apple3_bankaddr(~0, offset & 0x7FFF);
 			else if (offset < 0x2000)
-				result = apple3_bankaddr(machine,~0, offset - 0x2000);
+				result = apple3_bankaddr(~0, offset - 0x2000);
 			else if (offset > 0x9FFF)
-				result = apple3_bankaddr(machine,~0, offset - 0x8000);
+				result = apple3_bankaddr(~0, offset - 0x8000);
 			else
-				result = &machine.device<ram_device>(RAM_TAG)->pointer()[offset - 0x2000];
+				result = &machine().device<ram_device>(RAM_TAG)->pointer()[offset - 0x2000];
 		}
 		else if ((n >= 0x80) && (n <= 0x8E))
 		{
 			if (offset < 0x0100)
-				result = apple3_bankaddr(machine,~0, ((offs_t) state->m_via_0_b) * 0x100 + offset);
+				result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
 			else
-				result = apple3_bankaddr(machine,n, offset);
+				result = apple3_bankaddr(n, offset);
 		}
 		else if (n == 0xFF)
 		{
 			if (offset < 0x2000)
-				result = apple3_bankaddr(machine,~0, offset - 0x2000);
+				result = apple3_bankaddr(~0, offset - 0x2000);
 			else if (offset < 0xA000)
-				result = apple3_bankaddr(machine,state->m_via_1_a, offset - 0x2000);
+				result = apple3_bankaddr(m_via_1_a, offset - 0x2000);
 			else if (offset < 0xC000)
-				result = apple3_bankaddr(machine,~0, offset - 0x8000);
+				result = apple3_bankaddr(~0, offset - 0x8000);
 			else if (offset < 0xD000)
 				result = NULL;
 			else if (offset < 0xF000)
-				result = apple3_bankaddr(machine,~0, offset - 0x8000);
+				result = apple3_bankaddr(~0, offset - 0x8000);
 			else
 				result = (UINT8 *) ~0;
 		}
 		else if (offset < 0x0100)
 		{
-			result = apple3_bankaddr(machine,~0, ((offs_t) state->m_via_0_b) * 0x100 + offset);
+			result = apple3_bankaddr(~0, ((offs_t) m_via_0_b) * 0x100 + offset);
 		}
 	}
-	else if ((offset >= 0xF000) && (state->m_via_0_a & 0x01))
+	else if ((offset >= 0xF000) && (m_via_0_a & 0x01))
 	{
 #if 0
 		/* The Apple /// Diagnostics seems to expect that indexed writes
@@ -610,7 +606,7 @@ static UINT8 *apple3_get_indexed_addr(running_machine &machine,offs_t offset)
 		 * emulator does not have corresponding code here, though Chris
 		 * Smolinski does not rule out the possibility
 		 */
-		result = apple3_bankaddr(machine,~0, offset - 0x8000);
+		result = apple3_bankaddr(~0, offset - 0x8000);
 #endif
 	}
 
@@ -624,7 +620,7 @@ READ8_MEMBER(apple3_state::apple3_indexed_read)
 	UINT8 result;
 	UINT8 *addr;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(machine(),offset);
+	addr = apple3_get_indexed_addr(offset);
 	if (!addr)
 		result = prog_space.read_byte(offset);
 	else if (addr != (UINT8 *) ~0)
@@ -640,7 +636,7 @@ WRITE8_MEMBER(apple3_state::apple3_indexed_write)
 {
 	UINT8 *addr;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	addr = apple3_get_indexed_addr(machine(),offset);
+	addr = apple3_get_indexed_addr(offset);
 	if (!addr)
 		prog_space.write_byte(offset, data);
 	else if (addr != (UINT8 *) ~0)
@@ -655,7 +651,7 @@ DIRECT_UPDATE_MEMBER(apple3_state::apple3_opbase)
 
 	if ((address & 0xFF00) == 0x0000)
 	{
-		opptr = apple3_get_zpa_addr(machine(),address);
+		opptr = apple3_get_zpa_addr(address);
 		direct.explicit_configure(address, address, ~0, opptr - address);
 		address = ~0;
 	}
@@ -728,7 +724,7 @@ DRIVER_INIT_MEMBER(apple3_state,apple3)
 	m_via_0_a = ~0;
 	m_via_1_a = ~0;
 	m_via_1_irq = 0;
-	apple3_update_memory(machine());
+	apple3_update_memory();
 
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }

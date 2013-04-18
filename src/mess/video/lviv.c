@@ -34,29 +34,28 @@ void lviv_state::palette_init()
 }
 
 
-void lviv_update_palette(running_machine &machine, UINT8 pal)
+void lviv_state::lviv_update_palette(UINT8 pal)
 {
-	lviv_state *state = machine.driver_data<lviv_state>();
-	state->m_colortable[0][0] = 0;
-	state->m_colortable[0][1] = 0;
-	state->m_colortable[0][2] = 0;
-	state->m_colortable[0][3] = 0;
+	m_colortable[0][0] = 0;
+	m_colortable[0][1] = 0;
+	m_colortable[0][2] = 0;
+	m_colortable[0][3] = 0;
 
-	state->m_colortable[0][0] |= (((pal>>3)&0x01) == ((pal>>4)&0x01)) ? 0x04 : 0x00;
-	state->m_colortable[0][0] |= ((pal>>5)&0x01) ? 0x02 : 0x00;
-	state->m_colortable[0][0] |= (((pal>>2)&0x01) == ((pal>>6)&0x01)) ? 0x01 : 0x00;
+	m_colortable[0][0] |= (((pal>>3)&0x01) == ((pal>>4)&0x01)) ? 0x04 : 0x00;
+	m_colortable[0][0] |= ((pal>>5)&0x01) ? 0x02 : 0x00;
+	m_colortable[0][0] |= (((pal>>2)&0x01) == ((pal>>6)&0x01)) ? 0x01 : 0x00;
 
-	state->m_colortable[0][1] |= ((pal&0x01) == ((pal>>4)&0x01)) ? 0x04 : 0x00;
-	state->m_colortable[0][1] |= ((pal>>5)&0x01) ? 0x02 : 0x00;
-	state->m_colortable[0][1] |= ((pal>>6)&0x01) ? 0x00 : 0x01;
+	m_colortable[0][1] |= ((pal&0x01) == ((pal>>4)&0x01)) ? 0x04 : 0x00;
+	m_colortable[0][1] |= ((pal>>5)&0x01) ? 0x02 : 0x00;
+	m_colortable[0][1] |= ((pal>>6)&0x01) ? 0x00 : 0x01;
 
-	state->m_colortable[0][2] |= ((pal>>4)&0x01) ? 0x04 : 0x00;
-	state->m_colortable[0][2] |= ((pal>>5)&0x01) ? 0x00 : 0x02;
-	state->m_colortable[0][2] |= ((pal>>6)&0x01) ? 0x01 : 0x00;
+	m_colortable[0][2] |= ((pal>>4)&0x01) ? 0x04 : 0x00;
+	m_colortable[0][2] |= ((pal>>5)&0x01) ? 0x00 : 0x02;
+	m_colortable[0][2] |= ((pal>>6)&0x01) ? 0x01 : 0x00;
 
-	state->m_colortable[0][3] |= ((pal>>4)&0x01) ? 0x00 : 0x04;
-	state->m_colortable[0][3] |= (((pal>>1)&0x01) == ((pal>>5)&0x01)) ? 0x02 : 0x00;
-	state->m_colortable[0][3] |= ((pal>>6)&0x01) ? 0x01 : 0x00;
+	m_colortable[0][3] |= ((pal>>4)&0x01) ? 0x00 : 0x04;
+	m_colortable[0][3] |= (((pal>>1)&0x01) == ((pal>>5)&0x01)) ? 0x02 : 0x00;
+	m_colortable[0][3] |= ((pal>>6)&0x01) ? 0x01 : 0x00;
 }
 
 void lviv_state::video_start()

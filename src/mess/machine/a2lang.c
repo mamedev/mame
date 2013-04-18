@@ -88,7 +88,8 @@ void a2bus_lang_device::langcard_touch(offs_t offset)
 		val |= VAR_LCRAM2;
 
 	/* change the flags */
-	apple2_setvar(machine(), val, mask);
+	apple2_state *state = machine().driver_data<apple2_state>();
+	state->apple2_setvar(val, mask);
 }
 
 

@@ -34,6 +34,7 @@ public:
 	UINT32 screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
 	required_device<cpu_device> m_maincpu;
+	UINT8 get_bit_selected(UINT32 val,int num);
 };
 
 #endif /* BUSICOM_H_ */

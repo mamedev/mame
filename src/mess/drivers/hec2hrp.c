@@ -290,13 +290,13 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrp)
 /*****************************************************************************/
 {
-	hector_init(machine());
+	hector_init();
 }
 
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrp)
 {
 	// Machines init
-	hector_reset(machine(), 1, 0);
+	hector_reset(1, 0);
 }
 /*****************************************************************************/
 MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
@@ -329,7 +329,7 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2hrx)
 	// As video HR ram is in bank, use extern memory
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
-	hector_init(machine());
+	hector_init();
 	hector_disc2_init(machine()); // Init of the Disc II !
 }
 /*****************************************************************************/
@@ -355,8 +355,8 @@ MACHINE_START_MEMBER(hec2hrp_state,hec2mdhrx)
 	// As video HR ram is in bank, use extern memory
 	m_hector_videoram.set_target(m_hector_videoram_hrx,m_hector_videoram.bytes());
 
-	hector_init(machine());
-	hector_minidisc_init(machine());
+	hector_init();
+	hector_minidisc_init();
 }
 MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 {
@@ -367,7 +367,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2hrx)
 	membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Machines init
-	hector_reset(machine(), 1, 1);
+	hector_reset(1, 1);
 	hector_disc2_reset(machine());
 }
 //minidisc
@@ -378,7 +378,7 @@ MACHINE_RESET_MEMBER(hec2hrp_state,hec2mdhrx)
 	membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 
 	// Machines init
-	hector_reset(machine(), 1, 0);
+	hector_reset(1, 0);
 }
 
 /* Cassette definition */

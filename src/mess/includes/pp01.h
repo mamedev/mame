@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_8255_portc_w);
 	DECLARE_READ8_MEMBER(pp01_8255_portc_r);
 	required_device<cpu_device> m_maincpu;
+	void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part);
+	void pp01_set_memory(UINT8 block, UINT8 data);
 };
 
 

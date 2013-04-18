@@ -227,6 +227,11 @@ protected:
 	void setup_banks();
 	void sms_get_inputs(address_space &space);
 	required_device<cpu_device> m_maincpu;
+	int sms_verify_cart( UINT8 *magic, int size );
+	int detect_codemasters_mapper( UINT8 *rom );
+	int detect_korean_mapper( UINT8 *rom );
+	int detect_tvdraw( UINT8 *rom );
+	int detect_lphaser_xoffset( UINT8 *rom );
 };
 
 

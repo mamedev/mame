@@ -195,6 +195,18 @@ public:
 	DECLARE_READ8_HANDLER(dgnbeta_wd2797_r);
 	DECLARE_WRITE8_HANDLER(dgnbeta_wd2797_w);
 	required_device<cpu_device> m_maincpu;
+	void dgnbeta_vid_set_gctrl(int data);
+	void UpdateBanks(int first, int last);
+	void SetDefaultTask();
+	void dgn_beta_bank_memory(int offset, int data, int bank);
+	int SelectedKeyrow(dgn_beta_state *state, int Rows);
+	int GetKeyRow(dgn_beta_state *state, int RowNo);
+	void cpu0_recalc_irq(int state);
+	void cpu0_recalc_firq(int state);
+	void cpu1_recalc_firq(int state);
+	void ScanInKeyboard(void);
+	void dgn_beta_frame_interrupt (int data);
+	void dgn_beta_line_interrupt (int data);
 };
 
 
@@ -204,13 +216,7 @@ extern const wd17xx_interface dgnbeta_wd17xx_interface;
 extern const pia6821_interface dgnbeta_pia_intf[];
 
 
-void dgn_beta_frame_interrupt (running_machine &machine, int data);
-
-
 /*----------- defined in video/dgn_beta.c -----------*/
-
-/* mc6845 video display generator */
-void dgnbeta_vid_set_gctrl(running_machine &machine, int data);
 
 extern const mc6845_interface dgnbeta_crtc6845_interface;
 

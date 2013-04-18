@@ -148,13 +148,15 @@ static struct {
 
 WRITE8_HANDLER( pc1640_port60_w )
 {
+	pc_state *state = space.machine().driver_data<pc_state>();
+
 	switch (offset) {
 	case 1:
 		pc1640.port61=data;
 		if (data==0x30) pc1640.port62=(pc1640.port65&0x10)>>4;
 		else if (data==0x34) pc1640.port62=pc1640.port65&0xf;
 		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
-		pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
+		state->pc_speaker_set_spkrdata( data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		break;
 	case 4:

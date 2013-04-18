@@ -146,19 +146,17 @@ WRITE_LINE_MEMBER(macpci_state::cuda_adb_linechange_w)
 {
 }
 
-static void mac_driver_init(running_machine &machine, model_t model)
+void macpci_state::mac_driver_init(model_t model)
 {
-	macpci_state *mac = machine.driver_data<macpci_state>();
+	m_model = model;
 
-	mac->m_model = model;
-
-	memset(mac->m_ram->pointer(), 0, mac->m_ram->size());
+	memset(m_ram->pointer(), 0, m_ram->size());
 }
 
 #define MAC_DRIVER_INIT(label, model)   \
 DRIVER_INIT_MEMBER(macpci_state,label)  \
 {   \
-	mac_driver_init(machine(), model ); \
+	mac_driver_init(model ); \
 }
 
 MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)

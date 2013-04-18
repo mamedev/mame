@@ -1422,7 +1422,7 @@ void sms_state::setup_rom()
 }
 
 
-static int sms_verify_cart( UINT8 *magic, int size )
+int sms_state::sms_verify_cart( UINT8 *magic, int size )
 {
 	int retval;
 
@@ -1464,7 +1464,7 @@ static int sms_verify_cart( UINT8 *magic, int size )
 
 The Korean game Jang Pung II also seems to use a codemasters style mapper.
  */
-static int detect_codemasters_mapper( UINT8 *rom )
+int sms_state::detect_codemasters_mapper( UINT8 *rom )
 {
 	static const UINT8 jang_pung2[16] = { 0x00, 0xba, 0x38, 0x0d, 0x00, 0xb8, 0x38, 0x0c, 0x00, 0xb6, 0x38, 0x0b, 0x00, 0xb4, 0x38, 0x0a };
 
@@ -1478,7 +1478,7 @@ static int detect_codemasters_mapper( UINT8 *rom )
 }
 
 
-static int detect_korean_mapper( UINT8 *rom )
+int sms_state::detect_korean_mapper( UINT8 *rom )
 {
 	static const UINT8 signatures[2][16] =
 	{
@@ -1499,7 +1499,7 @@ static int detect_korean_mapper( UINT8 *rom )
 #endif
 
 
-static int detect_tvdraw( UINT8 *rom )
+int sms_state::detect_tvdraw( UINT8 *rom )
 {
 	static const UINT8 terebi_oekaki[7] = { 0x61, 0x6e, 0x6e, 0x61, 0x6b, 0x6d, 0x6e }; // "annakmn"
 
@@ -1510,9 +1510,8 @@ static int detect_tvdraw( UINT8 *rom )
 }
 
 
-static int detect_lphaser_xoffset( running_machine &machine, UINT8 *rom )
+int sms_state::detect_lphaser_xoffset( UINT8 *rom )
 {
-	sms_state *state = machine.driver_data<sms_state>();
 
 	static const UINT8 signatures[6][16] =
 	{
@@ -1530,7 +1529,7 @@ static int detect_lphaser_xoffset( running_machine &machine, UINT8 *rom )
 		{ 0x54, 0x4d, 0x52, 0x20, 0x53, 0x45, 0x47, 0x41, 0xff, 0xff, 0x9f, 0x74, 0x34, 0x70, 0x00, 0x40 },
 	};
 
-	if (!(state->m_bios_port & IO_CARTRIDGE) && state->m_cartridge[state->m_current_cartridge].size >= 0x8000)
+	if (!(m_bios_port & IO_CARTRIDGE) && m_cartridge[m_current_cartridge].size >= 0x8000)
 	{
 		if (!memcmp(&rom[0x7ff0], signatures[0], 16) || !memcmp(&rom[0x7ff0], signatures[1], 16))
 			return 40;
@@ -1789,7 +1788,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sms_state, sms_cart )
 	}
 
 	/* For Light Phaser games, we have to detect the x offset */
-	m_lphaser_x_offs = detect_lphaser_xoffset(machine(), m_cartridge[index].ROM);
+	m_lphaser_x_offs = detect_lphaser_xoffset(m_cartridge[index].ROM);
 
 	/* Terebi Oekaki (TV Draw) is a SG1000 game with special input device which is compatible with SG1000 Mark III */
 	if ((detect_tvdraw(m_cartridge[index].ROM)) && m_is_region_japan)

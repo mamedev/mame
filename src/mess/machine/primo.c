@@ -43,30 +43,29 @@ INTERRUPT_GEN_MEMBER(primo_state::primo_vblank_interrupt)
 
 *******************************************************************************/
 
-static void primo_update_memory(running_machine &machine)
+void primo_state::primo_update_memory()
 {
-	primo_state *state = machine.driver_data<primo_state>();
-	address_space& space = state->m_maincpu->space(AS_PROGRAM);
-	switch (state->m_port_FD & 0x03)
+	address_space& space = m_maincpu->space(AS_PROGRAM);
+	switch (m_port_FD & 0x03)
 	{
 		case 0x00:  /* Original ROM */
 			space.unmap_write(0x0000, 0x3fff);
-			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x10000);
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x10000);
 			break;
 		case 0x01:  /* EPROM extension 1 */
 			space.unmap_write(0x0000, 0x3fff);
-			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base()+0x14000);
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x14000);
 			break;
 		case 0x02:  /* RAM */
 			space.install_write_bank(0x0000, 0x3fff, "bank1");
-			state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 			break;
 		case 0x03:  /* EPROM extension 2 */
 			space.unmap_write(0x0000, 0x3fff);
-			state->membank("bank1")->set_base(state->memregion("maincpu")->base()+0x18000);
+			membank("bank1")->set_base(memregion("maincpu")->base()+0x18000);
 			break;
 	}
-	logerror ("Memory update: %02x\n", state->m_port_FD);
+	logerror ("Memory update: %02x\n", m_port_FD);
 }
 
 /*******************************************************************************
@@ -195,7 +194,7 @@ WRITE8_MEMBER(primo_state::primo_FD_w)
 	if (!ioport("MEMORY_EXPANSION")->read())
 	{
 		m_port_FD = data;
-		primo_update_memory(machine());
+		primo_update_memory();
 	}
 }
 
@@ -205,9 +204,9 @@ WRITE8_MEMBER(primo_state::primo_FD_w)
 
 *******************************************************************************/
 
-static void primo_common_driver_init (primo_state *state)
+void primo_state::primo_common_driver_init (primo_state *state)
 {
-	state->m_port_FD = 0x00;
+	m_port_FD = 0x00;
 }
 
 DRIVER_INIT_MEMBER(primo_state,primo32)
@@ -234,23 +233,22 @@ DRIVER_INIT_MEMBER(primo_state,primo64)
 
 *******************************************************************************/
 
-static void primo_common_machine_init (running_machine &machine)
+void primo_state::primo_common_machine_init ()
 {
-	primo_state *state = machine.driver_data<primo_state>();
-	if (machine.root_device().ioport("MEMORY_EXPANSION")->read())
-		state->m_port_FD = 0x00;
-	primo_update_memory(machine);
-	machine.device("maincpu")->set_clock_scale(machine.root_device().ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
+	if (machine().root_device().ioport("MEMORY_EXPANSION")->read())
+		m_port_FD = 0x00;
+	primo_update_memory();
+	machine().device("maincpu")->set_clock_scale(machine().root_device().ioport("CPU_CLOCK")->read() ? 1.5 : 1.0);
 }
 
 void primo_state::machine_reset()
 {
-	primo_common_machine_init(machine());
+	primo_common_machine_init();
 }
 
 MACHINE_RESET_MEMBER(primo_state,primob)
 {
-	primo_common_machine_init(machine());
+	primo_common_machine_init();
 
 //removed   cbm_drive_0_config(SERIAL, 8);
 //removed   cbm_drive_1_config(SERIAL, 9);
@@ -262,47 +260,47 @@ MACHINE_RESET_MEMBER(primo_state,primob)
 
 *******************************************************************************/
 
-static void primo_setup_pss (running_machine &machine, UINT8* snapshot_data, UINT32 snapshot_size)
+void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 {
-	primo_state *state = machine.driver_data<primo_state>();
 	int i;
 
 	/* Z80 registers */
 
-	state->m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
-	state->m_maincpu->set_state_int(Z80_DE, snapshot_data[6] + snapshot_data[7]*256);
-	state->m_maincpu->set_state_int(Z80_HL, snapshot_data[8] + snapshot_data[9]*256);
-	state->m_maincpu->set_state_int(Z80_AF, snapshot_data[10] + snapshot_data[11]*256);
-	state->m_maincpu->set_state_int(Z80_BC2, snapshot_data[12] + snapshot_data[13]*256);
-	state->m_maincpu->set_state_int(Z80_DE2, snapshot_data[14] + snapshot_data[15]*256);
-	state->m_maincpu->set_state_int(Z80_HL2, snapshot_data[16] + snapshot_data[17]*256);
-	state->m_maincpu->set_state_int(Z80_AF2, snapshot_data[18] + snapshot_data[19]*256);
-	state->m_maincpu->set_state_int(Z80_PC, snapshot_data[20] + snapshot_data[21]*256);
-	state->m_maincpu->set_state_int(Z80_SP, snapshot_data[22] + snapshot_data[23]*256);
-	state->m_maincpu->set_state_int(Z80_I, snapshot_data[24]);
-	state->m_maincpu->set_state_int(Z80_R, snapshot_data[25]);
-	state->m_maincpu->set_state_int(Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
-	state->m_maincpu->set_state_int(Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
+	m_maincpu->set_state_int(Z80_BC, snapshot_data[4] + snapshot_data[5]*256);
+	m_maincpu->set_state_int(Z80_DE, snapshot_data[6] + snapshot_data[7]*256);
+	m_maincpu->set_state_int(Z80_HL, snapshot_data[8] + snapshot_data[9]*256);
+	m_maincpu->set_state_int(Z80_AF, snapshot_data[10] + snapshot_data[11]*256);
+	m_maincpu->set_state_int(Z80_BC2, snapshot_data[12] + snapshot_data[13]*256);
+	m_maincpu->set_state_int(Z80_DE2, snapshot_data[14] + snapshot_data[15]*256);
+	m_maincpu->set_state_int(Z80_HL2, snapshot_data[16] + snapshot_data[17]*256);
+	m_maincpu->set_state_int(Z80_AF2, snapshot_data[18] + snapshot_data[19]*256);
+	m_maincpu->set_state_int(Z80_PC, snapshot_data[20] + snapshot_data[21]*256);
+	m_maincpu->set_state_int(Z80_SP, snapshot_data[22] + snapshot_data[23]*256);
+	m_maincpu->set_state_int(Z80_I, snapshot_data[24]);
+	m_maincpu->set_state_int(Z80_R, snapshot_data[25]);
+	m_maincpu->set_state_int(Z80_IX, snapshot_data[26] + snapshot_data[27]*256);
+	m_maincpu->set_state_int(Z80_IY, snapshot_data[28] + snapshot_data[29]*256);
 
 
 	/* IO ports */
 
 	// KI-1 bit 7 - NMI generator enable/disable
-	state->m_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
+	m_nmi = (snapshot_data[30] & 0x80) ? 1 : 0;
 
 	// KI-1 bit 4 - speaker
-	speaker_level_w(state->m_speaker, (snapshot_data[30]&0x10)>>4);
+	speaker_level_w(m_speaker, (snapshot_data[30]&0x10)>>4);
 
 
 	/* memory */
 
 	for (i=0; i<0xc000; i++)
-		state->m_maincpu->space(AS_PROGRAM).write_byte( i+0x4000, snapshot_data[i+38]);
+		m_maincpu->space(AS_PROGRAM).write_byte( i+0x4000, snapshot_data[i+38]);
 }
 
 SNAPSHOT_LOAD( primo )
 {
 	UINT8 *snapshot_data;
+	primo_state *state = image.device().machine().driver_data<primo_state>();
 
 	if (!(snapshot_data = (UINT8*) malloc(snapshot_size)))
 		return IMAGE_INIT_FAIL;
@@ -319,7 +317,7 @@ SNAPSHOT_LOAD( primo )
 		return IMAGE_INIT_FAIL;
 	}
 
-	primo_setup_pss(image.device().machine(),snapshot_data, snapshot_size);
+	state->primo_setup_pss(snapshot_data, snapshot_size);
 
 	free(snapshot_data);
 	return IMAGE_INIT_PASS;
@@ -332,11 +330,10 @@ SNAPSHOT_LOAD( primo )
 *******************************************************************************/
 
 
-static void primo_setup_pp (running_machine &machine,UINT8* quickload_data, UINT32 quickload_size)
+void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 {
 	int i;
 
-	primo_state *state = machine.driver_data<primo_state>();
 	
 	UINT16 load_addr;
 	UINT16 start_addr;
@@ -345,9 +342,9 @@ static void primo_setup_pp (running_machine &machine,UINT8* quickload_data, UINT
 	start_addr = quickload_data[2] + quickload_data[3]*256;
 
 	for (i=4; i<quickload_size; i++)
-		state->m_maincpu->space(AS_PROGRAM).write_byte(start_addr+i-4, quickload_data[i]);
+		m_maincpu->space(AS_PROGRAM).write_byte(start_addr+i-4, quickload_data[i]);
 
-	state->m_maincpu->set_state_int(Z80_PC, start_addr);
+	m_maincpu->set_state_int(Z80_PC, start_addr);
 
 	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }
@@ -355,6 +352,7 @@ static void primo_setup_pp (running_machine &machine,UINT8* quickload_data, UINT
 QUICKLOAD_LOAD( primo )
 {
 	UINT8 *quickload_data;
+	primo_state *state = image.device().machine().driver_data<primo_state>();
 
 	if (!(quickload_data = (UINT8*) malloc(quickload_size)))
 		return IMAGE_INIT_FAIL;
@@ -365,7 +363,7 @@ QUICKLOAD_LOAD( primo )
 		return IMAGE_INIT_FAIL;
 	}
 
-	primo_setup_pp(image.device().machine(), quickload_data, quickload_size);
+	state->primo_setup_pp(quickload_data, quickload_size);
 
 	free(quickload_data);
 	return IMAGE_INIT_PASS;

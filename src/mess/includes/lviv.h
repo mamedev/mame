@@ -48,6 +48,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	void lviv_update_palette(UINT8 pal);
+	void lviv_update_memory ();
+	void lviv_setup_snapshot (UINT8 * data);
+	void dump_registers();
+	int lviv_verify_snapshot (UINT8 * data, UINT32 size);
 };
 
 
@@ -62,7 +67,6 @@ SNAPSHOT_LOAD( lviv );
 /*----------- defined in video/lviv.c -----------*/
 
 extern const unsigned char lviv_palette[8*3];
-extern void lviv_update_palette(running_machine &, UINT8);
 
 
 #endif /* LVIV_H_ */

@@ -266,11 +266,11 @@ WRITE8_MEMBER(apple2gs_state::a2bus_irq_w)
 {
 	if (data)
 	{
-		apple2gs_add_irq(machine(), IRQ_SLOT);
+		apple2gs_add_irq(IRQ_SLOT);
 	}
 	else
 	{
-		apple2gs_remove_irq(machine(), IRQ_SLOT);
+		apple2gs_remove_irq(IRQ_SLOT);
 	}
 }
 

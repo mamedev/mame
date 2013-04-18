@@ -28,10 +28,9 @@ WRITE8_MEMBER(dai_state::dai_stack_interrupt_circuit_w)
 	m_tms5501->set_sensor(0);
 }
 
-static void dai_update_memory(running_machine &machine, int dai_rom_bank)
+void dai_state::dai_update_memory(int dai_rom_bank)
 {
-	dai_state *state = machine.driver_data<dai_state>();
-	state->membank("bank2")->set_entry(dai_rom_bank);
+	membank("bank2")->set_entry(dai_rom_bank);
 }
 
 TIMER_CALLBACK_MEMBER(dai_state::dai_bootstrap_callback)
@@ -199,7 +198,7 @@ WRITE8_MEMBER(dai_state::dai_io_discrete_devices_w)
 		m_cassette_motor[1] = (data&0x20)>>5;
 		m_cassette->change_state(m_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		m_cassette->output((data & 0x01) ? -1.0 : 1.0);
-		dai_update_memory (machine(), (data&0xc0)>>6);
+		dai_update_memory ((data&0xc0)>>6);
 		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");
 		LOG_DAI_PORT_W (offset, (data&0x08)>>3, "discrete devices - paddle enable");
 		LOG_DAI_PORT_W (offset, (data&0x10)>>4, "discrete devices - cassette motor 1");

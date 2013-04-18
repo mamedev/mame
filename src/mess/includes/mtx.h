@@ -76,6 +76,7 @@ public:
 	DECLARE_READ8_MEMBER(mtx_sound_strobe_r);
 	DECLARE_WRITE8_MEMBER(mtx_cst_w);
 	DECLARE_READ8_MEMBER(mtx_prt_r);
+	void bankswitch(UINT8 data);
 };
 
 /*----------- defined in machine/mtx.c -----------*/

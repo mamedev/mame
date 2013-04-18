@@ -390,7 +390,7 @@ int pcw16_state::pcw16_keyboard_can_transmit()
 
 #ifdef UNUSED_FUNCTION
 /* issue a begin byte transfer */
-static void pcw16_begin_byte_transfer(void)
+void ::pcw16_begin_byte_transfer(void)
 {
 }
 #endif

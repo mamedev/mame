@@ -124,17 +124,16 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	void draw_mode4_line(int y, int hpos);
+	void draw_mode3_line(int y, int hpos);
+	void draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask);
+	void draw_mode2_line(int y, int hpos);
+	void draw_mode1_line(int y, int hpos);
+	void samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memory, int is_readonly);
+	void samcoupe_install_ext_mem(address_space &space);
+	void samcoupe_update_memory(address_space &space);
+	UINT8 samcoupe_mouse_r();
+	void samcoupe_irq(UINT8 src);
 };
-
-
-/*----------- defined in drivers/samcoupe.c -----------*/
-
-void samcoupe_irq(device_t *device, UINT8 src);
-
-
-/*----------- defined in machine/samcoupe.c -----------*/
-
-void samcoupe_update_memory(address_space &space);
-UINT8 samcoupe_mouse_r(running_machine &machine);
 
 #endif /* SAMCOUPE_H_ */

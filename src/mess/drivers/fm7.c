@@ -52,11 +52,6 @@
 
 #include "includes/fm7.h"
 
-
-static void fm7_mmr_refresh(address_space&);
-
-
-
 /* key scancode conversion table
  * The FM-7 expects different scancodes when shift,ctrl or graph is held, or
  * when kana is active.
@@ -165,22 +160,20 @@ static const UINT16 fm7_key_list[0x60][7] =
 };
 
 
-static void main_irq_set_flag(running_machine &machine, UINT8 flag)
+void fm7_state::main_irq_set_flag(UINT8 flag)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	state->m_irq_flags |= flag;
+	m_irq_flags |= flag;
 
-	if(state->m_irq_flags != 0)
-		state->m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
+	if(m_irq_flags != 0)
+		m_maincpu->set_input_line(M6809_IRQ_LINE,ASSERT_LINE);
 }
 
-static void main_irq_clear_flag(running_machine &machine, UINT8 flag)
+void fm7_state::main_irq_clear_flag(UINT8 flag)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	state->m_irq_flags &= ~flag;
+	m_irq_flags &= ~flag;
 
-	if(state->m_irq_flags == 0)
-		state->m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
+	if(m_irq_flags == 0)
+		m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 
@@ -226,9 +219,9 @@ READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 	// Keyboard IRQ flag is cleared when the scancode is read from
 	// either keyboard data port (main CPU 0xfd01 or sub CPU 0xd401)
 	if(m_irq_flags & 0x04)
-		main_irq_clear_flag(machine(),IRQ_FLAG_TIMER);
+		main_irq_clear_flag(IRQ_FLAG_TIMER);
 	if(m_irq_flags & 0x02)
-		main_irq_clear_flag(machine(),IRQ_FLAG_PRINTER);
+		main_irq_clear_flag(IRQ_FLAG_PRINTER);
 
 	logerror("IRQ flags read: 0x%02x\n",ret);
 	return ret;
@@ -506,7 +499,7 @@ READ8_MEMBER(fm7_state::fm7_keyboard_r)
 			ret |= 0x01; // 1 = 2MHz, 0 = 1.2MHz
 			return ret;
 		case 1:
-			main_irq_clear_flag(machine(),IRQ_FLAG_KEY);
+			main_irq_clear_flag(IRQ_FLAG_KEY);
 			return m_current_scancode & 0xff;
 		default:
 			return 0x00;
@@ -522,7 +515,7 @@ READ8_MEMBER(fm7_state::fm7_sub_keyboard_r)
 			ret = (m_current_scancode >> 1) & 0x80;
 			return ret;
 		case 1:
-			main_irq_clear_flag(machine(),IRQ_FLAG_KEY);
+			main_irq_clear_flag(IRQ_FLAG_KEY);
 			return m_current_scancode & 0xff;
 		default:
 			return 0x00;
@@ -818,60 +811,59 @@ READ8_MEMBER(fm7_state::fm77av_boot_mode_r)
  *  0xfd0e - data register
  *  AY I/O ports are not connected to anything.
  */
-static void fm7_update_psg(running_machine &machine)
+void fm7_state::fm7_update_psg()
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if(state->m_type == SYS_FM7)
+	if(m_type == SYS_FM7)
 	{
-		switch(state->m_psg_regsel)
+		switch(m_psg_regsel)
 		{
 			case 0x00:
 				// High impedance
 				break;
 			case 0x01:
 				// Data read
-				state->m_psg_data = ay8910_r(space.machine().device("psg"),space, 0);
+				m_psg_data = ay8910_r(space.machine().device("psg"),space, 0);
 				break;
 			case 0x02:
 				// Data write
-				ay8910_data_w(space.machine().device("psg"),space, 0,state->m_psg_data);
+				ay8910_data_w(space.machine().device("psg"),space, 0,m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ay8910_address_w(space.machine().device("psg"),space, 0,state->m_psg_data);
+				ay8910_address_w(space.machine().device("psg"),space, 0,m_psg_data);
 				break;
 		}
 	}
 	else
 	{   // FM-77AV and later use a YM2203
-		switch(state->m_psg_regsel)
+		switch(m_psg_regsel)
 		{
 			case 0x00:
 				// High impedance
 				break;
 			case 0x01:
 				// Data read
-				state->m_psg_data = ym2203_r(space.machine().device("ym"),space, 1);
+				m_psg_data = ym2203_r(space.machine().device("ym"),space, 1);
 				break;
 			case 0x02:
 				// Data write
-				ym2203_w(space.machine().device("ym"),space, 1,state->m_psg_data);
-				logerror("YM: data write 0x%02x\n",state->m_psg_data);
+				ym2203_w(space.machine().device("ym"),space, 1,m_psg_data);
+				logerror("YM: data write 0x%02x\n",m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ym2203_w(space.machine().device("ym"),space, 0,state->m_psg_data);
-				logerror("YM: address latch 0x%02x\n",state->m_psg_data);
+				ym2203_w(space.machine().device("ym"),space, 0,m_psg_data);
+				logerror("YM: address latch 0x%02x\n",m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				state->m_psg_data = ym2203_r(space.machine().device("ym"),space, 0);
+				m_psg_data = ym2203_r(space.machine().device("ym"),space, 0);
 				break;
 			case 0x09:
 				// Joystick port read
-				state->m_psg_data = state->ioport("joy1")->read();
+				m_psg_data = ioport("joy1")->read();
 				break;
 		}
 	}
@@ -885,25 +877,25 @@ READ8_MEMBER(fm7_state::fm7_psg_select_r)
 WRITE8_MEMBER(fm7_state::fm7_psg_select_w)
 {
 	m_psg_regsel = data & 0x03;
-	fm7_update_psg(machine());
+	fm7_update_psg();
 }
 
 WRITE8_MEMBER(fm7_state::fm77av_ym_select_w)
 {
 	m_psg_regsel = data & 0x0f;
-	fm7_update_psg(machine());
+	fm7_update_psg();
 }
 
 READ8_MEMBER(fm7_state::fm7_psg_data_r)
 {
-//  fm7_update_psg(machine());
+//  fm7_update_psg();
 	return m_psg_data;
 }
 
 WRITE8_MEMBER(fm7_state::fm7_psg_data_w)
 {
 	m_psg_data = data;
-//  fm7_update_psg(machine());
+//  fm7_update_psg();
 }
 
 WRITE8_MEMBER(fm7_state::fm77av_bootram_w)
@@ -982,10 +974,10 @@ READ8_MEMBER(fm7_state::fm7_mmr_r)
 	return 0xff;
 }
 
-static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
+void fm7_state::fm7_update_bank(address_space & space, int bank, UINT8 physical)
 {
 	fm7_state *state = space.machine().driver_data<fm7_state>();
-	UINT8* RAM = state->memregion("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 	UINT16 size = 0xfff;
 	char bank_name[10];
 
@@ -1035,7 +1027,7 @@ static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 				space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),state),write8_delegate(FUNC(fm7_state::fm7_vramB_w),state));
 				break;
 		}
-//      state->membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
+//      membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
 		return;
 	}
 	if(physical == 0x1c)
@@ -1050,52 +1042,51 @@ static void fm7_update_bank(address_space & space, int bank, UINT8 physical)
 	}
 	if(physical == 0x35)
 	{
-		if(state->m_init_rom_en && (state->m_type == SYS_FM11 || state->m_type == SYS_FM16))
+		if(m_init_rom_en && (m_type == SYS_FM11 || m_type == SYS_FM16))
 		{
-			RAM = state->memregion("init")->base();
+			RAM = memregion("init")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
-			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x35000);
+			membank(bank_name)->set_base(RAM+(physical<<12)-0x35000);
 			return;
 		}
 	}
 	if(physical == 0x36 || physical == 0x37)
 	{
-		if(state->m_init_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
+		if(m_init_rom_en && (m_type != SYS_FM11 && m_type != SYS_FM16))
 		{
-			RAM = state->memregion("init")->base();
+			RAM = memregion("init")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
-			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x36000);
+			membank(bank_name)->set_base(RAM+(physical<<12)-0x36000);
 			return;
 		}
 	}
 	if(physical > 0x37 && physical <= 0x3f)
 	{
-		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
+		if(m_basic_rom_en && (m_type != SYS_FM11 && m_type != SYS_FM16))
 		{
-			RAM = state->memregion("fbasic")->base();
+			RAM = memregion("fbasic")->base();
 			space.install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
 			space.nop_write(bank*0x1000,(bank*0x1000)+size);
-			state->membank(bank_name)->set_base(RAM+(physical<<12)-0x38000);
+			membank(bank_name)->set_base(RAM+(physical<<12)-0x38000);
 			return;
 		}
 	}
 	space.install_readwrite_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
-	state->membank(bank_name)->set_base(RAM+(physical<<12));
+	membank(bank_name)->set_base(RAM+(physical<<12));
 }
 
-static void fm7_mmr_refresh(address_space& space)
+void fm7_state::fm7_mmr_refresh(address_space& space)
 {
-	fm7_state *state = space.machine().driver_data<fm7_state>();
 	int x;
 	UINT16 window_addr;
-	UINT8* RAM = state->memregion("maincpu")->base();
+	UINT8* RAM = memregion("maincpu")->base();
 
-	if(state->m_mmr.enabled)
+	if(m_mmr.enabled)
 	{
 		for(x=0;x<16;x++)
-			fm7_update_bank(space,x,state->m_mmr.bank_addr[state->m_mmr.segment][x]);
+			fm7_update_bank(space,x,m_mmr.bank_addr[m_mmr.segment][x]);
 	}
 	else
 	{
@@ -1104,16 +1095,16 @@ static void fm7_mmr_refresh(address_space& space)
 			fm7_update_bank(space,x,0x30+x);
 	}
 
-	if(state->m_mmr.mode & 0x40)
+	if(m_mmr.mode & 0x40)
 	{
 		// Handle window offset - 0x7c00-0x7fff will show the area of extended
 		// memory (0x00000-0x0ffff) defined by the window address register
 		// 0x00 = 0x07c00, 0x04 = 0x08000 ... 0xff = 0x07400.
-		window_addr = ((state->m_mmr.window_offset << 8) + 0x7c00) & 0xffff;
+		window_addr = ((m_mmr.window_offset << 8) + 0x7c00) & 0xffff;
 //      if(window_addr < 0xfc00)
 		{
 			space.install_readwrite_bank(0x7c00,0x7fff,"bank24");
-			state->membank("bank24")->set_base(RAM+window_addr);
+			membank("bank24")->set_base(RAM+window_addr);
 		}
 	}
 }
@@ -1205,7 +1196,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 {
 	if(m_irq_mask & IRQ_FLAG_TIMER)
 	{
-		main_irq_set_flag(machine(),IRQ_FLAG_TIMER);
+		main_irq_set_flag(IRQ_FLAG_TIMER);
 	}
 }
 
@@ -1218,69 +1209,67 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
 // When a key is pressed or released (in scan mode only), an IRQ is generated on the main CPU,
 // or an FIRQ on the sub CPU, if masked.  Both CPUs have ports to read keyboard data.
 // Scancodes are 9 bits in FM-7 mode, 8 bits in scan mode.
-static void key_press(running_machine &machine, UINT16 scancode)
+void fm7_state::key_press(UINT16 scancode)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-	state->m_current_scancode = scancode;
+	m_current_scancode = scancode;
 
 	if(scancode == 0)
 		return;
 
-	if(state->m_irq_mask & IRQ_FLAG_KEY)
+	if(m_irq_mask & IRQ_FLAG_KEY)
 	{
-		main_irq_set_flag(machine,IRQ_FLAG_KEY);
+		main_irq_set_flag(IRQ_FLAG_KEY);
 	}
 	else
 	{
-		state->m_sub->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
+		m_sub->set_input_line(M6809_FIRQ_LINE,ASSERT_LINE);
 	}
 	logerror("KEY: sent scancode 0x%03x\n",scancode);
 }
 
-static void fm7_keyboard_poll_scan(running_machine &machine)
+void fm7_state::fm7_keyboard_poll_scan()
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int bit = 0;
 	int x,y;
 	UINT32 keys;
-	UINT32 modifiers = machine.root_device().ioport("key_modifiers")->read();
+	UINT32 modifiers = machine().root_device().ioport("key_modifiers")->read();
 	static const UINT16 modscancodes[6] = { 0x52, 0x53, 0x54, 0x55, 0x56, 0x5a };
 
 	for(x=0;x<3;x++)
 	{
-		keys = machine.root_device().ioport(portnames[x])->read();
+		keys = machine().root_device().ioport(portnames[x])->read();
 
 		for(y=0;y<32;y++)  // loop through each bit in the port
 		{
-			if((keys & (1<<y)) != 0 && (state->m_key_data[x] & (1<<y)) == 0)
+			if((keys & (1<<y)) != 0 && (m_key_data[x] & (1<<y)) == 0)
 			{
-				key_press(machine,fm7_key_list[bit][6]); // key press
+				key_press(fm7_key_list[bit][6]); // key press
 			}
-			if((keys & (1<<y)) == 0 && (state->m_key_data[x] & (1<<y)) != 0)
+			if((keys & (1<<y)) == 0 && (m_key_data[x] & (1<<y)) != 0)
 			{
-				key_press(machine,fm7_key_list[bit][6] | 0x80); // key release
+				key_press(fm7_key_list[bit][6] | 0x80); // key release
 			}
 			bit++;
 		}
 
-		state->m_key_data[x] = keys;
+		m_key_data[x] = keys;
 	}
 	// check modifier keys
 	bit = 0;
 	for(y=0;x<7;x++)
 	{
-		if((modifiers & (1<<y)) != 0 && (state->m_mod_data & (1<<y)) == 0)
+		if((modifiers & (1<<y)) != 0 && (m_mod_data & (1<<y)) == 0)
 		{
-			key_press(machine,modscancodes[bit]); // key press
+			key_press(modscancodes[bit]); // key press
 		}
-		if((modifiers & (1<<y)) == 0 && (state->m_mod_data & (1<<y)) != 0)
+		if((modifiers & (1<<y)) == 0 && (m_mod_data & (1<<y)) != 0)
 		{
-			key_press(machine,modscancodes[bit] | 0x80); // key release
+			key_press(modscancodes[bit] | 0x80); // key release
 		}
 		bit++;
 	}
-	state->m_mod_data = modifiers;
+	m_mod_data = modifiers;
 }
 
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
@@ -1303,7 +1292,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 	if(m_key_scan_mode == KEY_MODE_SCAN)
 	{
 		// handle scancode mode
-		fm7_keyboard_poll_scan(machine());
+		fm7_keyboard_poll_scan();
 		return;
 	}
 
@@ -1327,7 +1316,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 		{
 			if((keys & (1<<y)) != 0 && (m_key_data[x] & (1<<y)) == 0)
 			{
-				key_press(machine(),fm7_key_list[bit][mod]); // key press
+				key_press(fm7_key_list[bit][mod]); // key press
 			}
 			bit++;
 		}
@@ -1354,13 +1343,13 @@ WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
 	if(state == 1)
 	{
 		// cannot be masked
-		main_irq_set_flag(machine(),IRQ_FLAG_OTHER);
+		main_irq_set_flag(IRQ_FLAG_OTHER);
 		m_fm77av_ym_irq = 1;
 		logerror("YM: IRQ on\n");
 	}
 	else
 	{
-		main_irq_clear_flag(machine(),IRQ_FLAG_OTHER);
+		main_irq_clear_flag(IRQ_FLAG_OTHER);
 		m_fm77av_ym_irq = 0;
 		logerror("YM: IRQ off\n");
 	}

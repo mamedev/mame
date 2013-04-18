@@ -228,7 +228,7 @@ READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 
 		/* if no key has been pressed, return the mouse state */
 		if (data == 0x1f)
-			data = samcoupe_mouse_r(machine());
+			data = samcoupe_mouse_r();
 	}
 
 	/* bit 5, lightpen strobe */
@@ -330,22 +330,20 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
 
 }
 
-void samcoupe_irq(device_t *device, UINT8 src)
+void samcoupe_state::samcoupe_irq(UINT8 src)
 {
-	samcoupe_state *state = device->machine().driver_data<samcoupe_state>();
-
 	/* assert irq and a timer to set it off again */
-	device->execute().set_input_line(0, ASSERT_LINE);
-	device->machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(samcoupe_state::irq_off),state), src);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(samcoupe_state::irq_off),this), src);
 
 	/* adjust STATUS register */
-	state->m_status &= ~src;
+	m_status &= ~src;
 }
 
 INTERRUPT_GEN_MEMBER(samcoupe_state::samcoupe_frame_interrupt)
 {
 	/* signal frame interrupt */
-	samcoupe_irq(&device, SAM_FRAME_INT);
+	samcoupe_irq(SAM_FRAME_INT);
 }
 
 

@@ -167,6 +167,7 @@ public:
 	DECLARE_READ8_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE8_MEMBER(mac_adb_via_out_cb2);
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
+	void mac_driver_init(model_t model);
 };
 
 #endif /* PCIMAC_H_ */

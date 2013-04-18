@@ -148,6 +148,20 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_disc2cpu;
 	required_device<cassette_image_device> m_cassette;
+	int isHectorWithDisc2();
+	int isHectorWithMiniDisc();
+	int isHectorHR();
+	int isHectoreXtend();
+	void hector_minidisc_init();
+	void Mise_A_Jour_Etat(int Adresse, int Value );
+	void Init_Value_SN76477_Hector();
+	void Update_Sound(address_space &space, UINT8 data);
+	void hector_reset(int hr, int with_D2 );
+	void hector_init();
+	void Init_Hector_Palette();
+	void hector_80c(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
+	void hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
+	
 };
 
 /*----------- defined in machine/hec2hrp.c -----------*/
@@ -155,16 +169,10 @@ public:
 /* Protoype of memory Handler*/
 DECLARE_WRITE8_HANDLER( hector_switch_bank_rom_w );
 
-void hector_init( running_machine &machine);
-void hector_reset(running_machine &machine, int hr, int with_D2);
-void hector_disc2_reset( running_machine &machine);
-
 /* Prototype of I/O Handler*/
 DECLARE_READ8_HANDLER( hector_mx_io_port_r );
 /*----------- defined in video/hec2video.c -----------*/
 
-void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
-void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram) ;
 
 
 
@@ -185,6 +193,7 @@ DECLARE_WRITE8_HANDLER( hector_disc2_io40_port_w);
 DECLARE_READ8_HANDLER(  hector_disc2_io50_port_r);
 DECLARE_WRITE8_HANDLER( hector_disc2_io50_port_w);
 
+void hector_disc2_reset( running_machine &machine);
 void hector_disc2_init( running_machine &machine);
 void hector_minidisc_init( running_machine &machine);
 

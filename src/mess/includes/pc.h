@@ -155,6 +155,12 @@ public:
 	IRQ_CALLBACK_MEMBER(pc_irq_callback);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
+	UINT8 pc_speaker_get_spk();
+	void pc_speaker_set_spkrdata(UINT8 data);
+	void pc_speaker_set_input(UINT8 data);
+	void pcjr_keyb_init();
+	void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
+	void pc_rtc_init();
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -173,14 +179,5 @@ extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;
 extern const i8255_interface mc1502_ppi8255_interface;
 extern const i8255_interface mc1502_ppi8255_interface_2;
-
-UINT8 pc_speaker_get_spk(running_machine &machine);
-void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data);
-void pc_speaker_set_input(running_machine &machine, UINT8 data);
-
-void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
-
-void pc_rtc_init(running_machine &machine);
-
 
 #endif /* PC_H_ */

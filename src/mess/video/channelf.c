@@ -39,7 +39,7 @@ void channelf_state::video_start()
 	m_p_videoram = memregion("vram")->base();
 }
 
-static int recalc_palette_offset(int reg1, int reg2)
+int channelf_state::recalc_palette_offset(int reg1, int reg2)
 {
 	/* Note: This is based on the decoding they used to   */
 	/*       determine which palette this line is using   */

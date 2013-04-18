@@ -90,6 +90,14 @@ public:
 	void hp48_apply_modules();
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac;
+	void hp48_pulse_irq( int irq_line);
+	void hp48_rs232_start_recv_byte( UINT8 data );
+	void hp48_rs232_send_byte(  );
+	int hp48_get_in(  );
+	void hp48_update_kdn(  );
+	void hp48_reset_modules(  );
+	void hp48_decode_nibble( UINT8* dst, UINT8* src, int size );
+	void hp48_encode_nibble( UINT8* dst, UINT8* src, int size );
 };
 
 
@@ -98,11 +106,11 @@ public:
 ***************************************************************************/
 
 /* read from I/O memory */
-#define HP48_IO_4(x)   (state->m_io[(x)])
-#define HP48_IO_8(x)   (state->m_io[(x)] | (state->m_io[(x)+1] << 4))
-#define HP48_IO_12(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8))
-#define HP48_IO_20(x)  (state->m_io[(x)] | (state->m_io[(x)+1] << 4) | (state->m_io[(x)+2] << 8) | \
-					(state->m_io[(x)+3] << 12) | (state->m_io[(x)+4] << 16))
+#define HP48_IO_4(x)   (m_io[(x)])
+#define HP48_IO_8(x)   (m_io[(x)] | (m_io[(x)+1] << 4))
+#define HP48_IO_12(x)  (m_io[(x)] | (m_io[(x)+1] << 4) | (m_io[(x)+2] << 8))
+#define HP48_IO_20(x)  (m_io[(x)] | (m_io[(x)+1] << 4) | (m_io[(x)+2] << 8) | \
+					   (m_io[(x)+3] << 12) | (m_io[(x)+4] << 16))
 
 
 /*----------- defined in machine/hp48.c -----------*/

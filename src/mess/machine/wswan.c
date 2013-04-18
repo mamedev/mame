@@ -1290,24 +1290,24 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 	m_ws_portram[offset] = data;
 }
 
-static const char* wswan_determine_sram( wswan_state *state, UINT8 data )
+const char* wswan_state::wswan_determine_sram(UINT8 data )
 {
-	state->m_eeprom.write_enabled = 0;
-	state->m_eeprom.mode = SRAM_UNKNOWN;
+	m_eeprom.write_enabled = 0;
+	m_eeprom.mode = SRAM_UNKNOWN;
 	switch( data )
 	{
-	case 0x00: state->m_eeprom.mode = SRAM_NONE; break;
-	case 0x01: state->m_eeprom.mode = SRAM_64K; break;
-	case 0x02: state->m_eeprom.mode = SRAM_256K; break;
-	case 0x03: state->m_eeprom.mode = SRAM_1M; break;
-	case 0x04: state->m_eeprom.mode = SRAM_2M; break;
-	case 0x05: state->m_eeprom.mode = SRAM_512K; break;
-	case 0x10: state->m_eeprom.mode = EEPROM_1K; break;
-	case 0x20: state->m_eeprom.mode = EEPROM_16K; break;
-	case 0x50: state->m_eeprom.mode = EEPROM_8K; break;
+	case 0x00: m_eeprom.mode = SRAM_NONE; break;
+	case 0x01: m_eeprom.mode = SRAM_64K; break;
+	case 0x02: m_eeprom.mode = SRAM_256K; break;
+	case 0x03: m_eeprom.mode = SRAM_1M; break;
+	case 0x04: m_eeprom.mode = SRAM_2M; break;
+	case 0x05: m_eeprom.mode = SRAM_512K; break;
+	case 0x10: m_eeprom.mode = EEPROM_1K; break;
+	case 0x20: m_eeprom.mode = EEPROM_16K; break;
+	case 0x50: m_eeprom.mode = EEPROM_8K; break;
 	}
-	state->m_eeprom.size = wswan_sram_size[ state->m_eeprom.mode ];
-	return wswan_sram_str[ state->m_eeprom.mode ];
+	m_eeprom.size = wswan_sram_size[ m_eeprom.mode ];
+	return wswan_sram_str[ m_eeprom.mode ];
 }
 
 enum enum_romsize { ROM_4M=0, ROM_8M, ROM_16M, ROM_32M, ROM_64M, ROM_128M, ROM_UNKNOWN };
@@ -1315,7 +1315,7 @@ static const char *const wswan_romsize_str[] = {
 	"4Mbit", "8Mbit", "16Mbit", "32Mbit", "64Mbit", "128Mbit", "Unknown"
 };
 
-static const char* wswan_determine_romsize( UINT8 data )
+const char* wswan_state::wswan_determine_romsize( UINT8 data )
 {
 	switch( data )
 	{
@@ -1391,7 +1391,7 @@ DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 		}
 	}
 
-	sram_str = wswan_determine_sram(this, m_ROMMap[m_ROMBanks - 1][0xfffb]);
+	sram_str = wswan_determine_sram(m_ROMMap[m_ROMBanks - 1][0xfffb]);
 
 	m_rtc.present = m_ROMMap[m_ROMBanks - 1][0xfffd] ? 1 : 0;
 	m_rotate = m_ROMMap[m_ROMBanks-1][0xfffc] & 0x01;
@@ -1443,7 +1443,7 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 {
 	if( m_vdp.current_line < 144 )
 	{
-		wswan_refresh_scanline(machine());
+		wswan_refresh_scanline();
 	}
 
 	/* Decrement 12kHz (HBlank) counter */

@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_drq_w);
 	required_device<cpu_device> m_maincpu;
+	void enterprise_update_memory_page(address_space &space, offs_t page, int index);
 };
 
 

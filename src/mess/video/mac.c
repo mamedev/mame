@@ -860,22 +860,22 @@ UINT32 mac_state::screen_update_macsonora(screen_device &screen, bitmap_rgb32 &b
 
 // DAFB: video for Quadra 700/900
 
-static void dafb_recalc_ints(mac_state *mac)
+void mac_state::dafb_recalc_ints()
 {
-	if (mac->m_dafb_int_status != 0)
+	if (m_dafb_int_status != 0)
 	{
-		mac->nubus_slot_interrupt(0xf, ASSERT_LINE);
+		nubus_slot_interrupt(0xf, ASSERT_LINE);
 	}
 	else
 	{
-		mac->nubus_slot_interrupt(0xf, CLEAR_LINE);
+		nubus_slot_interrupt(0xf, CLEAR_LINE);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 {
 	m_dafb_int_status |= 1;
-	dafb_recalc_ints(this);
+	dafb_recalc_ints();
 
 	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
 }
@@ -883,7 +883,7 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
 {
 	m_dafb_int_status |= 4;
-	dafb_recalc_ints(this);
+	dafb_recalc_ints();
 
 	m_cursor_timer->adjust(m_screen->time_until_pos(m_cursor_line, 0), 0);
 }
@@ -932,12 +932,12 @@ READ32_MEMBER(mac_state::dafb_r)
 
 		case 0x10c: // clear cursor scanline int
 			m_dafb_int_status &= ~4;
-			dafb_recalc_ints(this);
+			dafb_recalc_ints();
 			break;
 
 		case 0x114: // clear VBL int
 			m_dafb_int_status &= ~1;
-			dafb_recalc_ints(this);
+			dafb_recalc_ints();
 			break;
 	}
 	return 0;
@@ -975,7 +975,7 @@ WRITE32_MEMBER(mac_state::dafb_w)
 			{
 				m_vbl_timer->adjust(attotime::never);
 				m_dafb_int_status &= ~1;
-				dafb_recalc_ints(this);
+				dafb_recalc_ints();
 			}
 
 			if (data & 2)   // aux scanline interrupt enable
@@ -991,18 +991,18 @@ WRITE32_MEMBER(mac_state::dafb_w)
 			{
 				m_cursor_timer->adjust(attotime::never);
 				m_dafb_int_status &= ~4;
-				dafb_recalc_ints(this);
+				dafb_recalc_ints();
 			}
 			break;
 
 		case 0x10c: // clear cursor scanline int
 			m_dafb_int_status &= ~4;
-			dafb_recalc_ints(this);
+			dafb_recalc_ints();
 			break;
 
 		case 0x114: // clear VBL int
 			m_dafb_int_status &= ~1;
-			dafb_recalc_ints(this);
+			dafb_recalc_ints();
 			break;
 	}
 }

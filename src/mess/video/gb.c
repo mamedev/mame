@@ -142,7 +142,7 @@ PALETTE_INIT_MEMBER(megaduck_state,megaduck)
 }
 
 
-INLINE void gb_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void gb_state::gb_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }

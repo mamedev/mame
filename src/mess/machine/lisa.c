@@ -940,9 +940,8 @@ NVRAM_HANDLER(lisa)
 }
 
 #ifdef UNUSED_FUNCTION
-void init_lisa1(void)
+void lisa_state::init_lisa1(void)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	m_model = lisa1;
 	m_features.has_fast_timers = 0;
 	m_features.floppy_hardware = twiggy;

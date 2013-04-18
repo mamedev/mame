@@ -111,6 +111,9 @@ public:
 	required_ioport m_io_x6;
 	required_ioport m_io_x7;
 	required_ioport m_io_config;
+	void palette_set_colors_rgb(const UINT8 *colors);
+	void super80_cassette_motor( UINT8 data );
+	void driver_init_common(  );
 };
 
 

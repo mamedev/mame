@@ -512,6 +512,16 @@ public:
 	void mac_state_load();
 	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
 	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
+	void dafb_recalc_ints();
+	void set_scc_waitrequest(int waitrequest);
+	int scan_keyboard();
+	void keyboard_init();
+	void kbd_shift_out(int data);
+	void keyboard_receive(int val);
+	void mac_driver_init(model_t model);
+	void mac_tracetrap(const char *cpu_name_local, int addr, int trap);
+	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
+		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
 };
 
 #endif /* MAC_H_ */

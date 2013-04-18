@@ -137,7 +137,7 @@ void oric_state::oric_vh_update_attribute(UINT8 c)
 
 /* render 6-pixels using foreground and background colours specified */
 /* used in hires and text mode */
-static void oric_vh_render_6pixels(bitmap_ind16 &bitmap, int x, UINT8 y, UINT8 fg, UINT8 bg, UINT8 data, bool invert_flag)
+void oric_state::oric_vh_render_6pixels(bitmap_ind16 &bitmap, int x, UINT8 y, UINT8 fg, UINT8 bg, UINT8 data, bool invert_flag)
 {
 	/* invert? */
 	if (invert_flag)

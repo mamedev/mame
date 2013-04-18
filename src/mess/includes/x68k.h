@@ -384,6 +384,11 @@ private:
 public:	
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6258_device> m_okim6258;
+	bitmap_ind16* x68k_get_gfx_page(int pri,int type);
+	attotime prescale(int val);
+	void mfp_trigger_irq(int irq);
+	void mfp_set_timer(int timer, unsigned char data);
+	void mfp_recv_data(int data);
 };
 
 

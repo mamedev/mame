@@ -57,6 +57,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( channelf_cart );
 	required_device<channelf_sound_device> m_custom;
 	required_device<cpu_device> m_maincpu;
+	int recalc_palette_offset(int reg1, int reg2);
 };
 
 #endif /* CHANNELF_H_ */

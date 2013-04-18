@@ -163,18 +163,18 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 // VideoULA Internal Cursor controls
 
 /*
-static void set_cursor(bbc_state *state)
+void bbc_state::set_cursor(bbc_state *state)
 {
-    state->m_cursor_state=state->m_VideoULA_CR?0:7;
+    m_cursor_state=m_VideoULA_CR?0:7;
 }
 
-static void BBC_Clock_CR(bbc_state *state)
+void bbc_state::BBC_Clock_CR(bbc_state *state)
 {
-    if (state->m_VideoULA_CR)
+    if (m_VideoULA_CR)
     {
-        state->m_VideoULA_CR_counter-=1;
-        if (state->m_VideoULA_CR_counter<=0) {
-            state->m_VideoULA_CR=0;
+        m_VideoULA_CR_counter-=1;
+        if (m_VideoULA_CR_counter<=0) {
+            m_VideoULA_CR=0;
             set_cursor(state);
         }
     }
@@ -395,27 +395,26 @@ static void BBC_draw_teletext(running_machine &machine);
 
 
 
-static void BBC_draw_teletext(running_machine &machine)
+void bbc_state::BBC_draw_teletext()
 {
-    bbc_state *state = machine.driver_data<bbc_state>();
 
     //Teletext Latch bits 0 to 5 go to bits 0 to 5 on the Teletext chip
     //Teletext Latch bit 6 is only passed onto bits 6 on the Teletext chip if DE is true
     //Teletext Latch bit 7 goes to LOSE on the Teletext chip
 
-    teletext_LOSE_w(state->m_saa505x, 0, (state->m_Teletext_Latch>>7)&1);
+    teletext_LOSE_w(m_saa505x, 0, (m_Teletext_Latch>>7)&1);
 
-    teletext_F1(state->m_saa505x);
+    teletext_F1(m_saa505x);
 
-    teletext_data_w(state->m_saa505x, 0, (state->m_Teletext_Latch&0x3f)|((state->m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
+    teletext_data_w(m_saa505x, 0, (m_Teletext_Latch&0x3f)|((m_Teletext_Latch&0x40)|(m6845_display_enabled_r(0)?0:0x40)));
 
     int meml=m6845_memory_address_r(0);
 
     if (((meml>>13)&1)==0)
     {
-        state->m_Teletext_Latch=0;
+        m_Teletext_Latch=0;
     } else {
-        state->m_Teletext_Latch=(state->m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
+        m_Teletext_Latch=(m_BBC_Video_RAM[calculate_video_address(state,meml)]&0x7f)|(m6845_display_enabled_r(0)?0x80:0);
     }
 
 }
@@ -426,20 +425,20 @@ static void BBC_draw_teletext(running_machine &machine)
 
 // This is the actual output of the Video ULA this fuction does all the output to the screen in the BBC emulator
 
-static void BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels)
+void bbc_state::BBC_ula_drawpixel(bbc_state *state, int col, int number_of_pixels)
 {
     int pixel_count;
     int pixel_temp;
-    if ((state->m_BBC_display>=state->m_BBC_display_left) && ((state->m_BBC_display+number_of_pixels)<state->m_BBC_display_right))
+    if ((m_BBC_display>=m_BBC_display_left) && ((m_BBC_display+number_of_pixels)<m_BBC_display_right))
     {
 
-        pixel_temp=col^state->m_cursor_state;
+        pixel_temp=col^m_cursor_state;
         for(pixel_count=0;pixel_count<number_of_pixels;pixel_count++)
         {
-            *(state->m_BBC_display++) = pixel_temp;
+            *(m_BBC_display++) = pixel_temp;
         }
     } else {
-        state->m_BBC_display += number_of_pixels;
+        m_BBC_display += number_of_pixels;
     }
 }
 
@@ -463,9 +462,8 @@ static const struct m6845_interface BBC6845 =
 
 
 
-static void BBC_draw_hi_res(running_machine &machine)
+void bbc_state::BBC_draw_hi_res()
 {
-    bbc_state *state = machine.driver_data<bbc_state>();
     int meml;
     unsigned char i=0;
     int sc1;
@@ -478,17 +476,17 @@ static void BBC_draw_hi_res(running_machine &machine)
         // read the memory location for the next screen location.
         meml=calculate_video_address(state,m6845_memory_address_r(0));
 
-        i=state->m_BBC_Video_RAM[meml];
+        i=m_BBC_Video_RAM[meml];
 
-        for(sc1=0;sc1<state->m_pixels_per_byte;sc1++)
+        for(sc1=0;sc1<m_pixels_per_byte;sc1++)
         {
-            BBC_ula_drawpixel(state, state->m_videoULA_pallet_lookup[state->m_pixel_bits[i]], state->m_emulation_pixels_per_real_pixel);
+            BBC_ula_drawpixel(state, m_videoULA_pallet_lookup[m_pixel_bits[i]], m_emulation_pixels_per_real_pixel);
             i=(i<<1)|1;
         }
 
     } else {
         // if the display is not enable, just draw a blank area.
-        BBC_ula_drawpixel(state, 0, state->m_emulation_pixels_per_byte);
+        BBC_ula_drawpixel(state, 0, m_emulation_pixels_per_byte);
     }
 }
 
@@ -507,64 +505,61 @@ void bbc_draw_RGB_in(device_t *device, int offset,int data)
 
 
 // called when the 6845 changes the HSync
-static void BBC_Set_HSync(running_machine &machine, int offset, int data)
+void bbc_state::BBC_Set_HSync(int offset, int data)
 {
-    bbc_state *state = machine.driver_data<bbc_state>();
     // catch the falling edge
-    if((!data)&&(state->m_BBC_HSync))
+    if((!data)&&(m_BBC_HSync))
     {
-        state->m_y_screen_pos+=1;
+        m_y_screen_pos+=1;
 
-        if ((state->m_y_screen_pos>=0) && (state->m_y_screen_pos<300))
+        if ((m_y_screen_pos>=0) && (m_y_screen_pos<300))
         {
-            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(state->m_y_screen_pos);
-            state->m_BBC_display_right = state->m_BBC_display_left + 800;
+            m_BBC_display_left = &m_BBC_bitmap->pix16(m_y_screen_pos);
+            m_BBC_display_right = m_BBC_display_left + 800;
 
         } else {
-            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(0);
-            state->m_BBC_display_right = state->m_BBC_display_left;
+            m_BBC_display_left = &m_BBC_bitmap->pix16(0);
+            m_BBC_display_right = m_BBC_display_left;
         }
 
-        state->m_BBC_display = state->m_BBC_display_left + state->m_x_screen_offset;
+        m_BBC_display = m_BBC_display_left + m_x_screen_offset;
 
     }
-    state->m_BBC_HSync=data;
+    m_BBC_HSync=data;
 }
 
 // called when the 6845 changes the VSync
-static void BBC_Set_VSync(running_machine &machine, int offset, int data)
+void bbc_state::BBC_Set_VSync(int offset, int data)
 {
-    bbc_state *state = machine.driver_data<bbc_state>();
     // catch the falling edge
-    if ((!data)&&(state->m_BBC_VSync))
+    if ((!data)&&(m_BBC_VSync))
     {
-        state->m_y_screen_pos=state->m_y_screen_offset;
+        m_y_screen_pos=m_y_screen_offset;
 
-        if ((state->m_y_screen_pos>=0) && (state->m_y_screen_pos<300))
+        if ((m_y_screen_pos>=0) && (m_y_screen_pos<300))
         {
-            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(state->m_y_screen_pos);
-            state->m_BBC_display_right = state->m_BBC_display_left + 800;
+            m_BBC_display_left = &m_BBC_bitmap->pix16(m_y_screen_pos);
+            m_BBC_display_right = m_BBC_display_left + 800;
 
         } else {
-            state->m_BBC_display_left = &state->m_BBC_bitmap->pix16(0);
-            state->m_BBC_display_right = state->m_BBC_display_left;
+            m_BBC_display_left = &m_BBC_bitmap->pix16(0);
+            m_BBC_display_right = m_BBC_display_left;
         }
 
-        state->m_BBC_display = state->m_BBC_display_left + state->m_x_screen_offset;
+        m_BBC_display = m_BBC_display_left + m_x_screen_offset;
 
-        teletext_DEW(state->m_saa505x);
+        teletext_DEW(m_saa505x);
     }
-    state->m_BBC_VSync=data;
+    m_BBC_VSync=data;
 
 }
 
 // called when the 6845 changes the Cursor Enabled
-static void BBC_Set_CRE(running_machine &machine, int offset, int data)
+void bbc_state::BBC_Set_CRE(int offset, int data)
 {
-    bbc_state *state = machine.driver_data<bbc_state>();
     if (data&2) {
-        state->m_VideoULA_CR_counter=state->m_emulation_cursor_size;
-        state->m_VideoULA_CR=1;
+        m_VideoULA_CR_counter=m_emulation_cursor_size;
+        m_VideoULA_CR=1;
         // set the pallet on
         if (data&1) set_cursor(state);
     }
@@ -651,7 +646,7 @@ UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap,
     return 0;
 }
 
-void bbc_frameclock(running_machine &machine)
+void bbc_state::bbc_frameclock()
 {
     m6845_frameclock();
 }

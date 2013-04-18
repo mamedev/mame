@@ -117,12 +117,11 @@ WRITE8_MEMBER(bbc_state::bbc_memoryb4_w)
     PC is in the range c000 to dfff
     or if pagedRAM set and PC is in the range a000 to afff
 */
-static int vdudriverset(running_machine &machine)
+int bbc_state::vdudriverset()
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
 	int PC;
-	PC = machine.device("maincpu")->safe_pc(); // this needs to be set to the 6502 program counter
-	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((state->m_pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
+	PC = machine().device("maincpu")->safe_pc(); // this needs to be set to the 6502 program counter
+	return (((PC >= 0xc000) && (PC <= 0xdfff)) || ((m_pagedRAM) && ((PC >= 0xa000) && (PC <= 0xafff))));
 }
 
 
@@ -190,7 +189,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
 	}
 	else
 	{
-		if (vdudriverset(machine()))
+		if (vdudriverset())
 		{
 			// if VDUDriver set then read from shadow ram
 			m_bank2->set_base(ram + 0xb000);
@@ -215,7 +214,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 	}
 	else
 	{
-		if (vdudriverset(machine()))
+		if (vdudriverset())
 		{
 			// if VDUDriver set then write to shadow ram
 			ram[offset + 0xb000] = data;
@@ -395,10 +394,10 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 }
 
 
-static int bbcm_vdudriverset(running_machine &machine)
+int bbc_state::bbcm_vdudriverset()
 {
 	int PC;
-	PC = machine.device("maincpu")->safe_pc();
+	PC = machine().device("maincpu")->safe_pc();
 	return ((PC >= 0xc000) && (PC <= 0xdfff));
 }
 
@@ -436,7 +435,7 @@ DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
 	}
 	else
 	{
-		if (m_ACCCON_E && bbcm_vdudriverset(machine()))
+		if (m_ACCCON_E && bbcm_vdudriverset())
 		{
 			m_bank2->set_base( m_region_maincpu->base() + 0xb000 );
 		}
@@ -460,7 +459,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 	}
 	else
 	{
-		if (m_ACCCON_E && bbcm_vdudriverset(machine()))
+		if (m_ACCCON_E && bbcm_vdudriverset())
 		{
 			ram[offset + 0xb000] = data;
 		}
@@ -812,9 +811,8 @@ INTERRUPT_GEN_MEMBER(bbc_state::bbcm_keyscan)
 
 
 
-static int bbc_keyboard(address_space &space, int data)
+int bbc_state::bbc_keyboard(address_space &space, int data)
 {
-	bbc_state *state = space.machine().driver_data<bbc_state>();
 	int bit;
 	int row;
 	int res;
@@ -824,14 +822,14 @@ static int bbc_keyboard(address_space &space, int data)
 	};
 	via6522_device *via_0 = space.machine().device<via6522_device>("via6522_0");
 
-	state->m_column = data & 0x0f;
+	m_column = data & 0x0f;
 	row = (data>>4) & 0x07;
 
 	bit = 0;
 
-	if (state->m_column < 10)
+	if (m_column < 10)
 	{
-		res = state->ioport(colnames[state->m_column])->read();
+		res = ioport(colnames[m_column])->read();
 	}
 	else
 	{
@@ -857,50 +855,49 @@ static int bbc_keyboard(address_space &space, int data)
 }
 
 
-static void bbcb_IC32_initialise(bbc_state *state)
+void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 {
-	state->m_b0_sound=0x01;             // Sound is negative edge trigered
-	state->m_b1_speech_read=0x01;       // ????
-	state->m_b2_speech_write=0x01;      // ????
-	state->m_b3_keyboard=0x01;          // Keyboard is negative edge trigered
-	state->m_b4_video0=0x01;
-	state->m_b5_video1=0x01;
-	state->m_b6_caps_lock_led=0x01;
-	state->m_b7_shift_lock_led=0x01;
+	m_b0_sound=0x01;             // Sound is negative edge trigered
+	m_b1_speech_read=0x01;       // ????
+	m_b2_speech_write=0x01;      // ????
+	m_b3_keyboard=0x01;          // Keyboard is negative edge trigered
+	m_b4_video0=0x01;
+	m_b5_video1=0x01;
+	m_b6_caps_lock_led=0x01;
+	m_b7_shift_lock_led=0x01;
 
 }
 
 
 /* This the BBC Masters Real Time Clock and NVRam IC */
-static void MC146818_set(address_space &space)
+void bbc_state::MC146818_set(address_space &space)
 {
-	bbc_state *state = space.machine().driver_data<bbc_state>();
-	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",state->m_MC146818_WR,state->m_MC146818_DS,state->m_MC146818_AS,state->m_MC146818_CE);
+	logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
 	mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
-	if (state->m_MC146818_CE)
+	if (m_MC146818_CE)
 	{
 		// if data select is set then access the data in the 146818
-		if (state->m_MC146818_DS)
+		if (m_MC146818_DS)
 		{
-			if (state->m_MC146818_WR)
+			if (m_MC146818_WR)
 			{
-				state->m_via_system_porta=rtc->read(space, 1);
-				//logerror("read 146818 data %d \n",state->m_via_system_porta);
+				m_via_system_porta=rtc->read(space, 1);
+				//logerror("read 146818 data %d \n",m_via_system_porta);
 			}
 			else
 			{
-				rtc->write(space, 1, state->m_via_system_porta);
-				//logerror("write 146818 data %d \n",state->m_via_system_porta);
+				rtc->write(space, 1, m_via_system_porta);
+				//logerror("write 146818 data %d \n",m_via_system_porta);
 			}
 		}
 
 		// if address select is set then set the address in the 146818
-		if (state->m_MC146818_AS)
+		if (m_MC146818_AS)
 		{
-			rtc->write(space, 0, state->m_via_system_porta);
-			//logerror("write 146818 address %d \n",state->m_via_system_porta);
+			rtc->write(space, 0, m_via_system_porta);
+			//logerror("write 146818 address %d \n",m_via_system_porta);
 		}
 	}
 }
@@ -1139,11 +1136,11 @@ static const int TMSint=1;
 static const int TMSrdy=1;
 
 #ifdef UNUSED_FUNCTION
-void bbc_TMSint(int status)
+void bbc_state::bbc_TMSint(int status)
 {
 	TMSint=(!status)&1;
 	TMSrdy=(!tms5220_readyq_r())&1;
-	via_0_portb_w(0,(0xf | machine.root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
+	via_0_portb_w(0,(0xf | machine().root_device().ioport("IN0")->read()|(TMSint<<6)|(TMSrdy<<7)));
 }
 #endif
 
@@ -1297,15 +1294,14 @@ const uPD7002_interface bbc_uPD7002 =
 
 
 
-static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
+void bbc_state::MC6850_Receive_Clock(int new_clock)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	if (!state->m_mc6850_clock && new_clock)
+	if (!m_mc6850_clock && new_clock)
 	{
-		acia6850_device *acia = machine.device<acia6850_device>("acia6850");
+		acia6850_device *acia = machine().device<acia6850_device>("acia6850");
 		acia->tx_clock_in();
 	}
-	state->m_mc6850_clock = new_clock;
+	m_mc6850_clock = new_clock;
 }
 
 TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
@@ -1339,7 +1335,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 		{
 			/* Clock a 0 onto the serial line */
 			logerror("Serial value 0\n");
-			MC6850_Receive_Clock(machine(), 0);
+			MC6850_Receive_Clock(0);
 			m_len0=0;
 			m_len1=0;
 			m_len2=0;
@@ -1350,7 +1346,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 		{
 			/* Clock a 1 onto the serial line */
 			logerror("Serial value 1\n");
-			MC6850_Receive_Clock(machine(), 1);
+			MC6850_Receive_Clock(1);
 			m_len0=0;
 			m_len1=0;
 			m_len2=0;
@@ -1365,23 +1361,22 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 
 }
 
-static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
+void bbc_state::BBC_Cassette_motor(unsigned char status)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
 	if (status)
 	{
-		state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		state->m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_tape_timer->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	}
 	else
 	{
-		state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		state->m_tape_timer->reset();
-		state->m_len0 = 0;
-		state->m_len1 = 0;
-		state->m_len2 = 0;
-		state->m_len3 = 0;
-		state->m_wav_len = 0;
+		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_tape_timer->reset();
+		m_len0 = 0;
+		m_len1 = 0;
+		m_len2 = 0;
+		m_len3 = 0;
+		m_wav_len = 0;
 	}
 }
 
@@ -1389,7 +1384,7 @@ static void BBC_Cassette_motor(running_machine &machine, unsigned char status)
 
 WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 {
-	BBC_Cassette_motor(machine(), (data & 0x80) >> 7);
+	BBC_Cassette_motor((data & 0x80) >> 7);
 }
 
 /**************************************
@@ -1522,13 +1517,12 @@ density disc image
   The nmi is edge triggered, and triggers on a +ve edge.
 */
 
-static void bbc_update_fdq_int(running_machine &machine, int state)
+void bbc_state::bbc_update_fdq_int(int state)
 {
-	bbc_state *drvstate = machine.driver_data<bbc_state>();
 	int bbc_state;
 
 	/* if drq or irq is set, and interrupt is enabled */
-	if ((drvstate->m_wd177x_irq_state || drvstate->m_wd177x_drq_state) && (drvstate->m_1770_IntEnabled))
+	if ((m_wd177x_irq_state || m_wd177x_drq_state) && (m_1770_IntEnabled))
 	{
 		/* int trigger */
 		bbc_state = 1;
@@ -1541,29 +1535,29 @@ static void bbc_update_fdq_int(running_machine &machine, int state)
 
 	/* nmi is edge triggered, and triggers when the state goes from clear->set.
 	Here we are checking this transition before triggering the nmi */
-	if (bbc_state!=drvstate->m_previous_wd177x_int_state)
+	if (bbc_state!=m_previous_wd177x_int_state)
 	{
 		if (bbc_state)
 		{
 			/* I'll pulse it because if I used hold-line I'm not sure
 			it would clear - to be checked */
-			drvstate->m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 		}
 	}
 
-	drvstate->m_previous_wd177x_int_state = bbc_state;
+	m_previous_wd177x_int_state = bbc_state;
 }
 
 WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_intrq_w)
 {
 	m_wd177x_irq_state = state;
-	bbc_update_fdq_int(machine(), state);
+	bbc_update_fdq_int(state);
 }
 
 WRITE_LINE_MEMBER(bbc_state::bbc_wd177x_drq_w)
 {
 	m_wd177x_drq_state = state;
-	bbc_update_fdq_int(machine(), state);
+	bbc_update_fdq_int(state);
 }
 
 const wd17xx_interface bbc_wd17xx_interface =

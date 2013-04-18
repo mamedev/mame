@@ -24,20 +24,19 @@
 
 
 
-static void lviv_update_memory (running_machine &machine)
+void lviv_state::lviv_update_memory ()
 {
-	lviv_state *state = machine.driver_data<lviv_state>();
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	if (state->m_ppi_port_outputs[0][2] & 0x02)
+	if (m_ppi_port_outputs[0][2] & 0x02)
 	{
-		state->membank("bank1")->set_base(ram);
-		state->membank("bank2")->set_base(ram + 0x4000);
+		membank("bank1")->set_base(ram);
+		membank("bank2")->set_base(ram + 0x4000);
 	}
 	else
 	{
-		state->membank("bank1")->set_base(ram + 0x8000);
-		state->membank("bank2")->set_base(ram + 0xc000);
+		membank("bank1")->set_base(ram + 0x8000);
+		membank("bank2")->set_base(ram + 0xc000);
 	}
 }
 
@@ -81,7 +80,7 @@ WRITE8_MEMBER(lviv_state::lviv_ppi_0_porta_w)
 WRITE8_MEMBER(lviv_state::lviv_ppi_0_portb_w)
 {
 	m_ppi_port_outputs[0][1] = data;
-	lviv_update_palette(machine(), data&0x7f);
+	lviv_update_palette(data&0x7f);
 }
 
 WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off */
@@ -90,7 +89,7 @@ WRITE8_MEMBER(lviv_state::lviv_ppi_0_portc_w)/* tape in/out, video memory on/off
 	if (m_ppi_port_outputs[0][1]&0x80)
 		speaker_level_w(m_speaker, data&0x01);
 	m_cassette->output((data & 0x01) ? -1.0 : 1.0);
-	lviv_update_memory(machine());
+	lviv_update_memory();
 }
 
 READ8_MEMBER(lviv_state::lviv_ppi_1_porta_r)
@@ -263,55 +262,53 @@ Lviv snapshot files (SAV)
 1411D - 1412A:  ??? (something additional)
 *******************************************************************************/
 
-static void lviv_setup_snapshot (running_machine &machine,UINT8 * data)
+void lviv_state::lviv_setup_snapshot (UINT8 * data)
 {
-	lviv_state *state = machine.driver_data<lviv_state>();
 	unsigned char lo,hi;
 
 	/* Set registers */
 	lo = data[0x14112] & 0x0ff;
 	hi = data[0x14111] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_BC, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_BC, (hi << 8) | lo);
 	lo = data[0x14114] & 0x0ff;
 	hi = data[0x14113] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_DE, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_DE, (hi << 8) | lo);
 	lo = data[0x14116] & 0x0ff;
 	hi = data[0x14115] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_HL, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_HL, (hi << 8) | lo);
 	lo = data[0x14118] & 0x0ff;
 	hi = data[0x14117] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_AF, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_AF, (hi << 8) | lo);
 	lo = data[0x14119] & 0x0ff;
 	hi = data[0x1411a] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_SP, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_SP, (hi << 8) | lo);
 	lo = data[0x1411b] & 0x0ff;
 	hi = data[0x1411c] & 0x0ff;
-	state->m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
+	m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
-	memcpy (machine.device<ram_device>(RAM_TAG)->pointer(), data+0x0011, 0xc000);
-	memcpy (machine.device<ram_device>(RAM_TAG)->pointer()+0xc000, data+0x10011, 0x4000);
+	memcpy (machine().device<ram_device>(RAM_TAG)->pointer(), data+0x0011, 0xc000);
+	memcpy (machine().device<ram_device>(RAM_TAG)->pointer()+0xc000, data+0x10011, 0x4000);
 
 	/* Ports */
-	state->m_ppi_port_outputs[0][0] = data[0x14011+0xc0];
-	state->m_ppi_port_outputs[0][1] = data[0x14011+0xc1];
-	lviv_update_palette(machine, state->m_ppi_port_outputs[0][1]&0x7f);
-	state->m_ppi_port_outputs[0][2] = data[0x14011+0xc2];
-	lviv_update_memory(machine);
+	m_ppi_port_outputs[0][0] = data[0x14011+0xc0];
+	m_ppi_port_outputs[0][1] = data[0x14011+0xc1];
+	lviv_update_palette(m_ppi_port_outputs[0][1]&0x7f);
+	m_ppi_port_outputs[0][2] = data[0x14011+0xc2];
+	lviv_update_memory();
 }
 
-static void dump_registers(running_machine &machine)
+void lviv_state::dump_registers()
 {
-	lviv_state *state = machine.driver_data<lviv_state>();
-	logerror("PC   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_PC));
-	logerror("SP   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_SP));
-	logerror("AF   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_AF));
-	logerror("BC   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_BC));
-	logerror("DE   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_DE));
-	logerror("HL   = %04x\n", (unsigned) state->m_maincpu->state_int(I8085_HL));
+	logerror("PC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_PC));
+	logerror("SP   = %04x\n", (unsigned) m_maincpu->state_int(I8085_SP));
+	logerror("AF   = %04x\n", (unsigned) m_maincpu->state_int(I8085_AF));
+	logerror("BC   = %04x\n", (unsigned) m_maincpu->state_int(I8085_BC));
+	logerror("DE   = %04x\n", (unsigned) m_maincpu->state_int(I8085_DE));
+	logerror("HL   = %04x\n", (unsigned) m_maincpu->state_int(I8085_HL));
 }
 
-static int lviv_verify_snapshot (UINT8 * data, UINT32 size)
+int lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
 {
 	const char* tag = "LVOV/DUMP/2.0/";
 
@@ -334,6 +331,7 @@ static int lviv_verify_snapshot (UINT8 * data, UINT32 size)
 SNAPSHOT_LOAD( lviv )
 {
 	UINT8 *lviv_snapshot_data;
+	lviv_state *state = image.device().machine().driver_data<lviv_state>();
 
 	lviv_snapshot_data = (UINT8*)malloc(LVIV_SNAPSHOT_SIZE);
 	if (!lviv_snapshot_data)
@@ -344,15 +342,15 @@ SNAPSHOT_LOAD( lviv )
 
 	image.fread( lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
 
-	if( lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
+	if(state->lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
 		free(lviv_snapshot_data);
 		return IMAGE_INIT_FAIL;
 	}
 
-	lviv_setup_snapshot (image.device().machine(),lviv_snapshot_data);
+	state->lviv_setup_snapshot (lviv_snapshot_data);
 
-	dump_registers(image.device().machine());
+	state->dump_registers();
 
 	free(lviv_snapshot_data);
 

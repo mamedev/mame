@@ -54,16 +54,15 @@ public:
 	DECLARE_READ8_MEMBER(ssystem3_via_read_b);
 	DECLARE_WRITE8_MEMBER(ssystem3_via_write_b);
 	required_device<cpu_device> m_maincpu;
+	void ssystem3_lcd_reset();
+	void ssystem3_lcd_write(int clock, int data);
+	void ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y);
+	void ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch);
+	void ssystem3_playfield_getfigure(int x, int y, int *figure, int *black);
+	void ssystem3_playfield_reset();
+	void ssystem3_playfield_write(int reset, int signal);
+	void ssystem3_playfield_read(int *on, int *ready);
 };
 
-
-/*----------- defined in drivers/ssystem3.c -----------*/
-
-void ssystem3_playfield_getfigure(running_machine &machine, int x, int y, int *figure, int *black);
-
-/*----------- defined in video/ssystem3.c -----------*/
-
-void ssystem3_lcd_reset(running_machine &machine);
-void ssystem3_lcd_write(running_machine &machine, int clock, int data);
 
 #endif /* SSYSTEM3_H_ */

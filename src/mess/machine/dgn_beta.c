@@ -90,16 +90,6 @@ static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, c
 static void execute_beta_dat_log(running_machine &machine, int ref, int params, const char *param[]);
 static void execute_beta_key_dump(running_machine &machine, int ref, int params, const char *param[]);
 
-/* Debugging variables */
-
-
-
-static void cpu0_recalc_irq(running_machine &machine, int state);
-static void cpu0_recalc_firq(running_machine &machine, int state);
-
-static void cpu1_recalc_firq(running_machine &machine, int state);
-
-
 //static int DMA_NMI;               /* DMA cpu has received an NMI */
 
 #define INVALID_KEYROW  -1          /* no ketrow selected */
@@ -213,11 +203,10 @@ static const struct bank_info_entry bank_info[] =
 // this should probably be considdered a hack !
 //
 
-static void UpdateBanks(running_machine &machine, int first, int last)
+void dgn_beta_state::UpdateBanks(int first, int last)
 {
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	address_space &space_0 = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
-	address_space &space_1 = machine.device(DMACPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space_0 = machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space_1 = machine().device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int                 Page;
 	UINT8               *readbank;
 	int                 bank_start;
@@ -235,28 +224,28 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 
 		// bank16 and bank17 are mapped to the same page with a hole for the IO memory
 		if (!is_last_page(Page))
-			MapPage = state->m_PageRegs[state->m_TaskReg][Page].value;
+			MapPage = m_PageRegs[m_TaskReg][Page].value;
 		else
-			MapPage = state->m_PageRegs[state->m_TaskReg][LastPage].value;
+			MapPage = m_PageRegs[m_TaskReg][LastPage].value;
 
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((machine.device<ram_device>(RAM_TAG)->size() / 1024)-1))     // Block is ram
+		if ((MapPage*4) < ((machine().device<ram_device>(RAM_TAG)->size() / 1024)-1))     // Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[MapPage*RamPageSize];
-				if(state->m_LogDatWrites)
-					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
+				readbank = &machine().device<ram_device>(RAM_TAG)->pointer()[MapPage*RamPageSize];
+				if(m_LogDatWrites)
+					debug_console_printf(machine(), "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &machine.device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
+				readbank = &machine().device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			write8_delegate func = bank_info[Page].func;
-			if (!func.isnull()) func.late_bind(*state);
+			if (!func.isnull()) func.late_bind(*this);
 			space_0.install_write_handler(bank_start, bank_end, func);
 			space_1.install_write_handler(bank_start, bank_end, func);
 		}
@@ -265,64 +254,63 @@ static void UpdateBanks(running_machine &machine, int first, int last)
 			if (MapPage>0xfB)
 			{
 				if (Page!=IOPage+1)
-					readbank=&state->m_system_rom[(MapPage-0xFC)*0x1000];
+					readbank=&m_system_rom[(MapPage-0xFC)*0x1000];
 				else
-					readbank=&state->m_system_rom[0x3F00];
+					readbank=&m_system_rom[0x3F00];
 			}
 			else
-				readbank=state->m_system_rom;
+				readbank=m_system_rom;
 
 			space_0.unmap_write(bank_start, bank_end);
 			space_1.unmap_write(bank_start, bank_end);
 		}
 
-		state->m_PageRegs[state->m_TaskReg][Page].memory=readbank;
-		state->membank(page_num)->set_base(readbank);
+		m_PageRegs[m_TaskReg][Page].memory=readbank;
+		membank(page_num)->set_base(readbank);
 
 		LOG_BANK_UPDATE(("UpdateBanks:MapPage=$%02X readbank=$%X\n",MapPage,(int)(FPTR)readbank));
-		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",state->m_TaskReg,Page));
-		//LOG_BANK_UPDATE(("%X)\n",state->membank(Page+1)));
+		LOG_BANK_UPDATE(("PageRegsSet Task=%X Page=%x\n",m_TaskReg,Page));
+		//LOG_BANK_UPDATE(("%X)\n",membank(Page+1)));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=0\n"));
 		LOG_BANK_UPDATE(("memory_install_write8_handler CPU=1\n"));
 	}
 }
 
 //
-static void SetDefaultTask(running_machine &machine)
+void dgn_beta_state::SetDefaultTask()
 {
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-//  UINT8 *videoram = state->m_videoram;
+//  UINT8 *videoram = m_videoram;
 	int     Idx;
 
 	LOG_DEFAULT_TASK(("SetDefaultTask()\n"));
-	//if (VERBOSE) debug_console_printf(machine)->set_base("Set Default task\n");
+	//if (VERBOSE) debug_console_printf(machine())->set_base("Set Default task\n");
 
-	state->m_TaskReg=NoPagingTask;
+	m_TaskReg=NoPagingTask;
 
 	/* Reset ram pages */
 	for(Idx=0;Idx<ROMPage-1;Idx++)
 	{
-		state->m_PageRegs[state->m_TaskReg][Idx].value=NoMemPageValue;
+		m_PageRegs[m_TaskReg][Idx].value=NoMemPageValue;
 	}
 
 	/* Reset RAM Page */
-	state->m_PageRegs[state->m_TaskReg][RAMPage].value=RAMPageValue;
+	m_PageRegs[m_TaskReg][RAMPage].value=RAMPageValue;
 
 	/* Reset Video mem page */
-	state->m_PageRegs[state->m_TaskReg][VideoPage].value=VideoPageValue;
+	m_PageRegs[m_TaskReg][VideoPage].value=VideoPageValue;
 
 	/* Reset rom page */
-	state->m_PageRegs[state->m_TaskReg][ROMPage].value=ROMPageValue;
+	m_PageRegs[m_TaskReg][ROMPage].value=ROMPageValue;
 
 	/* Reset IO Page */
-	state->m_PageRegs[state->m_TaskReg][LastPage].value=IOPageValue;
-	state->m_PageRegs[state->m_TaskReg][LastPage+1].value=IOPageValue;
+	m_PageRegs[m_TaskReg][LastPage].value=IOPageValue;
+	m_PageRegs[m_TaskReg][LastPage+1].value=IOPageValue;
 
-	UpdateBanks(machine, 0,LastPage+1);
+	UpdateBanks(0,LastPage+1);
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-//  videoram=&machine.device<ram_device>(RAM_TAG)->pointer()[TextVidBasePage*RamPageSize];
+//  videoram=&machine().device<ram_device>(RAM_TAG)->pointer()[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -343,103 +331,102 @@ WRITE8_MEMBER(dgn_beta_state::dgn_beta_page_w )
 
 	if (m_EnableMapRegs)
 	{
-		UpdateBanks(machine(), offset,offset);
+		UpdateBanks(offset,offset);
 		if (offset==15)
-			UpdateBanks(machine(), offset+1,offset+1);
+			UpdateBanks(offset+1,offset+1);
 	}
 }
 
 /*********************** Memory bank write handlers ************************/
 /* These actually write the data to the memory, and not to the page regs ! */
-static void dgn_beta_bank_memory(running_machine &machine, int offset, int data, int bank)
+void dgn_beta_state::dgn_beta_bank_memory(int offset, int data, int bank)
 {
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	state->m_PageRegs[state->m_TaskReg][bank].memory[offset]=data;
+	m_PageRegs[m_TaskReg][bank].memory[offset]=data;
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b0_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,0);
+	dgn_beta_bank_memory(offset,data,0);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b1_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,1);
+	dgn_beta_bank_memory(offset,data,1);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b2_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,2);
+	dgn_beta_bank_memory(offset,data,2);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b3_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,3);
+	dgn_beta_bank_memory(offset,data,3);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b4_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,4);
+	dgn_beta_bank_memory(offset,data,4);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b5_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,5);
+	dgn_beta_bank_memory(offset,data,5);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b6_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,6);
+	dgn_beta_bank_memory(offset,data,6);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b7_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,7);
+	dgn_beta_bank_memory(offset,data,7);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b8_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,8);
+	dgn_beta_bank_memory(offset,data,8);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_b9_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,9);
+	dgn_beta_bank_memory(offset,data,9);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bA_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,10);
+	dgn_beta_bank_memory(offset,data,10);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bB_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,11);
+	dgn_beta_bank_memory(offset,data,11);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bC_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,12);
+	dgn_beta_bank_memory(offset,data,12);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bD_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,13);
+	dgn_beta_bank_memory(offset,data,13);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bE_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,14);
+	dgn_beta_bank_memory(offset,data,14);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bF_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,15);
+	dgn_beta_bank_memory(offset,data,15);
 }
 
 WRITE8_MEMBER(dgn_beta_state::dgnbeta_ram_bG_w )
 {
-	dgn_beta_bank_memory(machine(),offset,data,16);
+	dgn_beta_bank_memory(offset,data,16);
 }
 
 /*
@@ -462,7 +449,7 @@ than using a walking zero as the OS-9 driver does. This meant that SelectKeyrow
 never moved past the first row, by scanning for the last active row
 the beta_test rom works, and it does not break the OS-9 driver :)
 */
-static int SelectedKeyrow(dgn_beta_state *state, int Rows)
+int dgn_beta_state::SelectedKeyrow(dgn_beta_state *state, int Rows)
 {
 	int Idx;
 	int Row;    /* Row selected */
@@ -490,12 +477,12 @@ static int SelectedKeyrow(dgn_beta_state *state, int Rows)
 
 /* GetKeyRow, returns the value of a keyrow, checking for invalid rows */
 /* and returning no key pressed if row is invalid */
-static int GetKeyRow(dgn_beta_state *state, int RowNo)
+int dgn_beta_state::GetKeyRow(dgn_beta_state *state, int RowNo)
 {
 	if(RowNo==INVALID_KEYROW)
 		return NO_KEY_PRESSED;  /* row is invalid, so return no key down */
 	else
-		return state->m_Keyboard[RowNo];    /* Else return keyboard data */
+		return m_Keyboard[RowNo];    /* Else return keyboard data */
 }
 
 /*********************************** PIA Handlers ************************/
@@ -616,12 +603,12 @@ WRITE8_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_a)
 {
-	cpu0_recalc_irq(machine(), state);
+	cpu0_recalc_irq(state);
 }
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
 {
-	cpu0_recalc_firq(machine(), state);
+	cpu0_recalc_firq(state);
 }
 
 /* PIA #1 at $FC24-$FC27 I63
@@ -702,12 +689,12 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pb_w)
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_a)
 {
-	cpu0_recalc_irq(machine(), state);
+	cpu0_recalc_irq(state);
 }
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
 {
-	cpu0_recalc_irq(machine(), state);
+	cpu0_recalc_irq(state);
 }
 
 /* PIA #2 at FCC0-FCC3 I28
@@ -775,7 +762,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
 		else
 			m_TaskReg = NoPagingTask;
 
-		UpdateBanks(machine(), 0, IOPage + 1);
+		UpdateBanks(0, IOPage + 1);
 	}
 	else
 	{
@@ -783,7 +770,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia2_pa_w)
 		if ((m_PIATaskReg != OldTask) && (m_EnableMapRegs))
 		{
 			m_TaskReg = m_PIATaskReg;
-			UpdateBanks(machine(), 0, IOPage + 1);
+			UpdateBanks(0, IOPage + 1);
 		}
 	}
 	LOG_TASK(("TaskReg=$%02X PIATaskReg=$%02X\n", m_TaskReg, m_PIATaskReg));
@@ -797,26 +784,26 @@ READ8_MEMBER(dgn_beta_state::d_pia2_pb_r)
 WRITE8_MEMBER(dgn_beta_state::d_pia2_pb_w)
 {
 	/* Update top video address lines */
-	dgnbeta_vid_set_gctrl(machine(), data);
+	dgnbeta_vid_set_gctrl(data);
 }
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_a)
 {
-	cpu0_recalc_irq(machine(), state);
+	cpu0_recalc_irq(state);
 }
 
 WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_b)
 {
-	cpu0_recalc_irq(machine(), state);
+	cpu0_recalc_irq(state);
 }
 
 /************************************ Recalculate CPU inturrupts ****************************/
 /* CPU 0 */
-static void cpu0_recalc_irq(running_machine &machine, int state)
+void dgn_beta_state::cpu0_recalc_irq(int state)
 {
-	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
-	pia6821_device *pia_1 = machine.device<pia6821_device>( PIA_1_TAG );
-	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
+	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
+	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );
+	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
 	UINT8 pia0_irq_a = pia_0->irq_a_state();
 	UINT8 pia1_irq_a = pia_1->irq_a_state();
 	UINT8 pia1_irq_b = pia_1->irq_b_state();
@@ -829,13 +816,13 @@ static void cpu0_recalc_irq(running_machine &machine, int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	machine.device(MAINCPU_TAG)->execute().set_input_line(M6809_IRQ_LINE, IRQ);
+	machine().device(MAINCPU_TAG)->execute().set_input_line(M6809_IRQ_LINE, IRQ);
 	LOG_INTS(("cpu0 IRQ : %d\n", IRQ));
 }
 
-static void cpu0_recalc_firq(running_machine &machine, int state)
+void dgn_beta_state::cpu0_recalc_firq(int state)
 {
-	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
+	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
 	UINT8 pia0_irq_b = pia_0->irq_b_state();
 	UINT8 FIRQ;
 
@@ -844,16 +831,16 @@ static void cpu0_recalc_firq(running_machine &machine, int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	machine.device(MAINCPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, FIRQ);
+	machine().device(MAINCPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, FIRQ);
 
 	LOG_INTS(("cpu0 FIRQ : %d\n", FIRQ));
 }
 
 /* CPU 1 */
 
-static void cpu1_recalc_firq(running_machine &machine, int state)
+void dgn_beta_state::cpu1_recalc_firq(int state)
 {
-	machine.device(DMACPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, state);
+	machine().device(DMACPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, state);
 	LOG_INTS(("cpu1 FIRQ : %d\n",state));
 }
 
@@ -874,7 +861,7 @@ WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_intrq_w)
 WRITE_LINE_MEMBER(dgn_beta_state::dgnbeta_fdc_drq_w)
 {
 	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
-	cpu1_recalc_firq(machine(), state);
+	cpu1_recalc_firq(state);
 }
 
 const wd17xx_interface dgnbeta_wd17xx_interface =
@@ -942,10 +929,9 @@ WRITE8_MEMBER(dgn_beta_state::dgnbeta_wd2797_w)
 /* Scan physical keyboard into Keyboard array */
 /* gonna try and sync this more closely with hardware as keyboard being scanned */
 /* on *EVERY* vblank ! */
-static void ScanInKeyboard(void)
+void dgn_beta_state::ScanInKeyboard(void)
 {
 #if 0
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
 	int Idx;
 	int Row;
 	static const char *const keynames[] = {
@@ -958,12 +944,12 @@ static void ScanInKeyboard(void)
 	for(Idx=0; Idx<NoKeyrows; Idx++)
 	{
 		if (Idx < 10)
-			Row = machine.root_device().ioport(keynames[Idx])->read();
+			Row = machine().root_device().ioport(keynames[Idx])->read();
 
 		else
 			Row = 0x7f;
 
-		state->m_Keyboard[Idx]=Row;
+		m_Keyboard[Idx]=Row;
 		LOG_KEYBOARD(("Keyboard[%d]=$%02X\n",Idx,Row));
 
 		if (Row != 0x7F)
@@ -975,9 +961,9 @@ static void ScanInKeyboard(void)
 }
 
 /* VBlank inturrupt */
-void dgn_beta_frame_interrupt (running_machine &machine, int data)
+void dgn_beta_state::dgn_beta_frame_interrupt (int data)
 {
-	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
+	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
 
 	/* Set PIA line, so it recognises inturrupt */
 	if (!data)
@@ -990,7 +976,7 @@ void dgn_beta_frame_interrupt (running_machine &machine, int data)
 }
 
 #ifdef UNUSED_FUNCTION
-void dgn_beta_line_interrupt (int data)
+void dgn_beta_state::dgn_beta_line_interrupt (int data)
 {
 //  /* Set PIA line, so it recognises inturrupt */
 //  if (data)
@@ -1027,7 +1013,7 @@ void dgn_beta_state::machine_reset()
 	m_PIATaskReg = 0;
 	m_EnableMapRegs = 0;
 	memset(m_PageRegs, 0, sizeof(m_PageRegs));    /* Reset page registers to 0 */
-	SetDefaultTask(machine());
+	SetDefaultTask();
 
 	/* Set pullups on all PIA port A, to match what hardware does */
 	pia_0->set_port_a_z_mask(0xFF);

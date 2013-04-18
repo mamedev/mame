@@ -271,12 +271,31 @@ public:
 	TIMER_CALLBACK_MEMBER(il_timer_callback);
 	void pdp1_machine_stop();
 	required_device<cpu_device> m_maincpu;
+	inline void pdp1_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void pdp1_plot(int x, int y);
+	void pdp1_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
+	void pdp1_draw_multipleled(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
+	void pdp1_draw_switch(bitmap_ind16 &bitmap, int x, int y, int state);
+	void pdp1_draw_multipleswitch(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
+	void pdp1_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
+	void pdp1_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
+	void pdp1_draw_panel_backdrop(bitmap_ind16 &bitmap);
+	void pdp1_draw_panel(bitmap_ind16 &bitmap);
+	void pdp1_typewriter_linefeed();
+	void pdp1_typewriter_drawchar(int character);
+	void pdp1_update_lightpen_state(const lightpen_t *new_state);
+	void pdp1_draw_circle(bitmap_ind16 &bitmap, int x, int y, int radius, int color_);
+	void pdp1_erase_lightpen(bitmap_ind16 &bitmap);
+	void pdp1_draw_lightpen(bitmap_ind16 &bitmap);
+	int tape_read(UINT8 *reply);
+	void begin_tape_read(int binary, int nac);
+	void tape_write(UINT8 data);
+	void typewriter_out(UINT8 data);
+	void parallel_drum_set_il(int il);
+	void parallel_drum_init();
+	UINT32 drum_read(int field, int position);
+	void drum_write(int field, int position, UINT32 data);
+	void pdp1_keyboard();
+	void pdp1_lightpen();
 };
-
-/*----------- defined in video/pdp1.c -----------*/
-void pdp1_plot(running_machine &machine, int x, int y);
-void pdp1_typewriter_drawchar(running_machine &machine, int character);
-void pdp1_update_lightpen_state(running_machine &machine, const lightpen_t *new_state);
-
-
 #endif /* PDP1_H_ */

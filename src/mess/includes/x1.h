@@ -220,6 +220,9 @@ public:
 	UINT8 check_prev_height(running_machine &machine,int x,int y,int x_size);
 	UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,int height);
 
+	int priority_mixer_pri(int color);
+	void cmt_command( UINT8 cmd );
+	UINT16 jis_convert(int kanji_addr);
 };
 
 /*----------- defined in machine/x1.c -----------*/

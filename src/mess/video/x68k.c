@@ -38,7 +38,7 @@ inline void x68k_state::x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 /*
-static bitmap_ind16* x68k_get_gfx_page(int pri,int type)
+bitmap_ind16* ::x68k_get_gfx_page(int pri,int type)
 {
     if(type == GFX16)
     {

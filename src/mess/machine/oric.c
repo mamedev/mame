@@ -1342,14 +1342,13 @@ const via6522_interface telestrat_via2_interface=
 
 #if 0
 /* interrupt state from acia6551 */
-static void telestrat_acia_callback(running_machine &machine, int irq_state)
+void oric_state::telestrat_acia_callback(int irq_state)
 {
-	oric_state *state = machine.driver_data<oric_state>();
-	state->m_irqs&=~(1<<3);
+	m_irqs&=~(1<<3);
 
 	if (irq_state)
 	{
-		state->m_irqs |= (1<<3);
+		m_irqs |= (1<<3);
 	}
 
 	oric_refresh_ints();

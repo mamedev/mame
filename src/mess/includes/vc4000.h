@@ -134,6 +134,11 @@ protected:
 	required_ioport m_joys;
 	required_ioport m_config;
 #endif
+	inline UINT8 vc4000_joystick_return_to_centre(UINT8 joy);
+	void vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, int line);
+	inline void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int scale);
+	void vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, SPRITE *This);
+	inline void vc4000_draw_grid(UINT8 *collision);
 };
 
 /*----------- defined in audio/vc4000.c -----------*/

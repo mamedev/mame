@@ -116,6 +116,14 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
+	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void pcw_update_interrupt_counter();
+	void pcw_update_irqs();
+	void pcw_update_read_memory_block(int block, int bank);
+	void pcw_update_write_memory_block(int block, int bank);
+	void pcw_update_mem(int block, int data);
+	int pcw_get_sys_status();
+	void pcw_printer_fire_pins(UINT16 pins);
 };
 
 #endif /* PCW_H_ */

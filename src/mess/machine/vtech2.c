@@ -78,36 +78,35 @@ DRIVER_INIT_MEMBER(vtech2_state,laser)
 
 
 
-static void laser_machine_init(running_machine &machine, int bank_mask, int video_mask)
+void vtech2_state::laser_machine_init(int bank_mask, int video_mask)
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
 	int i;
 
-	state->m_laser_bank_mask = bank_mask;
-	state->m_laser_video_bank = video_mask;
-	state->m_videoram = state->m_mem + state->m_laser_video_bank * 0x04000;
-	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", state->m_laser_bank_mask, state->m_laser_video_bank, state->m_laser_video_bank * 0x04000);
+	m_laser_bank_mask = bank_mask;
+	m_laser_video_bank = video_mask;
+	m_videoram = m_mem + m_laser_video_bank * 0x04000;
+	logerror("laser_machine_init(): bank mask $%04X, video %d [$%05X]\n", m_laser_bank_mask, m_laser_video_bank, m_laser_video_bank * 0x04000);
 
-	for (i = 0; i < ARRAY_LENGTH(state->m_laser_bank); i++)
-		state->laser_bank_select_w(state->m_maincpu->space(AS_PROGRAM), i, 0);
+	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
+		laser_bank_select_w(m_maincpu->space(AS_PROGRAM), i, 0);
 }
 
 void vtech2_state::machine_reset()
 {
 	/* banks 0 to 3 only, optional ROM extension */
-	laser_machine_init(machine(), 0xf00f, 3);
+	laser_machine_init(0xf00f, 3);
 }
 
 MACHINE_RESET_MEMBER(vtech2_state,laser500)
 {
 	/* banks 0 to 2, and 4-7 only , optional ROM extension */
-	laser_machine_init(machine(), 0xf0f7, 7);
+	laser_machine_init(0xf0f7, 7);
 }
 
 MACHINE_RESET_MEMBER(vtech2_state,laser700)
 {
 	/* all banks except #3 */
-	laser_machine_init(machine(), 0xfff7, 7);
+	laser_machine_init(0xfff7, 7);
 }
 
 
@@ -338,38 +337,36 @@ static device_t *laser_file(running_machine &machine)
 	return machine.device( state->m_laser_drive ? FLOPPY_1 : FLOPPY_0 );
 }
 
-static void laser_get_track(running_machine &machine)
+void vtech2_state::laser_get_track()
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
-	sprintf(state->m_laser_frame_message, "#%d get track %02d", state->m_laser_drive, state->m_laser_track_x2[state->m_laser_drive]/2);
-	state->m_laser_frame_time = 30;
+	sprintf(m_laser_frame_message, "#%d get track %02d", m_laser_drive, m_laser_track_x2[m_laser_drive]/2);
+	m_laser_frame_time = 30;
 	/* drive selected or and image file ok? */
-	if( state->m_laser_drive >= 0 && laser_file(machine) != NULL )
+	if( m_laser_drive >= 0 && laser_file(machine()) != NULL )
 	{
 		int size, offs;
-		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine()));
 		size = TRKSIZE_VZ;
-		offs = TRKSIZE_VZ * state->m_laser_track_x2[state->m_laser_drive]/2;
+		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
 		image->fseek(offs, SEEK_SET);
-		size = image->fread(state->m_laser_fdc_data, size);
+		size = image->fread(m_laser_fdc_data, size);
 		logerror("get track @$%05x $%04x bytes\n", offs, size);
 	}
-	state->m_laser_fdc_offs = 0;
-	state->m_laser_fdc_write = 0;
+	m_laser_fdc_offs = 0;
+	m_laser_fdc_write = 0;
 }
 
-static void laser_put_track(running_machine &machine)
+void vtech2_state::laser_put_track()
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine()));
 	/* drive selected and image file ok? */
-	if( state->m_laser_drive >= 0 && laser_file(machine) != NULL )
+	if( m_laser_drive >= 0 && laser_file(machine()) != NULL )
 	{
 		int size, offs;
-		offs = TRKSIZE_VZ * state->m_laser_track_x2[state->m_laser_drive]/2;
-		image->fseek(offs + state->m_laser_fdc_start, SEEK_SET);
-		size = image->fwrite(&state->m_laser_fdc_data[state->m_laser_fdc_start], state->m_laser_fdc_write);
-		logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, state->m_laser_fdc_start, size, state->m_laser_fdc_write);
+		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
+		image->fseek(offs + m_laser_fdc_start, SEEK_SET);
+		size = image->fwrite(&m_laser_fdc_data[m_laser_fdc_start], m_laser_fdc_write);
+		logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, m_laser_fdc_start, size, m_laser_fdc_write);
 	}
 }
 
@@ -434,7 +431,7 @@ WRITE8_MEMBER(vtech2_state::laser_fdc_w)
 		{
 			m_laser_drive = drive;
 			if( m_laser_drive >= 0 )
-				laser_get_track(machine());
+				laser_get_track();
 		}
 		if( m_laser_drive >= 0 )
 		{
@@ -447,7 +444,7 @@ WRITE8_MEMBER(vtech2_state::laser_fdc_w)
 					m_laser_track_x2[m_laser_drive]--;
 				logerror("laser_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, m_laser_drive, m_laser_track_x2[m_laser_drive]/2,5*(m_laser_track_x2[m_laser_drive]&1));
 				if( (m_laser_track_x2[m_laser_drive] & 1) == 0 )
-					laser_get_track(machine());
+					laser_get_track();
 			}
 			else
 			if( (PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(m_laser_fdc_latch)) ||
@@ -459,7 +456,7 @@ WRITE8_MEMBER(vtech2_state::laser_fdc_w)
 					m_laser_track_x2[m_laser_drive]++;
 				logerror("laser_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, m_laser_drive, m_laser_track_x2[m_laser_drive]/2,5*(m_laser_track_x2[m_laser_drive]&1));
 				if( (m_laser_track_x2[m_laser_drive] & 1) == 0 )
-					laser_get_track(machine());
+					laser_get_track();
 			}
 			if( (data & 0x40) == 0 )
 			{
@@ -503,7 +500,7 @@ WRITE8_MEMBER(vtech2_state::laser_fdc_w)
 				{
 					/* data written to track before? */
 					if( m_laser_fdc_write )
-						laser_put_track(machine());
+						laser_put_track();
 				}
 				m_laser_fdc_bits = 8;
 				m_laser_fdc_write = 0;

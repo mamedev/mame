@@ -82,6 +82,13 @@ public:
 	DECLARE_WRITE8_MEMBER(cgenie_sh_control_port_w);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	void cgenie_offset_xy();
+	int cgenie_get_register(int indx);
+	void cgenie_mode_select(int mode);
+	void cgenie_refresh_monitor(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int cgenie_port_xx_r( int offset );
+	int cgenie_videoram_r( int offset );
 };
 
 
@@ -107,7 +114,6 @@ DECLARE_WRITE8_HANDLER ( cgenie_fontram_w );
 
 DECLARE_WRITE8_HANDLER ( cgenie_port_ff_w );
 	DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
-int cgenie_port_xx_r(int offset);
 
 	DECLARE_READ8_HANDLER ( cgenie_status_r );
 	DECLARE_READ8_HANDLER ( cgenie_track_r );
@@ -124,7 +130,6 @@ DECLARE_WRITE8_HANDLER ( cgenie_data_w );
 DECLARE_WRITE8_HANDLER ( cgenie_motor_w );
 
 	DECLARE_READ8_HANDLER ( cgenie_keyboard_r );
-int cgenie_videoram_r(running_machine &machine,int offset);
 DECLARE_WRITE8_HANDLER ( cgenie_videoram_w );
 
 
@@ -138,9 +143,5 @@ DECLARE_READ8_HANDLER ( cgenie_register_r );
 
 DECLARE_WRITE8_HANDLER ( cgenie_index_w );
 DECLARE_WRITE8_HANDLER ( cgenie_register_w );
-
-int cgenie_get_register(running_machine &machine, int indx);
-void cgenie_mode_select(running_machine &machine, int graphics);
-
 
 #endif /* CGENIE_H_ */

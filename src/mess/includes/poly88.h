@@ -68,6 +68,7 @@ protected:
 	required_ioport m_line4;
 	required_ioport m_line5;
 	required_ioport m_line6;
+	UINT8 row_number(UINT8 code);
 };
 
 

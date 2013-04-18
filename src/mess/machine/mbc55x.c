@@ -207,21 +207,19 @@ WRITE_LINE_MEMBER( mbc55x_state::mbc55x_fdc_drq_w )
 
 */
 
-static void keyboard_reset(running_machine &machine)
+void mbc55x_state::keyboard_reset()
 {
-	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	logerror("keyboard_reset()\n");
 
-	memset(state->m_keyboard.keyrows,0xFF,MBC55X_KEYROWS);
-	state->m_keyboard.key_special=0;
+	memset(m_keyboard.keyrows,0xFF,MBC55X_KEYROWS);
+	m_keyboard.key_special=0;
 
 	// Setup timer to scan keyboard.
-	state->m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+	m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 }
 
-static void scan_keyboard(running_machine &machine)
+void mbc55x_state::scan_keyboard()
 {
-	mbc55x_state *state = machine.driver_data<mbc55x_state>();
 	UINT8   keyrow;
 	UINT8   row;
 	UINT8   bitno;
@@ -260,33 +258,33 @@ static void scan_keyboard(running_machine &machine)
 
 	// First read shift, control and graph
 
-	state->m_keyboard.key_special = machine.root_device().ioport(KEY_SPECIAL_TAG)->read();
+	m_keyboard.key_special = machine().root_device().ioport(KEY_SPECIAL_TAG)->read();
 
 	for(row=0; row<MBC55X_KEYROWS; row++)
 	{
-		keyrow = machine.root_device().ioport(keynames[row])->read();
+		keyrow = machine().root_device().ioport(keynames[row])->read();
 
 		for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
 		{
-			if(!(keyrow & mask) && (state->m_keyboard.keyrows[row] & mask))
+			if(!(keyrow & mask) && (m_keyboard.keyrows[row] & mask))
 			{
-				if(state->m_keyboard.key_special & (KEY_BIT_LSHIFT | KEY_BIT_RSHIFT))
+				if(m_keyboard.key_special & (KEY_BIT_LSHIFT | KEY_BIT_RSHIFT))
 					key=keyvalues_shift[row][bitno];
 				else
 					key=keyvalues_normal[row][bitno];
 
 				if (LOG_KEYBOARD) logerror("keypress %c\n",key);
-				state->m_kb_uart->receive_character(key);
+				m_kb_uart->receive_character(key);
 			}
 		}
 
-		state->m_keyboard.keyrows[row]=keyrow;
+		m_keyboard.keyrows[row]=keyrow;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 {
-	scan_keyboard(machine());
+	scan_keyboard();
 }
 
 /* i8251 serial */
@@ -335,15 +333,14 @@ WRITE8_MEMBER(mbc55x_state::mbc55x_kb_usart_w)
 	}
 }
 
-static void set_ram_size(running_machine &machine)
+void mbc55x_state::set_ram_size()
 {
-	mbc55x_state    *state      = machine.driver_data<mbc55x_state>();
-	address_space   &space      = state->m_maincpu->space( AS_PROGRAM );
-	int             ramsize     = state->m_ram->size();
+	address_space   &space      = m_maincpu->space( AS_PROGRAM );
+	int             ramsize     = m_ram->size();
 	int             nobanks     = ramsize / RAM_BANK_SIZE;
 	char            bank[10];
 	int             bankno;
-	UINT8           *ram        = &state->m_ram->pointer()[0];
+	UINT8           *ram        = &m_ram->pointer()[0];
 	UINT8           *map_base;
 	int             bank_base;
 
@@ -361,7 +358,7 @@ static void set_ram_size(running_machine &machine)
 
 		if(bankno<nobanks)
 		{
-			state->membank(bank)->set_base(map_base);
+			membank(bank)->set_base(map_base);
 			space.install_readwrite_bank(bank_base, bank_base+(RAM_BANK_SIZE-1), bank);
 			logerror("Mapping bank %d at %05X to RAM\n",bankno,bank_base);
 		}
@@ -373,9 +370,9 @@ static void set_ram_size(running_machine &machine)
 	}
 
 	// Graphics red and blue plane memory mapping, green is in main memory
-	state->membank(RED_PLANE_TAG)->set_base(&state->m_video_mem[RED_PLANE_OFFSET]);
+	membank(RED_PLANE_TAG)->set_base(&m_video_mem[RED_PLANE_OFFSET]);
 	space.install_readwrite_bank(RED_PLANE_MEMBASE, RED_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), RED_PLANE_TAG);
-	state->membank(BLUE_PLANE_TAG)->set_base(&state->m_video_mem[BLUE_PLANE_OFFSET]);
+	membank(BLUE_PLANE_TAG)->set_base(&m_video_mem[BLUE_PLANE_OFFSET]);
 	space.install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
@@ -385,15 +382,15 @@ DRIVER_INIT_MEMBER(mbc55x_state,mbc55x)
 
 void mbc55x_state::machine_reset()
 {
-	set_ram_size(machine());
-	keyboard_reset(machine());
+	set_ram_size();
+	keyboard_reset();
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mbc55x_state::mbc55x_irq_callback),this));
 }
 
 void mbc55x_state::machine_start()
 {
 	/* init cpu */
-//  mbc55x_cpu_init(machine());
+//  mbc55x_cpu_init();
 
 
 	/* setup debug commands */

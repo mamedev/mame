@@ -37,10 +37,9 @@
 #include "includes/hec2hrp.h"
 
 
-static void Init_Hector_Palette( running_machine &machine)
+void hec2hrp_state::Init_Hector_Palette()
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *hector_color = state->m_hector_color;
+	UINT8 *hector_color = m_hector_color;
 	// basic colors !
 	hector_color[0] = 0;  // fond (noir)
 	hector_color[1] = 1;  // HECTOR HRX (rouge)
@@ -48,30 +47,29 @@ static void Init_Hector_Palette( running_machine &machine)
 	hector_color[3] = 3; // Ecriture de choix (jaune)
 
 	// Color initialisation : full lightning
-	palette_set_color( machine, 0,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine, 1,MAKE_RGB(255,000,000));//Rouge
-	palette_set_color( machine, 2,MAKE_RGB(000,255,000));//Vert
-	palette_set_color( machine, 3,MAKE_RGB(255,255,000));//Jaune
-	palette_set_color( machine, 4,MAKE_RGB(000,000,255));//Bleu
-	palette_set_color( machine, 5,MAKE_RGB(255,000,255));//Magneta
-	palette_set_color( machine, 6,MAKE_RGB(000,255,255));//Cyan
-	palette_set_color( machine, 7,MAKE_RGB(255,255,255));//Blanc
+	palette_set_color( machine(), 0,MAKE_RGB(000,000,000));//Noir
+	palette_set_color( machine(), 1,MAKE_RGB(255,000,000));//Rouge
+	palette_set_color( machine(), 2,MAKE_RGB(000,255,000));//Vert
+	palette_set_color( machine(), 3,MAKE_RGB(255,255,000));//Jaune
+	palette_set_color( machine(), 4,MAKE_RGB(000,000,255));//Bleu
+	palette_set_color( machine(), 5,MAKE_RGB(255,000,255));//Magneta
+	palette_set_color( machine(), 6,MAKE_RGB(000,255,255));//Cyan
+	palette_set_color( machine(), 7,MAKE_RGB(255,255,255));//Blanc
 	// 1/2 lightning
 
-	palette_set_color( machine, 8,MAKE_RGB(000,000,000));//Noir
-	palette_set_color( machine, 9,MAKE_RGB(128,000,000));//Rouge
-	palette_set_color( machine,10,MAKE_RGB(000,128,000));//Vert
-	palette_set_color( machine,11,MAKE_RGB(128,128,000));//Jaune
-	palette_set_color( machine,12,MAKE_RGB(000,000,128));//Bleu
-	palette_set_color( machine,13,MAKE_RGB(128,000,128));//Magneta
-	palette_set_color( machine,14,MAKE_RGB(000,128,128));//Cyan
-	palette_set_color( machine,15,MAKE_RGB(128,128,128));//Blanc
+	palette_set_color( machine(), 8,MAKE_RGB(000,000,000));//Noir
+	palette_set_color( machine(), 9,MAKE_RGB(128,000,000));//Rouge
+	palette_set_color( machine(),10,MAKE_RGB(000,128,000));//Vert
+	palette_set_color( machine(),11,MAKE_RGB(128,128,000));//Jaune
+	palette_set_color( machine(),12,MAKE_RGB(000,000,128));//Bleu
+	palette_set_color( machine(),13,MAKE_RGB(128,000,128));//Magneta
+	palette_set_color( machine(),14,MAKE_RGB(000,128,128));//Cyan
+	palette_set_color( machine(),15,MAKE_RGB(128,128,128));//Blanc
 }
 
-void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
+void hec2hrp_state::hector_hr(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
 {
-	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *hector_color = state->m_hector_color;
+	UINT8 *hector_color = m_hector_color;
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
 	for (y = 0; y <= ymax; y++) {  //224
@@ -88,7 +86,7 @@ void hector_hr(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int 
 	}
 }
 
-void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
+void hec2hrp_state::hector_80c(bitmap_ind16 &bitmap, UINT8 *page, int ymax, int yram)
 {
 	UINT8 gfx,y;
 	UINT16 sy=0,ma=0,x;
@@ -113,7 +111,7 @@ void hector_80c(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *page, int
 
 VIDEO_START_MEMBER(hec2hrp_state,hec2hrp)
 {
-	Init_Hector_Palette(machine());
+	Init_Hector_Palette();
 }
 
 UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -125,18 +123,18 @@ UINT32 hec2hrp_state::screen_update_hec2hrp(screen_device &screen, bitmap_ind16 
 		if (m_hector_flag_80c==0)
 			{
 				screen.set_visible_area(0, 243, 0, 227);
-				hector_hr( machine(), bitmap , &videoram_HR[0], 227, 64);
+				hector_hr(bitmap , &videoram_HR[0], 227, 64);
 			}
 		else
 			{
 				screen.set_visible_area(0, 243*2, 0, 227);
-				hector_80c( machine(), bitmap , &videoram_HR[0], 227, 64);
+				hector_80c(bitmap , &videoram_HR[0], 227, 64);
 			}
 		}
 	else
 		{
 			screen.set_visible_area(0, 113, 0, 75);
-			hector_hr( machine(), bitmap, videoram,  77, 32);
+			hector_hr(bitmap, videoram,  77, 32);
 		}
 	return 0;
 }

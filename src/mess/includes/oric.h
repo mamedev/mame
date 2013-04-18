@@ -193,6 +193,8 @@ protected:
 	void oric_vh_update_attribute(UINT8 c);
 	void oric_vh_update_flash();
 	void oric_refresh_charset();
+	void oric_vh_render_6pixels(bitmap_ind16 &bitmap, int x, UINT8 y, UINT8 fg, UINT8 bg, UINT8 data, bool invert_flag);
+	void telestrat_acia_callback(int irq_state);
 };
 
 /*----------- defined in machine/oric.c -----------*/

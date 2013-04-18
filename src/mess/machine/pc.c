@@ -342,26 +342,23 @@ const struct pic8259_interface pcjr_pic8259_config =
  *      PC Speaker related
  *
  *************************************************************************/
-UINT8 pc_speaker_get_spk(running_machine &machine)
+UINT8 pc_state::pc_speaker_get_spk()
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	return st->m_pc_spkrdata & st->m_pc_input;
+	return m_pc_spkrdata & m_pc_input;
 }
 
 
-void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data)
+void pc_state::pc_speaker_set_spkrdata(UINT8 data)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	st->m_pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( st->m_speaker, pc_speaker_get_spk(machine) );
+	m_pc_spkrdata = data ? 1 : 0;
+	speaker_level_w( m_speaker, pc_speaker_get_spk() );
 }
 
 
-void pc_speaker_set_input(running_machine &machine, UINT8 data)
+void pc_state::pc_speaker_set_input(UINT8 data)
 {
-	pc_state *st = machine.driver_data<pc_state>();
-	st->m_pc_input = data ? 1 : 0;
-	speaker_level_w( st->m_speaker, pc_speaker_get_spk(machine) );
+	m_pc_input = data ? 1 : 0;
+	speaker_level_w( m_speaker, pc_speaker_get_spk() );
 }
 
 
@@ -385,7 +382,7 @@ WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out1_changed)
 
 WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out2_changed)
 {
-	pc_speaker_set_input( machine(), state );
+	pc_speaker_set_input( state );
 }
 
 
@@ -662,7 +659,7 @@ static void pcjr_set_keyb_int(running_machine &machine, int state)
 }
 
 
-static void pcjr_keyb_init(running_machine &machine)
+void pc_state::pcjr_keyb_init()
 {
 	pcjr_keyb.transferring = 0;
 	pcjr_keyb.latch = 0;
@@ -830,7 +827,7 @@ WRITE8_MEMBER(pc_state::ibm5160_ppi_portb_w)
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
@@ -891,7 +888,7 @@ WRITE8_MEMBER(pc_state::pc_ppi_portb_w)
 	m_ppi_keyboard_clear = data & 0x80;
 	m_ppi_keyb_clock = data & 0x40;
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
-	pc_speaker_set_spkrdata( machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( data & 0x02 );
 	pc_keyb_set_clock( m_ppi_keyb_clock );
 
 	if ( m_ppi_keyboard_clear )
@@ -976,7 +973,7 @@ WRITE8_MEMBER(pc_state::mc1502_ppi_portb_w)
 //  DBG_LOG(2,"mc1502_ppi_portb_w",("( %02X )\n", data));
 	m_ppi_portb = data;
 	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( data & 0x02 );
 }
 
 READ8_MEMBER(pc_state::mc1502_ppi_portc_r)
@@ -1044,7 +1041,7 @@ WRITE8_MEMBER(pc_state::pcjr_ppi_portb_w)
 	m_ppi_portb = data;
 	m_ppi_portc_switch_high = data & 0x08;
 	pit8253_gate2_w(machine().device("pit8253"), BIT(data, 0));
-	pc_speaker_set_spkrdata( machine(), data & 0x02 );
+	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 }
@@ -1335,41 +1332,40 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
  *
  **********************************************************/
 
-void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int))
+void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int))
 {
-	pc_state *state = machine.driver_data<pc_state>();
 	if ( set_keyb_int_func != NULL )
-		init_pc_common(machine, flags, set_keyb_int_func);
+		init_pc_common(machine(), flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
-	if ( machine.device<ram_device>(RAM_TAG)->pointer() )
-		state->membank( "bank10" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer() );
+	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
+		membank( "bank10" )->set_base( machine().device<ram_device>(RAM_TAG)->pointer() );
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,ibm5150)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_rtc_init(machine());
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,pccga)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_rtc_init(machine());
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
 	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcmda)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT_MEMBER(pc_state,europc)
@@ -1393,7 +1389,7 @@ DRIVER_INIT_MEMBER(pc_state,europc)
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
 	europc_rtc_init(machine());
 //  europc_rtc_set_time(machine());
@@ -1401,7 +1397,7 @@ DRIVER_INIT_MEMBER(pc_state,europc)
 
 DRIVER_INIT_MEMBER(pc_state,t1000hx)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
 }
 
@@ -1414,7 +1410,7 @@ DRIVER_INIT_MEMBER(pc_state,pc200)
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT_MEMBER(pc_state,ppc512)
@@ -1426,7 +1422,7 @@ DRIVER_INIT_MEMBER(pc_state,ppc512)
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 DRIVER_INIT_MEMBER(pc_state,pc1512)
 {
@@ -1437,18 +1433,18 @@ DRIVER_INIT_MEMBER(pc_state,pc1512)
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
 DRIVER_INIT_MEMBER(pc_state,mc1502)
 {
-	mess_init_pc_common(machine(), 0, NULL, pc_set_irq_line);
+	mess_init_pc_common(0, NULL, pc_set_irq_line);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pc1640)
@@ -1458,7 +1454,7 @@ DRIVER_INIT_MEMBER(pc_state,pc1640)
 	io_space.install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
 	io_space.install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
 
-	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
@@ -1566,7 +1562,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_pcjx_1ff_bankval = 0;
 	memset(m_pcjx_1ff_bank, 0, sizeof(m_pcjx_1ff_bank));
 
-	pcjr_keyb_init(machine());
+	pcjr_keyb_init();
 }
 
 
@@ -1742,11 +1738,10 @@ TIMER_CALLBACK_MEMBER(pc_state::pc_rtc_timer)
 	}
 }
 
-void pc_rtc_init(running_machine &machine)
+void pc_state::pc_rtc_init()
 {
-	pc_state *state = machine.driver_data<pc_state>();
 	memset(&pc_rtc,0,sizeof(pc_rtc));
-	pc_rtc.timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_rtc_timer),state));
+	pc_rtc.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_rtc_timer),this));
 	pc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 

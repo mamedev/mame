@@ -1155,7 +1155,7 @@ static chardev* to7_midi_chardev;
 
 
 
-static void to7_midi_update_irq ( running_machine &machine )
+void thomson_state::to7_midi_update_irq (  )
 {
 	if ( (to7_midi_intr & 4) && (to7_midi_status & ACIA_6850_RDRF) )
 		to7_midi_status |= ACIA_6850_irq; /* byte received interrupt */
@@ -1171,7 +1171,7 @@ static void to7_midi_update_irq ( running_machine &machine )
 
 
 
-static void to7_midi_byte_received_cb( running_machine &machine, chardev_err s )
+void thomson_state::to7_midi_byte_received_cb( chardev_err s )
 {
 	to7_midi_status |= ACIA_6850_RDRF;
 	if ( s == CHARDEV_OVERFLOW )
@@ -1181,7 +1181,7 @@ static void to7_midi_byte_received_cb( running_machine &machine, chardev_err s )
 
 
 
-static void to7_midi_ready_to_send_cb( running_machine &machine )
+void thomson_state::to7_midi_ready_to_send_cb(  )
 {
 	to7_midi_status |= ACIA_6850_TDRE;
 	to7_midi_update_irq( machine );
@@ -1311,7 +1311,7 @@ static const chardev_interface to7_midi_interface =
 
 
 
-static void to7_midi_reset( running_machine &machine )
+void thomson_state::to7_midi_reset(  )
 {
 	LOG (( "to7_midi_reset called\n" ));
 	to7_midi_overrun = 0;
@@ -1322,7 +1322,7 @@ static void to7_midi_reset( running_machine &machine )
 
 
 
-static void to7_midi_init( running_machine &machine )
+void thomson_state::to7_midi_init(  )
 {
 	LOG (( "to7_midi_init\n" ));
 	to7_midi_chardev = chardev_open( &machine, "/dev/snd/midiC0D0", "/dev/snd/midiC0D1", &to7_midi_interface );

@@ -467,7 +467,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
  * of the bitmap.
  *
  */
-static int priority_mixer_pri(running_machine &machine,int color)
+int x1_state::priority_mixer_pri(int color)
 {
 	int pri_i,pri_mask_calc;
 
@@ -521,7 +521,7 @@ void x1_state::draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,con
 
 					color =  (pen_g<<2 | pen_r<<1 | pen_b<<0) | 8;
 
-					pri_mask_val = priority_mixer_pri(machine,color);
+					pri_mask_val = priority_mixer_pri(color);
 					if(pri_mask_val & pri) continue;
 
 					if((color == 8 && m_scrn_reg.blackclip & 0x10) || (color == 9 && m_scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
@@ -742,9 +742,8 @@ READ8_MEMBER( x1_state::x1_sub_io_r )
 	return ret;
 }
 
-static void cmt_command( running_machine &machine, UINT8 cmd )
+void x1_state::cmt_command( UINT8 cmd )
 {
-	x1_state *state = machine.driver_data<x1_state>();
 	// CMT deck control command (E9 xx)
 	// E9 00 - Eject
 	// E9 01 - Stop
@@ -758,47 +757,47 @@ static void cmt_command( running_machine &machine, UINT8 cmd )
 	APSS is a Sharp invention and stands for Automatic Program Search System, it scans the tape for silent parts that are bigger than 4 seconds.
 	It's basically used for audio tapes in order to jump over the next/previous "track".
 	*/
-	state->m_cmt_current_cmd = cmd;
+	m_cmt_current_cmd = cmd;
 
-	if(state->m_cassette->get_image() == NULL) //avoid a crash if a disk game tries to access this
+	if(m_cassette->get_image() == NULL) //avoid a crash if a disk game tries to access this
 		return;
 
 	switch(cmd)
 	{
 		case 0x01:  // Stop
-			state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-			state->m_cmt_test = 1;
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			m_cmt_test = 1;
 			popmessage("CMT: Stop");
 			break;
 		case 0x02:  // Play
-			state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Play");
 			break;
 		case 0x03:  // Fast Forward
-			state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Fast Forward");
 			break;
 		case 0x04:  // Rewind
-			state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Rewind");
 			break;
 		case 0x05:  // APSS Fast Forward
-			state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: APSS Fast Forward");
 			break;
 		case 0x06:  // APSS Rewind
-			state->m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: APSS Rewind");
 			break;
 		case 0x0a:  // Record
-			state->m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-			state->m_cassette->change_state(CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
+			m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+			m_cassette->change_state(CASSETTE_RECORD,CASSETTE_MASK_UISTATE);
 			popmessage("CMT: Record");
 			break;
 		default:
@@ -818,13 +817,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
 		case 0x05:  // Fast Forwarding tape
 			m_cassette->seek(1,SEEK_CUR);
 			if(m_cassette->get_position() >= m_cassette->get_length())  // at end?
-				cmt_command(machine(),0x01);  // Stop tape
+				cmt_command(0x01);  // Stop tape
 			break;
 		case 0x04:
 		case 0x06:  // Rewinding tape
 			m_cassette->seek(-1,SEEK_CUR);
 			if(m_cassette->get_position() <= 0) // at beginning?
-				cmt_command(machine(),0x01);  // Stop tape
+				cmt_command(0x01);  // Stop tape
 			break;
 	}
 }
@@ -847,7 +846,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 
 	if(m_sub_cmd == 0xe9)
 	{
-		cmt_command(machine(),data);
+		cmt_command(data);
 		data = 0;
 	}
 
@@ -1424,7 +1423,7 @@ WRITE8_MEMBER( x1_state::x1turbo_gfxpal_w )
  *  FIXME: bit-wise this doesn't make any sense, I guess that it uses the lv 2 kanji roms
  *         Test cases for this port so far are Hyper Olympics '84 disk version and Might & Magic.
  */
-static UINT16 jis_convert(int kanji_addr)
+UINT16 x1_state::jis_convert(int kanji_addr)
 {
 	if(kanji_addr >= 0x0e00 && kanji_addr <= 0x0e9f) { kanji_addr -= 0x0e00; kanji_addr &= 0x0ff; return ((0x0e0) + (kanji_addr >> 3)) << 4; } // numbers
 	if(kanji_addr >= 0x0f00 && kanji_addr <= 0x109f) { kanji_addr -= 0x0f00; kanji_addr &= 0x1ff; return ((0x4c0) + (kanji_addr >> 3)) << 4; } // lower case chars

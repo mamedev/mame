@@ -5,25 +5,23 @@
 #include "emu.h"
 #include "includes/ssystem3.h"
 
-void ssystem3_lcd_reset(running_machine &machine)
+void ssystem3_state::ssystem3_lcd_reset()
 {
-	ssystem3_state *state = machine.driver_data<ssystem3_state>();
-	state->m_lcd.count=0; state->m_lcd.clock=1;
+	m_lcd.count=0; m_lcd.clock=1;
 }
 
-void ssystem3_lcd_write(running_machine &machine, int clock, int data)
+void ssystem3_state::ssystem3_lcd_write(int clock, int data)
 {
-	ssystem3_state *state = machine.driver_data<ssystem3_state>();
-	if (clock&&!state->m_lcd.clock) {
-		state->m_lcd.data[state->m_lcd.count/8]&=~(1<<(state->m_lcd.count&7));
-		if (data) state->m_lcd.data[state->m_lcd.count/8]|=1<<(state->m_lcd.count&7);
-		if (state->m_lcd.count+1==40) {
-			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)machine.device("maincpu")->safe_pc(),
-				state->m_lcd.data[0], state->m_lcd.data[1], state->m_lcd.data[2], state->m_lcd.data[3], state->m_lcd.data[4]);
+	if (clock&&!m_lcd.clock) {
+		m_lcd.data[m_lcd.count/8]&=~(1<<(m_lcd.count&7));
+		if (data) m_lcd.data[m_lcd.count/8]|=1<<(m_lcd.count&7);
+		if (m_lcd.count+1==40) {
+			logerror("%.4x lcd %02x%02x%02x%02x%02x\n",(int)machine().device("maincpu")->safe_pc(),
+				m_lcd.data[0], m_lcd.data[1], m_lcd.data[2], m_lcd.data[3], m_lcd.data[4]);
 		}
-		state->m_lcd.count=(state->m_lcd.count+1)%40;
+		m_lcd.count=(m_lcd.count+1)%40;
 	}
-	state->m_lcd.clock=clock;
+	m_lcd.clock=clock;
 }
 
 
@@ -82,7 +80,7 @@ static const char led[]={
 		"  dddddddddddd"
 };
 
-static void ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y)
+void ssystem3_state::ssystem3_draw_7segment(bitmap_ind16 &bitmap,int value, int x, int y)
 {
 	int i, xi, yi, mask, color;
 
@@ -161,7 +159,7 @@ static const char single_led[]=
 " 55555555   55555555          000000   000000   00   00   00  00         000000      00     00  00    00   0000000"
 ;
 
-static void ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch)
+void ssystem3_state::ssystem3_draw_led(bitmap_ind16 &bitmap,INT16 color, int x, int y, int ch)
 {
 	int j, xi=0;
 	for (j=0; single_led[j]; j++) {
@@ -221,7 +219,7 @@ UINT32 ssystem3_state::screen_update_ssystem3(screen_device &screen, bitmap_ind1
 				int figure, black;
 				int xp=263+x*22;
 				int yp=55+(y^7)*28;
-				ssystem3_playfield_getfigure(machine(), x, y, &figure, &black);
+				ssystem3_playfield_getfigure(x, y, &figure, &black);
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&1?1:0, xp, yp, '6');
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&2?1:0, xp, yp, '8');
 				ssystem3_draw_led(bitmap, lcd_signs_on[figure]&4?1:0, xp, yp, '9');

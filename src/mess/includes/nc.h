@@ -103,20 +103,27 @@ public:
 	void nc100_machine_stop();
 	void nc200_machine_stop();
 	required_device<cpu_device> m_maincpu;
+	void nc200_video_set_backlight(int state);
+	void nc_card_save(device_image_interface &image);
+	int nc_card_calculate_mask(int size);
+	int nc_card_load(device_image_interface &image, unsigned char **ptr);
+	void nc_set_card_present_state(int state);
+	void nc_update_interrupts();
+	void nc_refresh_memory_bank_config(int bank);
+	void nc_refresh_memory_config();
+	void nc_common_restore_memory_from_stream();
+	void nc_common_store_memory_to_stream();
+	void nc_common_open_stream_for_reading();
+	void nc_common_open_stream_for_writing();
+	void nc_common_close_stream();
+	void nc_common_init_machine();
+	void nc_sound_update(int channel);
+	void nc_printer_update(UINT8 data);
+	void nc150_init_machine();
+	void nc200_refresh_uart_interrupt();
+	void nc200_floppy_drive_index_callback(int drive_id);
 };
 
 
-/*----------- defined in video/nc.c -----------*/
-
-void nc200_video_set_backlight(running_machine &machine, int state);
-
-
-/*----------- defined in drivers/nc.c -----------*/
-
-/* pointer to loaded data */
-/* mask used to stop access over end of card ram area */
-
-
-void nc_set_card_present_state(running_machine &machine, int state);
 
 #endif /* NC_H_ */

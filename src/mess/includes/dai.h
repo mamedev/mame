@@ -86,6 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dai_timer);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	void dai_update_memory(int dai_rom_bank);
 };
 
 

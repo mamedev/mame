@@ -349,15 +349,14 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 
 
 /* 80 column card init */
-static void svi318_80col_init(running_machine &machine)
+void svi318_state::svi318_80col_init()
 {
-	svi318_state *state = machine.driver_data<svi318_state>();
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	state->m_svi.svi806_ram = machine.memory().region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE );
-	memset( state->m_svi.svi806_ram->base(), 0x00, 0x800 );
-	memset( state->m_svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
-	state->m_svi.svi806_gfx = state->memregion("gfx1")->base();
+	m_svi.svi806_ram = machine().memory().region_alloc("gfx2", 0x1000, 1, ENDIANNESS_LITTLE );
+	memset( m_svi.svi806_ram->base(), 0x00, 0x800 );
+	memset( m_svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
+	m_svi.svi806_gfx = memregion("gfx1")->base();
 }
 
 
@@ -375,7 +374,7 @@ MACHINE_RESET_MEMBER(svi318_state,svi328_806)
 {
 	MACHINE_RESET_CALL_MEMBER(svi318);
 
-	svi318_80col_init(machine());
+	svi318_80col_init();
 	m_svi.svi806_present = 1;
 	svi318_set_banks();
 
@@ -386,10 +385,9 @@ MACHINE_RESET_MEMBER(svi318_state,svi328_806)
 
 /* Init functions */
 
-void svi318_vdp_interrupt(running_machine &machine, int i)
+void svi318_state::svi318_vdp_interrupt(int i)
 {
-	svi318_state *drvstate = machine.driver_data<svi318_state>();
-	drvstate->m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 

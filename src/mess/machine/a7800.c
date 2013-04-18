@@ -189,7 +189,7 @@ void a7800_partialhash(hash_collection &dest, const unsigned char *data,
 }
 
 
-static int a7800_verify_cart(char header[128])
+int a7800_state::a7800_verify_cart(char header[128])
 {
 	const char* tag = "ATARI7800";
 
@@ -226,7 +226,7 @@ static const a7800_pcb pcb_list[] =
 	{ 0 }
 };
 
-static UINT16 a7800_get_pcb_id(const char *pcb)
+UINT16 a7800_state::a7800_get_pcb_id(const char *pcb)
 {
 	int i;
 

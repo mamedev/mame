@@ -84,10 +84,10 @@ public:
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	inline UINT8 read_vram( UINT16 addr );
+	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void electron_interrupt_handler(int mode, int interrupt);
 };
 
-
-/*----------- defined in machine/electron.c -----------*/
-void electron_interrupt_handler(running_machine &machine, int mode, int interrupt);
 
 #endif /* ELECTRON_H_ */

@@ -113,6 +113,8 @@ protected:
 	memory_bank *m_bank11;
 
 	void maria_draw_scanline();
+	int a7800_verify_cart(char header[128]);
+	UINT16 a7800_get_pcb_id(const char *pcb);
 };
 
 /*----------- defined in machine/a7800.c -----------*/

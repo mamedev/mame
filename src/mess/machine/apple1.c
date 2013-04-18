@@ -159,14 +159,14 @@ DRIVER_INIT_MEMBER(apple1_state,apple1)
 void apple1_state::machine_reset()
 {
 	/* Reset the display hardware. */
-	apple1_vh_dsp_clr(machine());
+	apple1_vh_dsp_clr();
 }
 
 
 /*****************************************************************************
 **  apple1_verify_header
 *****************************************************************************/
-static int apple1_verify_header (UINT8 *data)
+int apple1_state::apple1_verify_header (UINT8 *data)
 {
 	/* Verify the format for the snapshot */
 	if ((data[0] == 'L') &&
@@ -220,7 +220,7 @@ SNAPSHOT_LOAD(apple1)
 		return IMAGE_INIT_FAIL;
 
 	/* Verify the snapshot header */
-	if (apple1_verify_header(snapbuf) == IMAGE_VERIFY_FAIL)
+	if (state->apple1_verify_header(snapbuf) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("apple1 - Snapshot Header is in incorrect format - needs to be LOAD:xxyyDATA:\n");
 		return IMAGE_INIT_FAIL;
@@ -304,7 +304,7 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_kbd_poll)
 		{
 			/* Ignore further video writes, and clear the screen. */
 			m_vh_clrscrn_pressed = 1;
-			apple1_vh_dsp_clr(machine());
+			apple1_vh_dsp_clr();
 		}
 	}
 	else if (m_vh_clrscrn_pressed)
@@ -382,7 +382,7 @@ READ8_MEMBER(apple1_state::apple1_pia0_kbdin)
 WRITE8_MEMBER(apple1_state::apple1_pia0_dspout)
 {
 	/* Send an ASCII character to the video hardware. */
-	apple1_vh_dsp_w(machine(), data);
+	apple1_vh_dsp_w(data);
 }
 
 WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
@@ -403,7 +403,7 @@ WRITE8_MEMBER(apple1_state::apple1_pia0_dsp_write_signal)
 	   write.  Thus the write delay depends on the cursor position and
 	   where the display is in the refresh cycle. */
 	if (!data)
-		machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(machine()), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),this));
+		machine().scheduler().timer_set(apple1_vh_dsp_time_to_ready(), timer_expired_delegate(FUNC(apple1_state::apple1_dsp_ready_start),this));
 }
 
 TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_start)
@@ -484,16 +484,15 @@ TIMER_CALLBACK_MEMBER(apple1_state::apple1_dsp_ready_end)
    flip-flop which is toggled to produce the output waveform.  Any
    access to the cassette I/O range, whether a read or a write,
    toggles this flip-flop. */
-static void cassette_toggle_output(running_machine &machine)
+void apple1_state::cassette_toggle_output()
 {
-	apple1_state *state = machine.driver_data<apple1_state>();
-	state->m_cassette_output_flipflop = !state->m_cassette_output_flipflop;
-	state->m_cassette->output(state->m_cassette_output_flipflop ? 1.0 : -1.0);
+	m_cassette_output_flipflop = !m_cassette_output_flipflop;
+	m_cassette->output(m_cassette_output_flipflop ? 1.0 : -1.0);
 }
 
 READ8_MEMBER(apple1_state::apple1_cassette_r)
 {
-	cassette_toggle_output(machine());
+	cassette_toggle_output();
 
 	if (offset <= 0x7f)
 	{
@@ -535,5 +534,5 @@ WRITE8_MEMBER(apple1_state::apple1_cassette_w)
 	   However, we still have to handle writes, since they may be done
 	   by user code. */
 
-	cassette_toggle_output(machine());
+	cassette_toggle_output();
 }

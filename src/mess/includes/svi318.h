@@ -137,6 +137,8 @@ protected:
 	required_ioport m_buttons;
 
 	void svi318_set_banks();
+	void svi318_80col_init();
+	void svi318_vdp_interrupt(int i);
 };
 
 
@@ -145,8 +147,6 @@ protected:
 extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
-
-int svi318_cassette_present(running_machine &machine, int id);
 
 MC6845_UPDATE_ROW( svi806_crtc6845_update_row );
 

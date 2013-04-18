@@ -20,11 +20,9 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*dl1416_update_func)(device_t *device, int digit, int data);
-
 struct dl1416_interface
 {
-	dl1416_update_func update;
+	devcb_write16 update;
 };
 
 

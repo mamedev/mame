@@ -104,50 +104,48 @@ UINT32 concept_state::screen_update_concept(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static void concept_set_interrupt(running_machine &machine, int level, int state)
+void concept_state::concept_set_interrupt(int level, int state)
 {
-	concept_state *drvstate = machine.driver_data<concept_state>();
 	int interrupt_mask;
 	int final_level;
 
 	if (state)
-		drvstate->m_pending_interrupts |= 1 << level;
+		m_pending_interrupts |= 1 << level;
 	else
-		drvstate->m_pending_interrupts &= ~ (1 << level);
+		m_pending_interrupts &= ~ (1 << level);
 
-	for (final_level = 7, interrupt_mask = drvstate->m_pending_interrupts; (final_level > 0) && ! (interrupt_mask & 0x80); final_level--, interrupt_mask <<= 1)
+	for (final_level = 7, interrupt_mask = m_pending_interrupts; (final_level > 0) && ! (interrupt_mask & 0x80); final_level--, interrupt_mask <<= 1)
 		;
 
 	if (final_level)
 		/* assert interrupt */
-		drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1 + final_level - 1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-INLINE void post_in_KeyQueue(concept_state *state, int keycode)
+inline  void concept_state::post_in_KeyQueue(int keycode)
 {
-	state->m_KeyQueue[(state->m_KeyQueueHead+state->m_KeyQueueLen) % KeyQueueSize] = keycode;
-	state->m_KeyQueueLen++;
+	m_KeyQueue[(m_KeyQueueHead+m_KeyQueueLen) % KeyQueueSize] = keycode;
+	m_KeyQueueLen++;
 }
 
-static void poll_keyboard(running_machine &machine)
+void concept_state::poll_keyboard()
 {
-	concept_state *state = machine.driver_data<concept_state>();
 	UINT32 keystate;
 	UINT32 key_transitions;
 	int i, j;
 	int keycode;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-	for(i = 0; (i < /*4*/3) && (state->m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
+	for(i = 0; (i < /*4*/3) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); i++)
 	{
-		keystate = machine.root_device().ioport(keynames[2*i])->read() | (machine.root_device().ioport(keynames[2*i + 1])->read() << 16);
-		key_transitions = keystate ^ state->m_KeyStateSave[i];
+		keystate = machine().root_device().ioport(keynames[2*i])->read() | (machine().root_device().ioport(keynames[2*i + 1])->read() << 16);
+		key_transitions = keystate ^ m_KeyStateSave[i];
 		if(key_transitions)
 		{
-			for(j = 0; (j < 32) && (state->m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
+			for(j = 0; (j < 32) && (m_KeyQueueLen <= (KeyQueueSize-MaxKeyMessageLen)); j++)
 			{
 				if((key_transitions >> j) & 1)
 				{
@@ -156,15 +154,15 @@ static void poll_keyboard(running_machine &machine)
 					if (((keystate >> j) & 1))
 					{
 						/* key is pressed */
-						state->m_KeyStateSave[i] |= (1 << j);
+						m_KeyStateSave[i] |= (1 << j);
 						keycode |= 0x80;
 					}
 					else
 						/* key is released */
-						state->m_KeyStateSave[i] &= ~ (1 << j);
+						m_KeyStateSave[i] &= ~ (1 << j);
 
-					post_in_KeyQueue(state, keycode);
-					concept_set_interrupt(machine, KEYINT_level, 1);
+					post_in_KeyQueue(keycode);
+					concept_set_interrupt(KEYINT_level, 1);
 				}
 			}
 		}
@@ -173,7 +171,7 @@ static void poll_keyboard(running_machine &machine)
 
 INTERRUPT_GEN_MEMBER(concept_state::concept_interrupt)
 {
-	poll_keyboard(machine());
+	poll_keyboard();
 }
 
 /*
@@ -239,7 +237,8 @@ WRITE8_MEMBER(concept_state::via_out_cb2)
 */
 static void via_irq_func(device_t *device, int state)
 {
-	concept_set_interrupt(device->machine(), TIMINT_level, state);
+	concept_state *drvstate = device->machine().driver_data<concept_state>();
+	drvstate->concept_set_interrupt(TIMINT_level, state);
 }
 
 READ16_MEMBER(concept_state::concept_io_r)
@@ -325,7 +324,7 @@ READ16_MEMBER(concept_state::concept_io_r)
 				}
 
 				if (!m_KeyQueueLen)
-					concept_set_interrupt(machine(), KEYINT_level, 0);
+					concept_set_interrupt(KEYINT_level, 0);
 
 				return reply;
 

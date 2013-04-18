@@ -86,6 +86,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(concept_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(concept_fdc_drq_w);
 	required_device<cpu_device> m_maincpu;
+	void concept_set_interrupt(int level, int state);
+	inline void post_in_KeyQueue(int keycode);
+	void poll_keyboard();
 };
 
 

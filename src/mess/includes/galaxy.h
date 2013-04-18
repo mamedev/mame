@@ -42,6 +42,7 @@ public:
 	TIMER_CALLBACK_MEMBER(gal_video);
 	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
 	void galaxy_set_timer();
+	void galaxy_setup_snapshot (const UINT8 * data, UINT32 size);
 	required_device<cpu_device> m_maincpu;
 protected:
 	required_device<cassette_image_device> m_cassette;

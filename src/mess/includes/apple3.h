@@ -68,6 +68,22 @@ public:
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_a);
 	DECLARE_WRITE8_MEMBER(apple3_via_1_out_b);
 	DECLARE_WRITE_LINE_MEMBER(apple2_via_1_irq_func);
+	void apple3_write_charmem();
+	void apple3_video_text40(bitmap_ind16 &bitmap);
+	void apple3_video_text80(bitmap_ind16 &bitmap);
+	void apple3_video_graphics_hgr(bitmap_ind16 &bitmap);
+	UINT8 swap_bits(UINT8 b);
+	void apple3_video_graphics_chgr(bitmap_ind16 &bitmap);
+	void apple3_video_graphics_shgr(bitmap_ind16 &bitmap);
+	void apple3_video_graphics_chires(bitmap_ind16 &bitmap);
+	void apple3_profile_init(void);
+	void apple3_profile_statemachine(void);
+	UINT8 *apple3_bankaddr(UINT16 bank, offs_t offset);
+	void apple3_setbank(const char *mame_bank, UINT16 bank, offs_t offset);
+	UINT8 *apple3_get_zpa_addr(offs_t offset);
+	void apple3_update_memory();
+	void apple3_via_out(UINT8 *var, UINT8 data);
+	UINT8 *apple3_get_indexed_addr(offs_t offset);
 };
 
 
@@ -76,10 +92,5 @@ public:
 extern const applefdc_interface apple3_fdc_interface;
 extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;
-
-/*----------- defined in video/apple3.c -----------*/
-
-void apple3_write_charmem(running_machine &machine);
-
 
 #endif /* APPLE3_H_ */

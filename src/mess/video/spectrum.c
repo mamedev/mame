@@ -43,7 +43,7 @@ VIDEO_START_MEMBER(spectrum_state,spectrum_128)
 
 
 /* return the color to be used inverting FLASHing colors if necessary */
-INLINE unsigned char get_display_color (unsigned char color, int invert)
+inline unsigned char spectrum_state::get_display_color (unsigned char color, int invert)
 {
 	if (invert && (color & 0x80))
 		return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
@@ -96,7 +96,7 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 
 ***************************************************************************/
 
-INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }

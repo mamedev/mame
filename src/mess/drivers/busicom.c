@@ -11,7 +11,7 @@
 #include "includes/busicom.h"
 
 
-static UINT8 get_bit_selected(UINT32 val,int num)
+UINT8 busicom_state::get_bit_selected(UINT32 val,int num)
 {
 	int i;
 	for(i=0;i<num;i++) {

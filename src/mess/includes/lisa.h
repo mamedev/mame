@@ -225,6 +225,7 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
+	void init_lisa1(void);
 };
 
 

@@ -68,6 +68,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 	IRQ_CALLBACK_MEMBER(b2m_irq_callback);
 	void b2m_postload();
+	void b2m_set_bank(int bank);
 };
 
 /*----------- defined in machine/b2m.c -----------*/

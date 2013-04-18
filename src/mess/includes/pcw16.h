@@ -145,6 +145,11 @@ public:
 	void trigger_fdc_int();
 	void fdc_interrupt(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	inline void pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
+	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
+	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
+	void pcw16_begin_byte_transfer();
 };
 
 #endif /* PCW16_H_ */

@@ -55,7 +55,7 @@
 #define CURSOR_OFF (0)
 
 /* character set DL1416T */
-static const int dl1416t_segments[128] = {
+static const UINT16 dl1416t_segments[128] = {
 	SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, /* undefined */
 	SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, /* undefined */
 	SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, SEG_UNDEF, /* undefined */
@@ -100,6 +100,7 @@ struct dl1416_state
 	int write_enable;
 	int chip_enable;
 	int cursor_enable;
+	devcb_resolved_write16 update_func;
 
 	UINT16 digit_ram[4]; // holds the digit code for each position
 	UINT8 cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on
@@ -126,7 +127,7 @@ INLINE dl1416_state *get_safe_token(device_t *device)
 static DEVICE_START( dl1416 )
 {
 	dl1416_state *dl1416 = get_safe_token(device);
-
+	
 	/* register for state saving */
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->chip_enable);
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_enable);
@@ -137,13 +138,16 @@ static DEVICE_START( dl1416 )
 
 static DEVICE_RESET( dl1416 )
 {
-	int i, pattern;
+	int i;
+	UINT16 pattern;
 	dl1416_state *chip = get_safe_token(device);
 	const dl1416_interface *intf = (const dl1416_interface *)device->static_config();
 	/* disable all lines */
 	chip->chip_enable = FALSE;
 	chip->write_enable = FALSE;
 	chip->cursor_enable = FALSE;
+
+	chip->update_func.resolve(intf->update, *device);
 
 	/* randomize digit and cursor memory */
 	for (i = 0; i < 4; i++)
@@ -164,8 +168,8 @@ static DEVICE_RESET( dl1416 )
 			pattern = SEG_BLANK;
 
 		/* Call update function */
-		if (intf->update)
-			intf->update(device, i, pattern);
+		if (!chip->update_func.isnull())
+			chip->update_func(i, pattern);
 	}
 }
 
@@ -199,7 +203,6 @@ WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w )
 WRITE8_DEVICE_HANDLER( dl1416_data_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	const dl1416_interface *intf = (const dl1416_interface *)device->static_config();
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */
@@ -235,8 +238,8 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 						pattern = SEG_BLANK;
 
 					/* Call update function */
-					if (intf->update)
-						intf->update(device, offset, pattern);
+					if (!chip->update_func.isnull())
+						chip->update_func(offset, pattern);
 				}
 			}
 			else {
@@ -263,8 +266,8 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 							pattern = SEG_BLANK;
 
 						/* Call update function */
-						if (intf->update)
-							intf->update(device, i, pattern);
+						if (!chip->update_func.isnull())
+							chip->update_func(i, pattern);
 					}
 				}
 			}
@@ -287,8 +290,8 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 				pattern = SEG_BLANK;
 
 			/* Call update function */
-			if (intf->update)
-				intf->update(device, offset, pattern);
+			if (!chip->update_func.isnull())
+				chip->update_func(offset, pattern);
 		}
 	}
 }

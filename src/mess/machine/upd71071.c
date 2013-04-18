@@ -110,6 +110,8 @@ struct upd71071_t
 	const upd71071_intf* intf;
 	devcb_resolved_write_line   m_out_hreq_func;
 	devcb_resolved_write_line   m_out_eop_func;
+	devcb_resolved_read16		m_dma_read[4];
+	devcb_resolved_write16 		m_dma_write[4];	
 	devcb_resolved_write_line   m_out_dack_func[4];
 	int m_hreq;
 	int m_eop;
@@ -137,8 +139,8 @@ static TIMER_CALLBACK(dma_transfer_timer)
 		case 0x00:  // Verify
 			break;
 		case 0x04:  // I/O -> memory
-			if(dmac->intf->dma_read[channel])
-				data = dmac->intf->dma_read[channel](device->machine());
+			if(!dmac->m_dma_read[channel].isnull())
+				data = dmac->m_dma_read[channel](0);
 			space.write_byte(dmac->reg.address_current[channel],data & 0xff);
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction
 				dmac->reg.address_current[channel]--;
@@ -159,8 +161,8 @@ static TIMER_CALLBACK(dma_transfer_timer)
 			break;
 		case 0x08:  // memory -> I/O
 			data = space.read_byte(dmac->reg.address_current[channel]);
-			if(dmac->intf->dma_read[channel])
-				dmac->intf->dma_write[channel](device->machine(),data);
+			if(!dmac->m_dma_write[channel].isnull())
+				dmac->m_dma_write[channel](0,data);
 			if(dmac->reg.mode_control[channel] & 0x20)  // Address direction
 				dmac->reg.address_current[channel]--;
 			else
@@ -256,6 +258,8 @@ static DEVICE_START(upd71071)
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = device->machine().scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);
+		dmac->m_dma_read[x].resolve(dmac->intf->m_dma_read[x], *device);
+		dmac->m_dma_write[x].resolve(dmac->intf->m_dma_write[x], *device);
 		dmac->m_out_dack_func[x].resolve(dmac->intf->m_out_dack_cb[x], *device);
 	}
 	dmac->selected_channel = 0;

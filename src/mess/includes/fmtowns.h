@@ -281,6 +281,29 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	IRQ_CALLBACK_MEMBER(towns_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_crtc_refresh_mode();
+	void towns_update_kanji_offset();
+	void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect);
+	void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect);
+	void draw_sprites(const rectangle* rect);
+	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* rect,int layer);
+	void render_text_char(UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr);
+	void draw_text_layer();
+	inline UINT8 byte_to_bcd(UINT8 val);
+	inline UINT8 bcd_to_byte(UINT8 val);
+	inline UINT32 msf_to_lbafm(UINT32 val);  // because the CDROM core doesn't provide this;
+	DECLARE_READ16_MEMBER(towns_fdc_dma_r);
+	DECLARE_WRITE16_MEMBER(towns_fdc_dma_w);
+	void towns_cdrom_set_irq(int line,int state);
+	UINT8 towns_cd_get_track();
+	DECLARE_READ16_MEMBER(towns_cdrom_dma_r);
+	void rtc_hour();
+	void rtc_minute();
+	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
+	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 };
 
 class towns16_state : public towns_state

@@ -336,43 +336,26 @@ public:
 	virtual void machine_reset();
 	void apple2_setup_memory(const apple2_memmap_config *config);
 	void apple2_update_memory();
+	inline UINT32 effective_a2();
+	UINT32 compute_video_address(int col, int row);
+	void adjust_begin_and_end_row(const rectangle &cliprect, int *beginrow, int *endrow);
+	inline void apple2_plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
+		const UINT8 *textgfx_data, UINT32 textgfx_datalen, UINT32 my_a2);
+	void apple2_text_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
+	void apple2_lores_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
+	void apple2_hires_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow);
+	void apple2_video_start(const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo);
+	void apple2_setvar(UINT32 val, UINT32 mask);
+	UINT8 apple2_getfloatingbusvalue();
+	int apple2_fdc_has_35();
+	int apple2_fdc_has_525();
+	void apple2_iwm_setdiskreg(UINT8 data);
+	void apple2_init_common();
+	INT8 apple2_slotram_r(address_space &space, int slotnum, int offset);
 };
-
-
 /*----------- defined in drivers/apple2.c -----------*/
-
 INPUT_PORTS_EXTERN( apple2ep );
-
-
-
 /*----------- defined in machine/apple2.c -----------*/
-
 extern const applefdc_interface apple2_fdc_interface;
-
-void apple2_iwm_setdiskreg(running_machine &machine, UINT8 data);
-UINT8 apple2_iwm_getdiskreg(running_machine &machine);
-
-void apple2_init_common(running_machine &machine);
-
-
-
-
-
-UINT8 apple2_getfloatingbusvalue(running_machine &machine);
-DECLARE_READ8_HANDLER( apple2_c0xx_r );
-DECLARE_WRITE8_HANDLER( apple2_c0xx_w );
-DECLARE_READ8_HANDLER( apple2_c080_r );
-DECLARE_WRITE8_HANDLER( apple2_c080_w );
-
-INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset);
-
-void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask);
-
-int apple2_pressed_specialkey(running_machine &machine, UINT8 key);
-
-/*----------- defined in video/apple2.c -----------*/
-
-void apple2_video_start(running_machine &machine, const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo);
-
 
 #endif /* APPLE2_H_ */

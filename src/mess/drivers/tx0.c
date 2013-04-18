@@ -589,9 +589,9 @@ void tx0_readtape_image_device::call_unload()
 /*
     Read a byte from perforated tape
 */
-static int tape_read(tx0_state *state, UINT8 *reply)
+int tx0_state::tape_read(UINT8 *reply)
 {
-	if (state->m_tape_reader.fd && (state->m_tape_reader.fd->fread(reply, 1) == 1))
+	if (m_tape_reader.fd && (m_tape_reader.fd->fread(reply, 1) == 1))
 		return 0;   /* unit OK */
 	else
 		return 1;   /* unit not ready */
@@ -600,29 +600,29 @@ static int tape_read(tx0_state *state, UINT8 *reply)
 /*
     Write a byte to perforated tape
 */
-static void tape_write(tx0_state *state, UINT8 data)
+void tx0_state::tape_write(UINT8 data)
 {
-	if (state->m_tape_puncher.fd)
-		state->m_tape_puncher.fd->fwrite(& data, 1);
+	if (m_tape_puncher.fd)
+		m_tape_puncher.fd->fwrite(& data, 1);
 }
 
 /*
     common code for tape read commands (R1C, R3C, and read-in mode)
 */
-static void begin_tape_read(tx0_state *state, int binary)
+void tx0_state::begin_tape_read(int binary)
 {
-	state->m_tape_reader.rcl = 1;
-	state->m_tape_reader.rc = (binary) ? 1 : 3;
+	m_tape_reader.rcl = 1;
+	m_tape_reader.rc = (binary) ? 1 : 3;
 
 	/* set up delay if tape is advancing */
-	if (state->m_tape_reader.motor_on && state->m_tape_reader.rcl)
+	if (m_tape_reader.motor_on && m_tape_reader.rcl)
 	{
 		/* delay is approximately 1/400s */
-		state->m_tape_reader.timer->adjust(attotime::from_usec(2500));
+		m_tape_reader.timer->adjust(attotime::from_usec(2500));
 	}
 	else
 	{
-		state->m_tape_reader.timer->enable(0);
+		m_tape_reader.timer->enable(0);
 	}
 }
 
@@ -638,7 +638,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
 
 	if (m_tape_reader.rc)
 	{
-		not_ready = tape_read(this, & data);
+		not_ready = tape_read( & data);
 		if (not_ready)
 		{
 			m_tape_reader.motor_on = 0; /* let us stop the motor */
@@ -706,7 +706,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
 static void tx0_io_r1l(device_t *device)
 {
 	tx0_state *state = device->machine().driver_data<tx0_state>();
-	begin_tape_read(state, 0);
+	state->begin_tape_read( 0);
 }
 
 /*
@@ -715,7 +715,7 @@ static void tx0_io_r1l(device_t *device)
 static void tx0_io_r3l(device_t *device)
 {
 	tx0_state *state = device->machine().driver_data<tx0_state>();
-	begin_tape_read(state, 1);
+	state->begin_tape_read(1);
 }
 
 /*
@@ -729,7 +729,7 @@ static void tx0_io_p6h(device_t *device)
 	/* read current AC */
 	ac = device->state().state_int(TX0_AC);
 	/* shuffle and punch 6-bit word */
-	tape_write(state, ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5));
+	state->tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5));
 
 	state->m_tape_puncher.timer->adjust(attotime::from_usec(15800));
 }
@@ -745,7 +745,7 @@ static void tx0_io_p7h(device_t *device)
 	/* read current AC */
 	ac = device->state().state_int(TX0_AC);
 	/* shuffle and punch 6-bit word */
-	tape_write(state, ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5) | 0100);
+	state->tape_write(((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5) | 0100);
 
 	state->m_tape_puncher.timer->adjust(attotime::from_usec(15800));
 }
@@ -779,12 +779,11 @@ void tx0_printer_image_device::call_unload()
 /*
     Write a character to typewriter
 */
-static void typewriter_out(running_machine &machine, UINT8 data)
+void tx0_state::typewriter_out(UINT8 data)
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
-	tx0_typewriter_drawchar(machine, data);
-	if (state->m_typewriter.fd)
-		state->m_typewriter.fd->fwrite(& data, 1);
+	tx0_typewriter_drawchar(data);
+	if (m_typewriter.fd)
+		m_typewriter.fd->fwrite(& data, 1);
 }
 
 /*
@@ -808,7 +807,7 @@ static void tx0_io_prt(device_t *device)
 	ac = device->state().state_int(TX0_AC);
 	/* shuffle and print 6-bit word */
 	ch = ((ac & 0100000) >> 15) | ((ac & 0010000) >> 11) | ((ac & 0001000) >> 7) | ((ac & 0000100) >> 3) | ((ac & 0000010) << 1) | ((ac & 0000001) << 5);
-	typewriter_out(device->machine(), ch);
+	state->typewriter_out(ch);
 
 	state->m_typewriter.prt_timer->adjust(attotime::from_msec(100));
 }
@@ -835,7 +834,7 @@ static void tx0_io_dis(device_t *device)
 	ac = device->state().state_int(TX0_AC);
 	x = ac >> 9;
 	y = ac & 0777;
-	tx0_plot(device->machine(), x, y);
+	state->tx0_plot(x, y);
 
 	state->m_dis_timer->adjust(attotime::from_usec(50));
 }
@@ -851,11 +850,11 @@ static void tx0_io_dis(device_t *device)
 
 */
 
-static void schedule_select(tx0_state *state)
+void tx0_state::schedule_select()
 {
 	attotime delay = attotime::zero;
 
-	switch (state->m_magtape.command)
+	switch (m_magtape.command)
 	{
 	case 0: /* backspace */
 		delay = attotime::from_usec(4600);
@@ -870,14 +869,14 @@ static void schedule_select(tx0_state *state)
 		delay = attotime::from_usec(4600);
 		break;
 	}
-	state->m_magtape.timer->adjust(delay);
+	m_magtape.timer->adjust(delay);
 }
 
-static void schedule_unselect(tx0_state *state)
+void tx0_state::schedule_unselect()
 {
 	attotime delay = attotime::zero;
 
-	switch (state->m_magtape.command)
+	switch (m_magtape.command)
 	{
 	case 0: /* backspace */
 		delay = attotime::from_usec(5750);
@@ -892,7 +891,7 @@ static void schedule_unselect(tx0_state *state)
 		delay = attotime::from_usec(5750);
 		break;
 	}
-	state->m_magtape.timer->adjust(delay);
+	m_magtape.timer->adjust(delay);
 }
 
 void tx0_magtape_image_device::device_start()
@@ -918,7 +917,7 @@ bool tx0_magtape_image_device::call_load()
 	if (state->m_magtape.timer)
 	{
 		if (state->m_magtape.state == MTS_SELECTING)
-			schedule_select(state);
+			state->schedule_select();
 	}
 
 	return IMAGE_INIT_PASS;
@@ -938,7 +937,7 @@ void tx0_magtape_image_device::call_unload()
 		{   /* unit has become unavailable */
 			state->m_magtape.state = MTS_UNSELECTING;
 			state->m_maincpu->set_state_int(TX0_PF, state->m_maincpu->state_int(TX0_PF) | PF_RWC);
-			schedule_unselect(state);
+			state->schedule_unselect();
 		}
 	}
 }
@@ -975,7 +974,7 @@ static void magtape_callback(device_t *device)
 				state->m_magtape.binary_flag = (mar & 020 >> 4);
 
 				if (state->m_magtape.img)
-					schedule_select(state);
+					state->schedule_select();
 			}
 
 			state->m_magtape.sel_pending = FALSE;
@@ -1023,7 +1022,7 @@ static void magtape_callback(device_t *device)
 			{   /* tape at ldp */
 				state->m_magtape.state = MTS_UNSELECTING;
 				device->state().set_state_int(TX0_PF, device->state().state_int(TX0_PF) | PF_RWC);
-				schedule_unselect(state);
+				state->schedule_unselect();
 			}
 			else if (state->m_magtape.img->fseek( -1, SEEK_CUR))
 			{   /* eject tape */
@@ -1092,7 +1091,7 @@ static void magtape_callback(device_t *device)
 						/* set EOR and unselect... */
 						state->m_magtape.state = MTS_UNSELECTING;
 						device->state().set_state_int(TX0_PF, device->state().state_int(TX0_PF) | PF_EOR);
-						schedule_unselect(state);
+						state->schedule_unselect();
 						state->m_magtape.irg_pos = MTIRGP_ENDMINUS1;
 					}
 					else
@@ -1148,7 +1147,7 @@ static void magtape_callback(device_t *device)
 					/* Or do we stop at EOT mark??? */
 					state->m_magtape.state = MTS_UNSELECTING;
 					device->state().set_state_int(TX0_PF, device->state().state_int(TX0_PF) | PF_EOT);
-					schedule_unselect(state);
+					state->schedule_unselect();
 				}
 			}
 			else
@@ -1276,7 +1275,7 @@ static void magtape_callback(device_t *device)
 					/* set EOR and unselect... */
 					state->m_magtape.state = MTS_UNSELECTING;
 					device->state().set_state_int(TX0_PF, device->state().state_int(TX0_PF) | PF_EOR);
-					schedule_unselect(state);
+					state->schedule_unselect();
 					state->m_magtape.irg_pos = MTIRGP_START;
 					break;
 				}
@@ -1362,7 +1361,7 @@ static void magtape_callback(device_t *device)
 				else
 				{
 					state->m_magtape.state = MTS_UNSELECTING;
-					schedule_unselect(state);
+					state->schedule_unselect();
 					state->m_magtape.irg_pos = MTIRGP_END;
 				}
 				break;
@@ -1453,9 +1452,8 @@ static void tx0_io_reset_callback(device_t *device)
 /*
     typewriter keyboard handler
 */
-static void tx0_keyboard(running_machine &machine)
+void tx0_state::tx0_keyboard()
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
 	int i;
 	int j;
 
@@ -1467,12 +1465,12 @@ static void tx0_keyboard(running_machine &machine)
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = machine.root_device().ioport(twrnames[i])->read();
+		typewriter_keys[i] = machine().root_device().ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_transitions = typewriter_keys[i] & (~ state->m_old_typewriter_keys[i]);
+		typewriter_transitions = typewriter_keys[i] & (~ m_old_typewriter_keys[i]);
 		if (typewriter_transitions)
 		{
 			for (j=0; (((typewriter_transitions >> j) & 1) == 0) /*&& (j<16)*/; j++)
@@ -1483,14 +1481,14 @@ static void tx0_keyboard(running_machine &machine)
 			previous LR */
 			lr = (1 << 17) | ((charcode & 040) << 10) | ((charcode & 020) << 8) | ((charcode & 010) << 6) | ((charcode & 004) << 4) | ((charcode & 002) << 2) | ((charcode & 001) << 1);
 			/* write modified LR */
-			machine.device("maincpu")->state().set_state_int(TX0_LR, lr);
-			tx0_typewriter_drawchar(machine, charcode); /* we want to echo input */
+			machine().device("maincpu")->state().set_state_int(TX0_LR, lr);
+			tx0_typewriter_drawchar(charcode); /* we want to echo input */
 			break;
 		}
 	}
 
 	for (i=0; i<4; i++)
-		state->m_old_typewriter_keys[i] = typewriter_keys[i];
+		m_old_typewriter_keys[i] = typewriter_keys[i];
 }
 
 /*
@@ -1592,7 +1590,7 @@ INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
 		m_old_control_keys = 0;
 		m_old_tsr_keys = 0;
 
-		tx0_keyboard(machine());
+		tx0_keyboard();
 	}
 }
 

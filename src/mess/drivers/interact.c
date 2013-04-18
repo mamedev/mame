@@ -122,19 +122,19 @@ DISCRETE_SOUND_END
 
 MACHINE_RESET_MEMBER(interact_state,interact)
 {
-	hector_reset(machine(), 0, 0);
+	hector_reset(0, 0);
 }
 
 MACHINE_START_MEMBER(interact_state,interact)
 {
-	hector_init(machine());
+	hector_init();
 }
 
 UINT32 interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *videoram = m_videoram;
 	screen.set_visible_area(0, 113, 0, 75);
-	hector_hr( machine(), bitmap, videoram,  77, 32);
+	hector_hr(bitmap, videoram,  77, 32);
 	return 0;
 }
 

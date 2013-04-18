@@ -162,17 +162,28 @@ public:
 	TIMER_CALLBACK_MEMBER(dis_callback);
 	void tx0_machine_stop();
 	required_device<cpu_device> m_maincpu;
+	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void tx0_plot(int x, int y);
+	void tx0_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
+	void tx0_draw_multipleled(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
+	void tx0_draw_switch(bitmap_ind16 &bitmap, int x, int y, int state);
+	void tx0_draw_multipleswitch(bitmap_ind16 &bitmap, int x, int y, int value, int nb_bits);
+	void tx0_draw_char(bitmap_ind16 &bitmap, char character, int x, int y, int color);
+	void tx0_draw_string(bitmap_ind16 &bitmap, const char *buf, int x, int y, int color);
+	void tx0_draw_vline(bitmap_ind16 &bitmap, int x, int y, int height, int color);
+	void tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, int color);
+	void tx0_draw_panel_backdrop(bitmap_ind16 &bitmap);
+	void tx0_draw_panel(bitmap_ind16 &bitmap);
+	void tx0_typewriter_linefeed();
+	void tx0_typewriter_drawchar(int character);
+	int tape_read(UINT8 *reply);
+	void tape_write(UINT8 data);
+	void begin_tape_read(int binary);
+	void typewriter_out(UINT8 data);
+	void schedule_select();
+	void schedule_unselect();
+	void tx0_keyboard();
 };
-
-
-/*----------- defined in video/tx0.c -----------*/
-
-
-
-
-
-void tx0_plot(running_machine &machine, int x, int y);
-void tx0_typewriter_drawchar(running_machine &machine, int character);
 
 /* defines for each bit and mask in input port "CSW" */
 enum

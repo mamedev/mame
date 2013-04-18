@@ -423,9 +423,8 @@ void intv_state::render_background(bitmap_ind16 &bitmap)
 }
 
 #ifdef UNUSED_CODE
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int transparency)
+void intv_state::draw_background(bitmap_ind16 &bitmap, int transparency)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	// First, draw the background
 	int offs = 0;
 	int value = 0;
@@ -441,17 +440,17 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 
 	int j;
 
-	int x0 = STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay;
-	int y0 = STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay;
+	int x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay;
+	int y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay;
 
-	if (state->m_color_stack_mode == 1)
+	if (m_color_stack_mode == 1)
 	{
-		state->m_color_stack_offset = 0;
+		m_color_stack_offset = 0;
 		for(row = 0; row < STIC_BACKTAB_HEIGHT; row++)
 		{
 			for(col = 0; col < STIC_BACKTAB_WIDTH; col++)
 			{
-				value = state->m_ram16[offs];
+				value = m_ram16[offs];
 
 				n_bit = value & STIC_CSTM_ADV;
 				p_bit = value & STIC_CSTM_FG3;
@@ -464,10 +463,10 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 					colorc = (value & STIC_CSQM_C) >> 6;
 					colord = ((n_bit & STIC_CSQM_D2) >> 11) + ((value & STIC_CSQM_D10) >> 9);
 					// color 7 if the top of the color stack in this mode
-					if (colora == 7) colora = state->m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colorb == 7) colorb = state->m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colorc == 7) colorc = state->m_stic_registers[STIC_CSR + STIC_CSR3];
-					if (colord == 7) colord = state->m_stic_registers[STIC_CSR + STIC_CSR3];
+					if (colora == 7) colora = m_stic_registers[STIC_CSR + STIC_CSR3];
+					if (colorb == 7) colorb = m_stic_registers[STIC_CSR + STIC_CSR3];
+					if (colorc == 7) colorc = m_stic_registers[STIC_CSR + STIC_CSR3];
+					if (colord == 7) colord = m_stic_registers[STIC_CSR + STIC_CSR3];
 					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colora);
 					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH)) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorb);
 					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorc);
@@ -477,8 +476,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 				{
 					if (n_bit) // next color
 					{
-						state->m_color_stack_offset += 1;
-						state->m_color_stack_offset &= (STIC_CSRS - 1);
+						m_color_stack_offset += 1;
+						m_color_stack_offset &= (STIC_CSRS - 1);
 					}
 
 					if (p_bit) // pastel color set
@@ -486,22 +485,22 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 					else
 						fgcolor = value & STIC_CSTM_FG20;
 
-					bgcolor = state->m_stic_registers[STIC_CSR + state->m_color_stack_offset];
+					bgcolor = m_stic_registers[STIC_CSR + m_color_stack_offset];
 					code = (value & STIC_CSTM_C)>>3;
 
 					if (g_bit) // read from gram
 					{
 						code &= (STIC_CSTM_C50 >> 3);  // keep from going outside the array
-						//if (state->m_gramdirtybytes[code] == 1)
+						//if (m_gramdirtybytes[code] == 1)
 						{
-							decodechar(machine.gfx[1],
+							decodechar(machine().gfx[1],
 								code,
-								state->m_gram,
-								machine.config()->gfxdecodeinfo[1].gfxlayout);
-							state->m_gramdirtybytes[code] = 0;
+								m_gram,
+								machine().config()->gfxdecodeinfo[1].gfxlayout);
+							m_gramdirtybytes[code] = 0;
 						}
 						// Draw GRAM char
-						drawgfx(bitmap,machine.gfx[1],
+						drawgfx(bitmap,machine().gfx[1],
 							code,
 							bgcolor*16+fgcolor,
 							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -515,7 +514,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 					}
 					else // read from grom
 					{
-						drawgfx(bitmap,machine.gfx[0],
+						drawgfx(bitmap,machine().gfx[0],
 							code,
 							bgcolor*16+fgcolor,
 							0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -538,23 +537,23 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 		{
 			for(col = 0; col < STIC_BACKTAB_WIDTH; col++)
 			{
-				value = state->m_ram16[offs];
+				value = m_ram16[offs];
 				fgcolor = value & STIC_FBM_FG;
 				bgcolor = ((value & STIC_FBM_BG2) >> 11) + ((value & STIC_FBM_BG310) >> 9);
 				code = (value & STIC_FBM_C) >> 3;
 
 				if (value & STIC_FBM_SEL) // read for GRAM
 				{
-					//if (state->m_gramdirtybytes[code] == 1)
+					//if (m_gramdirtybytes[code] == 1)
 					{
-						decodechar(machine.gfx[1],
+						decodechar(machine().gfx[1],
 							code,
-							state->m_gram,
-							machine.config()->gfxdecodeinfo[1].gfxlayout);
-						state->m_gramdirtybytes[code] = 0;
+							m_gram,
+							machine().config()->gfxdecodeinfo[1].gfxlayout);
+						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfx(bitmap,machine.gfx[1],
+					drawgfx(bitmap,machine().gfx[1],
 						code,
 						bgcolor*16+fgcolor,
 						0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -562,7 +561,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 				}
 				else // read from GROM
 				{
-					drawgfx(bitmap,machine.gfx[0],
+					drawgfx(bitmap,machine().gfx[0],
 						code,
 						bgcolor*16+fgcolor,
 						0,0, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE,
@@ -577,17 +576,16 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 
 /* TBD: need to handle sprites behind foreground? */
 #ifdef UNUSED_FUNCTION
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int behind_foreground)
+void intv_state::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	int i;
 	int code;
-	int x0 = STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay - STIC_CARD_WIDTH;
-	int y0 = STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay - STIC_CARD_HEIGHT;
+	int x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay - STIC_CARD_WIDTH;
+	int y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay - STIC_CARD_HEIGHT;
 
 	for(i = STIC_MOBS - 1; i >= 0; --i)
 	{
-		intv_sprite_type *s = &state->m_sprite[i];
+		intv_sprite_type *s = &m_sprite[i];
 		if (s->visible && (s->behind_foreground == behind_foreground))
 		{
 			code = s->card;
@@ -596,16 +594,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int beh
 				code %= 64;  // keep from going outside the array
 				if (s->yres == 1)
 				{
-					//if (state->m_gramdirtybytes[code] == 1)
+					//if (m_gramdirtybytes[code] == 1)
 					{
-						decodechar(machine.gfx[1],
+						decodechar(machine().gfx[1],
 							code,
-							state->m_gram,
-							machine.config()->gfxdecodeinfo[1].gfxlayout);
-						state->m_gramdirtybytes[code] = 0;
+							m_gram,
+							machine().config()->gfxdecodeinfo[1].gfxlayout);
+						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
 						code,
 						s->color,
 						s->xflip,s->yflip,
@@ -614,27 +612,27 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int beh
 				}
 				else
 				{
-					//if ((state->m_gramdirtybytes[code] == 1) || (state->m_gramdirtybytes[code+1] == 1))
+					//if ((m_gramdirtybytes[code] == 1) || (m_gramdirtybytes[code+1] == 1))
 					{
-						decodechar(machine.gfx[1],
+						decodechar(machine().gfx[1],
 							code,
-							state->m_gram,
-							machine.config()->gfxdecodeinfo[1].gfxlayout);
-						decodechar(machine.gfx[1],
+							m_gram,
+							machine().config()->gfxdecodeinfo[1].gfxlayout);
+						decodechar(machine().gfx[1],
 							code+1,
-							state->m_gram,
-							machine.config()->gfxdecodeinfo[1].gfxlayout);
-						state->m_gramdirtybytes[code] = 0;
-						state->m_gramdirtybytes[code+1] = 0;
+							m_gram,
+							machine().config()->gfxdecodeinfo[1].gfxlayout);
+						m_gramdirtybytes[code] = 0;
+						m_gramdirtybytes[code+1] = 0;
 					}
 					// Draw GRAM char
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 						0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[1],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[1],
 						code+1,
 						s->color,
 						s->xflip,s->yflip,
@@ -647,7 +645,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int beh
 				if (s->yres == 1)
 				{
 					// Draw GROM char
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
 						code,
 						s->color,
 						s->xflip,s->yflip,
@@ -656,13 +654,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int beh
 				}
 				else
 				{
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
 						code,
 						s->color,
 						s->xflip,s->yflip,
 						(s->xpos + x0) * STIC_X_SCALE, (s->ypos + y0) * STIC_Y_SCALE + s->yflip * s->ysize * STIC_CARD_HEIGHT,
 						0x8000*s->xsize, 0x8000*s->ysize,0);
-					drawgfxzoom_transpen(bitmap,&machine.screen[0].visarea,machine.gfx[0],
+					drawgfxzoom_transpen(bitmap,&machine().screen[0].visarea,machine().gfx[0],
 						code+1,
 						s->color,
 						s->xflip,s->yflip,

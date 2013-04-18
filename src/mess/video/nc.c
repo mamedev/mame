@@ -41,10 +41,9 @@ void nc_state::palette_init()
 }
 
 
-void nc200_video_set_backlight(running_machine &machine, int state)
+void nc_state::nc200_video_set_backlight(int state)
 {
-	nc_state *drvstate = machine.driver_data<nc_state>();
-	drvstate->m_nc200_backlight = state;
+	m_nc200_backlight = state;
 }
 
 

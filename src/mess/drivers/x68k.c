@@ -145,7 +145,7 @@
 // MFP is clocked at 4MHz, so at /4 prescaler the timer is triggered after 1us (4 cycles)
 // No longer necessary with the new MFP core
 #ifdef UNUSED_FUNCTION
-static attotime prescale(int val)
+attotime x68k_state::prescale(int val)
 {
 	switch(val)
 	{
@@ -229,26 +229,25 @@ TIMER_CALLBACK_MEMBER(x68k_state::mfp_update_irq)
 	}
 }
 
-void mfp_trigger_irq(running_machine &machine, int irq)
+void x68k_state::mfp_trigger_irq(int irq)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	// check if interrupt is enabled
 	if(irq > 7)
 	{
-		if(!(state->m_mfp.iera & (1 << (irq-8))))
+		if(!(m_mfp.iera & (1 << (irq-8))))
 			return;  // not enabled, no action taken
 	}
 	else
 	{
-		if(!(state->m_mfp.ierb & (1 << irq)))
+		if(!(m_mfp.ierb & (1 << irq)))
 			return;  // not enabled, no action taken
 	}
 
 	// set requested IRQ as pending
 	if(irq > 7)
-		state->m_mfp.ipra |= (1 << (irq-8));
+		m_mfp.ipra |= (1 << (irq-8));
 	else
-		state->m_mfp.iprb |= (1 << irq);
+		m_mfp.iprb |= (1 << irq);
 
 	// check for IRQs to be called
 //  mfp_update_irq(0);
@@ -295,7 +294,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::mfp_timer_d_callback)
 	}
 }
 
-void mfp_set_timer(int timer, unsigned char data)
+void x68k_state::mfp_set_timer(int timer, unsigned char data)
 {
 	if((data & 0x07) == 0x0000)
 	{  // Timer stop
@@ -506,13 +505,12 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 
 
 #ifdef UNUSED_FUNCTION
-void mfp_recv_data(int data)
+void x68k_state::mfp_recv_data(int data)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	state->m_mfp.rsr |= 0x80;  // Buffer full
-	state->m_mfp.tsr |= 0x80;
-	state->m_mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
-	state->m_mfp.vector = state->m_current_vector[6] = (state->m_mfp.vr & 0xf0) | 0x0c;
+	m_mfp.rsr |= 0x80;  // Buffer full
+	m_mfp.tsr |= 0x80;
+	m_mfp.usart.recv_buffer = 0x00;   // TODO: set up keyboard data
+	m_mfp.vector = m_current_vector[6] = (m_mfp.vr & 0xf0) | 0x0c;
 //  mfp_trigger_irq(MFP_IRQ_RX_FULL);
 //  logerror("MFP: Receive buffer full IRQ sent\n");
 }

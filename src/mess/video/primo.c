@@ -13,9 +13,8 @@
 
 
 
-static void primo_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, int primo_scanline)
+void primo_state::primo_draw_scanline(bitmap_ind16 &bitmap, int primo_scanline)
 {
-	primo_state *state = machine.driver_data<primo_state>();
 	int x, i;
 	UINT8 data;
 
@@ -23,7 +22,7 @@ static void primo_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, i
 	UINT16 *scanline = &bitmap.pix16(primo_scanline);
 
 	/* address of current line in Primo video memory */
-	const UINT8* primo_video_ram_line = (const UINT8*)state->m_maincpu->space(AS_PROGRAM).get_read_ptr(state->m_video_memory_base + 32 * primo_scanline);
+	const UINT8* primo_video_ram_line = (const UINT8*)m_maincpu->space(AS_PROGRAM).get_read_ptr(m_video_memory_base + 32 * primo_scanline);
 
 	for (x=0; x<256; x+=8)
 	{
@@ -41,6 +40,6 @@ UINT32 primo_state::screen_update_primo(screen_device &screen, bitmap_ind16 &bit
 	int primo_scanline;
 
 	for (primo_scanline=0; primo_scanline<192; primo_scanline++)
-		primo_draw_scanline(machine(), bitmap, primo_scanline);
+		primo_draw_scanline( bitmap, primo_scanline);
 	return 0;
 }

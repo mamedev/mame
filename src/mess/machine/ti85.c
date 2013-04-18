@@ -50,57 +50,54 @@ inline void ti8x_update_bank(address_space &space, UINT8 bank, UINT8 *base, UINT
 		space.nop_write(bank * 0x4000, bank * 0x4000 + 0x3fff);
 }
 
-static void update_ti85_memory (running_machine &machine)
+void ti85_state::update_ti85_memory ()
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	state->membank("bank2")->set_base(state->m_bios + 0x004000*state->m_ti8x_memory_page_1);
+	membank("bank2")->set_base(m_bios + 0x004000*m_ti8x_memory_page_1);
 }
 
-static void update_ti83p_memory (running_machine &machine)
+void ti85_state::update_ti83p_memory ()
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if (state->m_ti8x_memory_page_1 & 0x40)
+	if (m_ti8x_memory_page_1 & 0x40)
 	{
-		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 2 : 1, state->m_ti8x_ram, state->m_ti8x_memory_page_1 & 0x01, true);
+		ti8x_update_bank(space, (m_ti83p_port4 & 1) ? 2 : 1, m_ti8x_ram, m_ti8x_memory_page_1 & 0x01, true);
 	}
 	else
 	{
-		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 2 : 1, state->m_bios, state->m_ti8x_memory_page_1 & 0x1f, false);
+		ti8x_update_bank(space, (m_ti83p_port4 & 1) ? 2 : 1, m_bios, m_ti8x_memory_page_1 & 0x1f, false);
 	}
 
-	if (state->m_ti8x_memory_page_2 & 0x40)
+	if (m_ti8x_memory_page_2 & 0x40)
 	{
-		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 3 : 2, state->m_ti8x_ram, state->m_ti8x_memory_page_2 & 0x01, true);
+		ti8x_update_bank(space, (m_ti83p_port4 & 1) ? 3 : 2, m_ti8x_ram, m_ti8x_memory_page_2 & 0x01, true);
 	}
 	else
 	{
-		ti8x_update_bank(space, (state->m_ti83p_port4 & 1) ? 3 : 2, state->m_bios, state->m_ti8x_memory_page_2 & 0x1f, false);
+		ti8x_update_bank(space, (m_ti83p_port4 & 1) ? 3 : 2, m_bios, m_ti8x_memory_page_2 & 0x1f, false);
 	}
 }
 
-static void update_ti86_memory (running_machine &machine)
+void ti85_state::update_ti86_memory ()
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if (state->m_ti8x_memory_page_1 & 0x40)
+	if (m_ti8x_memory_page_1 & 0x40)
 	{
-		ti8x_update_bank(space, 1, state->m_ti8x_ram, state->m_ti8x_memory_page_1 & 0x07, true);
+		ti8x_update_bank(space, 1, m_ti8x_ram, m_ti8x_memory_page_1 & 0x07, true);
 	}
 	else
 	{
-		ti8x_update_bank(space, 1, state->m_bios, state->m_ti8x_memory_page_1 & 0x0f, false);
+		ti8x_update_bank(space, 1, m_bios, m_ti8x_memory_page_1 & 0x0f, false);
 	}
 
-	if (state->m_ti8x_memory_page_2 & 0x40)
+	if (m_ti8x_memory_page_2 & 0x40)
 	{
-		ti8x_update_bank(space, 2, state->m_ti8x_ram, state->m_ti8x_memory_page_2 & 0x07, true);
+		ti8x_update_bank(space, 2, m_ti8x_ram, m_ti8x_memory_page_2 & 0x07, true);
 	}
 	else
 	{
-		ti8x_update_bank(space, 2, state->m_bios, state->m_ti8x_memory_page_2 & 0x0f, false);
+		ti8x_update_bank(space, 2, m_bios, m_ti8x_memory_page_2 & 0x0f, false);
 	}
 
 }
@@ -391,7 +388,7 @@ WRITE8_MEMBER(ti85_state::ti85_port_0004_w)
 WRITE8_MEMBER(ti85_state::ti85_port_0005_w)
 {
 	m_ti8x_memory_page_1 = data;
-	update_ti85_memory(machine());
+	update_ti85_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
@@ -413,32 +410,32 @@ WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 WRITE8_MEMBER(ti85_state::ti86_port_0005_w)
 {
 	m_ti8x_memory_page_1 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(machine());
+	update_ti86_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti86_port_0006_w)
 {
 	m_ti8x_memory_page_2 = data&((data&0x40)?0x47:0x4f);
-	update_ti86_memory(machine());
+	update_ti86_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti82_port_0002_w)
 {
 	m_ti8x_memory_page_1 = (data & 0x07);
-	update_ti85_memory(machine());
+	update_ti85_memory();
 	m_ti8x_port2 = data;
 }
 
 WRITE8_MEMBER(ti85_state::ti83_port_0000_w)
 {
 	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
-	update_ti85_memory(machine());
+	update_ti85_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti83_port_0002_w)
 {
 	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 8) | (data & 7);
-	update_ti85_memory(machine());
+	update_ti85_memory();
 	m_ti8x_port2 = data;
 }
 
@@ -485,20 +482,20 @@ WRITE8_MEMBER(ti85_state::ti83p_port_0004_w)
 		m_ti8x_memory_page_1 = 0x1f;
 		m_ti8x_memory_page_2 = 0x40;
 	}
-	update_ti83p_memory(machine());
+	update_ti83p_memory();
 	m_ti83p_port4 = data;
 }
 
 WRITE8_MEMBER(ti85_state::ti83p_port_0006_w)
 {
 	m_ti8x_memory_page_1 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(machine());
+	update_ti83p_memory();
 }
 
 WRITE8_MEMBER(ti85_state::ti83p_port_0007_w)
 {
 	m_ti8x_memory_page_2 = data & ((data&0x40) ? 0x41 : 0x5f);
-	update_ti83p_memory(machine());
+	update_ti83p_memory();
 }
 
 /* NVRAM functions */
@@ -544,149 +541,147 @@ NVRAM_HANDLER( ti86 )
   TI calculators snapshot files (SAV)
 ***************************************************************************/
 
-static void ti8x_snapshot_setup_registers (running_machine &machine, UINT8 * data)
+void ti85_state::ti8x_snapshot_setup_registers (UINT8 * data)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
 	unsigned char lo,hi;
 	unsigned char * reg = data + 0x40;
 
 	/* Set registers */
 	lo = reg[0x00] & 0x0ff;
 	hi = reg[0x01] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_AF, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_AF, (hi << 8) | lo);
 	lo = reg[0x04] & 0x0ff;
 	hi = reg[0x05] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_BC, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_BC, (hi << 8) | lo);
 	lo = reg[0x08] & 0x0ff;
 	hi = reg[0x09] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_DE, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_DE, (hi << 8) | lo);
 	lo = reg[0x0c] & 0x0ff;
 	hi = reg[0x0d] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_HL, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_HL, (hi << 8) | lo);
 	lo = reg[0x10] & 0x0ff;
 	hi = reg[0x11] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_IX, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_IX, (hi << 8) | lo);
 	lo = reg[0x14] & 0x0ff;
 	hi = reg[0x15] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_IY, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_IY, (hi << 8) | lo);
 	lo = reg[0x18] & 0x0ff;
 	hi = reg[0x19] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_PC, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_PC, (hi << 8) | lo);
 	lo = reg[0x1c] & 0x0ff;
 	hi = reg[0x1d] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_SP, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_SP, (hi << 8) | lo);
 	lo = reg[0x20] & 0x0ff;
 	hi = reg[0x21] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_AF2, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_AF2, (hi << 8) | lo);
 	lo = reg[0x24] & 0x0ff;
 	hi = reg[0x25] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_BC2, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_BC2, (hi << 8) | lo);
 	lo = reg[0x28] & 0x0ff;
 	hi = reg[0x29] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_DE2, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_DE2, (hi << 8) | lo);
 	lo = reg[0x2c] & 0x0ff;
 	hi = reg[0x2d] & 0x0ff;
-	state->m_maincpu->set_state_int(Z80_HL2, (hi << 8) | lo);
-	state->m_maincpu->set_state_int(Z80_IFF1, reg[0x30]&0x0ff);
-	state->m_maincpu->set_state_int(Z80_IFF2, reg[0x34]&0x0ff);
-	state->m_maincpu->set_state_int(Z80_HALT, reg[0x38]&0x0ff);
-	state->m_maincpu->set_state_int(Z80_IM, reg[0x3c]&0x0ff);
-	state->m_maincpu->set_state_int(Z80_I, reg[0x40]&0x0ff);
+	m_maincpu->set_state_int(Z80_HL2, (hi << 8) | lo);
+	m_maincpu->set_state_int(Z80_IFF1, reg[0x30]&0x0ff);
+	m_maincpu->set_state_int(Z80_IFF2, reg[0x34]&0x0ff);
+	m_maincpu->set_state_int(Z80_HALT, reg[0x38]&0x0ff);
+	m_maincpu->set_state_int(Z80_IM, reg[0x3c]&0x0ff);
+	m_maincpu->set_state_int(Z80_I, reg[0x40]&0x0ff);
 
-	state->m_maincpu->set_state_int(Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
+	m_maincpu->set_state_int(Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
-	state->m_maincpu->set_input_line(0, 0);
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, 0);
-	state->m_maincpu->set_input_line(INPUT_LINE_HALT, 0);
+	m_maincpu->set_input_line(0, 0);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, 0);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, 0);
 }
 
-static void ti85_setup_snapshot (running_machine &machine, UINT8 * data)
+void ti85_state::ti85_setup_snapshot (UINT8 * data)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x8000 + 0x94;
 
-	ti8x_snapshot_setup_registers (machine, data);
+	ti8x_snapshot_setup_registers (data);
 
 	/* Memory dump */
 	for (i = 0; i < 0x8000; i++)
 		space.write_byte(i + 0x8000, data[i+0x94]);
 
-	state->m_keypad_mask = hdw[0x00]&0x7f;
+	m_keypad_mask = hdw[0x00]&0x7f;
 
-	state->m_ti8x_memory_page_1 = hdw[0x08]&0xff;
-	update_ti85_memory(machine);
+	m_ti8x_memory_page_1 = hdw[0x08]&0xff;
+	update_ti85_memory();
 
-	state->m_power_mode = hdw[0x14]&0xff;
+	m_power_mode = hdw[0x14]&0xff;
 
 	lo = hdw[0x28] & 0x0ff;
 	hi = hdw[0x29] & 0x0ff;
-	state->m_LCD_memory_base = (((hi << 8) | lo)-0xc000)>>8;
+	m_LCD_memory_base = (((hi << 8) | lo)-0xc000)>>8;
 
-	state->m_LCD_status = hdw[0x2c]&0xff ? 0 : 0x08;
-	if (state->m_LCD_status) state->m_LCD_mask = 0x02;
+	m_LCD_status = hdw[0x2c]&0xff ? 0 : 0x08;
+	if (m_LCD_status) m_LCD_mask = 0x02;
 
-	state->m_LCD_contrast = hdw[0x30]&0xff;
+	m_LCD_contrast = hdw[0x30]&0xff;
 
-	state->m_timer_interrupt_mask = !hdw[0x38];
-	state->m_timer_interrupt_status = 0;
+	m_timer_interrupt_mask = !hdw[0x38];
+	m_timer_interrupt_status = 0;
 
-	state->m_ON_interrupt_mask = !state->m_LCD_status && state->m_timer_interrupt_status;
-	state->m_ON_interrupt_status = 0;
-	state->m_ON_pressed = 0;
+	m_ON_interrupt_mask = !m_LCD_status && m_timer_interrupt_status;
+	m_ON_interrupt_status = 0;
+	m_ON_pressed = 0;
 
-	state->m_video_buffer_width = 0x02;
-	state->m_interrupt_speed = 0x03;
+	m_video_buffer_width = 0x02;
+	m_interrupt_speed = 0x03;
 }
 
-static void ti86_setup_snapshot (running_machine &machine, UINT8 * data)
+void ti85_state::ti86_setup_snapshot (UINT8 * data)
 {
-	ti85_state *state = machine.driver_data<ti85_state>();
 	unsigned char lo,hi;
 	unsigned char * hdw = data + 0x20000 + 0x94;
 
-	ti8x_snapshot_setup_registers (machine, data);
+	ti8x_snapshot_setup_registers ( data);
 
 	/* Memory dump */
-	memcpy(state->m_ti8x_ram, data+0x94, 0x20000);
+	memcpy(m_ti8x_ram, data+0x94, 0x20000);
 
-	state->m_keypad_mask = hdw[0x00]&0x7f;
+	m_keypad_mask = hdw[0x00]&0x7f;
 
-	state->m_ti8x_memory_page_1 = hdw[0x04]&0xff ? 0x40 : 0x00;
-	state->m_ti8x_memory_page_1 |= hdw[0x08]&0x0f;
+	m_ti8x_memory_page_1 = hdw[0x04]&0xff ? 0x40 : 0x00;
+	m_ti8x_memory_page_1 |= hdw[0x08]&0x0f;
 
-	state->m_ti8x_memory_page_2 = hdw[0x0c]&0xff ? 0x40 : 0x00;
-	state->m_ti8x_memory_page_2 |= hdw[0x10]&0x0f;
+	m_ti8x_memory_page_2 = hdw[0x0c]&0xff ? 0x40 : 0x00;
+	m_ti8x_memory_page_2 |= hdw[0x10]&0x0f;
 
-	update_ti86_memory(machine);
+	update_ti86_memory();
 
 	lo = hdw[0x2c] & 0x0ff;
 	hi = hdw[0x2d] & 0x0ff;
-	state->m_LCD_memory_base = (((hi << 8) | lo)-0xc000)>>8;
+	m_LCD_memory_base = (((hi << 8) | lo)-0xc000)>>8;
 
-	state->m_LCD_status = hdw[0x30]&0xff ? 0 : 0x08;
-	if (state->m_LCD_status) state->m_LCD_mask = 0x02;
+	m_LCD_status = hdw[0x30]&0xff ? 0 : 0x08;
+	if (m_LCD_status) m_LCD_mask = 0x02;
 
-	state->m_LCD_contrast = hdw[0x34]&0xff;
+	m_LCD_contrast = hdw[0x34]&0xff;
 
-	state->m_timer_interrupt_mask = !hdw[0x3c];
-	state->m_timer_interrupt_status = 0;
+	m_timer_interrupt_mask = !hdw[0x3c];
+	m_timer_interrupt_status = 0;
 
-	state->m_ON_interrupt_mask = !state->m_LCD_status && state->m_timer_interrupt_status;
-	state->m_ON_interrupt_status = 0;
-	state->m_ON_pressed = 0;
+	m_ON_interrupt_mask = !m_LCD_status && m_timer_interrupt_status;
+	m_ON_interrupt_status = 0;
+	m_ON_pressed = 0;
 
-	state->m_video_buffer_width = 0x02;
-	state->m_interrupt_speed = 0x03;
+	m_video_buffer_width = 0x02;
+	m_interrupt_speed = 0x03;
 }
 
 SNAPSHOT_LOAD( ti8x )
 {
 	int expected_snapshot_size = 0;
 	UINT8 *ti8x_snapshot_data;
-
+	ti85_state *state = image.device().machine().driver_data<ti85_state>();
+	
 	if (!strncmp(image.device().machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;
 	else if (!strncmp(image.device().machine().system().name, "ti86", 4))
@@ -706,9 +701,9 @@ SNAPSHOT_LOAD( ti8x )
 	image.fread( ti8x_snapshot_data, snapshot_size);
 
 	if (!strncmp(image.device().machine().system().name, "ti85", 4))
-		ti85_setup_snapshot(image.device().machine(), ti8x_snapshot_data);
+		state->ti85_setup_snapshot(ti8x_snapshot_data);
 	else if (!strncmp(image.device().machine().system().name, "ti86", 4))
-		ti86_setup_snapshot(image.device().machine(), ti8x_snapshot_data);
+		state->ti86_setup_snapshot(ti8x_snapshot_data);
 
 	free(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;

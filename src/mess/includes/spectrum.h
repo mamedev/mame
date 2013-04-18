@@ -212,6 +212,8 @@ protected:
 	optional_ioport m_io_plus4;
 
 	void spectrum_UpdateBorderBitmap();
+	inline unsigned char get_display_color (unsigned char color, int invert);
+	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 };
 
 
