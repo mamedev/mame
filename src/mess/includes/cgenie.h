@@ -89,6 +89,45 @@ public:
 	void cgenie_refresh_tv_set(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int cgenie_port_xx_r( int offset );
 	int cgenie_videoram_r( int offset );
+
+	DECLARE_READ8_MEMBER( cgenie_psg_port_a_r );
+	DECLARE_READ8_MEMBER( cgenie_psg_port_b_r );
+	DECLARE_WRITE8_MEMBER( cgenie_psg_port_a_w );
+	DECLARE_WRITE8_MEMBER( cgenie_psg_port_b_w );
+
+	DECLARE_READ8_MEMBER( cgenie_colorram_r );
+	DECLARE_READ8_MEMBER( cgenie_fontram_r );
+
+	DECLARE_WRITE8_MEMBER( cgenie_colorram_w );
+	DECLARE_WRITE8_MEMBER( cgenie_fontram_w );
+
+	DECLARE_WRITE8_MEMBER( cgenie_port_ff_w );
+	DECLARE_READ8_MEMBER( cgenie_port_ff_r );
+
+	DECLARE_READ8_MEMBER( cgenie_status_r );
+	DECLARE_READ8_MEMBER( cgenie_track_r );
+	DECLARE_READ8_MEMBER( cgenie_sector_r );
+	DECLARE_READ8_MEMBER( cgenie_data_r );
+
+	DECLARE_WRITE8_MEMBER( cgenie_command_w );
+	DECLARE_WRITE8_MEMBER( cgenie_track_w );
+	DECLARE_WRITE8_MEMBER( cgenie_sector_w );
+	DECLARE_WRITE8_MEMBER( cgenie_data_w );
+
+	DECLARE_READ8_MEMBER( cgenie_irq_status_r );
+
+	DECLARE_WRITE8_MEMBER( cgenie_motor_w );
+
+	DECLARE_READ8_MEMBER( cgenie_keyboard_r );
+	DECLARE_WRITE8_MEMBER( cgenie_videoram_w );
+
+
+	DECLARE_READ8_MEMBER( cgenie_index_r );
+	DECLARE_READ8_MEMBER( cgenie_register_r );
+
+	DECLARE_WRITE8_MEMBER( cgenie_index_w );
+	DECLARE_WRITE8_MEMBER( cgenie_register_w );
+	
 };
 
 
@@ -96,52 +135,5 @@ public:
 
 
 extern const wd17xx_interface cgenie_wd17xx_interface;
-
-
-DECLARE_READ8_HANDLER ( cgenie_psg_port_a_r );
-DECLARE_READ8_HANDLER ( cgenie_psg_port_b_r );
-DECLARE_WRITE8_HANDLER ( cgenie_psg_port_a_w );
-DECLARE_WRITE8_HANDLER ( cgenie_psg_port_b_w );
-
-
-
-
-DECLARE_READ8_HANDLER ( cgenie_colorram_r );
-DECLARE_READ8_HANDLER ( cgenie_fontram_r );
-
-DECLARE_WRITE8_HANDLER ( cgenie_colorram_w );
-DECLARE_WRITE8_HANDLER ( cgenie_fontram_w );
-
-DECLARE_WRITE8_HANDLER ( cgenie_port_ff_w );
-	DECLARE_READ8_HANDLER ( cgenie_port_ff_r );
-
-	DECLARE_READ8_HANDLER ( cgenie_status_r );
-	DECLARE_READ8_HANDLER ( cgenie_track_r );
-	DECLARE_READ8_HANDLER ( cgenie_sector_r );
-	DECLARE_READ8_HANDLER ( cgenie_data_r );
-
-DECLARE_WRITE8_HANDLER ( cgenie_command_w );
-DECLARE_WRITE8_HANDLER ( cgenie_track_w );
-DECLARE_WRITE8_HANDLER ( cgenie_sector_w );
-DECLARE_WRITE8_HANDLER ( cgenie_data_w );
-
-	DECLARE_READ8_HANDLER ( cgenie_irq_status_r );
-
-DECLARE_WRITE8_HANDLER ( cgenie_motor_w );
-
-	DECLARE_READ8_HANDLER ( cgenie_keyboard_r );
-DECLARE_WRITE8_HANDLER ( cgenie_videoram_w );
-
-
-/*----------- defined in video/cgenie.c -----------*/
-
-
-
-
-DECLARE_READ8_HANDLER ( cgenie_index_r );
-DECLARE_READ8_HANDLER ( cgenie_register_r );
-
-DECLARE_WRITE8_HANDLER ( cgenie_index_w );
-DECLARE_WRITE8_HANDLER ( cgenie_register_w );
 
 #endif /* CGENIE_H_ */

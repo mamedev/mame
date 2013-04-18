@@ -56,101 +56,100 @@ void cgenie_state::cgenie_offset_xy()
 /***************************************************************************
   Write to an indexed register of the 6845 CRTC
 ***************************************************************************/
-WRITE8_HANDLER ( cgenie_register_w )
-{
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
+WRITE8_MEMBER( cgenie_state::cgenie_register_w )
+{	
 	//int addr;
 
-	switch (state->m_crt.idx)
+	switch (m_crt.idx)
 	{
 		case 0:
-			if( state->m_crt.horizontal_total == data )
+			if( m_crt.horizontal_total == data )
 				break;
-			state->m_crt.horizontal_total = data;
-			state->cgenie_offset_xy();
+			m_crt.horizontal_total = data;
+			cgenie_offset_xy();
 			break;
 		case 1:
-			if( state->m_crt.horizontal_displayed == data )
+			if( m_crt.horizontal_displayed == data )
 				break;
-			state->m_crt.horizontal_displayed = data;
+			m_crt.horizontal_displayed = data;
 			break;
 		case 2:
-			if( state->m_crt.horizontal_sync_pos == data )
+			if( m_crt.horizontal_sync_pos == data )
 				break;
-			state->m_crt.horizontal_sync_pos = data;
-			state->cgenie_offset_xy();
+			m_crt.horizontal_sync_pos = data;
+			cgenie_offset_xy();
 			break;
 		case 3:
-			state->m_crt.horizontal_length = data;
+			m_crt.horizontal_length = data;
 			break;
 		case 4:
-			if( state->m_crt.vertical_total == data )
+			if( m_crt.vertical_total == data )
 				break;
-			state->m_crt.vertical_total = data;
-			state->cgenie_offset_xy();
+			m_crt.vertical_total = data;
+			cgenie_offset_xy();
 			break;
 		case 5:
-			if( state->m_crt.vertical_adjust == data )
+			if( m_crt.vertical_adjust == data )
 				break;
-			state->m_crt.vertical_adjust = data;
-			state->cgenie_offset_xy();
+			m_crt.vertical_adjust = data;
+			cgenie_offset_xy();
 			break;
 		case 6:
-			if( state->m_crt.vertical_displayed == data )
+			if( m_crt.vertical_displayed == data )
 				break;
-			state->m_crt.vertical_displayed = data;
+			m_crt.vertical_displayed = data;
 			break;
 		case 7:
-			if( state->m_crt.vertical_sync_pos == data )
+			if( m_crt.vertical_sync_pos == data )
 				break;
-			state->m_crt.vertical_sync_pos = data;
-			state->cgenie_offset_xy();
+			m_crt.vertical_sync_pos = data;
+			cgenie_offset_xy();
 			break;
 		case 8:
-			state->m_crt.crt_mode = data;
+			m_crt.crt_mode = data;
 			break;
 		case 9:
 			data &= 15;
-			if( state->m_crt.scan_lines == data )
+			if( m_crt.scan_lines == data )
 				break;
-			state->m_crt.scan_lines = data;
-			state->cgenie_offset_xy();
+			m_crt.scan_lines = data;
+			cgenie_offset_xy();
 			break;
 		case 10:
-			if( state->m_crt.cursor_top == data )
+			if( m_crt.cursor_top == data )
 				break;
-			state->m_crt.cursor_top = data;
-			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
+			m_crt.cursor_top = data;
+			//addr = 256 * m_crt.cursor_address_hi + m_crt.cursor_address_lo;
 			break;
 		case 11:
-			if( state->m_crt.cursor_bottom == data )
+			if( m_crt.cursor_bottom == data )
 				break;
-			state->m_crt.cursor_bottom = data;
-			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
+			m_crt.cursor_bottom = data;
+			//addr = 256 * m_crt.cursor_address_hi + m_crt.cursor_address_lo;
 			break;
 		case 12:
 			data &= 63;
-			if( state->m_crt.screen_address_hi == data )
+			if( m_crt.screen_address_hi == data )
 				break;
-			state->m_crt.screen_address_hi = data;
+			m_crt.screen_address_hi = data;
 			break;
 		case 13:
-			if( state->m_crt.screen_address_lo == data )
+			if( m_crt.screen_address_lo == data )
 				break;
-			state->m_crt.screen_address_lo = data;
+			m_crt.screen_address_lo = data;
 			break;
 		case 14:
 			data &= 63;
-			if( state->m_crt.cursor_address_hi == data )
+			if( m_crt.cursor_address_hi == data )
 				break;
-			state->m_crt.cursor_address_hi = data;
-			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
+			m_crt.cursor_address_hi = data;
+			//addr = 256 * m_crt.cursor_address_hi + m_crt.cursor_address_lo;
 			break;
 		case 15:
-			if( state->m_crt.cursor_address_lo == data )
+			if( m_crt.cursor_address_lo == data )
 				break;
-			state->m_crt.cursor_address_lo = data;
-			//addr = 256 * state->m_crt.cursor_address_hi + state->m_crt.cursor_address_lo;
+			m_crt.cursor_address_lo = data;
+			//addr = 256 * m_crt.cursor_address_hi + m_crt.cursor_address_lo;
 			break;
 	}
 }
@@ -158,19 +157,17 @@ WRITE8_HANDLER ( cgenie_register_w )
 /***************************************************************************
   Write to the index register of the 6845 CRTC
 ***************************************************************************/
-WRITE8_HANDLER ( cgenie_index_w )
+WRITE8_MEMBER( cgenie_state::cgenie_index_w )
 {
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	state->m_crt.idx = data & 15;
+	m_crt.idx = data & 15;
 }
 
 /***************************************************************************
   Read from an indexed register of the 6845 CRTC
 ***************************************************************************/
-READ8_HANDLER ( cgenie_register_r )
-{
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	return state->cgenie_get_register(state->m_crt.idx);
+READ8_MEMBER( cgenie_state::cgenie_register_r )
+{	
+	return cgenie_get_register(m_crt.idx);
 }
 
 /***************************************************************************
@@ -219,10 +216,9 @@ int cgenie_state::cgenie_get_register(int indx)
 /***************************************************************************
   Read the index register of the 6845 CRTC
 ***************************************************************************/
-	READ8_HANDLER ( cgenie_index_r )
-{
-	cgenie_state *state = space.machine().driver_data<cgenie_state>();
-	return state->m_crt.idx;
+READ8_MEMBER( cgenie_state::cgenie_index_r )
+{	
+	return m_crt.idx;
 }
 
 /***************************************************************************
