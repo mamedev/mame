@@ -150,29 +150,35 @@ public:
 	DECLARE_READ8_MEMBER(c65_dma_read_color);
 	DECLARE_WRITE_LINE_MEMBER(c65_vic_interrupt);
 	DECLARE_WRITE8_MEMBER(c65_bankswitch_interface);
+	DECLARE_READ8_MEMBER( c65_read_mem );
+	DECLARE_WRITE8_MEMBER( c65_write_mem );
+	DECLARE_READ8_MEMBER( c65_ram_expansion_r );
+	DECLARE_WRITE8_MEMBER( c65_ram_expansion_w );
+	DECLARE_WRITE8_MEMBER( c65_write_io );
+	DECLARE_WRITE8_MEMBER( c65_write_io_dc00 );
+	DECLARE_READ8_MEMBER( c65_read_io );
+	DECLARE_READ8_MEMBER( c65_read_io_dc00 );
 	int c64_paddle_read( device_t *device, address_space &space, int which );
+	void c65_nmi(  );
+	void c65_irq( int level );
+	void c65_dma_port_w( int offset, int value );
+	int c65_dma_port_r( int offset );
+	void c65_6511_port_w( int offset, int value );
+	int c65_6511_port_r( int offset );
+	void c65_fdc_state(void);
+	void c65_fdc_w( int offset, int data );
+	int c65_fdc_r( int offset );
+	void c65_bankswitch(  );
+	void c65_colorram_write( int offset, int value );
+	void c65_common_driver_init(  );
 
 	required_device<cpu_device> m_maincpu;
 };
 
-
 /*----------- defined in machine/c65.c -----------*/
-
-/*extern UINT8 *c65_memory; */
-/*extern UINT8 *c65_basic; */
-/*extern UINT8 *c65_kernal; */
-/*extern UINT8 *c65_dos; */
-/*extern UINT8 *c65_monitor; */
-/*extern UINT8 *c65_graphics; */
-
-void c65_bankswitch (running_machine &machine);
-//void c65_colorram_write (running_machine &machine, int offset, int value);
-
 extern const legacy_mos6526_interface c65_cia0;
 extern const legacy_mos6526_interface c65_cia1;
 
-DECLARE_READ8_HANDLER ( c64_colorram_read );
-DECLARE_WRITE8_HANDLER ( c64_colorram_write );
 MACHINE_CONFIG_EXTERN( c64_cartslot );
 
 #endif /* C65_H_ */
