@@ -114,15 +114,14 @@ WRITE_LINE_MEMBER(c65_state::c65_cia0_interrupt)
 }
 
 /* is this correct for c65 as well as c64? */
-void c65_vic_interrupt( running_machine &machine, int level )
+WRITE_LINE_MEMBER(c65_state::c65_vic_interrupt)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	device_t *cia_0 = machine.device("cia_0");
+	device_t *cia_0 = machine().device("cia_0");
 #if 1
-	if (level != state->m_vicirq)
+	if (state != m_vicirq)
 	{
-		c65_irq (machine, level || mos6526_irq_r(cia_0));
-		state->m_vicirq = level;
+		c65_irq (machine(), state || mos6526_irq_r(cia_0));
+		m_vicirq = state;
 	}
 #endif
 }
@@ -777,57 +776,56 @@ d02f:
 /* bit 1 external sync enable (genlock)
    bit 2 palette enable
    bit 6 vic3 c65 character set */
-void c65_bankswitch_interface( running_machine &machine, int value )
+WRITE8_MEMBER(c65_state::c65_bankswitch_interface)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	DBG_LOG(machine, 2, "c65 bankswitch", ("%.2x\n",value));
+	DBG_LOG(machine(), 2, "c65 bankswitch", ("%.2x\n",data));
 
-	if (state->m_io_on)
+	if (m_io_on)
 	{
-		if (value & 1)
+		if (data & 1)
 		{
-			state->membank("bank8")->set_base(state->m_colorram + 0x400);
-			state->membank("bank9")->set_base(state->m_colorram + 0x400);
-			state->m_maincpu->space(AS_PROGRAM).install_read_bank(0x0dc00, 0x0dfff, "bank8");
-			state->m_maincpu->space(AS_PROGRAM).install_write_bank(0x0dc00, 0x0dfff, "bank9");
+			membank("bank8")->set_base(m_colorram + 0x400);
+			membank("bank9")->set_base(m_colorram + 0x400);
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x0dc00, 0x0dfff, "bank8");
+			m_maincpu->space(AS_PROGRAM).install_write_bank(0x0dc00, 0x0dfff, "bank9");
 		}
 		else
 		{
-			state->m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
-			state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
+			m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x0dc00, 0x0dfff, FUNC(c65_read_io_dc00));
+			m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x0dc00, 0x0dfff, FUNC(c65_write_io_dc00));
 		}
 	}
 
-	state->m_io_dc00_on = !(value & 1);
+	m_io_dc00_on = !(data & 1);
 #if 0
 	/* cartridge roms !?*/
-	if (value & 0x08)
-		state->membank("bank1")->set_base(state->m_roml);
+	if (data & 0x08)
+		membank("bank1")->set_base(m_roml);
 	else
-		state->membank("bank1")->set_base(state->m_memory + 0x8000);
+		membank("bank1")->set_base(m_memory + 0x8000);
 
-	if (value & 0x10)
-		state->membank("bank2")->set_base(state->m_basic);
+	if (data & 0x10)
+		membank("bank2")->set_base(m_basic);
 	else
-		state->membank("bank2")->set_base(state->m_memory + 0xa000);
+		membank("bank2")->set_base(m_memory + 0xa000);
 #endif
-	if ((state->m_old_value^value) & 0x20)
+	if ((m_old_value^data) & 0x20)
 	{
 	/* bankswitching faulty when doing actual page */
-		if (value & 0x20)
-			state->membank("bank3")->set_base(state->m_basic);
+		if (data & 0x20)
+			membank("bank3")->set_base(m_basic);
 		else
-			state->membank("bank3")->set_base(state->m_memory + 0xc000);
+			membank("bank3")->set_base(m_memory + 0xc000);
 	}
-	state->m_charset_select = value & 0x40;
+	m_charset_select = data & 0x40;
 #if 0
 	/* cartridge roms !?*/
-	if (value & 0x80)
-		state->membank("bank8")->set_base(state->m_kernal);
+	if (data & 0x80)
+		membank("bank8")->set_base(m_kernal);
 	else
-		state->membank("bank6")->set_base(state->m_memory + 0xe000);
+		membank("bank6")->set_base(m_memory + 0xe000);
 #endif
-	state->m_old_value = value;
+	m_old_value = data;
 }
 
 void c65_bankswitch( running_machine &machine )
@@ -930,36 +928,34 @@ void c65_colorram_write( running_machine &machine, int offset, int value )
  * a15 and a14 portlines
  * 0x1000-0x1fff, 0x9000-0x9fff char rom
  */
-int c65_dma_read( running_machine &machine, int offset )
+READ8_MEMBER(c65_state::c65_dma_read)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	if (!state->m_game && state->m_exrom)
+	if (!m_game && m_exrom)
 	{
 		if (offset < 0x3000)
-			return state->m_memory[offset];
-		return state->m_romh[offset & 0x1fff];
+			return m_memory[offset];
+		return m_romh[offset & 0x1fff];
 	}
-	if ((state->m_vicaddr == state->m_memory) || (state->m_vicaddr == state->m_memory + 0x8000))
+	if ((m_vicaddr == m_memory) || (m_vicaddr == m_memory + 0x8000))
 	{
 		if (offset < 0x1000)
-			return state->m_vicaddr[offset & 0x3fff];
+			return m_vicaddr[offset & 0x3fff];
 		if (offset < 0x2000) {
-			if (state->m_charset_select)
-				return state->m_chargen[offset & 0xfff];
+			if (m_charset_select)
+				return m_chargen[offset & 0xfff];
 			else
-				return state->m_chargen[offset & 0xfff];
+				return m_chargen[offset & 0xfff];
 		}
-		return state->m_vicaddr[offset & 0x3fff];
+		return m_vicaddr[offset & 0x3fff];
 	}
-	return state->m_vicaddr[offset & 0x3fff];
+	return m_vicaddr[offset & 0x3fff];
 }
 
-int c65_dma_read_color( running_machine &machine, int offset )
+READ8_MEMBER(c65_state::c65_dma_read_color)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	if (state->m_c64mode)
-		return state->m_colorram[offset & 0x3ff] & 0xf;
-	return state->m_colorram[offset & 0x7ff];
+	if (m_c64mode)
+		return m_colorram[offset & 0x3ff] & 0xf;
+	return m_colorram[offset & 0x7ff];
 }
 
 static void c65_common_driver_init( running_machine &machine )
@@ -1013,7 +1009,7 @@ MACHINE_START_MEMBER(c65_state,c65)
 
 	m_c64mode = 0;
 
-	c65_bankswitch_interface(machine(), 0xff);
+	c65_bankswitch_interface(m_maincpu->space(AS_PROGRAM),0,0xff);
 	c65_bankswitch (machine());
 }
 

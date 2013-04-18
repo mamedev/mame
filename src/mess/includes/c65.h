@@ -142,6 +142,16 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( c64_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( c64_cart );
 	DECLARE_WRITE_LINE_MEMBER(c65_cia0_interrupt);
+	DECLARE_READ8_MEMBER(c65_lightpen_x_cb);
+	DECLARE_READ8_MEMBER(c65_lightpen_y_cb);
+	DECLARE_READ8_MEMBER(c65_lightpen_button_cb);
+	DECLARE_READ8_MEMBER(c65_c64_mem_r);
+	DECLARE_READ8_MEMBER(c65_dma_read);
+	DECLARE_READ8_MEMBER(c65_dma_read_color);
+	DECLARE_WRITE_LINE_MEMBER(c65_vic_interrupt);
+	DECLARE_WRITE8_MEMBER(c65_bankswitch_interface);
+	int c64_paddle_read( device_t *device, address_space &space, int which );
+
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -157,11 +167,6 @@ public:
 
 void c65_bankswitch (running_machine &machine);
 //void c65_colorram_write (running_machine &machine, int offset, int value);
-
-int c65_dma_read(running_machine &machine, int offset);
-int c65_dma_read_color(running_machine &machine, int offset);
-void c65_vic_interrupt(running_machine &machine, int level);
-void c65_bankswitch_interface(running_machine &machine, int value);
 
 extern const legacy_mos6526_interface c65_cia0;
 extern const legacy_mos6526_interface c65_cia1;

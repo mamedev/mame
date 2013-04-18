@@ -14,18 +14,6 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT8 (*vic3_lightpen_x_callback)(running_machine &machine);
-typedef UINT8 (*vic3_lightpen_y_callback)(running_machine &machine);
-typedef UINT8 (*vic3_lightpen_button_callback)(running_machine &machine);
-
-typedef int (*vic3_dma_read)(running_machine &machine, int);
-typedef int (*vic3_dma_read_color)(running_machine &machine, int);
-typedef void (*vic3_irq) (running_machine &, int);
-
-typedef void (*vic3_port_changed_callback) (running_machine &, int);
-
-typedef UINT8 (*vic3_c64mem_callback)(running_machine &machine, int offset);
-
 enum vic3_type
 {
 	VIC4567_NTSC,
@@ -37,19 +25,19 @@ struct vic3_interface
 	const char         *screen;
 	const char         *cpu;
 
-	vic3_type type;
+	vic3_type 		   type;
 
-	vic3_lightpen_x_callback        x_cb;
-	vic3_lightpen_y_callback        y_cb;
-	vic3_lightpen_button_callback   button_cb;
+	devcb_read8        x_cb;
+	devcb_read8        y_cb;
+	devcb_read8		   button_cb;
 
-	vic3_dma_read          dma_read;
-	vic3_dma_read_color    dma_read_color;
-	vic3_irq               irq;
+	devcb_read8        dma_read;
+	devcb_read8		   dma_read_color;
+	devcb_write_line   irq;
 
-	vic3_port_changed_callback        port_changed;
+	devcb_write8       port_changed;
 
-	vic3_c64mem_callback      c64_mem_r;
+	devcb_read8        c64_mem_r;
 };
 
 /***************************************************************************

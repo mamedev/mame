@@ -71,22 +71,22 @@ struct vic3_state
 	vic3_sprite sprites[8];
 
 	/* DMA */
-	vic3_dma_read          dma_read;
-	vic3_dma_read_color    dma_read_color;
+	devcb_resolved_read8          dma_read;
+	devcb_resolved_read8    dma_read_color;
 
 	/* IRQ */
-	vic3_irq               interrupt;
+	devcb_resolved_write_line               interrupt;
 
 	/* Port Changed */
-	vic3_port_changed_callback      port_changed;
+	devcb_resolved_write8      port_changed;
 
 	/* lightpen */
-	vic3_lightpen_button_callback lightpen_button_cb;
-	vic3_lightpen_x_callback lightpen_x_cb;
-	vic3_lightpen_y_callback lightpen_y_cb;
+	devcb_resolved_read8 lightpen_button_cb;
+	devcb_resolved_read8 lightpen_x_cb;
+	devcb_resolved_read8 lightpen_y_cb;
 
 	/* C64 memory access */
-	vic3_c64mem_callback      c64_mem_r;
+	devcb_resolved_read8      c64_mem_r;
 
 	/* palette - vic3 specific items (the ones above are used for VIC II as well) */
 	UINT8 palette_red[0x100];
@@ -122,9 +122,9 @@ struct vic3_state
 
 /* 2008-05 FP: lightpen code needs to read input port from c64.c and cbmb.c */
 
-#define LIGHTPEN_BUTTON     (vic3->lightpen_button_cb(machine))
-#define LIGHTPEN_X_VALUE    (vic3->lightpen_x_cb(machine))
-#define LIGHTPEN_Y_VALUE    (vic3->lightpen_y_cb(machine))
+#define LIGHTPEN_BUTTON     (vic3->lightpen_button_cb(0))
+#define LIGHTPEN_X_VALUE    (vic3->lightpen_x_cb(0))
+#define LIGHTPEN_Y_VALUE    (vic3->lightpen_y_cb(0))
 
 /* lightpen delivers values from internal counters; they do not start with the visual area or frame area */
 #define VIC2_MAME_XPOS          0
@@ -262,7 +262,7 @@ static void vic3_set_interrupt( running_machine &machine, int mask, vic3_state *
 		{
 			//DBG_LOG(2, "vic2", ("irq start %.2x\n", mask));
 			vic3->reg[0x19] |= 0x80;
-			vic3->interrupt(machine, 1);
+			vic3->interrupt(1);
 		}
 	}
 	vic3->reg[0x19] |= mask;
@@ -275,7 +275,7 @@ static void vic3_clear_interrupt( running_machine &machine, int mask, vic3_state
 	{
 		//DBG_LOG(2, "vic2", ("irq end %.2x\n", mask));
 		vic3->reg[0x19] &= ~0x80;
-		vic3->interrupt(machine, 0);
+		vic3->interrupt(0);
 	}
 }
 
@@ -304,7 +304,7 @@ static void vic3_draw_character( device_t *device, int ybegin, int yend, int ch,
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
+		code = vic3->dma_read(vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = color[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = color[(code >> 6) & 1];
@@ -324,7 +324,7 @@ static void vic3_draw_character_multi( device_t *device, int ybegin, int yend, i
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine(), vic3->chargenaddr + ch * 8 + y);
+		code = vic3->dma_read(vic3->chargenaddr + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->multi[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->multi[code >> 6];
@@ -344,7 +344,7 @@ static void vic3_draw_bitmap( device_t *device, int ybegin, int yend, int ch, in
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
+		code = vic3->dma_read((vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = code;
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->c64_bitmap[code >> 7];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->c64_bitmap[(code >> 6) & 1];
@@ -364,7 +364,7 @@ static void vic3_draw_bitmap_multi( device_t *device, int ybegin, int yend, int 
 
 	for (y = ybegin; y <= yend; y++)
 	{
-		code = vic3->dma_read(device->machine(), (vic3->chargenaddr & 0x2000) + ch * 8 + y);
+		code = vic3->dma_read((vic3->chargenaddr & 0x2000) + ch * 8 + y);
 		vic3->screen[y + yoff][xoff >> 3] = vic3->foreground[code];
 		if ((xoff + 0 > start_x) && (xoff + 0 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 0) = vic3->bitmapmulti[code >> 6];
 		if ((xoff + 1 > start_x) && (xoff + 1 < end_x)) vic3->bitmap->pix16(y + yoff + FIRSTLINE, xoff + 1) = vic3->bitmapmulti[code >> 6];
@@ -470,7 +470,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 	int value, value3 = 0;
 
 	xbegin = SPRITE_X_POS(nr);
-	addr = vic3->dma_read(device->machine(), SPRITE_ADDR(nr)) << 6;
+	addr = vic3->dma_read(SPRITE_ADDR(nr)) << 6;
 	color = SPRITE_COLOR(nr);
 	prior = SPRITE_PRIORITY(nr);
 	collision = SPRITE_BG_COLLISION(nr);
@@ -482,7 +482,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->expandx[vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i)];
+				value = vic3->expandx[vic3->dma_read(addr + vic3->sprites[nr].line * 3 + i)];
 				vic3->sprites[nr].bitmap[y][i * 2] = value >> 8;
 				vic3->sprites[nr].bitmap[y][i * 2 + 1] = value & 0xff;
 				vic3_sprite_collision(device, nr, y, xbegin + i * 16, value >> 8);
@@ -524,7 +524,7 @@ static void vic3_draw_sprite( device_t *device, int nr, int yoff, int ybegin, in
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i);
+				value = vic3->dma_read(addr + vic3->sprites[nr].line * 3 + i);
 				vic3->sprites[nr].bitmap[y][i] = value;
 				vic3_sprite_collision(device, nr, y, xbegin + i * 8, value);
 				if (prior || !collision)
@@ -565,7 +565,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 	int value, value2, value3 = 0, bg/*, color[2]*/;
 
 	xbegin = SPRITE_X_POS(nr);
-	addr = vic3->dma_read(device->machine(), SPRITE_ADDR(nr)) << 6;
+	addr = vic3->dma_read(SPRITE_ADDR(nr)) << 6;
 	vic3->spritemulti[2] = SPRITE_COLOR(nr);
 	prior = SPRITE_PRIORITY(nr);
 	collision = SPRITE_BG_COLLISION(nr);
@@ -579,7 +579,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->expandx_multi[bg = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i)];
+				value = vic3->expandx_multi[bg = vic3->dma_read(addr + vic3->sprites[nr].line * 3 + i)];
 				value2 = vic3->expandx[vic3->multi_collision[bg]];
 				vic3->sprites[nr].bitmap[y][i * 2] = value2 >> 8;
 				vic3->sprites[nr].bitmap[y][i * 2 + 1] = value2 & 0xff;
@@ -630,7 +630,7 @@ static void vic3_draw_sprite_multi( device_t *device, int nr, int yoff, int ybeg
 			vic3->sprites[nr].paintedline[y] = 1;
 			for (i = 0; i < 3; i++)
 			{
-				value = vic3->dma_read(device->machine(), addr + vic3->sprites[nr].line * 3 + i);
+				value = vic3->dma_read(addr + vic3->sprites[nr].line * 3 + i);
 				vic3->sprites[nr].bitmap[y][i] = value2 = vic3->multi_collision[value];
 				vic3_sprite_collision(device, nr, y, xbegin + i * 8, value2);
 				if (prior || !collision)
@@ -756,8 +756,8 @@ static void vic3_drawlines( device_t *device, int first, int last, int start_x, 
 
 		for (xoff = vic3->x_begin + XPOS; xoff < x_end2 + XPOS; xoff += 8, offs++)
 		{
-			ch = vic3->dma_read(device->machine(), vic3->videoaddr + offs);
-			attr = vic3->dma_read_color(device->machine(), vic3->videoaddr + offs);
+			ch = vic3->dma_read(vic3->videoaddr + offs);
+			attr = vic3->dma_read_color(vic3->videoaddr + offs);
 			if (HIRESON)
 			{
 				vic3->bitmapmulti[1] = vic3->c64_bitmap[1] = ch >> 4;
@@ -996,12 +996,12 @@ static void vic2_drawlines( device_t *device, int first, int last, int start_x, 
 		vic3->shift[line] = HORIZONTALPOS;
 		for (xoff = vic3->x_begin + XPOS; xoff < vic3->x_end + XPOS; xoff += 8, offs++)
 		{
-			ch = vic3->dma_read(device->machine(), vic3->videoaddr + offs);
+			ch = vic3->dma_read(vic3->videoaddr + offs);
 #if 0
-			attr = vic3->dma_read_color(device->machine(), vic3->videoaddr + offs);
+			attr = vic3->dma_read_color(vic3->videoaddr + offs);
 #else
 			/* temporaery until vic3 finished */
-			attr = vic3->dma_read_color(device->machine(), (vic3->videoaddr + offs)&0x3ff)&0x0f;
+			attr = vic3->dma_read_color((vic3->videoaddr + offs)&0x3ff)&0x0f;
 #endif
 			if (HIRESON)
 			{
@@ -1377,10 +1377,10 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		break;
 	case 0x30:
 		vic3->reg[offset] = data;
-		if (vic3->port_changed!=NULL) {
+		if (!vic3->port_changed.isnull()) {
 			DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 			vic3->reg[offset] = data;
-			vic3->port_changed(space.machine(), data);
+			vic3->port_changed(0,data);
 		}
 		break;
 	case 0x31:
@@ -1555,21 +1555,21 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 	if (M)                                                      \
 	{                                                           \
 		if (M & 0x01)                                           \
-			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(0) + offset);        \
+			colors[0] = vic3->c64_mem_r(VIC3_ADDR(0) + offset);        \
 		if (M & 0x02)                                           \
-			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(1) + offset) << 1;     \
+			colors[1] = vic3->c64_mem_r(VIC3_ADDR(1) + offset) << 1;     \
 		if (M & 0x04)                                           \
-			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(2) + offset) << 2;     \
+			colors[2] = vic3->c64_mem_r(VIC3_ADDR(2) + offset) << 2;     \
 		if (M & 0x08)                                           \
-			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(3) + offset) << 3;     \
+			colors[3] = vic3->c64_mem_r(VIC3_ADDR(3) + offset) << 3;     \
 		if (M & 0x10)                                           \
-			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(4) + offset) << 4;     \
+			colors[4] = vic3->c64_mem_r(VIC3_ADDR(4) + offset) << 4;     \
 		if (M & 0x20)                                           \
-			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(5) + offset) << 5;     \
-		if (M & 0x40)                                           \
-			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(6) + offset) << 6;     \
-		if (M & 0x80)                                           \
-			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_ADDR(7) + offset) << 7;     \
+			colors[5] = vic3->c64_mem_r(VIC3_ADDR(5) + offset) << 5;     \
+		if (M & 0x40)                        \
+			colors[6] = vic3->c64_mem_r(VIC3_ADDR(6) + offset) << 6;     \
+		if (M & 0x80)                        \
+			colors[7] = vic3->c64_mem_r(VIC3_ADDR(7) + offset) << 7;     \
 		for (i = 7; i >= 0; i--)                                \
 		{                                                       \
 			p = 0;                                              \
@@ -1646,28 +1646,28 @@ static void vic3_interlace_draw_block( device_t *device, int x, int y, int offse
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_IADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{
@@ -1718,28 +1718,28 @@ static void vic3_draw_block( device_t *device, int x, int y, int offset )
 		break;
 	default:
 		if (VIC3_BITPLANES_MASK & 0x01)
-			colors[0] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(0) + offset);
+			colors[0] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(0) + offset);
 
 		if (VIC3_BITPLANES_MASK & 0x02)
-			colors[1] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(1) + offset) << 1;
+			colors[1] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
-			colors[2] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(2) + offset) << 2;
+			colors[2] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(2) + offset) << 2;
 
 		if (VIC3_BITPLANES_MASK & 0x08)
-			colors[3] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(3) + offset) << 3;
+			colors[3] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(3) + offset) << 3;
 
 		if (VIC3_BITPLANES_MASK & 0x10)
-			colors[4] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(4) + offset) << 4;
+			colors[4] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(4) + offset) << 4;
 
 		if (VIC3_BITPLANES_MASK & 0x20)
-			colors[5] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(5) + offset) << 5;
+			colors[5] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(5) + offset) << 5;
 
 		if (VIC3_BITPLANES_MASK & 0x40)
-			colors[6] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(6) + offset) << 6;
+			colors[6] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(6) + offset) << 6;
 
 		if (VIC3_BITPLANES_MASK & 0x80)
-			colors[7] = vic3->c64_mem_r(device->machine(), VIC3_BITPLANE_ADDR(7) + offset) << 7;
+			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(7) + offset) << 7;
 
 		for (i = 7; i >= 0; i--)
 		{
@@ -1965,17 +1965,17 @@ static DEVICE_START( vic3 )
 
 	vic3->type = intf->type;
 
-	vic3->dma_read = intf->dma_read;
-	vic3->dma_read_color = intf->dma_read_color;
-	vic3->interrupt = intf->irq;
+	vic3->dma_read.resolve(intf->dma_read, *device);
+	vic3->dma_read_color.resolve(intf->dma_read_color, *device);
+	vic3->interrupt.resolve(intf->irq, *device);
 
-	vic3->port_changed = intf->port_changed;
+	vic3->port_changed.resolve(intf->port_changed, *device);
 
-	vic3->c64_mem_r = intf->c64_mem_r;
+	vic3->c64_mem_r.resolve(intf->c64_mem_r, *device);
 
-	vic3->lightpen_button_cb = intf->button_cb;
-	vic3->lightpen_x_cb = intf->x_cb;
-	vic3->lightpen_y_cb = intf->y_cb;
+	vic3->lightpen_button_cb.resolve(intf->button_cb, *device);
+	vic3->lightpen_x_cb.resolve(intf->x_cb, *device);
+	vic3->lightpen_y_cb.resolve(intf->y_cb, *device);
 
 	vic3->screen[0] = auto_alloc_array(device->machine(), UINT8, 216 * 656 / 8);
 
