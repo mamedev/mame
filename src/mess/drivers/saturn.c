@@ -161,7 +161,7 @@ READ8_MEMBER(sat_console_state::saturn_cart_type_r)
 }
 
 /* TODO: Bug! accesses this one, if returning 0 the SH-2 hard-crashes. Might be an actual bug with the CD block. */
-READ32_HANDLER( sat_console_state::abus_dummy_r )
+READ32_MEMBER( sat_console_state::abus_dummy_r )
 {
 	logerror("A-Bus Dummy access %08x\n",offset*4);
 	return -1;
