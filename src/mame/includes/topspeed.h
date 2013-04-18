@@ -70,7 +70,6 @@ public:
 	INTERRUPT_GEN_MEMBER(topspeed_cpub_interrupt);
 	TIMER_CALLBACK_MEMBER(topspeed_interrupt6);
 	TIMER_CALLBACK_MEMBER(topspeed_cpub_interrupt6);
-	DECLARE_WRITE8_MEMBER(topspeed_tc0140syt_comm_w);
 	void topspeed_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
