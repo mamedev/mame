@@ -71,8 +71,6 @@ public:
 	DECLARE_READ16_MEMBER(io1_r);
 	DECLARE_WRITE16_MEMBER(ml_output_w);
 	DECLARE_WRITE16_MEMBER(ml_sub_reset_w);
-	DECLARE_WRITE16_MEMBER(ml_to_sound_w);
-	DECLARE_WRITE8_MEMBER(ml_sound_to_main_w);
 	DECLARE_READ16_MEMBER(ml_analog1_lsb_r);
 	DECLARE_READ16_MEMBER(ml_analog2_lsb_r);
 	DECLARE_READ16_MEMBER(ml_analog3_lsb_r);
@@ -91,6 +89,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ml_msm_start_lsb_w);
 	DECLARE_DRIVER_INIT(mlanding);
 	virtual void machine_reset();
+	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dma_complete);
@@ -292,8 +291,7 @@ WRITE16_MEMBER(mlanding_state::ml_output_w)
 
 WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 {
-	data=0;
-	membank("bank1")->set_base(memregion("audiocpu")->base() + ((data) & 0x03) * 0x4000 + 0x10000 );
+	membank("bank10")->set_entry(data & 1);
 }
 
 WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
@@ -355,28 +353,6 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	{
 		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		m_dsp_HOLD_signal = data & 0x80;
-	}
-}
-
-WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
-{
-	if (offset == 0)
-		m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-	{
-		//m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
-	}
-}
-
-WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
-{
-	if (offset == 0)
-		m_tc0140syt->tc0140syt_slave_port_w(space, 0, data & 0xff);
-	else if (offset == 1)
-	{
-		//m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_tc0140syt->tc0140syt_slave_comm_w(space, 0, data & 0xff);
 	}
 }
 
@@ -499,9 +475,8 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
 
-	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
@@ -549,11 +524,11 @@ WRITE8_MEMBER(mlanding_state::ml_msm_start_msb_w)
 
 static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(ml_msm5205_address_w) //guess
 //  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)
@@ -763,6 +738,11 @@ void mlanding_state::machine_reset()
 	m_dsp_HOLD_signal = 0;
 }
 
+void mlanding_state::machine_start()
+{
+	membank("bank10")->configure_entries(0, 2, memregion("audiocpu")->base(), 0x4000);
+}
+
 static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	/* basic machine hardware */
@@ -823,10 +803,8 @@ ROM_START( mlanding )
 	ROM_LOAD16_BYTE( "ml_b0925.epr", 0x40000, 0x10000, CRC(ff59f049) SHA1(aba490a28aba03728415f34d321fd599c31a5fde) )
 	ROM_LOAD16_BYTE( "ml_b0924.epr", 0x40001, 0x10000, CRC(9bc3e1b0) SHA1(6d86804327df11a513a0f06dceb57b83b34ac007) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* z80 */
-	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x4000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
-	ROM_CONTINUE(             0x10000, 0x04000 )    /* banked stuff */
-	ROM_LOAD( "ml_b0936.epr", 0x14000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 */
+	ROM_LOAD( "ml_b0935.epr", 0x00000, 0x08000, CRC(b85915c5) SHA1(656e97035ae304f84e90758d0dd6f0616c40f1db) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASE00 )
 
@@ -834,15 +812,18 @@ ROM_START( mlanding )
 	ROM_LOAD16_BYTE( "ml_b0923.epr", 0x00000, 0x10000, CRC(81b2c871) SHA1(a085bc528c63834079469db6ae263a5b9b984a7c) )
 	ROM_LOAD16_BYTE( "ml_b0922.epr", 0x00001, 0x10000, CRC(36923b42) SHA1(c31d7c45a563cfc4533379f69f32889c79562534) )
 
-	ROM_REGION( 0x10000, "z80sub", 0 )  /* z80 */
+	ROM_REGION( 0x10000, "z80sub", 0 ) /* z80 */
 	ROM_LOAD( "ml_b0937.epr", 0x00000, 0x08000, CRC(4bdf15ed) SHA1(b960208e63cede116925e064279a6cf107aef81c) )
 
 	ROM_REGION( 0x80000, "adpcm", ROMREGION_ERASEFF )
-	ROM_LOAD( "ml_b0930.epr", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
-	ROM_LOAD( "ml_b0931.epr", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
-	ROM_LOAD( "ml_b0932.epr", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
-	ROM_LOAD( "ml_b0933.epr", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
 	ROM_LOAD( "ml_b0934.epr", 0x00000, 0x10000, CRC(0899666f) SHA1(032e3ddd4caa48f82592570616e16c084de91f3e) )
+	ROM_LOAD( "ml_b0933.epr", 0x10000, 0x10000, CRC(f5cac954) SHA1(71abdc545e0196ad4d357af22dd6312d10a1323f) )
+	ROM_LOAD( "ml_b0932.epr", 0x20000, 0x10000, CRC(4721dc59) SHA1(faad75d577344e9ba495059040a2cf0647567426) )
+	ROM_LOAD( "ml_b0931.epr", 0x30000, 0x10000, CRC(9c4a82bf) SHA1(daeac620c636013a36595ce9f37e84e807f88977) )
+	ROM_LOAD( "ml_b0930.epr", 0x40000, 0x10000, CRC(214a30e2) SHA1(3dcc3a89ed52e4dbf232d2a92a3e64975b46c2dd) )
+
+	ROM_REGION( 0x2000, "unknown", 0 )
+	ROM_LOAD( "ml_b0936.epr", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 ROM_END
 
 DRIVER_INIT_MEMBER(mlanding_state,mlanding)
