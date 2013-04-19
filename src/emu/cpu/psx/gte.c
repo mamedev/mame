@@ -28,15 +28,15 @@ INLINE void ATTR_PRINTF(2,3) GTELOG( UINT32 pc, const char *a, ...) {}
 #define VX( n ) ( n < 3 ? m_cp2dr[ n << 1 ].sw.l : m_cp2dr[ 9 ].sw.l )
 #define VY( n ) ( n < 3 ? m_cp2dr[ n << 1 ].sw.h : m_cp2dr[ 10 ].sw.l )
 #define VZ( n ) ( n < 3 ? m_cp2dr[ ( n << 1 ) + 1 ].sw.l : m_cp2dr[ 11 ].sw.l )
-#define MX11( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) ].sw.l : 0 )
-#define MX12( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) ].sw.h : 0 )
-#define MX13( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 1 ].sw.l : 0 )
-#define MX21( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 1 ].sw.h : 0 )
-#define MX22( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 2 ].sw.l : 0 )
-#define MX23( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 2 ].sw.h : 0 )
-#define MX31( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 3 ].sw.l : 0 )
-#define MX32( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 3 ].sw.h : 0 )
-#define MX33( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 4 ].sw.l : 0 )
+#define MX11( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) ].sw.l : ( m_cp2dr[ 6 ].b.l * -0x10 ) )
+#define MX12( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) ].sw.h : ( m_cp2dr[ 6 ].b.l * 0x10 ) )
+#define MX13( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 1 ].sw.l : m_cp2dr[ 8 ].sw.l )
+#define MX21( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 1 ].sw.h : m_cp2cr[ 1 ].sw.l )
+#define MX22( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 2 ].sw.l : m_cp2cr[ 1 ].sw.l )
+#define MX23( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 2 ].sw.h : m_cp2cr[ 1 ].sw.l )
+#define MX31( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 3 ].sw.l : m_cp2cr[ 2 ].sw.l )
+#define MX32( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 3 ].sw.h : m_cp2cr[ 2 ].sw.l )
+#define MX33( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 4 ].sw.l : m_cp2cr[ 2 ].sw.l )
 #define CV1( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 5 ].sd : 0 )
 #define CV2( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
 #define CV3( n ) ( n < 3 ? m_cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
@@ -2554,9 +2554,24 @@ int gte::docop2( UINT32 pc, int gteop )
 		v = GTE_V( gteop );
 		cv = GTE_CV( gteop );
 
-		MAC1 = A1( ( (INT64) CV1( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) + ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) );
-		MAC2 = A2( ( (INT64) CV2( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) + ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) );
-		MAC3 = A3( ( (INT64) CV3( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) + ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) );
+		switch( cv )
+		{
+		case 2:
+			MAC1 = A1( (INT64) ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) );
+			MAC2 = A2( (INT64) ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) );
+			MAC3 = A3( (INT64) ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) );
+			Lm_B1( A1( ( (INT64) CV1( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) ), 0 );
+			Lm_B2( A2( ( (INT64) CV2( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) ), 0 );
+			Lm_B3( A3( ( (INT64) CV3( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) ), 0 );
+			break;
+
+		default:
+			MAC1 = A1( acc( (INT64) CV1( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) + ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) );
+			MAC2 = A2( acc( (INT64) CV2( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) + ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) );
+			MAC3 = A3( acc( (INT64) CV3( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) + ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) );
+			break;
+		}
+
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3( MAC3, lm );
@@ -2873,9 +2888,9 @@ int gte::docop2( UINT32 pc, int gteop )
 
 		for( v = 0; v < 3; v++ )
 		{
-			MAC1 = A1( ( (INT64) L11 * VX( v ) ) + ( L12 * VY( v ) ) + ( L13 * VZ( v ) ) );
-			MAC2 = A2( ( (INT64) L21 * VX( v ) ) + ( L22 * VY( v ) ) + ( L23 * VZ( v ) ) );
-			MAC3 = A3( ( (INT64) L31 * VX( v ) ) + ( L32 * VY( v ) ) + ( L33 * VZ( v ) ) );
+			MAC1 = A1( (INT64) ( L11 * VX( v ) ) + ( L12 * VY( v ) ) + ( L13 * VZ( v ) ) );
+			MAC2 = A2( (INT64) ( L21 * VX( v ) ) + ( L22 * VY( v ) ) + ( L23 * VZ( v ) ) );
+			MAC3 = A3( (INT64) ( L31 * VX( v ) ) + ( L32 * VY( v ) ) + ( L33 * VZ( v ) ) );
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
 			IR3 = Lm_B3( MAC3, lm );
