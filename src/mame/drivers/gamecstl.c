@@ -746,20 +746,11 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 MACHINE_CONFIG_END
 
-static void gamecstl_set_keyb_int(running_machine &machine, int state)
-{
-	gamecstl_state *drvstate = machine.driver_data<gamecstl_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
-
 	intel82439tx_init();
-
 }
 
 /*****************************************************************************/

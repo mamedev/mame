@@ -1227,18 +1227,9 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 MACHINE_CONFIG_END
 
 	
-static void mediagx_set_keyb_int(running_machine &machine, int _state)
-{
-	mediagx_state *state = machine.driver_data<mediagx_state>();
-
-	pic8259_ir1_w(state->m_pic8259_1, _state);
-}
-
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
-
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 }
 
 #if SPEEDUP_HACKS

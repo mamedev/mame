@@ -622,12 +622,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(xtom3d_state,get_out2)
 };
 
-static void xtom3d_set_keyb_int(running_machine &machine, int state)
-{
-	xtom3d_state *drvstate = machine.driver_data<xtom3d_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 IRQ_CALLBACK_MEMBER(xtom3d_state::irq_callback)
 {
 	return pic8259_acknowledge(m_pic8259_1);
@@ -643,11 +637,8 @@ void xtom3d_state::machine_start()
 	m_isa_ram1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, xtom3d_set_keyb_int);
-
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(xtom3d_state::irq_callback),this));
 	intel82439tx_init();
-
 }
 
 void xtom3d_state::machine_reset()

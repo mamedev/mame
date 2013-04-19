@@ -620,9 +620,10 @@ TIMER_CALLBACK_MEMBER(pc_state::pcjr_keyb_signal_callback)
 
 static void pcjr_set_keyb_int(running_machine &machine, int state)
 {
+	pc_state *drvstate = machine.driver_data<pc_state>();
 	if ( state )
 	{
-		UINT8   data = pc_keyb_read();
+		UINT8   data = drvstate->pc_keyb_read();
 		UINT8   parity = 0;
 		int     i;
 
@@ -1329,11 +1330,89 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
  * Initialization code
  *
  **********************************************************/
+/*
+   keyboard seams to permanently sent data clocked by the mainboard
+   clock line low for longer means "resync", keyboard sends 0xaa as answer
+   will become automatically 0x00 after a while
+*/
 
-void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int))
+UINT8 pc_state::pc_keyb_read()
+{
+	return m_pc_keyb_data;
+}
+
+TIMER_CALLBACK_MEMBER( pc_state::pc_keyb_timer )
+{
+	if ( m_pc_keyb_on ) {
+		pc_keyboard();
+	} else {
+		/* Clock has been low for more than 5 msec, start diagnostic test */
+		at_keyboard_reset(machine());
+		m_pc_keyb_self_test = 1;
+	}
+}
+
+void pc_state::pc_keyb_set_clock(int on)
+{
+	on = on ? 1 : 0;
+
+	if (m_pc_keyb_on != on)
+	{
+		if (!on)
+			m_pc_keyb_timer->adjust(attotime::from_msec(5));
+		else {
+			if ( m_pc_keyb_self_test ) {
+				/* The self test of the keyboard takes some time. 2 msec seems to work. */
+				/* This still needs to verified against a real keyboard. */
+				m_pc_keyb_timer->adjust(attotime::from_msec( 2 ));
+			} else {
+				m_pc_keyb_timer->reset();
+				m_pc_keyb_self_test = 0;
+			}
+		}
+
+		m_pc_keyb_on = on;
+	}
+}
+
+void pc_state::pc_keyb_clear(void)
+{
+	m_pc_keyb_data = 0;
+	if ( m_pc_keyb_int_cb ) {
+		m_pc_keyb_int_cb(machine(),0);
+	}
+}
+
+void pc_state::pc_keyboard(void)
+{
+	int data;
+
+	at_keyboard_polling();
+
+	if (m_pc_keyb_on)
+	{
+		if ( (data=at_keyboard_read())!=-1) {
+			m_pc_keyb_data = data;
+			//DBG_LOG(1,"KB_scancode",("$%02x\n", m_pc_keyb_data));
+			if ( m_pc_keyb_int_cb ) {
+				m_pc_keyb_int_cb(machine(),1);
+			}
+			m_pc_keyb_self_test = 0;
+		}
+	}
+}
+void pc_state::init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
+{
+	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_PC);
+	at_keyboard_set_scan_code_set(1);
+	m_pc_keyb_int_cb = set_keyb_int_func;
+	m_pc_keyb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_keyb_timer),this));
+}
+ 
+void pc_state::mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
 {
 	if ( set_keyb_int_func != NULL )
-		init_pc_common(machine(), flags, set_keyb_int_func);
+		init_pc_common(set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
@@ -1343,43 +1422,43 @@ void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(runni
 
 DRIVER_INIT_MEMBER(pc_state,ibm5150)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
+	mess_init_pc_common(NULL);
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,pccga)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
+	mess_init_pc_common(NULL);
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
+	mess_init_pc_common(NULL);
 	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcmda)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int);
+	mess_init_pc_common(pc_set_keyb_int);
 }
 
 DRIVER_INIT_MEMBER(pc_state,t1000hx)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int);
+	mess_init_pc_common(pc_set_keyb_int);
 	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int);
+	mess_init_pc_common(pcjr_set_keyb_int);
 }
 
 DRIVER_INIT_MEMBER(pc_state,mc1502)
 {
-	mess_init_pc_common(0, NULL);
+	mess_init_pc_common(NULL);
 }
 
 

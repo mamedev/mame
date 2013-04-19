@@ -352,13 +352,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(photoply_state,get_out2)
 };
 
-static void photoply_set_keyb_int(running_machine &machine, int state)
-{
-	photoply_state *drvstate = machine.driver_data<photoply_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
-
 void photoply_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photoply_state::irq_callback),this));
@@ -367,8 +360,6 @@ void photoply_state::machine_start()
 	m_pic8259_2 = machine().device( "pic8259_2" );
 	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
 	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
-
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
 }
 
 static const gfx_layout CGA_charlayout =

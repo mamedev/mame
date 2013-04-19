@@ -244,6 +244,8 @@ void kbdc8042_device::device_start()
 	m_speaker_func.resolve(m_speaker_cb, *this);
 	m_getout2_func.resolve(m_getout2_cb, *this);
 	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_time),this));
+	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
+	at_keyboard_set_scan_code_set(1);
 }
 
 /*-------------------------------------------------

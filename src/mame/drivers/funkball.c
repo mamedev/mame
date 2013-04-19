@@ -1077,12 +1077,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(funkball_state,get_out2)
 };
 
-static void funkball_set_keyb_int(running_machine &machine, int state)
-{
-	funkball_state *drvstate = machine.driver_data<funkball_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 IRQ_CALLBACK_MEMBER(funkball_state::irq_callback)
 {
 	return pic8259_acknowledge(m_pic8259_1);
@@ -1092,10 +1086,7 @@ void funkball_state::machine_start()
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT8, 0x20000);
 
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, funkball_set_keyb_int);
-
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(funkball_state::irq_callback),this));
-
 
 	/* defaults, otherwise it won't boot */
 	m_unk_ram[0x010/4] = 0x2f8d85ff;

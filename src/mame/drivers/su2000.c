@@ -123,12 +123,6 @@ ADDRESS_MAP_END
  *
  *************************************************************/
 
-static void su2000_set_keyb_int(running_machine &machine, int state)
-{
-	su2000_state *drv_state = machine.driver_data<su2000_state>();
-	pic8259_ir1_w(drv_state->m_pic8259_1, state);
-}
-
 READ8_MEMBER(su2000_state::get_out2)
 {
 	return pit8253_get_output( machine().device("pit8254"), 2 );
@@ -266,8 +260,6 @@ void su2000_state::machine_start()
 	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
-
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 }
 
 void su2000_state::machine_reset()

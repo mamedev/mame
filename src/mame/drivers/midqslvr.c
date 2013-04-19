@@ -630,12 +630,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(midqslvr_state,get_out2)
 };
 
-static void midqslvr_set_keyb_int(running_machine &machine, int state)
-{
-	midqslvr_state *drvstate = machine.driver_data<midqslvr_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 IRQ_CALLBACK_MEMBER(midqslvr_state::irq_callback)
 {
 	return pic8259_acknowledge(m_pic8259_1);
@@ -650,8 +644,6 @@ void midqslvr_state::machine_start()
 	m_bios_ext4_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram1 = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_isa_ram2 = auto_alloc_array(machine(), UINT32, 0x4000/4);
-
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, midqslvr_set_keyb_int);
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(midqslvr_state::irq_callback),this));
 	intel82439tx_init();

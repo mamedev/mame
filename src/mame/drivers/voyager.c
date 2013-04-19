@@ -744,12 +744,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(voyager_state,get_out2)
 };
 
-static void voyager_set_keyb_int(running_machine &machine, int state)
-{
-	voyager_state *drvstate = machine.driver_data<voyager_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // actually AMD Duron CPU of unknown clock
 	MCFG_CPU_PROGRAM_MAP(voyager_map)
@@ -782,10 +776,7 @@ DRIVER_INIT_MEMBER(voyager_state,voyager)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
 
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, voyager_set_keyb_int);
-
 	intel82439tx_init();
-
 }
 
 ROM_START( voyager )

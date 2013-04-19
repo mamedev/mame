@@ -78,6 +78,9 @@ video card
 #include "machine/pcshare.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
+#include "machine/8042kbdc.h"
+#include "machine/pckeybrd.h"
+#include "machine/pit8253.h"
 #include "video/pc_vga.h"
 
 
@@ -98,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
+	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
@@ -195,17 +199,28 @@ static INPUT_PORTS_START( magtouch )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static void magtouch_set_keyb_int(running_machine &machine, int state)
+
+READ8_MEMBER(magtouch_state::get_out2)
 {
-	pic8259_ir1_w(machine.device("pic8259_1"), state);
+	return pit8253_get_output( machine().device("pit8254"), 2 );
 }
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(magtouch_state,get_out2)
+};
 
 void magtouch_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
-
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
-
+	
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
 

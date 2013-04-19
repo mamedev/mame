@@ -110,11 +110,6 @@ static INPUT_PORTS_START( pcat_dyn )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
-static void pcat_dyn_set_keyb_int(running_machine &machine, int state)
-{
-	pic8259_ir1_w(machine.device("pic8259_1"), state);
-}
-
 READ8_MEMBER(pcat_dyn_state::get_out2)
 {
 	return pit8253_get_output( machine().device("pit8254"), 2 );
@@ -131,10 +126,10 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(pcat_dyn_state,get_out2)
 };
+
 void pcat_dyn_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, pcat_dyn_set_keyb_int);
 }
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )

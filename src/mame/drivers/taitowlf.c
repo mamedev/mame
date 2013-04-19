@@ -690,21 +690,11 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	#endif
 MACHINE_CONFIG_END
 
-
-static void taitowlf_set_keyb_int(running_machine &machine, int state)
-{
-	taitowlf_state *drvstate = machine.driver_data<taitowlf_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 {
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
-
 	intel82439tx_init();
-
 }
 
 /*****************************************************************************/

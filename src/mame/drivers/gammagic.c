@@ -765,12 +765,6 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_DRIVER_MEMBER(gammagic_state,get_out2)
 };
 
-static void gammagic_set_keyb_int(running_machine &machine, int state)
-{
-	gammagic_state *drvstate = machine.driver_data<gammagic_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
 static MACHINE_CONFIG_START( gammagic, gammagic_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
 	MCFG_CPU_PROGRAM_MAP(gammagic_map)
@@ -798,7 +792,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(gammagic_state,gammagic)
 {
-	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, gammagic_set_keyb_int);
 	atapi_init(machine());
 }
 
