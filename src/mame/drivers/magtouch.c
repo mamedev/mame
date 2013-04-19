@@ -84,14 +84,13 @@ video card
 #include "video/pc_vga.h"
 
 
-class magtouch_state : public driver_device
+class magtouch_state : public pcat_base_state
 {
 public:
 	magtouch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: pcat_base_state(mconfig, type, tag),
 			m_uart(*this, "ns16450_0"),
-			m_microtouch(*this, "microtouch"),
-			m_maincpu(*this, "maincpu") { }
+			m_microtouch(*this, "microtouch"){ }
 
 	required_device<ns16450_device> m_uart;
 	required_device<microtouch_serial_device> m_microtouch;
@@ -104,7 +103,6 @@ public:
 	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -219,7 +217,7 @@ static const struct kbdc8042_interface at8042 =
 
 void magtouch_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(magtouch_state::irq_callback),this));
 	
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);

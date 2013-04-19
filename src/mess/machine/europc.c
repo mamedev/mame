@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "includes/europc.h"
-#include "machine/pcshare.h"
 #include "machine/pit8253.h"
 #include "coreutil.h"
 

@@ -30,7 +30,6 @@
 #include "machine/pc_fdc.h"
 #include "machine/upd765.h"
 #include "includes/amstr_pc.h"
-#include "machine/pcshare.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 

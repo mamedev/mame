@@ -1,8 +1,6 @@
 #include "emu.h"
 
 #include "machine/pckeybrd.h"
-
-#include "machine/pcshare.h"
 #include "includes/pc.h"
 #include "machine/pit8253.h"
 #include "includes/tandy1t.h"

@@ -15,7 +15,6 @@ TODO:
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/mc146818.h"
-#include "machine/pcshare.h"
 #include "machine/pci.h"
 #include "machine/8042kbdc.h"
 #include "machine/pckeybrd.h"

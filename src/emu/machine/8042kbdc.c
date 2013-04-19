@@ -177,7 +177,6 @@
 
 #include "machine/pckeybrd.h"
 #include "machine/8042kbdc.h"
-#include "machine/pcshare.h"
 
 
 /***************************************************************************

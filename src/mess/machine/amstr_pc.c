@@ -2,7 +2,6 @@
 
 #include "machine/pit8253.h"
 #include "machine/pc_lpt.h"
-#include "machine/pcshare.h"
 #include "includes/amstr_pc.h"
 #include "includes/pc.h"
 #include "video/pc_vga.h"

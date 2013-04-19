@@ -102,17 +102,15 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "video/pc_vga.h"
 
 
-class pangofun_state : public driver_device
+class pangofun_state : public pcat_base_state
 {
 public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: pcat_base_state(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(pangofun);
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -191,7 +189,7 @@ static const struct kbdc8042_interface at8042 =
 
 void pangofun_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pangofun_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( pangofun, pangofun_state )

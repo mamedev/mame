@@ -172,9 +172,9 @@ static const struct pic8259_interface pic8259_2_config =
 	DEVCB_NULL
 };
 
-IRQ_CALLBACK(pcat_irq_callback)
+IRQ_CALLBACK_MEMBER(pcat_base_state::irq_callback)
 {
-	return pic8259_acknowledge(device->machine().device("pic8259_1"));
+	return pic8259_acknowledge(machine().device("pic8259_1"));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )

@@ -37,17 +37,15 @@ keyboard trick;
 #include "video/pc_vga.h"
 
 
-class pcat_dyn_state : public driver_device
+class pcat_dyn_state : public pcat_base_state
 {
 public:
 	pcat_dyn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: pcat_base_state(mconfig, type, tag) { }
 
 	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(pcat_dyn);
 	virtual void machine_start();
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -129,7 +127,7 @@ static const struct kbdc8042_interface at8042 =
 
 void pcat_dyn_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcat_dyn_state::irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )

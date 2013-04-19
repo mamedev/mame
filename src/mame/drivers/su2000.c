@@ -64,12 +64,11 @@
  *
  *************************************/
 
-class su2000_state : public driver_device
+class su2000_state : public pcat_base_state
 {
 public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: pcat_base_state(mconfig, type, tag){ }
 
 	device_t    *m_pit8254;
 	device_t    *m_pic8259_1;
@@ -83,8 +82,6 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
-	IRQ_CALLBACK_MEMBER(irq_callback);
-	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -217,19 +214,6 @@ static const struct pit8253_config su2000_pit8254_config =
 		}
 	}
 };
-
-
-/*************************************
- *
- *  Interrupt Generation
- *
- *************************************/
-
-IRQ_CALLBACK_MEMBER(su2000_state::irq_callback)
-{
-	return pic8259_acknowledge(m_pic8259_1);
-}
-
 
 /*************************************
  *

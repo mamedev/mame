@@ -374,7 +374,6 @@ DRVLIBS += \
 
 $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/nmk112.o \
-	$(MACHINE)/pckeybrd.o \
 	$(MACHINE)/pcshare.o \
 	$(MACHINE)/segacrpt.o \
 	$(MACHINE)/segacrp2.o \

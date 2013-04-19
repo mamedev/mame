@@ -17,7 +17,7 @@
 */
 
 #include "emu.h"
-#include "machine/pckeybrd.h"
+#include "pckeybrd.h"
 
 /* AT keyboard documentation comes from www.beyondlogic.org and HelpPC documentation */
 

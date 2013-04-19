@@ -47,7 +47,6 @@
 #include "includes/at.h"
 #include "machine/8042kbdc.h"
 #include "machine/pit8253.h"
-#include "machine/pcshare.h"
 #include "video/newport.h"
 #include "sound/dac.h"
 #include "machine/nvram.h"

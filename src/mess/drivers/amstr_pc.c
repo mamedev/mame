@@ -47,7 +47,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 
 #include "includes/amstr_pc.h"
 
-#include "machine/pcshare.h"
 #include "includes/pc.h"
 
 #include "imagedev/flopdrv.h"

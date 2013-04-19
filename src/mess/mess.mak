@@ -430,7 +430,6 @@ DRVLIBS += \
 #-------------------------------------------------
 
 $(MESSOBJ)/mame.a: \
-	$(MAME_MACHINE)/pckeybrd.o  \
 	$(MAME_MACHINE)/archimds.o  \
 	$(MAME_VIDEO)/archimds.o    \
 	$(MAME_VIDEO)/amiga.o       \
@@ -459,7 +458,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_VIDEO)/rdpblend.o    \
 	$(MAME_VIDEO)/rdptpipe.o    \
 	$(MAME_VIDEO)/rdpspn16.o    \
-	$(MAME_MACHINE)/pcshare.o   \
 	$(MAME_MACHINE)/megadriv.o  \
 	$(MAME_MACHINE)/megacd.o    \
 	$(MAME_MACHINE)/megacdcd.o  \

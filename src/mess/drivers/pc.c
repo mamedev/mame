@@ -84,7 +84,6 @@ video HW too.
 #include "includes/europc.h"
 #include "includes/tandy1t.h"
 
-#include "machine/pcshare.h"
 #include "includes/pc.h"
 
 #include "imagedev/flopdrv.h"
