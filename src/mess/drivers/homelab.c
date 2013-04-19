@@ -644,7 +644,7 @@ static const mea8000_interface brailab4_speech_intf = { "speech", DEVCB_NULL };
 
 QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 {
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i=0;
 	UINT8 ch;
 	UINT16 quick_addr;

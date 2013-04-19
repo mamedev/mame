@@ -135,10 +135,9 @@ ROM_END
 
 QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
-	lynx_state *state = image.device().machine().driver_data<lynx_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *data = NULL;
-	UINT8 *rom = state->memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	UINT16 start, length;
 	int i;
@@ -147,7 +146,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 		return IMAGE_INIT_FAIL;
 
 	/* Check the image */
-	if (state->lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
+	if (lynx_verify_cart((char*)header, LYNX_QUICKLOAD) == IMAGE_VERIFY_FAIL)
 		return IMAGE_INIT_FAIL;
 
 	start = header[3] | (header[2]<<8); //! big endian format in file format for little endian cpu
@@ -172,7 +171,7 @@ QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 	space.write_byte(0x1fc, start & 0xff);
 	space.write_byte(0x1fd, start >> 8);
 
-	state->m_maincpu->set_pc(start);
+	m_maincpu->set_pc(start);
 
 	return IMAGE_INIT_PASS;
 }

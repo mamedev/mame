@@ -768,11 +768,10 @@ static const cassette_interface tmc1800_cassette_interface =
 
 QUICKLOAD_LOAD_MEMBER( tmc1800_state, tmc1800 )
 {
-	tmc1800_state *state = image.device().machine().driver_data<tmc1800_state>();
-	UINT8 *ptr = state->m_rom->base();
+	UINT8 *ptr = m_rom->base();
 	int size = image.length();
 
-	if (size > state->m_ram->size())
+	if (size > m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

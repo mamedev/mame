@@ -213,8 +213,7 @@ public:
 
 SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 {
-	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
-	address_space &space = vtech1->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
@@ -230,7 +229,7 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	size = end - start;
 
 	/* check if we have enough ram */
-	if (vtech1->m_ram_size < size)
+	if (m_ram_size < size)
 	{
 		char message[256];
 		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
@@ -240,7 +239,7 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	}
 
 	/* write it to ram */
-	image.fread( &vtech1->m_ram[start - 0x7800], size);
+	image.fread( &m_ram[start - 0x7800], size);
 
 	/* patch variables depending on snapshot type */
 	switch (header[21])
@@ -261,7 +260,7 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 		space.write_byte(0x788e, start % 256); /* usr subroutine address */
 		space.write_byte(0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		image.device().machine().device("maincpu")->state().set_pc(start);              /* start program */
+		m_maincpu->set_pc(start);              /* start program */
 		break;
 
 	default:

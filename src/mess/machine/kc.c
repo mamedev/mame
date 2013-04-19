@@ -26,7 +26,6 @@ struct kcc_header
 /* load snapshot */
 QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 {
-	kc_state *state = image.device().machine().driver_data<kc_state>();
 	UINT8 *data;
 	struct kcc_header *header;
 	int addr;
@@ -40,7 +39,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	if (datasize != 0)
 	{
 		/* malloc memory for this data */
-		data = (UINT8 *)auto_alloc_array(image.device().machine(), UINT8, datasize);
+		data = (UINT8 *)auto_alloc_array(machine(), UINT8, datasize);
 
 		if (data != NULL)
 			image.fread( data, datasize);
@@ -61,7 +60,7 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 		datasize = image.length() - 128;
 	}
 
-	address_space &space = state->m_maincpu->space( AS_PROGRAM );
+	address_space &space = m_maincpu->space( AS_PROGRAM );
 
 	for (i=0; i<datasize; i++)
 		space.write_byte((addr+i) & 0xffff, data[i+128]);
@@ -69,10 +68,10 @@ QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 	if (execution_address != 0 && header->number_addresses >= 3 )
 	{
 		// if specified, jumps to the quickload start address
-		state->m_maincpu->set_pc(execution_address);
+		m_maincpu->set_pc(execution_address);
 	}
 
-	auto_free(image.device().machine(), data);
+	auto_free(machine(), data);
 
 	logerror("Snapshot loaded at: 0x%04x-0x%04x, execution address: 0x%04x\n", addr, addr + datasize - 1, execution_address);
 

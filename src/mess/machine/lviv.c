@@ -331,7 +331,6 @@ int lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
 SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
 	UINT8 *lviv_snapshot_data;
-	lviv_state *state = image.device().machine().driver_data<lviv_state>();
 
 	lviv_snapshot_data = (UINT8*)malloc(LVIV_SNAPSHOT_SIZE);
 	if (!lviv_snapshot_data)
@@ -342,15 +341,15 @@ SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 
 	image.fread( lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
 
-	if(state->lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
+	if(lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
 		free(lviv_snapshot_data);
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->lviv_setup_snapshot (lviv_snapshot_data);
+	lviv_setup_snapshot (lviv_snapshot_data);
 
-	state->dump_registers();
+	dump_registers();
 
 	free(lviv_snapshot_data);
 

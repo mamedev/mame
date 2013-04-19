@@ -194,10 +194,8 @@ inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 d
 
 QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 {
-	running_machine &machine = image.device().machine();
-	svmu_state *state = machine.driver_data<svmu_state>();
 	UINT32 size = image.length();
-	UINT8 *flash = (UINT8*)state->m_flash->space().get_read_ptr(0);
+	UINT8 *flash = (UINT8*)m_flash->space().get_read_ptr(0);
 
 	image.fread(flash, size);
 

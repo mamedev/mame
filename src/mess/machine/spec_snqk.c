@@ -127,7 +127,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .SNA file size.\n");
 			goto error;
 		}
-		spectrum_setup_sna(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_sna(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "sp"))
 	{
@@ -139,7 +139,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 				goto error;
 			}
 		}
-		spectrum_setup_sp(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_sp(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "ach"))
 	{
@@ -148,7 +148,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .ACH file size.\n");
 			goto error;
 		}
-		spectrum_setup_ach(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_ach(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "prg"))
 	{
@@ -157,7 +157,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .PRG file size.\n");
 			goto error;
 		}
-		spectrum_setup_prg(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_prg(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "plusd"))
 	{
@@ -166,7 +166,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .PLUSD file size.\n");
 			goto error;
 		}
-		spectrum_setup_plusd(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_plusd(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "sem"))
 	{
@@ -180,7 +180,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 				goto error;
 			}
 		}
-		spectrum_setup_sem(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_sem(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "sit"))
 	{
@@ -189,7 +189,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .SIT file size.\n");
 			goto error;
 		}
-		spectrum_setup_sit(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_sit(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "zx"))
 	{
@@ -198,7 +198,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .ZX file size.\n");
 			goto error;
 		}
-		spectrum_setup_zx(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_zx(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "snp"))
 	{
@@ -207,7 +207,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .SNP file size.\n");
 			goto error;
 		}
-		spectrum_setup_snp(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_snp(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "snx"))
 	{
@@ -217,7 +217,7 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .SNX file size.\n");
 			goto error;
 		}
-		spectrum_setup_snx(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_snx(machine(), snapshot_data, snapshot_size);
 	}
 	else if (!mame_stricmp(file_type, "frz"))
 	{
@@ -226,11 +226,11 @@ SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .FRZ file size.\n");
 			goto error;
 		}
-		spectrum_setup_frz(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_frz(machine(), snapshot_data, snapshot_size);
 	}
 	else
 	{
-		spectrum_setup_z80(image.device().machine(), snapshot_data, snapshot_size);
+		spectrum_setup_z80(machine(), snapshot_data, snapshot_size);
 	}
 
 	free(snapshot_data);
@@ -2468,7 +2468,7 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .SCR file size.\n");
 			goto error;
 		}
-		spectrum_setup_scr(image.device().machine(), quickload_data, quickload_size);
+		spectrum_setup_scr(machine(), quickload_data, quickload_size);
 	}
 	else if (!mame_stricmp(file_type, "raw"))
 	{
@@ -2477,7 +2477,7 @@ QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 			logerror("Invalid .RAW file size.\n");
 			goto error;
 		}
-		spectrum_setup_raw(image.device().machine(), quickload_data, quickload_size);
+		spectrum_setup_raw(machine(), quickload_data, quickload_size);
 	}
 
 	free(quickload_data);

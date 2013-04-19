@@ -36,19 +36,14 @@ DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 {
-	running_machine &machine = image.device().machine();
-	cybiko_state *state = machine.driver_data<cybiko_state>();
-
-	image.fread(state->m_flash1->get_ptr(), MIN(image.length(), 0x84000));
+	image.fread(m_flash1->get_ptr(), MIN(image.length(), 0x84000));
 
 	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 {
-	running_machine &machine = image.device().machine();
-	cybiko_state *state = machine.driver_data<cybiko_state>();
-	address_space &dest = state->m_maincpu->space(AS_PROGRAM);
+	address_space &dest = m_maincpu->space(AS_PROGRAM);
 	UINT32 size = MIN(image.length(), RAMDISK_SIZE);
 
 	UINT8 *buffer = global_alloc_array(UINT8, size);

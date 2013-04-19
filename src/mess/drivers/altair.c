@@ -89,13 +89,12 @@ INPUT_PORTS_END
 
 QUICKLOAD_LOAD_MEMBER( altair_state,altair)
 {
-	altair_state *state = image.device().machine().driver_data<altair_state>();
 	int quick_length;
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
 		return IMAGE_INIT_FAIL;
-	read_ = image.fread(state->m_ram, quick_length);
+	read_ = image.fread(m_ram, quick_length);
 	if (read_ != quick_length)
 		return IMAGE_INIT_FAIL;
 

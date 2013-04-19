@@ -345,9 +345,8 @@ MACHINE_RESET_MEMBER(kaypro_state,kaypro2x)
 
 QUICKLOAD_LOAD_MEMBER( kaypro_state, kayproii )
 {
-	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT8 *RAM = state->memregion("rambank")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *RAM = memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 
@@ -359,18 +358,17 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kayproii )
 		RAM[i+0x100] = data;
 	}
 
-	state->common_pio_system_w(space, 0, state->m_system_port & 0x7f);  // switch TPA in
+	common_pio_system_w(space, 0, m_system_port & 0x7f);  // switch TPA in
 	RAM[0x80]=0;                            // clear out command tail
 	RAM[0x81]=0;
-	state->m_maincpu->set_pc(0x100);                // start program
+	m_maincpu->set_pc(0x100);                // start program
 	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro2x )
 {
-	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT8 *RAM = state->memregion("rambank")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *RAM = memregion("rambank")->base();
 	UINT16 i;
 	UINT8 data;
 
@@ -381,9 +379,9 @@ QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro2x )
 		RAM[i+0x100] = data;
 	}
 
-	state->kaypro2x_system_port_w(space, 0, state->m_system_port & 0x7f);
+	kaypro2x_system_port_w(space, 0, m_system_port & 0x7f);
 	RAM[0x80]=0;
 	RAM[0x81]=0;
-	state->m_maincpu->set_pc(0x100);
+	m_maincpu->set_pc(0x100);
 	return IMAGE_INIT_PASS;
 }

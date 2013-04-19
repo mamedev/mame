@@ -254,8 +254,8 @@ WRITE8_MEMBER(poly88_state::poly88_intr_w)
 
 SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 {
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8* data= auto_alloc_array(machine(), UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;
 	UINT16 address;
@@ -297,7 +297,7 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 					break;
 			case 3 :
 					/* 03 Auto Start @ Address */
-					image.device().machine().device("maincpu")->state().set_state_int(I8085_PC, address);
+					m_maincpu->set_state_int(I8085_PC, address);
 					theend = 1;
 					break;
 			case 4 :
@@ -322,6 +322,6 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 		}
 		pos+=recordLen;
 	}
-	image.device().machine().device("uart")->reset();
+	machine().device("uart")->reset();
 	return IMAGE_INIT_PASS;
 }

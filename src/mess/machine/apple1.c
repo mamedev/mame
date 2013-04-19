@@ -205,7 +205,6 @@ int apple1_state::apple1_verify_header (UINT8 *data)
 *****************************************************************************/
 SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 {
-	apple1_state *state = image.device().machine().driver_data<apple1_state>();
 	UINT64 filesize, datasize;
 	UINT8 *snapbuf, *snapptr;
 	UINT16 start_addr, end_addr, addr;
@@ -220,7 +219,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 		return IMAGE_INIT_FAIL;
 
 	/* Verify the snapshot header */
-	if (state->apple1_verify_header(snapbuf) == IMAGE_VERIFY_FAIL)
+	if (apple1_verify_header(snapbuf) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("apple1 - Snapshot Header is in incorrect format - needs to be LOAD:xxyyDATA:\n");
 		return IMAGE_INIT_FAIL;
@@ -234,7 +233,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 
 	end_addr = start_addr + datasize - 1;
 
-	if ((start_addr < 0xE000 && end_addr > image.device().machine().device<ram_device>(RAM_TAG)->size() - 1)
+	if ((start_addr < 0xE000 && end_addr > machine().device<ram_device>(RAM_TAG)->size() - 1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"
@@ -246,7 +245,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 			addr <= end_addr;
 			addr++, snapptr++)
-		state->m_maincpu->space(AS_PROGRAM).write_byte(addr, *snapptr);
+		m_maincpu->space(AS_PROGRAM).write_byte(addr, *snapptr);
 
 
 	return IMAGE_INIT_PASS;

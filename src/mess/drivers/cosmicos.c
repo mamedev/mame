@@ -533,8 +533,7 @@ void cosmicos_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 {
-	cosmicos_state *state = image.device().machine().driver_data<cosmicos_state>();
-	UINT8 *ptr = state->m_rom->base();
+	UINT8 *ptr = m_rom->base();
 	int size = image.length();
 
 	/* load image to RAM */

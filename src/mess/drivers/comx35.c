@@ -55,7 +55,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 	UINT8 header[16] = {0};
 	int size = image.length();
 
-	if (size > image.device().machine().device<ram_device>(RAM_TAG)->size())
+	if (size > machine().device<ram_device>(RAM_TAG)->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

@@ -615,14 +615,13 @@ WRITE_LINE_MEMBER(tvc_state::tvc_centronics_ack)
 
 QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 {
-	running_machine &machine = image.device().machine();
 	UINT8 first_byte;
 
 	image.fread(&first_byte, 1);
 	if (first_byte == 0x11)
 	{
 		image.fseek(0x90, SEEK_SET);
-		image.fread(machine.device<ram_device>(RAM_TAG)->pointer() + 0x19ef, image.length() - 0x90);
+		image.fread(machine().device<ram_device>(RAM_TAG)->pointer() + 0x19ef, image.length() - 0x90);
 		return IMAGE_INIT_PASS;
 	}
 	else

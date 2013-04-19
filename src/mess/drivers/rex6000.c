@@ -565,12 +565,11 @@ void rex6000_state::palette_init()
 QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
-	running_machine &machine = image.device().machine();
-	address_space& flash = machine.device("flash0b")->memory().space(0);
+	address_space& flash = machine().device("flash0b")->memory().space(0);
 	UINT32 img_start = 0;
 	UINT8 *data;
 
-	data = (UINT8*)auto_alloc_array(machine, UINT8, image.length());
+	data = (UINT8*)auto_alloc_array(machine(), UINT8, image.length());
 	image.fread(data, image.length());
 
 	if(strncmp((const char*)data, magic, 21))
@@ -582,7 +581,7 @@ QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 	for (int i=0; i<image.length() - img_start ;i++)
 		flash.write_byte(i, data[img_start + i]);
 
-	auto_free(machine, data);
+	auto_free(machine(), data);
 
 	return IMAGE_INIT_PASS;
 }

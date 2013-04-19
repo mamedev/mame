@@ -873,23 +873,21 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 
 SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 {
-	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	UINT8 *snapshot_buff;
 
 	snapshot_buff = (UINT8*)image.ptr();
 	if (!snapshot_buff)
 		return IMAGE_INIT_FAIL;
 
-	if (state->microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
+	if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
 		return IMAGE_INIT_FAIL;
 
-	state->microtan_snapshot_copy(snapshot_buff, snapshot_size);
+	microtan_snapshot_copy(snapshot_buff, snapshot_size);
 	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 {
-	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	int snapshot_size;
 	UINT8 *snapshot_buff;
 	char *buff;
@@ -916,11 +914,11 @@ QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 	buff[quickload_size] = '\0';
 
 	if (buff[0] == ':')
-		rc = state->parse_intel_hex(snapshot_buff, buff);
+		rc = parse_intel_hex(snapshot_buff, buff);
 	else
-		rc = state->parse_zillion_hex(snapshot_buff, buff);
+		rc = parse_zillion_hex(snapshot_buff, buff);
 	if (rc == IMAGE_INIT_PASS)
-		state->microtan_snapshot_copy(snapshot_buff, snapshot_size);
+		microtan_snapshot_copy(snapshot_buff, snapshot_size);
 	free(snapshot_buff);
 	return rc;
 }

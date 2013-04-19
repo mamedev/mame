@@ -340,7 +340,6 @@ UINT32 jr100_state::readByLittleEndian(UINT8 *buf,int pos)
 
 QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 {
-	jr100_state *state = image.device().machine().driver_data<jr100_state>();
 	int quick_length;
 	UINT8 buf[0x10000];
 	int read_;
@@ -356,32 +355,32 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 		return IMAGE_INIT_FAIL;
 	}
 	int pos = 4;
-	if (state->readByLittleEndian(buf,pos)!=1) {
+	if (readByLittleEndian(buf,pos)!=1) {
 		// not version 1 of PRG file
 		return IMAGE_INIT_FAIL;
 	}
 	pos += 4;
-	UINT32 len =state->readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 len =readByLittleEndian(buf,pos); pos+= 4;
 	pos += len; // skip name
-	UINT32 start_address = state->readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 code_length   = state->readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 flag          = state->readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 flag          = readByLittleEndian(buf,pos); pos+= 4;
 
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code
-	memcpy(state->m_ram + start_address,buf + pos,code_length);
+	memcpy(m_ram + start_address,buf + pos,code_length);
 	if (flag == 0) {
-		state->m_ram[end_address + 1] =  0xdf;
-		state->m_ram[end_address + 2] =  0xdf;
-		state->m_ram[end_address + 3] =  0xdf;
-		state->m_ram[6 ] = (end_address >> 8 & 0xFF);
-		state->m_ram[7 ] = (end_address & 0xFF);
-		state->m_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
-		state->m_ram[9 ] = ((end_address + 1) & 0xFF);
-		state->m_ram[10] = ((end_address + 2) >> 8 & 0xFF);
-		state->m_ram[11] = ((end_address + 2) & 0xFF);
-		state->m_ram[12] = ((end_address + 3) >> 8 & 0xFF);
-		state->m_ram[13] = ((end_address + 3) & 0xFF);
+		m_ram[end_address + 1] =  0xdf;
+		m_ram[end_address + 2] =  0xdf;
+		m_ram[end_address + 3] =  0xdf;
+		m_ram[6 ] = (end_address >> 8 & 0xFF);
+		m_ram[7 ] = (end_address & 0xFF);
+		m_ram[8 ] = ((end_address + 1) >> 8 & 0xFF);
+		m_ram[9 ] = ((end_address + 1) & 0xFF);
+		m_ram[10] = ((end_address + 2) >> 8 & 0xFF);
+		m_ram[11] = ((end_address + 2) & 0xFF);
+		m_ram[12] = ((end_address + 3) >> 8 & 0xFF);
+		m_ram[13] = ((end_address + 3) & 0xFF);
 	}
 
 	return IMAGE_INIT_PASS;

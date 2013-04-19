@@ -279,16 +279,14 @@ static DM9368_INTERFACE( led_l_intf )
 
 QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 {
-	elf2_state *state = image.device().machine().driver_data<elf2_state>();
-
 	int size = image.length();
 
-	if (size > state->m_ram->size())
+	if (size > m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.fread(state->m_ram->pointer(), size);
+	image.fread(m_ram->pointer(), size);
 
 	return IMAGE_INIT_PASS;
 }

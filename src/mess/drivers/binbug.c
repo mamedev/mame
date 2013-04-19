@@ -220,7 +220,7 @@ GFXDECODE_END
 
 QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 {
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x0440;
 	int exec_addr;
@@ -284,7 +284,7 @@ QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
 
 	// Start the quickload
-	image.device().machine().device("maincpu")->state().set_pc(exec_addr);
+	m_maincpu->set_pc(exec_addr);
 	return IMAGE_INIT_PASS;
 }
 

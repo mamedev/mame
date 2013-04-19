@@ -300,7 +300,6 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
 	UINT8 *snapshot_data;
-	primo_state *state = image.device().machine().driver_data<primo_state>();
 
 	if (!(snapshot_data = (UINT8*) malloc(snapshot_size)))
 		return IMAGE_INIT_FAIL;
@@ -317,7 +316,7 @@ SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->primo_setup_pss(snapshot_data, snapshot_size);
+	primo_setup_pss(snapshot_data, snapshot_size);
 
 	free(snapshot_data);
 	return IMAGE_INIT_PASS;
@@ -352,7 +351,6 @@ void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
 	UINT8 *quickload_data;
-	primo_state *state = image.device().machine().driver_data<primo_state>();
 
 	if (!(quickload_data = (UINT8*) malloc(quickload_size)))
 		return IMAGE_INIT_FAIL;
@@ -363,7 +361,7 @@ QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->primo_setup_pp(quickload_data, quickload_size);
+	primo_setup_pp(quickload_data, quickload_size);
 
 	free(quickload_data);
 	return IMAGE_INIT_PASS;

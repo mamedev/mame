@@ -331,7 +331,7 @@ SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 0020 up   - Program to load
 */
 
-	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
+	UINT8* data= auto_alloc_array(machine(), UINT8, snapshot_size);
 	UINT16 startaddr,endaddr,runaddr;
 
 	image.fread( data, snapshot_size);
@@ -349,11 +349,11 @@ SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 		return IMAGE_INIT_FAIL;
 	}
 
-	memcpy (image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(startaddr),
+	memcpy (m_maincpu->space(AS_PROGRAM).get_read_ptr(startaddr),
 			data+0x20, endaddr - startaddr + 1);
 
 	if (runaddr)
-		image.device().machine().device("maincpu")->state().set_state_int(Z80_PC, runaddr);
+		m_maincpu->set_state_int(Z80_PC, runaddr);
 	else
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Loaded but cannot run");

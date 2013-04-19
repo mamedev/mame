@@ -752,10 +752,9 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 
 QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 {
-	mbee_state *state = image.device().machine().driver_data<mbee_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 i, j;
-	UINT8 data, sw = state->ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
+	UINT8 data, sw = ioport("CONFIG")->read() & 1;   /* reading the dipswitch: 1 = autorun */
 
 	if (!mame_stricmp(image.filetype(), "mwb"))
 	{
@@ -770,7 +769,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 				return IMAGE_INIT_FAIL;
 			}
 
-			if ((j < state->m_size) || (j > 0xefff))
+			if ((j < m_size) || (j > 0xefff))
 				space.write_byte(j, data);
 			else
 			{
@@ -782,7 +781,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 		if (sw)
 		{
 			space.write_word(0xa2,0x801e);  /* fix warm-start vector to get around some copy-protections */
-			state->m_maincpu->set_pc(0x801e);
+			m_maincpu->set_pc(0x801e);
 		}
 		else
 			space.write_word(0xa2,0x8517);
@@ -800,7 +799,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 				return IMAGE_INIT_FAIL;
 			}
 
-			if ((j < state->m_size) || (j > 0xefff))
+			if ((j < m_size) || (j > 0xefff))
 				space.write_byte(j, data);
 			else
 			{
@@ -809,7 +808,7 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 			}
 		}
 
-		if (sw) state->m_maincpu->set_pc(0x100);
+		if (sw) m_maincpu->set_pc(0x100);
 	}
 
 	return IMAGE_INIT_PASS;
@@ -822,7 +821,6 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 
 QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 {
-	mbee_state *state = image.device().machine().driver_data<mbee_state>();
 	UINT16 execute_address, start_addr, end_addr;
 	int autorun;
 
@@ -834,16 +832,16 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = state->ioport("CONFIG")->read_safe(0xFF) & 1;
+		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		address_space &space = state->m_maincpu->space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
 
 		if (autorun)
 		{
 			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
-			state->m_maincpu->set_pc(execute_address);
+			m_maincpu->set_pc(execute_address);
 		}
 		else
 		{

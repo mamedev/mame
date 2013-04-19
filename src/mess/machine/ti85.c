@@ -680,11 +680,10 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 {
 	int expected_snapshot_size = 0;
 	UINT8 *ti8x_snapshot_data;
-	ti85_state *state = image.device().machine().driver_data<ti85_state>();
-	
-	if (!strncmp(image.device().machine().system().name, "ti85", 4))
+
+	if (!strncmp(machine().system().name, "ti85", 4))
 		expected_snapshot_size = TI85_SNAPSHOT_SIZE;
-	else if (!strncmp(image.device().machine().system().name, "ti86", 4))
+	else if (!strncmp(machine().system().name, "ti86", 4))
 		expected_snapshot_size = TI86_SNAPSHOT_SIZE;
 
 	logerror("Snapshot loading\n");
@@ -700,10 +699,10 @@ SNAPSHOT_LOAD_MEMBER( ti85_state, ti8x )
 
 	image.fread( ti8x_snapshot_data, snapshot_size);
 
-	if (!strncmp(image.device().machine().system().name, "ti85", 4))
-		state->ti85_setup_snapshot(ti8x_snapshot_data);
-	else if (!strncmp(image.device().machine().system().name, "ti86", 4))
-		state->ti86_setup_snapshot(ti8x_snapshot_data);
+	if (!strncmp(machine().system().name, "ti85", 4))
+		ti85_setup_snapshot(ti8x_snapshot_data);
+	else if (!strncmp(machine().system().name, "ti86", 4))
+		ti86_setup_snapshot(ti8x_snapshot_data);
 
 	free(ti8x_snapshot_data);
 	return IMAGE_INIT_PASS;

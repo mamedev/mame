@@ -290,9 +290,8 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 
 SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 {
-	device_t *cpu = image.device().machine().device("maincpu");
-	UINT8 *RAM = memregion(cpu->tag())->base();
-	address_space &space = cpu->memory().space(AS_PROGRAM);
+	UINT8 *RAM = memregion(m_maincpu->tag())->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
 
@@ -316,23 +315,23 @@ SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 	image.fread( RAM+0xc000, 0x4000);
 
 	/* patch CPU registers */
-	cpu->state().set_state_int(Z80_I, header[0]);
-	cpu->state().set_state_int(Z80_HL2, header[1] | (header[2] << 8));
-	cpu->state().set_state_int(Z80_DE2, header[3] | (header[4] << 8));
-	cpu->state().set_state_int(Z80_BC2, header[5] | (header[6] << 8));
-	cpu->state().set_state_int(Z80_AF2, header[7] | (header[8] << 8));
-	cpu->state().set_state_int(Z80_HL, header[9] | (header[10] << 8));
-	cpu->state().set_state_int(Z80_DE, header[11] | (header[12] << 8));
-	cpu->state().set_state_int(Z80_BC, header[13] | (header[14] << 8));
-	cpu->state().set_state_int(Z80_IY, header[15] | (header[16] << 8));
-	cpu->state().set_state_int(Z80_IX, header[17] | (header[18] << 8));
-	cpu->state().set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
-	cpu->state().set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
-	cpu->state().set_state_int(Z80_R, header[20]);
-	cpu->state().set_state_int(Z80_AF, header[21] | (header[22] << 8));
-	cpu->state().set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
-	cpu->state().set_state_int(Z80_IM, header[25]);
-	cpu->state().set_pc(header[26] | (header[27] << 8));
+	m_maincpu->set_state_int(Z80_I, header[0]);
+	m_maincpu->set_state_int(Z80_HL2, header[1] | (header[2] << 8));
+	m_maincpu->set_state_int(Z80_DE2, header[3] | (header[4] << 8));
+	m_maincpu->set_state_int(Z80_BC2, header[5] | (header[6] << 8));
+	m_maincpu->set_state_int(Z80_AF2, header[7] | (header[8] << 8));
+	m_maincpu->set_state_int(Z80_HL, header[9] | (header[10] << 8));
+	m_maincpu->set_state_int(Z80_DE, header[11] | (header[12] << 8));
+	m_maincpu->set_state_int(Z80_BC, header[13] | (header[14] << 8));
+	m_maincpu->set_state_int(Z80_IY, header[15] | (header[16] << 8));
+	m_maincpu->set_state_int(Z80_IX, header[17] | (header[18] << 8));
+	m_maincpu->set_state_int(Z80_IFF1, header[19]&2 ? 1 : 0);
+	m_maincpu->set_state_int(Z80_IFF2, header[19]&4 ? 1 : 0);
+	m_maincpu->set_state_int(Z80_R, header[20]);
+	m_maincpu->set_state_int(Z80_AF, header[21] | (header[22] << 8));
+	m_maincpu->set_state_int(STATE_GENSP, header[23] | (header[24] << 8));
+	m_maincpu->set_state_int(Z80_IM, header[25]);
+	m_maincpu->set_pc(header[26] | (header[27] << 8));
 
 	return IMAGE_INIT_PASS;
 }
@@ -427,7 +426,7 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 		/* check to see if autorun is on (I hate how this works) */
 		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
 
-		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space &space = m_maincpu->space(AS_PROGRAM);
 
 		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
 			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */
@@ -463,12 +462,12 @@ QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 			if ((execute_address != 0xc858) && autorun)
 				space.write_word(0xf028, execute_address);
 
-			image.device().machine().device("maincpu")->state().set_pc(0xf01f);
+			m_maincpu->set_pc(0xf01f);
 		}
 		else
 		{
 			if (autorun)
-				image.device().machine().device("maincpu")->state().set_pc(execute_address);
+				m_maincpu->set_pc(execute_address);
 		}
 
 	}

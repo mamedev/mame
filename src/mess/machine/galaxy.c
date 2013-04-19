@@ -125,12 +125,11 @@ SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
 {
 	UINT8* snapshot_data;
 
-	galaxy_state *state = image.device().machine().driver_data<galaxy_state>();
 	switch (snapshot_size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_alloc_array(image.device().machine(), UINT8, snapshot_size);
+			snapshot_data = auto_alloc_array(machine(), UINT8, snapshot_size);
 			break;
 		default:
 			return IMAGE_INIT_FAIL;
@@ -138,7 +137,7 @@ SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
 
 	image.fread( snapshot_data, snapshot_size);
 
-	state->galaxy_setup_snapshot(snapshot_data, snapshot_size);
+	galaxy_setup_snapshot(snapshot_data, snapshot_size);
 
 	return IMAGE_INIT_PASS;
 }

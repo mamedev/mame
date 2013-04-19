@@ -217,14 +217,14 @@ SNAPSHOT_LOAD_MEMBER( nascom1_state, nascom1 )
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b0);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b1);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b2);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b3);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b4);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b5);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b6);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).write_byte(addr++, b7);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b0);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b1);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b2);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b3);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b4);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b5);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b6);
+			m_maincpu->space(AS_PROGRAM).write_byte(addr++, b7);
 		}
 	}
 

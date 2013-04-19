@@ -336,7 +336,7 @@ static const cassette_interface d6800_cassette_interface =
 
 QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 {
-	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
 	int quick_addr = 0x0200;
 	int exec_addr = 0xc000;
@@ -369,7 +369,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 	// Start the quickload
-	image.device().machine().device("maincpu")->state().set_pc(exec_addr);
+	m_maincpu->set_pc(exec_addr);
 	return IMAGE_INIT_PASS;
 }
 

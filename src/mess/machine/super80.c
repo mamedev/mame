@@ -247,7 +247,7 @@ QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		if (autorun)
-			image.device().machine().device("maincpu")->state().set_pc(exec_addr);
+			m_maincpu->set_pc(exec_addr);
 	}
 
 	return IMAGE_INIT_PASS;

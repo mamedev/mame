@@ -3114,7 +3114,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.device().machine().driver_data<amstrad_state>()->amstrad_handle_snapshot(snapshot);
+	amstrad_handle_snapshot(snapshot);
 	free(snapshot);
 	return IMAGE_INIT_PASS;
 }
