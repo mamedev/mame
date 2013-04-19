@@ -44,6 +44,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
+	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(pcat_dyn);
 	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
@@ -114,32 +115,26 @@ static void pcat_dyn_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(machine.device("pic8259_1"), state);
 }
 
-static void set_gate_a20(running_machine &machine, int a20)
+READ8_MEMBER(pcat_dyn_state::get_out2)
 {
-	pcat_dyn_state *state = machine.driver_data<pcat_dyn_state>();
-	state->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
+	return pit8253_get_output( machine().device("pit8254"), 2 );
 }
-
-static void keyboard_interrupt(running_machine &machine, int state)
-{
-	pic8259_ir1_w(machine.device("pic8259_1"), state);
-}
-
-static int pcat_dyn_get_out2(running_machine &machine) {
-	return pit8253_get_output(machine.device("pit8254"), 2 );
-}
-
 
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, pcat_dyn_get_out2
-};
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
 
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pcat_dyn_state,get_out2)
+};
 void pcat_dyn_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(pcat_irq_callback);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, pcat_dyn_set_keyb_int);
-	kbdc8042_init(machine(), &at8042);
 }
 
 static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
@@ -156,6 +151,8 @@ static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_FRAGMENT_ADD( pcat_common )
+	
+	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 /***************************************

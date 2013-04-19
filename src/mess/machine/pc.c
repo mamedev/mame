@@ -1156,7 +1156,7 @@ void pc_state::fdc_dma_drq(bool state)
 	m_dma8237->dreq2_w( state );
 }
 
-void pc_set_irq_line(running_machine &machine,int irq, int state)
+static void pc_set_irq_line(running_machine &machine,int irq, int state)
 {
 	pc_state *st = machine.driver_data<pc_state>();
 
@@ -1330,7 +1330,7 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
  *
  **********************************************************/
 
-void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int))
+void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int))
 {
 	if ( set_keyb_int_func != NULL )
 		init_pc_common(machine(), flags, set_keyb_int_func);
@@ -1343,43 +1343,43 @@ void pc_state::mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(runni
 
 DRIVER_INIT_MEMBER(pc_state,ibm5150)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,pccga)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
 	pc_rtc_init();
 }
 
 
 DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, NULL);
 	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcmda)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int);
 }
 
 DRIVER_INIT_MEMBER(pc_state,t1000hx)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pc_set_keyb_int);
 	pc_turbo_setup(4.77/12, 1);
 }
 
 DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
-	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int);
 }
 
 DRIVER_INIT_MEMBER(pc_state,mc1502)
 {
-	mess_init_pc_common(0, NULL, pc_set_irq_line);
+	mess_init_pc_common(0, NULL);
 }
 
 

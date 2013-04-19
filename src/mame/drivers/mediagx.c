@@ -199,6 +199,7 @@ public:
 	DECLARE_READ32_MEMBER(speedup9_r);
 	DECLARE_READ32_MEMBER(speedup10_r);
 	DECLARE_READ32_MEMBER(speedup11_r);
+	DECLARE_READ8_MEMBER(get_out2);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
@@ -960,7 +961,7 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE8(io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,              at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
@@ -1156,6 +1157,23 @@ static RAMDAC_INTERFACE( ramdac_intf )
 	0
 };
 
+READ8_MEMBER(mediagx_state::get_out2)
+{
+	return pit8253_get_output( m_pit8254, 2 );
+}
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(mediagx_state,get_out2)
+};
+
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
@@ -1196,6 +1214,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_GFXDECODE(CGA)
 	MCFG_PALETTE_LENGTH(256)
 
+	MCFG_KBDC8042_ADD("kbdc", at8042)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1207,31 +1226,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static void set_gate_a20(running_machine &machine, int a20)
-{
-	mediagx_state *state = machine.driver_data<mediagx_state>();
-	state->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
-}
-
-static void keyboard_interrupt(running_machine &machine, int _state)
-{
-	mediagx_state *state = machine.driver_data<mediagx_state>();
-
-	pic8259_ir1_w(state->m_pic8259_1, _state);
-}
-
-static int mediagx_get_out2(running_machine &machine)
-{
-	mediagx_state *state = machine.driver_data<mediagx_state>();
-
-	return pit8253_get_output( state->m_pit8254, 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, mediagx_get_out2
-};
-
+	
 static void mediagx_set_keyb_int(running_machine &machine, int _state)
 {
 	mediagx_state *state = machine.driver_data<mediagx_state>();
@@ -1244,8 +1239,6 @@ void mediagx_state::init_mediagx()
 	m_frame_width = m_frame_height = 1;
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
-
-	kbdc8042_init(machine(), &at8042);
 }
 
 #if SPEEDUP_HACKS

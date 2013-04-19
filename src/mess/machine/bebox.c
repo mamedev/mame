@@ -104,7 +104,6 @@
 #include "machine/idectrl.h"
 #include "machine/pci.h"
 #include "machine/intelfsh.h"
-#include "machine/8042kbdc.h"
 #include "machine/53c810.h"
 #include "machine/ram.h"
 
@@ -837,35 +836,6 @@ WRITE8_MEMBER(bebox_state::bebox_flash_w )
 
 /*************************************
  *
- *  Keyboard
- *
- *************************************/
-
-static void bebox_keyboard_interrupt(running_machine &machine,int state)
-{
-	bebox_state *drvstate = machine.driver_data<bebox_state>();
-	bebox_set_irq_bit(machine, 16, state);
-	if ( drvstate->m_devices.pic8259_master ) {
-		pic8259_ir1_w(drvstate->m_devices.pic8259_master, state);
-	}
-}
-
-static int bebox_get_out2(running_machine &machine) {
-	return pit8253_get_output(machine.device("pit8254"), 2 );
-}
-
-static const struct kbdc8042_interface bebox_8042_interface =
-{
-	KBDC8042_STANDARD,
-	NULL,
-	bebox_keyboard_interrupt,
-	NULL,
-	bebox_get_out2
-};
-
-
-/*************************************
- *
  *  SCSI
  *
  *************************************/
@@ -1046,9 +1016,7 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	space_0.install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
 	space_1.install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
 	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
-
-	kbdc8042_init(machine(), &bebox_8042_interface);
-
+	
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
 	 * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never

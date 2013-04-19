@@ -90,6 +90,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(bebox_ide_interrupt);
 
+	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
+	DECLARE_READ8_MEMBER(bebox_get_out2);
+
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

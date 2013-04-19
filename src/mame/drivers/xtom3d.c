@@ -113,6 +113,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(xtom3d_pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_out2);
 	virtual void machine_start();
 	virtual void machine_reset();
 	IRQ_CALLBACK_MEMBER(irq_callback);
@@ -540,7 +541,7 @@ static ADDRESS_MAP_START(xtom3d_io, AS_IO, 32, xtom3d_state)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,  at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
@@ -604,28 +605,21 @@ static const struct pic8259_interface xtom3d_pic8259_2_config =
 	DEVCB_NULL
 };
 
-static void set_gate_a20(running_machine &machine, int a20)
+READ8_MEMBER(xtom3d_state::get_out2)
 {
-	xtom3d_state *state = machine.driver_data<xtom3d_state>();
-
-	state->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
-}
-
-static void keyboard_interrupt(running_machine &machine, int state)
-{
-	xtom3d_state *drvstate = machine.driver_data<xtom3d_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
-static int xtom3d_get_out2(running_machine &machine)
-{
-	xtom3d_state *state = machine.driver_data<xtom3d_state>();
-	return pit8253_get_output(state->m_pit8254, 2 );
+	return pit8253_get_output( m_pit8254, 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, xtom3d_get_out2
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(xtom3d_state,get_out2)
 };
 
 static void xtom3d_set_keyb_int(running_machine &machine, int state)
@@ -654,7 +648,6 @@ void xtom3d_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(xtom3d_state::irq_callback),this));
 	intel82439tx_init();
 
-	kbdc8042_init(machine(), &at8042);
 }
 
 void xtom3d_state::machine_reset()
@@ -689,6 +682,8 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
+	MCFG_KBDC8042_ADD("kbdc", at8042)
+	
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END

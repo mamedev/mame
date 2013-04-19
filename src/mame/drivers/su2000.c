@@ -79,6 +79,7 @@ public:
 
 	UINT32      *m_pc_ram;
 	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -128,31 +129,21 @@ static void su2000_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drv_state->m_pic8259_1, state);
 }
 
-static void set_gate_a20(running_machine &machine, int a20)
+READ8_MEMBER(su2000_state::get_out2)
 {
-	su2000_state *state = machine.driver_data<su2000_state>();
-	state->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
-}
-
-static void keyboard_interrupt(running_machine &machine, int state)
-{
-	su2000_state *drv_state = machine.driver_data<su2000_state>();
-	pic8259_ir1_w(drv_state->m_pic8259_1, state);
-}
-
-static int pcat_get_out2(running_machine &machine)
-{
-	su2000_state *state = machine.driver_data<su2000_state>();
-	return pit8253_get_output(state->m_pit8254, 2);
+	return pit8253_get_output( machine().device("pit8254"), 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
 {
 	KBDC8042_AT386,
-	set_gate_a20,
-	keyboard_interrupt,
-	NULL,
-	pcat_get_out2,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(su2000_state,get_out2)
 };
 
 
@@ -277,8 +268,6 @@ void su2000_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
-
-	kbdc8042_init(machine(), &at8042);
 }
 
 void su2000_state::machine_reset()
@@ -319,6 +308,8 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // TODO
 
 	MCFG_FRAGMENT_ADD(pcat_common)
+	
+	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 

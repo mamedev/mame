@@ -153,7 +153,7 @@ public:
 	void pc_speaker_set_spkrdata(UINT8 data);
 	void pc_speaker_set_input(UINT8 data);
 	void pcjr_keyb_init();
-	void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
+	void mess_init_pc_common(UINT32 flags, void (*set_keyb_int_func)(running_machine &, int));
 	void pc_rtc_init();
 	
 	TIMER_CALLBACK_MEMBER(pc_turbo_callback);
@@ -165,7 +165,6 @@ public:
 
 };
 
-void pc_set_irq_line(running_machine &machine,int irq, int state);
 void pc_set_keyb_int(running_machine &machine, int state);
 
 /*----------- defined in machine/pc.c -----------*/

@@ -34,6 +34,7 @@
 #include "machine/scsihd.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
+#include "machine/8042kbdc.h"
 
 READ8_MEMBER(bebox_state::at_dma8237_1_r)  { return machine().device<i8237_device>("dma8237_2")->i8237_r(space, offset / 2); }
 WRITE8_MEMBER(bebox_state::at_dma8237_1_w) { machine().device<i8237_device>("dma8237_2")->i8237_w(space, offset / 2, data); }
@@ -48,7 +49,7 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000060, 0x8000006F) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
@@ -143,6 +144,38 @@ const struct mpc105_interface mpc105_config =
 	0
 };
 
+
+/*************************************
+ *
+ *  Keyboard
+ *
+ *************************************/
+
+WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
+{
+	bebox_set_irq_bit(machine(), 16, state);
+	if ( m_devices.pic8259_master ) {
+		pic8259_ir1_w(m_devices.pic8259_master, state);
+	}
+}
+
+READ8_MEMBER(bebox_state::bebox_get_out2) 
+{
+	return pit8253_get_output(machine().device("pit8254"), 2 );
+}
+
+static const struct kbdc8042_interface bebox_8042_interface =
+{
+	KBDC8042_STANDARD,
+	DEVCB_CPU_INPUT_LINE("ppc1", INPUT_LINE_RESET),
+	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_keyboard_interrupt),
+	DEVCB_NULL,
+	
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(bebox_state,bebox_get_out2)
+};
+
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("mpc105", MPC105)
 	SLOT_INTERFACE("cirrus", CIRRUS)
@@ -203,6 +236,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_KBDC8042_ADD("kbdc", bebox_8042_interface)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32M")

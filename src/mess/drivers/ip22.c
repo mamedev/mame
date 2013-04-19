@@ -100,7 +100,8 @@ public:
 	m_mainram(*this, "mainram"),
 	m_lpt0(*this, "lpt_0"),
 	m_pit(*this, "pit8254"),
-	m_dac(*this, "dac")
+	m_dac(*this, "dac"),
+	m_kbdc8042(*this, "kbdc")
 	{ }
 
 	RTC_t m_RTC;
@@ -130,6 +131,7 @@ public:
 	DECLARE_READ32_MEMBER(hpc3_unkpbus0_r);
 	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	DECLARE_READ8_MEMBER(ip22_get_out2);
 	DECLARE_DRIVER_INIT(ip225015);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -143,6 +145,7 @@ public:
 	required_device<device_t> m_lpt0;
 	required_device<pit8254_device> m_pit;
 	required_device<dac_device> m_dac;
+	required_device<kbdc8042_device> m_kbdc8042;
 	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
 	void int3_raise_local0_irq(UINT8 source_mask);
 	void int3_lower_local0_irq(UINT8 source_mask);
@@ -281,9 +284,9 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		//verboselog(2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
 		return 0x00000004;
 	case 0x40/4:
-		return kbdc8042_8_r(space, 0);
+		return m_kbdc8042->data_r(space, 0);
 	case 0x44/4:
-		return kbdc8042_8_r(space, 4);
+		return m_kbdc8042->data_r(space, 4);
 	case 0x58/4:
 		return 0x20;    // chip rev 1, board rev 0, "Guinness" (Indy) => 0x01 for "Full House" (Indigo2)
 	case 0x80/4:
@@ -365,10 +368,10 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 		}
 		break;
 	case 0x40/4:
-		kbdc8042_8_w(space, 0, data);
+		m_kbdc8042->data_w(space, 0, data);
 		break;
 	case 0x44/4:
-		kbdc8042_8_w(space, 4, data);
+		m_kbdc8042->data_w(space, 4, data);
 		break;
 	case 0x80/4:
 	case 0x84/4:
@@ -1475,10 +1478,9 @@ static const struct WD33C93interface wd33c93_intf =
 	DEVCB_DRIVER_LINE_MEMBER(ip22_state,scsi_irq)      /* command completion IRQ */
 };
 
-static int ip22_get_out2(running_machine &machine)
+READ8_MEMBER(ip22_state::ip22_get_out2)
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
-	return pit8253_get_output(state->m_pit, 2 );
+	return pit8253_get_output(m_pit, 2 );
 }
 
 void ip22_state::machine_start()
@@ -1490,17 +1492,23 @@ void ip22_state::machine_start()
 	machine().device<nvram_device>("nvram")->set_base(m_RTC.nRAM, 0x200);
 }
 
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_STANDARD,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ip22_state,ip22_get_out2)	
+};
+
 DRIVER_INIT_MEMBER(ip22_state,ip225015)
 {
-	static const struct kbdc8042_interface at8042 =
-	{
-		KBDC8042_STANDARD, NULL, NULL, NULL, ip22_get_out2
-	};
-
 	// IP22 uses 2 pieces of PC-compatible hardware: the 8042 PS/2 keyboard/mouse
 	// interface and the 8254 PIT.  Both are licensed cores embedded in the IOC custom chip.
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, NULL);
-	kbdc8042_init(machine(), &at8042);
 
 	m_nIOC_ParReadCnt = 0;
 }
@@ -1637,7 +1645,8 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^rspeaker", 1.0)
-
+	
+	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )

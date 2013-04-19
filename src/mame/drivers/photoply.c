@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 	DECLARE_DRIVER_INIT(photoply);
+	DECLARE_READ8_MEMBER(get_out2);
 	virtual void machine_start();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
@@ -284,7 +285,7 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM//DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
@@ -334,6 +335,22 @@ static INPUT_PORTS_START( photoply )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
+READ8_MEMBER(photoply_state::get_out2)
+{
+	return pit8253_get_output( m_pit8253, 2 );
+}
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(photoply_state,get_out2)
+};
 
 static void photoply_set_keyb_int(running_machine &machine, int state)
 {
@@ -391,6 +408,8 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
+	
+	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 

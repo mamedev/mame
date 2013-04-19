@@ -117,6 +117,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(gamecstl_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_DRIVER_INIT(gamecstl);
+	DECLARE_READ8_MEMBER(get_out2);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -530,7 +531,7 @@ static ADDRESS_MAP_START(gamecstl_io, AS_IO, 32, gamecstl_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE8_LEGACY(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
@@ -685,6 +686,23 @@ static const struct pit8253_config gamecstl_pit8254_config =
 	}
 };
 
+READ8_MEMBER(gamecstl_state::get_out2)
+{
+	return pit8253_get_output( m_pit8254, 2 );
+}
+
+static const struct kbdc8042_interface at8042 =
+{
+	KBDC8042_AT386,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
+	DEVCB_NULL,
+
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(gamecstl_state,get_out2)
+};
+
 static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	/* basic machine hardware */
@@ -712,6 +730,8 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
+	MCFG_KBDC8042_ADD("kbdc", at8042)
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -725,29 +745,6 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 
 MACHINE_CONFIG_END
-
-static void set_gate_a20(running_machine &machine, int a20)
-{
-	gamecstl_state *drvstate = machine.driver_data<gamecstl_state>();
-	drvstate->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
-}
-
-static void keyboard_interrupt(running_machine &machine, int state)
-{
-	gamecstl_state *drvstate = machine.driver_data<gamecstl_state>();
-	pic8259_ir1_w(drvstate->m_pic8259_1, state);
-}
-
-static int gamecstl_get_out2(running_machine &machine)
-{
-	gamecstl_state *state = machine.driver_data<gamecstl_state>();
-	return pit8253_get_output( state->m_pit8254, 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, NULL, gamecstl_get_out2
-};
 
 static void gamecstl_set_keyb_int(running_machine &machine, int state)
 {
@@ -763,7 +760,6 @@ DRIVER_INIT_MEMBER(gamecstl_state,gamecstl)
 
 	intel82439tx_init();
 
-	kbdc8042_init(machine(), &at8042);
 }
 
 /*****************************************************************************/
