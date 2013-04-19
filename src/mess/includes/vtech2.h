@@ -80,6 +80,7 @@ public:
 	void laser_machine_init(int bank_mask, int video_mask);
 	void laser_get_track();
 	void laser_put_track();
+	device_t *laser_file();
 };
 
 

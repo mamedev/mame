@@ -10,7 +10,7 @@
 
 struct WD33C93interface
 {
-	void (*irq_callback)(running_machine &machine, int state); /* irq callback */
+	devcb_write_line m_irq_cb; /* irq callback */
 };
 
 /* wd register names */
@@ -107,6 +107,7 @@ private:
 	emu_timer   *cmd_timer;
 	emu_timer   *service_req_timer;
 	emu_timer   *deassert_cip_timer;
+	devcb_resolved_write_line m_irq_func;
 };
 
 // device type definition

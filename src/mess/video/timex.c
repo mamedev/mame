@@ -17,7 +17,7 @@
 #include "includes/spectrum.h"
 #include "machine/ram.h"
 
-INLINE void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	bitmap.pix16(y, x) = (UINT16)color;
 }
@@ -53,9 +53,8 @@ VIDEO_START_MEMBER(spectrum_state,ts2068)
  *******************************************************************/
 
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
-static void ts2068_hires_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines)
+void spectrum_state::ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
 	unsigned char *attr, *scr;
@@ -63,13 +62,13 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr=machine.device<ram_device>(RAM_TAG)->pointer() + y*32;
+	scr=machine().device<ram_device>(RAM_TAG)->pointer() + y*32;
 	attr=scr + 0x2000;
 
 	for (x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
-		if (state->m_flash_invert && (*attr & 0x80))
+		if (m_flash_invert && (*attr & 0x80))
 		{
 			ink=((*attr)>>3) & 0x0f;
 			pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -99,7 +98,7 @@ static void ts2068_hires_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 }
 
 /* Draw a scanline in TS2068/TC2048 64-column mode */
-static void ts2068_64col_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor)
+void spectrum_state::ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor)
 {
 	int x,b,scrx,scry;
 	unsigned char *scr1, *scr2;
@@ -107,7 +106,7 @@ static void ts2068_64col_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr1=machine.device<ram_device>(RAM_TAG)->pointer() + y*32;
+	scr1=machine().device<ram_device>(RAM_TAG)->pointer() + y*32;
 	scr2=scr1 + 0x2000;
 
 	for (x=0;x<32;x++)
@@ -133,9 +132,8 @@ static void ts2068_64col_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 }
 
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
-static void ts2068_lores_scanline(running_machine &machine,bitmap_ind16 &bitmap, int y, int borderlines, int screen)
+void spectrum_state::ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
 	unsigned char *attr, *scr;
@@ -143,13 +141,13 @@ static void ts2068_lores_scanline(running_machine &machine,bitmap_ind16 &bitmap,
 	scrx=TS2068_LEFT_BORDER;
 	scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
 
-	scr = machine.device<ram_device>(RAM_TAG)->pointer() + y*32 + screen*0x2000;
-	attr = machine.device<ram_device>(RAM_TAG)->pointer() + ((scry>>3)*32) + screen*0x2000 + 0x1800;
+	scr = machine().device<ram_device>(RAM_TAG)->pointer() + y*32 + screen*0x2000;
+	attr = machine().device<ram_device>(RAM_TAG)->pointer() + ((scry>>3)*32) + screen*0x2000 + 0x1800;
 
 	for (x=0;x<32;x++)
 	{
 		/* Get ink and paper colour with bright */
-		if (state->m_flash_invert && (*attr & 0x80))
+		if (m_flash_invert && (*attr & 0x80))
 		{
 			ink=((*attr)>>3) & 0x0f;
 			pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -191,25 +189,25 @@ UINT32 spectrum_state::screen_update_ts2068(screen_device &screen, bitmap_ind16 
 		/* 64 Column mode */
 		unsigned short inkcolor = (m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
-			ts2068_64col_scanline(machine(),bitmap, count, TS2068_TOP_BORDER, inkcolor);
+			ts2068_64col_scanline(bitmap, count, TS2068_TOP_BORDER, inkcolor);
 	}
 	else if ((m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
-			ts2068_hires_scanline(machine(),bitmap, count, TS2068_TOP_BORDER);
+			ts2068_hires_scanline(bitmap, count, TS2068_TOP_BORDER);
 	}
 	else if ((m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(machine(),bitmap, count, TS2068_TOP_BORDER, 1);
+			ts2068_lores_scanline(bitmap, count, TS2068_TOP_BORDER, 1);
 	}
 	else
 	{
 		/* Screen 4000-5aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(machine(),bitmap, count, TS2068_TOP_BORDER, 0);
+			ts2068_lores_scanline(bitmap, count, TS2068_TOP_BORDER, 0);
 	}
 
 	return 0;
@@ -228,25 +226,25 @@ UINT32 spectrum_state::screen_update_tc2048(screen_device &screen, bitmap_ind16 
 		/* 64 Column mode */
 		unsigned short inkcolor = (m_port_ff_data & 0x38) >> 3;
 		for (count = 0; count < 192; count++)
-			ts2068_64col_scanline(machine(),bitmap, count, SPEC_TOP_BORDER, inkcolor);
+			ts2068_64col_scanline(bitmap, count, SPEC_TOP_BORDER, inkcolor);
 	}
 	else if ((m_port_ff_data & 7) == 2)
 	{
 		/* Extended Color mode */
 		for (count = 0; count < 192; count++)
-			ts2068_hires_scanline(machine(),bitmap, count, SPEC_TOP_BORDER);
+			ts2068_hires_scanline(bitmap, count, SPEC_TOP_BORDER);
 	}
 	else if ((m_port_ff_data & 7) == 1)
 	{
 		/* Screen 6000-7aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(machine(),bitmap, count, SPEC_TOP_BORDER, 1);
+			ts2068_lores_scanline(bitmap, count, SPEC_TOP_BORDER, 1);
 	}
 	else
 	{
 		/* Screen 4000-5aff */
 		for (count = 0; count < 192; count++)
-			ts2068_lores_scanline(machine(),bitmap, count, SPEC_TOP_BORDER, 0);
+			ts2068_lores_scanline(bitmap, count, SPEC_TOP_BORDER, 0);
 	}
 
 	return 0;

@@ -214,6 +214,9 @@ protected:
 	void spectrum_UpdateBorderBitmap();
 	inline unsigned char get_display_color (unsigned char color, int invert);
 	inline void spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void ts2068_hires_scanline(bitmap_ind16 &bitmap, int y, int borderlines);
+	void ts2068_64col_scanline(bitmap_ind16 &bitmap, int y, int borderlines, unsigned short inkcolor);
+	void ts2068_lores_scanline(bitmap_ind16 &bitmap, int y, int borderlines, int screen);
 };
 
 

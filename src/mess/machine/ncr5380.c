@@ -80,7 +80,7 @@ void ncr5380_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		irq_callback = NULL;
+		memset(&m_irq_cb, 0, sizeof(m_irq_cb));
 	}
 }
 
@@ -110,6 +110,7 @@ void ncr5380_device::device_start()
 	memset(m_scsi_devices, 0, sizeof(m_scsi_devices));
 
 	m_next_req_flag = 0;
+	m_irq_func.resolve(m_irq_cb, *this);
 
 	save_item(NAME(m_5380_Registers));
 	save_item(NAME(m_5380_Command));

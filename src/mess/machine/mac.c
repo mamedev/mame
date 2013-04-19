@@ -1034,7 +1034,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 	m_ncr5380->ncr5380_write_reg(reg, data>>8);
 }
 
-void mac_scsi_irq(running_machine &machine, int state)
+WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
 {
 /*  mac_state *mac = machine.driver_data<mac_state>();
 

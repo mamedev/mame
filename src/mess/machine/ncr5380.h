@@ -10,7 +10,7 @@
 
 struct NCR5380interface
 {
-	void (*irq_callback)(running_machine &machine, int state);  /* irq callback */
+	devcb_write_line m_irq_cb;  /* irq callback */
 };
 
 // 5380 registers
@@ -69,6 +69,7 @@ private:
 	UINT8 m_5380_Command[32];
 	INT32 m_cmd_ptr, m_d_ptr, m_d_limit, m_next_req_flag;
 	UINT8 m_5380_Data[512];
+	devcb_resolved_write_line m_irq_func;
 };
 
 // device type definition

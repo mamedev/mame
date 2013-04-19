@@ -828,7 +828,7 @@ static const applefdc_interface mac_iwm_interface =
 
 static const struct NCR5380interface macplus_5380intf =
 {
-	mac_scsi_irq    // IRQ (unconnected on the Mac Plus)
+	DEVCB_DRIVER_LINE_MEMBER(mac_state,mac_scsi_irq)    // IRQ (unconnected on the Mac Plus)
 };
 
 static const struct NCR539Xinterface mac_539x_intf =

@@ -2245,7 +2245,7 @@ INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	NULL            /* command completion IRQ */
+	DEVCB_NULL            /* command completion IRQ */
 };
 
 void cps3_state::machine_reset()

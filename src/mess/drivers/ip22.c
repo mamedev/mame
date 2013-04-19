@@ -129,6 +129,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hpc3_pbusdma_w);
 	DECLARE_READ32_MEMBER(hpc3_unkpbus0_r);
 	DECLARE_WRITE32_MEMBER(hpc3_unkpbus0_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_DRIVER_INIT(ip225015);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -1229,60 +1230,59 @@ void ip22_state::dump_chain(address_space &space, UINT32 ch_base)
 #define HPC3_DMACTRL_ENABLE (0x10)
 
 
-static void scsi_irq(running_machine &machine, int state)
+WRITE_LINE_MEMBER(ip22_state::scsi_irq)
 {
-	ip22_state *drvstate = machine.driver_data<ip22_state>();
-	address_space &space = drvstate->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if (state)
 	{
-		if (drvstate->m_wd33c93->get_dma_count())
+		if (m_wd33c93->get_dma_count())
 		{
-			printf("drvstate->m_wd33c93->get_dma_count() is %d\n", drvstate->m_wd33c93->get_dma_count() );
-			if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE)
+			printf("m_wd33c93->get_dma_count() is %d\n", m_wd33c93->get_dma_count() );
+			if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE)
 			{
-				if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_IRQ) logerror("IP22: Unhandled SCSI DMA IRQ\n");
+				if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_IRQ) logerror("IP22: Unhandled SCSI DMA IRQ\n");
 			}
 
 			// HPC3 DMA: host to device
-			if ((drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE) && (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_DIR))
+			if ((m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE) && (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_DIR))
 			{
 				UINT32 wptr, tmpword;
 				int words, dptr, twords;
 
-				words = drvstate->m_wd33c93->get_dma_count();
+				words = m_wd33c93->get_dma_count();
 				words /= 4;
 
-				wptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
-				drvstate->m_HPC3.nSCSI0Descriptor += words*4;
+				wptr = space.read_dword(m_HPC3.nSCSI0Descriptor);
+				m_HPC3.nSCSI0Descriptor += words*4;
 				dptr = 0;
 
 				printf("DMA to device: %d words @ %x\n", words, wptr);
 
-				drvstate->dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
+				dump_chain(space, m_HPC3.nSCSI0Descriptor);
 
 				if (words <= (512/4))
 				{
 					// one-shot
-					//drvstate->m_wd33c93->get_dma_data(drvstate->m_wd33c93->get_dma_count(), drvstate->m_dma_buffer);
+					//m_wd33c93->get_dma_data(m_wd33c93->get_dma_count(), m_dma_buffer);
 
 					while (words)
 					{
 						tmpword = space.read_dword(wptr);
 
-						if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
+						if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
-							drvstate->m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
-							drvstate->m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
-							drvstate->m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
-							drvstate->m_dma_buffer[dptr] = tmpword&0xff;
+							m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
+							m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
+							m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
+							m_dma_buffer[dptr] = tmpword&0xff;
 						}
 						else
 						{
-							drvstate->m_dma_buffer[dptr] = (tmpword>>24)&0xff;
-							drvstate->m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
-							drvstate->m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
-							drvstate->m_dma_buffer[dptr+3] = tmpword&0xff;
+							m_dma_buffer[dptr] = (tmpword>>24)&0xff;
+							m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
+							m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
+							m_dma_buffer[dptr+3] = tmpword&0xff;
 						}
 
 						wptr += 4;
@@ -1290,35 +1290,35 @@ static void scsi_irq(running_machine &machine, int state)
 						words--;
 					}
 
-					words = drvstate->m_wd33c93->get_dma_count();
-					drvstate->m_wd33c93->write_data(words, drvstate->m_dma_buffer);
+					words = m_wd33c93->get_dma_count();
+					m_wd33c93->write_data(words, m_dma_buffer);
 				}
 				else
 				{
 					while (words)
 					{
-						//drvstate->m_wd33c93->get_dma_data(512, drvstate->m_dma_buffer);
+						//m_wd33c93->get_dma_data(512, m_dma_buffer);
 						twords = 512/4;
-						drvstate->m_HPC3.nSCSI0Descriptor += 512;
+						m_HPC3.nSCSI0Descriptor += 512;
 						dptr = 0;
 
 						while (twords)
 						{
 							tmpword = space.read_dword(wptr);
 
-							if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
+							if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 							{
-								drvstate->m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
-								drvstate->m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
-								drvstate->m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
-								drvstate->m_dma_buffer[dptr] = tmpword&0xff;
+								m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
+								m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
+								m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
+								m_dma_buffer[dptr] = tmpword&0xff;
 							}
 							else
 							{
-								drvstate->m_dma_buffer[dptr] = (tmpword>>24)&0xff;
-								drvstate->m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
-								drvstate->m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
-								drvstate->m_dma_buffer[dptr+3] = tmpword&0xff;
+								m_dma_buffer[dptr] = (tmpword>>24)&0xff;
+								m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
+								m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
+								m_dma_buffer[dptr+3] = tmpword&0xff;
 							}
 
 							wptr += 4;
@@ -1326,23 +1326,23 @@ static void scsi_irq(running_machine &machine, int state)
 							twords--;
 						}
 
-						drvstate->m_wd33c93->write_data(512, drvstate->m_dma_buffer);
+						m_wd33c93->write_data(512, m_dma_buffer);
 
 						words -= (512/4);
 					}
 				}
 
 				// clear DMA on the controller too
-				drvstate->m_wd33c93->clear_dma();
+				m_wd33c93->clear_dma();
 #if 0
 				UINT32 dptr, tmpword;
-				UINT32 bc = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor + 4);
-				UINT32 rptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
+				UINT32 bc = space.read_dword(m_HPC3.nSCSI0Descriptor + 4);
+				UINT32 rptr = space.read_dword(m_HPC3.nSCSI0Descriptor);
 				int length = bc & 0x3fff;
 				int xie = (bc & 0x20000000) ? 1 : 0;
 				int eox = (bc & 0x80000000) ? 1 : 0;
 
-				dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
+				dump_chain(space, m_HPC3.nSCSI0Descriptor);
 
 				printf("PC is %08x\n", machine.device("maincpu")->safe_pc());
 				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
@@ -1353,19 +1353,19 @@ static void scsi_irq(running_machine &machine, int state)
 					while (length > 0)
 					{
 						tmpword = space.read_dword(rptr);
-						if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
+						if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
-							drvstate->m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
-							drvstate->m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
-							drvstate->m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
-							drvstate->m_dma_buffer[dptr] = tmpword&0xff;
+							m_dma_buffer[dptr+3] = (tmpword>>24)&0xff;
+							m_dma_buffer[dptr+2] = (tmpword>>16)&0xff;
+							m_dma_buffer[dptr+1] = (tmpword>>8)&0xff;
+							m_dma_buffer[dptr] = tmpword&0xff;
 						}
 						else
 						{
-							drvstate->m_dma_buffer[dptr] = (tmpword>>24)&0xff;
-							drvstate->m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
-							drvstate->m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
-							drvstate->m_dma_buffer[dptr+3] = tmpword&0xff;
+							m_dma_buffer[dptr] = (tmpword>>24)&0xff;
+							m_dma_buffer[dptr+1] = (tmpword>>16)&0xff;
+							m_dma_buffer[dptr+2] = (tmpword>>8)&0xff;
+							m_dma_buffer[dptr+3] = tmpword&0xff;
 						}
 
 						dptr += 4;
@@ -1373,11 +1373,11 @@ static void scsi_irq(running_machine &machine, int state)
 						length -= 4;
 					}
 
-					length = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor+4) & 0x3fff;
-					drvstate->m_wd33c93->write_data(length, drvstate->m_dma_buffer);
+					length = space.read_dword(m_HPC3.nSCSI0Descriptor+4) & 0x3fff;
+					m_wd33c93->write_data(length, m_dma_buffer);
 
 					// clear DMA on the controller too
-					drvstate->m_wd33c93->clear_dma();
+					m_wd33c93->clear_dma();
 				}
 				else
 				{
@@ -1387,35 +1387,35 @@ static void scsi_irq(running_machine &machine, int state)
 			}
 
 			// HPC3 DMA: device to host
-			if ((drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE) && !(drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_DIR))
+			if ((m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENABLE) && !(m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_DIR))
 			{
 				UINT32 wptr, tmpword;
 				int words, sptr, twords;
 
-				words = drvstate->m_wd33c93->get_dma_count();
+				words = m_wd33c93->get_dma_count();
 				words /= 4;
 
-				wptr = space.read_dword(drvstate->m_HPC3.nSCSI0Descriptor);
+				wptr = space.read_dword(m_HPC3.nSCSI0Descriptor);
 				sptr = 0;
 
 //              mame_printf_info("DMA from device: %d words @ %x\n", words, wptr);
 
-				drvstate->dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
+				dump_chain(space, m_HPC3.nSCSI0Descriptor);
 
 				if (words <= (1024/4))
 				{
 					// one-shot
-					drvstate->m_wd33c93->get_dma_data(drvstate->m_wd33c93->get_dma_count(), drvstate->m_dma_buffer);
+					m_wd33c93->get_dma_data(m_wd33c93->get_dma_count(), m_dma_buffer);
 
 					while (words)
 					{
-						if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
+						if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 						{
-							tmpword = drvstate->m_dma_buffer[sptr+3]<<24 | drvstate->m_dma_buffer[sptr+2]<<16 | drvstate->m_dma_buffer[sptr+1]<<8 | drvstate->m_dma_buffer[sptr];
+							tmpword = m_dma_buffer[sptr+3]<<24 | m_dma_buffer[sptr+2]<<16 | m_dma_buffer[sptr+1]<<8 | m_dma_buffer[sptr];
 						}
 						else
 						{
-							tmpword = drvstate->m_dma_buffer[sptr]<<24 | drvstate->m_dma_buffer[sptr+1]<<16 | drvstate->m_dma_buffer[sptr+2]<<8 | drvstate->m_dma_buffer[sptr+3];
+							tmpword = m_dma_buffer[sptr]<<24 | m_dma_buffer[sptr+1]<<16 | m_dma_buffer[sptr+2]<<8 | m_dma_buffer[sptr+3];
 						}
 
 						space.write_dword(wptr, tmpword);
@@ -1428,19 +1428,19 @@ static void scsi_irq(running_machine &machine, int state)
 				{
 					while (words)
 					{
-						drvstate->m_wd33c93->get_dma_data(512, drvstate->m_dma_buffer);
+						m_wd33c93->get_dma_data(512, m_dma_buffer);
 						twords = 512/4;
 						sptr = 0;
 
 						while (twords)
 						{
-							if (drvstate->m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
+							if (m_HPC3.nSCSI0DMACtrl & HPC3_DMACTRL_ENDIAN)
 							{
-								tmpword = drvstate->m_dma_buffer[sptr+3]<<24 | drvstate->m_dma_buffer[sptr+2]<<16 | drvstate->m_dma_buffer[sptr+1]<<8 | drvstate->m_dma_buffer[sptr];
+								tmpword = m_dma_buffer[sptr+3]<<24 | m_dma_buffer[sptr+2]<<16 | m_dma_buffer[sptr+1]<<8 | m_dma_buffer[sptr];
 							}
 							else
 							{
-								tmpword = drvstate->m_dma_buffer[sptr]<<24 | drvstate->m_dma_buffer[sptr+1]<<16 | drvstate->m_dma_buffer[sptr+2]<<8 | drvstate->m_dma_buffer[sptr+3];
+								tmpword = m_dma_buffer[sptr]<<24 | m_dma_buffer[sptr+1]<<16 | m_dma_buffer[sptr+2]<<8 | m_dma_buffer[sptr+3];
 							}
 							space.write_dword(wptr, tmpword);
 
@@ -1454,25 +1454,25 @@ static void scsi_irq(running_machine &machine, int state)
 				}
 
 				// clear DMA on the controller too
-				drvstate->m_wd33c93->clear_dma();
+				m_wd33c93->clear_dma();
 			}
 		}
 
 		// clear HPC3 DMA active flag
-		drvstate->m_HPC3.nSCSI0DMACtrl &= ~HPC3_DMACTRL_ENABLE;
+		m_HPC3.nSCSI0DMACtrl &= ~HPC3_DMACTRL_ENABLE;
 
 		// set the interrupt
-		drvstate->int3_raise_local0_irq(INT3_LOCAL0_SCSI0);
+		int3_raise_local0_irq(INT3_LOCAL0_SCSI0);
 	}
 	else
 	{
-		drvstate->int3_lower_local0_irq(INT3_LOCAL0_SCSI0);
+		int3_lower_local0_irq(INT3_LOCAL0_SCSI0);
 	}
 }
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	&scsi_irq,      /* command completion IRQ */
+	DEVCB_DRIVER_LINE_MEMBER(ip22_state,scsi_irq)      /* command completion IRQ */
 };
 
 static int ip22_get_out2(running_machine &machine)

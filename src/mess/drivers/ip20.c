@@ -60,6 +60,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hpc_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
+	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_DRIVER_INIT(ip204415);
 	virtual void machine_start();
 	virtual void video_start();
@@ -479,13 +480,13 @@ static ADDRESS_MAP_START( ip204415_map, AS_PROGRAM, 32, ip20_state )
 	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
-static void scsi_irq(running_machine &machine, int state)
+WRITE_LINE_MEMBER(ip20_state::scsi_irq)
 {
 }
 
 static const struct WD33C93interface wd33c93_intf =
 {
-	&scsi_irq,      /* command completion IRQ */
+	DEVCB_DRIVER_LINE_MEMBER(ip20_state,scsi_irq)      /* command completion IRQ */
 };
 
 DRIVER_INIT_MEMBER(ip20_state,ip204415)

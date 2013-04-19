@@ -189,6 +189,12 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_timer_callback);
 	IRQ_CALLBACK_MEMBER(int_callback);
 	IRQ_CALLBACK_MEMBER(compis_irq_callback);
+	void compis_irq_set(UINT8 irq);
+	void compis_keyb_update();
+	void compis_keyb_init();
+	void compis_fdc_reset();
+	void update_interrupt_state();
+	void compis_cpu_init();
 };
 
 

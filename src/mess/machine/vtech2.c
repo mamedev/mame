@@ -331,10 +331,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER( vtech2_state, laser_cart )
 	memset(&m_mem[0x30000], 0xff, 0x10000);
 }
 
-static device_t *laser_file(running_machine &machine)
-{
-	vtech2_state *state = machine.driver_data<vtech2_state>();
-	return machine.device( state->m_laser_drive ? FLOPPY_1 : FLOPPY_0 );
+device_t *vtech2_state::laser_file()
+{	
+	return machine().device(m_laser_drive ? FLOPPY_1 : FLOPPY_0);
 }
 
 void vtech2_state::laser_get_track()
@@ -342,10 +341,10 @@ void vtech2_state::laser_get_track()
 	sprintf(m_laser_frame_message, "#%d get track %02d", m_laser_drive, m_laser_track_x2[m_laser_drive]/2);
 	m_laser_frame_time = 30;
 	/* drive selected or and image file ok? */
-	if( m_laser_drive >= 0 && laser_file(machine()) != NULL )
+	if( m_laser_drive >= 0 && laser_file() != NULL )
 	{
 		int size, offs;
-		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine()));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
 		size = TRKSIZE_VZ;
 		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;
 		image->fseek(offs, SEEK_SET);
@@ -358,9 +357,9 @@ void vtech2_state::laser_get_track()
 
 void vtech2_state::laser_put_track()
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine()));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file());
 	/* drive selected and image file ok? */
-	if( m_laser_drive >= 0 && laser_file(machine()) != NULL )
+	if( m_laser_drive >= 0 && laser_file() != NULL )
 	{
 		int size, offs;
 		offs = TRKSIZE_VZ * m_laser_track_x2[m_laser_drive]/2;

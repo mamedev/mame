@@ -203,9 +203,9 @@ void wd33c93_device::complete_immediate( int status )
 	regs[WD_AUXILIARY_STATUS] &= ~(ASR_CIP | ASR_BSY);
 
 	/* if we have a callback, call it */
-	if (irq_callback)
+	if (!m_irq_func.isnull())
 	{
-		irq_callback(machine(), 1);
+		m_irq_func(1);
 	}
 }
 
@@ -641,9 +641,9 @@ READ8_MEMBER(wd33c93_device::read)
 			{
 				regs[WD_AUXILIARY_STATUS] &= ~ASR_INT;
 
-				if (irq_callback)
+				if (!m_irq_func.isnull())
 				{
-					irq_callback(machine(), 0);
+					m_irq_func(0);
 				}
 
 				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", space.device().safe_pc(), regs[WD_SCSI_STATUS] ));
@@ -777,6 +777,7 @@ void wd33c93_device::device_start()
 			devices[scsidev->GetDeviceID()] = scsidev;
 		}
 	}
+	m_irq_func.resolve(m_irq_cb, *this);
 
 	/* allocate a timer for commands */
 	cmd_timer = timer_alloc(0);
