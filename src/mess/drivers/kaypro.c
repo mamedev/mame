@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kayproii, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kayproii_brg_intf)  // WD1943, SMC8116
@@ -313,7 +313,7 @@ static MACHINE_CONFIG_START( kaypro2x, kaypro_state )
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 2000000, kaypro2x_crtc) /* comes out of ULA - needs to be measured */
-	MCFG_QUICKLOAD_ADD("quickload", kaypro2x, "com,cpm", 3)
+	MCFG_QUICKLOAD_ADD("quickload", kaypro_state, kaypro2x, "com,cpm", 3)
 	MCFG_FD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_COM8116_ADD("brg", XTAL_5_0688MHz, kaypro2x_brg_intf)  // WD1943, SMC8116

@@ -68,10 +68,10 @@ Ports:
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD( ace )
+SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 {
-	cpu_device *cpu = image.device().machine().firstcpu;
-	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
+	cpu_device *cpu = m_maincpu;
+	UINT8 *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( ace, ace_state )
 
 	// devices
 	MCFG_CASSETTE_ADD("cassette", ace_cassette_interface)
-	MCFG_SNAPSHOT_ADD("snapshot", ace, "ace", 1)
+	MCFG_SNAPSHOT_ADD("snapshot", ace_state, ace, "ace", 1)
 	MCFG_I8255A_ADD(I8255_TAG, ppi_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_6_5MHz/2, pio_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)

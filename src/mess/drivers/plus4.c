@@ -33,7 +33,7 @@
 
 
 
-static QUICKLOAD_LOAD( cbm_c16 )
+QUICKLOAD_LOAD_MEMBER( plus4_state, cbm_c16 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
 }
@@ -744,7 +744,7 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, "c1551", NULL, DEVWRITELINE(DEVICE_SELF, plus4_state, exp_irq_w))
 	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, plus4_state, read), DEVWRITE8(DEVICE_SELF, plus4_state, write), INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, plus4_expansion_cards, "c1551", NULL, DEVWRITELINE(DEVICE_SELF, plus4_state, exp_irq_w))
 	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, plus4_state, read), DEVWRITE8(DEVICE_SELF, plus4_state, write), INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", plus4_state, cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

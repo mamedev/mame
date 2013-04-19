@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cd2650 );
 	const UINT8 *m_p_chargen;
 	UINT8 m_term_data;
 	virtual void machine_reset();
@@ -164,7 +165,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(cd2650_state, kbd_put)
 };
 
-QUICKLOAD_LOAD( cd2650 )
+QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -267,7 +268,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cd2650, "pgm", 1)
+	MCFG_QUICKLOAD_ADD("quickload", cd2650_state, cd2650, "pgm", 1)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

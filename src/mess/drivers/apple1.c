@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( apple1, apple1_state )
 	MCFG_PIA6821_ADD( "pia", apple1_pia0 )
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", apple1, "snp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", apple1_state, apple1, "snp", 0)
 
 	MCFG_CASSETTE_ADD("cassette", apple1_cassette_interface)
 	MCFG_SOFTWARE_LIST_ADD("cass_list","apple1")

@@ -55,6 +55,8 @@ public:
 	int m_keylatch;         /* key latch */
 	DECLARE_DRIVER_INIT(tmc1800);
 	TIMER_CALLBACK_MEMBER(setup_beep);
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER( tmc1800 );
 };
 
 class osc1000b_state : public driver_device

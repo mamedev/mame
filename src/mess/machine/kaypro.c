@@ -343,7 +343,7 @@ MACHINE_RESET_MEMBER(kaypro_state,kaypro2x)
 
 ************************************************************/
 
-QUICKLOAD_LOAD( kayproii )
+QUICKLOAD_LOAD_MEMBER( kaypro_state, kayproii )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
@@ -366,7 +366,7 @@ QUICKLOAD_LOAD( kayproii )
 	return IMAGE_INIT_PASS;
 }
 
-QUICKLOAD_LOAD( kaypro2x )
+QUICKLOAD_LOAD_MEMBER( kaypro_state, kaypro2x )
 {
 	kaypro_state *state = image.device().machine().driver_data<kaypro_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);

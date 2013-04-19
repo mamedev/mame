@@ -50,6 +50,7 @@ public:
 	int load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len );
 	void cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( psx_exe_load );
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -448,7 +449,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 	return address;
 }
 
-static QUICKLOAD_LOAD( psx_exe_load )
+QUICKLOAD_LOAD_MEMBER( psx1_state, psx_exe_load )
 {
 	psx1_state *state = image.device().machine().driver_data<psx1_state>();
 	address_space &space = state->m_maincpu->space( AS_PROGRAM );
@@ -517,7 +518,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
@@ -551,7 +552,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 

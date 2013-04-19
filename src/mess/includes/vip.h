@@ -99,6 +99,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
 
+	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
 	// memory state
 	int m_8000;
 

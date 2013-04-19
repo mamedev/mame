@@ -43,6 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 	DECLARE_READ8_MEMBER(p7_r);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( svmu );
 
 private:
 	UINT8 *     m_bios;
@@ -191,7 +192,7 @@ inline void vmufat_write_word(UINT8* flash, UINT8 block, offs_t offset, UINT16 d
 	flash[(block * 512) + offset + 1] = (data>>8) & 0xff;
 }
 
-static QUICKLOAD_LOAD( svmu )
+QUICKLOAD_LOAD_MEMBER( svmu_state, svmu )
 {
 	running_machine &machine = image.device().machine();
 	svmu_state *state = machine.driver_data<svmu_state>();
@@ -322,7 +323,7 @@ static MACHINE_CONFIG_START( svmu, svmu_state )
 
 	/* devices */
 	MCFG_ATMEL_29C010_ADD("flash")
-	MCFG_QUICKLOAD_ADD("quickload", svmu, "vms,bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", svmu_state, svmu, "vms,bin", 0)
 	MCFG_QUICKLOAD_INTERFACE("svmu_quik")
 
 	/* Software lists */

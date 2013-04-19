@@ -200,6 +200,7 @@ public:
 	DECLARE_READ8_MEMBER(vtech1_printer_r);
 	DECLARE_WRITE8_MEMBER(vtech1_strobe_w);
 	DECLARE_READ8_MEMBER(vtech1_mc6847_videoram_r);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 	void vtech1_get_track();
 	void vtech1_put_track();
 	required_device<cpu_device> m_maincpu;
@@ -210,7 +211,7 @@ public:
     SNAPSHOT LOADING
 ***************************************************************************/
 
-static SNAPSHOT_LOAD( vtech1 )
+SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 {
 	vtech1_state *vtech1 = image.device().machine().driver_data<vtech1_state>();
 	address_space &space = vtech1->m_maincpu->space(AS_PROGRAM);
@@ -985,7 +986,7 @@ static MACHINE_CONFIG_START( laser110, vtech1_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", vtech1, "vz", 1.5)
+	MCFG_SNAPSHOT_ADD("snapshot", vtech1_state, vtech1, "vz", 1.5)
 
 	MCFG_CASSETTE_ADD( "cassette", laser_cassette_interface )
 

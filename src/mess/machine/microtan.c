@@ -871,7 +871,7 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 	}
 }
 
-SNAPSHOT_LOAD( microtan )
+SNAPSHOT_LOAD_MEMBER( microtan_state, microtan )
 {
 	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	UINT8 *snapshot_buff;
@@ -887,7 +887,7 @@ SNAPSHOT_LOAD( microtan )
 	return IMAGE_INIT_PASS;
 }
 
-QUICKLOAD_LOAD( microtan )
+QUICKLOAD_LOAD_MEMBER( microtan_state, microtan )
 {
 	microtan_state *state = image.device().machine().driver_data<microtan_state>();
 	int snapshot_size;

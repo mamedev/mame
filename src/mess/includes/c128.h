@@ -193,7 +193,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( restore );
 	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
-
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
 	// memory state
 	int m_z80en;
 	int m_loram;

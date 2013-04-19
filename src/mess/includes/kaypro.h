@@ -83,6 +83,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kaypro_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(kayproii );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro2x );
 };
 
 
@@ -102,10 +104,6 @@ extern const z80pio_interface kayproii_pio_s_intf;
 extern const z80pio_interface kaypro4_pio_s_intf;
 extern const z80sio_interface kaypro_sio_intf;
 extern const wd17xx_interface kaypro_wd1793_interface;
-
-
-QUICKLOAD_LOAD( kayproii );
-QUICKLOAD_LOAD( kaypro2x );
 
 /*----------- defined in video/kaypro.c -----------*/
 

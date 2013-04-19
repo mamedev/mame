@@ -275,8 +275,8 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", primo, "pss", 0)
-	MCFG_QUICKLOAD_ADD("quickload", primo, "pp", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", primo_state, primo, "pss", 0)
+	MCFG_QUICKLOAD_ADD("quickload", primo_state, primo, "pp", 0)
 
 	MCFG_CASSETTE_ADD( "cassette", primo_cassette_interface )
 

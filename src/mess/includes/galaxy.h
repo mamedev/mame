@@ -44,6 +44,7 @@ public:
 	void galaxy_set_timer();
 	void galaxy_setup_snapshot (const UINT8 * data, UINT32 size);
 	required_device<cpu_device> m_maincpu;
+	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -51,8 +52,5 @@ protected:
 	ioport_port *m_io_ports[8];
 };
 
-
-/*----------- defined in machine/galaxy.c -----------*/
-SNAPSHOT_LOAD( galaxy );
 
 #endif /* GALAXY_H_ */

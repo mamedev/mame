@@ -288,10 +288,10 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
  Snapshot Handling
 ******************************************************************************/
 
-SNAPSHOT_LOAD(sorcerer)
+SNAPSHOT_LOAD_MEMBER( sorcerer_state,sorcerer)
 {
 	device_t *cpu = image.device().machine().device("maincpu");
-	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
+	UINT8 *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
@@ -410,10 +410,10 @@ void sorcerer_state::machine_reset()
 
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD( sorcerer )
+    QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD( sorcerer )
+QUICKLOAD_LOAD_MEMBER( sorcerer_state, sorcerer )
 {
 	UINT16 execute_address, start_address, end_address;
 	int autorun;
@@ -425,7 +425,7 @@ QUICKLOAD_LOAD( sorcerer )
 	if (execute_address != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
+		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 

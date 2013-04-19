@@ -204,7 +204,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
@@ -240,7 +240,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", galaxy, "gal", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", galaxy_state, galaxy, "gal", 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

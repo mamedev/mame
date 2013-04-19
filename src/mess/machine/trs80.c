@@ -935,9 +935,9 @@ MACHINE_RESET_MEMBER(trs80_state,lnw80)
     IMPLEMENTATION
 ***************************************************************************/
 
-QUICKLOAD_LOAD( trs80_cmd )
+QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 {
-	address_space &program = image.device().machine().firstcpu->space(AS_PROGRAM);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	UINT8 type, length;
 	UINT8 data[0x100];
@@ -969,7 +969,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD transfer address %04x\n", address);
-			image.device().machine().firstcpu->set_state_int(Z80_PC, address);
+			m_maincpu->set_state_int(Z80_PC, address);
 			}
 			break;
 

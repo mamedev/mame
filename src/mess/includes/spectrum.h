@@ -180,6 +180,10 @@ public:
 	void spectrum_plus3_update_memory();
 	void ts2068_update_memory();
 
+	DECLARE_SNAPSHOT_LOAD_MEMBER( spectrum );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( spectrum );
+
+
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

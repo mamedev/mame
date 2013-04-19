@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_bc_w);
 	DECLARE_READ8_MEMBER(sby_r);
 	DECLARE_WRITE8_MEMBER(ald_w);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 };
 
 #endif /* ACE_H_ */

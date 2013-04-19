@@ -79,6 +79,7 @@ public:
 	required_shared_ptr<const UINT8> m_p_videoram;
 	required_shared_ptr<const UINT8> m_p_attribram;
 	required_device<cpu_device> m_maincpu;
+	DECLARE_QUICKLOAD_LOAD_MEMBER( binbug );
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
@@ -217,7 +218,7 @@ static GFXDECODE_START( dg640 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
 GFXDECODE_END
 
-QUICKLOAD_LOAD( binbug )
+QUICKLOAD_LOAD_MEMBER( binbug_state, binbug )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -314,7 +315,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", binbug, "pgm", 1)
+	MCFG_QUICKLOAD_ADD("quickload", binbug_state, binbug, "pgm", 1)
 MACHINE_CONFIG_END
 
 

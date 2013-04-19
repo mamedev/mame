@@ -129,7 +129,7 @@ INPUT_CHANGED_MEMBER(gizmondo_state::port_changed)
 }
 
 #if 0
-static QUICKLOAD_LOAD( gizmondo )
+QUICKLOAD_LOAD_MEMBER( gizmondo_state, gizmondo )
 {
 	return gizmondo_quickload( image, file_type, quickload_size, 0x3000E000); // eboot
 	//return gizmondo_quickload( image, file_type, quickload_size, 0x30400000); // wince
@@ -216,7 +216,7 @@ static MACHINE_CONFIG_START( gizmondo, gizmondo_state )
 	MCFG_DISKONCHIP_G3_ADD("diskonchip", 64)
 
 #if 0
-	MCFG_QUICKLOAD_ADD("quickload", wince, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", gizmondo_state, wince, "bin", 0)
 #endif
 MACHINE_CONFIG_END
 

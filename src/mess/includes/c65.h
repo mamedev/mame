@@ -10,6 +10,7 @@
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
 #include "imagedev/cartslot.h"
+#include "imagedev/snapquik.h"
 
 #define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
 
@@ -158,6 +159,8 @@ public:
 	DECLARE_WRITE8_MEMBER( c65_write_io_dc00 );
 	DECLARE_READ8_MEMBER( c65_read_io );
 	DECLARE_READ8_MEMBER( c65_read_io_dc00 );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c65 );
+	
 	int c64_paddle_read( device_t *device, address_space &space, int which );
 	void c65_nmi(  );
 	void c65_irq( int level );

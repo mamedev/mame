@@ -277,7 +277,7 @@ static DM9368_INTERFACE( led_l_intf )
 	DEVCB_NULL
 };
 
-static QUICKLOAD_LOAD( elf )
+QUICKLOAD_LOAD_MEMBER( elf2_state, elf )
 {
 	elf2_state *state = image.device().machine().driver_data<elf2_state>();
 
@@ -314,7 +314,7 @@ static MACHINE_CONFIG_START( elf2, elf2_state )
 
 	/* devices */
 	MCFG_CASSETTE_ADD("cassette", elf_cassette_interface)
-	MCFG_QUICKLOAD_ADD("quickload", elf, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", elf2_state, elf, "bin", 0)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

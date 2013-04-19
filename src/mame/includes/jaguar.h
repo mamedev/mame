@@ -8,6 +8,7 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "machine/eeprom.h"
+#include "imagedev/snapquik.h"
 
 #ifndef ENABLE_SPEEDUP_HACKS
 #define ENABLE_SPEEDUP_HACKS 1
@@ -218,6 +219,7 @@ public:
 	int cart_load(device_image_interface &image);
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
 protected:
 	// timer IDs
 	enum

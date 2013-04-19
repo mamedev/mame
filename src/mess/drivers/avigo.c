@@ -823,7 +823,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(avigo_state::avigo_1hz_timer)
 	refresh_ints();
 }
 
-static QUICKLOAD_LOAD(avigo)
+QUICKLOAD_LOAD_MEMBER( avigo_state,avigo)
 {
 	avigo_state *state = image.device().machine().driver_data<avigo_state>();
 	address_space& flash1 = state->m_flashes[1]->space(0);
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( avigo, avigo_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", avigo_state, avigo_1hz_timer, attotime::from_hz(1))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", avigo, "app", 0)
+	MCFG_QUICKLOAD_ADD("quickload", avigo_state, avigo, "app", 0)
 MACHINE_CONFIG_END
 
 

@@ -613,7 +613,7 @@ WRITE_LINE_MEMBER(tvc_state::tvc_centronics_ack)
 		m_centronics_ff = 1;
 }
 
-static QUICKLOAD_LOAD(tvc64)
+QUICKLOAD_LOAD_MEMBER( tvc_state,tvc64)
 {
 	running_machine &machine = image.device().machine();
 	UINT8 first_byte;
@@ -726,7 +726,7 @@ static MACHINE_CONFIG_START( tvc, tvc_state )
 	MCFG_CASSETTE_ADD( "cassette", tvc_cassette_interface )
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", tvc64, "cas", 6)
+	MCFG_QUICKLOAD_ADD("quickload", tvc_state, tvc64, "cas", 6)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "tvc_cart")

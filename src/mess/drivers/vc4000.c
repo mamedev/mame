@@ -106,8 +106,6 @@ to work on the vc4000 as well. Procedure:
 
 #include "includes/vc4000.h"
 
-static QUICKLOAD_LOAD( vc4000 );
-
 READ8_MEMBER( vc4000_state::vc4000_key_r )
 {
 	UINT8 data=0;
@@ -408,7 +406,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", vc4000, "pgm,tvc", 0)
+	MCFG_QUICKLOAD_ADD("quickload", vc4000_state, vc4000, "pgm,tvc", 0)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -526,7 +524,7 @@ ROM_START( elektor )
 	ROM_LOAD( "elektor.rom", 0x0000, 0x0800, CRC(e6ef1ee1) SHA1(6823b5a22582344016415f2a37f9f3a2dc75d2a7))
 ROM_END
 
-QUICKLOAD_LOAD(vc4000)
+QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;

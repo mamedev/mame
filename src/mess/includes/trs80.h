@@ -152,6 +152,7 @@ public:
 	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(trs80_fdc_intrq_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
 
 protected:
 	required_memory_region m_region_maincpu;
@@ -190,7 +191,5 @@ protected:
 /*----------- defined in machine/trs80.c -----------*/
 
 extern const wd17xx_interface trs80_wd17xx_interface;
-
-QUICKLOAD_LOAD( trs80_cmd );
 
 #endif  /* TRS80_H_ */

@@ -717,8 +717,8 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
-	MCFG_QUICKLOAD_ADD("quickload", spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
+	MCFG_SNAPSHOT_ADD("snapshot", spectrum_state, spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
+	MCFG_QUICKLOAD_ADD("quickload", spectrum_state, spectrum, "raw,scr", 2) // The delay prevents the screen from being cleared by the RAM test at boot
 	MCFG_CASSETTE_ADD( "cassette", spectrum_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","spectrum_cass")
 

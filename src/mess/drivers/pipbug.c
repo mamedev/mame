@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pipbug_serial_w);
 	required_device<serial_terminal_device> m_terminal;
 	required_device<cpu_device> m_maincpu;
+	DECLARE_QUICKLOAD_LOAD_MEMBER( pipbug );
 };
 
 WRITE8_MEMBER( pipbug_state::pipbug_ctrl_w )
@@ -92,7 +93,7 @@ static const serial_terminal_interface terminal_intf =
 	DEVCB_NULL
 };
 
-QUICKLOAD_LOAD( pipbug )
+QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -172,7 +173,7 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 110)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", pipbug, "pgm", 1)
+	MCFG_QUICKLOAD_ADD("quickload", pipbug_state, pipbug, "pgm", 1)
 MACHINE_CONFIG_END
 
 

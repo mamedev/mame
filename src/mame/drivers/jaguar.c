@@ -347,8 +347,6 @@ Notes:
 #define R3000_CLOCK         XTAL_40MHz
 #define M68K_CLOCK          XTAL_50MHz
 
-static QUICKLOAD_LOAD( jaguar );
-
 
 /*************************************
  *
@@ -1615,7 +1613,7 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 2)
+	MCFG_QUICKLOAD_ADD("quickload", jaguar_state, jaguar, "abs,bin,cof,jag,prg", 2)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -1673,9 +1671,9 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguar)
 	}
 }
 
-QUICKLOAD_LOAD( jaguar )
+QUICKLOAD_LOAD_MEMBER( jaguar_state, jaguar )
 {
-	return image.device().machine().driver_data<jaguar_state>()->quickload(image, file_type, quickload_size);
+	return quickload(image, file_type, quickload_size);
 }
 
 int jaguar_state::quickload(device_image_interface &image, const char *file_type, int quickload_size)

@@ -451,8 +451,8 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", sorcerer, "snp", 2)
-	MCFG_QUICKLOAD_ADD("quickload", sorcerer, "bin", 3)
+	MCFG_SNAPSHOT_ADD("snapshot", sorcerer_state, sorcerer, "snp", 2)
+	MCFG_QUICKLOAD_ADD("quickload", sorcerer_state, sorcerer, "bin", 3)
 
 	MCFG_CASSETTE_ADD( "cassette", sorcerer_cassette_interface )
 	MCFG_CASSETTE_ADD( "cassette2", sorcerer_cassette_interface )

@@ -750,7 +750,7 @@ DRIVER_INIT_MEMBER(mbee_state,mbeett)
 
 ************************************************************/
 
-QUICKLOAD_LOAD( mbee )
+QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
@@ -817,10 +817,10 @@ QUICKLOAD_LOAD( mbee )
 
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD( mbee_z80bin )
+    QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD( mbee_z80bin )
+QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
 {
 	mbee_state *state = image.device().machine().driver_data<mbee_state>();
 	UINT16 execute_address, start_addr, end_addr;

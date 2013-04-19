@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER( input_w );
 
+	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
 	// display state
 	UINT8 m_data;
 };

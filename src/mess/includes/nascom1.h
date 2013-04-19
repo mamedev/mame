@@ -61,12 +61,11 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 };
 
 
 /*----------- defined in machine/nascom1.c -----------*/
 
 extern const wd17xx_interface nascom2_wd17xx_interface;
-
-SNAPSHOT_LOAD( nascom1 );
 #endif /* NASCOM1_H_ */

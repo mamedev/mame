@@ -458,7 +458,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", lviv_state, lviv, "sav", 0)
 
 	MCFG_CASSETTE_ADD( "cassette", lviv_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")

@@ -173,6 +173,8 @@ public:
 	TIMER_CALLBACK_MEMBER(mbee256_kbd);
 	TIMER_CALLBACK_MEMBER(mbee_rtc_irq);
 	TIMER_CALLBACK_MEMBER(mbee_reset);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( mbee_z80bin );
 
 protected:
 	required_memory_bank m_boot;
@@ -213,9 +215,6 @@ protected:
 
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
-
-QUICKLOAD_LOAD( mbee );
-QUICKLOAD_LOAD( mbee_z80bin );
 
 /*----------- defined in video/mbee.c -----------*/
 

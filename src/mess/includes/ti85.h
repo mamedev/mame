@@ -109,14 +109,13 @@ public:
 	void ti8x_snapshot_setup_registers (UINT8 * data);
 	void ti85_setup_snapshot (UINT8 * data);
 	void ti86_setup_snapshot (UINT8 * data);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( ti8x );
 };
 
 
 /*----------- defined in machine/ti85.c -----------*/
 NVRAM_HANDLER( ti83p );
 NVRAM_HANDLER( ti86 );
-
-SNAPSHOT_LOAD( ti8x );
 
 
 #endif /* TI85_H_ */

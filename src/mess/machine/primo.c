@@ -297,7 +297,7 @@ void primo_state::primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size)
 		m_maincpu->space(AS_PROGRAM).write_byte( i+0x4000, snapshot_data[i+38]);
 }
 
-SNAPSHOT_LOAD( primo )
+SNAPSHOT_LOAD_MEMBER( primo_state, primo )
 {
 	UINT8 *snapshot_data;
 	primo_state *state = image.device().machine().driver_data<primo_state>();
@@ -349,7 +349,7 @@ void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 	logerror ("Quickload .pp l: %04x r: %04x s: %04x\n", load_addr, start_addr, quickload_size-4);
 }
 
-QUICKLOAD_LOAD( primo )
+QUICKLOAD_LOAD_MEMBER( primo_state, primo )
 {
 	UINT8 *quickload_data;
 	primo_state *state = image.device().machine().driver_data<primo_state>();

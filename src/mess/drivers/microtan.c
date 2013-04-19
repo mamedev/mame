@@ -248,8 +248,8 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* snapshot/quickload */
-	MCFG_SNAPSHOT_ADD("snapshot", microtan, "m65", 0.5)
-	MCFG_QUICKLOAD_ADD("quickload", microtan, "hex", 0.5)
+	MCFG_SNAPSHOT_ADD("snapshot", microtan_state, microtan, "m65", 0.5)
+	MCFG_QUICKLOAD_ADD("quickload", microtan_state, microtan, "hex", 0.5)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

@@ -13,8 +13,6 @@
 #include "imagedev/snapquik.h"
 #include "lynx.lh"
 
-static QUICKLOAD_LOAD( lynx );
-
 static ADDRESS_MAP_START( lynx_mem , AS_PROGRAM, 8, lynx_state )
 	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_SHARE("mem_0000")
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_SHARE("mem_fc00")
@@ -89,7 +87,7 @@ static MACHINE_CONFIG_START( lynx, lynx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", lynx, "o", 0)
+	MCFG_QUICKLOAD_ADD("quickload", lynx_state, lynx, "o", 0)
 
 	MCFG_FRAGMENT_ADD(lynx_cartslot)
 MACHINE_CONFIG_END
@@ -135,7 +133,7 @@ ROM_START(lynx2)
 ROM_END
 
 
-static QUICKLOAD_LOAD( lynx )
+QUICKLOAD_LOAD_MEMBER( lynx_state, lynx )
 {
 	lynx_state *state = image.device().machine().driver_data<lynx_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);

@@ -79,13 +79,13 @@ public:
 	void cassette_toggle_output();
 	terminal_t *terminal_create(int gfx, int blank_char, int char_bits,int (*getcursorcode)(int original_code),int num_cols, int num_rows);
 	attotime apple1_vh_dsp_time_to_ready();
+	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
 };
 
 
 /*----------- defined in machine/apple1.c -----------*/
 
 extern const pia6821_interface apple1_pia0;
-SNAPSHOT_LOAD( apple1 );
 
 /*----------- defined in drivers/apple1.c -----------*/
 

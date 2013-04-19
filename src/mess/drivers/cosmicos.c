@@ -531,7 +531,7 @@ void cosmicos_state::machine_reset()
 
 /* Quickload */
 
-static QUICKLOAD_LOAD( cosmicos )
+QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 {
 	cosmicos_state *state = image.device().machine().driver_data<cosmicos_state>();
 	UINT8 *ptr = state->m_rom->base();
@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", cosmicos, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin", 0)
 	MCFG_CASSETTE_ADD("cassette", cosmicos_cassette_interface)
 
 	/* internal ram */

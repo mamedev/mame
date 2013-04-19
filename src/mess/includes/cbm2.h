@@ -215,6 +215,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER( pic_irq_callback );
 
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
 	// memory state
 	int m_dramon;
 	int m_busen1;
@@ -312,6 +313,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
 
+	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
 	// video state
 	int m_statvid;
 	int m_vicdotsel;

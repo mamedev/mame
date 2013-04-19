@@ -70,7 +70,7 @@ static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddre
 	space.write_byte(0x83, hiaddress >> 8);
 }
 
-static QUICKLOAD_LOAD( cbm_c65 )
+QUICKLOAD_LOAD_MEMBER( c65_state, cbm_c65 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_c65_quick_sethiaddress);
 }
@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", c65_state, cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	/* cia */
 	MCFG_LEGACY_MOS6526R1_ADD("cia_0", 3500000, 60, c65_cia0)

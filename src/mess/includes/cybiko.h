@@ -90,10 +90,10 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	void machine_stop_cybiko();
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cybiko );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cybikoxt );
 };
 
 NVRAM_HANDLER( cybikoxt );
-QUICKLOAD_LOAD( cybiko );
-QUICKLOAD_LOAD( cybikoxt );
 
 #endif /* CYBIKO_H_ */

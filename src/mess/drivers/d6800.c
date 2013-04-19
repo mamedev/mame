@@ -77,6 +77,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -333,7 +334,7 @@ static const cassette_interface d6800_cassette_interface =
 	NULL
 };
 
-static QUICKLOAD_LOAD( d6800 )
+QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -401,7 +402,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800, "ch8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "ch8", 1)
 MACHINE_CONFIG_END
 
 /* ROMs */

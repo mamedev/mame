@@ -77,6 +77,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_z1013(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( z1013 );
 };
 
 
@@ -317,7 +318,7 @@ const z80pio_interface z1013k7659_z80pio_intf =
 	DEVCB_NULL
 };
 
-SNAPSHOT_LOAD( z1013 )
+SNAPSHOT_LOAD_MEMBER( z1013_state, z1013 )
 {
 /* header layout
 0000,0001 - load address
@@ -417,7 +418,7 @@ static MACHINE_CONFIG_START( z1013, z1013_state )
 	/* Devices */
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_1MHz, z1013_z80pio_intf )
 	MCFG_CASSETTE_ADD( "cassette", z1013_cassette_interface )
-	MCFG_SNAPSHOT_ADD("snapshot", z1013, "z80", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", z1013_state, z1013, "z80", 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( z1013k76, z1013 )

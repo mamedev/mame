@@ -11,7 +11,7 @@
 
 
 
-static QUICKLOAD_LOAD( cbm_vc20 )
+QUICKLOAD_LOAD_MEMBER( vic20_state, cbm_vc20 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
 }
@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", vic20_state, cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic1001_cart")

@@ -661,7 +661,7 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)
+	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", super80, "bin", 3)
+	MCFG_QUICKLOAD_ADD("quickload", super80_state, super80, "bin", 3)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", super80_cassette_interface )

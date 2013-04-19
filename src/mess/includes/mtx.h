@@ -77,10 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mtx_cst_w);
 	DECLARE_READ8_MEMBER(mtx_prt_r);
 	void bankswitch(UINT8 data);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( mtx );
 };
-
-/*----------- defined in machine/mtx.c -----------*/
-
-SNAPSHOT_LOAD( mtx );
 
 #endif /* __MTX_H__ */

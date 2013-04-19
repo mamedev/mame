@@ -110,7 +110,7 @@ static void spectrum_page_basicrom(running_machine &machine)
 }
 
 
-SNAPSHOT_LOAD(spectrum)
+SNAPSHOT_LOAD_MEMBER( spectrum_state,spectrum)
 {
 	UINT8 *snapshot_data = NULL;
 
@@ -2451,7 +2451,7 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 	}
 }
 
-QUICKLOAD_LOAD(spectrum)
+QUICKLOAD_LOAD_MEMBER( spectrum_state,spectrum)
 {
 	UINT8 *quickload_data = NULL;
 

@@ -230,6 +230,7 @@ public:
 
 	void amstrad_handle_snapshot(unsigned char *pSnapshot);
 	void amstrad_rethinkMemory();
+	DECLARE_SNAPSHOT_LOAD_MEMBER( amstrad );
 
 protected:
 	required_memory_region m_region_maincpu;
@@ -300,7 +301,6 @@ WRITE_LINE_DEVICE_HANDLER( cpc_nmi_w );
 WRITE_LINE_DEVICE_HANDLER( cpc_romdis );
 WRITE_LINE_DEVICE_HANDLER( cpc_romen );
 
-SNAPSHOT_LOAD( amstrad );
 
 extern const mc6845_interface amstrad_mc6845_intf;
 extern const mc6845_interface amstrad_plus_mc6845_intf;

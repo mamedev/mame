@@ -48,13 +48,9 @@ public:
 	void primo_common_machine_init ();
 	void primo_setup_pss (UINT8* snapshot_data, UINT32 snapshot_size);
 	void primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
 };
-
-
-/*----------- defined in machine/primo.c -----------*/
-
-extern SNAPSHOT_LOAD( primo );
-extern QUICKLOAD_LOAD( primo );
 
 
 #endif /* PRIMO_H_ */

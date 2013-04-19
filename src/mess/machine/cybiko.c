@@ -34,7 +34,7 @@ DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
 }
 
-QUICKLOAD_LOAD( cybiko )
+QUICKLOAD_LOAD_MEMBER( cybiko_state, cybiko )
 {
 	running_machine &machine = image.device().machine();
 	cybiko_state *state = machine.driver_data<cybiko_state>();
@@ -44,7 +44,7 @@ QUICKLOAD_LOAD( cybiko )
 	return IMAGE_INIT_PASS;
 }
 
-QUICKLOAD_LOAD( cybikoxt )
+QUICKLOAD_LOAD_MEMBER( cybiko_state, cybikoxt )
 {
 	running_machine &machine = image.device().machine();
 	cybiko_state *state = machine.driver_data<cybiko_state>();

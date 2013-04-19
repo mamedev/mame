@@ -529,7 +529,7 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ti85d, ti85 )
-	MCFG_SNAPSHOT_ADD("snapshot", ti8x, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 	//MCFG_TI85SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_DERIVED( ti86, ti85 )
 	MCFG_DEVICE_REMOVE("nvram")
 	MCFG_NVRAM_HANDLER( ti86 )
 
-	MCFG_SNAPSHOT_ADD("snapshot", ti8x, "sav", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 	//MCFG_TI86SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 

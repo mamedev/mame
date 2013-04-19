@@ -114,6 +114,7 @@ public:
 	void palette_set_colors_rgb(const UINT8 *colors);
 	void super80_cassette_motor( UINT8 data );
 	void driver_init_common(  );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( super80 );
 };
 
 
@@ -123,4 +124,3 @@ MC6845_UPDATE_ROW( super80v_update_row );
 /*----------- defined in machine/super80.c -----------*/
 
 extern const z80pio_interface super80_pio_intf;
-QUICKLOAD_LOAD( super80 );

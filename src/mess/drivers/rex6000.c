@@ -119,6 +119,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
 	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
 };
 
 
@@ -561,7 +562,7 @@ void rex6000_state::palette_init()
 	palette_set_color(machine(), 1, MAKE_RGB(92, 83, 88));
 }
 
-static QUICKLOAD_LOAD(rex6000)
+QUICKLOAD_LOAD_MEMBER( rex6000_state,rex6000)
 {
 	static const char magic[] = "ApplicationName:Addin";
 	running_machine &machine = image.device().machine();
@@ -662,7 +663,7 @@ static MACHINE_CONFIG_START( rex6000, rex6000_state )
 	MCFG_GFXDECODE(rex6000)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", rex6000, "rex,ds2", 0)
+	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
 	MCFG_RP5C01_ADD(TC8521_TAG, XTAL_32_768kHz, rtc_intf)
 

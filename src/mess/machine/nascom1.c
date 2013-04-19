@@ -206,7 +206,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_state,nascom1_cassette )
  *
  *************************************/
 
-SNAPSHOT_LOAD( nascom1 )
+SNAPSHOT_LOAD_MEMBER( nascom1_state, nascom1 )
 {
 	UINT8 line[35];
 

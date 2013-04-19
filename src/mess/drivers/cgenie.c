@@ -707,7 +707,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
 				spt = pd_list[i].SPT / heads;
 				dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
 				dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-				memcpy(image.device().machine().root_device().memregion("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+				memcpy(memregion("maincpu")->base() + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
 				break;
 			}
 		}

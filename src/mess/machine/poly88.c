@@ -252,7 +252,7 @@ WRITE8_MEMBER(poly88_state::poly88_intr_w)
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-SNAPSHOT_LOAD( poly88 )
+SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8* data= auto_alloc_array(image.device().machine(), UINT8, snapshot_size);

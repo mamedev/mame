@@ -108,6 +108,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
 	// keyboard state
 	int m_key_col;
 

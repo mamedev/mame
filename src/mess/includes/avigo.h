@@ -107,5 +107,7 @@ public:
 	virtual void palette_init();
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
 };
 #endif /* AVIGO_H_ */

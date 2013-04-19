@@ -24,7 +24,7 @@ struct kcc_header
 /* now type name that has appeared! */
 
 /* load snapshot */
-QUICKLOAD_LOAD(kc)
+QUICKLOAD_LOAD_MEMBER( kc_state,kc)
 {
 	kc_state *state = image.device().machine().driver_data<kc_state>();
 	UINT8 *data;

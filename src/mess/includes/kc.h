@@ -149,6 +149,8 @@ public:
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
 };
 
 
@@ -181,10 +183,5 @@ public:
 	UINT8               m_port_86_data;
 	UINT8 *             m_display_video_ram;
 };
-
-
-/*----------- defined in machine/kc.c -----------*/
-
-QUICKLOAD_LOAD( kc );
 
 #endif /* KC_H_ */

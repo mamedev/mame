@@ -64,6 +64,8 @@ public:
 	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
 	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
 	UINT32 readByLittleEndian(UINT8 *buf,int pos);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
+
 
 protected:
 	required_device<via6522_device> m_via;
@@ -336,7 +338,7 @@ UINT32 jr100_state::readByLittleEndian(UINT8 *buf,int pos)
 	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
 
-static QUICKLOAD_LOAD(jr100)
+QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 {
 	jr100_state *state = image.device().machine().driver_data<jr100_state>();
 	int quick_length;
@@ -420,7 +422,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_tick", jr100_state, sound_tick, attotime::from_hz(XTAL_14_31818MHz / 16))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", jr100, "prg", 2)
+	MCFG_QUICKLOAD_ADD("quickload", jr100_state, jr100, "prg", 2)
 MACHINE_CONFIG_END
 
 

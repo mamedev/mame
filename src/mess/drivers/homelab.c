@@ -74,6 +74,7 @@ public:
 	UINT32 screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(homelab_frame);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
 };
 
 INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
@@ -641,7 +642,7 @@ GFXDECODE_END
 
 static const mea8000_interface brailab4_speech_intf = { "speech", DEVCB_NULL };
 
-static QUICKLOAD_LOAD(homelab)
+QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i=0;
@@ -760,7 +761,7 @@ static MACHINE_CONFIG_START( homelab, homelab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 2)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( homelab3, homelab_state )
@@ -790,7 +791,7 @@ static MACHINE_CONFIG_START( homelab3, homelab_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
-	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 2)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( brailab4, homelab_state )
@@ -823,7 +824,7 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
 	MCFG_MEA8000_ADD("mea8000", brailab4_speech_intf)
-	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 18)
+	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 18)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(homelab_state,brailab4)

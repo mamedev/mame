@@ -28,9 +28,8 @@ public:
 	altair_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_terminal(*this, TERMINAL_TAG)
-	,
-		m_ram(*this, "ram"){ }
+	m_terminal(*this, TERMINAL_TAG),
+	m_ram(*this, "ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -42,6 +41,7 @@ public:
 	UINT8 m_term_data;
 	required_shared_ptr<UINT8> m_ram;
 	virtual void machine_reset();
+	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 };
 
 
@@ -87,7 +87,7 @@ static INPUT_PORTS_START( altair )
 INPUT_PORTS_END
 
 
-QUICKLOAD_LOAD(altair)
+QUICKLOAD_LOAD_MEMBER( altair_state,altair)
 {
 	altair_state *state = image.device().machine().driver_data<altair_state>();
 	int quick_length;
@@ -132,7 +132,7 @@ static MACHINE_CONFIG_START( altair, altair_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", altair, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", altair_state, altair, "bin", 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */

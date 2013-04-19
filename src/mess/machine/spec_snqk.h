@@ -177,7 +177,4 @@ enum SPECTRUM_Z80_SNAPSHOT_TYPE {
 #define RAW_HDR    9
 #define RAW_SIZE   (RAW_HDR + 3*SPECTRUM_BANK)
 
-SNAPSHOT_LOAD( spectrum );
-QUICKLOAD_LOAD( spectrum );
-
 #endif  /* __SPEC_SNQK_H__ */

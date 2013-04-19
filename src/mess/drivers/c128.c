@@ -27,7 +27,7 @@
 
 
 
-static QUICKLOAD_LOAD( cbm_c64 )
+QUICKLOAD_LOAD_MEMBER( c128_state, cbm_c64 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
 }
@@ -1454,7 +1454,7 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
 	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
@@ -1577,7 +1577,7 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
 	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
 	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", c128_state, cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")

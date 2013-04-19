@@ -8,7 +8,7 @@
 #define LYNX_H_
 
 #include "imagedev/cartslot.h"
-
+#include "imagedev/snapquik.h"
 
 #define LYNX_CART       0
 #define LYNX_QUICKLOAD  1
@@ -163,6 +163,7 @@ public:
 	UINT32 lynx_time_factor(int val);
 	void lynx_uart_reset();
 	int lynx_verify_cart (char *header, int kind);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( lynx );
 };
 
 

@@ -228,10 +228,10 @@ DRIVER_INIT_MEMBER(super80_state,super80v)
 }
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD( super80 )
+    QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD( super80 )
+QUICKLOAD_LOAD_MEMBER( super80_state, super80 )
 {
 	UINT16 exec_addr, start_addr, end_addr;
 	int autorun;
@@ -244,7 +244,7 @@ QUICKLOAD_LOAD( super80 )
 	if (exec_addr != 0xffff)
 	{
 		/* check to see if autorun is on (I hate how this works) */
-		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
+		autorun = ioport("CONFIG")->read_safe(0xFF) & 1;
 
 		if (autorun)
 			image.device().machine().device("maincpu")->state().set_pc(exec_addr);

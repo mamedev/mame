@@ -53,6 +53,7 @@ public:
 	void lviv_setup_snapshot (UINT8 * data);
 	void dump_registers();
 	int lviv_verify_snapshot (UINT8 * data, UINT32 size);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );	
 };
 
 
@@ -61,8 +62,6 @@ public:
 extern const i8255_interface lviv_ppi8255_interface_0;
 extern const i8255_interface lviv_ppi8255_interface_1;
 
-
-SNAPSHOT_LOAD( lviv );
 
 /*----------- defined in video/lviv.c -----------*/
 

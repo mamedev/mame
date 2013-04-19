@@ -323,7 +323,7 @@ WRITE8_MEMBER(mtx_state::hrx_attr_w)
     SNAPSHOT
 ***************************************************************************/
 
-SNAPSHOT_LOAD( mtx )
+SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 {
 	address_space &program = image.device().machine().device(Z80_TAG)->memory().space(AS_PROGRAM);
 

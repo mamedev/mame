@@ -328,7 +328,7 @@ int lviv_state::lviv_verify_snapshot (UINT8 * data, UINT32 size)
 	return IMAGE_VERIFY_PASS;
 }
 
-SNAPSHOT_LOAD( lviv )
+SNAPSHOT_LOAD_MEMBER( lviv_state, lviv )
 {
 	UINT8 *lviv_snapshot_data;
 	lviv_state *state = image.device().machine().driver_data<lviv_state>();

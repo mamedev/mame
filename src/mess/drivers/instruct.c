@@ -70,6 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( instruct );
 	virtual void machine_reset();
 	UINT8 m_digit;
 	bool m_valid_digit;
@@ -216,7 +217,7 @@ void instruct_state::machine_reset()
 	memcpy(m_p_ram, ROM+0x1800, 0x0200);
 }
 
-QUICKLOAD_LOAD( instruct )
+QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
 	address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
@@ -296,7 +297,7 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", instruct, "pgm", 1)
+	MCFG_QUICKLOAD_ADD("quickload", instruct_state, instruct, "pgm", 1)
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )

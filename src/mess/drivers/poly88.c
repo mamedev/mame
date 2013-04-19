@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( poly88, poly88_state )
 	MCFG_SERIAL_SOURCE_ADD("sercas")
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", poly88, "img", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", poly88_state, poly88, "img", 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( poly8813, poly88 )

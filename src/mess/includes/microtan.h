@@ -89,6 +89,8 @@ public:
 	int parse_zillion_hex(UINT8 *snapshot_buff, char *src);
 	void microtan_set_cpu_regs(const UINT8 *snapshot_buff, int base);
 	void microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_size);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( microtan );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( microtan );
 };
 
 
@@ -96,7 +98,4 @@ public:
 
 extern const via6522_interface microtan_via6522_0;
 extern const via6522_interface microtan_via6522_1;
-
-SNAPSHOT_LOAD( microtan );
-QUICKLOAD_LOAD( microtan );
 #endif /* MICROTAN_H_ */

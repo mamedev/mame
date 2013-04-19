@@ -89,11 +89,8 @@ public:
 	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sorcerer_reset);
+	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
 };
-
-
-/*----------- defined in machine/sorcerer.c -----------*/
-SNAPSHOT_LOAD( sorcerer );
-QUICKLOAD_LOAD(sorcerer);
 
 #endif /* SORCERER_H_ */

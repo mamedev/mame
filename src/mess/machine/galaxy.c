@@ -121,7 +121,7 @@ void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-SNAPSHOT_LOAD( galaxy )
+SNAPSHOT_LOAD_MEMBER( galaxy_state, galaxy )
 {
 	UINT8* snapshot_data;
 

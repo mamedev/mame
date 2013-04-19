@@ -37,12 +37,12 @@ static void cbmb_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
 	space.write_byte(0xf0047, hiaddress >> 8);
 }
 
-static QUICKLOAD_LOAD( cbmb )
+QUICKLOAD_LOAD_MEMBER( cbm2_state, cbmb )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0x10000, cbmb_quick_sethiaddress);
 }
 
-static QUICKLOAD_LOAD( p500 )
+QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
 {
 	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
 }
@@ -2211,7 +2211,7 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
@@ -2268,7 +2268,7 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
@@ -2331,7 +2331,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
 	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
-	MCFG_QUICKLOAD_ADD("quickload", cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_ADD("quickload", cbm2_state, cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")

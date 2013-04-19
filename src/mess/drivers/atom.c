@@ -128,18 +128,18 @@ Hardware:   PPIA 8255
     image_fread_memory - read image to memory
 -------------------------------------------------*/
 
-static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
+void atom_state::image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = image.device().machine().firstcpu->space(AS_PROGRAM).get_write_ptr(addr);
+	void *ptr = m_maincpu->space(AS_PROGRAM).get_write_ptr(addr);
 
 	image.fread( ptr, count);
 }
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD( atom_atm )
+    QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD( atom_atm )
+QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 {
 	/*
 
@@ -174,7 +174,7 @@ QUICKLOAD_LOAD( atom_atm )
 
 	image_fread_memory(image, start_address, size);
 
-	image.device().machine().firstcpu->set_pc(run_address);
+	m_maincpu->set_pc(run_address);
 
 	return IMAGE_INIT_PASS;
 }
@@ -877,7 +877,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(atom_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, atom_centronics_config)
 	MCFG_CASSETTE_ADD("cassette", atom_cassette_interface)
-	MCFG_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
+	MCFG_QUICKLOAD_ADD("quickload", atom_state, atom_atm, "atm", 0)
 
 	/* cartridge */
 	MCFG_ATOM_CARTSLOT_ADD("cart")

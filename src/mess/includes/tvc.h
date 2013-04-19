@@ -116,6 +116,8 @@ public:
 	DECLARE_READ8_MEMBER(tvc_expansion_r);
 	DECLARE_READ8_MEMBER(tvc_exp_id_r);
 	DECLARE_WRITE8_MEMBER(tvc_expint_ack_w);
+	
+	DECLARE_QUICKLOAD_LOAD_MEMBER( tvc64);
 
 	tvcexp_slot_device * m_expansions[4];
 	UINT8       m_video_mode;

@@ -54,7 +54,7 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_machine_state);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
 	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
-
+	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
@@ -75,6 +75,5 @@ protected:
 /*----------- defined in machine/poly88.c -----------*/
 extern const i8251_interface poly88_usart_interface;
 
-extern SNAPSHOT_LOAD( poly88 );
 
 #endif /* POLY88_H_ */

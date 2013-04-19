@@ -872,7 +872,7 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
 	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","cpc_cass")
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( cpcplus, amstrad_state )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	/* snapshot */
-	MCFG_SNAPSHOT_ADD("snapshot", amstrad, "sna", 0)
+	MCFG_SNAPSHOT_ADD("snapshot", amstrad_state, amstrad, "sna", 0)
 
 	MCFG_CASSETTE_ADD( "cassette", amstrad_cassette_interface )
 

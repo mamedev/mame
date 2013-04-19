@@ -203,7 +203,7 @@ int apple1_state::apple1_verify_header (UINT8 *data)
 **  The image can be of arbitrary length, but it must fit in available
 **  memory.
 *****************************************************************************/
-SNAPSHOT_LOAD(apple1)
+SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 {
 	apple1_state *state = image.device().machine().driver_data<apple1_state>();
 	UINT64 filesize, datasize;
