@@ -1958,7 +1958,7 @@ static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
 	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
 	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
-	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
+	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
 	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
 	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
 	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)

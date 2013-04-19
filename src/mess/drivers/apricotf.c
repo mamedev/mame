@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
 	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8_LEGACY(Z80SIO2_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
-//  AM_RANGE(0x0030, 0x0031) AM_WRITE8_LEGACY(ctc_ack_w, 0x00ff)
+//  AM_RANGE(0x0030, 0x0031) AM_WRITE8(ctc_ack_w, 0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
 //  AM_RANGE(0x01e0, 0x01ff) winchester
 ADDRESS_MAP_END
