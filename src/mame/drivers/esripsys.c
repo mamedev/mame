@@ -16,11 +16,10 @@
         To skip, hold down keypad '*' on reset.
         * Hold '*' during the game to access the operator menu.
 
-    To do:
-        * Confirm that occasional line drop outs do occur on real hardware.
-        14 sprites seems to be the maximum number that the RIP CPU can safely
-        process per line.
+    BTANB:
+        * Missing lines occur on real hardware.
 
+    To do:
         * Implement collision detection hardware (unused by Turbo Sub).
 
 ****************************************************************************/
@@ -590,7 +589,7 @@ static ADDRESS_MAP_START( game_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_SHARE("pal_ram")
 	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
-	AM_RANGE(0x4400, 0x47ff) AM_NOP /* Collision detection RAM */
+	AM_RANGE(0x4400, 0x47ff) AM_NOP // Collision detection RAM
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(g_iobus_r, g_iobus_w)
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
@@ -612,7 +611,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
+	AM_RANGE(0x0800, 0x0fff) AM_RAM // Not installed on later PCBs
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITE(esripsys_dac_w)
 	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
@@ -696,6 +695,7 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
+	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
 
 	MCFG_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
