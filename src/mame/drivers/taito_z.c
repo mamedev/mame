@@ -1587,7 +1587,7 @@ static ADDRESS_MAP_START( bshark_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
-//  AM_RANGE(0x40000a, 0x40000b) AM_READ_LEGACY(taitoz_unknown_r)  // ???
+//  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_NOP // interrupt controller?
 	AM_RANGE(0x60000e, 0x60000f) AM_NOP
@@ -1661,8 +1661,8 @@ static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
 	AM_RANGE(0x800800, 0x80083f) AM_READ(aquajack_unknown_r) // Read regularly after write to 800800...
-//  AM_RANGE(0x800800, 0x800801) AM_WRITE_LEGACY(taitoz_unknown_w)
-//  AM_RANGE(0x900000, 0x900007) AM_READWRITE_LEGACY(taitoz_unknown_r, taitoz_unknown_w)
+//  AM_RANGE(0x800800, 0x800801) AM_WRITE(taitoz_unknown_w)
+//  AM_RANGE(0x900000, 0x900007) AM_READWRITE(taitoz_unknown_r, taitoz_unknown_w)
 ADDRESS_MAP_END
 
 

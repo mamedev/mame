@@ -566,7 +566,7 @@ static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 	AM_RANGE(0x00f0, 0x01ef) AM_NOP
-	//AM_RANGE(0x01f0, 0x01f7) AM_READWRITE_LEGACY(atapi_r, atapi_w)
+	//AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(atapi_r, atapi_w)
 	AM_RANGE(0x01f8, 0x03ef) AM_NOP
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)

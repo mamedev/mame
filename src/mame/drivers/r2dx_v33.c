@@ -410,11 +410,11 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(rdx_v33_unknown2_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 
 	AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
-//  AM_RANGE(0x00740, 0x00741) AM_READ_LEGACY(rdx_v33_unknown2_r)
+//  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READNOP
@@ -483,14 +483,14 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(bbbbll_w) // scroll?
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(nzerotea_unknown_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	//AM_RANGE(0x00700, 0x00701) AM_WRITE(rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x00762, 0x00763) AM_READ_LEGACY(nzerotea_unknown_r)
+//  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 

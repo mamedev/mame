@@ -530,7 +530,7 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 
-//  AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(ml_msm5205_address_w) //guess
+//  AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
 //  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)
 //  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_stop_w)
 
@@ -579,7 +579,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, mlanding_state )
 	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
-//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
+//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )

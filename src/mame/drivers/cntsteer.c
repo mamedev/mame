@@ -606,7 +606,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-//  AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(nmiack_w)
+//  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)

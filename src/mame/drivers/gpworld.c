@@ -308,9 +308,9 @@ static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0xc800,0xcfff) AM_RAM_WRITE(palette_write) AM_SHARE("palette_ram") /* The memory test reads at 0xc800 */
 	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_SHARE("tile_ram")
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
-/*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
+/*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL") //8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE_LEGACY(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
+/*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */                 /* These inputs are interesting - there are writes and reads all over these addr's */
 	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)               /*bit 0 select gas/brake input */
 	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
 

@@ -435,8 +435,8 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
 	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
 
-//  AM_RANGE(0x22, 0x22) AM_READ_LEGACY(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ_LEGACY(hu_scrolly_hi_set)
+//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
+//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
 ADDRESS_MAP_END
 
 

@@ -605,7 +605,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(p8k_16_iomap, AS_IO, 16, p8k_state)
 //  AM_RANGE(0x0fef0, 0x0feff) // clock
-	//AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE_LEGACY(p8k_16_sio0_r, p8k_16_sio0_w)
+	//AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(p8k_16_sio0_r, p8k_16_sio0_w)
 	AM_RANGE(0x0ff80, 0x0ff87) AM_READWRITE(portff82_r,portff82_w)
 	AM_RANGE(0x0ff88, 0x0ff8f) AM_READWRITE(p8k_16_sio1_r, p8k_16_sio1_w)          //"z80sio_1",
 	AM_RANGE(0x0ff90, 0x0ff97) AM_READWRITE(p8k_16_pio0_r, p8k_16_pio0_w)          //"z80pio_0",

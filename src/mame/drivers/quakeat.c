@@ -100,18 +100,18 @@ static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
 //  AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 //  AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-//  AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,          kbdc8042_32le_w)
+//  AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,          kbdc8042_32le_w)
 //  AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-//  AM_RANGE(0x0080, 0x009f) AM_READWRITE_LEGACY(at_page32_r,              at_page32_w)
+//  AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,              at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 //  AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
-//  AM_RANGE(0x0278, 0x027b) AM_WRITE_LEGACY(pnp_config_w)
+//  AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
 //  AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
-//  AM_RANGE(0x0a78, 0x0a7b) AM_WRITE_LEGACY(pnp_data_w)
+//  AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 //  AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 

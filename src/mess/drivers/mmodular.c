@@ -1305,7 +1305,7 @@ static ADDRESS_MAP_START(diablo68_mem , AS_PROGRAM, 16, polgar_state )
 	AM_RANGE( 0x00ff0000, 0x00ff7fff ) AM_ROM AM_REGION("maincpu",10000) // Opening Book
 //  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciaread)
 //  AM_RANGE( 0x00300000, 0x00300007 ) AM_READ(diablo68_aciawrite)
-//  AM_RANGE( 0x00300002, 0x00300003 ) AM_READ_LEGACY(diablo68_flags)
+//  AM_RANGE( 0x00300002, 0x00300003 ) AM_READ(diablo68_flags)
 	AM_RANGE( 0x003a0000, 0x003a0001 ) AM_WRITE(diablo68_write_LCD)
 	AM_RANGE( 0x003c0000, 0x003c0001 ) AM_WRITE(diablo68_reg_select)
 	AM_RANGE( 0x00280000, 0x0028ffff ) AM_RAM  // hash tables

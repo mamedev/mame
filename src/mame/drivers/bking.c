@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(bking_cont2_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking_cont3_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(bking_eport2_w)   this is not shown to be connected anywhere
+//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 ADDRESS_MAP_END
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(bking_cont2_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(bking_cont3_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(bking_eport2_w)   this is not shown to be connected anywhere
+//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ(bking_pos_r)
 	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)

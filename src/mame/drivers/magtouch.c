@@ -100,7 +100,6 @@ public:
 	DECLARE_READ8_MEMBER(magtouch_io_r);
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
-	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(magtouch);
 	virtual void machine_start();
 };
@@ -196,24 +195,6 @@ static INPUT_PORTS_START( magtouch )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_COIN2) PORT_IMPULSE(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(1)
 INPUT_PORTS_END
-
-
-READ8_MEMBER(magtouch_state::get_out2)
-{
-	return pit8253_get_output( machine().device("pit8254"), 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(magtouch_state,get_out2)
-};
 
 void magtouch_state::machine_start()
 {

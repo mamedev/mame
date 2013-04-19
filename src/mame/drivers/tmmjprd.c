@@ -683,7 +683,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x200140, 0x200157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
 	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
 	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
-//  AM_RANGE(0x200300, 0x200303) AM_WRITE_LEGACY(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
+//  AM_RANGE(0x200300, 0x200303) AM_WRITE(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
 	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
 	AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("tmmjprd_viewregs7")

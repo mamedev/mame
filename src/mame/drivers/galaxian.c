@@ -1483,8 +1483,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-//  AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(dambustr_bg_color_w)
-//  AM_RANGE(0x8001, 0x8001) AM_WRITE_LEGACY(dambustr_bg_split_line_w)
+//  AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
+//  AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd800, 0xd8ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")

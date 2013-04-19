@@ -108,8 +108,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, strnskil_state )
-//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ_LEGACY(mcu_portk_r)
-//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE_LEGACY(mcu_portr0_r, mcu_portr0_w)
+//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
+//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -534,7 +534,7 @@ DRIVER_INIT_MEMBER(strnskil_state,pettanp)
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
-//  AM_RANGE(0xd806, 0xd806) AM_READ_LEGACY(protection_r) /* protection data read (pettanp) */
+//  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd806, 0xd806, read8_delegate(FUNC(strnskil_state::pettanp_protection_r),this));

@@ -79,7 +79,7 @@ public:
 static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-/*  AM_RANGE(0x0800,0x0808) AM_WRITE_LEGACY(hector_switch_bank_w)// Bank management not udsed in BR machine*/
+/*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
 	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
 	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/

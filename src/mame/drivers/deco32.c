@@ -746,7 +746,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
-//  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE_LEGACY(deco32_pf1_data_w) // wtf??
+//  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x120020, 0x12002f) AM_READ(fghthist_control_r)

@@ -1042,11 +1042,11 @@ static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_SHARE("sc0_vram")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)
-//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
-//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
+//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
-/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE_LEGACY(urashima_sc2vregs_w)
+/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
 	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_SHARE("sc3_vram")
 	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/

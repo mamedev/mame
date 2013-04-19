@@ -167,8 +167,8 @@ static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(unknown)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(unknown)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
 #endif
 ADDRESS_MAP_END
 
@@ -233,8 +233,8 @@ static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn3", sn76496_device, write)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(senjyo_volume_w)
 #if 0
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(unknown)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(unknown)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(unknown)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
 #endif
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

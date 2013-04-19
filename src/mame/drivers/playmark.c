@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x710016, 0x710017) AM_WRITE(wbeachvl_coin_eeprom_w)
 	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
-//  AM_RANGE(0x71001c, 0x71001d) AM_READ_LEGACY(playmark_snd_status???)
+//  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
 //  AM_RANGE(0x71001e, 0x71001f) AM_WRITENOP//playmark_snd_command_w },
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram_RRRRRGGGGGBBBBBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM

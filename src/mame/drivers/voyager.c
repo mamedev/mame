@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
 	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE_LEGACY(pnp_config_w)
+	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
 	AM_RANGE(0x0280, 0x0287) AM_NOP //To debug
 	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
 	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
 	// AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE_LEGACY(pnp_data_w)
+	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
 	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")

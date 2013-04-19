@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	//      @0x000036bc/?: 0xF0FD when inserting coin
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
-//  AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(xxxx) /* see init */
+//  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_SHARE("fof_700000")
 	//  kept at 0xe07900/0xe04c56
 

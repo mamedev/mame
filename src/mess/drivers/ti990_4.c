@@ -213,7 +213,7 @@ static ADDRESS_MAP_START(ti990_4_cru_map, AS_IO, 8, ti990_4_state )
 	AM_RANGE(0xff0, 0xfff) AM_WRITE_LEGACY(ti990_panel_write)
 
 	/* external instruction decoding */
-/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE_LEGACY(idle_callback)*/
+/*  AM_RANGE(0x2000, 0x2fff) AM_WRITE(idle_callback)*/
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(rset_callback)
 	AM_RANGE(0x5000, 0x6fff) AM_WRITE(ckon_ckof_callback)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(lrex_callback)

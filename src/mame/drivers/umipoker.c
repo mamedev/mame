@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("IN1") // unused?
 	AM_RANGE(0xe00008, 0xe00009) AM_READ_PORT("IN2")
 //  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE_LEGACY(counters_w) --> coin counters for both games.
+//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
 	AM_RANGE(0xe00014, 0xe00015) AM_READ_PORT("DSW1-2")
 	AM_RANGE(0xe00018, 0xe00019) AM_READ_PORT("DSW3-4")
 	AM_RANGE(0xe00020, 0xe00021) AM_WRITE(umipoker_scrolly_0_w)

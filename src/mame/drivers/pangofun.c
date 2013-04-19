@@ -108,7 +108,6 @@ public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag) { }
 
-	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_DRIVER_INIT(pangofun);
 	virtual void machine_start();
 };
@@ -170,23 +169,6 @@ static INPUT_PORTS_START( pangofun )
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
-READ8_MEMBER(pangofun_state::get_out2)
-{
-	return pit8253_get_output( machine().device("pit8254"), 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pangofun_state,get_out2)
-};
-
 void pangofun_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pangofun_state::irq_callback),this));
@@ -206,8 +188,6 @@ static MACHINE_CONFIG_START( pangofun, pangofun_state )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_FRAGMENT_ADD( pcat_common )
-	
-	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 

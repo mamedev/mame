@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 
 	// CHR RAM: checked [$500000-$5fffff]
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_SHARE("chrram")
-	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE_LEGACY(dma_w) AM_SHARE("dmaram")
+	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_SHARE("dmaram")
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_SHARE("video_regs")    // ? gfx regs ST-0026 NiLe
 	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_device, nile_snd_r, nile_snd_w)

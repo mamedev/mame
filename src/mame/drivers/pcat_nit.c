@@ -111,7 +111,6 @@ public:
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(pcat_nit);
-	DECLARE_READ8_MEMBER(get_out2);
 	virtual void machine_start();	
 };
 
@@ -226,23 +225,6 @@ static INPUT_PORTS_START( pcat_nit )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN3) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-READ8_MEMBER(pcat_nit_state::get_out2)
-{
-	return pit8253_get_output( machine().device("pit8254"), 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pcat_nit_state,get_out2)
-};
-
 void pcat_nit_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcat_nit_state::irq_callback),this));
@@ -274,8 +256,6 @@ static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	MCFG_MICROTOUCH_SERIAL_ADD( "microtouch", pcat_nit_microtouch_interface, 9600 ) // rate?
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	
-	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 
 /***************************************

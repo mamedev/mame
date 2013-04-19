@@ -78,7 +78,6 @@ public:
 
 	UINT32      *m_pc_ram;
 	DECLARE_WRITE_LINE_MEMBER(su2000_pic8259_1_set_int_line);
-	DECLARE_READ8_MEMBER(get_out2);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -112,30 +111,6 @@ ADDRESS_MAP_END
  *  Inputs
  *
  *************************************/
-
-
-/*************************************************************
- *
- * Keyboard
- *
- *************************************************************/
-
-READ8_MEMBER(su2000_state::get_out2)
-{
-	return pit8253_get_output( machine().device("pit8254"), 2 );
-}
-
-static const struct kbdc8042_interface at8042 =
-{
-	KBDC8042_AT386,
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir1_w),
-	DEVCB_NULL,
-
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(su2000_state,get_out2)
-};
 
 
 /*************************************************************
@@ -283,9 +258,7 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // TODO
 
-	MCFG_FRAGMENT_ADD(pcat_common)
-	
-	MCFG_KBDC8042_ADD("kbdc", at8042)
+	MCFG_FRAGMENT_ADD(pcat_common)	
 MACHINE_CONFIG_END
 
 
