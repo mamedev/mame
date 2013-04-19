@@ -68,7 +68,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ダンスピコ はしっておどって超ハッピー! - Dance Pico with Hashitte Odotte Chou Happy! (Sega Toys - 200302xx - HPC-6118)
 * 学研 ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Sega Toys - ???? - HPC-????)
 * ミニモニ。小学校へ行くんだぴょん! - Mini Moni. Shougakkou he Iku Ndapyon! (Sega Toys - 200303xx - HPC-6120)
-* ドライブピコ ゴーゴー!カーナビツーリング! ＜同梱＞ - Drive Pico with Go Go! Car Navi Touring! (Sega Toys - 20030620 - HPC-6121)
 * サンリオピューロランドで ダンスカーニバル みんなで おりょうり おさいほう<10th> - Sanrio Puroland de Dance Carnival Minna de Oryouri Osaihou ~10th Anniversary Edition~ (Sega Toys - 200305xx - HPC-6123) [reprint HPC-6026]
 * ピーターパン ネバーランドへ いこう!<10th> - Peter Pan - Neverland e Ikou! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6124) [reprint HPC-6047]
 * McDonald's マクドナルドであそぼ!<10th> - McDonald's - McDonald de Asobo! ~10th Anniversary Edition~ (Sega Toys - 200306xx - HPC-6125) [reprint HPC-6079]
@@ -130,7 +129,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 学研のおべんきょうソフト たしざん ひきざん - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1995xxxx - T-169030)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
-* 学研ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
@@ -694,8 +692,30 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-226020"/>
 		<info name="alt_title" value="ドラえもん ようちえんはたのしいな"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19942 J45" />
 			<dataarea name="rom" size="1048576">
-				<rom name="doraemon - youchien wa tanoshii na (j).bin" size="1048576" crc="c68c35c0" sha1="df2a97a73cff3c097d16a18cd673177d6824c7ab" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19942 j45.ic1" size="1048576" crc="c68c35c0" sha1="df2a97a73cff3c097d16a18cd673177d6824c7ab" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carcarnt">
+		<description>Drive Pico with Go Go! Car Navi Touring! (Jpn)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6121"/>
+		<info name="release" value="20030620"/>
+		<info name="alt_title" value="ドライブピコ ゴーゴー!カーナビツーリング!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="SHP03001_R3" />
+			<feature name="u1" value="EPOXY BLOCK U1" />
+			<feature name="u2" value="MM74HC" />
+			<feature name="u3" value="MM74HC" />
+			<feature name="u4" value="MM74HC" />
+			<feature name="u5" value="(unpopulated, marked as 74HC08)" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.u1" size="2097152" crc="e29f2af2" sha1="8149b48140515b12d466181a45819b043caaf0ca" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -931,6 +951,22 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-18585-16MX" />
 			<dataarea name="rom" size="2097152">
 				<rom name="mpr-18585-16mx.ic1" size="2097152" crc="dd4f5471" sha1="0eb13ae5f4b4649b107f4e105c3ae63475b75ee8" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picogak1">
+		<description>Gakken Pico de Gakushuu 1-nensei (Jpn)</description>
+		<year>2002</year>
+		<publisher>Gakken</publisher>
+		<info name="serial" value="T-169100"/>
+		<info name="release" value="20020112"/>
+		<info name="alt_title" value="学研ピコで学習 1年生"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0051-RV16" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9ko-0051-rv16.ic1" size="2097152" crc="242172ff" sha1="bd3695ea269ebb584129d59d18ff14cb46246003" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

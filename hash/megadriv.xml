@@ -726,7 +726,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 	<software name="backtof3">
 		<description>Back to the Future Part III (Euro)</description>
 		<year>1991</year>
-		<publisher>Imageworks</publisher>
+		<publisher>Image Works</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703" />
 			<feature name="ic1" value="MPR-14328-F" />
@@ -4029,6 +4029,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670115 REV 3" />
 			<feature name="ic1" value="MORTAL KOMBAT VER 1.00 S220, MORTAL KOMBAT S215 VER 1.00" />
+            <!-- USA cart, on a REV 4 PCB has chip labeled as MPR-15748-SM -->
 			<dataarea name="rom" size="2097152">
 				<rom name="mortal kombat ver 1.00 s220.ic1" size="2097152" crc="1aa3a207" sha1="c098bf38ddd755ab7caa4612d025be2039009eb2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -10403,6 +10404,11 @@ but dumps still have to be confirmed.
 		<year>1993</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed and split appropriately, info based on nointro pcb pic -->
+			<feature name="pcb" value="171-6331A" />
+			<feature name="ic1" value="MPR-16170-F" />
+			<feature name="ic2" value="MPR-16171-F" />
+			<feature name="ic3" value="74HC00N" />
 			<dataarea name="rom" size="1572864">
 				<rom name="soldiers of fortune (usa).bin" size="1572864" crc="a84d28a1" sha1="619faee3d78532478aad405db335d00fb93e6850" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -11655,7 +11661,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="darkcast">
+	<software name="darkcstl">
 		<description>Dark Castle (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
@@ -14965,12 +14971,15 @@ but dumps still have to be confirmed.
 	</software>
 
 	<software name="issdx">
-		<description>International Superstar Soccer Deluxe (Euro)</description>
+		<description>International Superstar Soccer Deluxe (Euro, Bra)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, info based on nointro pcb pic of the brazilian cart -->
+			<feature name="pcb" value="670128-1 REV 1" />
+			<feature name="u1" value="FX016A1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="international superstar soccer deluxe (euro).bin" size="2097152" crc="9bb3b180" sha1="ccc60352b43f8c3d536267dd05a8f2c0f3b73df6" offset="000000" loadflag="load16_word_swap" />
+				<rom name="fx014a1.u1" size="2097152" crc="9bb3b180" sha1="ccc60352b43f8c3d536267dd05a8f2c0f3b73df6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -17435,6 +17444,11 @@ but dumps still have to be confirmed.
 		<info name="release" value="19940909"/>
 		<info name="alt_title" value="モータルコンバットII"/>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed and split appropriately, info based on nointro pcb pic of the USA cart -->
+			<feature name="pcb" value="670121 REV3" />
+			<feature name="u1" value="MORTAL KOMBAT2 S376-U1.1" />
+			<feature name="u2" value="MORTAL KOMBAT2 S376-U2.1" />
+			<feature name="u3" value="DV74ALS139N" />
 			<dataarea name="rom" size="3145728">
 				<rom name="s376-u2.1+s382-u1.1.bin" size="3145728" crc="a9e013d8" sha1="af6d2db16f2b76940ff5a9738f1e00c4e7ea485e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21297,8 +21311,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, info based on nointro pcb pic of the brazilian cart -->
+			<feature name="pcb" value="PWA P10001 REV H" />
+			<feature name="u1" value="ROAD RASH 2 RR206" />
 			<dataarea name="rom" size="1048576">
-				<rom name="road rash ii (euro, usa) (v1.2).bin" size="1048576" crc="0876e992" sha1="9afea43ed627671b50dd4a2abdd043b235414b91" offset="000000" loadflag="load16_word_swap" />
+				<rom name="road rash 2 rr206.bin" size="1048576" crc="0876e992" sha1="9afea43ed627671b50dd4a2abdd043b235414b91" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -22929,17 +22946,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="sonicjam" supported="no">
-		<description>Sonic Jam 6</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="sonic jam 6 (unl).bin" size="2097152" crc="bf39d897" sha1="3a6fe5a92dc2ada7e9ab17ac120c7e50d1f9a1ed" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonicjam1" cloneof="sonicjam" supported="no">
 		<description>Sonic Jam 6 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -25908,8 +25914,11 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>Williams</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<!-- Dump To Be Confirmed, info based on nointro pcb pic -->
+			<feature name="pcb" value="670128 REV 1" />
+			<feature name="u1" value="T-97146" />
 			<dataarea name="rom" size="4194304">
-				<rom name="ultimate mortal kombat 3 (usa).bin" size="4194304" crc="7290770d" sha1="bf2da4a7ae7aa428b0b316581f65b280dc3ba356" offset="000000" loadflag="load16_word_swap" />
+				<rom name="t-97146.u1" size="4194304" crc="7290770d" sha1="bf2da4a7ae7aa428b0b316581f65b280dc3ba356" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -29218,17 +29227,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="unknown2">
-		<description>Unknown Game 2 (Rockman-related?)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ultsoccrp" cloneof="ultsoccr">
 		<description>Ultimate Soccer (Euro, Prototype)</description>
 		<year>199?</year>
@@ -29310,7 +29308,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonicjam2" cloneof="sonicjam">
+	<software name="sonicjamh" cloneof="sonicjam">
 		<description>Sonic Jam 6 (Hacked?)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
@@ -30519,7 +30517,43 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!--
+Aborted attempt to hack out the Rockman X3 protection?
+rockman x3 (unl).bin [1/2]      xxx3.bin     [1/2]      88.159271%
+rockman x3 (unl).bin [2/2]      xxx3.bin     [2/2]      IDENTICAL
+-->
+	<software name="rockmnx3b" cloneof="rockmnx3">
+		<description>Rockman X3 (Bad? Hacked?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
 
+
+<!--
+Investigation by Eke:
+this dump has the PC pointing to $1FE1DE, which does not hold any valid 68k program data in the ROM, 
+so the game actually does not even starts when the 68k resets => either the dump is incomplete or it 
+is a bad dump, there is no way bankswitching can be "triggered" before the CPU has reseted and 
+fetches the PC, only possibility would be that this ROM area is only activated if some signal conditions 
+is met (I know that some pirate carts will need to have the !RESET lines set HIGH like with the real console, 
+which most dumpers ignore)
+This dump is either a bad dump or a wrongly patched one.
+-->
+	<software name="sonicjamb" cloneof="sonicjam" supported="no">
+		<description>Sonic Jam 6 (Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonic jam 6 (unl).bin" size="2097152" crc="bf39d897" sha1="3a6fe5a92dc2ada7e9ab17ac120c7e50d1f9a1ed" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
 
 <!--
     <software name="debugc">

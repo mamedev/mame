@@ -22945,6 +22945,54 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="onimush2">
+		<description>Gui Wu Zhe 2 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="鬼武者2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="gui wu zhe 2 (unlicensed, chinese) [raw dump].bin" size="2097152" crc="955bc6ad" sha1="5fe41ac064f4b4d4476ef4177a2f4d69fae1a933" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- this is a sprite hack (based on Golden Sun by Camelot) of another syntax game "Castlevania DX", currently undumped -->
+<!-- ingame title uses 黃金の太陽, so I romanized it in the Jpn way rather than in the Chinese way... -->
+	<software name="hjtaiyou">
+		<description>Pian Wai Zhang Huang Jin no Taiyou - Feng Yin De Yuan Gu Lian Jin Shu (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="篇外章 黃金太陽-封印的遠古煉金術 ~ Pian Wai Zhang Huang Jin Tai Yang - Feng Yin De Yuan Gu Lian Jin Shu"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pian wai zhang huang jin tai yang - feng yin de yuan gu lian jin shu (unlicensed, chinese) [raw dump].bin" size="2097152" crc="0db9fdfa" sha1="6d2acdca141001bfefdcbf0076702fec6619e368" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- this is a sprite hack (based on Dragon Quest by Enix) of another syntax game "Castlevania DX", currently undumped -->
+	<software name="dquest8">
+		<description>Yong Zhe Dou E Long VIII (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="勇者鬥惡龍VIII"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<dataarea name="rom" size="2097152">
+				<rom name="yong zhe dou e long viii (unlicensed, chinese) [raw dump].bin" size="2097152" crc="8b8b84ec" sha1="d71788eabb4d2535e31773338523a721e2784bb5" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mgear2">
 		<description>He Jin Zhuang Bei II (Chi)</description>
 		<year>200?</year>
@@ -23401,12 +23449,45 @@ Undumped Pirates:
 		</part>
 	</software>
 
-	<software name="zzx3">
+	<software name="spiderm3">
+		<description>Spider-Man 3 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Movie Version Spider-Man 3 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="movie version - spider-man 3 (unlicensed, english) [raw dump].bin" size="2097152" crc="2c0d43a9" sha1="8a6b6a1300db59b86ddf87599cfc8edd2e52e2b0" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chuanshu" cloneof="spiderm3">
+	<!-- Same game as spiderm3 but alt sprite (still uses spider-man in status bar!) -->
+		<description>Chuan Shuo (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="傳說"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_sintax" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="chuan shuo (unlicensed, chinese) [raw dump].bin" size="2097152" crc="0b20d3af" sha1="f390b702d4b160149c1030bcccb5ed6f76c0b94a" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zzx3" cloneof="spiderm3">
 	<!-- 4MB rom with crc 66442e7d is taizou's cracked version running on base MBC5 -->
 		<description>Zhi Zhu Xia III (Chi)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="蜘蛛侠3-电影版 ~ Zhi Zhu Xia 3 - Dian Ying Ban (Spiderman 3 Movie Version)"/>
+		<info name="alt_title" value="蜘蛛侠3-电影版 ~ Zhi Zhu Xia 3 - Dian Ying Ban (Spider-Man 3 Movie Version)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
