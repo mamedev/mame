@@ -1659,12 +1659,14 @@ device_debug::device_debug(device_t &device)
 		m_trace(NULL),
 		m_hotspots(NULL),
 		m_hotspot_count(0),
-		m_hotspot_threshhold(0)
+		m_hotspot_threshhold(0),
+		m_track_pc_set(),
+		m_track_pc(false),
+		m_comment_set(),
+		m_comment_change(0)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
 	memset(m_wplist, 0, sizeof(m_wplist));
-
-	m_comment_change = 0;
 
 	// find out which interfaces we have to work with
 	device.interface(m_exec);
@@ -1867,6 +1869,13 @@ void device_debug::instruction_hook(offs_t curpc)
 	// update total cycles
 	m_last_total_cycles = m_total_cycles;
 	m_total_cycles = m_exec->total_cycles();
+
+	// are we tracking our recent pc visits?
+	if (m_track_pc)
+	{
+		const UINT32 crc = compute_opcode_crc32(curpc);
+		m_track_pc_set.insert(dasm_pc_tag(curpc, crc));
+	}
 
 	// are we tracing?
 	if (m_trace != NULL)
@@ -2594,6 +2603,34 @@ offs_t device_debug::history_pc(int index) const
 
 
 //-------------------------------------------------
+//  track_pc_visited - returns a boolean stating
+//  if this PC has been visited or not.  CRC32 is
+//  done in this function on currently active CPU.
+//  TODO: Take a CPU context as input
+//-------------------------------------------------
+
+bool device_debug::track_pc_visited(const offs_t& pc) const
+{
+	if (m_track_pc_set.empty())
+		return false;
+	const UINT32 crc = compute_opcode_crc32(pc);
+	return m_track_pc_set.contains(dasm_pc_tag(pc, crc));
+}
+
+
+//-------------------------------------------------
+//  set_track_pc_visited - set this pc as visited.
+//  TODO: Take a CPU context as input
+//-------------------------------------------------
+
+void device_debug::set_track_pc_visited(const offs_t& pc)
+{
+	const UINT32 crc = compute_opcode_crc32(pc);
+	m_track_pc_set.insert(dasm_pc_tag(pc, crc));
+}
+
+
+//-------------------------------------------------
 //  comment_add - adds a comment to the list at
 //  the given address
 //-------------------------------------------------
@@ -2601,11 +2638,14 @@ offs_t device_debug::history_pc(int index) const
 void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 {
 	// create a new item for the list
-	UINT32 crc = compute_opcode_crc32(addr);
-    dasm_comment newComment = dasm_comment(comment, addr, color, crc);
-    if (m_comment_set.contains(newComment))
-        m_comment_set.remove(newComment);
-    m_comment_set.insert(newComment);
+	const UINT32 crc = compute_opcode_crc32(addr);
+	dasm_comment newComment = dasm_comment(addr, crc, comment, color);
+	if (!m_comment_set.insert(newComment))
+	{
+		// Insert returns false if comment exists
+		m_comment_set.remove(newComment);
+		m_comment_set.insert(newComment);
+	}
 
 	// force an update
 	m_comment_change++;
@@ -2619,10 +2659,9 @@ void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 
 bool device_debug::comment_remove(offs_t addr)
 {
-	// scan the list for a match
-	UINT32 crc = compute_opcode_crc32(addr);
-    bool success = m_comment_set.remove(dasm_comment("", addr, 0xffffffff, crc));
-    if (success) m_comment_change++;
+	const UINT32 crc = compute_opcode_crc32(addr);
+	bool success = m_comment_set.remove(dasm_comment(addr, crc, "", 0xffffffff));
+	if (success) m_comment_change++;
 	return success;
 }
 
@@ -2633,11 +2672,10 @@ bool device_debug::comment_remove(offs_t addr)
 
 const char *device_debug::comment_text(offs_t addr) const
 {
-	// scan the list for a match
-	UINT32 crc = compute_opcode_crc32(addr);
-    dasm_comment* comment = m_comment_set.find(dasm_comment("", addr, 0, crc));
-    if (comment == NULL) return NULL;
-    return comment->m_text;
+	const UINT32 crc = compute_opcode_crc32(addr); 
+	dasm_comment* comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
+	if (comment == NULL) return NULL;
+	return comment->m_text;
 }
 
 
@@ -2650,8 +2688,8 @@ bool device_debug::comment_export(xml_data_node &curnode)
 {
 	// iterate through the comments
 	astring crc_buf;
-    simple_set_iterator<dasm_comment> iter(m_comment_set);
-    for (dasm_comment* item = iter.first(); item != iter.last(); item = iter.next())
+	simple_set_iterator<dasm_comment> iter(m_comment_set);
+	for (dasm_comment* item = iter.first(); item != iter.last(); item = iter.next())
 	{
 		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(item->m_text));
 		if (datanode == NULL)
@@ -2682,8 +2720,8 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 		UINT32 crc;
 		sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &crc);
 
-		// add the new comment; we assume they were saved ordered
-		m_comment_set.insert(dasm_comment(datanode->value, address, color, crc));
+		// add the new comment
+		m_comment_set.insert(dasm_comment(address, crc, datanode->value, color));
 	}
 	return true;
 }
@@ -2694,31 +2732,31 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 //  the opcode bytes at the given address
 //-------------------------------------------------
 
-UINT32 device_debug::compute_opcode_crc32(offs_t address) const
+UINT32 device_debug::compute_opcode_crc32(offs_t pc) const
 {
-	// no memory interface?  just fail
-	if (m_memory == NULL)
-		return 0;
+	// Basically the same thing as dasm_wrapped, but with some tiny savings
+	assert(m_memory != NULL);
 
-	// get the crc bytes from program memory
+	// determine the adjusted PC
 	address_space &space = m_memory->space(AS_PROGRAM);
+	offs_t pcbyte = space.address_to_byte(pc) & space.bytemask();
 
-	// ask the interface how many bytes to get
-	int maxbytes = m_disasm->max_opcode_bytes();
-
-	// fetch the arg and op bytes & mash 'em into a single buffer
-	UINT8* buff = new UINT8(maxbytes*2);
-	memset(buff, 0x00, sizeof(UINT8)*maxbytes*2);
-	for (int index = 0; index < maxbytes; index++)
+	// fetch the bytes up to the maximum
+	UINT8 opbuf[64], argbuf[64];
+	int maxbytes = max_opcode_bytes();
+	for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 	{
-		buff[index]          = debug_read_opcode(space, address + index, 1, false);
-		buff[index+maxbytes] = debug_read_opcode(space, address + index, 1, true);
+		opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, false);
+		argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, true);
 	}
 
-	// return a CRC of the resulting bytes
-	UINT32 crc = crc32(0, buff, maxbytes*2);
-	delete[] buff;
-	return crc;
+	// disassemble to our buffer
+	char diasmbuf[200];
+	memset(diasmbuf, 0x00, 200);
+	UINT32 numbytes = disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+
+	// return a CRC of the exact count of opcode bytes
+	return crc32(0, opbuf, numbytes);
 }
 
 
@@ -3480,14 +3518,22 @@ void device_debug::tracer::flush()
 
 
 //-------------------------------------------------
+//  dasm_pc_tag - constructor
+//-------------------------------------------------
+
+device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const UINT32& crc)
+	: m_address(address),
+	  m_crc(crc)
+{
+}
+
+//-------------------------------------------------
 //  dasm_comment - constructor
 //-------------------------------------------------
 
-device_debug::dasm_comment::dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc)
-	: m_next(NULL),
-		m_address(address),
-		m_color(color),
-		m_crc(crc),
-		m_text(text)
+device_debug::dasm_comment::dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color)
+	: dasm_pc_tag(address, crc),
+	  m_text(text),
+	  m_color(color)
 {
 }

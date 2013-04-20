@@ -393,7 +393,7 @@ void debug_view_memory::view_char(int chval)
 			data &= ~((UINT64)0x0f << pos.m_shift);
 			data |= (UINT64)(hexchar - hexvals) << pos.m_shift;
 			write(m_bytes_per_chunk, pos.m_address, data);
-			// fall through...
+			// fall through to the right-arrow press
 		}
 
 		case DCH_RIGHT:

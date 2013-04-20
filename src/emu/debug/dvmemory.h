@@ -60,7 +60,7 @@ public:
 	address_space *space() const { return m_space; }
 
 private:
-	address_space *m_space;             // address space we reference (if any)
+	address_space *m_space;                     // address space we reference (if any)
 	device_memory_interface *m_memintf;         // pointer to the memory interface of the device
 	void *              m_base;                 // pointer to memory base
 	offs_t              m_length;               // length of memory

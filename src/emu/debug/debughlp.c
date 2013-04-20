@@ -87,6 +87,8 @@ static const help_item static_help_list[] =
 		"  printf <format>[,<item>[,...]] -- prints one or more <item>s to the console using <format>\n"
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
+		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes.\n"
+		"  trackpc [<bool>,<cpu>,<bool>] -- toggle to visually track visited opcodes [for the given cpu [& clear]].\n"
 		"  snap [<filename>] -- save a screen snapshot\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
 		"  quit -- exits MAME and the debugger\n"
@@ -373,6 +375,24 @@ static const help_item static_help_list[] =
 		"\n"
 		"printf \"A=%d, B=%d\\nC=%d\",a,b,a+b\n"
 		"  Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.\n"
+	},
+	{
+		"trackpc",
+		"\n"
+		"  trackpc [<bool>,<cpu>,<bool>]\n"
+		"\n"
+		"The trackpc command displays which program counters have already been visited in all disassembler "
+		"windows. The first boolean argument toggles the process on and off.  The second argument is a "
+		"cpu selector; if no cpu is specified, the current cpu is automatically selected.  The third argument "
+		"is a boolean denoting if the existing data should be cleared or not.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"trackpc 1\n"
+		"  Begin tracking the current cpu's pc.\n"
+		"\n"
+		"trackpc 1, 0, 0\n"
+		"  Continue tracking pc on cpu 0, but clear existing track info.\n"
 	},
 	{
 		"snap",

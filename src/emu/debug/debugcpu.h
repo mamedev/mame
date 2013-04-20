@@ -67,7 +67,6 @@ typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 
 struct xml_data_node;
 
-
 class device_debug
 {
 	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -248,10 +247,16 @@ public:
 	UINT32 comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
 	bool comment_import(xml_data_node &node);
-	UINT32 compute_opcode_crc32(offs_t address) const;
+	UINT32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
 	offs_t history_pc(int index) const;
+
+	// pc tracking
+	void set_track_pc(bool value) { m_track_pc = value; }
+	bool track_pc_visited(const offs_t& pc) const;
+	void set_track_pc_visited(const offs_t& pc);
+	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
 	// tracing
 	void trace(FILE *file, bool trace_over, const char *action);
@@ -362,26 +367,34 @@ private:
 	int                     m_hotspot_count;            // number of hotspots
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
 
-	// comments
-	class dasm_comment
+	// pc tracking
+	class dasm_pc_tag
 	{
 	public:
-		dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc);
+		dasm_pc_tag(const offs_t& address, const UINT32& crc);
 
-		dasm_comment *next() const { return m_next; }
+		// required to be included in a simple_set
+		bool operator < (const dasm_pc_tag& rhs) const
+		{
+			if (m_address == rhs.m_address)
+					return m_crc < rhs.m_crc;
+			return (m_address < rhs.m_address);
+		}
 
-		dasm_comment *      m_next;                     // next comment in the list
-		offs_t              m_address;                  // address in question
-		rgb_t               m_color;                    // color to use
-		UINT32              m_crc;                      // CRC of code
-		astring             m_text;                     // text
-        
-        bool operator < (const dasm_comment& rhs) const          // required to be included in a simple_set
-        {
-            if (m_address == rhs.m_address)
-                return m_crc < rhs.m_crc;
-            return (m_address < rhs.m_address);
-        }
+		offs_t m_address;
+		UINT32 m_crc;
+	};
+	simple_set<dasm_pc_tag> m_track_pc_set;
+	bool m_track_pc;
+
+	// comments
+	class dasm_comment : public dasm_pc_tag
+	{
+	public:
+		dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color);
+
+		astring  m_text;                     // comment text
+		rgb_t    m_color;                    // comment color
 	};
 	simple_set<dasm_comment> m_comment_set;             // collection of comments
 	UINT32                   m_comment_change;          // change counter for comments

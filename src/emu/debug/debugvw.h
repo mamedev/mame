@@ -72,14 +72,15 @@ enum debug_view_notification
 
 
 // attribute bits for debug_view_char.attrib
-const UINT8 DCA_NORMAL      = 0x00;     // in Windows: black on white
-const UINT8 DCA_CHANGED     = 0x01;     // in Windows: red foreground
-const UINT8 DCA_SELECTED    = 0x02;     // in Windows: light red background
-const UINT8 DCA_INVALID     = 0x04;     // in Windows: dark blue foreground
-const UINT8 DCA_DISABLED    = 0x08;     // in Windows: darker foreground
-const UINT8 DCA_ANCILLARY   = 0x10;     // in Windows: grey background
-const UINT8 DCA_CURRENT     = 0x20;     // in Windows: yellow background
-const UINT8 DCA_COMMENT     = 0x40;     // in Windows: green foreground
+const UINT8 DCA_NORMAL      = 0x00;     // black on white
+const UINT8 DCA_CHANGED     = 0x01;     // red foreground
+const UINT8 DCA_SELECTED    = 0x02;     // light red background
+const UINT8 DCA_INVALID     = 0x04;     // dark blue foreground
+const UINT8 DCA_DISABLED    = 0x08;     // darker foreground
+const UINT8 DCA_ANCILLARY   = 0x10;     // grey background
+const UINT8 DCA_CURRENT     = 0x20;     // yellow background
+const UINT8 DCA_COMMENT     = 0x40;     // green foreground
+const UINT8 DCA_VISITED     = 0x80;     // light blue background
 
 
 // special characters that can be passed to process_char()

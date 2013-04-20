@@ -609,6 +609,10 @@ recompute:
 			if (m_cursor_visible && effrow == m_cursor.y)
 				attrib |= DCA_SELECTED;
 
+			// if we've visited this pc, mark it as such
+			if (source.m_device.debug()->track_pc_visited(m_byteaddress[effrow]))
+				attrib |= DCA_VISITED;
+
 			// get the effective string
 			const char *data = &m_dasm[effrow * m_allocated.x];
 			UINT32 len = (UINT32)strlen(data);

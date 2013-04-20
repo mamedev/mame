@@ -142,6 +142,7 @@ static void execute_trace(running_machine &machine, int ref, int params, const c
 static void execute_traceover(running_machine &machine, int ref, int params, const char **param);
 static void execute_traceflush(running_machine &machine, int ref, int params, const char **param);
 static void execute_history(running_machine &machine, int ref, int params, const char **param);
+static void execute_trackpc(running_machine &machine, int ref, int params, const char **param);
 static void execute_snap(running_machine &machine, int ref, int params, const char **param);
 static void execute_source(running_machine &machine, int ref, int params, const char **param);
 static void execute_map(running_machine &machine, int ref, int params, const char **param);
@@ -366,6 +367,7 @@ void debug_command_init(running_machine &machine)
 	debug_console_register_command(machine, "traceflush",CMDFLAG_NONE, 0, 0, 0, execute_traceflush);
 
 	debug_console_register_command(machine, "history",   CMDFLAG_NONE, 0, 0, 2, execute_history);
+	debug_console_register_command(machine, "trackpc",   CMDFLAG_NONE, 0, 0, 3, execute_trackpc);
 
 	debug_console_register_command(machine, "snap",      CMDFLAG_NONE, 0, 0, 1, execute_snap);
 
@@ -2647,6 +2649,48 @@ static void execute_history(running_machine &machine, int ref, int params, const
 
 		debug_console_printf(machine, "%s: %s\n", core_i64_hex_format(pc, space->logaddrchars()), buffer);
 	}
+}
+
+
+/*-------------------------------------------------
+    execute_trackpc - execute the trackpc command
+-------------------------------------------------*/
+
+static void execute_trackpc(running_machine &machine, int ref, int params, const char *param[])
+{
+	// Gather the on/off switch (if present)
+	UINT64 turnOn = true;
+	if (!debug_command_parameter_number(machine, param[0], &turnOn))
+		return;
+
+	// Gather the cpu id (if present)
+	device_t *cpu = NULL;
+	if (!debug_command_parameter_cpu(machine, (params > 1) ? param[1] : NULL, &cpu))
+		return;
+
+	// Should we clear the existing data?
+	UINT64 clear = false;
+	if (!debug_command_parameter_number(machine, param[2], &clear))
+		return;
+
+	cpu->debug()->set_track_pc((bool)turnOn);
+	if (turnOn)
+	{
+		// Insert current pc
+		if (debug_cpu_get_visible_cpu(machine) == cpu)
+		{
+			const offs_t pc = cpu->debug()->pc();
+			cpu->debug()->set_track_pc_visited(pc);
+		}
+		debug_console_printf(machine, "PC tracking enabled\n");
+	}
+	else
+	{
+		debug_console_printf(machine, "PC tracking disabled\n");
+	}
+
+	if (clear)
+		cpu->debug()->track_pc_data_clear();
 }
 
 
