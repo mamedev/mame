@@ -63,7 +63,6 @@ static TIMER_CALLBACK(process_snapshot_or_quickload)
 void snapshot_image_device::timer_callback()
 {
 	/* invoke the load */
-//	(*m_load)(*this, filetype(), length());
 	m_load(*this, filetype(), length());
 
 	/* unload the device */

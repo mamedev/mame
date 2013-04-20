@@ -5,10 +5,9 @@ Midnight Landing (c) 1987 Taito Corporation
 driver by Tomasz Slanina, Phil Bennett & Angelo Salese, based on early work by David Haywood
 
 Dual 68k + 2xZ80 + tms DSP
-no other hardware info..but it doesn't seem related to taitoair.c at all
+no other hardware info..
 
 TODO:
-- Sound is nowhere near to be perfect, mode 5 causes "sound cpu error" for whatever reason;
 - Palette banking;
 - Comms between the five CPUs;
 - Gameplay looks stiff;
@@ -33,39 +32,39 @@ public:
 	mlanding_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_dsp(*this, "dsp"),
+		m_audiocpu(*this, "audiocpu"),
+		m_mechacpu(*this, "z80sub"),
 		m_msm(*this, "msm"),
-		m_tc0140syt(*this, "tc0140syt"),
+		m_adpcm_rom(*this, "adpcm"),
 		m_g_ram(*this, "g_ram"),
 		m_ml_tileram(*this, "ml_tileram"),
 		m_dma_ram(*this, "dma_ram"),
 		m_ml_dotram(*this, "ml_dotram"),
-		m_mecha_ram(*this, "mecha_ram")
+		m_power_ram(*this, "power_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_dsp;
+	required_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_mechacpu;
 	required_device<msm5205_device> m_msm;
-	required_device<tc0140syt_device> m_tc0140syt;
+	required_memory_region m_adpcm_rom;
 
 	required_shared_ptr<UINT16> m_g_ram;
 	required_shared_ptr<UINT16> m_ml_tileram;
 	required_shared_ptr<UINT16> m_dma_ram;
 	required_shared_ptr<UINT16> m_ml_dotram;
-	required_shared_ptr<UINT8> m_mecha_ram;
+	required_shared_ptr<UINT8> m_power_ram;
 
 	UINT32 m_adpcm_pos;
-	UINT32 m_adpcm_end;
-	int m_adpcm_data;
-	UINT8 m_adpcm_idle;
+	UINT32 m_adpcm_address;
+	UINT8 m_adpcm_trigger;
 	UINT8 m_pal_fg_bank;
 	int m_dma_active;
 	UINT16 m_dsp_HOLD_signal;
-	UINT8 m_trigger;
 	DECLARE_WRITE16_MEMBER(ml_tileram_w);
 	DECLARE_READ16_MEMBER(ml_tileram_r);
 	DECLARE_READ16_MEMBER(io1_r);
@@ -77,17 +76,17 @@ public:
 	DECLARE_READ16_MEMBER(ml_analog1_msb_r);
 	DECLARE_READ16_MEMBER(ml_analog2_msb_r);
 	DECLARE_READ16_MEMBER(ml_analog3_msb_r);
-	DECLARE_WRITE16_MEMBER(ml_nmi_to_sound_w);
-	DECLARE_READ16_MEMBER(ml_mecha_ram_r);
-	DECLARE_WRITE16_MEMBER(ml_mecha_ram_w);
-	DECLARE_WRITE8_MEMBER(ml_msm_start_msb_w);
+	DECLARE_READ16_MEMBER(ml_power_ram_r);
+	DECLARE_WRITE16_MEMBER(ml_power_ram_w);
 	DECLARE_READ16_MEMBER(ml_dotram_r);
 	DECLARE_WRITE16_MEMBER(ml_dotram_w);
 	DECLARE_READ16_MEMBER(dsp_HOLD_signal_r);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(ml_msm_start_lsb_w);
-	DECLARE_DRIVER_INIT(mlanding);
+	DECLARE_WRITE8_MEMBER(ml_adpcm_address_lo_w);
+	DECLARE_WRITE8_MEMBER(ml_adpcm_address_hi_w);
+	DECLARE_WRITE8_MEMBER(ml_adpcm_start_w);
+	DECLARE_WRITE8_MEMBER(ml_adpcm_stop_w);
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
@@ -291,38 +290,15 @@ WRITE16_MEMBER(mlanding_state::ml_output_w)
 
 WRITE8_MEMBER(mlanding_state::sound_bankswitch_w)
 {
-	membank("bank10")->set_entry(data & 1);
+	// unused? assume audiocpu prg bankswitch leftover
 }
 
 WRITE_LINE_MEMBER(mlanding_state::ml_msm5205_vck)
 {
-//  popmessage("%08x",m_adpcm_pos);
-
-	if (m_adpcm_pos >= 0x50000  || m_adpcm_idle)
-	{
-		//m_adpcm_idle = 1;
-		msm5205_reset_w(m_msm,1);
-		m_trigger = 0;
-	}
-	else
-	{
-		UINT8 *ROM = memregion("adpcm")->base();
-
-		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0)>>4) );
-		msm5205_data_w(m_msm,m_adpcm_data & 0xf);
-		m_trigger^=1;
-		if(m_trigger == 0)
-		{
-			m_adpcm_pos++;
-			//m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-			/*TODO: simplify this */
-			if(ROM[m_adpcm_pos] == 0x00 && ROM[m_adpcm_pos+1] == 0x00 && ROM[m_adpcm_pos+2] == 0x00 && ROM[m_adpcm_pos+3] == 0x00
-				&& ROM[m_adpcm_pos+4] == 0x00 && ROM[m_adpcm_pos+5] == 0x00 && ROM[m_adpcm_pos+6] == 0x00 && ROM[m_adpcm_pos+7] == 0x00
-				&& ROM[m_adpcm_pos+8] == 0x00 && ROM[m_adpcm_pos+9] == 0x00 && ROM[m_adpcm_pos+10] == 0x00 && ROM[m_adpcm_pos+11] == 0x00
-				&& ROM[m_adpcm_pos+12] == 0x00 && ROM[m_adpcm_pos+13] == 0x00 && ROM[m_adpcm_pos+14] == 0x00 && ROM[m_adpcm_pos+15] == 0x00)
-				m_adpcm_idle = 1;
-		}
-	}
+	UINT8 data = m_adpcm_rom->base()[m_adpcm_pos];
+	msm5205_data_w(m_msm, m_adpcm_trigger ? (data & 0xf) : (data >> 4));
+	m_adpcm_pos = (m_adpcm_pos + m_adpcm_trigger) & 0x7ffff;
+	m_adpcm_trigger ^= 1;
 }
 
 TIMER_CALLBACK_MEMBER(mlanding_state::dma_complete)
@@ -343,17 +319,23 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 		m_dma_active = 1;
 		machine().scheduler().timer_set(attotime::from_msec(20), timer_expired_delegate(FUNC(mlanding_state::dma_complete),this));
 	}
-
-	if(!(data & 0x40)) // unknown line used
+	
+	// 0 (falling edge?) starts cpus in this order:
+	
+	if (!(data & 0x40)) // $09b0 d6: sub cpu
 		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
-	//data & 0x20 sound cpu?
-
-	if(!(data & 0x80)) // unknown line used
+	if (!(data & 0x80)) // $0950 d7: dsp?
 	{
 		m_dsp->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		m_dsp_HOLD_signal = data & 0x80;
 	}
+
+	if (!(data & 0x20)) // $0950 d5: sound cpu?
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
+	if (!(data & 0x10)) // $09e0 d4: mecha cpu
+		m_mechacpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ16_MEMBER(mlanding_state::ml_analog1_lsb_r)
@@ -445,41 +427,37 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 	return ((ioport("STICKX")->read() & 0xf00)>>8) | res;
 }
 
-WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
+
+READ16_MEMBER(mlanding_state::ml_power_ram_r)
 {
-//  m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	return m_power_ram[offset * 2] << 8 | m_power_ram[offset * 2 + 1];
 }
 
-READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
+WRITE16_MEMBER(mlanding_state::ml_power_ram_w)
 {
-	return (m_mecha_ram[offset*2]<<8)|m_mecha_ram[offset*2+1];
-}
-
-WRITE16_MEMBER(mlanding_state::ml_mecha_ram_w)
-{
-	COMBINE_DATA(m_mecha_ram+offset*2+1);
-	data >>= 8;
-	mem_mask >>= 8;
-	COMBINE_DATA(m_mecha_ram+offset*2);
+	if (ACCESSING_BITS_0_7)
+		m_power_ram[offset * 2 + 1] = data;
+	if (ACCESSING_BITS_8_15)
+		m_power_ram[offset * 2] = data;
 }
 
 static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram")// 512kB G RAM - enough here for double buffered 512x400x8 frame
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_SHARE("g_ram") // 512kB G RAM - enough here for double buffered 512x400x8 frame
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_SHARE("ml_tileram")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
+//	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITENOP // ?
 
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_power_ram_r, ml_power_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
 	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
@@ -509,34 +487,52 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("ml_dotram")
 ADDRESS_MAP_END
 
-WRITE8_MEMBER(mlanding_state::ml_msm_start_lsb_w)
+
+WRITE8_MEMBER(mlanding_state::ml_adpcm_start_w)
 {
-	m_adpcm_pos = (m_adpcm_pos & 0x0f0000) | ((data & 0xff)<<8) | 0x20;
-	m_adpcm_idle = 0;
-	msm5205_reset_w(m_msm,0);
-	m_adpcm_end = (m_adpcm_pos+0x800);
+	m_adpcm_pos = m_adpcm_address << 8;
+	m_adpcm_trigger = 0;
+	msm5205_reset_w(m_msm, 0);
 }
 
-WRITE8_MEMBER(mlanding_state::ml_msm_start_msb_w)
+WRITE8_MEMBER(mlanding_state::ml_adpcm_stop_w)
 {
-	m_adpcm_pos = (m_adpcm_pos & 0x00ff00) | ((data & 0x0f)<<16) | 0x20;
+	msm5205_reset_w(m_msm, 1);
+}
+
+WRITE8_MEMBER(mlanding_state::ml_adpcm_address_lo_w)
+{
+	m_adpcm_address = (m_adpcm_address & 0x700) | data;
+}
+
+WRITE8_MEMBER(mlanding_state::ml_adpcm_address_hi_w)
+{
+	m_adpcm_address = (m_adpcm_address & 0x0ff) | (data << 8 & 0x700);
 }
 
 static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-
-//  AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
-//  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)
-//  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_stop_w)
-
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ml_msm_start_lsb_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // ?
+	AM_RANGE(0xc000, 0xc000) AM_WRITENOP // ?
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(ml_adpcm_start_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ml_adpcm_stop_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ml_adpcm_address_lo_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_adpcm_address_hi_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // ?
+	AM_RANGE(0xf600, 0xf600) AM_WRITENOP // ?
+	AM_RANGE(0xf800, 0xf800) AM_WRITENOP // ?
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITENOP // ?
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mlanding_z80_io, AS_IO, 8, mlanding_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
+ADDRESS_MAP_END
+
 
 READ16_MEMBER(mlanding_state::ml_dotram_r)
 {
@@ -562,11 +558,11 @@ READ8_MEMBER(mlanding_state::test_r)
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("mecha_ram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("power_ram")
 
-	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)
-	AM_RANGE(0x9800, 0x9803) AM_READ(test_r)
+	//AM_RANGE(0x9000, 0x9001) AM_READ(test_r)
+	AM_RANGE(0x9800, 0x9805) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
@@ -584,30 +580,35 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ))
-	PORT_DIPSETTING(    0x01, DEF_STR( Standard ))
-	PORT_DIPSETTING(    0x00, "Deluxe" ) //with Mecha driver
-	PORT_DIPNAME( 0x02, 0x02, "$2000-1")
-	PORT_DIPSETTING(    0x02, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
-	PORT_DIPNAME( 0x04, 0x04, "Test Mode")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "$2000-3")
-	PORT_DIPSETTING(    0x08, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
-	PORT_DIPNAME( 0x10, 0x10, "$2000-4")
-	PORT_DIPSETTING(    0x10, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
-	PORT_DIPNAME( 0x20, 0x20, "$2000-5")
-	PORT_DIPSETTING(    0x20, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
-	PORT_DIPNAME( 0x40, 0x40, "$2000-6")
-	PORT_DIPSETTING(    0x40, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
-	PORT_DIPNAME( 0x80, 0x80, "$2000-7")
-	PORT_DIPSETTING(    0x80, "H" )
-	PORT_DIPSETTING(    0x00, "L" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Standard ) )
+	PORT_DIPSETTING(    0x00, "Deluxe" ) // with Mecha driver
+	PORT_DIPNAME( 0x02, 0x02, "Coin Mode" ) PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(    0x02, "Mode A (Japan)" ) /* Mode A is TAITO_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x00, "Mode B (World)" ) /* Mode B is TAITO_COINAGE_WORLD */
+	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWA:3" ) PORT_NAME("Test Mode 1")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:7,8")
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+
 	PORT_DIPNAME( 0x0100, 0x0100, "$2001-0")
 	PORT_DIPSETTING(    0x0100, "H" )
 	PORT_DIPSETTING(    0x0000, "L" )
@@ -658,8 +659,8 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -730,42 +731,46 @@ static const tc0140syt_interface mlanding_tc0140syt_intf =
 void mlanding_state::machine_reset()
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_adpcm_pos = 0;
-	m_adpcm_data = -1;
-	m_adpcm_idle = 1;
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_mechacpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	msm5205_reset_w(m_msm, 1);
 	m_dsp_HOLD_signal = 0;
 }
 
 void mlanding_state::machine_start()
 {
-	membank("bank10")->configure_entries(0, 2, memregion("audiocpu")->base(), 0x4000);
+	m_adpcm_pos = 0;
+	m_adpcm_address = 0;
+	m_adpcm_trigger = 0;
 }
 
 static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12000000 )      /* 12 MHz ??? (guess) */
+	MCFG_CPU_ADD("maincpu", M68000, 12000000 ) /* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 12000000 )      /* 12 MHz ??? (guess) */
+	MCFG_CPU_ADD("sub", M68000, 12000000 ) /* 12 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_sub_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mlanding_state, irq6_line_hold, 7*60) /* ??? */
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4000000 )     /* 4 MHz ??? (guess) */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000 ) /* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_mem)
+	MCFG_CPU_IO_MAP(mlanding_z80_io)
 
-	MCFG_CPU_ADD("z80sub", Z80, 4000000 )       /* 4 MHz ??? (guess) */
+	MCFG_CPU_ADD("z80sub", Z80, 4000000 ) /* 4 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(mlanding_z80_sub_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", mlanding_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("dsp", TMS32025,24000000)          /* 24 MHz ??? (guess) */
+	MCFG_CPU_ADD("dsp", TMS32025, 24000000) /* 24 MHz ??? (guess) */
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_CPU_IO_MAP(DSP_map_io)
 
+	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
@@ -826,11 +831,5 @@ ROM_START( mlanding )
 	ROM_LOAD( "ml_b0936.epr", 0x00000, 0x02000, CRC(51fd3a77) SHA1(1fcbadf1877e25848a1d1017322751560a4823c0) )
 ROM_END
 
-DRIVER_INIT_MEMBER(mlanding_state,mlanding)
-{
-//  UINT8 *rom = memregion("sub")->base();
-//  rom[0x88b]=0x4e;
-//  rom[0x88a]=0x71;
-}
 
-GAME( 1987, mlanding, 0,        mlanding,   mlanding, mlanding_state, mlanding,        ROT0,    "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
