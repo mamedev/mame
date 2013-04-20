@@ -2356,9 +2356,9 @@ static const UINT16 reciprocals[ 32768 ]=
 	0xf,0xe,0xd,0xc,0xb,0xa,0x9,0x8,0x7,0x6,0x5,0x4,0x3,0x2,0x1,0x0,
 };
 
-INLINE UINT32 gte_divide( INT16 numerator, UINT16 denominator )
+INLINE UINT32 gte_divide( UINT16 numerator, UINT16 denominator )
 {
-	if( numerator >= 0 && numerator < ( denominator * 2 ) )
+	if( numerator < ( denominator * 2 ) )
 	{
 		UINT32 offset = denominator;
 		int shift = 0;
@@ -2430,9 +2430,39 @@ UINT32 gte::Lm_E( UINT32 result )
 	return result;
 }
 
-INT32 gte::F( INT64 a ) { m_mac0 = a; if( a > S64( 0x7fffffff ) ) FLAG |= ( 1 << 31 ) | ( 1 << 16 ); if( a < S64(-0x80000000) ) FLAG |= ( 1 << 31 ) | ( 1 << 15 ); return a; }
-INT32 gte::Lm_G1( INT32 a ) { return LIM( a, 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 14 ) ); }
-INT32 gte::Lm_G2( INT32 a ) { return LIM( a, 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 13 ) ); }
+INT64 gte::F( INT64 a ) { m_mac0 = a; if( a > S64( 0x7fffffff ) ) FLAG |= ( 1 << 31 ) | ( 1 << 16 ); if( a < S64(-0x80000000) ) FLAG |= ( 1 << 31 ) | ( 1 << 15 ); return a; }
+INT32 gte::Lm_G1( INT64 a )
+{
+	if( a > 0x3ff )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 14 );
+		return 0x3ff;
+	}
+	if( a < -0x400 )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 14 );
+		return -0x400;
+	}
+
+	return a;
+}
+
+INT32 gte::Lm_G2( INT64 a )
+{
+	if( a > 0x3ff )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 13 );
+		return 0x3ff;
+	}
+
+	if( a < -0x400 )
+	{
+		FLAG |= ( 1 << 31 ) | ( 1 << 13 );
+		return -0x400;
+	}
+
+	return a;
+}
 
 INT32 gte::Lm_H( INT64 value, int sf )
 {
@@ -2477,9 +2507,9 @@ int gte::docop2( UINT32 pc, int gteop )
 	case 0x01:
 		GTELOG( pc, "%08x RTPS", gteop );
 
-		MAC1 = A1( ( (INT64) TRX << 12 ) + ( R11 * VX0 ) + ( R12 * VY0 ) + ( R13 * VZ0 ) );
-		MAC2 = A2( ( (INT64) TRY << 12 ) + ( R21 * VX0 ) + ( R22 * VY0 ) + ( R23 * VZ0 ) );
-		MAC3 = A3( ( (INT64) TRZ << 12 ) + ( R31 * VX0 ) + ( R32 * VY0 ) + ( R33 * VZ0 ) );
+		MAC1 = A1( acc( (INT64) TRX << 12 ) + ( R11 * VX0 ) + ( R12 * VY0 ) + ( R13 * VZ0 ) );
+		MAC2 = A2( acc( (INT64) TRY << 12 ) + ( R21 * VX0 ) + ( R22 * VY0 ) + ( R23 * VZ0 ) );
+		MAC3 = A3( acc( (INT64) TRZ << 12 ) + ( R31 * VX0 ) + ( R32 * VY0 ) + ( R33 * VZ0 ) );
 		IR1 = Lm_B1( MAC1, lm );
 		IR2 = Lm_B2( MAC2, lm );
 		IR3 = Lm_B3_sf( m_mac3, m_sf, lm );

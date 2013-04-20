@@ -95,9 +95,9 @@ protected:
 	INT32 Lm_C3( INT32 a );
 	INT32 Lm_D( INT64 a, int sf );
 	UINT32 Lm_E( UINT32 result );
-	INT32 F( INT64 a );
-	INT32 Lm_G1( INT32 a );
-	INT32 Lm_G2( INT32 a );
+	INT64 F( INT64 a );
+	INT32 Lm_G1( INT64 a );
+	INT32 Lm_G2( INT64 a );
 	INT32 Lm_H( INT64 value, int sf );
 
 	int m_sf;
