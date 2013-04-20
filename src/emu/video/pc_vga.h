@@ -277,6 +277,10 @@ public:
 	WRITE16_MEMBER(ibm8514_foremix_w);
 	READ16_MEMBER(ibm8514_pixel_xfer_r);
 	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
+	READ16_MEMBER(ibm8514_read_mask_r);
+	WRITE16_MEMBER(ibm8514_read_mask_w);
+	READ16_MEMBER(ibm8514_write_mask_r);
+	WRITE16_MEMBER(ibm8514_write_mask_w);
 	void ibm8514_wait_draw();
 	struct
 	{
@@ -319,6 +323,9 @@ public:
 		UINT16 pixel_control;
 		UINT8 bus_size;
 		UINT8 multifunc_sel;
+		UINT16 multifunc_misc;
+		UINT32 read_mask;
+		UINT32 write_mask;
 
 		int state;
 		UINT8 wait_vector_len;

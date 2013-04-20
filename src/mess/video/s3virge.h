@@ -34,9 +34,9 @@ protected:
 	virtual void device_start();
 
 private:
-	UINT8 s3_crtc_reg_read(UINT8 index);
-	void s3_define_video_mode(void);
-	void s3_crtc_reg_write(UINT8 index, UINT8 data);
+	virtual UINT8 s3_crtc_reg_read(UINT8 index);
+	virtual void s3_define_video_mode(void);
+	virtual void s3_crtc_reg_write(UINT8 index, UINT8 data);
 	// has no 8514/A device
 };
 

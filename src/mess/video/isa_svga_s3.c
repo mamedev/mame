@@ -90,6 +90,8 @@ void isa16_svga_s3_device::device_start()
 	m_isa->install16_device(0x9ee8, 0x9eeb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_ssv_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_ssv_w),m_8514));
 	m_isa->install16_device(0xa2e8, 0xa2eb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_bgcolour_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_bgcolour_w),m_8514));
 	m_isa->install16_device(0xa6e8, 0xa6eb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_fgcolour_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_fgcolour_w),m_8514));
+	m_isa->install16_device(0xaae8, 0xaaeb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_write_mask_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_write_mask_w),m_8514));
+	m_isa->install16_device(0xaee8, 0xaeeb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_read_mask_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_read_mask_w),m_8514));
 	m_isa->install16_device(0xb6e8, 0xb6eb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_backmix_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_backmix_w),m_8514));
 	m_isa->install16_device(0xbae8, 0xbaeb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_foremix_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_foremix_w),m_8514));
 	m_isa->install16_device(0xbee8, 0xbeeb, 0, 0, read16_delegate(FUNC(ibm8514a_device::ibm8514_multifunc_r),m_8514), write16_delegate(FUNC(ibm8514a_device::ibm8514_multifunc_w),m_8514));
