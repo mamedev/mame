@@ -117,10 +117,10 @@ Notes:
 
 - fitegolfu:  An "SNK Fighting Golf Program Update" notice published in a trade
   journal outlines 3 improvements which is supposed to allow game players a bit
-  more time at cruicial points in the game.
+  more time at crucial points in the game.
 
   1) Shot time: The 12/10 seconds dip has been changed to 15/12 seconds.
-  2) Power/Swing guage moves slower when the ball is on the green.
+  2) Power/Swing gauge moves slower when the ball is on the green.
   3) Hit Check area around the cup is enlarged for easier putting.
 
 - there are two versions of the Ikari Warriors board, one has the standard JAMMA
