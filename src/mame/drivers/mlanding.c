@@ -12,7 +12,6 @@ TODO:
 - Comms between the five CPUs;
 - Gameplay looks stiff;
 - Needs a custom artwork for the cloche status;
-- Current dump is weird, a mix between German, English and Japanese?
 - clean-ups!
 
 ************************************************************************************************************/
@@ -21,6 +20,7 @@ TODO:
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
+#include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
@@ -270,8 +270,9 @@ READ16_MEMBER(mlanding_state::io1_r)//240006
 	*/
 // multiplexed? or just overriden?
 
-	int retval = (m_dma_active << 15) | (ioport("DSW")->read() & 0x7fff);
-	return retval;
+	UINT8 swa = ioport("DSWA")->read();
+	UINT8 swb = ioport("DSWB")->read() & 0x7f;
+	return m_dma_active << 15 | swb << 8 | swa;
 }
 
 /* output */
@@ -436,9 +437,9 @@ READ16_MEMBER(mlanding_state::ml_power_ram_r)
 WRITE16_MEMBER(mlanding_state::ml_power_ram_w)
 {
 	if (ACCESSING_BITS_0_7)
-		m_power_ram[offset * 2 + 1] = data;
+		m_power_ram[offset * 2 + 1] = data & 0xff;
 	if (ACCESSING_BITS_8_15)
-		m_power_ram[offset * 2] = data;
+		m_power_ram[offset * 2] = data >> 8;
 }
 
 static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
@@ -579,8 +580,8 @@ static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SWA:1")
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Standard ) )
 	PORT_DIPSETTING(    0x00, "Deluxe" ) // with Mecha driver
 	PORT_DIPNAME( 0x02, 0x02, "Coin Mode" ) PORT_DIPLOCATION("SWA:2")
@@ -591,48 +592,44 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:7,8")
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x02)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSWA", 0x02, EQUALS, 0x00)
 
-	PORT_DIPNAME( 0x0100, 0x0100, "$2001-0")
-	PORT_DIPSETTING(    0x0100, "H" )
-	PORT_DIPSETTING(    0x0000, "L" )
-	PORT_DIPNAME( 0x0200, 0x0200, "$2001-1")
-	PORT_DIPSETTING(    0x0200, "H" )
-	PORT_DIPSETTING(    0x0000, "L" )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "$2001-3")
-	PORT_DIPSETTING(    0x0800, "H" )
-	PORT_DIPSETTING(    0x0000, "L" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Test Mode 2")
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "$2001-5")
-	PORT_DIPSETTING(    0x2000, "H" )
-	PORT_DIPSETTING(    0x0000, "L" )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( English ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "$2001-7")
-	PORT_DIPSETTING(    0x8000, "H" )
-	PORT_DIPSETTING(    0x0000, "L" )
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY_LOC(SWB)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "$2001-3") PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
+	PORT_DIPNAME( 0x10, 0x10, "Test Mode 2") PORT_DIPLOCATION("SWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "$2001-5") PORT_DIPLOCATION("SWB:6")
+	PORT_DIPSETTING(    0x20, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SWB:7") // probably not meant to be used on German version?
+	PORT_DIPSETTING(    0x40, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPNAME( 0x80, 0x80, "$2001-7") PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(    0x80, "H" )
+	PORT_DIPSETTING(    0x00, "L" )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
