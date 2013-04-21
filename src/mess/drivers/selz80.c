@@ -36,15 +36,25 @@ class selz80_state : public driver_device
 {
 public:
 	selz80_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_p_ram(*this, "ram")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
+	DECLARE_MACHINE_RESET(dagz80);
 	UINT8 m_digit;
 	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<UINT8> m_p_ram;
 };
+
+static ADDRESS_MAP_START(dagz80_mem, AS_PROGRAM, 8, selz80_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xe000, 0xffff) AM_RAM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(selz80_mem, AS_PROGRAM, 8, selz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -110,6 +120,14 @@ RG EN SA SD     0(AF)  1(BC)  2(DE)  3(HL)
 INPUT_PORTS_END
 
 
+MACHINE_RESET_MEMBER(selz80_state, dagz80)
+{
+	UINT8* rom = memregion("user1")->base();
+	UINT16 size = memregion("user1")->bytes();
+	memcpy(m_p_ram, rom, size);
+	m_maincpu->reset();
+}
+
 WRITE8_MEMBER( selz80_state::scanlines_w )
 {
 	m_digit = data;
@@ -157,15 +175,32 @@ static MACHINE_CONFIG_START( selz80, selz80_state )
 	MCFG_I8279_ADD("i8279", 2500000, selz80_intf) // based on divider
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( dagz80, selz80 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dagz80_mem)
+	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, dagz80 )
+MACHINE_CONFIG_END
+
+
 /* ROM definition */
 ROM_START( selz80 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1))
+	ROM_SYSTEM_BIOS(0, "v3.3", "V3.3")
+	ROMX_LOAD( "z80-trainer.rom", 0x0000, 0x1000, CRC(eed1755f) SHA1(72e6ebfccb0e50034660bc36db1a741932311ce1), ROM_BIOS(1)) // (c)TEL86/V3.3
+	ROM_SYSTEM_BIOS(1, "v3.2", "V3.2")
+	ROMX_LOAD( "moniz80_3.2_04.12.1985.bin", 0x0000, 0x1000, CRC(3a3cf574) SHA1(ba6cd2276ce66f3a4545baf4d396f6c06d51dc38), ROM_BIOS(2)) // (c)SEL85/V3.2
 	ROM_LOAD( "term80-a000.bin", 0xa000, 0x2000, CRC(0a58c0a7) SHA1(d1b4b3b2ad0d084175b1ff6966653d8b20025252))
 	ROM_LOAD( "term80-e000.bin", 0xe000, 0x2000, CRC(158e08e6) SHA1(f1add43bcf8744a01238fb893ee284872d434db5))
 ROM_END
 
+ROM_START( dagz80 )
+	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "moni_1.5_15.08.1988.bin", 0x0000, 0x2000, CRC(318AEE6E) SHA1(c698fdee401b88e673791aabcba6a9628938a075) )
+ROM_END
+
+
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, selz80,  0,       0,     selz80,    selz80, driver_device,   0,       "SEL", "SEL Z80 Trainer", GAME_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS,       INIT COMPANY   FULLNAME       FLAGS */
+COMP( 1985, selz80,  0,       0,     selz80,    selz80, driver_device, 0, "SEL", "SEL Z80 Trainer", GAME_NO_SOUND_HW)
+COMP( 1988, dagz80, selz80,   0,     dagz80,    selz80, driver_device, 0, "DAG", "DAG Z80 Trainer", GAME_NO_SOUND_HW)
