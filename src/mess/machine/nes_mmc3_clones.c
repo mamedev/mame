@@ -2496,7 +2496,7 @@ WRITE8_MEMBER(nes_bmc_411120c_device::write_m)
 
 void nes_bmc_830118c_device::prg_cb(int start, int bank)
 {
-	if (m_reg & 0x0c != 0x0c)
+	if ((m_reg & 0x0c) != 0x0c)
 		prg8_x(start, (bank & 0x0f) | ((m_reg & 0x0c) << 2));
 	else
 	{

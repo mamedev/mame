@@ -1064,7 +1064,7 @@ WRITE8_MEMBER(nes_whero_device::write_h)
 
 		case 0x1002:
 		case 0x1080:
-			if (m_reg != data & 2)
+			if (m_reg != (data & 2))
 			{
 				m_reg = data & 2;
 				// swap banks!
@@ -1126,7 +1126,7 @@ WRITE8_MEMBER(nes_43272_device::write_h)
 {
 	LOG_MMC(("unl_43272 write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (m_latch & 0x81 == 0x81)
+	if ((m_latch & 0x81) == 0x81)
 		prg32((m_latch & 0x38) >> 3);
 
 	m_latch = offset & 0xffff;

@@ -271,11 +271,11 @@ READ8_MEMBER(nes_jy_typea_device::read_l)
 	}
 	if (offset >= 0x1800)
 	{
-		if ((offset & 3) & 3 == 0)
+		if ((offset & 3) == 0)
 			return (m_mul[0] * m_mul[1]) & 0xff;
-		if ((offset & 3) & 3 == 1)
+		if ((offset & 3) == 1)
 			return ((m_mul[0] * m_mul[1]) >> 8) & 0xff;
-		if ((offset & 3) & 3 == 3)
+		if ((offset & 3) == 3)
 			return m_latch;
 	}
 	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
@@ -290,9 +290,9 @@ WRITE8_MEMBER(nes_jy_typea_device::write_l)
 	{
 		if ((offset & 3) == 0)
 			m_mul[0] = data;
-		if ((offset & 3) & 3 == 1)
+		if ((offset & 3) == 1)
 			m_mul[1] = data;
-		if ((offset & 3) & 3 == 3)
+		if ((offset & 3) == 3)
 			m_latch = data;
 	}
 }
