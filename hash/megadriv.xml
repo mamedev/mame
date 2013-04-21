@@ -29392,6 +29392,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="biohaz3s" cloneof="bodyco">
+		<description>Biohazard 3 - SARS war (Pirate)</description>
+		<year>200?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="biohazard 3 sars war.bin" size="1048576" crc="cbb66063" sha1="27ab663dbc4bc16f49e91a0435a4cba31b4c95d0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bomber">
 		<description>Bomber</description>
 		<year>2005</year>
@@ -29599,6 +29610,28 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="fifa 2003 (unl).bin" size="2097152" crc="419bcb02" sha1="8dc04a0f137323ec95d6c7dfa9cb03fa572bdc51" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa2k5" cloneof="fifa98">
+		<description>FIFA 2005 (Pirate)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fifa 2005.bin" size="2097152" crc="19aa7bd3" sha1="490043fb6b374b803424f4768a3ba49d76f0e47a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa2k6" cloneof="fifa98">
+		<description>FIFA World Cup - Germany 2006 (Pirate)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fifa 2006.bin" size="2097152" crc="e3f2651d" sha1="26f5ca0d9976755d4a18ef95feef7c965fbf12bc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -30032,6 +30065,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="pokemon crazy drummer (unl) [a].bin" size="2097152" crc="84f49061" sha1="5d8122e9aa855ad2fd7cd0f94cbb79d3dc37c6b9" offset="00000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmang2k5" cloneof="premierm">
+		<description>Premier Manager - English Premier League 2005 (Pirate)</description>
+		<year>199?</year>
+		<publisher>Glorysun</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="premier manager 2005.bin" size="1048576" crc="42e123b2" sha1="5450d3c8289047e384821658beabc471142bf967" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

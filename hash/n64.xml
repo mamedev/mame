@@ -6092,6 +6092,17 @@ Canceled games (possibly never got to the proto stage)
 	</software>
 
 	<software name="blitz2k">
+		<description>NFL Blitz 2000 (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="nfl blitz 2000 (usa) v1.1.bin" size="16777216" crc="f77108c0" sha1="2041bc6ebc6bfd412640a14d236a279b07cae616" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blitz2ka" cloneof="blitz2k">
 		<description>NFL Blitz 2000 (USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
