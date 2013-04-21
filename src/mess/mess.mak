@@ -1400,7 +1400,48 @@ $(MESSOBJ)/next.a:              \
 	$(MESS_MACHINE)/nextmo.o    \
 
 $(MESSOBJ)/nintendo.a:          \
-	$(MESS_MACHINE)/nes_mmc.o   \
+	$(MESS_MACHINE)/nes_nxrom.o  \
+	$(MESS_MACHINE)/nes_mmc1.o  \
+	$(MESS_MACHINE)/nes_mmc2.o  \
+	$(MESS_MACHINE)/nes_mmc3.o  \
+	$(MESS_MACHINE)/nes_mmc3_clones.o  \
+	$(MESS_MACHINE)/nes_mmc5.o  \
+	$(MESS_MACHINE)/nes_ave.o  \
+	$(MESS_MACHINE)/nes_bandai.o  \
+	$(MESS_MACHINE)/nes_benshieng.o  \
+	$(MESS_MACHINE)/nes_bootleg.o  \
+	$(MESS_MACHINE)/nes_camerica.o  \
+	$(MESS_MACHINE)/nes_cne.o  \
+	$(MESS_MACHINE)/nes_cony.o  \
+	$(MESS_MACHINE)/nes_discrete.o  \
+	$(MESS_MACHINE)/nes_event.o  \
+	$(MESS_MACHINE)/nes_ggenie.o  \
+	$(MESS_MACHINE)/nes_hes.o  \
+	$(MESS_MACHINE)/nes_henggedianzi.o  \
+	$(MESS_MACHINE)/nes_hosenkan.o  \
+	$(MESS_MACHINE)/nes_irem.o  \
+	$(MESS_MACHINE)/nes_jaleco.o  \
+	$(MESS_MACHINE)/nes_jy.o  \
+	$(MESS_MACHINE)/nes_kaiser.o  \
+	$(MESS_MACHINE)/nes_konami.o  \
+	$(MESS_MACHINE)/nes_legacy.o  \
+	$(MESS_MACHINE)/nes_multigame.o  \
+	$(MESS_MACHINE)/nes_namcot.o  \
+	$(MESS_MACHINE)/nes_nanjing.o  \
+	$(MESS_MACHINE)/nes_ntdec.o  \
+	$(MESS_MACHINE)/nes_pirate.o  \
+	$(MESS_MACHINE)/nes_pt554.o  \
+	$(MESS_MACHINE)/nes_racermate.o  \
+	$(MESS_MACHINE)/nes_rcm.o  \
+	$(MESS_MACHINE)/nes_rexsoft.o  \
+	$(MESS_MACHINE)/nes_sachen.o  \
+	$(MESS_MACHINE)/nes_somari.o  \
+	$(MESS_MACHINE)/nes_tengen.o  \
+	$(MESS_MACHINE)/nes_txc.o  \
+	$(MESS_MACHINE)/nes_sunsoft.o  \
+	$(MESS_MACHINE)/nes_sunsoft_dcs.o  \
+	$(MESS_MACHINE)/nes_taito.o  \
+	$(MESS_MACHINE)/nes_waixing.o  \
 	$(MESS_MACHINE)/nes_slot.o  \
 	$(MESS_VIDEO)/nes.o         \
 	$(MESS_MACHINE)/nes.o       \
@@ -2136,7 +2177,7 @@ $(MESS_VIDEO)/gba.o:        $(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbamode2.c \
 				$(MESSSRC)/video/gbam345.c
 
-$(MESS_MACHINE)/nes_mmc.o:  $(MESSSRC)/machine/nes_ines.c \
+$(MESS_MACHINE)/nes_slot.o:  $(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_pcb.c \
 				$(MESSSRC)/machine/nes_unif.c \
 

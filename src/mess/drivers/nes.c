@@ -11,12 +11,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "cpu/m6502/n2a03.h"
 #include "sound/nes_apu.h"
 #include "imagedev/flopdrv.h"
 #include "formats/nes_dsk.h"
+
+#include "machine/nes_slot.h"
 
 
 READ8_MEMBER(nes_state::psg_4015_r)
@@ -487,15 +488,11 @@ static const nes_cart_interface nes_crt_interface =
 {
 };
 
-static SLOT_INTERFACE_START(nes_cart)
-	SLOT_INTERFACE("rom",  NES_ROM)
-SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( nes, nes_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nes_map)
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.098)
@@ -511,7 +508,7 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	MCFG_PALETTE_LENGTH(4*16*8)
 
-	MCFG_PPU2C02_ADD( "ppu", nes_ppu_interface )
+	MCFG_PPU2C02_ADD("ppu", nes_ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* sound hardware */
@@ -522,16 +519,17 @@ static MACHINE_CONFIG_START( nes, nes_state )
 
 	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","nes")
+	MCFG_SOFTWARE_LIST_ADD("ntb_list","nes_ntbrom") // Nantettate Baseball mini_carts
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nespal, nes )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( PAL_CLOCK )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(PAL_CLOCK)
 
-	MCFG_DEVICE_REMOVE( "ppu" )
-	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_DEVICE_REMOVE("ppu")
+	MCFG_PPU2C07_ADD("ppu", nes_ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */
@@ -553,8 +551,8 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 
-	MCFG_DEVICE_REMOVE( "ppu" )
-	MCFG_PPU2C07_ADD( "ppu", nes_ppu_interface )
+	MCFG_DEVICE_REMOVE("ppu")
+	MCFG_PPU2C07_ADD("ppu", nes_ppu_interface)
 	MCFG_PPU2C0X_SET_NMI(nes_state, ppu_nmi)
 
 	/* video hardware */
@@ -569,8 +567,8 @@ static MACHINE_CONFIG_DERIVED( dendy, nes )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( famicom, nes )
-	MCFG_DEVICE_REMOVE( "nes_slot" )
-	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL) // here we need a non-mandatory cart...
+	MCFG_DEVICE_REMOVE("nes_slot")
+	MCFG_NES_CARTRIDGE_ADD("nes_slot", nes_crt_interface, nes_cart, NULL, NULL)
 	MCFG_NES_CARTRIDGE_NOT_MANDATORY
 
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, nes_floppy_interface)
@@ -581,34 +579,26 @@ MACHINE_CONFIG_END
 /* rom regions are just place-holders: they get removed and re-allocated when a cart is loaded */
 ROM_START( nes )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( nespal )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( famicom )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
 	ROM_LOAD_OPTIONAL( "disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62) )
-
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( famitwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM */
 	ROM_LOAD_OPTIONAL( "disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) )
-
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( m82 )
 	ROM_REGION( 0x14000, "maincpu", 0 )  /* Main RAM + program banks */
 	/* Banks to be mapped at 0xe000? More investigations needed... */
 	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
-
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 // see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
@@ -620,13 +610,10 @@ ROM_START( drpcjr )
 	ROM_LOAD("drpcjr_bios.bin", 0x10000, 0x8000, CRC(c8fbef89) SHA1(2cb0a817b31400cdf27817d09bae7e69f41b062b) ) // bios vers. 1.0a
 	// Not sure if we should support this: hacked version 1.5a by Chris Covell with bugfixes and GameGenie support
 //  ROM_LOAD("drpcjr_v1_5_gg.bin", 0x10000, 0x8000, CRC(98f2033b) SHA1(93c114da787a19279d1a46667c2f69b49e25d4f1) )
-
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( dendy )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM */
-	ROM_REGION( 0x800,   "ciram", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 

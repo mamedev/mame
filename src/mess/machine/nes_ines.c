@@ -6,175 +6,26 @@
 
 ****************************************************************************************/
 
+
+/* Set to generate prg & chr files when the cart is loaded */
+#define SPLIT_PRG   0
+#define SPLIT_CHR   0
+
+
+/*************************************************************
+
+ mmc_list
+
+ Supported mappers and corresponding pcb id
+
+ *************************************************************/
+
 struct nes_mmc
 {
 	int    iNesMapper; /* iNES Mapper # */
 	int    pcb_id;
 };
 
-/*************************************************************
-
-    Mapper 6
-
-    Known Boards: FFE4 Copier Board
-    Games: Hacked versions of games
-
-    In MESS: Supported? Not sure if we could also have ExRAM or not...
-       However, priority is pretty low for this mapper.
-
-*************************************************************/
-
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
-we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
-there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-
-void nes_state::ffe_irq( int scanline, int vblank, int blanked )
-{
-	// 114 is the number of cycles per scanline
-	// TODO: change to reflect the actual number of cycles spent
-	if (m_IRQ_enable)
-	{
-		if ((0xffff - m_IRQ_count) < 114)
-		{
-			m_maincpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_IRQ_count = 0xffff;
-			m_IRQ_enable = 0;
-		}
-		m_IRQ_count -= 114;
-	}
-}
-
-WRITE8_MEMBER(nes_carts_state::mapper6_l_w)
-{
-	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset)
-	{
-		case 0x1fe:
-			m_mmc_latch1 = data & 0x80;
-			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-			break;
-		case 0x1ff:
-			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-
-		case 0x401:
-			m_IRQ_enable = data & 0x01;
-			break;
-		case 0x402:
-			m_IRQ_count = (m_IRQ_count & 0xff00) | data;
-			break;
-		case 0x403:
-			m_IRQ_enable = 1;
-			m_IRQ_count = (m_IRQ_count & 0x00ff) | (data << 8);
-			break;
-	}
-}
-
-WRITE8_MEMBER(nes_carts_state::mapper6_w)
-{
-	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
-
-	if (!m_mmc_latch1)  // when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
-	{
-		prg16_89ab(data >> 2);
-		// chr8(data & 0x03, ???);
-		// due to lack of info on the exact behavior, we simply act as if mmc_latch1=1
-		if (m_mmc_chr_source == CHRROM)
-			chr8(data & 0x03, CHRROM);
-	}
-	else if (m_mmc_chr_source == CHRROM)            // otherwise, we can use CHRROM (when present)
-		chr8(data, CHRROM);
-}
-
-/*************************************************************
-
-    Mapper 8
-
-    Known Boards: FFE3 Copier Board
-    Games: Hacked versions of games
-
-    In MESS: Supported? (I have no games to test this)
-
-*************************************************************/
-
-WRITE8_MEMBER(nes_carts_state::mapper8_w)
-{
-	LOG_MMC(("mapper8_w, offset: %04x, data: %02x\n", offset, data));
-
-	chr8(data & 0x07, CHRROM);
-	prg16_89ab(data >> 3);
-}
-
-/*************************************************************
-
-    Mapper 17
-
-    Known Boards: FFE8 Copier Board
-    Games: Hacked versions of games
-
-    In MESS: Supported?. IRQ support is just a guess (used to
-      use MMC3 IRQ but it was wrong and it never enabled it)
-
-*************************************************************/
-
-WRITE8_MEMBER(nes_carts_state::mapper17_l_w)
-{
-	LOG_MMC(("mapper17_l_w, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset)
-	{
-		case 0x1fe:
-			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-			break;
-		case 0x1ff:
-			set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-
-		case 0x401:
-			m_IRQ_enable = data & 0x01;
-			break;
-		case 0x402:
-			m_IRQ_count = (m_IRQ_count & 0xff00) | data;
-			break;
-		case 0x403:
-			m_IRQ_enable = 1;
-			m_IRQ_count = (m_IRQ_count & 0x00ff) | (data << 8);
-			break;
-
-		case 0x404:
-			prg8_89(data);
-			break;
-		case 0x405:
-			prg8_ab(data);
-			break;
-		case 0x406:
-			prg8_cd(data);
-			break;
-		case 0x407:
-			prg8_ef(data);
-			break;
-
-		case 0x410:
-		case 0x411:
-		case 0x412:
-		case 0x413:
-		case 0x414:
-		case 0x415:
-		case 0x416:
-		case 0x417:
-			chr1_x(offset & 7, data, CHRROM);
-			break;
-	}
-}
-
-/*************************************************************
-
-    mmc_list
-
-    Supported mappers and corresponding pcb id
-
-*************************************************************/
 
 static const nes_mmc mmc_list[] =
 {
@@ -185,18 +36,18 @@ static const nes_mmc mmc_list[] =
 	{  3, STD_CNROM },
 	{  4, STD_TXROM },
 	{  5, STD_EXROM },
-	{  6, FFE_MAPPER6 },
+	{  6, FFE4_BOARD },
 	{  7, STD_AXROM },
-	{  8, FFE_MAPPER8 },
+	{  8, FFE3_BOARD },
 	{  9, STD_PXROM },
 	{ 10, STD_FXROM },
 	{ 11, DIS_74X377 },
 	{ 12, REXSOFT_DBZ5 },
 	{ 13, STD_CPROM },
 	{ 14, REXSOFT_SL1632 },
-	{ 15, WAIXING_PS2 },
-	{ 16, BANDAI_LZ93EX },  // with 24c02
-	{ 17, FFE_MAPPER17 },
+	{ 15, WAIXING_WXZS2 },
+	{ 16, BANDAI_LZ93EX2 },  // with 24c02
+	{ 17, FFE8_BOARD },
 	{ 18, JALECO_SS88006 },
 	{ 19, NAMCOT_163 },
 	{ 21, KONAMI_VRC4 },
@@ -205,6 +56,7 @@ static const nes_mmc mmc_list[] =
 	{ 24, KONAMI_VRC6 },
 	{ 25, KONAMI_VRC4 },
 	{ 26, KONAMI_VRC6 },
+	{ 27, UNL_WORLDHERO },
 	// 27 World Hero board - Unsupported
 	// 28 Unused
 	// 29 Unused
@@ -214,13 +66,13 @@ static const nes_mmc mmc_list[] =
 	{ 33, TAITO_TC0190FMC },
 	{ 34, STD_BXROM },
 	{ 35, UNL_SC127 },
-	{ 36, TXC_STRIKEWOLF },
+	{ 36, TXC_STRIKEW },
 	{ 37, PAL_ZZ },
 	{ 38, DIS_74X161X138 },
 	{ 39, UNL_STUDYNGAME },
-	{ 40, BTL_SMB2A },
+	{ 40, BTL_SMB2JA },
 	{ 41, CALTRON_6IN1 },
-	{ 42, BTL_MARIOBABY },  // ai senshi nicol?
+	{ 42, BTL_MARIOBABY },  // ai senshi nicole too, changed by crc_hack
 	{ 43, UNL_SMB2J },
 	{ 44, BMC_SUPERBIG_7IN1 },
 	{ 45, BMC_HIK8IN1 },
@@ -228,26 +80,26 @@ static const nes_mmc mmc_list[] =
 	{ 47, NES_QJ },
 	{ 48, TAITO_TC0190FMCP },
 	{ 49, BMC_SUPERHIK_4IN1 },
-	{ 50, BTL_SMB2B },
+	{ 50, BTL_SMB2JB },
 	{ 51, BMC_BALLGAMES_11IN1 },
 	{ 52, BMC_GOLD_7IN1 },
-	// 53 Supervision 16-in-1 - Unsupported
-	{ 54, BMC_NOVELDIAMOND },
+	{ 53, SVISION16_BOARD },
+	{ 54, BMC_NOVEL1 },
 	// 55 Genius SMB - No info (nor images) available
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
 	// 59 Unused
 	// 60 4-in-1, 35-in-1 Reset based
-	{ 61, RCM_TETRISFAMILY },
+	{ 61, RCM_TF9IN1 },
 	{ 62, BMC_SUPER_700IN1 },
-	// 63 CH001 X-in-1 - No info (nor images) available
+	{ 63, BMC_CH001 },  // Powerful 255
 	{ 64, TENGEN_800032 },
 	{ 65, IREM_H3001 },
 	{ 66, STD_GXROM },
 	{ 67, SUNSOFT_3 },
-	{ 68, STD_NXROM },
-	{ 69, STD_JXROM },
+	{ 68, SUNSOFT_DCS },
+	{ 69, SUNSOFT_FME7 },
 	{ 70, DIS_74X161X161X32 },
 	{ 71, CAMERICA_BF9093 },
 	{ 72, JALECO_JF17 },
@@ -256,7 +108,7 @@ static const nes_mmc mmc_list[] =
 	{ 75, KONAMI_VRC1 },
 	{ 76, NAMCOT_3446 },
 	{ 77, IREM_LROG017 },
-	{ 78, IREM_HOLYDIV },
+	{ 78, IREM_HOLYDIVR },
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
 	// 81 Unused
@@ -268,7 +120,7 @@ static const nes_mmc mmc_list[] =
 	{ 87, DIS_74X139X74 },
 	{ 88, NAMCOT_34X3 },
 	{ 89, SUNSOFT_2 },
-	// 90 JY Company Type A (Aladdin, Final Fight 3, Super Mario World, Tekken 2) - Unsupported
+	{ 90, JYCOMPANY_A },
 	{ 91, UNL_MK2 },
 	{ 92, JALECO_JF19 },
 	{ 93, SUNSOFT_2 },
@@ -281,9 +133,10 @@ static const nes_mmc mmc_list[] =
 	// 100 images hacked to work with nesticle?
 	// 101 Unused (Urusei Yatsura had been assigned to this mapper, but it's Mapper 87)
 	// 102 Unused
+	{ 103, UNL_2708 },
 	// 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
 	{ 104, CAMERICA_GOLDENFIVE },
-	// 105 Nintendo World Championship - Unsupported
+	{ 105, STD_EVENT },
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
 	{ 108, WHIRLWIND_2706 },
@@ -294,12 +147,12 @@ static const nes_mmc mmc_list[] =
 	{ 113, HES_BOARD },
 	{ 114, SUPERGAME_LIONKING },
 	{ 115, KASING_BOARD },
-	{ 116, SOMERI_SL12 },
+	{ 116, SOMARI_SL12 },
 	{ 117, FUTUREMEDIA_BOARD },
 	{ 118, STD_TXSROM },
 	{ 119, STD_TQROM },
 	{ 120, BTL_TOBIDASE },
-	{ 121, KAY_PANDAPRINCE },
+	{ 121, KAY_BOARD },
 	// 122 Unused
 	{ 123, UNL_H2288 },
 	// 124 Unused
@@ -310,9 +163,9 @@ static const nes_mmc mmc_list[] =
 	// 129 Unused
 	// 130 Unused
 	// 131 Unused
-	{ 132, TXC_22211B },
+	{ 132, TXC_22211 },
 	{ 133, SACHEN_SA72008 },
-	{ 134, BMC_FAMILY_4646B },
+	{ 134, BMC_FAMILY_4646 },
 	// 135 Unused
 	{ 136, SACHEN_TCU02 },
 	{ 137, SACHEN_8259D },
@@ -332,12 +185,12 @@ static const nes_mmc mmc_list[] =
 	// 151 VS. system by Konami - Not going to be implemented (use MAME instead)
 	{ 152, DIS_74X161X161X32 },
 	{ 153, BANDAI_LZ93 },
-	{ 154, NAMCOT_3453 },
+	{ 154, NAMCOT_34X3 },
 	{ 155, STD_SXROM_A }, // diff compared to MMC1 concern WRAM
 	{ 156, OPENCORP_DAOU306 },
 	{ 157, BANDAI_DATACH }, // no Datach Reader -> we fall back to mapper 16
 	{ 158, TENGEN_800037 },
-	{ 159, BANDAI_LZ93EX }, // with 24c01
+	{ 159, BANDAI_LZ93EX1 }, // with 24c01
 	{ 160, SACHEN_SA009 },
 	// 161 Unused
 	// 162 Unused
@@ -350,18 +203,18 @@ static const nes_mmc mmc_list[] =
 	// 169 Unused
 	// 170 Fujiya
 	{ 171, KAISER_KS7058 },
-	{ 172, TXC_22211B },
-	{ 173, TXC_22211C },
+	{ 172, TXC_DUMARACING },
+	{ 173, TXC_MJBLOCK },
 	// 174 Unused
 	{ 175, KAISER_KS7022},
-	{ 176, UNL_XZY },
-	{ 177, HENGEDIANZI_BOARD },
+	{ 176, UNL_XIAOZY },
+	{ 177, HENGG_SRICH },
 	{ 178, WAIXING_SGZLZ },
-	{ 179, HENGEDIANZI_XJZB },
+	{ 179, HENGG_XHZS },
 	{ 180, UXROM_CC },
 	// 181 Unused
 	{ 182, HOSENKAN_BOARD },
-	// 183 FDS bootleg (Shui Guan Pipe) - Unsupported
+	{ 183, BTL_SHUIGUAN },
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
 	{ 186, FUKUTAKE_BOARD },
@@ -374,8 +227,8 @@ static const nes_mmc mmc_list[] =
 	{ 193, NTDEC_FIGHTINGHERO },
 	{ 194, WAIXING_TYPE_D },
 	{ 195, WAIXING_TYPE_E },
-	{ 196, BTL_SUPERBROS11 },
-	{ 197, UNL_SUPERFIGHTER3 },
+	{ 196, BTL_SBROS11 },
+	{ 197, UNL_SF3 },
 	{ 198, WAIXING_TYPE_F },
 	{ 199, WAIXING_TYPE_G },
 	{ 200, BMC_36IN1 },
@@ -384,20 +237,20 @@ static const nes_mmc mmc_list[] =
 	{ 203, BMC_35IN1 },
 	{ 204, BMC_64IN1 },
 	{ 205, BMC_15IN1 },
-	{ 206, STD_DXROM },
-	{ 207, TAITO_X1_005_A },
+	{ 206, NAMCOT_34X3 },
+	{ 207, TAITO_X1_005 },
 	{ 208, GOUDER_37017 },
-	// 209 JY Company Type B (Power Rangers 3 & 4, Shin Samurai Spirits 2) - Unsupported
-	// 210 Some emu uses this as Mapper 19 without some features
-	// 211 JY Company Type C (Tiny Toon Adventures 6, Donkey Kong Country 4) - Unsupported
+	{ 209, JYCOMPANY_C },
+	{ 210, NAMCOT_175 },
+	{ 211, JYCOMPANY_B },
 	{ 212, BMC_SUPERHIK_300IN1 },
-	{ 213, BMC_9999999IN1 },
+	{ 213, BMC_NOVEL2 },
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, SUPERGAME_BOOGERMAN },
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_GOLDENCARD_6IN1 },
 	// 218 Unused
-	// 219 Bootleg A9746 - Unsupported
+	{ 216, UNL_A9746 },
 	// 220 Unused
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },
@@ -411,17 +264,18 @@ static const nes_mmc mmc_list[] =
 	{ 230, BMC_22GAMES },
 	{ 231, BMC_20IN1 },
 	{ 232, CAMERICA_BF9096 },
-	// 233 Super 22 Games - Unsupported
-	// 234 AVE Maxi 15 - Unsupported
+	{ 233, BMC_SUPER22 },
+	{ 234, AVE_MAXI15 },
+	{ 235, BMC_GOLD150 },
 	// 235 Golden Game x-in-1 - Unsupported
 	// 236 Game 800-in-1 - Unsupported
 	// 237 Unused
 	{ 238, UNL_603_5052 },
 	// 239 Unused
 	{ 240, CNE_SHLZ },
-	{ 241, TXC_MXMDHTWO },
-	{ 242, WAIXING_ZS },
-	{ 243, SACHEN_74LS374_A },
+	{ 241, TXC_COMMANDOS },
+	{ 242, WAIXING_WXZS },
+	{ 243, SACHEN_74LS374_ALT },
 	{ 244, CNE_DECATHLON },
 	{ 245, WAIXING_TYPE_H },
 	{ 246, CNE_FSB },
@@ -449,6 +303,7 @@ const nes_mmc *nes_mapper_lookup( int mapper )
 	return NULL;
 }
 
+#if 0
 int nes_get_mmc_id( running_machine &machine, int mapper )
 {
 	const nes_mmc *mmc = nes_mapper_lookup(mapper);
@@ -457,4 +312,480 @@ int nes_get_mmc_id( running_machine &machine, int mapper )
 		fatalerror("Unimplemented Mapper %d\n", mapper);
 
 	return mmc->pcb_id;
+}
+#endif
+
+/*************************************************************
+
+ ines_mapr_setup
+
+ setup the board specific pcb_id for a given mapper
+
+ *************************************************************/
+
+void ines_mapr_setup( int mapper, int *pcb_id )
+{
+	const nes_mmc *mmc = nes_mapper_lookup(mapper);
+	if (mmc == NULL)
+		fatalerror("Unimplemented Mapper %d\n", mapper);
+
+	*pcb_id = mmc->pcb_id;
+}
+
+/*************************************************************
+
+ call_load_ines
+
+ *************************************************************/
+
+void nes_cart_slot_device::call_load_ines()
+{
+	UINT32 vram_size = 0, prgram_size = 0, battery_size = 0, mapper_sram_size = 0;
+	UINT32 prg_size, vrom_size;
+	UINT8 header[0x10];
+	UINT8 mapper, local_options;
+	bool ines20 = FALSE, prg16k;
+	const char *mapinfo = NULL;
+	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
+	int crc_hack = 0;
+
+	// check if the image is recognized by nes.hsi
+	mapinfo = hashfile_extrainfo(*this);
+
+	// read out the header
+	fseek(0, SEEK_SET);
+	fread(&header, 0x10);
+
+	// SETUP step 1: getting PRG, VROM, VRAM sizes
+	prg16k = (header[4] == 1);
+	prg_size = prg16k ? 2 * 0x4000 : header[4] * 0x4000;
+	vrom_size = header[5] * 0x2000;
+	vram_size = 0x4000;
+
+	// SETUP step 2: getting PCB and other settings
+	mapper = (header[6] & 0xf0) >> 4;
+	local_options = header[6] & 0x0f;
+
+	switch (header[7] & 0xc)
+	{
+		case 0x4:
+		case 0xc:
+			// probably the header got corrupted: don't trust upper bits for mapper
+			break;
+
+		case 0x8:   // it's iNES 2.0 format
+			ines20 = TRUE;
+		case 0x0:
+		default:
+			mapper |= header[7] & 0xf0;
+			break;
+	}
+
+	// use info from nes.hsi if available!
+	if (mapinfo)
+	{
+		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		{
+			/* image is present in nes.hsi: overwrite the header settings with these */
+			mapper = mapint1;
+			local_options = mapint2 & 0x0f;
+			crc_hack = (mapint2 & 0xf0) >> 4; // this is used to differentiate among variants of the same Mapper (see below)
+			prg16k = (mapint3 == 1);
+			prg_size = prg16k ? 2 * 0x4000 : mapint3 * 0x4000;
+			vrom_size = mapint4 * 0x2000;
+			logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
+		}
+		else
+		{
+			logerror("NES: [%s], Invalid mapinfo found\n", mapinfo);
+		}
+	}
+	else
+	{
+		logerror("NES: No extrainfo found\n");
+	}
+
+	// use extended iNES2.0 info if available!
+	if (ines20)
+	{
+		mapper |= (header[8] & 0x0f) << 8;
+		// header[8] & 0xf0 is used for submappers, but I haven't found any specific image to implement this
+		prg_size += ((header[9] & 0x0f) << 8) * 0x4000;
+		vrom_size += ((header[9] & 0xf0) << 4) * 0x2000;
+	}
+	ines_mapr_setup(mapper, &pcb_id);
+
+	// SETUP step 3: storing the info needed for emulation
+	m_pcb_id = pcb_id;
+	m_cart->set_mirroring(BIT(local_options, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	if (BIT(local_options, 1))
+		battery_size = NES_BATTERY_SIZE; // with original iNES format we can only support 8K WRAM battery
+	m_cart->set_trainer(BIT(local_options, 2) ? TRUE : FALSE);
+	m_cart->set_four_screen_vram(BIT(local_options, 3) ? TRUE : FALSE);
+
+	if (ines20)
+	{
+		// PRGRAM/BWRAM (not fully supported, also due to lack of 2.0 files)
+		if ((header[10] & 0x0f) > 0)
+			prgram_size = 0x80 << ((header[10] & 0x0f) - 1);
+		if ((header[10] & 0xf0) > 0)
+			battery_size = 0x80 << ((header[10] & 0xf0) - 5);
+		// VRAM
+		vram_size = 0;
+		if ((header[11] & 0x0f) > 0)
+			vram_size = 0x80 << ((header[11] & 0x0f) - 1);
+		// header[11] & 0xf0 is the size of battery backed VRAM, found so far in Racermate II only and not supported yet
+	}
+	else
+	{
+		// PRGRAM size is 8k for most games, but pirate carts often use different sizes,
+		// so its size has been added recently to the iNES format spec, but almost no image uses it
+		prgram_size = header[8] ? header[8] * 0x2000 : 0x2000;
+	}
+
+	// a few mappers correspond to multiple PCBs, so we need a few additional checks and tweaks
+	switch (m_pcb_id)
+	{
+		case STD_CNROM:
+			if (mapper == 185)
+			{
+				switch (crc_hack)
+				{
+					case 0x0: // pin26: CE, pin27: CE (B-Wings, Bird Week)
+						m_cart->set_ce(0x03, 0x03);
+						break;
+					case 0x4: // pin26: CE, pin27: /CE (Mighty Bomb Jack, Spy Vs. Spy)
+						m_cart->set_ce(0x03, 0x01);
+						break;
+					case 0x8: // pin26: /CE, pin27: CE (Sansu 1, 2, 3 Nen)
+						m_cart->set_ce(0x03, 0x02);
+						break;
+					case 0xc: // pin26: /CE, pin27: /CE (Seicross v2.0)
+						m_cart->set_ce(0x03, 0x00);
+						break;
+				}
+			}
+			break;
+
+		case KONAMI_VRC2:
+			if (mapper == 22)
+				m_cart->set_vrc_lines(0, 1, 1);
+			if (mapper == 23 && !crc_hack)
+				m_cart->set_vrc_lines(1, 0, 0);
+			if (mapper == 23 && crc_hack)
+			{
+				// here there are also Akumajou Special, Crisis Force, Parodius da!, Tiny Toons which are VRC-4
+				m_cart->set_vrc_lines(3, 2, 0);
+				m_pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
+			}
+			break;
+
+		case KONAMI_VRC4:
+			if (mapper == 21)   // Wai Wai World 2 & Ganbare Goemon Gaiden 2 (the latter with crc_hack)
+				m_cart->set_vrc_lines(crc_hack ? 7 : 2, crc_hack ? 6 : 1, 0);
+			if (mapper == 25)   // here there is also Ganbare Goemon Gaiden which is VRC-2
+				m_cart->set_vrc_lines(crc_hack ? 2 : 0, crc_hack ? 3 : 1, 0);
+			break;
+
+		case KONAMI_VRC6:
+			if (mapper == 24)
+				m_cart->set_vrc_lines(1, 0, 0);
+			if (mapper == 26)
+				m_cart->set_vrc_lines(0, 1, 0);
+			break;
+
+		case IREM_G101:
+			if (crc_hack)
+				m_cart->set_mirroring(PPU_MIRROR_HIGH); // Major League has hardwired mirroring
+			else
+				m_cart->set_pcb_ctrl_mirror(TRUE);
+			break;
+
+		case DIS_74X161X161X32:
+			if (mapper == 70)
+				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 70 & 152
+			else
+				m_cart->set_pcb_ctrl_mirror(TRUE);
+			break;
+
+		case SUNSOFT_2:
+			if (mapper == 93)
+				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 89 & 93
+			else
+				m_cart->set_pcb_ctrl_mirror(TRUE);
+			break;
+
+		case HES_BOARD:
+			if (crc_hack)
+				m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 113 is used for 2 diff boards
+			break;
+
+		case CAMERICA_BF9093:
+			if (crc_hack)
+				m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 71 is used for 2 diff boards
+			break;
+
+		case STD_BXROM:
+			if (crc_hack)
+				m_pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
+			break;
+
+		case BANDAI_LZ93:
+			if (crc_hack)
+				m_pcb_id = BANDAI_FJUMP2;   // Mapper 153 is used for 2 diff boards
+			break;
+
+		case IREM_HOLYDIVR:
+			if (crc_hack)
+				m_pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
+			break;
+
+		case WAIXING_WXZS:
+			if (crc_hack)
+				m_pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
+			break;
+
+		case BMC_GOLD_7IN1:
+			if (crc_hack)
+				m_pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
+			break;
+
+
+		case BTL_MARIOBABY:
+			if (crc_hack)
+				m_pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
+			break;
+
+		case TAITO_X1_017:
+			mapper_sram_size = m_cart->get_mapper_sram_size();
+			break;
+
+		case TAITO_X1_005:
+			if (mapper == 207)
+				m_cart->set_x1_005_alt(TRUE);
+			mapper_sram_size = m_cart->get_mapper_sram_size();
+			break;
+
+		case NAMCOT_163:
+			mapper_sram_size = m_cart->get_mapper_sram_size();
+			break;
+			//FIXME: we also have to fix Action 52 PRG loading somewhere...
+	}
+
+	// Finally turn off bus conflict emulation, because the pirate variants of the boards are bus conflict free and games would glitch
+	m_cart->set_bus_conflict(FALSE);
+
+	// SETUP step 4: logging what we have found
+	if (!ines20)
+	{
+		logerror("Loaded game in iNES format:\n");
+		logerror("-- Mapper %d\n", mapper);
+		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
+		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
+		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
+		if (battery_size)
+			logerror("-- Battery found\n");
+		if (m_cart->get_trainer())
+			logerror("-- Trainer found\n");
+		if (m_cart->get_four_screen_vram())
+			logerror("-- 4-screen VRAM\n");
+		logerror("-- TV System: %s\n", ((header[10] & 3) == 0) ? "NTSC" : (header[10] & 1) ? "Both NTSC and PAL" : "PAL");
+	}
+	else
+	{
+		logerror("Loaded game in Extended iNES format:\n");
+		logerror("-- Mapper: %d\n", mapper);
+		logerror("-- Submapper: %d\n", (header[8] & 0xf0) >> 4);
+		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
+		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
+		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
+		logerror("-- PRG NVWRAM: %d\n", header[10] & 0x0f);
+		logerror("-- PRG WRAM: %d\n", (header[10] & 0xf0) >> 4);
+		logerror("-- CHR NVWRAM: %d\n", header[11] & 0x0f);
+		logerror("-- CHR WRAM: %d\n", (header[11] & 0xf0) >> 4);
+		logerror("-- TV System: %s\n", (header[12] & 2) ? "Both NTSC and PAL" : (header[12] & 1) ? "PAL" : "NTSC");
+	}
+
+	// SETUP step 5: allocate pointers for PRG/VROM
+	if (prg_size)
+		m_cart->prg_alloc(machine(), prg_size);
+	if (vrom_size)
+		m_cart->vrom_alloc(machine(), vrom_size);
+
+	// if there is a trainer, skip it for the moment
+	if (m_cart->get_trainer())
+		fseek(0x210, SEEK_SET);
+
+	// SETUP step 6: at last load the data!
+	// Read in the program chunks
+	if (prg16k)
+	{
+		fread(m_cart->get_prg_base(), 0x4000);
+		memcpy(m_cart->get_prg_base() + 0x4000, m_cart->get_prg_base(), 0x4000);
+	}
+	else
+		fread(m_cart->get_prg_base(), m_cart->get_prg_size());
+#if SPLIT_PRG
+	{
+		FILE *prgout;
+		char outname[255];
+
+		sprintf(outname, "%s.prg", filename());
+		prgout = fopen(outname, "wb");
+		if (prgout)
+		{
+			fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
+			mame_printf_error("Created PRG chunk\n");
+		}
+
+		fclose(prgout);
+	}
+#endif
+
+	// Read in any chr chunks
+	if (m_cart->get_vrom_size())
+		fread(m_cart->get_vrom_base(), m_cart->get_vrom_size());
+
+#if SPLIT_CHR
+	if (state->m_chr_chunks > 0)
+	{
+		FILE *chrout;
+		char outname[255];
+
+		sprintf(outname, "%s.chr", filename());
+		chrout= fopen(outname, "wb");
+		if (chrout)
+		{
+			fwrite(m_cart->get_vrom_base(), 1, m_cart->get_vrom_size(), chrout);
+			mame_printf_error("Created CHR chunk\n");
+		}
+		fclose(chrout);
+	}
+#endif
+
+	// SETUP steps 7: allocate the remaining pointer, when needed
+	if (vram_size)
+		m_cart->vram_alloc(machine(), vram_size);
+	if (prgram_size || m_cart->get_trainer())
+	{
+		if (prgram_size)
+			m_cart->prgram_alloc(machine(), prgram_size);
+		else
+			m_cart->prgram_alloc(machine(), 0x2000);
+		if (m_cart->get_trainer())
+		{
+			fseek(0x10, SEEK_SET);
+			fread(m_cart->get_prgram_base() + 0x1000, 0x200);
+		}
+	}
+
+
+	// Attempt to load a battery file for this ROM
+	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
+	if (battery_size || mapper_sram_size)
+	{
+		UINT32 tot_size = battery_size + mapper_sram_size;
+		UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+		battery_load(temp_nvram, tot_size, 0x00);
+		if (battery_size)
+		{
+			m_cart->battery_alloc(machine(), battery_size);
+			memcpy(m_cart->get_battery_base(), temp_nvram, battery_size);
+		}
+		if (mapper_sram_size)
+			memcpy(m_cart->get_mapper_sram_base(), temp_nvram + battery_size, m_cart->get_mapper_sram_size());
+
+		if (temp_nvram)
+			auto_free(machine(), temp_nvram);
+	}
+}
+
+const char * nes_cart_slot_device::get_default_card_ines(UINT8 *ROM, UINT32 len)
+{
+	UINT8 mapper;
+	bool ines20 = FALSE;
+	const char *mapinfo = NULL;
+	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
+	int crc_hack = 0;
+
+	// check if the image is recognized by nes.hsi
+//  mapinfo = hashfile_extrainfo(*this);
+
+	mapper = (ROM[6] & 0xf0) >> 4;
+
+	switch (ROM[7] & 0xc)
+	{
+		case 0x4:
+		case 0xc:
+			// probably the header got corrupted: don't trust upper bits for mapper
+			break;
+
+		case 0x8:   // it's iNES 2.0 format
+			ines20 = TRUE;
+		case 0x0:
+		default:
+			mapper |= ROM[7] & 0xf0;
+			break;
+	}
+
+	// use info from nes.hsi if available!
+	if (mapinfo)
+	{
+		if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
+		{
+			/* image is present in nes.hsi: overwrite the header settings with these */
+			mapper = mapint1;
+			crc_hack = (mapint2 & 0xf0) >> 4; // this is used to differentiate among variants of the same Mapper (see below)
+		}
+	}
+
+	// use extended iNES2.0 info if available!
+	if (ines20)
+	{
+		mapper |= (ROM[8] & 0x0f) << 8;
+		// ROM[8] & 0xf0 is used for submappers, but I haven't found any specific image to implement this
+	}
+
+	ines_mapr_setup(mapper, &pcb_id);
+
+	// solve mapper conflicts
+	switch (pcb_id)
+	{
+		case KONAMI_VRC2:
+			if (mapper == 23 && crc_hack)
+				m_pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
+			break;
+
+		case STD_BXROM:
+			if (crc_hack)
+				m_pcb_id = AVE_NINA01; // Mapper 34 is used for 2 diff boards
+			break;
+
+		case BANDAI_LZ93:
+			if (crc_hack)
+				m_pcb_id = BANDAI_FJUMP2;   // Mapper 153 is used for 2 diff boards
+			break;
+
+		case IREM_HOLYDIVR:
+			if (crc_hack)
+				m_pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
+			break;
+
+		case WAIXING_WXZS:
+			if (crc_hack)
+				m_pcb_id = WAIXING_DQ8;    // Mapper 242 is used for 2 diff boards
+			break;
+
+		case BMC_GOLD_7IN1:
+			if (crc_hack)
+				m_pcb_id = BMC_MARIOPARTY_7IN1;    // Mapper 52 is used for 2 diff boards
+			break;
+
+		case BTL_MARIOBABY:
+			if (crc_hack)
+				m_pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
+			break;
+	}
+
+	return nes_get_slot(pcb_id);
 }
