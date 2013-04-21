@@ -125,6 +125,9 @@ enum
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
 	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_PSX_RAM_SIZE( size ) \
+	psxcpu_device::set_ram_size( *device, size );
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -144,12 +147,17 @@ public:
 	template<class _Object> static devcb2_base &set_spu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(object); }
+	static void set_ram_size(device_t &device, UINT32 size);
 
 	// public interfaces
-	DECLARE_WRITE32_MEMBER( biu_w );
-	DECLARE_READ32_MEMBER( biu_r );
 	DECLARE_WRITE32_MEMBER( berr_w );
 	DECLARE_READ32_MEMBER( berr_r );
+
+	DECLARE_WRITE32_MEMBER( ram_config_w );
+	DECLARE_READ32_MEMBER( ram_config_r );
+
+	DECLARE_WRITE32_MEMBER( biu_w );
+	DECLARE_READ32_MEMBER( biu_r );
 
 	DECLARE_WRITE32_MEMBER( gpu_w );
 	DECLARE_READ32_MEMBER( gpu_r );
@@ -166,10 +174,11 @@ public:
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 
 protected:
-	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
+	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_post_load();
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -232,6 +241,7 @@ protected:
 	UINT32 m_bad_byte_address_mask;
 	UINT32 m_bad_half_address_mask;
 	UINT32 m_bad_word_address_mask;
+	UINT32 m_ram_config;
 
 	void stop();
 	UINT32 cache_readword( UINT32 offset );
@@ -261,6 +271,7 @@ protected:
 	int execute_unstoppable_instructions( int executeCop2 );
 	void update_address_masks();
 	void update_scratchpad();
+	void update_ram_config();
 	void update_cop0( int reg );
 	void commit_delayed_load();
 	void set_pc( unsigned pc );
@@ -305,6 +316,8 @@ protected:
 	devcb2_write16 m_spu_write_handler;
 	devcb2_read8 m_cd_read_handler;
 	devcb2_write8 m_cd_write_handler;
+	UINT32 *m_ram;
+	UINT32 m_ram_size;
 };
 
 class cxd8530aq_device : public psxcpu_device

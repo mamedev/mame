@@ -486,11 +486,8 @@ void psx1_state::cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_MIRROR(0x00600000) AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_MIRROR(0x00600000) AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_MIRROR(0x00600000) AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
@@ -501,6 +498,7 @@ DRIVER_INIT_MEMBER(psx1_state,psx)
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_PSX_RAM_SIZE( 0x200000 )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
@@ -534,6 +532,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_PSX_RAM_SIZE( 0x200000 )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)

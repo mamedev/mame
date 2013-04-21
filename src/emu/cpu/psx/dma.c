@@ -73,11 +73,6 @@ void psxdma_device::device_start()
 
 	save_item( NAME(m_dpcp) );
 	save_item( NAME(m_dicr) );
-
-	/// TODO: access ram through the memory map
-	memory_share *share = machine().root_device().memshare("share1");
-	m_ram = (UINT32 *)share->ptr();
-	m_ramsize = share->bytes();
 }
 
 void psxdma_device::dma_start_timer( int index, UINT32 n_ticks )

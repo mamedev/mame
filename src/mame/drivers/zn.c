@@ -422,8 +422,6 @@ WRITE32_MEMBER(zn_state::coin_w)
 }
 
 static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
-	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
@@ -439,34 +437,13 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0x80400000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zn_8M_map, AS_PROGRAM, 32, zn_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
-	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
-	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
 	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_8M_r)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_WRITE(coin_w)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_NOP /* ?? */
-	AM_RANGE(0x1fa40000, 0x1fa40003) AM_READNOP /* ?? */
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa07fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
+	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
@@ -493,6 +470,7 @@ void zn_state::zn_driver_init(  )
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
@@ -520,6 +498,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
+	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
@@ -1469,6 +1448,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000w)
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_PSX_RAM_SIZE( 0x800000 )
 	MCFG_CPU_PROGRAM_MAP(zn_8M_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
