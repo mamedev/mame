@@ -245,9 +245,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 				for (int ch = 0; ch < 16; ch++)
 				{
 					if (data & (1 << ch))
-					{
 						m_channels[ch].is_playing = false;
-					}
 				}
 				break;
 
@@ -268,6 +266,7 @@ void i5000snd_device::write_reg16(UINT8 reg, UINT16 data)
 READ16_MEMBER( i5000snd_device::read )
 {
 	UINT16 ret = 0;
+	m_stream->update();
 
 	switch (offset)
 	{
