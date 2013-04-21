@@ -209,8 +209,9 @@ WRITE32_MEMBER(fruitpc_state::fdc_w)
 static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
+	AM_RANGE(0x000c0000, 0x000dffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_RAM AM_REGION("bios", 0)
-	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
+	AM_RANGE(0x00100000, 0x008fffff) AM_RAM  // 8MB RAM
 	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
@@ -571,7 +572,7 @@ ROM_START( fruitpc )
 	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) ) 
 
 	DISK_REGION( "drive_0" )	// 8 MB Compact Flash card
-	DISK_IMAGE_READONLY( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
+	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 
 GAME( 2006, fruitpc,  0, fruitpc, fruitpc, fruitpc_state,  fruitpc, ROT0, "Unknown", "Fruit", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
