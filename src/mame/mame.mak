@@ -787,6 +787,7 @@ $(MAMEOBJ)/gottlieb.a: \
 
 $(MAMEOBJ)/ibmpc.a: \
 	$(DRIVERS)/calchase.o \
+    $(DRIVERS)/fruitpc.o \
 	$(DRIVERS)/pangofun.o \
 	$(DRIVERS)/pcat_dyn.o \
 	$(DRIVERS)/pcat_nit.o \

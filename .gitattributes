@@ -2944,6 +2944,7 @@ src/mame/drivers/freekick.c svneol=native#text/plain
 src/mame/drivers/fresh.c svneol=native#text/plain
 src/mame/drivers/fromanc2.c svneol=native#text/plain
 src/mame/drivers/fromance.c svneol=native#text/plain
+src/mame/drivers/fruitpc.c svneol=native#text/plain
 src/mame/drivers/funkball.c svneol=native#text/plain
 src/mame/drivers/funkybee.c svneol=native#text/plain
 src/mame/drivers/funkyjet.c svneol=native#text/plain
