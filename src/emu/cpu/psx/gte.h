@@ -3,8 +3,6 @@
  *
  * Copyright 2003-2013 smf
  *
- * divider reverse engineering by pSXAuthor.
- *
  */
 
 #pragma once
