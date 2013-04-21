@@ -32,28 +32,28 @@ public:
 	int docop2( UINT32 pc, int gteop );
 
 protected:
-	class acc
+	class int44
 	{
 	public:
-		acc( INT64 value ) :
+		int44( INT64 value ) :
 			m_value( value ),
 			m_positive_overflow( value > S64( 0x7ffffffffff ) ),
 			m_negative_overflow( value < S64( -0x80000000000 ) )
 		{
 		}
 
-		acc( INT64 value, bool positive_overflow, bool negative_overflow ) :
+		int44( INT64 value, bool positive_overflow, bool negative_overflow ) :
 			m_value( value ),
 			m_positive_overflow( positive_overflow ),
 			m_negative_overflow( negative_overflow )
 		{
 		}
 
-		acc operator+( INT64 add )
+		int44 operator+( INT64 add )
 		{
 			INT64 value = ( ( m_value + add ) << 20 ) >> 20;
 
-			return acc( value,
+			return int44( value,
 				m_positive_overflow || ( value < 0 && m_value >= 0 && add >= 0 ),
 				m_negative_overflow || ( value >= 0 && m_value < 0 && add < 0 ) );
 		}
@@ -80,10 +80,10 @@ protected:
 	};
 
 	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
-	INT32 BOUNDS( acc a, int max_flag, int min_flag );
-	INT32 A1( acc a );
-	INT32 A2( acc a );
-	INT32 A3( acc a );
+	INT32 BOUNDS( int44 a, int max_flag, int min_flag );
+	INT32 A1( int44 a );
+	INT32 A2( int44 a );
+	INT32 A3( int44 a );
 	INT32 Lm_B1( INT32 a, int lm );
 	INT32 Lm_B2( INT32 a, int lm );
 	INT32 Lm_B3( INT32 a, int lm );
