@@ -1671,6 +1671,26 @@ void psxcpu_device::set_ram_size(device_t &device, UINT32 ram_size)
 
 
 //-------------------------------------------------
+//  ram_size - temporary kludge to allow
+//  access to the current ram size
+//-------------------------------------------------
+
+UINT32 psxcpu_device::ram_size()
+{
+	return m_ram_size;
+}
+
+//-------------------------------------------------
+//  ram - temporary kludge to allow
+//  access to the current ram
+//-------------------------------------------------
+
+UINT32 *psxcpu_device::ram()
+{
+	return m_ram;
+}
+
+//-------------------------------------------------
 //  device_start - start up the device
 //-------------------------------------------------
 

@@ -51,7 +51,7 @@ public:
 	void cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( psx_exe_load );
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 };
 
 
@@ -146,9 +146,8 @@ int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len
 		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
 		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
 
-		memory_share *share = memshare("share1");
-		p_ram = (UINT8 *)share->ptr();
-		n_ram = share->bytes();
+		p_ram = (UINT8 *)m_maincpu->ram();
+		n_ram = m_maincpu->ram_size();
 
 		p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
 
@@ -250,9 +249,8 @@ int psx1_state::load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
 						( (int)p_n_file[ n_offset + 7 ] << 24 );
 
-					memory_share *share = memshare("share1");
-					UINT8 *p_ram = (UINT8 *)share->ptr();
-					UINT32 n_ram = share->bytes();
+					UINT8 *p_ram = (UINT8 *)m_maincpu->ram();
+					UINT32 n_ram = m_maincpu->ram_size();
 
 					n_offset += 8;
 

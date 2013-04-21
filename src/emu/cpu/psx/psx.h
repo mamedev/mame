@@ -173,6 +173,9 @@ public:
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 
+	UINT32 ram_size();
+	UINT32 *ram();
+
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 

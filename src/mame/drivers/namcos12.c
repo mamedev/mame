@@ -1101,7 +1101,7 @@ public:
 	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 	void system11gun_install(  );
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 };
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1193,7 +1193,7 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 	INT32 n_ramleft;
 
 	// TODO: the check for going past the end of ram should be in dma.c
-	UINT32 m_n_psxramsize = 0x400000;
+	UINT32 m_n_psxramsize = m_maincpu->ram_size();
 
 	if(m_has_tektagt_dma && !m_n_dmaoffset)
 	{

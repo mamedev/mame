@@ -666,7 +666,7 @@ public:
 	void hyperbbc_lamp_callback( int data );
 	void mamboagg_output_callback( int offset, int data );
 	void punchmania_output_callback( int offset, int data );
-	required_device<cpu_device> m_maincpu;
+	required_device<psxcpu_device> m_maincpu;
 };
 
 void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1462,7 +1462,7 @@ void ksys573_state::sys573_vblank(screen_device &screen, bool vblank_state)
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *)memshare("share1")->ptr();
+		UINT32 *p_n_psxram = m_maincpu->ram();
 
 		/* install cd */
 
@@ -1486,7 +1486,8 @@ void ksys573_state::sys573_vblank(screen_device &screen, bool vblank_state)
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *)memshare("share1")->ptr();
+		UINT32 *p_n_psxram = m_maincpu->ram();
+
 		/* 8001f850: jal $8003221c */
 		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
 		{
