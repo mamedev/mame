@@ -2,31 +2,28 @@
 #include "psxcd.h"
 #include "debugger.h"
 
-//
-//
-//
+#define VERBOSE_LEVEL ( 0 )
 
-//#define debug_cdrom
-//#define debug_cdrom_registers
-//#define skip_reads
-//#define dump_subheader
-
-//
-//
-//
+INLINE void ATTR_PRINTF(3,4) verboselog( running_machine& machine, int n_level, const char *s_fmt, ... )
+{
+	if( VERBOSE_LEVEL >= n_level )
+	{
+		va_list v;
+		char buf[ 32768 ];
+		va_start( v, s_fmt );
+		vsprintf( buf, s_fmt, v );
+		va_end( v );
+		logerror( "%s: %s", machine.describe_context(), buf );
+	}
+}
 
 enum cdrom_events
 {
 	event_cmd_complete=0,
-	event_preread_sector,
 	event_read_sector,
 	event_play_sector,
 	event_change_disk
 };
-
-//
-//
-//
 
 enum intr_status
 {
@@ -44,8 +41,7 @@ enum mode_flags
 	mode_adpcm=0x40,
 	mode_size=0x20,
 	mode_size2=0x10,
-	mode_size_shift=4,
-	mode_size_mask=(3<<mode_size_shift),
+	mode_size_mask=0x30,
 	mode_channel=0x08,
 	mode_report=0x04,
 	mode_autopause=0x02,
@@ -66,10 +62,7 @@ enum status_f
 
 struct subheader
 {
-	unsigned char file,
-								channel,
-								submode,
-								coding;
+	UINT8 file, channel, submode, coding;
 };
 
 enum submode_flags
@@ -83,10 +76,6 @@ enum submode_flags
 	submode_video=0x02,
 	submode_eor=0x01
 };
-
-//
-//
-//
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -123,22 +112,8 @@ void psxcd_device::device_start()
 
 	m_sysclock = sysclk;
 
-	secleft = 0;
-	secsize = 2048;
 	res_queue = NULL;
-	cur_res = NULL;
-	streaming = false;
-	sechead = 0;
-	sectail = 0;
-	secskip = 0;
-	next_read_event = -1;
-	cbp = cmdbuf;
-	m_mute = false;
-
 	status=status_shellopen;
-	sr=8|1;
-	res=0;
-	ir=0;
 	mode=0;
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
@@ -146,14 +121,7 @@ void psxcd_device::device_start()
 		m_timers[i] = timer_alloc(i);
 		m_timerinuse[i] = false;
 	}
-
-	curpos.w = 0;
-	m_param_count = 0;
 }
-
-//
-//
-//
 
 void psxcd_device::device_reset()
 {
@@ -168,27 +136,24 @@ void psxcd_device::device_reset()
 	if(m_cdrom_handle)
 		add_system_event(event_change_disk, m_sysclock, NULL);
 
-	next_read_event = -1;
-
-	if(cur_res)
-	{
-		global_free(cur_res);
-		cur_res = NULL;
-	}
-
 	while(res_queue)
 	{
-		cur_res = res_queue->next;
+		command_result *res = res_queue->next;
 		global_free(res_queue);
-		res_queue = cur_res;
+		res_queue = res;
 	}
 
 	m_param_count = 0;
+	m_regs.sr = 0x18;
+	m_regs.ir = 0;
+	m_regs.imr = 0x1f;
+	sechead = 0;
+	sectail = 0;
+	next_read_event = -1;
+	m_mute = false;
+	m_dmaload = false;
+	curpos.w = 0;
 }
-
-//
-//
-//
 
 bool psxcd_device::call_load()
 {
@@ -210,9 +175,8 @@ void psxcd_device::call_unload()
 
 READ8_MEMBER( psxcd_device::read )
 {
-	unsigned char ret = 0;
-
-	switch (offset&3)
+	UINT8 ret = 0;
+	switch (offset & 3)
 	{
 		/*
 		x--- ---- command/parameter busy flag
@@ -222,121 +186,91 @@ READ8_MEMBER( psxcd_device::read )
 		---- x--- parameter fifo empty (active high)
 		---- --xx cmd mode
 		*/
-		case 0: ret=sr; break;
-		case 1:
-			ret=res;
-			if ((cur_res) && (rdp<cur_res->sz))
-			{
-				res=cur_res->data[rdp++];
-				sr|=(1<<5);
-			} else
-			{
-				if ((cur_res) && (cur_res->res&0x10))
-				{
-					global_free(cur_res);
-					cur_res=NULL;
-				}
+		case 0:
+			ret = m_regs.sr;
+			break;
 
-				sr&=~(1<<5);
+		case 1:
+			if ((res_queue) && (rdp < res_queue->sz))
+			{
+				ret = res_queue->data[rdp++];
+				if(rdp == res_queue->sz)
+					m_regs.sr &= ~0x20;
+				else
+					m_regs.sr |= 0x20;
+			}
+			else
+				ret = 0;
+			break;
+
+		case 2:
+			if(!m_dmaload)
+				ret = 0;
+			else
+			{
+				ret = m_transbuf[m_transcurr++];
+				if(m_transcurr >= raw_sector_size)
+				{
+					m_dmaload = false;
+					m_regs.sr &= ~0x40;
+				}
 			}
 			break;
-		case 2: ret=0; break;
-		case 3: ret=ir; break;
+
+		case 3:
+			if(m_regs.sr & 1)
+				ret = m_regs.ir | 0xe0;
+			else
+				ret = m_regs.imr | 0xe0;
+			break;
 	}
 
-	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x (PC=%08x)\n",offset,ret,space.device().safe_pc());
-	#endif
+	verboselog(machine(), 2, "psxcd: read byte %08x = %02x\n",offset,ret);
 
 	return ret;
 }
 
-//
-//
-//
-
 WRITE8_MEMBER( psxcd_device::write )
 {
-	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x (PC=%08x)\n",offset,data,space.device().safe_pc());
-	#endif
+	verboselog(machine(), 2, "psxcd: write byte %08x = %02x\n",offset,data);
 
-	switch (offset&3)
+	switch ((offset & 3) | ((m_regs.sr & 3) << 4))
 	{
-		case 0:
-			//if(data & 2)
-			//  popmessage("cmdmode = %02x, contact MESSdev",data);
-
-			cmdmode=data&1;
-			if (cmdmode==0)
-			{
-				cbp=cmdbuf;
-			} else
-			{
-				if (! cur_res)
-				{
-					if (cur_res) global_free(cur_res);
-
-					if (res_queue)
-					{
-						#ifdef debug_cdrom_registers
-							printf("cdrom: nextres\n");
-						#endif
-
-						cur_res=res_queue;
-						res_queue=res_queue->next;
-						ir=cur_res->res&0xf;
-						rdp=0;
-
-						if (cur_res->sz)
-						{
-							res=cur_res->data[rdp++];
-							sr|=(1<<5);
-						} else
-						{
-							sr&=~(1<<5);
-						}
-					} else
-					{
-						//ir=0;
-						cur_res=NULL;
-					}
-				}
-				/*else
-				{
-				    if (rdp>=cur_res->sz)
-				    {
-				        sr&=~(1<<5);
-				    } else
-				    {
-				        sr|=~(1<<5);
-				        res=cur_res->data[rdp++];
-				    }
-				}
-				*/
-			}
+		case 0x00:
+		case 0x10:
+		case 0x20:
+		case 0x30:
+			m_regs.sr = (m_regs.sr & ~3) | (data & 3);
 			break;
 
-		case 1:
-			if (cmdmode==0)
-			{
-				write_command(data);
-			}
+		case 0x01:
+			write_command(data);
 			break;
 
-		case 2:
-			if (cmdmode==0)
-			{
-				*cbp++=data;
-				m_param_count++;
-			} else
-			{
-				// ?flush buffer?
-				//if(data & 0xf8)
-				//popmessage("Interrupt enable register mode 1 [%02x] -> %02x",offset,data);
-			}
+		case 0x11:
+		case 0x21:
 			break;
 
+		case 0x31:
+			m_regs.vol.rr = data;
+			break;
+
+		case 0x02:
+			cmdbuf[m_param_count] = data;
+			m_param_count++;
+			break;
+
+		case 0x12:
+			m_regs.imr = data & 0x1f;
+			break;
+
+		case 0x22:
+			m_regs.vol.ll = data;
+			break;
+
+		case 0x32:
+			m_regs.vol.rl = data;
+			break;
 		/*
 		x--- ---- unknown
 		-x-- ---- Reset parameter FIFO
@@ -344,78 +278,127 @@ WRITE8_MEMBER( psxcd_device::write )
 		---x ---- Command start
 		---- -xxx Response received
 		*/
-		case 3:
-			//if(data & 0x78)
-			//  popmessage("IRQ flag = %02x, contact MESSdev",data);
-
-			if (data==0x07)
+		case 0x03:
+			if((data & 0x80) && !m_dmaload)
 			{
-				if (cur_res)
+				if(sechead == sectail)
+					break;
+
+				m_dmaload = true;
+				memcpy(m_transbuf, secbuf[sechead], raw_sector_size);
+				m_regs.sr |= 0x40;
+				sechead++;
+				sechead %= sector_buffer_size;
+
+				switch(mode & mode_size_mask)
 				{
-					global_free(cur_res);
-					cur_res=NULL;
-					sr&=~(1<<5);
+					case 0x00:
+					default:
+						m_transcurr = 24;
+						break;
+					case 0x10:
+						m_transcurr = 24;
+						break;
+					case 0x20:
+						m_transcurr = 12;
+						break;
 				}
-				ir=0;
+#if (VERBOSE_LEVEL > 0)
+				char str[1024];
+				for (int i=0; i<12; i++)
+					sprintf(&str[i*4], "%02x  ", m_transbuf[i+12]);
+				verboselog(machine(), 1, "psxcd: request data=%s\n",str);
+#endif
 			}
+			else if(!(data & 0x80))
+			{
+				m_dmaload = false;
+				m_regs.sr &= ~0x40;
+			}
+			break;
+
+		case 0x13:
+			if(data & 0x1f)
+			{
+				m_regs.ir &= ~(data & 0x1f);
+				if(m_regs.ir)
+					break;
+
+				if (res_queue)
+				{
+					command_result *res = res_queue;
+					res_queue = res->next;
+					global_free(res);
+					m_regs.sr &= ~0x20;
+					rdp = 0;
+					if(res_queue)
+					{
+						m_regs.sr |= 0x20;
+						m_regs.ir = res_queue->res;
+					}
+					verboselog(machine(), 1, "psxcd: nextres\n");
+				}
+			}
+			if(data & 0x40)
+				m_param_count = 0;
+			break;
+
+		case 0x23:
+			m_regs.vol.lr = data;
+			break;
+
+		case 0x33:
+			break;
 	}
 }
 
-psxcd_device::command_info psxcd_device::cmd_table[num_commands]=
+const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 {
-	{ &psxcd_device::cdcmd_sync,                "sync"          },  // 00
-	{ &psxcd_device::cdcmd_nop,             "nop"               },  // 01
-	{ &psxcd_device::cdcmd_setloc,          "setloc"        },  // 02
-	{ &psxcd_device::cdcmd_play,                "play"          },  // 03
-	{ &psxcd_device::cdcmd_forward,     "forward"       },  // 04
-	{ &psxcd_device::cdcmd_backward,        "backward"  },  // 05
-	{ &psxcd_device::cdcmd_readn,           "readn"         },  // 06
-	{ &psxcd_device::cdcmd_standby,     "standby"       },  // 07
-	{ &psxcd_device::cdcmd_stop,                "stop"          },  // 08
-	{ &psxcd_device::cdcmd_pause,           "pause"         },  // 09
-	{ &psxcd_device::cdcmd_init,                "init"          },  // 0a
-	{ &psxcd_device::cdcmd_mute,                "mute"          },  // 0b
-	{ &psxcd_device::cdcmd_demute,          "demute"        },  // 0c
-	{ &psxcd_device::cdcmd_setfilter,   "setfilter" },  // 0d
-	{ &psxcd_device::cdcmd_setmode,     "setmode"       },  // 0e
-	{ &psxcd_device::cdcmd_getparam,        "getparam"  },  // 0f
-	{ &psxcd_device::cdcmd_getlocl,     "getlocl"       },  // 10
-	{ &psxcd_device::cdcmd_getlocp,     "getlocp"       },  // 11
-	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 12
-	{ &psxcd_device::cdcmd_gettn,           "gettn"         },  // 13
-	{ &psxcd_device::cdcmd_gettd,           "gettd"         },  // 14
-	{ &psxcd_device::cdcmd_seekl,           "seekl"         },  // 15
-	{ &psxcd_device::cdcmd_seekp,           "seekp"         },  // 16
-	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 17
-	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 18
-	{ &psxcd_device::cdcmd_test,                "test"          },  // 19
-	{ &psxcd_device::cdcmd_id,                  "id"                },  // 1a
-	{ &psxcd_device::cdcmd_reads,           "reads"         },  // 1b
-	{ &psxcd_device::cdcmd_reset,           "reset"         },  // 1c
-	{ &psxcd_device::cdcmd_illegal,     "illegal"       },  // 1d
-	{ &psxcd_device::cdcmd_readtoc,     "readtoc"       },  // 1e
+	&psxcd_device::cdcmd_sync,
+	&psxcd_device::cdcmd_nop,
+	&psxcd_device::cdcmd_setloc,
+	&psxcd_device::cdcmd_play,
+	&psxcd_device::cdcmd_forward,
+	&psxcd_device::cdcmd_backward,
+	&psxcd_device::cdcmd_readn,
+	&psxcd_device::cdcmd_standby,
+	&psxcd_device::cdcmd_stop,
+	&psxcd_device::cdcmd_pause,
+	&psxcd_device::cdcmd_init,
+	&psxcd_device::cdcmd_mute,
+	&psxcd_device::cdcmd_demute,
+	&psxcd_device::cdcmd_setfilter,
+	&psxcd_device::cdcmd_setmode,
+	&psxcd_device::cdcmd_getparam,
+	&psxcd_device::cdcmd_getlocl,
+	&psxcd_device::cdcmd_getlocp,
+	&psxcd_device::cdcmd_unknown12,
+	&psxcd_device::cdcmd_gettn,
+	&psxcd_device::cdcmd_gettd,
+	&psxcd_device::cdcmd_seekl,
+	&psxcd_device::cdcmd_seekp,
+	&psxcd_device::cdcmd_illegal17,
+	&psxcd_device::cdcmd_illegal18,
+	&psxcd_device::cdcmd_test,
+	&psxcd_device::cdcmd_id,
+	&psxcd_device::cdcmd_reads,
+	&psxcd_device::cdcmd_reset,
+	&psxcd_device::cdcmd_illegal1d,
+	&psxcd_device::cdcmd_readtoc
 };
 
-//
-//
-//
-
-void psxcd_device::write_command(const unsigned char byte)
+void psxcd_device::write_command(UINT8 byte)
 {
-	assert(byte<num_commands);
-	(this->*cmd_table[byte].func)();
+	if(byte > 31)
+		illegalcmd(byte);
+	else
+		(this->*cmd_table[byte])();
 	m_param_count = 0;
 }
 
-//
-//
-//
-
 void psxcd_device::cdcmd_sync()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: sync\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: sync\n");
 
 	stop_read();
 	send_result(intr_acknowledge);
@@ -423,11 +406,7 @@ void psxcd_device::cdcmd_sync()
 
 void psxcd_device::cdcmd_nop()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: nop\n");
-	#endif
-
-	//stop_read();
+	verboselog(machine(), 1, "psxcd: nop\n");
 
 	if (!open)
 		status &= ~status_shellopen;
@@ -437,12 +416,7 @@ void psxcd_device::cdcmd_nop()
 
 void psxcd_device::cdcmd_setloc()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: setloc %08x:%08x:%08x\n",
-				cmdbuf[0],
-				cmdbuf[1],
-				cmdbuf[2]);
-	#endif
+	verboselog(machine(), 1, "psxcd: setloc %08x:%08x:%08x\n", cmdbuf[0], cmdbuf[1], cmdbuf[2]);
 
 	stop_read();
 
@@ -455,7 +429,7 @@ void psxcd_device::cdcmd_setloc()
 	if ((l.b[M]>0) || (l.b[S]>=2))
 		loc.w=l.w;
 	else
-		logerror("setloc out of range: %02d:%02d:%02d\n",l.b[M],l.b[S],l.b[F]);
+		verboselog(machine(), 0, "psxcd: setloc out of range: %02d:%02d:%02d\n",l.b[M],l.b[S],l.b[F]);
 
 	send_result(intr_complete);
 }
@@ -469,9 +443,7 @@ void psxcd_device::cdcmd_play()
 	if (!curpos.w)
 		curpos.b[S] = 2;
 
-#ifdef debug_cdrom
-	printf("cdrom: play %02x %02x %02x => %d\n", loc.b[M], loc.b[S], loc.b[F], msf_to_lba_ps(loc.w));
-#endif
+	verboselog(machine(), 1, "psxcd: play %02x %02x %02x => %d\n", loc.b[M], loc.b[S], loc.b[F], msf_to_lba_ps(loc.w));
 
 	stop_read();
 	start_play();
@@ -480,31 +452,24 @@ void psxcd_device::cdcmd_play()
 
 void psxcd_device::cdcmd_forward()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: forward\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: forward\n");
 }
 
 void psxcd_device::cdcmd_backward()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: backward\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: backward\n");
 }
 
 void psxcd_device::cdcmd_readn()
 {
 	if(!open)
 	{
-		#ifdef debug_cdrom
-			printf("cdrom: readn\n");
-		#endif
+		verboselog(machine(), 1, "psxcd: readn\n");
 
 		curpos.w=loc.w;
 
 		stop_read();
 		start_read();
-		send_result(intr_complete);
 	} else
 	{
 		send_result(intr_diskerror);
@@ -513,9 +478,7 @@ void psxcd_device::cdcmd_readn()
 
 void psxcd_device::cdcmd_standby()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: standby\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: standby\n");
 
 	stop_read();
 	send_result(intr_acknowledge);
@@ -523,9 +486,7 @@ void psxcd_device::cdcmd_standby()
 
 void psxcd_device::cdcmd_stop()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: stop\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: stop\n");
 
 	stop_read();
 	send_result(intr_acknowledge);
@@ -533,9 +494,7 @@ void psxcd_device::cdcmd_stop()
 
 void psxcd_device::cdcmd_pause()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: pause\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: pause\n");
 
 	stop_read();
 
@@ -544,22 +503,18 @@ void psxcd_device::cdcmd_pause()
 
 void psxcd_device::cdcmd_init()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: init\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: init\n");
 
 	stop_read();
 	mode=0;
-	sr|=0x10;
+	m_regs.sr |= 0x10;
 
 	send_result(intr_acknowledge);
 }
 
 void psxcd_device::cdcmd_mute()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: mute\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: mute\n");
 
 	m_mute = true;
 	send_result(intr_acknowledge);
@@ -567,9 +522,7 @@ void psxcd_device::cdcmd_mute()
 
 void psxcd_device::cdcmd_demute()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: demute\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: demute\n");
 
 	m_mute = false;
 	send_result(intr_acknowledge);
@@ -577,9 +530,7 @@ void psxcd_device::cdcmd_demute()
 
 void psxcd_device::cdcmd_setfilter()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: setfilter %08x,%08x\n",cmdbuf[0],cmdbuf[1]);
-	#endif
+	verboselog(machine(), 1, "psxcd: setfilter %08x,%08x\n",cmdbuf[0],cmdbuf[1]);
 
 	filter_file=cmdbuf[0];
 	filter_channel=cmdbuf[1];
@@ -589,30 +540,9 @@ void psxcd_device::cdcmd_setfilter()
 
 void psxcd_device::cdcmd_setmode()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: setmode %08x\n",cmdbuf[0]);
-	#endif
+	verboselog(machine(), 1, "psxcd: setmode %08x\n",cmdbuf[0]);
 
 	mode=cmdbuf[0];
-
-	switch ((mode&mode_size_mask)>>mode_size_shift)
-	{
-		case 1:
-			secsize=2328;
-			secskip=24;
-			break;
-
-		case 2:
-			secsize=2340;
-			secskip=12;
-			break;
-
-		default:
-			secsize=2048;
-			secskip=24;
-			break;
-	}
-
 	send_result(intr_complete);
 }
 
@@ -628,15 +558,8 @@ void psxcd_device::cdcmd_getparam()
 		0
 	};
 
-	#ifdef debug_cdrom
-		printf("cdrom: getparam [%02x %02x %02x %02x %02x %02x]\n",
-									data[0],
-									data[1],
-									data[2],
-									data[3],
-									data[4],
-									data[5]);
-	#endif
+	verboselog(machine(), 1, "psxcd: getparam [%02x %02x %02x %02x %02x %02x]\n",
+								data[0], data[1], data[2], data[3], data[4], data[5]);
 
 	send_result(intr_complete,data,6);
 }
@@ -662,21 +585,9 @@ UINT32 psxcd_device::sub_loc(CDPOS src1, CDPOS src2)
 
 void psxcd_device::cdcmd_getlocl()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: getlocl\n");
-	#endif
-
-	#ifdef debug_cdrom
-		printf("cdrom: getlocl [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
-									lastsechdr[0],
-									lastsechdr[1],
-									lastsechdr[2],
-									lastsechdr[3],
-									lastsechdr[4],
-									lastsechdr[5],
-									lastsechdr[6],
-									lastsechdr[7]);
-	#endif
+	verboselog(machine(), 1, "psxcd: getlocl [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
+							lastsechdr[0], lastsechdr[1], lastsechdr[2], lastsechdr[3],
+							lastsechdr[4], lastsechdr[5], lastsechdr[6], lastsechdr[7]);
 
 	send_result(intr_complete,lastsechdr,8);
 }
@@ -700,33 +611,15 @@ void psxcd_device::cdcmd_getlocp()
 		decimal_to_bcd(loc.b[F])  // aframe
 	};
 
-	//unsigned char data[8]={ 2,1,0,0xff,0xff,0xff,0xff,0xff };
-
-	#ifdef debug_cdrom
-		printf("cdrom: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
-									data[0],
-									data[1],
-									data[2],
-									data[3],
-									data[4],
-									data[5],
-									data[6],
-									data[7]);
-	#endif
+		verboselog(machine(), 1, "psxcd: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
+							data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 
 	send_result(intr_complete,data,8);
 }
 
-void psxcd_device::cdcmd_illegal()
-{
-	assert(0);
-}
-
 void psxcd_device::cdcmd_gettn()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: gettn\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: gettn\n");
 
 
 	if(!open)
@@ -738,7 +631,6 @@ void psxcd_device::cdcmd_gettn()
 				decimal_to_bcd(cdrom_get_last_track(m_cdrom_handle))
 		};
 
-		//stop_read();
 		send_result(intr_complete,data,3);
 	}
 	else
@@ -767,15 +659,8 @@ void psxcd_device::cdcmd_gettd()
 			decimal_to_bcd(trkstart.b[S])
 		};
 
-		#ifdef debug_cdrom
-			printf("cdrom: gettd %02x [%02x %02x %02x]\n",
-														cmdbuf[0],
-														data[0],
-														data[1],
-														data[2]);
-		#endif
+		verboselog(machine(), 1, "psxcd: gettd %02x [%02x %02x %02x]\n", cmdbuf[0], data[0], data[1], data[2]);
 
-		//stop_read();
 		send_result(intr_acknowledge,data,3);
 	}
 	else
@@ -787,9 +672,7 @@ void psxcd_device::cdcmd_gettd()
 
 void psxcd_device::cdcmd_seekl()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: seekl [%02d:%02d:%02d]\n",loc.b[M],loc.b[S],loc.b[F]);
-	#endif
+	verboselog(machine(), 1, "psxcd: seekl [%02d:%02d:%02d]\n", loc.b[M], loc.b[S], loc.b[F]);
 
 	curpos.w=loc.w;
 
@@ -798,9 +681,7 @@ void psxcd_device::cdcmd_seekl()
 
 void psxcd_device::cdcmd_seekp()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: seekp\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: seekp\n");
 
 	curpos.w=loc.w;
 
@@ -809,9 +690,7 @@ void psxcd_device::cdcmd_seekp()
 
 void psxcd_device::cdcmd_test()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: test %08x\n",cmdbuf[0]);
-	#endif
+	verboselog(machine(), 1, "psxcd: test %08x\n",cmdbuf[0]);
 
 	static unsigned char data[4]=
 	{
@@ -826,9 +705,7 @@ void psxcd_device::cdcmd_test()
 
 void psxcd_device::cdcmd_id()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: id\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: id\n");
 
 	if (!open)
 	{
@@ -854,105 +731,94 @@ void psxcd_device::cdcmd_id()
 
 void psxcd_device::cdcmd_reads()
 {
-	curpos.w=loc.w;
+	if(!open)
+	{
+		verboselog(machine(), 1, "psxcd: reads\n");
 
-	#ifdef skip_reads
-		#ifdef debug_cdrom
-			log("cdrom: reads [SKIPPING - RETURN COMPLETE]\n");
-		#endif
-
-		send_result(intr_complete);
-	#else
-		#ifdef debug_cdrom
-			printf("cdrom: reads\n");
-		#endif
+		curpos.w=loc.w;
 
 		stop_read();
-		start_streaming();
-	#endif
+		start_read();
+	} else
+	{
+		send_result(intr_diskerror);
+	}
 }
 
 void psxcd_device::cdcmd_reset()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: reset\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: reset\n");
 }
 
 void psxcd_device::cdcmd_readtoc()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: readtoc\n");
-	#endif
+	verboselog(machine(), 1, "psxcd: readtoc\n");
 
-	static unsigned char data[4]=
-	{
-		0x00,
-		0x00,
-		0xff,
-		0xfe
-	};
-
-	send_result(intr_complete|0x10,data,2);
+	send_result(intr_complete);
 }
 
-//
-//
-//
+void psxcd_device::cdcmd_unknown12()
+{
+	verboselog(machine(), 1, "psxcd: unknown 12\n");
+	// set session? readt?
+	if(cmdbuf[0] == 1)
+		send_result(intr_complete);
+	else
+	{
+		status |= status_error;
+		send_result(intr_diskerror);
+	}
+}
+
+void psxcd_device::cdcmd_illegal17()
+{
+	illegalcmd(0x17); // set clock?
+}
+
+void psxcd_device::cdcmd_illegal18()
+{
+	illegalcmd(0x18); // get clock?
+}
+
+void psxcd_device::cdcmd_illegal1d()
+{
+	illegalcmd(0x1d); // read q subchannel
+}
+
+void psxcd_device::illegalcmd(UINT8 cmd)
+{
+	verboselog(machine(), 0, "psxcd: unimplemented cd command %02x\n", cmd);
+	command_result *res=global_alloc(command_result);
+	res->res=intr_diskerror;
+	res->data[0]=status | status_error;
+	res->data[1]=0x40; //invalid command
+	res->sz=2;
+	cmd_complete(res);
+}
 
 void psxcd_device::cmd_complete(command_result *res)
 {
-	bool doint=((res->res&0x10)==0);
-	#ifdef debug_cdrom
 	command_result *rf;
-	#endif
 
-	if (doint)
-	{
-		m_irq_handler(1);
-	}
-
-	add_result(res);
-
-	#ifdef debug_cdrom
-		if (doint)
-		{
-			printf("cdrom: irq [");
-			for (rf=res_queue; ((rf) && (rf->next)); rf=rf->next);
-				printf("%d ",rf->res);
-			printf("]\n");
-		}
-	#endif
-}
-
-//
-//
-//
-
-void psxcd_device::add_result(command_result *res)
-{
-	command_result *rf;
+	verboselog(machine(), 1, "psxcd: irq [%d]\n", res->res);
 
 	if (res_queue)
 	{
 		for (rf=res_queue; rf->next; rf=rf->next);
 		rf->next=res;
-	} else
-	{
-		res_queue=res;
 	}
-
-	res->next=NULL;
+	else
+	{
+		res_queue = res;
+		m_regs.ir = res_queue->res & m_regs.imr; // or should it not trigger a masked irq?
+		if(m_regs.ir)
+			m_irq_handler(1);
+		m_regs.sr |= 0x20;
+	}
+	res->next = NULL;
 }
 
-//
-//
-//
-
-void psxcd_device::send_result(const unsigned int res,
-														const unsigned char *data,
-														const unsigned int sz,
-															const unsigned int delay)
+void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay)
 {
 	command_result *cr=global_alloc(command_result);
 
@@ -982,65 +848,21 @@ void psxcd_device::send_result(const unsigned int res,
 	add_system_event(event_cmd_complete, delay, (void *)cr);
 }
 
-//
-//
-//
-
 void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
 {
-	if ((int)size>secleft)
-	{
-		logerror("cdrom: dma past end of sector (secleft=%d sz=%d)\n",secleft,size);
-	}
+	verboselog(machine(), 1, "psxcd: start dma %d bytes at %d\n", size, m_transcurr);
 
-//  printf("cdrom: start dma %d bytes, %d remaining, secptr %p\n", size, secleft, secptr);
-	#ifdef debug_cdrom
-	if (size==12)
-	{
-		char poo[1024],*pp=poo;
-		for (unsigned int i=0; i<12; i++)
-		{
-			sprintf(pp,"%02x ",secptr[i]);
-			pp+=3;
-		}
-		printf("cdrom: data=%s\n",poo);
-	}
-	#endif
+	if(!m_dmaload)
+		return;
 
-	memcpy(mainram, secptr, size);
-	memset(secptr, 0xff, size);
+	if(size > (raw_sector_size - m_transcurr))
+		size = (raw_sector_size - m_transcurr);
 
-	secptr += size;
-	secleft -= size;
-
-	if (secleft<0) secleft=0;
-	if (secleft==0) sr&=~0x40;
+	memcpy(mainram, &m_transbuf[m_transcurr], size);
+	m_transcurr += size;
+	if(raw_sector_size <= m_transcurr)
+		m_regs.sr &= ~0x40;
 }
-
-bool psxcd_device::read_next_sector()
-{
-	UINT32 pos=msf_to_lba_ps(curpos.w);
-	unsigned char *buf=secbuf[sechead];
-
-//  printf("read_next_sector: sec %d, sechead %d, raw_sector_size %d\n", pos, sechead, raw_sector_size);
-	if (cdrom_read_data(m_cdrom_handle, pos, buf, CD_TRACK_RAW_DONTCARE))
-	{
-//      printf("buf contents = %02x %02x | %02x %02x\n", buf[0], buf[1], buf[0x20], buf[0x21]);
-
-		sechead=(sechead+1)&(sector_buffer_size-1);
-
-		memcpy(lastsechdr,&secbuf[sectail][12],8);
-
-		return true;
-	} else
-	{
-		return false;
-	}
-}
-
-//
-//
-//
 
 void psxcd_device::read_sector()
 {
@@ -1048,64 +870,41 @@ void psxcd_device::read_sector()
 
 	if (status & status_reading)
 	{
-		bool isend=false;
-
-		if (read_next_sector())
+		bool isend = false;
+		UINT32 sector = msf_to_lba_ps(curpos.w);
+		UINT8 *buf = secbuf[sectail];
+		if (cdrom_read_data(m_cdrom_handle, sector, buf, CD_TRACK_RAW_DONTCARE))
 		{
-			unsigned char *rawsec;
+			subheader *sub=(subheader *)(buf+16);
+			memcpy(lastsechdr, buf+12, 8);
 
-			if ((mode&mode_adpcm) && (streaming))
+			verboselog(machine(), 2, "psxcd: subheader file=%02x chan=%02x submode=%02x coding=%02x [%02x%02x%02x%02x]\n",
+						sub->file, sub->channel, sub->submode, sub->coding, buf[0xc], buf[0xd], buf[0xe], buf[0xf]);
+
+			if ((mode & mode_adpcm) && (sub->submode & submode_audio))
 			{
-				rawsec=secbuf[sectail];
-				secptr=rawsec+24;
-				secleft=2048;
+				if ((sub->submode & submode_eof) && (mode & mode_autopause))
+				{
+					isend=true;
+					//printf("end of file\n");
+				}
+				if((!(mode & mode_channel) ||
+						((sub->file == filter_file) && (sub->channel == filter_channel))) && !m_mute)
+					m_spu->play_xa(0,buf+16);
 			}
 			else
 			{
-				rawsec=secbuf[sectail];
-				secptr=rawsec+secskip;
-				secleft=secsize;
+				command_result *res=global_alloc(command_result);
+				res->res=intr_dataready;
+				res->data[0]=status;
+				res->sz=1;
+				cmd_complete(res);
+				sectail++;
+				sectail %= sector_buffer_size;
+
+				if(sectail == sechead)
+					verboselog(machine(), 0, "psxcd: sector buffer overrun\n");
 			}
-
-			sectail=(sectail+1)&(sector_buffer_size-1);
-
-			subheader *sub=(subheader *)(rawsec+16);
-
-			#ifdef dump_subheader
-				printf("cdrom: subheader file=%02x chan=%02x submode=%02x coding=%02x [%02x%02x%02x%02x]\n",
-						sub->file,
-						sub->channel,
-						sub->submode,
-						sub->coding,
-						rawsec[0xc],
-						rawsec[0xd],
-						rawsec[0xe],
-						rawsec[0xf]);
-			#endif
-
-			status&=~status_playing;
-			bool isxa=((mode&mode_adpcm) && (sub->submode&submode_audio));
-
-			if (((mode&mode_channel)==0) ||
-					((sub->file==filter_file) && (sub->channel==filter_channel)))
-			{
-				if (isxa)
-				{
-					if (sub->submode&submode_eof)
-					{
-						isend=true;
-						//printf("end of file\n");
-					}
-					m_spu->play_xa(0,rawsec+16);
-
-					status|=status_playing;
-				}
-			}
-
-			if ((mode&mode_autopause)==0)
-				isend=false;
-
-			//
 
 			curpos.b[F]++;
 			if (curpos.b[F]==75)
@@ -1120,18 +919,9 @@ void psxcd_device::read_sector()
 			}
 
 			loc.w=curpos.w;
-
-			sr|=0x40;
-
-			if(!(streaming && isxa))
-			{
-				command_result *res=global_alloc(command_result);
-				res->res=isend?intr_dataend:intr_dataready;
-				res->data[0]=status;
-				res->sz=1;
-				cmd_complete(res);
-			}
 		}
+		else
+			isend = true;
 
 		if (! isend)
 		{
@@ -1141,21 +931,19 @@ void psxcd_device::read_sector()
 			next_sector_t+=cyc;
 
 			next_read_event = add_system_event(event_read_sector, cyc, NULL);
-
-			//read_next_sector();
 		} else
 		{
-#ifdef debug_cdrom
-			printf("autopause xa\n");
-#endif
+			verboselog(machine(), 1, "psxcd: autopause xa\n");
+
+			command_result *res=global_alloc(command_result);
+			res->res=intr_dataend;
+			res->data[0]=status;
+			res->sz=1;
+			cmd_complete(res);
 			stop_read();
 		}
 	}
 }
-
-//
-//
-//
 
 void psxcd_device::play_sector()
 {
@@ -1163,9 +951,26 @@ void psxcd_device::play_sector()
 
 	if (status&status_playing)
 	{
-		if(!m_mute)
-			m_spu->play_cdda(0,secbuf[sectail]);
-		sectail=(sectail+1)&(sector_buffer_size-1);
+		UINT32 sector = msf_to_lba_ps(curpos.w);
+
+		if(cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_AUDIO))
+		{
+			if(!m_mute)
+				m_spu->play_cdda(0, secbuf[sectail]);
+		}
+		else
+		{
+			if(!cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_RAW_DONTCARE))
+			{
+				stop_read(); // assume we've reached the end
+				command_result *res=global_alloc(command_result);
+				res->res=intr_dataend;
+				res->data[0]=status;
+				res->sz=1;
+				cmd_complete(res);
+				return;
+			}
+		}
 
 		curpos.b[F]++;
 		if (curpos.b[F]==75)
@@ -1180,18 +985,16 @@ void psxcd_device::play_sector()
 		}
 
 		loc.w=curpos.w;
-
-		//
-
-		UINT32 sector = msf_to_lba_ps(loc.w);
+		sector++;
+		sectail++;
+		sectail %= sector_buffer_size;
 
 		if (mode&mode_autopause)
 		{
 			if (sector>=autopause_sector)
 			{
-#ifdef debug_cdrom
-				printf("autopause cdda\n");
-#endif
+				verboselog(machine(), 1, "psxcd: autopause cdda\n");
+
 				stop_read();
 				command_result *res=global_alloc(command_result);
 				res->res=intr_dataend;
@@ -1237,34 +1040,18 @@ void psxcd_device::play_sector()
 		next_sector_t+=cyc>>1;
 
 		next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), NULL);
-
-		if(!read_next_sector())
-		{
-			stop_read(); // assume we've reached the end
-			command_result *res=global_alloc(command_result);
-			res->res=intr_dataend;
-			res->data[0]=status;
-			res->sz=1;
-			cmd_complete(res);
-		}
 	}
 }
 
-
-//
-//
-//
-
-void psxcd_device::preread_sector()
+void psxcd_device::start_read()
 {
-	UINT64 next_clock;
-	int type;
-	next_read_event=-1;
+	UINT32 sector = msf_to_lba_ps(curpos.w);
 
-	UINT32 pos=msf_to_lba_ps(curpos.w);
-	//
-	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, pos + 150)) == CD_TRACK_AUDIO))
+	assert((status&(status_reading|status_playing))==0);
+
+	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, sector + 150)) == CD_TRACK_AUDIO))
 	{
+		stop_read();
 		command_result *res=global_alloc(command_result);
 		res->res=intr_diskerror;
 		res->data[0]=status | status_error;
@@ -1273,57 +1060,8 @@ void psxcd_device::preread_sector()
 		cmd_complete(res);
 		return;
 	}
-
-	unsigned char *buf=secbuf[sechead];
-	if (! cdrom_read_data(m_cdrom_handle, pos, buf, CD_TRACK_RAW_DONTCARE))
-	{
-		next_clock=(m_sysclock/60);
-		type=event_preread_sector;
-
-		unsigned int cyc=read_sector_cycles;
-		if (mode&mode_double_speed) cyc>>=1;
-		next_sector_t=next_clock+(cyc-preread_delay)+m_maincpu->total_cycles();
-	} else
-	{
-		memcpy(lastsechdr,buf+12,8);
-
-		//
-
-		command_result *res=global_alloc(command_result);
-		res->res=intr_complete;
-		res->data[0]=status;
-		res->sz=1;
-
-		#ifdef debug_cdrom
-			printf("cdrom: read acknowledge\n");
-		#endif
-
-		cmd_complete(res);
-
-		//
-
-		next_clock=next_sector_t - m_maincpu->total_cycles();
-		type=event_read_sector;
-
-		//read_next_sector();
-	}
-
-	next_read_event = add_system_event(type, next_clock, NULL);
-}
-
-//
-//
-//
-
-void psxcd_device::start_read()
-{
-	#ifdef debug_cdrom
-		printf("cdrom: start read\n");
-	#endif
-
-	assert((status&(status_reading|status_playing))==0);
-
-	status|=status_reading;
+	send_result(intr_complete);
+	status |= status_reading;	
 
 	sechead=sectail=0;
 
@@ -1335,30 +1073,15 @@ void psxcd_device::start_read()
 	systime+=start_read_delay;
 
 	next_sector_t=systime+cyc;
-	next_read_event = add_system_event(event_preread_sector, start_read_delay+preread_delay, NULL);
+	next_read_event = add_system_event(event_read_sector, start_read_delay+preread_delay, NULL);
 }
-
-//
-//
-//
-
-void psxcd_device::start_streaming()
-{
-	assert(! streaming);
-
-	streaming=true;
-	start_read();
-}
-
-//
-//
-//
 
 void psxcd_device::start_play()
 {
-	#ifdef debug_cdrom
-		printf("cdrom: start play\n");
-	#endif
+	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
+
+	if(cdrom_get_track_type(m_cdrom_handle, track) != CD_TRACK_AUDIO)
+		verboselog(machine(), 0, "psxcd: playing data track\n");
 
 	status|=status_playing;
 
@@ -1366,7 +1089,6 @@ void psxcd_device::start_play()
 
 	if (mode&mode_autopause)
 	{
-		UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
 		autopause_sector = cdrom_get_track_start(m_cdrom_handle, track) + cdrom_get_toc(m_cdrom_handle)->tracks[track].frames;
 //      printf("pos=%d auto=%d\n",pos,autopause_sector);
 	}
@@ -1378,22 +1100,14 @@ void psxcd_device::start_play()
 	next_sector_t+=cyc>>1;
 
 	next_read_event = add_system_event(event_play_sector, next_sector_t - m_maincpu->total_cycles(), NULL);
-
-	read_next_sector();
 }
-
-//
-//
-//
 
 void psxcd_device::stop_read()
 {
-	#ifdef debug_cdrom
-		if (status&status_reading)
-			printf("cdrom: stop read\n");
-	#endif
+	if (status & (status_reading|status_playing))
+		verboselog(machine(), 1, "psxcd: stop read\n");
+
 	status&=~(status_reading|status_playing);
-	streaming=false;
 
 	if (next_read_event != -1)
 	{
@@ -1407,14 +1121,11 @@ void psxcd_device::stop_read()
 	m_spu->flush_cdda(sector);
 }
 
-//
-//
-//
 void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 	if (!m_timerinuse[tid])
 	{
-		printf("cdrom:: timer fired for free event\n");
+		verboselog(machine(), 0, "psxcd: timer fired for free event\n");
 		return;
 	}
 
@@ -1423,17 +1134,11 @@ void psxcd_device::device_timer(emu_timer &timer, device_timer_id tid, int param
 	{
 		case event_cmd_complete:
 		{
-			#ifdef debug_cdrom
-				printf("cdrom:: event cmd complete\n");
-			#endif
+			verboselog(machine(), 1, "psxcd: event cmd complete\n");
 
 			cmd_complete((command_result *)ptr);
 			break;
 		}
-
-		case event_preread_sector:
-			preread_sector();
-			break;
 
 		case event_read_sector:
 			read_sector();
@@ -1454,7 +1159,6 @@ int psxcd_device::add_system_event(int type, UINT64 t, void *ptr)
 {
 	// t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / t;
-//  printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
 	for(int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		if(!m_timerinuse[i])

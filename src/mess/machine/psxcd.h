@@ -5,11 +5,6 @@
 #include "sound/spu.h"
 
 #define MAX_PSXCD_TIMERS    (4)
-const int num_commands=0x20;
-
-//
-//
-//
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -24,72 +19,35 @@ const int num_commands=0x20;
 class psxcd_device : public cdrom_image_device
 {
 public:
-
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
 	static void static_set_devname(device_t &device, const char *devname);
+	virtual bool call_load();
+	virtual void call_unload();
+
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	void start_dma(UINT8 *mainram, UINT32 size);
+
+protected:
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 private:
+	void write_command(UINT8 byte);
+
+	typedef void (psxcd_device::*cdcmd)();
 	struct command_result
 	{
-		unsigned char data[32], sz, res;
+		UINT8 data[32], sz, res;
 		command_result *next;
 	};
-
-	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
-	static const unsigned int raw_sector_size=2352;
-
-	unsigned char sr,res,ir,cmdmode,
-								cmdbuf[64],*cbp,
-								mode,
-								secbuf[sector_buffer_size][raw_sector_size],
-								*secptr,
-								filter_file,
-								filter_channel,
-								lastsechdr[8],
-								status;
-	int rdp,secsize,secleft,secskip,
-			sechead,sectail;
-	command_result *res_queue,
-									*cur_res;
-
 	union CDPOS {
 		UINT8 b[4];
 		UINT32 w;
-	};
-	CDPOS loc, curpos;
-
-#ifdef LSB_FIRST
-	enum {
-		M = 2,
-		S = 1,
-		F = 0
-	};
-#else
-	enum {
-		M = 1,
-		S = 2,
-		F = 3
-	};
-#endif
-
-	bool open, m_mute,
-				streaming;
-	device_timer_id next_read_event;
-	INT64 next_sector_t;
-	unsigned int autopause_sector;
-
-	unsigned int start_read_delay,
-								read_sector_cycles,
-								preread_delay;
-
-	void write_command(const unsigned char byte);
-
-	struct command_info
-	{
-		void (psxcd_device::*func)();
-		const char *name;
 	};
 
 	void cdcmd_sync();
@@ -110,7 +68,6 @@ private:
 	void cdcmd_getparam();
 	void cdcmd_getlocl();
 	void cdcmd_getlocp();
-	void cdcmd_illegal();
 	void cdcmd_gettn();
 	void cdcmd_gettd();
 	void cdcmd_seekl();
@@ -120,56 +77,78 @@ private:
 	void cdcmd_reads();
 	void cdcmd_reset();
 	void cdcmd_readtoc();
+	void cdcmd_unknown12();
+	void cdcmd_illegal17();
+	void cdcmd_illegal18();
+	void cdcmd_illegal1d();
 
-	static command_info cmd_table[num_commands];
+	static const cdcmd cmd_table[31];
+	void illegalcmd(UINT8 cmd);
 
 	void cmd_complete(command_result *res);
-	void add_result(command_result *res);
-	void send_result(const unsigned int res,
-											const unsigned char *data=NULL,
-											const unsigned int sz=0,
-											const unsigned int delay=default_irq_delay);
+	void send_result(UINT8 res, UINT8 *data=NULL, int sz=0, int delay=default_irq_delay);
 
 	void start_read();
 	void start_play();
-	void start_streaming();
 	void stop_read();
 	void read_sector();
-	bool read_next_sector();
 	void play_sector();
-	void preread_sector();
 	UINT32 sub_loc(CDPOS src1, CDPOS src2);
-
-public:
-
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual bool call_load();
-	virtual void call_unload();
-
-	void start_dma(UINT8 *mainram, UINT32 size);
-
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( read );
-
-private:
-	UINT32 m_param_count;
-	UINT32 m_sysclock;
-	emu_timer *m_timers[MAX_PSXCD_TIMERS];
-	bool m_timerinuse[MAX_PSXCD_TIMERS];
-
 	int add_system_event(int type, UINT64 t, void *ptr);
-
-	devcb2_write_line m_irq_handler;
-	cpu_device *m_maincpu;
-	spu_device *m_spu;
 
 	UINT8 bcd_to_decimal(const UINT8 bcd) { return ((bcd>>4)*10)+(bcd&0xf); }
 	UINT8 decimal_to_bcd(const UINT8 dec) { return ((dec/10)<<4)|(dec%10); }
 	UINT32 msf_to_lba_ps(UINT32 msf) { msf = msf_to_lba(msf); return (msf>150)?(msf-150):msf; }
 	UINT32 lba_to_msf_ps(UINT32 lba) { return lba_to_msf_alt(lba+150); }
 
+	static const unsigned int sector_buffer_size=16, default_irq_delay=16000;   //480;  //8000; //2000<<2;
+	static const unsigned int raw_sector_size=2352;
+
+	UINT8 cmdbuf[64], mode, secbuf[sector_buffer_size][raw_sector_size];
+	UINT8 filter_file, filter_channel, lastsechdr[8], status;
+	int rdp;
+	UINT8 sechead, sectail;
+	UINT16 m_transcurr;
+	UINT8 m_transbuf[raw_sector_size];
+	command_result *res_queue;
+
+	struct {
+		UINT8 sr, ir, imr;
+		struct {
+			UINT8 ll, lr, rl, rr;
+		} vol;
+	} m_regs;
+
+	CDPOS loc, curpos;
+
+#ifdef LSB_FIRST
+	enum {
+		M = 2,
+		S = 1,
+		F = 0
+	};
+#else
+	enum {
+		M = 1,
+		S = 2,
+		F = 3
+	};
+#endif
+
+	bool open, m_mute, m_dmaload;
+	device_timer_id next_read_event;
+	INT64 next_sector_t;
+	unsigned int autopause_sector, start_read_delay, read_sector_cycles, preread_delay;
+
+	UINT32 m_param_count;
+	UINT32 m_sysclock;
+	emu_timer *m_timers[MAX_PSXCD_TIMERS];
+	bool m_timerinuse[MAX_PSXCD_TIMERS];
+
+
+	devcb2_write_line m_irq_handler;
+	cpu_device *m_maincpu;
+	spu_device *m_spu;
 };
 
 // device type definition
