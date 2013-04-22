@@ -317,7 +317,7 @@ void info_xml_creator::output_one()
 	output_bios();
 	output_rom(m_drivlist.config().root_device());
 	output_device_roms();
-	output_sample();
+	output_sample(m_drivlist.config().root_device());
 	output_chips(m_drivlist.config().root_device(), "");
 	output_display(m_drivlist.config().root_device(), "");
 	output_sound(m_drivlist.config().root_device());
@@ -373,6 +373,7 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	fprintf(m_output, "\t\t<description>%s</description>\n", xml_normalize_string(device.name()));
 
 	output_rom(device);
+	output_sample(device);
 	output_chips(device, devtag);
 	output_display(device, devtag);
 	if (has_speaker)
@@ -613,15 +614,15 @@ void info_xml_creator::output_rom(device_t &device)
 //  samples referenced by a game_driver
 //-------------------------------------------------
 
-void info_xml_creator::output_sample()
+void info_xml_creator::output_sample(device_t &device)
 {
 	// iterate over sample devices
-	samples_device_iterator iter(m_drivlist.config().root_device());
-	for (samples_device *device = iter.first(); device != NULL; device = iter.next())
+	samples_device_iterator sampiter(device);
+	for (samples_device *samples = sampiter.first(); samples != NULL; samples = sampiter.next())
 	{
-		samples_iterator sampiter(*device);
+		samples_iterator iter(*samples);
 		tagmap_t<int> already_printed;
-		for (const char *samplename = sampiter.first(); samplename != NULL; samplename = sampiter.next())
+		for (const char *samplename = iter.first(); samplename != NULL; samplename = iter.next())
 		{
 			// filter out duplicates
 			if (already_printed.add(samplename, 1) == TMERR_DUPLICATE)

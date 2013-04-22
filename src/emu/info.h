@@ -66,7 +66,7 @@ private:
 	void output_bios();
 	void output_rom(device_t &device);
 	void output_device_roms();
-	void output_sample();
+	void output_sample(device_t &device);
 	void output_chips(device_t &device, const char *root_tag);
 	void output_display(device_t &device, const char *root_tag);
 	void output_sound(device_t &device);
