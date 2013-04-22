@@ -399,7 +399,7 @@ void mbc55x_state::machine_start()
 		debug_console_register_command(machine(), "mbc55x_debug", CMDFLAG_NONE, 0, 0, 1, mbc55x_debug);
 
 		/* set up the instruction hook */
-		machine().device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
+		m_maincpu->debug()->set_instruction_hook(instruction_hook);
 	}
 
 	m_debug_machine=DEBUG_NONE;

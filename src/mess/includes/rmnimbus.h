@@ -275,11 +275,11 @@ extern const wd17xx_interface nimbus_wd17xx_interface;
 #define FDC_DRQ_MASK    0x80
 #define FDC_DRIVE_MASK  (FDC_DRIVE0_MASK | FDC_DRIVE1_MASK | FDC_DRIVE2_MASK | FDC_DRIVE3_MASK)
 
-#define FDC_SIDE()          ((state->m_nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
-#define FDC_MOTOR()         ((state->m_nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
-#define FDC_DRIVE()         (fdc_driveno(state->m_nimbus_drives.reg400 & FDC_DRIVE_MASK))
-#define HDC_DRQ_ENABLED()   ((state->m_nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
-#define FDC_DRQ_ENABLED(state)   ((state->m_nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
+#define FDC_SIDE()          ((m_nimbus_drives.reg400 & FDC_SIDE_MASK) >> 4)
+#define FDC_MOTOR()         ((m_nimbus_drives.reg400 & FDC_MOTOR_MASKO) >> 5)
+#define FDC_DRIVE()         (fdc_driveno(m_nimbus_drives.reg400 & FDC_DRIVE_MASK))
+#define HDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & HDC_DRQ_MASK) ? 1 : 0)
+#define FDC_DRQ_ENABLED()   ((m_nimbus_drives.reg400 & FDC_DRQ_MASK) ? 1 : 0)
 
 /* Masks for port 0x410 read*/
 
@@ -469,4 +469,53 @@ public:
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
 	required_device<cpu_device> m_maincpu;
+	UINT8 get_pixel(UINT16 x, UINT16 y);
+	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
+	UINT16 read_pixel_data(UINT16 x, UINT16 y);
+	UINT16 read_reg_00A();
+	void set_pixel(UINT16 x, UINT16 y, UINT8 colour);
+	void set_pixel40(UINT16 x, UINT16 y, UINT8 colour);
+	void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
+	void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
+	void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
+	void write_reg_004();
+	void write_reg_006();
+	void write_reg_010();
+	void write_reg_012();
+	void write_reg_014();
+	void write_reg_016();
+	void write_reg_01A();
+	void write_reg_01C();
+	void write_reg_01E();
+	void write_reg_026();
+	void change_palette(UINT8 bank, UINT16 colours, UINT8 regno);
+	void update_interrupt_state();
+	void handle_eoi(int data);
+	void external_int(UINT16 intno, UINT8 vector);
+	void nimbus_recalculate_ints();
+	void internal_timer_sync(int which);
+	void internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control);
+	void update_dma_control(int which, int new_control);
+	void drq_callback(int which);
+	void nimbus_cpu_init();
+	void nimbus_cpu_reset();
+	void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si);
+	void nimbus_bank_memory();
+	void memory_reset();
+	void keyboard_reset();
+	void queue_scancode(UINT8 scancode);
+	int keyboard_queue_read();
+	void scan_keyboard();
+	void fdc_reset();
+	void set_disk_int(int state);
+	UINT8 fdc_driveno(UINT8 drivesel);
+	void hdc_reset();
+	void hdc_ctrl_write(UINT8 data);
+	void hdc_post_rw();
+	void hdc_drq();
+	void pc8031_reset();
+	void ipc_dumpregs();
+	void iou_reset();
+	void rmni_sound_reset();
+	void mouse_js_reset();
 };

@@ -102,7 +102,8 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 
 /* Debugging */
 
-#define DEBUG_SET(flags)    ((state->m_debug_machine & (flags))==(flags))
+#define DEBUG_SET(flags)    ((m_debug_machine & (flags))==(flags))
+#define DEBUG_SET_STATE(flags)    ((state->m_debug_machine & (flags))==(flags))
 
 #define DEBUG_NONE          0x0000000
 #define DMA_BREAK           0x0000001
@@ -152,9 +153,6 @@ static const UINT16 def_config[16] =
 /* Sound */
 
 
-static void drq_callback(running_machine &machine, int which);
-static void nimbus_recalculate_ints(running_machine &machine);
-
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[]);
 static void execute_debug_intmasks(running_machine &machine, int ref, int params, const char *param[]);
 static void nimbus_debug(running_machine &machine, int ref, int params, const char *param[]);
@@ -168,24 +166,6 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag);
-
-static void nimbus_bank_memory(running_machine &machine);
-static void memory_reset(running_machine &machine);
-static void fdc_reset(running_machine &machine);
-static void set_disk_int(running_machine &machine, int state);
-static void hdc_reset(running_machine &machine);
-static void hdc_ctrl_write(running_machine &machine, UINT8 data);
-static void hdc_post_rw(running_machine &machine);
-static void hdc_drq(running_machine &machine);
-
-static void keyboard_reset(running_machine &machine);
-
-
-static void pc8031_reset(running_machine &machine);
-static void iou_reset(running_machine &machine);
-static void rmni_sound_reset(running_machine &machine);
-
-static void mouse_js_reset(running_machine &machine);
 
 
 
@@ -260,82 +240,81 @@ IRQ_CALLBACK_MEMBER(rmnimbus_state::int_callback)
 }
 
 
-static void update_interrupt_state(running_machine &machine)
+void rmnimbus_state::update_interrupt_state()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int new_vector = 0;
 	int Priority;
 	int IntNo;
 
 	if (LOG_INTERRUPTS)
-		logerror("update_interrupt_status: req=%04X stat=%04X serv=%04X priority_mask=%4X\n", state->m_i186.intr.request, state->m_i186.intr.status, state->m_i186.intr.in_service, state->m_i186.intr.priority_mask);
+		logerror("update_interrupt_status: req=%04X stat=%04X serv=%04X priority_mask=%4X\n", m_i186.intr.request, m_i186.intr.status, m_i186.intr.in_service, m_i186.intr.priority_mask);
 
 	/* loop over priorities */
-	for (Priority = 0; Priority <= state->m_i186.intr.priority_mask; Priority++)
+	for (Priority = 0; Priority <= m_i186.intr.priority_mask; Priority++)
 	{
 		/* note: by checking 4 bits, we also verify that the mask is off */
-		if ((state->m_i186.intr.timer & 0x0F) == Priority)
+		if ((m_i186.intr.timer & 0x0F) == Priority)
 		{
 			/* if we're already servicing something at this level, don't generate anything new */
-			if (state->m_i186.intr.in_service & 0x01)
+			if (m_i186.intr.in_service & 0x01)
 				return;
 
 			/* if there's something pending, generate an interrupt */
-			if (state->m_i186.intr.status & 0x07)
+			if (m_i186.intr.status & 0x07)
 			{
-				if (state->m_i186.intr.status & 1)
+				if (m_i186.intr.status & 1)
 					new_vector = 0x08;
-				else if (state->m_i186.intr.status & 2)
+				else if (m_i186.intr.status & 2)
 					new_vector = 0x12;
-				else if (state->m_i186.intr.status & 4)
+				else if (m_i186.intr.status & 4)
 					new_vector = 0x13;
 				else
 					popmessage("Invalid timer interrupt!");
 
 				/* set the clear mask and generate the int */
-				state->m_i186.intr.ack_mask = 0x0001;
+				m_i186.intr.ack_mask = 0x0001;
 				goto generate_int;
 			}
 		}
 
 		/* check DMA interrupts */
 		for (IntNo = 0; IntNo < 2; IntNo++)
-			if ((state->m_i186.intr.dma[IntNo] & 0x0F) == Priority)
+			if ((m_i186.intr.dma[IntNo] & 0x0F) == Priority)
 			{
 				/* if we're already servicing something at this level, don't generate anything new */
-				if (state->m_i186.intr.in_service & (0x04 << IntNo))
+				if (m_i186.intr.in_service & (0x04 << IntNo))
 					return;
 
 				/* if there's something pending, generate an interrupt */
-				if (state->m_i186.intr.request & (0x04 << IntNo))
+				if (m_i186.intr.request & (0x04 << IntNo))
 				{
 					new_vector = 0x0a + IntNo;
 
 					/* set the clear mask and generate the int */
-					state->m_i186.intr.ack_mask = 0x0004 << IntNo;
+					m_i186.intr.ack_mask = 0x0004 << IntNo;
 					goto generate_int;
 				}
 			}
 
 		/* check external interrupts */
 		for (IntNo = 0; IntNo < 4; IntNo++)
-			if ((state->m_i186.intr.ext[IntNo] & 0x0F) == Priority)
+			if ((m_i186.intr.ext[IntNo] & 0x0F) == Priority)
 			{
 				if (LOG_INTERRUPTS)
 					logerror("Int%d priority=%d\n",IntNo,Priority);
 
 				/* if we're already servicing something at this level, don't generate anything new */
-				if (state->m_i186.intr.in_service & (0x10 << IntNo))
+				if (m_i186.intr.in_service & (0x10 << IntNo))
 					return;
 
 				/* if there's something pending, generate an interrupt */
-				if (state->m_i186.intr.request & (0x10 << IntNo))
+				if (m_i186.intr.request & (0x10 << IntNo))
 				{
 					/* otherwise, generate an interrupt for this request */
 					new_vector = 0x0c + IntNo;
 
 					/* set the clear mask and generate the int */
-					state->m_i186.intr.ack_mask = 0x0010 << IntNo;
+					m_i186.intr.ack_mask = 0x0010 << IntNo;
 					goto generate_int;
 				}
 			}
@@ -344,19 +323,18 @@ static void update_interrupt_state(running_machine &machine)
 
 generate_int:
 	/* generate the appropriate interrupt */
-	state->m_i186.intr.poll_status = 0x8000 | new_vector;
-	if (!state->m_i186.intr.pending)
-		machine.device(MAINCPU_TAG)->execute().set_input_line(0, ASSERT_LINE);
-	state->m_i186.intr.pending = 1;
-	machine.scheduler().trigger(CPU_RESUME_TRIGGER);
+	m_i186.intr.poll_status = 0x8000 | new_vector;
+	if (!m_i186.intr.pending)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_i186.intr.pending = 1;
+	machine().scheduler().trigger(CPU_RESUME_TRIGGER);
 	if (LOG_OPTIMIZATION) logerror("  - trigger due to interrupt pending\n");
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine.time().as_double(), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", machine().time().as_double(), new_vector);
 }
 
 
-static void handle_eoi(running_machine &machine,int data)
+void rmnimbus_state::handle_eoi(int data)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int Priority;
 	int IntNo;
 	int handled=0;
@@ -367,18 +345,18 @@ static void handle_eoi(running_machine &machine,int data)
 		/* turn off the appropriate in-service bit */
 		switch (data & 0x1f)
 		{
-			case 0x08:  state->m_i186.intr.in_service &= ~0x01; break;
-			case 0x12:  state->m_i186.intr.in_service &= ~0x01; break;
-			case 0x13:  state->m_i186.intr.in_service &= ~0x01; break;
-			case 0x0a:  state->m_i186.intr.in_service &= ~0x04; break;
-			case 0x0b:  state->m_i186.intr.in_service &= ~0x08; break;
-			case 0x0c:  state->m_i186.intr.in_service &= ~0x10; break;
-			case 0x0d:  state->m_i186.intr.in_service &= ~0x20; break;
-			case 0x0e:  state->m_i186.intr.in_service &= ~0x40; break;
-			case 0x0f:  state->m_i186.intr.in_service &= ~0x80; break;
-			default:    logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", machine.device(MAINCPU_TAG)->safe_pc(), data & 0x1f);
+			case 0x08:  m_i186.intr.in_service &= ~0x01; break;
+			case 0x12:  m_i186.intr.in_service &= ~0x01; break;
+			case 0x13:  m_i186.intr.in_service &= ~0x01; break;
+			case 0x0a:  m_i186.intr.in_service &= ~0x04; break;
+			case 0x0b:  m_i186.intr.in_service &= ~0x08; break;
+			case 0x0c:  m_i186.intr.in_service &= ~0x10; break;
+			case 0x0d:  m_i186.intr.in_service &= ~0x20; break;
+			case 0x0e:  m_i186.intr.in_service &= ~0x40; break;
+			case 0x0f:  m_i186.intr.in_service &= ~0x80; break;
+			default:    logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", m_maincpu->pc(), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine.time().as_double(), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", machine().time().as_double(), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -388,39 +366,38 @@ static void handle_eoi(running_machine &machine,int data)
 		for (Priority = 0; ((Priority <= 7) && !handled); Priority++)
 		{
 			/* check for in-service timers */
-			if ((state->m_i186.intr.timer & 0x07) == Priority && (state->m_i186.intr.in_service & 0x01))
+			if ((m_i186.intr.timer & 0x07) == Priority && (m_i186.intr.in_service & 0x01))
 			{
-				state->m_i186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine.time().as_double());
+				m_i186.intr.in_service &= ~0x01;
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", machine().time().as_double());
 				handled=1;
 			}
 
 			/* check for in-service DMA interrupts */
 			for (IntNo = 0; ((IntNo < 2) && !handled) ; IntNo++)
-				if ((state->m_i186.intr.dma[IntNo] & 0x07) == Priority && (state->m_i186.intr.in_service & (0x04 << IntNo)))
+				if ((m_i186.intr.dma[IntNo] & 0x07) == Priority && (m_i186.intr.in_service & (0x04 << IntNo)))
 				{
-					state->m_i186.intr.in_service &= ~(0x04 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine.time().as_double(), IntNo);
+					m_i186.intr.in_service &= ~(0x04 << IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", machine().time().as_double(), IntNo);
 					handled=1;
 				}
 
 			/* check external interrupts */
 			for (IntNo = 0; ((IntNo < 4) && !handled) ; IntNo++)
-				if ((state->m_i186.intr.ext[IntNo] & 0x07) == Priority && (state->m_i186.intr.in_service & (0x10 << IntNo)))
+				if ((m_i186.intr.ext[IntNo] & 0x07) == Priority && (m_i186.intr.in_service & (0x10 << IntNo)))
 				{
-					state->m_i186.intr.in_service &= ~(0x10 << IntNo);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine.time().as_double(), IntNo);
+					m_i186.intr.in_service &= ~(0x10 << IntNo);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", machine().time().as_double(), IntNo);
 					handled=1;
 				}
 		}
 	}
-	nimbus_recalculate_ints(machine);
+	nimbus_recalculate_ints();
 }
 
 /* Trigger an external interupt, optionally supplying the vector to take */
-static void external_int(running_machine &machine, UINT16 intno, UINT8 vector)
+void rmnimbus_state::external_int(UINT16 intno, UINT8 vector)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	if (LOG_INTERRUPTS_EXT) logerror("generating external int %02X, vector %02X\n",intno,vector);
 
 	// Only 4 external ints
@@ -434,22 +411,21 @@ static void external_int(running_machine &machine, UINT16 intno, UINT8 vector)
 	// int 0 & int 1
 	if (intno<2)
 	{
-		if(state->m_i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
-			state->m_i186.intr.ext_vector[intno]=vector;
+		if(m_i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
+			m_i186.intr.ext_vector[intno]=vector;
 	}
 
 	// Turn on the requested request bit and handle interrupt
-	state->m_i186.intr.request |= (0x010 << intno);
-	update_interrupt_state(machine);
+	m_i186.intr.request |= (0x010 << intno);
+	update_interrupt_state();
 }
 
-static void nimbus_recalculate_ints(running_machine &machine)
+void rmnimbus_state::nimbus_recalculate_ints()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	if((state->m_iou_reg092 & DISK_INT_ENABLE) && state->m_nimbus_drives.int_ff)
+	if((m_iou_reg092 & DISK_INT_ENABLE) && m_nimbus_drives.int_ff)
 	{
-		state->m_nimbus_drives.int_ff=0;
-		external_int(machine,0,EXTERNAL_INT_DISK);
+		m_nimbus_drives.int_ff=0;
+		external_int(0,EXTERNAL_INT_DISK);
 	}
 }
 
@@ -473,7 +449,7 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::internal_timer_int)
 	if (t->control & 0x2000)
 	{
 		m_i186.intr.status |= 0x01 << which;
-		update_interrupt_state(machine());
+		update_interrupt_state();
 		if (LOG_TIMER) logerror("  Generating timer interrupt\n");
 	}
 
@@ -489,10 +465,9 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::internal_timer_int)
 }
 
 
-static void internal_timer_sync(running_machine &machine, int which)
+void rmnimbus_state::internal_timer_sync(int which)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	struct timer_state *t = &state->m_i186.timer[which];
+	struct timer_state *t = &m_i186.timer[which];
 
 	/* if we have a timing timer running, adjust the count */
 	if (t->time_timer_active)
@@ -514,15 +489,9 @@ static void internal_timer_sync(running_machine &machine, int which)
 }
 
 
-static void internal_timer_update(running_machine &machine,
-									int which,
-									int new_count,
-									int new_maxA,
-									int new_maxB,
-									int new_control)
+void rmnimbus_state::internal_timer_update(int which,int new_count,int new_maxA,int new_maxB,int new_control)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	struct timer_state *t = &state->m_i186.timer[which];
+	struct timer_state *t = &m_i186.timer[which];
 	int update_int_timer = 0;
 
 	if (LOG_TIMER)
@@ -533,7 +502,7 @@ static void internal_timer_update(running_machine &machine,
 	{
 		if (t->control & 0x8000)
 		{
-			internal_timer_sync(machine, which);
+			internal_timer_sync(which);
 			update_int_timer = 1;
 		}
 		t->count = new_count;
@@ -544,7 +513,7 @@ static void internal_timer_update(running_machine &machine,
 	{
 		if (t->control & 0x8000)
 		{
-			internal_timer_sync(machine, which);
+			internal_timer_sync(which);
 			update_int_timer = 1;
 		}
 		t->maxA = new_maxA;
@@ -559,7 +528,7 @@ static void internal_timer_update(running_machine &machine,
 	{
 		if (t->control & 0x8000)
 		{
-			internal_timer_sync(machine, which);
+			internal_timer_sync(which);
 			update_int_timer = 1;
 		}
 
@@ -589,7 +558,7 @@ static void internal_timer_update(running_machine &machine,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 			logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-				machine.device(MAINCPU_TAG)->safe_pc(), new_control);
+				m_maincpu->pc(), new_control);
 
 		/* if we have real changes, update things */
 		if (diff != 0)
@@ -598,7 +567,7 @@ static void internal_timer_update(running_machine &machine,
 			if ((diff & 0x8000) && !(new_control & 0x8000))
 			{
 				/* compute the final count */
-				internal_timer_sync(machine, which);
+				internal_timer_sync(which);
 
 				/* nuke the timer and force the interrupt timer to be recomputed */
 				t->time_timer->adjust(attotime::never, which);
@@ -618,7 +587,7 @@ static void internal_timer_update(running_machine &machine,
 			/* if something about the interrupt timer changed, force an update */
 			if (!(diff & 0x8000) && (diff & 0x2000))
 			{
-				internal_timer_sync(machine, which);
+				internal_timer_sync(which);
 				update_int_timer = 1;
 			}
 		}
@@ -668,15 +637,14 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::dma_timer_callback)
 	{
 		if (LOG_DMA>1) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
 		m_i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine());
+		update_interrupt_state();
 	}
 }
 
 
-static void update_dma_control(running_machine &machine, int which, int new_control)
+void rmnimbus_state::update_dma_control(int which, int new_control)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	struct dma_state *d = &state->m_i186.dma[which];
+	struct dma_state *d = &m_i186.dma[which];
 	int diff;
 
 	/* handle the CHG bit */
@@ -688,7 +656,7 @@ static void update_dma_control(running_machine &machine, int which, int new_cont
 	diff = new_control ^ d->control;
 	if ((LOG_DMA) && (diff & 0x6811))
 		logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-			machine.device(MAINCPU_TAG)->safe_pc(), new_control);
+			m_maincpu->pc(), new_control);
 #if 0
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
@@ -717,18 +685,17 @@ static void update_dma_control(running_machine &machine, int which, int new_cont
 
 	if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 	if (DEBUG_SET(DMA_BREAK))
-		debugger_break(machine);
+		debugger_break(machine());
 
 	/* set the new control register */
 	d->control = new_control;
 }
 
-static void drq_callback(running_machine &machine, int which)
+void rmnimbus_state::drq_callback(int which)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	struct dma_state *dma = &state->m_i186.dma[which];
-	address_space &memory_space   = machine.device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
-	address_space &io_space       = machine.device(MAINCPU_TAG)->memory().space(AS_IO);
+	struct dma_state *dma = &m_i186.dma[which];
+	address_space &memory_space   = m_maincpu->space(AS_PROGRAM);
+	address_space &io_space       = m_maincpu->space(AS_IO);
 
 	UINT16  dma_word;
 	UINT8   dma_byte;
@@ -740,7 +707,7 @@ static void drq_callback(running_machine &machine, int which)
 	if(!(dma->control & ST_STOP))
 	{
 		logerror("%05X:ERROR! - drq%d with dma channel stopped\n",
-		machine.device(MAINCPU_TAG)->safe_pc(), which);
+		m_maincpu->pc(), which);
 
 		return;
 	}
@@ -789,8 +756,8 @@ static void drq_callback(running_machine &machine, int which)
 	if((dma->control & INTERRUPT_ON_ZERO) && (dma->count==0))
 	{
 		if (LOG_DMA>1) logerror("DMA%d - requesting interrupt: count = %04X, source = %04X\n", which, dma->count, dma->source);
-		state->m_i186.intr.request |= 0x04 << which;
-		update_interrupt_state(machine);
+		m_i186.intr.request |= 0x04 << which;
+		update_interrupt_state();
 	}
 }
 
@@ -798,45 +765,43 @@ static void drq_callback(running_machine &machine, int which)
 /* Name: rmnimbus                                                            */
 /* Desc: CPU - Initialize the 80186 CPU                                    */
 /*-------------------------------------------------------------------------*/
-static void nimbus_cpu_init(running_machine &machine)
+void rmnimbus_state::nimbus_cpu_init()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	logerror("Machine reset\n");
 
 	/* create timers here so they stick around */
-	state->m_i186.timer[0].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
-	state->m_i186.timer[1].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
-	state->m_i186.timer[2].int_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),state));
-	state->m_i186.timer[0].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.timer[1].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.timer[2].time_timer = machine.scheduler().timer_alloc(FUNC_NULL);
-	state->m_i186.dma[0].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),state));
-	state->m_i186.dma[1].finish_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),state));
+	m_i186.timer[0].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),this));
+	m_i186.timer[1].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),this));
+	m_i186.timer[2].int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::internal_timer_int),this));
+	m_i186.timer[0].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_i186.timer[1].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_i186.timer[2].time_timer = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_i186.dma[0].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),this));
+	m_i186.dma[1].finish_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::dma_timer_callback),this));
 }
 
-static void nimbus_cpu_reset(running_machine &machine)
+void rmnimbus_state::nimbus_cpu_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	/* reset the interrupt state */
-	state->m_i186.intr.priority_mask        = 0x0007;
-	state->m_i186.intr.timer            = 0x000f;
-	state->m_i186.intr.dma[0]           = 0x000f;
-	state->m_i186.intr.dma[1]           = 0x000f;
-	state->m_i186.intr.ext[0]           = 0x000f;
-	state->m_i186.intr.ext[1]           = 0x000f;
-	state->m_i186.intr.ext[2]           = 0x000f;
-	state->m_i186.intr.ext[3]           = 0x000f;
-	state->m_i186.intr.in_service       = 0x0000;
+	m_i186.intr.priority_mask        = 0x0007;
+	m_i186.intr.timer            = 0x000f;
+	m_i186.intr.dma[0]           = 0x000f;
+	m_i186.intr.dma[1]           = 0x000f;
+	m_i186.intr.ext[0]           = 0x000f;
+	m_i186.intr.ext[1]           = 0x000f;
+	m_i186.intr.ext[2]           = 0x000f;
+	m_i186.intr.ext[3]           = 0x000f;
+	m_i186.intr.in_service       = 0x0000;
 
 	/* External vectors by default to internal int 0/1 vectors */
-	state->m_i186.intr.ext_vector[0]        = 0x000C;
-	state->m_i186.intr.ext_vector[1]        = 0x000D;
+	m_i186.intr.ext_vector[0]        = 0x000C;
+	m_i186.intr.ext_vector[1]        = 0x000D;
 
-	state->m_i186.intr.pending           = 0x0000;
-	state->m_i186.intr.ack_mask          = 0x0000;
-	state->m_i186.intr.request           = 0x0000;
-	state->m_i186.intr.status            = 0x0000;
-	state->m_i186.intr.poll_status       = 0x0000;
+	m_i186.intr.pending           = 0x0000;
+	m_i186.intr.ack_mask          = 0x0000;
+	m_i186.intr.request           = 0x0000;
+	m_i186.intr.status            = 0x0000;
+	m_i186.intr.poll_status       = 0x0000;
 
 	logerror("CPU reset done\n");
 }
@@ -854,7 +819,7 @@ READ16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_r)
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", space.device().safe_pc());
 			if (m_i186.intr.poll_status & 0x8000)
-				int_callback(*machine().device(MAINCPU_TAG), 0);
+				int_callback(*m_maincpu, 0);
 			return m_i186.intr.poll_status;
 
 		case 0x13:
@@ -925,7 +890,7 @@ READ16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_r)
 			if (LOG_PORTS) logerror("%05X:read 80186 Timer %d count\n", space.device().safe_pc(), (offset - 0x28) / 4);
 			which = (offset - 0x28) / 4;
 			if (!(offset & 1))
-				internal_timer_sync(machine(), which);
+				internal_timer_sync(which);
 			return m_i186.timer[which].count;
 
 		case 0x29:
@@ -1025,8 +990,8 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 	{
 		case 0x11:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X\n", space.device().safe_pc(), data16);
-			handle_eoi(machine(),0x8000);
-			update_interrupt_state(machine());
+			handle_eoi(0x8000);
+			update_interrupt_state();
 			break;
 
 		case 0x12:
@@ -1046,31 +1011,31 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			m_i186.intr.ext[1] = (m_i186.intr.ext[1] & ~0x08) | ((data16 >> 2) & 0x08);
 			m_i186.intr.ext[2] = (m_i186.intr.ext[2] & ~0x08) | ((data16 >> 3) & 0x08);
 			m_i186.intr.ext[3] = (m_i186.intr.ext[3] & ~0x08) | ((data16 >> 4) & 0x08);
-			update_interrupt_state(machine());
+			update_interrupt_state();
 			break;
 
 		case 0x15:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X\n", space.device().safe_pc(), data16);
 			m_i186.intr.priority_mask = data16 & 0x0007;
-			update_interrupt_state(machine());
+			update_interrupt_state();
 			break;
 
 		case 0x16:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X\n", space.device().safe_pc(), data16);
 			m_i186.intr.in_service = data16 & 0x00ff;
-			update_interrupt_state(machine());
+			update_interrupt_state();
 			break;
 
 		case 0x17:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X\n", space.device().safe_pc(), data16);
 			m_i186.intr.request = (m_i186.intr.request & ~0x00c0) | (data16 & 0x00c0);
-			update_interrupt_state(machine());
+			update_interrupt_state();
 			break;
 
 		case 0x18:
 			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X\n", space.device().safe_pc(), data16);
 			m_i186.intr.status = (m_i186.intr.status & ~0x8007) | (data16 & 0x8007);
-			update_interrupt_state(machine());
+			update_interrupt_state();
 			break;
 
 		case 0x19:
@@ -1113,7 +1078,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 		case 0x30:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d count = %04X\n", space.device().safe_pc(), (offset - 0x28) / 4, data16);
 			which = (offset - 0x28) / 4;
-			internal_timer_update(machine(),which, data16, -1, -1, -1);
+			internal_timer_update(which, data16, -1, -1, -1);
 			break;
 
 		case 0x29:
@@ -1121,14 +1086,14 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 		case 0x31:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d max A = %04X\n", space.device().safe_pc(), (offset - 0x29) / 4, data16);
 			which = (offset - 0x29) / 4;
-			internal_timer_update(machine(),which, -1, data16, -1, -1);
+			internal_timer_update(which, -1, data16, -1, -1);
 			break;
 
 		case 0x2a:
 		case 0x2e:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d max B = %04X\n", space.device().safe_pc(), (offset - 0x2a) / 4, data16);
 			which = (offset - 0x2a) / 4;
-			internal_timer_update(machine(),which, -1, -1, data16, -1);
+			internal_timer_update(which, -1, -1, data16, -1);
 			break;
 
 		case 0x2b:
@@ -1136,7 +1101,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 		case 0x33:
 			if (LOG_PORTS) logerror("%05X:80186 Timer %d control = %04X\n", space.device().safe_pc(), (offset - 0x2b) / 4, data16);
 			which = (offset - 0x2b) / 4;
-			internal_timer_update(machine(),which, -1, -1, -1, data16);
+			internal_timer_update(which, -1, -1, -1, data16);
 			break;
 
 		case 0x50:
@@ -1208,7 +1173,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 		case 0x6d:
 			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X\n", space.device().safe_pc(), (offset - 0x65) / 8, data16);
 			which = (offset - 0x65) / 8;
-			update_dma_control(machine(), which, data16);
+			update_dma_control(which, data16);
 			break;
 
 		case 0x7f:
@@ -1220,14 +1185,14 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			temp = (data16 & 0x0fff) << 8;
 			if (data16 & 0x1000)
 			{
-				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
-				machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
 			}
 			else
 			{
 				temp &= 0xffff;
-				machine().device(MAINCPU_TAG)->memory().space(AS_IO).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
-				machine().device(MAINCPU_TAG)->memory().space(AS_IO).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
+				m_maincpu->space(AS_IO).install_read_handler(temp, temp + 0xff, read16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_r),this));
+				m_maincpu->space(AS_IO).install_write_handler(temp, temp + 0xff, write16_delegate(FUNC(rmnimbus_state::nimbus_i186_internal_port_w),this));
 			}
 			break;
 
@@ -1240,15 +1205,15 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 void rmnimbus_state::machine_reset()
 {
 	/* CPU */
-	nimbus_cpu_reset(machine());
-	iou_reset(machine());
-	fdc_reset(machine());
-	hdc_reset(machine());
-	keyboard_reset(machine());
-	pc8031_reset(machine());
-	rmni_sound_reset(machine());
-	memory_reset(machine());
-	mouse_js_reset(machine());
+	nimbus_cpu_reset();
+	iou_reset();
+	fdc_reset();
+	hdc_reset();
+	keyboard_reset();
+	pc8031_reset();
+	rmni_sound_reset();
+	memory_reset();
+	mouse_js_reset();
 }
 
 DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
@@ -1258,7 +1223,7 @@ DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 void rmnimbus_state::machine_start()
 {
 	/* init cpu */
-	nimbus_cpu_init(machine());
+	nimbus_cpu_init();
 
 	m_keyboard.keyscan_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::keyscan_callback),this));
 	m_nimbus_mouse.m_mouse_timer=machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(rmnimbus_state::mouse_callback),this));
@@ -1271,7 +1236,7 @@ void rmnimbus_state::machine_start()
 		debug_console_register_command(machine(), "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
 		/* set up the instruction hook */
-		machine().device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
+		m_maincpu->debug()->set_instruction_hook(instruction_hook);
 	}
 
 	m_debug_machine=DEBUG_NONE;
@@ -1279,6 +1244,7 @@ void rmnimbus_state::machine_start()
 
 static void execute_debug_irq(running_machine &machine, int ref, int params, const char *param[])
 {
+	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int IntNo;
 	int Vector;
 
@@ -1288,7 +1254,7 @@ static void execute_debug_irq(running_machine &machine, int ref, int params, con
 		sscanf(param[1],"%X",&Vector);
 
 		debug_console_printf(machine,"triggering IRQ%d, Vector=%02X\n",IntNo,Vector);
-		external_int(machine,IntNo,Vector);
+		state->external_int(IntNo,Vector);
 	}
 	else
 	{
@@ -1341,15 +1307,15 @@ static int instruction_hook(device_t &device, offs_t curpc)
 
 	if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD))
 	{
-		if(DEBUG_SET(DECODE_BIOS) && (addr_ptr[1]==0xF0))
+		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[1]==0xF0))
 		{
-			if(DEBUG_SET(DECODE_BIOS_RAW))
+			if(DEBUG_SET_STATE(DECODE_BIOS_RAW))
 				decode_subbios(&device,curpc,1);
 			else
 				decode_subbios(&device,curpc,0);
 		}
 
-		if(DEBUG_SET(DECODE_DOS21) && (addr_ptr[1]==0x21))
+		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[1]==0x21))
 			decode_dos21(&device,curpc);
 	}
 
@@ -1700,7 +1666,7 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 	}
 }
 
-static void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
+void *rmnimbus_state::get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 {
 	int             addr;
 
@@ -1712,14 +1678,15 @@ static void *get_dssi_ptr(address_space &space, UINT16   ds, UINT16 si)
 
 static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *params;
 	int     count;
 
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
 
 	for(count=0; count<10; count++)
 		logerror("%04X ",params[count]);
@@ -1730,14 +1697,15 @@ static void decode_dssi_generic(device_t *device,UINT16  ds, UINT16 si, UINT8 ra
 
 static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	UINT16          *addr_ptr;
 	t_area_params   *area_params;
 	t_nimbus_brush  *brush;
 	int             cocount;
 
-	area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
+	area_params = (t_area_params   *)state->get_dssi_ptr(space,ds,si);
 
 	if (!raw_flag)
 		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
@@ -1783,7 +1751,8 @@ static void decode_dssi_f_fill_area(device_t *device,UINT16  ds, UINT16 si, UINT
 
 static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 
 	UINT8                   *char_ptr;
 	t_plot_string_params    *plot_string_params;
@@ -1792,7 +1761,7 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 	if(raw_flag)
 		return;
 
-	plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
+	plot_string_params=(t_plot_string_params   *)state->get_dssi_ptr(space,ds,si);
 
 	OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
 	OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
@@ -1812,10 +1781,11 @@ static void decode_dssi_f_plot_character_string(device_t *device,UINT16  ds, UIN
 
 static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *new_colours;
 	int     colour;
-	new_colours=(UINT16  *)get_dssi_ptr(space,ds,si);
+	new_colours=(UINT16  *)state->get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -1829,9 +1799,10 @@ static void decode_dssi_f_set_new_clt(device_t *device,UINT16  ds, UINT16 si, UI
 
 static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *params;
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
 
 	if(raw_flag)
 		return;
@@ -1843,14 +1814,15 @@ static void decode_dssi_f_plonk_char(device_t *device,UINT16  ds, UINT16 si, UIN
 
 static void decode_dssi_f_rw_sectors(device_t *device,UINT16  ds, UINT16 si, UINT8 raw_flag)
 {
-	address_space &space = device->machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	rmnimbus_state  *state = device->machine().driver_data<rmnimbus_state>();
+	address_space &space = state->m_maincpu->space(AS_PROGRAM);
 	UINT16  *params;
 	int     param_no;
 
 	if(raw_flag)
 		return;
 
-	params=(UINT16  *)get_dssi_ptr(space,ds,si);
+	params=(UINT16  *)state->get_dssi_ptr(space,ds,si);
 
 	for(param_no=0;param_no<16;param_no++)
 		logerror("%04X ",params[param_no]);
@@ -1976,21 +1948,20 @@ static const nimbus_blocks ramblocks[] =
 	{{ 0, 512 },    { 512, 512 },   { 1024, 512 } }
 };
 
-static void nimbus_bank_memory(running_machine &machine)
+void rmnimbus_state::nimbus_bank_memory()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	address_space &space = machine.device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
-	int     ramsize = machine.device<ram_device>(RAM_TAG)->size();
+	address_space &space = machine().device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
+	int     ramsize = machine().device<ram_device>(RAM_TAG)->size();
 	int     ramblock = 0;
 	int     blockno;
 	char    bank[10];
-	UINT8   *ram    = &machine.device<ram_device>(RAM_TAG)->pointer()[0];
+	UINT8   *ram    = &machine().device<ram_device>(RAM_TAG)->pointer()[0];
 	UINT8   *map_blocks[3];
 	UINT8   *map_base;
 	int     map_blockno;
 	int     block_ofs;
 
-	UINT8   ramsel = (state->m_mcu_reg080 & 0x1F);
+	UINT8   ramsel = (m_mcu_reg080 & 0x1F);
 
 	// Invalid ramsel, return.
 	if((ramsel & 0x07)!=0x07)
@@ -2011,7 +1982,7 @@ static void nimbus_bank_memory(running_machine &machine)
 	map_blocks[1]  = (ramblocks[ramblock][1].blocksize==0) ? NULL : &ram[ramblocks[ramblock][1].blockbase*1024];
 	map_blocks[2]  = (ramblocks[ramblock][2].blocksize==0) ? NULL : &ram[ramblocks[ramblock][2].blockbase*1024];
 
-	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",state->m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
+	//if(LOG_RAM) logerror("\n\nmcu_reg080=%02X, ramblock=%d, map_blocks[0]=%X, map_blocks[1]=%X, map_blocks[2]=%X\n",m_mcu_reg080,ramblock,(int)map_blocks[0],(int)map_blocks[1],(int)map_blocks[2]);
 
 	for(blockno=0;blockno<8;blockno++)
 	{
@@ -2035,7 +2006,7 @@ static void nimbus_bank_memory(running_machine &machine)
 		{
 			map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
-			state->membank(bank)->set_base(map_base);
+			membank(bank)->set_base(map_base);
 			space.install_readwrite_bank(memmap[blockno].start, memmap[blockno].end, bank);
 			//if(LOG_RAM) logerror(", base=%X\n",(int)map_base);
 		}
@@ -2056,14 +2027,13 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_mcu_w)
 {
 	m_mcu_reg080=data;
 
-	nimbus_bank_memory(machine());
+	nimbus_bank_memory();
 }
 
-static void memory_reset(running_machine &machine)
+void rmnimbus_state::memory_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	state->m_mcu_reg080=0x07;
-	nimbus_bank_memory(machine);
+	m_mcu_reg080=0x07;
+	nimbus_bank_memory();
 }
 
 READ16_MEMBER(rmnimbus_state::nimbus_io_r)
@@ -2097,44 +2067,39 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_io_w)
 
 */
 
-static void keyboard_reset(running_machine &machine)
+void rmnimbus_state::keyboard_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	memset(state->m_keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
+	memset(m_keyboard.keyrows,0xFF,NIMBUS_KEYROWS);
 
-	// Setup timer to scan state->m_keyboard.
-	state->m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
+	// Setup timer to scan m_keyboard.
+	m_keyboard.keyscan_timer->adjust(attotime::zero, 0, attotime::from_hz(50));
 }
 
-static void queue_scancode(running_machine &machine, UINT8 scancode)
+void rmnimbus_state::queue_scancode(UINT8 scancode)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	state->m_keyboard.queue[state->m_keyboard.head] = scancode;
-	state->m_keyboard.head++;
-	state->m_keyboard.head %= ARRAY_LENGTH(state->m_keyboard.queue);
+	m_keyboard.queue[m_keyboard.head] = scancode;
+	m_keyboard.head++;
+	m_keyboard.head %= ARRAY_LENGTH(m_keyboard.queue);
 }
 
-static int keyboard_queue_read(running_machine &machine)
+int rmnimbus_state::keyboard_queue_read()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	int data;
-	if (state->m_keyboard.tail == state->m_keyboard.head)
+	if (m_keyboard.tail == m_keyboard.head)
 		return -1;
 
-	data = state->m_keyboard.queue[state->m_keyboard.tail];
+	data = m_keyboard.queue[m_keyboard.tail];
 
 	if (LOG_KEYBOARD)
 		logerror("keyboard_queue_read(): Keyboard Read 0x%02x\n",data);
 
-	state->m_keyboard.tail++;
-	state->m_keyboard.tail %= ARRAY_LENGTH(state->m_keyboard.queue);
+	m_keyboard.tail++;
+	m_keyboard.tail %= ARRAY_LENGTH(m_keyboard.queue);
 	return data;
 }
 
-static void scan_keyboard(running_machine &machine)
-
+void rmnimbus_state::scan_keyboard()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	UINT8   keyrow;
 	UINT8   row;
 	UINT8   bitno;
@@ -2147,30 +2112,30 @@ static void scan_keyboard(running_machine &machine)
 
 	for(row=0;row<NIMBUS_KEYROWS;row++)
 	{
-		keyrow=machine.root_device().ioport(keynames[row])->read();
+		keyrow=machine().root_device().ioport(keynames[row])->read();
 
 		for(mask=0x80, bitno=7;mask>0;mask=mask>>1, bitno-=1)
 		{
-			if(!(keyrow & mask) && (state->m_keyboard.keyrows[row] & mask))
+			if(!(keyrow & mask) && (m_keyboard.keyrows[row] & mask))
 			{
 				if (LOG_KEYBOARD) logerror("keypress %02X\n",(row<<3)+bitno);
-				queue_scancode(machine, (row<<3)+bitno);
+				queue_scancode((row<<3)+bitno);
 			}
 
-			if((keyrow & mask) && !(state->m_keyboard.keyrows[row] & mask))
+			if((keyrow & mask) && !(m_keyboard.keyrows[row] & mask))
 			{
 				if (LOG_KEYBOARD) logerror("keyrelease %02X\n",0x80+(row<<3)+bitno);
-				queue_scancode(machine, 0x80+(row<<3)+bitno);
+				queue_scancode(0x80+(row<<3)+bitno);
 			}
 		}
 
-		state->m_keyboard.keyrows[row]=keyrow;
+		m_keyboard.keyrows[row]=keyrow;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(rmnimbus_state::keyscan_callback)
 {
-	scan_keyboard(machine());
+	scan_keyboard();
 }
 
 /*
@@ -2192,7 +2157,7 @@ WRITE_LINE_MEMBER(rmnimbus_state::sio_interrupt)
 		m_sio_int_state=state;
 
 		if(state)
-			external_int(machine(),0,EXTERNAL_INT_Z80SIO);
+			external_int(0,EXTERNAL_INT_Z80SIO);
 	}
 }
 
@@ -2213,7 +2178,7 @@ READ16_MEMBER(rmnimbus_state::sio_serial_receive)
 {
 	if(offset==0)
 	{
-		return keyboard_queue_read(machine());
+		return keyboard_queue_read();
 	}
 	else
 		return -1;
@@ -2221,36 +2186,34 @@ READ16_MEMBER(rmnimbus_state::sio_serial_receive)
 
 /* Floppy disk */
 
-static void fdc_reset(running_machine &machine)
+void rmnimbus_state::fdc_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	device_t *fdc = machine.device(FDC_TAG);
+	device_t *fdc = machine().device(FDC_TAG);
 
-	state->m_nimbus_drives.reg400=0;
-	state->m_nimbus_drives.reg410_in=0;
-	state->m_nimbus_drives.reg410_out=0;
-	state->m_nimbus_drives.int_ff=0;
+	m_nimbus_drives.reg400=0;
+	m_nimbus_drives.reg410_in=0;
+	m_nimbus_drives.reg410_out=0;
+	m_nimbus_drives.int_ff=0;
 	wd17xx_set_pause_time(fdc,FDC_PAUSE);
 }
 
-static void set_disk_int(running_machine &machine, int state)
+void rmnimbus_state::set_disk_int(int state)
 {
-	rmnimbus_state *drvstate = machine.driver_data<rmnimbus_state>();
 	if(LOG_DISK)
 		logerror("nimbus_drives_intrq = %d\n",state);
 
-	if(drvstate->m_iou_reg092 & DISK_INT_ENABLE)
+	if(m_iou_reg092 & DISK_INT_ENABLE)
 	{
-		drvstate->m_nimbus_drives.int_ff=state;
+		m_nimbus_drives.int_ff=state;
 
 		if(state)
-			external_int(machine,0,EXTERNAL_INT_DISK);
+			external_int(0,EXTERNAL_INT_DISK);
 	}
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_intrq_w)
 {
-	set_disk_int(machine(),state);
+	set_disk_int(state);
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
@@ -2258,11 +2221,11 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 	if(LOG_DISK)
 		logerror("nimbus_drives_drq_w(%d)\n", state);
 
-	if(state && FDC_DRQ_ENABLED(this))
-		drq_callback(machine(),1);
+	if(state && FDC_DRQ_ENABLED())
+		drq_callback(1);
 }
 
-static UINT8 fdc_driveno(UINT8 drivesel)
+UINT8 rmnimbus_state::fdc_driveno(UINT8 drivesel)
 {
 	switch (drivesel)
 	{
@@ -2297,7 +2260,6 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 	device_t *fdc = machine().device(FDC_TAG);
 
 	int pc=space.device().safe_pc();
-	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
 	device_t *drive = machine().device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
 
 	switch(offset*2)
@@ -2326,7 +2288,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_disk_r)
 			break;
 		case 0x18 :
 			result = m_scsibus->scsi_data_r();
-			hdc_post_rw(machine());
+			hdc_post_rw();
 		default:
 			break;
 	}
@@ -2371,7 +2333,6 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 	if((LOG_DISK_HDD) && (((offset*2)>=0x10) || (offset==0)))
 		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x400);
 
-	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
 	switch(offset*2)
 	{
 		case 0x00 :
@@ -2384,7 +2345,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 
 			// if we enable hdc drq with a pending condition, act on it
 			if((data & HDC_DRQ_MASK) && (~reg400_old & HDC_DRQ_MASK))
-				hdc_drq(machine());
+				hdc_drq();
 
 			break;
 		case 0x08 :
@@ -2400,61 +2361,57 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 			wd17xx_data_w(fdc, space, 0, data);
 			break;
 		case 0x10 :
-			hdc_ctrl_write(machine(),data);
+			hdc_ctrl_write(data);
 			break;
 
 		case 0x18 :
 			m_scsibus->scsi_data_w(data);
-			hdc_post_rw(machine());
+			hdc_post_rw();
 			break;
 	}
 }
 
-static void hdc_reset(running_machine &machine)
+void rmnimbus_state::hdc_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 
-	state->m_nimbus_drives.reg410_in=0;
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_req_r() ? 0 : HDC_REQ_MASK);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_cd_r()  ? 0 : HDC_CD_MASK);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_io_r()  ? 0 : HDC_IO_MASK);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_bsy_r() ? 0 : HDC_BSY_MASK);
-	state->m_nimbus_drives.reg410_in |= (state->m_scsibus->scsi_msg_r() ? 0 : HDC_MSG_MASK);
+	m_nimbus_drives.reg410_in=0;
+	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_req_r() ? 0 : HDC_REQ_MASK);
+	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_cd_r()  ? 0 : HDC_CD_MASK);
+	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_io_r()  ? 0 : HDC_IO_MASK);
+	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_bsy_r() ? 0 : HDC_BSY_MASK);
+	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_msg_r() ? 0 : HDC_MSG_MASK);
 
-	state->m_nimbus_drives.drq_ff=0;
+	m_nimbus_drives.drq_ff=0;
 }
 
-static void hdc_ctrl_write(running_machine &machine, UINT8 data)
+void rmnimbus_state::hdc_ctrl_write(UINT8 data)
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 
 	// If we enable the HDC interupt, and an interrupt is pending, go deal with it.
-	if(((data & HDC_IRQ_MASK) && (~state->m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
-		((~state->m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-		set_disk_int(machine,1);
+	if(((data & HDC_IRQ_MASK) && (~m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
+		((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+		set_disk_int(1);
 
-	state->m_nimbus_drives.reg410_out=data;
+	m_nimbus_drives.reg410_out=data;
 
-	state->m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 1 : 0);
-	state->m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 1 : 0);
+	m_scsibus->scsi_rst_w((data & HDC_RESET_MASK) ? 1 : 0);
+	m_scsibus->scsi_sel_w((data & HDC_SEL_MASK) ? 1 : 0);
 }
 
-static void hdc_post_rw(running_machine &machine)
+void rmnimbus_state::hdc_post_rw()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 
-	if((state->m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
-		state->m_scsibus->scsi_ack_w(1);
+	if((m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
+		m_scsibus->scsi_ack_w(1);
 
-	state->m_nimbus_drives.drq_ff=0;
+	m_nimbus_drives.drq_ff=0;
 }
 
-static void hdc_drq(running_machine &machine)
+void rmnimbus_state::hdc_drq()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	if(HDC_DRQ_ENABLED() && state->m_nimbus_drives.drq_ff)
+	if(HDC_DRQ_ENABLED() && m_nimbus_drives.drq_ff)
 	{
-		drq_callback(machine,1);
+		drq_callback(1);
 	}
 }
 
@@ -2496,9 +2453,9 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 
 
 	if(HDC_IRQ_ENABLED() && ((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-		set_disk_int(machine(),1);
+		set_disk_int(1);
 	else
-		set_disk_int(machine(),0);
+		set_disk_int(0);
 
 	switch( mask )
 	{
@@ -2508,7 +2465,7 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 			if(((m_nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
 			{
 				m_nimbus_drives.drq_ff=1;
-				hdc_drq(machine());
+				hdc_drq();
 			}
 		}
 		else
@@ -2528,14 +2485,13 @@ void rmnimbus_state::nimbus_scsi_linechange( UINT8 mask, UINT8 state )
 
 /* 8031/8051 Peripheral controler 80186 side */
 
-static void pc8031_reset(running_machine &machine)
+void rmnimbus_state::pc8031_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	device_t *er59256 = machine.device(ER59256_TAG);
+	device_t *er59256 = machine().device(ER59256_TAG);
 
 	logerror("peripheral controler reset\n");
 
-	memset(&state->m_ipc_interface,0,sizeof(state->m_ipc_interface));
+	memset(&m_ipc_interface,0,sizeof(m_ipc_interface));
 
 	if(!er59256_data_loaded(er59256))
 		er59256_preload_rom(er59256,def_config,ARRAY_LENGTH(def_config));
@@ -2543,12 +2499,11 @@ static void pc8031_reset(running_machine &machine)
 
 
 #if 0
-static void ipc_dumpregs()
+void rmnimbus_state::ipc_dumpregs()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
 	logerror("in_data=%02X, in_status=%02X, out_data=%02X, out_status=%02X\n",
-				state->m_ipc_interface.ipc_in, state->m_ipc_interface.status_in,
-				state->m_ipc_interface.ipc_out, state->m_ipc_interface.status_out);
+				m_ipc_interface.ipc_in, m_ipc_interface.status_in,
+				m_ipc_interface.ipc_out, m_ipc_interface.status_out);
 
 }
 #endif
@@ -2620,7 +2575,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 	}
 
 	if(((offset==2) || (offset==3)) && (m_iou_reg092 & PC8031_INT_ENABLE))
-		external_int(machine(),0,EXTERNAL_INT_PC8031_8C);
+		external_int(0,EXTERNAL_INT_PC8031_8C);
 
 	if(LOG_PC8031)
 		logerror("8031: PCIOR %04X read of %04X returns %02X\n",pc,offset,result);
@@ -2654,7 +2609,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 						m_ipc_interface.status_out  &= ~IPC_OUT_ADDR;
 						m_ipc_interface.status_in   |= IPC_IN_READ_PEND;
 						if(m_iou_reg092 & PC8031_INT_ENABLE)
-						external_int(machine(),0,EXTERNAL_INT_PC8031_8F);
+						external_int(0,EXTERNAL_INT_PC8031_8F);
 						break;
 
 		case 0x03   : m_ipc_interface.ipc_out=data;
@@ -2662,7 +2617,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 						m_ipc_interface.status_out   |= IPC_OUT_ADDR;
 						m_ipc_interface.status_in    |= IPC_IN_READ_PEND;
 						if(m_iou_reg092 & PC8031_INT_ENABLE)
-						external_int(machine(),0,EXTERNAL_INT_PC8031_8E);
+						external_int(0,EXTERNAL_INT_PC8031_8E);
 						break;
 	}
 }
@@ -2732,10 +2687,9 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 	}
 }
 
-static void iou_reset(running_machine &machine)
+void rmnimbus_state::iou_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	state->m_iou_reg092=0x00;
+	m_iou_reg092=0x00;
 }
 
 /*
@@ -2752,19 +2706,18 @@ static void iou_reset(running_machine &machine)
 
 */
 
-static void rmni_sound_reset(running_machine &machine)
+void rmnimbus_state::rmni_sound_reset()
 {
-	rmnimbus_state *state = machine.driver_data<rmnimbus_state>();
-	//device_t *ay8910 = machine.device(AY8910_TAG);
-	device_t *msm5205 = machine.device(MSM5205_TAG);
+	//device_t *ay8910 = machine().device(AY8910_TAG);
+	device_t *msm5205 = machine().device(MSM5205_TAG);
 
 	//ay8910_reset_ym(ay8910);
 	msm5205_reset_w(msm5205, 1);
 
-	state->m_last_playmode=MSM5205_S48_4B;
-	msm5205_playmode_w(msm5205,state->m_last_playmode);
+	m_last_playmode=MSM5205_S48_4B;
+	msm5205_playmode_w(msm5205,m_last_playmode);
 
-	state->m_ay8910_a=0;
+	m_ay8910_a=0;
 }
 
 READ8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_r)
@@ -2819,7 +2772,7 @@ void nimbus_msm5205_vck(device_t *device, int st)
 {
 	rmnimbus_state *state = device->machine().driver_data<rmnimbus_state>();
 	if(state->m_iou_reg092 & MSM5205_INT_ENABLE)
-		external_int(device->machine(),0,EXTERNAL_INT_MSM5205);
+		state->external_int(0,EXTERNAL_INT_MSM5205);
 }
 
 static const int MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
@@ -2827,10 +2780,9 @@ static const int MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 
 //static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
 //static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
-static void mouse_js_reset(running_machine &machine)
+void rmnimbus_state::mouse_js_reset()
 {
-	rmnimbus_state *drvstate = machine.driver_data<rmnimbus_state>();
-	mouse_joy_state *state = &drvstate->m_nimbus_mouse;
+	mouse_joy_state *state = &m_nimbus_mouse;
 
 	state->m_mouse_px=0;
 	state->m_mouse_py=0;
@@ -2851,7 +2803,7 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 {
 	UINT8   x = 0;
 	UINT8   y = 0;
-//  int     pc=machine().device(MAINCPU_TAG)->safe_pc();
+//  int     pc=m_maincpu->pc();
 
 	UINT8   intstate_x;
 	UINT8   intstate_y;
@@ -2943,7 +2895,7 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 		{
 			xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
 
-			external_int(machine(),0,xint);
+			external_int(0,xint);
 
 //            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
 		}
@@ -2953,7 +2905,7 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 		{
 			yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
 
-			external_int(machine(),0,yint);
+			external_int(0,yint);
 //            logerror("Yint:%02X, myb=%02X\n",yint,myb);
 		}
 	}
@@ -2996,7 +2948,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_mouse_js_r)
 
 	*/
 	UINT8 result;
-	//int pc=machine().device(MAINCPU_TAG)->safe_pc();
+	//int pc=m_maincpu->_pc();
 	mouse_joy_state *state = &m_nimbus_mouse;
 
 	if (ioport("config")->read() & 0x01)
@@ -3041,7 +2993,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_via_write_portb)
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_via_irq_w)
 {
 	if(state)
-		external_int(machine(),VIA_INT,0x00);
+		external_int(VIA_INT,0x00);
 }
 
 const via6522_interface nimbus_via =

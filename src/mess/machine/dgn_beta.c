@@ -205,7 +205,7 @@ static const struct bank_info_entry bank_info[] =
 
 void dgn_beta_state::UpdateBanks(int first, int last)
 {
-	address_space &space_0 = machine().device(MAINCPU_TAG)->memory().space(AS_PROGRAM);
+	address_space &space_0 = m_maincpu->space(AS_PROGRAM);
 	address_space &space_1 = machine().device(DMACPU_TAG)->memory().space(AS_PROGRAM);
 	int                 Page;
 	UINT8               *readbank;
@@ -645,7 +645,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			machine().device(MAINCPU_TAG)->execute().yield();
+			m_maincpu->yield();
 
 		m_d_pia1_pa_last = data & 0x80;
 	}
@@ -677,7 +677,7 @@ WRITE8_MEMBER(dgn_beta_state::d_pia1_pb_w)
 			HALT_CPU = ASSERT_LINE;
 
 		LOG_HALT(("MAIN_CPU HALT=%d\n", HALT_CPU));
-		machine().device(MAINCPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, HALT_CPU);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, HALT_CPU);
 
 		m_d_pia1_pb_last = data & 0x02;
 
@@ -816,7 +816,7 @@ void dgn_beta_state::cpu0_recalc_irq(int state)
 	else
 		IRQ = CLEAR_LINE;
 
-	machine().device(MAINCPU_TAG)->execute().set_input_line(M6809_IRQ_LINE, IRQ);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, IRQ);
 	LOG_INTS(("cpu0 IRQ : %d\n", IRQ));
 }
 
@@ -831,7 +831,7 @@ void dgn_beta_state::cpu0_recalc_firq(int state)
 	else
 		FIRQ = CLEAR_LINE;
 
-	machine().device(MAINCPU_TAG)->execute().set_input_line(M6809_FIRQ_LINE, FIRQ);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, FIRQ);
 
 	LOG_INTS(("cpu0 FIRQ : %d\n", FIRQ));
 }
