@@ -766,7 +766,7 @@ static const cassette_interface tmc1800_cassette_interface =
 	NULL
 };
 
-QUICKLOAD_LOAD_MEMBER( tmc1800_state, tmc1800 )
+QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 {
 	UINT8 *ptr = m_rom->base();
 	int size = image.length();
@@ -798,7 +798,7 @@ static MACHINE_CONFIG_START( tmc1800, tmc1800_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_state, tmc1800, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
 
 	// internal ram
@@ -824,7 +824,7 @@ static MACHINE_CONFIG_START( osc1000b, osc1000b_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_state, tmc1800, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
 
 	// internal ram
@@ -844,7 +844,7 @@ static MACHINE_CONFIG_START( tmc2000, tmc2000_state )
 	MCFG_FRAGMENT_ADD(tmc2000_video)
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_state, tmc1800, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
 
 	// internal ram
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( nano, nano_state )
 	MCFG_FRAGMENT_ADD(nano_video)
 
 	// devices
-	MCFG_QUICKLOAD_ADD("quickload", tmc1800_state, tmc1800, "bin", 0)
+	MCFG_QUICKLOAD_ADD("quickload", tmc1800_base_state, tmc1800, "bin", 0)
 	MCFG_CASSETTE_ADD( "cassette", tmc1800_cassette_interface )
 
 	// internal ram
