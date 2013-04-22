@@ -560,7 +560,7 @@ WRITE8_MEMBER(nes_namcot163_device::chr_w)
 {
 	int bank = offset >> 10;
 
-	if (!(m_latch) & 0x40 && m_chr_bank >= 0xe0)
+	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
 		ui_popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
@@ -575,7 +575,7 @@ WRITE8_MEMBER(nes_namcot163_device::chr_w)
 READ8_MEMBER(nes_namcot163_device::chr_r)
 {
 	int bank = offset >> 10;
-	if (!(m_latch) & 0x40 && m_chr_bank >= 0xe0)
+	if (!(m_latch & 0x40) && m_chr_bank >= 0xe0)
 	{
 		// CIRAM!!!
 		ui_popup_time(10, "CIRAM mapped to VRAM. Please contact MAMEDevs.");
