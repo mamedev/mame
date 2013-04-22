@@ -162,6 +162,7 @@ void nes_sunsoft_dcs_device::device_start()
 	common_start();
 	ntb_enable_timer = timer_alloc(TIMER_PROTECT);
 	ntb_enable_timer->reset();
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(107520);
 
 	save_item(NAME(m_latch1));
 	save_item(NAME(m_latch2));
@@ -248,7 +249,7 @@ WRITE8_MEMBER(nes_sunsoft_dcs_device::write_m)
 	{
 		m_timer_on = 1;
 		// start NTB-ROM timer
-		ntb_enable_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(107520));
+		ntb_enable_timer->adjust(timer_freq);
 	}
 }
 

@@ -48,6 +48,7 @@ void nes_event_device::device_start()
 	common_start();
 	event_timer = timer_alloc(TIMER_EVENT);
 	event_timer->adjust(attotime::never);
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(1);
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_count));
@@ -156,7 +157,7 @@ void nes_event_device::set_prg()
 		if (!m_timer_on && m_timer_enabled)
 		{
 			m_timer_count = 0x20000000 | ((m_dsw->read() & 0x0f) << 25);
-			event_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+			event_timer->adjust(attotime::zero, 0, timer_freq);
 			m_timer_on = 1;
 		}
 	}

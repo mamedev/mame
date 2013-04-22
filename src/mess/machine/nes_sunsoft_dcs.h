@@ -126,6 +126,7 @@ private:
 
 	static const device_timer_id TIMER_PROTECT = 0;
 	emu_timer *ntb_enable_timer;
+	attotime timer_freq;
 };
 
 

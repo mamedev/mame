@@ -75,6 +75,7 @@ void nes_jy_typea_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(1);
 
 	save_item(NAME(m_mul));
 	save_item(NAME(m_latch));
@@ -499,7 +500,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 					m_irq_down = data & 0x80;
 					m_irq_up = data & 0x40;
 					if (m_irq_mode == 0)
-						irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+						irq_timer->adjust(attotime::zero, 0, timer_freq);
 					else
 						irq_timer->adjust(attotime::never);
 					break;

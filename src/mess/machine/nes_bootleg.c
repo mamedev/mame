@@ -202,6 +202,7 @@ void nes_mbaby_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(24576);
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_latch));
@@ -673,7 +674,7 @@ WRITE8_MEMBER(nes_mbaby_device::write_h)
 				if (!m_irq_enable && (data & 0x02))
 				{
 					m_irq_enable = 1;
-					irq_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(24576));
+					irq_timer->adjust(timer_freq);
 				}
 				if (!(data & 0x02))
 				{

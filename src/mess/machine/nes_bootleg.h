@@ -68,6 +68,7 @@ private:
 
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
+	attotime timer_freq;
 };
 
 

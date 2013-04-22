@@ -29,6 +29,8 @@ protected:
 
 	static const device_timer_id TIMER_EVENT = 0;
 	emu_timer *event_timer;
+	attotime timer_freq;
+
 	UINT32 m_timer_count;
 	int m_timer_on, m_timer_enabled;
 };

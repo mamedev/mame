@@ -1131,11 +1131,7 @@ void md_base_state::megadriv_init_common()
 
 	if (machine().device("sega32x"))
 		printf("32X found 'sega32x'\n");
-	if (machine().device("svp"))
-	{
-		printf("SVP (cpu) found 'svp'\n");
-		vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_delayed;
-	}
+
 	if (machine().device("segacd"))
 	{
 		printf("SegaCD found 'segacd'\n");

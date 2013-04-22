@@ -901,11 +901,10 @@ int base_md_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 const char * base_md_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
-	const char *slot_string = "rom";
-
 	if (open_image_file(options))
 	{
-		UINT32 len = core_fsize(m_file), offset = 0;;
+		const char *slot_string = "rom";
+		UINT32 len = core_fsize(m_file), offset = 0;
 		UINT8 *ROM = global_alloc_array(UINT8, len);
 		int type;
 

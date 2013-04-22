@@ -84,6 +84,7 @@ void nes_tengen032_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->reset();
+	timer_freq = machine().device<cpu_device>("maincpu")->cycles_to_attotime(4);
 
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
@@ -304,7 +305,7 @@ WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			m_irq_mode = data & 0x01;
 			if (m_irq_mode)
-				irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(4));
+				irq_timer->adjust(attotime::zero, 0, timer_freq);
 			else
 				irq_timer->adjust(attotime::never);
 			m_irq_reset = 1;
