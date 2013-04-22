@@ -9,9 +9,11 @@
 
  Here we emulate the following PCBs
 
- * Bandai UNL-CONY [mapper 83]
- * Bandai UNL-YOKO
+ * UNL-CONY [mapper 83]
+ * UNL-YOKO
 
+ TODO: fix glitches and emulate properly the variants
+ 
  ***********************************************************************************************************/
 
 

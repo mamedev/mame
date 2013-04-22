@@ -78,12 +78,11 @@ void nes_lrog017_device::device_start()
 
 void nes_lrog017_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
 	chr2_0(0, CHRROM);
-	chr2_2(0, CHRROM);
-	chr2_4(1, CHRROM);
-	chr2_6(2, CHRROM);
+	chr2_2(0, CHRRAM);
+	chr2_4(1, CHRRAM);
+	chr2_6(2, CHRRAM);
 }
 
 void nes_holydivr_device::device_start()
@@ -160,6 +159,10 @@ void nes_h3001_device::pcb_reset()
  Games: Napoleon Senki
 
  iNES: mapper 77
+ 
+ This board should use 2KB of CHRRAM as NTRAM, instead
+ of using directly 4-screen mirroring, but for the 
+ moment we cheat in this way...
 
  -------------------------------------------------*/
 
@@ -179,7 +182,7 @@ WRITE8_MEMBER(nes_lrog017_device::write_h)
  Irem Holy Diver board emulation
 
  iNES: mapper 78 (shared with JF-16)
-
+ 
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_holydivr_device::write_h)

@@ -9,6 +9,9 @@
 
  Here we emulate the various PCBs used by Asian & Korean pirate games
 
+ TODO:
+ - Are the scrolling glitches (check status bar) in Magic Dragon correct? FWIW, NEStopia behaves similarly
+ 
  ***********************************************************************************************************/
 
 

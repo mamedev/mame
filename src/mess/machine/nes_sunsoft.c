@@ -16,6 +16,9 @@
  * Sunsoft FME7 & Sunsoft-5A [mapper 69]
  * Sunsoft-5B [mapper 69]
 
+ TODO:
+ - check 1-line glitches due to IRQ in Sunsoft-3
+ 
  ***********************************************************************************************************/
 
 

@@ -15,7 +15,9 @@
 
 
  TODO:
- - check what causes flickering from PPU
+ - check what causes flickering from PPU in Fire Hawk, Poogie and Big Nose (same PPU issue as Back to 
+   Future 2&3?)
+ - not all the Golden Five games work. investigate!
 
  ***********************************************************************************************************/
 

@@ -23,6 +23,7 @@
  - try to implement some sort of Datach emulation
  - try to implement some sort of Karaoke emulation
  - add support to the PPU for the code necessary to Oeka Kids games (also needed by UNL-DANCE2000 PCB)
+ - check the cause for the flickering in Famicom Jump 2
 
  ***********************************************************************************************************/
 

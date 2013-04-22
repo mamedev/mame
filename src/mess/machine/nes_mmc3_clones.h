@@ -358,9 +358,8 @@ public:
 	virtual void pcb_reset();
 
 private:
-	void prgram_bank8_x(int start, int bank);
 	UINT8 m_reg;
-	int m_use_prgram;
+	int m_prg_chip;
 };
 
 

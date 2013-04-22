@@ -17,6 +17,16 @@
  * Kaiser KS7032
  * Kaiser KS7058
 
+ The Kaiser KS7057 bootleg board is emulated in nes_mmc3_clones.c
+
+ 
+ TODO:
+ - FCEUmm lists more Kaiser PCBs: 
+   * KS7030 (for Yume Koujou Doki Doki Panic by Kaiser?) 
+   * KS7031 (for Dracula II?)
+   * KS7037 
+   but there seem to be no available dumps...
+
  ***********************************************************************************************************/
 
 
@@ -155,7 +165,7 @@ void nes_ks7017_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
+	prg16_cdef(2);
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
@@ -392,7 +402,7 @@ READ8_MEMBER(nes_ks202_device::read_m)
 
  iNES:
 
- In MESS: Not working
+ In MESS: Supported.
 
  -------------------------------------------------*/
 
@@ -420,7 +430,7 @@ WRITE8_MEMBER(nes_ks7017_device::write_l)
 	if (offset >= 0xa00 && offset < 0xb00)
 		m_latch = ((offset >> 2) & 0x03) | ((offset >> 4) & 0x04);
 
-	if (offset >= 0x1000 && offset < 0x1100)
+	if (offset >= 0x1100 && offset < 0x1200)
 		prg16_89ab(m_latch);
 }
 
@@ -429,13 +439,16 @@ WRITE8_MEMBER(nes_ks7017_device::write_ex)
 	LOG_MMC(("ks7017 write_ex, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x20;
 
-	if (offset == 0x0020) /* 0x4020 */
+	if (offset == 0x0020) // 0x4020
 		m_irq_count = (m_irq_count & 0xff00) | data;
 
-	if (offset == 0x0021) /* 0x4021 */
+	if (offset == 0x0021) // 0x4021
+	{
 		m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
+		m_irq_enable = 1;
+	}
 
-	if (offset == 0x0025) /* 0x4025 */
+	if (offset == 0x0025) // 0x4025
 		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
@@ -444,13 +457,14 @@ READ8_MEMBER(nes_ks7017_device::read_ex)
 	LOG_MMC(("ks7017 read_ex, offset: %04x\n", offset));
 	offset += 0x20;
 
-	if (offset == 0x0030) /* 0x4030 */
+	if (offset == 0x0030) // 0x4030
 	{
+		int temp = m_irq_status;
 		m_irq_status &= ~0x01;
-		return m_irq_status;
+		return temp;
 	}
 
-	return 0xff;
+	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
 }
 
 /*-------------------------------------------------

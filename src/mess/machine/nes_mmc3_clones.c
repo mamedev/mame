@@ -408,7 +408,7 @@ void nes_sa9602b_device::device_start()
 {
 	mmc3_start();
 	save_item(NAME(m_reg));
-	save_item(NAME(m_use_prgram));
+	save_item(NAME(m_prg_chip));
 }
 
 void nes_sa9602b_device::pcb_reset()
@@ -416,8 +416,8 @@ void nes_sa9602b_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
 	m_reg = 0;
-	m_use_prgram = 0;
-	mmc3_common_initialize(0x1ff, 0, 0);    // 1.5MB of PRG-ROM, no CHR-ROM
+	m_prg_chip = 0;
+	mmc3_common_initialize(0x1ff, 0xff, 0);    // 1.5MB of PRG-ROM, no CHR-ROM but 32K CHR-RAM
 }
 
 void nes_sachen_shero_device::device_start()
@@ -1709,36 +1709,26 @@ void nes_gouder_device::prg_cb(int start, int bank)
 
  Sachen boards used for a chinese port of Princess Maker (?)
 
- in MESS: Very Preliminary support
+ in MESS: Very Preliminary support, based on Cah4e3
+ code in FCEUMM
 
  -------------------------------------------------*/
 
-/* This PCB can map PRG RAM to 0x8000-0xdfff like MMC5 */
-void nes_sa9602b_device::prgram_bank8_x(int start, int bank)
-{
-	assert(start < 4);
-	assert(bank >= 0);
-
-	bank &= (m_prgram_size / 0x2000) - 1;
-
-	// PRG RAM is mapped after PRG ROM
-	m_prg_bank[start] = m_prg_chunks + bank;
-	m_prg_bank_mem[start]->set_entry(m_prg_bank[start]);
-}
-
 void nes_sa9602b_device::prg_cb(int start, int bank)
 {
-	if (m_use_prgram)
-		prgram_bank8_x(start, bank);
-	else
-		prg8_x(start, bank);
+	if (m_prg_chip == 3)
+	{
+		printf("Accessing PRG beyond end of ROM!\n");
+		m_prg_chip = 2; // assume that the higher PRG chip is mirrored twice
+	}
+	prg8_x(start, (m_prg_chip * 0x40) | (bank & 0x3f));
 
 	if (m_latch & 0x40)
-		prg8_89(m_prg_chunks-2);
+		prg8_89(0x3e);
 	else
-		prg8_cd(m_prg_chunks-2);
+		prg8_cd(0x3e);
 
-	prg8_ef(m_prg_chunks-1);
+	prg8_ef(0x3f);
 //  printf("start %d, bank %d\n", start, bank);
 }
 
@@ -1754,14 +1744,12 @@ WRITE8_MEMBER( nes_sa9602b_device::write_h )
 			break;
 		case 0x0001:
 			if ((m_reg & 7) < 6)
-				m_use_prgram = (data & 0xc0);
-			set_prg(m_prg_base, m_prg_mask);
-			set_chr(m_chr_source, m_chr_base, m_chr_mask);
-			break;
-		default:
-			txrom_write(space, offset, data);
+				m_prg_chip = (data & 0xc0) >> 6;
+			set_prg(0, m_prg_mask);
 			break;
 	}
+
+	txrom_write(space, offset, data, mem_mask);
 }
 
 /*-------------------------------------------------

@@ -20,6 +20,10 @@
  * Sachen Discrete PCBs [mapper 150 & 243]
  * Sachen 8259 [mapper 141 (A), 138 (B), 139 (C), 137 (D)]
 
+ Known issues on specific mappers:
+ 
+ * 133 Qi Wang starts with corrupted graphics (ingame seems better)
+
 
  ***********************************************************************************************************/
 

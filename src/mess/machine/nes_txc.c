@@ -14,6 +14,9 @@
  * TXC Mahjong Block [mapper 172]
  * TXC Strike Wolf [mapper 36]
  * TXC Commandos (and many more) [mapper 241]
+ 
+ TODO: 
+ - Does Commandos indeed use this board?
 
 
  ***********************************************************************************************************/

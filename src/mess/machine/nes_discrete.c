@@ -6,7 +6,16 @@
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
 
-
+ Here we emulate the following PCBs
+ 
+ * PCB with IC 74x161x161x32 [mapper 70 & 152]
+ * PCB with IC 74x139x74 [mapper 87] 
+ * PCB with IC 74x377 [mapper 11]
+ * PCB with IC 74x161x138 [mapper 38]
+ 
+ TODO:
+ - Investigating missing inputs in Crime Busters
+ 
  ***********************************************************************************************************/
 
 

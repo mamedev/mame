@@ -12,6 +12,8 @@
  * NTDEC ASDER [mapper 112]
  * NTDEC Fighting Hero [mapper 193]
 
+ TODO:
+ - why is Master Shooter not working?
 
  ***********************************************************************************************************/
 

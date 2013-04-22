@@ -14,6 +14,7 @@
 
  TODO:
  - review all PCBs and fix the starting banks (which are often the main problem of not working games)
+ - investigate pcbs listed in FCEUmm but with apparently no dumps available (LE05 and LH53)
 
  ***********************************************************************************************************/
 

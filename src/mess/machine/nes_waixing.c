@@ -10,7 +10,8 @@
  Here we emulate the various PCBs used by Waixing for its games
 
  TODO:
- - investigate the PPU issues causing some games not to have sprites...
+ - investigate the PPU issues causing some games not to have sprites (e.g. some games using mappers 15, 164, 
+   242, 249)
 
  ***********************************************************************************************************/
 

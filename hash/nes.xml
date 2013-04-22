@@ -25732,7 +25732,7 @@
 		</part>
 	</software>
 
-	<software name="napoleon" supported="partial">
+	<software name="napoleon">
 		<description>Napoleon Senki (Jpn)</description>
 		<year>1988</year>
 		<publisher>Irem</publisher>
@@ -55929,23 +55929,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="titan12" supported="no">
+	<software name="titan12" supported="partial">
 		<description>Titanic 1912 (Asia, Hacked)</description>
 		<year>19??</year>
 		<publisher>Union Bond</publisher>
 		<info name="serial" value="G-0002"/>
 		<info name="alt_title" value="泰坦尼克号"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nina001" />
-			<feature name="pcb" value="AVE-NINA-01" />
+			<feature name="slot" value="bnrom" />
+			<feature name="pcb" value="NES-BNROM" />
+			<feature name="bus_conflict" value="no" />
 			<dataarea name="prg" size="1048576">
 				<rom name="titanic 1912 (unl).prg" size="1048576" crc="54d98b79" sha1="b96cb87b7cb300bc9225e8778d928672c2659ee6" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -60074,7 +60075,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="meishao" supported="no">
+	<software name="meishao">
 		<description>Mei Shao Nv Meng Gong Chang (Asia)</description>       <!-- Princess Maker? Princess Maker 3? -->
 		<year>19??</year>
 		<publisher>Sachen</publisher>
@@ -60087,12 +60088,10 @@ We don't include these hacks because they were not burned into real carts nor so
 				<rom name="mei shao nv meng gong chang (princess maker)(sachen)(unl)[u].prg1" size="524288" crc="5275487a" sha1="5e48ee1845d29aac9dcd7088e30f5c31221f8e00" offset="0x080000" status="baddump" />
 				<rom name="mei shao nv meng gong chang (princess maker)(sachen)(unl)[u].prg2" size="524288" crc="8e6afee6" sha1="e239a2be92a0e843f8bf2756dfdebc244c6937ca" offset="0x100000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
 			</dataarea>
-			<!-- 32k WRAM on cartridge -->
-			<dataarea name="bwram" size="32768">
-			</dataarea>
+			<!-- The cart has a battery which powers up the CHR-RAM! -->
 		</part>
 	</software>
 
@@ -63031,7 +63030,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 
 <!-- FDS CONVERSIONS -->
 
-	<software name="aisenshi" supported="no">
+	<software name="aisenshi">
 		<description>Ai Senshi Nicol (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63048,7 +63047,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="almanfds" supported="no">
+	<software name="almanfds">
 		<description>Almana no Kiseki (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -63067,7 +63066,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="almanfdsa" cloneof="almanfds" supported="no">
+	<software name="almanfdsa" cloneof="almanfds">
 		<description>Almana no Kiseki (Asia, FDS conversion, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -63138,7 +63137,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<!-- This has been hacked to run on a different hardware -->
-	<software name="bublbfdsa" cloneof="bublbfds" supported="no">
+	<software name="bublbfdsa" cloneof="bublbfds" supported="partial">
 		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -63155,7 +63154,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<!-- This runs on a different hardware -->
-	<software name="bublbfdsb" cloneof="bublbfds" supported="no">
+	<software name="bublbfdsb" cloneof="bublbfds">
 		<description>Bubble Bobble (Asia, FDS conversion, Alt PCB 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -63189,7 +63188,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="dokidoki" supported="no">
+	<software name="dokidoki">
 		<description>Doki Doki Panic (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63208,7 +63207,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="falsnfds" supported="no">
+	<software name="falsnfds">
 		<description>Falsion (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
@@ -63225,7 +63224,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="fuunsfds" supported="no">
+	<software name="fuunsfds">
 		<description>Fuuun Shaolin Kyo (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -63245,7 +63244,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gbertfds" supported="no">
+	<software name="gbertfds">
 		<description>Green Beret (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
@@ -63262,7 +63261,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gbertfdsa" cloneof="gbertfds" supported="no">
+	<software name="gbertfdsa" cloneof="gbertfds">
 		<description>Green Beret (Asia, FDS conversion, Alt)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -63279,7 +63278,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gyrusfds" supported="no">
+	<software name="gyrusfds">
 		<description>Gyruss (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -63360,7 +63359,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="montyfds" supported="no">
+	<software name="montyfds">
 		<description>Monty no Doki Doki Daidassou (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63396,7 +63395,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="prowrfds" supported="no">
+	<software name="prowrfds">
 		<description>ProWres - Famicom Wrestling Association (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -63496,7 +63495,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="tobidfds" supported="partial">
+	<software name="tobidfds">
 		<description>Tobidase Daisakusen (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>

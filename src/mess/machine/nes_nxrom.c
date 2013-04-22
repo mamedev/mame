@@ -18,7 +18,13 @@
  * Nintendo UxROM [mapper 2] + Crazy Climbers variant [mapper 180]
  * Nintendo UN1ROM [mapper 94]
 
-
+ Known issues on specific mappers:
+ 
+ * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
+ * 003 Firehouse Rescue has flashing graphics (same PPU issue as Back to the Future 2 & 3?)
+ * 007 Marble Madness has small graphics corruptions
+ * 034 Titanic 1912 (pirate BxROM) has missing gfx (same PPU issue of many Waixing titles almost for sure)
+ 
  ***********************************************************************************************************/
 
 

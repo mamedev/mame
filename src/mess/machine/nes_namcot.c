@@ -18,6 +18,7 @@
 
  TODO:
  - add sound feature of Namcot-163
+ - Quinty is not working (same issue of Mendel Palace on TxROM boards, of course)
 
  ***********************************************************************************************************/
 

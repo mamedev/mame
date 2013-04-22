@@ -9,7 +9,11 @@
 
  Here we emulate the Nintendo SxROM / MMC-1 PCBs + older variants without WRAM protect bit
 
-
+ Known issues on specific mappers:
+ 
+ * 001 Yoshi flashes in-game. 
+ * 001 Back to the Future have heavily corrupted graphics (since forever).
+ 
  ***********************************************************************************************************/
 
 

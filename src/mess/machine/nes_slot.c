@@ -17,71 +17,6 @@
  You can find the latest version of the doc at http://www.romhacking.net/docs/362/
  
  
- Missing components:
- * Currently, we are not emulating 4-screen mirroring (only 3 games use it)
- * We need a better way to implement CPU cycle based IRQ. Currently we update their counter once every scanline
- but, with this approach, every time 114 clocks have passed and for certain games it is too much!
- * We need to emulate additional sound hardware in mappers 019, 024, 026, 069, 085 (and possibly other ones)
- * We need to emulate EEPROM in mapper 016 and 159
- * Barcode World (mapper 069) and Datach games (mapper 157) need Barcode Reader emulation
- Notice that for mapper 157, the barcode reader enters in the irq, so glitches may be related to this!
- * Karaoke Studio (mapper 188) misses input devices
- 
- Known issues on specific mappers:
- 
- * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
- * 001 Yoshi flashes in-game. Back to the Future have heavily corrupted graphics (since forever).
- * 001 SOROM boards do not properly handle the two WRAM/Battery banks
- * 002, 003, 094, 097, 152 Bus conflict?
- * 003 Firehouse Rescue has flashing graphics
- * 004 Mendel Palace has never worked properly
- * 004 Ninja Gaiden 2 has flashing bg graphics in the second level
- * 005 has issues (see e.g. Just Breed or Metal Slader Glory), RAM banking needs hardware flags to determine size
- * 007 Marble Madness has small graphics corruptions
- * 014 in-game graphics is glitched
- * 015 Shanghai Tycoon has corrupted graphics
- * 033 has still some graphics problem (e.g. missing text in Akira)
- * 034 Impossible Mission II does not show graphics
- * 038 seems to miss inputs. separate reads?
- * 042 Ai Senshi Nicol has broken graphics (our Mapper 42 implementation does not handle CHR banks)
- * 048 Don Doko Don 2 freezes when you reach the first boss
- * 051 only half of the games work
- * 064 has many IRQ problems (due to the way we implement CPU based IRQ) - see Skull & Crossbones.
- Klax has problems as well (even if it uses scanline based IRQ, according to Disch's docs).
- * 067 some 1-line glitches that cannot be solved without a better implementation for cycle-based IRQs
- * 071 Fire Hawk is flashing all the times.
- * 072, 086, 092 lack samples support (maybe others as well)
- * 073 16 bit IRQ mode is not implemented
- * 077 Requires 4-screen mirroring. Currently, it is very glitchy
- * 083 has serious glitches
- * 088 Quinty has never worked properly
- * 096 is preliminary (no correct chr switch in connection to PPU)
- * 104 Not all the games work
- * 107 Are the scrolling glitches (check status bar) correct? NEStopia behaves similarly
- * 112 Master Shooter is not working and misses some graphics
- * 117 In-game glitches
- * 119 Pin Bot has glitches when the ball is in the upper half of the screen
- * 133 Qi Wang starts with corrupted graphics (ingame seems better)
- * 143 are Dancing Block borders (in the intro) correct?
- * 158 In addition to IRQ problems (same as 64), mirroring was just a guess (wrong?). info needed!
- * 164 preliminary - no sprites?
- * 176 has some graphics problem
- * 178 Fan Kong Jin Ying is not working (but not even in NEStopia)
- * 180 Crazy Climber controller?
- * 187, 198, 208, 215 have some PRG banking issues - preliminary!
- * 188 needs mic input (reads from 0x6000-0x7fff)
- * 197 Super Fighter 3 has some glitch in-game (maybe mirroring?)
- * 222 is only preliminar (wrong IRQ, mirroring or CHR banking?)
- * 225 115-in-1 has glitches in the menu (games seem fine)
- * 229 is preliminary
- * 230 not working yet (needs a value to flip at reset)
- * 232 has graphics glitches
- * 241 Commandos is not working (but not even in NEStopia)
- * 242 In Dragon Quest VIII graphics of the main character is not drawn (it seems similar to Shanghai Tycoon [map15]
- because in place of the missing graphics we get glitches in the left border)
- * 249 only half of the games work (and Du Bao Ying Hao seems to suffer the same problem as DQ8 and Shanghai Tycoon)
- * 255 does not really select game (same in NEStopia apparently)
- 
  A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than
  a kind of boards. In these cases (and only in these cases) we exploit nes.hsi to set up accordingly
  emulation. Games which requires this hack are the following:
@@ -98,25 +33,8 @@
  * CHR protection pins for mapper 185
  * VRC-2, VRC-4 and VRC-6 line wiring
  
- Details to investigate:
- * 034 writes to 0x8000-0xffff should not be used for NINA-001 and BNROM, only unlicensed BxROM...
- * 144 we ignore writes to 0x8000 while NEStopia does not. is it a problem?
- * 240 we do not map writes to 0x4020-0x40ff. is this a problem?
- * some other emus uses mapper 210 for mapper 019 games without additional sound hardware and mirroring capabilities
- (in 210 mirroring is hardwired). However, simply initializing mirroring to Vertical in 019 seems to fix all glitches
- in 210 games, so there seems to be no reason to have this duplicate mapper
- 
- Some mappers copy PRG rom in SRAM region. Below is a list of those which does it (in MESS) to further
- investigate if we are supporting them in the right way (e.g. do any of the following have conflicts with SRAM?):
- * 065 (Gimmick! breaks badly without it)
- * 040, 042, 050
- 
  Remember that the MMC # does not equal the mapper #. In particular, Mapper 4 is
  in fact MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
- 
- TODO:
- - add more info
- - add missing mappers
  
  ****************************************************************************************/
 
@@ -209,7 +127,7 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 			// contrary to what happens with later systems, like e.g. SNES or MD,
 			// only half a dozen of NES carts have PRG which is not a power of 2
 			// so we use this bank_map only as an exception
-			printf("uneven rom!\n");
+//			printf("uneven rom!\n");
 
 			// 1. redefine mask as (next power of 2)-1
 			for (; temp; )
