@@ -301,7 +301,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	UINT8 m_reg[3];
+	UINT8 m_reg[4];
 };
 
 
@@ -585,7 +585,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	UINT8 m_reg[3];
+	UINT8 m_reg[4];
 };
 
 
