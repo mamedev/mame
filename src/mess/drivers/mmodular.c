@@ -129,10 +129,12 @@ class polgar_state : public mboard_state
 public:
 	polgar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
-			m_lcdc(*this, "hd44780")
+			m_lcdc(*this, "hd44780"),
+			m_beeper(*this, "beeper")
 		{ }
 
 	optional_device<hd44780_device> m_lcdc;
+	optional_device<beep_device> m_beeper;
 
 	UINT8 led_status;
 	UINT8 lcd_char;
@@ -244,9 +246,9 @@ WRITE8_MEMBER(polgar_state::write_polgar_IO)
 	}
 
 	if (BIT(data,2) || BIT(data,3))
-			machine().device<beep_device>("beep")->set_state(1);
+			m_beeper->set_state(1);
 		else
-			machine().device<beep_device>("beep")->set_state(0);
+			m_beeper->set_state(0);
 
 	if (BIT(data,7) && BIT(data, 4)) {
 		for (i = 0;i < 8;i++)
@@ -412,9 +414,9 @@ WRITE8_MEMBER(polgar_state::milano_write_LED)
 WRITE8_MEMBER(polgar_state::megaiv_write_LED)
 {
 	if (BIT(data,7))
-		machine().device<beep_device>("beep")->set_state(1);
+		m_beeper->set_state(1);
 	else
-		machine().device<beep_device>("beep")->set_state(0);
+		m_beeper->set_state(0);
 	output_set_led_value(102,BIT(data,1)?1:0);
 	output_set_led_value(107,BIT(data,6)?1:0);
 
@@ -475,13 +477,13 @@ if ((data & 0xa1) == 0xa1) {
 }
 
 if (BIT(data,7))
-	machine().device<beep_device>("beep")->set_state(1);
+	m_beeper->set_state(1);
 else
-	machine().device<beep_device>("beep")->set_state(0);
+	m_beeper->set_state(0);
 if (BIT(data,1))
-	machine().device<beep_device>("beep")->set_state(1);
+	m_beeper->set_state(1);
 else
-	machine().device<beep_device>("beep")->set_state(0);
+	m_beeper->set_state(0);
 //  logerror("LEDs  FUNC = %02x found = %d\n",data,found);
 	if (!found) {
 		logerror("unknown LED mask %d\n",data);
@@ -724,9 +726,9 @@ READ32_MEMBER(polgar_state::read_keys_BPL32)
 WRITE8_MEMBER(polgar_state::beep_academy)
 {
 	if (!BIT(data,7))
-			machine().device<beep_device>("beep")->set_state(1);
+			m_beeper->set_state(1);
 		else
-			machine().device<beep_device>("beep")->set_state(0);
+			m_beeper->set_state(0);
 }
 
 WRITE8_MEMBER(polgar_state::megaiv_IO)
@@ -878,7 +880,6 @@ WRITE16_MEMBER(polgar_state::write_LCD_data)
 void polgar_state::write_IOenable(unsigned char data,address_space &space)
 {
 	hd44780_device * hd44780 = space.machine().device<hd44780_device>("hd44780");
-	beep_device *speaker = machine().device<beep_device>("beep");
 
 	if (BIT(data,5) && BIT(data,4)) {
 		if (BIT(data,1)) {
@@ -904,9 +905,9 @@ void polgar_state::write_IOenable(unsigned char data,address_space &space)
 	logerror("Write to IOENBL data: %08x\n",data);
 
 		if (BIT(data,2) || BIT(data,3))
-					speaker->set_state(1);
+					m_beeper->set_state(1);
 				else
-					speaker->set_state(0);
+					m_beeper->set_state(0);
 	}
 
 }
@@ -1532,7 +1533,7 @@ static MACHINE_CONFIG_FRAGMENT ( chess_common )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

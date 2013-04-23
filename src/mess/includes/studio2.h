@@ -23,7 +23,7 @@ public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
-			m_speaker(*this, BEEPER_TAG),
+			m_beeper(*this, "beeper"),
 			m_vdc(*this, CDP1861_TAG),
 			m_clear(*this, "CLEAR"),
 			m_a(*this, "A"),
@@ -31,7 +31,7 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<beep_device> m_speaker;
+	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
 	required_ioport m_clear;
 	required_ioport m_a;

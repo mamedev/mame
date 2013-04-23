@@ -16,6 +16,7 @@
 #include "machine/upd765.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 class pc_state : public driver_device
 {
@@ -26,7 +27,8 @@ public:
 		m_dma8237(*this, "dma8237"),
 		m_pc_kbdc(*this, "pc_kbdc"),
 		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
 	device_t *m_pic8259;
@@ -35,6 +37,7 @@ public:
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
+	optional_device<ram_device> m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */

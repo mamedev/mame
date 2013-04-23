@@ -28,7 +28,7 @@ public:
 		m_pia0(*this, "pia_0"),
 		m_pia1(*this, "pia_1"),
 		m_fdc(*this, "mb8877"),
-		m_beep(*this, BEEPER_TAG),
+		m_beep(*this, "beeper"),
 		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
 		m_row0(*this, "ROW0"),

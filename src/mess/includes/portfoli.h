@@ -46,7 +46,8 @@ public:
 			m_y6(*this, "Y6"),
 			m_y7(*this, "Y7"),
 			m_battery(*this, "BATTERY"),
-			m_contrast(*this, "contrast")
+			m_contrast(*this, "contrast"),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -113,6 +114,7 @@ public:
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
 	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( portfolio_cart );
+	required_device<ram_device> m_ram;
 };
 
 #endif

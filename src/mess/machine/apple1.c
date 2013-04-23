@@ -135,8 +135,8 @@ DRIVER_INIT_MEMBER(apple1_state,apple1)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	space.install_readwrite_bank(0x0000, machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	space.install_readwrite_bank(0x0000, m_ram->size() - 1, "bank1");
+	membank("bank1")->set_base(m_ram->pointer());
 
 	/* Poll the keyboard input ports periodically.  These include both
 	   ordinary keys and the RESET and CLEAR SCREEN pushbutton
@@ -233,7 +233,7 @@ SNAPSHOT_LOAD_MEMBER( apple1_state,apple1)
 
 	end_addr = start_addr + datasize - 1;
 
-	if ((start_addr < 0xE000 && end_addr > machine().device<ram_device>(RAM_TAG)->size() - 1)
+	if ((start_addr < 0xE000 && end_addr > m_ram->size() - 1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"

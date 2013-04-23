@@ -1015,7 +1015,7 @@ void ep_state::video_start()
 {
 	nick = auto_alloc_clear(machine(), NICK_STATE);
 
-	nick->videoram = machine().device<ram_device>(RAM_TAG)->pointer();
+	nick->videoram = m_ram->pointer();
 	Nick_Init();
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }

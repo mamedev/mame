@@ -1951,11 +1951,11 @@ static const nimbus_blocks ramblocks[] =
 void rmnimbus_state::nimbus_bank_memory()
 {
 	address_space &space = machine().device( MAINCPU_TAG)->memory().space( AS_PROGRAM );
-	int     ramsize = machine().device<ram_device>(RAM_TAG)->size();
+	int     ramsize = m_ram->size();
 	int     ramblock = 0;
 	int     blockno;
 	char    bank[10];
-	UINT8   *ram    = &machine().device<ram_device>(RAM_TAG)->pointer()[0];
+	UINT8   *ram    = &m_ram->pointer()[0];
 	UINT8   *map_blocks[3];
 	UINT8   *map_base;
 	int     map_blockno;

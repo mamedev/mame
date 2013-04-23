@@ -39,7 +39,7 @@ public:
 			m_flash1(*this, "flash1"),
 			m_fdc(*this, "fdc"),
 			m_uart2(*this, "ns16550_2"),
-			m_speaker(*this, BEEPER_TAG),
+			m_beeper(*this, "beeper"),
 			m_ram(*this, RAM_TAG),
 			m_region_rom(*this, "maincpu"),
 			m_io_extra(*this, "EXTRA")
@@ -50,7 +50,7 @@ public:
 	required_device<intel_e28f008sa_device> m_flash1;
 	required_device<pc_fdc_superio_device> m_fdc;
 	required_device<ns16550_device> m_uart2;
-	required_device<beep_device> m_speaker;
+	required_device<beep_device> m_beeper;
 	required_device<ram_device> m_ram;
 	required_memory_region m_region_rom;
 	required_ioport m_io_extra;

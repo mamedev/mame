@@ -19,10 +19,12 @@ class ms0515_state : public driver_device
 public:
 	ms0515_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 
 	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
@@ -83,7 +85,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 {
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 	membank("bank0")->set_base(ram + 0000000 + BIT(data,0) * 0160000);
 	membank("bank1")->set_base(ram + 0020000 + BIT(data,1) * 0160000);
 	membank("bank2")->set_base(ram + 0040000 + BIT(data,2) * 0160000);
@@ -118,7 +120,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
 
 void ms0515_state::machine_reset()
 {
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 	ms0515_bank_w(machine().driver_data()->generic_space(),0,0);
 
 	m_video_ram = ram + 0000000 + 0340000;

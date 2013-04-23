@@ -12,6 +12,7 @@
 #include "machine/rescap.h"
 #include "sound/cdp1864.h"
 #include "video/cdp1861.h"
+#include "sound/beep.h"
 
 #define TMC2000_COLORRAM_SIZE   0x200
 
@@ -29,7 +30,8 @@ public:
 			m_cassette(*this, "cassette"),
 			m_rom(*this, CDP1802_TAG),
 			m_run(*this, "RUN"),			
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_beeper(*this, "beeper")
 	{ }
 
 
@@ -38,6 +40,7 @@ public:
 	required_memory_region m_rom;
 	required_ioport m_run;
 	required_device<ram_device> m_ram;
+	optional_device<beep_device> m_beeper;
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( tmc1800 );
 };

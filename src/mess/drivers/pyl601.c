@@ -498,7 +498,7 @@ static MC6845_INTERFACE( pyl601a_crtc6845_interface )
 
 DRIVER_INIT_MEMBER(pyl601_state,pyl601)
 {
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, 64 * 1024);
+	memset(m_ram->pointer(), 0, 64 * 1024);
 }
 
 INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)

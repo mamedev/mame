@@ -8,6 +8,8 @@
 #define PCW_H_
 
 #include "machine/upd765.h"
+#include "machine/ram.h"
+#include "sound/beep.h"
 
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8
@@ -28,7 +30,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_screen(*this, "screen"),
-		  m_fdc(*this, "upd765")
+		  m_fdc(*this, "upd765"),
+		  m_ram(*this, RAM_TAG),
+		  m_beeper(*this, "beeper")	
 	{ }
 
 	int m_boot;
@@ -116,6 +120,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<upd765a_device> m_fdc;
+	required_device<ram_device> m_ram;
+	required_device<beep_device> m_beeper;
+	
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void pcw_update_interrupt_counter();
 	void pcw_update_irqs();

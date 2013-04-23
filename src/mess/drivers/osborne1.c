@@ -246,7 +246,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_PALETTE_LENGTH( 3 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_PIA6821_ADD( "pia_0", osborne1_ieee_pia_config )

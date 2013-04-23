@@ -31,12 +31,12 @@ public:
 	pb1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_beep(*this, BEEPER_TAG),
+			m_beeper(*this, "beeper"),
 			m_hd44352(*this, "hd44352")
 		{ }
 
 	required_device<hd61700_cpu_device> m_maincpu;
-	required_device<beep_device> m_beep;
+	required_device<beep_device> m_beeper;
 	required_device<hd44352_device> m_hd44352;
 
 	emu_timer *m_kb_timer;
@@ -443,7 +443,8 @@ static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
 
 static void port_w(hd61700_cpu_device &device, UINT8 data)
 {
-	device.machine().device<beep_device>(BEEPER_TAG)->set_state((BIT(data,7) ^ BIT(data,6)));
+	pb1000_state *state = device.machine().driver_data<pb1000_state>();
+	state->m_beeper->set_state((BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 
@@ -526,7 +527,7 @@ static MACHINE_CONFIG_START( pb1000, pb1000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 

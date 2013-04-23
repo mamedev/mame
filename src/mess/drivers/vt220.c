@@ -16,12 +16,14 @@ class vt220_state : public driver_device
 public:
 	vt220_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_vt220(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 
@@ -38,7 +40,7 @@ INPUT_PORTS_END
 
 void vt220_state::machine_reset()
 {
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(),0,16*1024);
+	memset(m_ram->pointer(),0,16*1024);
 }
 
 void vt220_state::video_start()

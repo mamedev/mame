@@ -27,7 +27,7 @@ public:
 	m_centronics(*this, "centronics"),
 	m_fdc(*this, "wd1793"),
 	m_crtc(*this, "crtc"),
-	m_beep(*this, BEEPER_TAG),
+	m_beep(*this, "beeper"),
 	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;

@@ -146,10 +146,10 @@ void cgenie_state::machine_start()
 		memset(gfx + i * 8, i, 8);
 
 	/* set up RAM */
-	space.install_read_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	space.install_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(cgenie_state::cgenie_videoram_w),this));
-	m_videoram = machine().device<ram_device>(RAM_TAG)->pointer();
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	space.install_read_bank(0x4000, 0x4000 + m_ram->size() - 1, "bank1");
+	space.install_write_handler(0x4000, 0x4000 + m_ram->size() - 1, write8_delegate(FUNC(cgenie_state::cgenie_videoram_w),this));
+	m_videoram = m_ram->pointer();
+	membank("bank1")->set_base(m_ram->pointer());
 	machine().scheduler().timer_pulse(attotime::from_hz(11025), timer_expired_delegate(FUNC(cgenie_state::handle_cassette_input),this));
 }
 

@@ -52,8 +52,9 @@ class rx78_state : public driver_device
 public:
 	rx78_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, "cassette")
+		m_maincpu(*this, "maincpu"),
+		m_cass(*this, "cassette"),
+		m_ram(*this, RAM_TAG)
 	{ }
 
 	DECLARE_READ8_MEMBER( key_r );
@@ -78,6 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	required_device<ram_device> m_ram;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
 };
 
@@ -514,7 +516,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rx78_state,rx78)
 {
-	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	UINT32 ram_size = m_ram->size();
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)

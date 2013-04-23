@@ -1576,7 +1576,7 @@ UINT8 apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 
 	if ((m_shadow & 0x40) && ((address & 0xF00000) == 0x000000)) // shadow all banks and C0xx?
 	{
-		result = machine().device<ram_device>(RAM_TAG)->pointer()[address];
+		result = m_ram->pointer()[address];
 	}
 	else if ((address & 0x000F00) == 0x000000)  // accessing C0xx?
 	{
@@ -1667,7 +1667,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, UIN
 
 	if ((m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 	{
-		machine().device<ram_device>(RAM_TAG)->pointer()[address] = data;
+		m_ram->pointer()[address] = data;
 	}
 	else if ((address & 0x000F00) == 0x000000)
 	{
@@ -1745,7 +1745,7 @@ DIRECT_UPDATE_MEMBER(apple2gs_state::apple2gs_opbase)
 	{
 		if ((m_shadow & 0x40) && ((address & 0xF00000) == 0x000000))
 		{
-			opptr = &machine().device<ram_device>(RAM_TAG)->pointer()[address];
+			opptr = &m_ram->pointer()[address];
 		}
 		else if ((address & 0x000F00) == 0x000000)
 		{
@@ -1829,22 +1829,22 @@ void apple2gs_state::apple2gs_setup_memory()
 	// otherwise nothing works :)
 	if (m_is_rom3)
 	{
-		int ramsize = machine().device<ram_device>(RAM_TAG)->size();
+		int ramsize = m_ram->size();
 
 		// ROM 03 hardware: the quoted "1 MB" for a base machine doesn't include banks e0/e1, so map accordingly
 		space.install_readwrite_bank(0x010000, ramsize - 1, "bank1");
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x010000);
+		membank("bank1")->set_base(m_ram->pointer() + 0x010000);
 
 		space.install_read_handler( ramsize, 0xdfffff, read8_delegate(FUNC(apple2gs_state::apple2gs_bank_echo_r),this));
 		m_echo_bank = (ramsize >> 16);
 	}
 	else
 	{
-		int ramsize = machine().device<ram_device>(RAM_TAG)->size()-0x30000;
+		int ramsize = m_ram->size()-0x30000;
 
 		// ROM 00/01 hardware: the quoted "256K" for a base machine *does* include banks e0/e1.
 		space.install_readwrite_bank(0x010000, ramsize - 1 + 0x10000, "bank1");
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x010000);
+		membank("bank1")->set_base(m_ram->pointer() + 0x010000);
 
 		space.install_read_handler( ramsize + 0x10000, 0xdfffff, read8_delegate(FUNC(apple2gs_state::apple2gs_bank_echo_r),this));
 		m_echo_bank = (ramsize+0x10000) >> 16;
@@ -1971,8 +1971,8 @@ MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 	machine().device<nvram_device>("nvram")->set_base(m_clock_bram, sizeof(m_clock_bram));
 
 	/* save state stuff.  note that the driver takes care of docram. */
-	UINT8* ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	state_save_register_item_pointer(machine(), "APPLE2GS_RAM", NULL, 0, ram, machine().device<ram_device>(RAM_TAG)->size());
+	UINT8* ram = m_ram->pointer();
+	state_save_register_item_pointer(machine(), "APPLE2GS_RAM", NULL, 0, ram, m_ram->size());
 
 	state_save_register_item(machine(), "NEWVIDEO", NULL, 0, m_newvideo);
 	state_save_register_item(machine(), "BORDERCOLOR", NULL, 0, m_bordercolor);

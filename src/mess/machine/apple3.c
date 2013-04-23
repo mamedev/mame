@@ -262,13 +262,13 @@ UINT8 *apple3_state::apple3_bankaddr(UINT16 bank, offs_t offset)
 {
 	if (bank != (UINT16) ~0)
 	{
-		bank %= machine().device<ram_device>(RAM_TAG)->size() / 0x8000;
-		if ((bank + 1) == (machine().device<ram_device>(RAM_TAG)->size() / 0x8000))
+		bank %= m_ram->size() / 0x8000;
+		if ((bank + 1) == (m_ram->size() / 0x8000))
 			bank = 0x02;
 	}
 	offset += ((offs_t) bank) * 0x8000;
-	offset %= machine().device<ram_device>(RAM_TAG)->size();
-	return &machine().device<ram_device>(RAM_TAG)->pointer()[offset];
+	offset %= m_ram->size();
+	return &m_ram->pointer()[offset];
 }
 
 
@@ -283,9 +283,9 @@ void apple3_state::apple3_setbank(const char *mame_bank, UINT16 bank, offs_t off
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine().device<ram_device>(RAM_TAG)->pointer());
+		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - m_ram->pointer());
 		#else
-		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - machine().device<ram_device>(RAM_TAG)->pointer());
+		logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - m_ram->pointer());
 		#endif
 	}
 	#endif
@@ -568,7 +568,7 @@ UINT8 *apple3_state::apple3_get_indexed_addr(offs_t offset)
 			else if (offset > 0x9FFF)
 				result = apple3_bankaddr(~0, offset - 0x8000);
 			else
-				result = &machine().device<ram_device>(RAM_TAG)->pointer()[offset - 0x2000];
+				result = &m_ram->pointer()[offset - 0x2000];
 		}
 		else if ((n >= 0x80) && (n <= 0x8E))
 		{

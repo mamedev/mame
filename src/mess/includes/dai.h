@@ -57,7 +57,8 @@ public:
 		m_tms5501(*this, "tms5501"),
 		m_sound(*this, "custom"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
@@ -86,6 +87,7 @@ public:
 	TIMER_CALLBACK_MEMBER(dai_timer);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 	void dai_update_memory(int dai_rom_bank);
 };
 

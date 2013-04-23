@@ -852,7 +852,7 @@ static MACHINE_CONFIG_START( c1p, c1p_state )
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(osi600c_discrete_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_PIA6821_ADD( "pia_1", pia_dummy_intf )
@@ -933,9 +933,8 @@ ROM_END
 
 TIMER_CALLBACK_MEMBER(sb2m600_state::setup_beep)
 {
-	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
-	speaker->set_state(0);
-	speaker->set_frequency(300);
+	m_beeper->set_state(0);
+	m_beeper->set_frequency(300);
 }
 
 DRIVER_INIT_MEMBER(c1p_state,c1p)

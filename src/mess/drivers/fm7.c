@@ -229,7 +229,7 @@ READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_beeper_off)
 {
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_state(0);
 	logerror("timed beeper off\n");
 }
 
@@ -239,23 +239,23 @@ WRITE8_MEMBER(fm7_state::fm7_beeper_w)
 
 	if(!m_speaker_active)  // speaker not active, disable all beeper sound
 	{
-		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+		m_beeper->set_state(0);
 		return;
 	}
 
 	if(data & 0x80)
 	{
 		if(m_speaker_active)
-			machine().device<beep_device>(BEEPER_TAG)->set_state(1);
+			m_beeper->set_state(1);
 	}
 	else
-		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+		m_beeper->set_state(0);
 
 	if(data & 0x40)
 	{
 		if(m_speaker_active)
 		{
-			machine().device<beep_device>(BEEPER_TAG)->set_state(1);
+			m_beeper->set_state(1);
 			logerror("timed beeper on\n");
 			machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 		}
@@ -272,7 +272,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 {
 	if(m_speaker_active)
 	{
-		machine().device<beep_device>(BEEPER_TAG)->set_state(1);
+		m_beeper->set_state(1);
 		logerror("timed beeper on\n");
 		machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 	}
@@ -1836,8 +1836,8 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM7;
 
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(1200);
+	m_beeper->set_state(0);
 }
 
 MACHINE_START_MEMBER(fm7_state,fm77av)
@@ -1857,8 +1857,8 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 	membank("bank21")->set_base(RAM+0x800);
 
 	m_type = SYS_FM77AV;
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(1200);
+	m_beeper->set_state(0);
 }
 
 MACHINE_START_MEMBER(fm7_state,fm11)
@@ -1868,8 +1868,8 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(1200);
+	m_beeper->set_state(0);
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 }
@@ -1877,8 +1877,8 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 MACHINE_START_MEMBER(fm7_state,fm16)
 {
 	m_type = SYS_FM16;
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(1200);
+	m_beeper->set_state(0);
 }
 
 void fm7_state::machine_reset()
@@ -2022,7 +2022,7 @@ static MACHINE_CONFIG_START( fm7, fm7_state )
 	MCFG_SOUND_ADD("psg", AY8910, XTAL_4_9152MHz / 4)
 	MCFG_SOUND_CONFIG(fm7_psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 1.00)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.25)
@@ -2064,7 +2064,7 @@ static MACHINE_CONFIG_START( fm8, fm7_state )
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2107,7 +2107,7 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 	MCFG_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
 	MCFG_SOUND_CONFIG(fm7_ym_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2153,7 +2153,7 @@ static MACHINE_CONFIG_START( fm11, fm7_state )
 	MCFG_CPU_IO_MAP(fm11_x86_io)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)
@@ -2194,7 +2194,7 @@ static MACHINE_CONFIG_START( fm16beta, fm7_state )
 	MCFG_QUANTUM_PERFECT_CPU("sub")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.25)

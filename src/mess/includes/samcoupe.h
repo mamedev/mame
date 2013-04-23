@@ -14,6 +14,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 /* screen dimensions */
 #define SAM_BLOCK           8
@@ -42,7 +43,8 @@ public:
 			: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speaker(*this, "speaker"),
-			m_cassette(*this, "cassette") {
+			m_cassette(*this, "cassette"),
+			m_ram(*this, RAM_TAG) {
 				sam_bank_read_ptr[0] = NULL;
 				sam_bank_write_ptr[0] = NULL;
 				sam_bank_read_ptr[1] = NULL;
@@ -124,6 +126,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 	void draw_mode4_line(int y, int hpos);
 	void draw_mode3_line(int y, int hpos);
 	void draw_mode12_block(bitmap_ind16 &bitmap, int vpos, int hpos, UINT8 mask);

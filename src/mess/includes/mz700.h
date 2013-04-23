@@ -17,6 +17,7 @@
 #include "machine/z80pio.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 class mz_state : public driver_device
 {
@@ -25,7 +26,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -98,6 +100,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 };
 
 

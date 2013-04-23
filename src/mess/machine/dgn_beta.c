@@ -231,17 +231,17 @@ void dgn_beta_state::UpdateBanks(int first, int last)
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((machine().device<ram_device>(RAM_TAG)->size() / 1024)-1))     // Block is ram
+		if ((MapPage*4) < ((m_ram->size() / 1024)-1))     // Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &machine().device<ram_device>(RAM_TAG)->pointer()[MapPage*RamPageSize];
+				readbank = &m_ram->pointer()[MapPage*RamPageSize];
 				if(m_LogDatWrites)
 					debug_console_printf(machine(), "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &machine().device<ram_device>(RAM_TAG)->pointer()[(MapPage*RamPageSize)-256];
+				readbank = &m_ram->pointer()[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			write8_delegate func = bank_info[Page].func;
@@ -310,7 +310,7 @@ void dgn_beta_state::SetDefaultTask()
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-//  videoram=&machine().device<ram_device>(RAM_TAG)->pointer()[TextVidBasePage*RamPageSize];
+//  videoram=&m_ram->pointer()[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -1036,7 +1036,7 @@ void dgn_beta_state::machine_reset()
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	m_videoram.set_target(machine().device<ram_device>(RAM_TAG)->pointer(),m_videoram.bytes());     /* Point video ram at the start of physical ram */
+	m_videoram.set_target(m_ram->pointer(),m_videoram.bytes());     /* Point video ram at the start of physical ram */
 
 	wd17xx_reset(fdc);
 	m_wd2797_written=0;

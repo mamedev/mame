@@ -1,4 +1,5 @@
 #include "imagedev/cassette.h"
+#include "sound/beep.h"
 
 /*
  *
@@ -110,7 +111,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sub(*this, "sub"),
 		m_x86(*this, "x86"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_beeper(*this, "beeper") { }
 
 	optional_shared_ptr<UINT8> m_shared_ram;
 	optional_shared_ptr<UINT8> m_boot_ram;
@@ -262,6 +264,7 @@ public:
 	required_device<cpu_device> m_sub;
 	optional_device<cpu_device> m_x86;
 	required_device<cassette_image_device> m_cassette;
+	required_device<beep_device> m_beeper;
 	void fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat);
 	void fm7_alu_function_compare(UINT32 offset);
 	void fm7_alu_function_pset(UINT32 offset);

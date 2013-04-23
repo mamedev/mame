@@ -36,10 +36,12 @@ class mstation_state : public driver_device
 public:
 	mstation_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 
 	intelfsh8_device *m_flashes[2];
 	UINT8 m_bank1[2];
@@ -454,7 +456,7 @@ void mstation_state::machine_start()
 
 	// allocate the videoram
 	m_vram = (UINT8*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
-	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
+	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// map firsh RAM bank at 0xc000-0xffff
 	membank("sysram")->set_base(m_ram_base);

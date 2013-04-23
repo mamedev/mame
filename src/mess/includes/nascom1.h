@@ -10,6 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/wd17xx.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 struct nascom1_portstat_t
 {
@@ -32,7 +33,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	required_shared_ptr<UINT8> m_videoram;
 	device_t *m_hd6402;
@@ -61,6 +63,7 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;	
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 };
 

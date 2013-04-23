@@ -93,8 +93,8 @@ void apple3_state::apple3_video_text40(bitmap_ind16 &bitmap)
 	const UINT8 *char_data;
 	pen_t fg, bg, temp;
 	UINT16 *dest;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	UINT8 *ram = m_ram->pointer();
+	UINT32 ram_size = m_ram->size();
 
 	for (y = 0; y < 24; y++)
 	{
@@ -150,8 +150,8 @@ void apple3_state::apple3_video_text80(bitmap_ind16 &bitmap)
 	const UINT8 *char_data;
 	pen_t fg, bg;
 	UINT16 *dest;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	UINT8 *ram = m_ram->pointer();
+	UINT32 ram_size = m_ram->size();
 
 	for (y = 0; y < 24; y++)
 	{
@@ -201,7 +201,7 @@ void apple3_state::apple3_video_graphics_hgr(bitmap_ind16 &bitmap)
 	const UINT8 *pix_info;
 	UINT16 *ptr;
 	UINT8 b;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	for (y = 0; y < 192; y++)
 	{
@@ -246,7 +246,7 @@ void apple3_state::apple3_video_graphics_chgr(bitmap_ind16 &bitmap)
 	UINT16 *ptr;
 	UINT8 b;
 	UINT16 fgcolor, bgcolor;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	for (y = 0; y < 192; y++)
 	{
@@ -291,7 +291,7 @@ void apple3_state::apple3_video_graphics_shgr(bitmap_ind16 &bitmap)
 	const UINT8 *pix_info2;
 	UINT16 *ptr;
 	UINT8 b1, b2;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	for (y = 0; y < 192; y++)
 	{
@@ -330,7 +330,7 @@ void apple3_state::apple3_video_graphics_chires(bitmap_ind16 &bitmap)
 	UINT16 *pen;
 	PAIR pix;
 	int y, i;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	for (y = 0; y < 192; y++)
 	{

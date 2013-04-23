@@ -29,7 +29,7 @@ public:
 		m_cram(*this, "cram"),
 		m_mn1271_ram(*this, "mn1271_ram"),
 		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, BEEPER_TAG),
+		m_beeper(*this, "beeper"),
 		m_pcg(*this, "pcg"),
 		m_gfx_rom(*this, "gfx_rom"),
 		m_gfx_ram(*this, "gfx_ram"),
@@ -559,7 +559,7 @@ static MACHINE_CONFIG_START( jr200, jr200_state )
 
 	// AY-8910 ?
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

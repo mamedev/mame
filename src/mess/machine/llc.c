@@ -147,7 +147,7 @@ Z80CTC_INTERFACE( llc2_ctc_intf )
 /* Driver initialization */
 DRIVER_INIT_MEMBER(llc_state,llc2)
 {
-	m_p_videoram.set_target( machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000,m_p_videoram.bytes());
+	m_p_videoram.set_target( m_ram->pointer() + 0xc000,m_p_videoram.bytes());
 }
 
 MACHINE_RESET_MEMBER(llc_state,llc2)
@@ -164,14 +164,14 @@ MACHINE_RESET_MEMBER(llc_state,llc2)
 	membank("bank3")->set_base(memregion("maincpu")->base() + 0x6000);
 
 	space.install_write_bank(0xc000, 0xffff, "bank4");
-	membank("bank4")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000);
+	membank("bank4")->set_base(m_ram->pointer() + 0xc000);
 
 }
 
 WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	mem_space.install_write_bank(0x0000, 0xbfff, "bank1");
 	membank("bank1")->set_base(ram);
@@ -198,7 +198,7 @@ WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 	else
 	{
 		mem_space.install_write_bank(0x4000, 0x5fff, "bank2");
-		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
+		membank("bank2")->set_base(m_ram->pointer() + 0x4000);
 	}
 
 }

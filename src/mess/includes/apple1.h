@@ -10,6 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 typedef short termchar_t;
 
@@ -34,7 +35,8 @@ public:
 	apple1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	int m_vh_clrscrn_pressed;
 	int m_kbd_data;
@@ -80,6 +82,7 @@ public:
 	terminal_t *terminal_create(int gfx, int blank_char, int char_bits,int (*getcursorcode)(int original_code),int num_cols, int num_rows);
 	attotime apple1_vh_dsp_time_to_ready();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
+	required_device<ram_device> m_ram;
 };
 
 

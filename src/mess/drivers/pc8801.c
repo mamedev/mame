@@ -303,7 +303,8 @@ public:
 			m_fdccpu(*this, "fdccpu"),
 			m_pic(*this, I8214_TAG),
 			m_rtc(*this, UPD1990A_TAG),
-			m_cassette(*this, "cassette")
+			m_cassette(*this, "cassette"),
+			m_beeper(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -311,6 +312,7 @@ public:
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
+	required_device<beep_device> m_beeper;
 	UINT8 *m_work_ram;
 	UINT8 *m_hi_work_ram;
 	UINT8 *m_ext_work_ram;
@@ -1185,10 +1187,10 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 	m_rtc->clk_w((data & 4) >> 2);
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		machine().device<beep_device>(BEEPER_TAG)->set_state(1);
+		m_beeper->set_state(1);
 
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
-		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+		m_beeper->set_state(0);
 
 	if((m_device_ctrl_data & 0x40) != (data & 0x40))
 	{
@@ -1215,7 +1217,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 
 	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
 	if(m_device_ctrl_data & 0x80)
-		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+		m_beeper->set_state(0);
 
 	m_device_ctrl_data = data;
 }
@@ -2473,8 +2475,8 @@ void pc8801_state::machine_reset()
 		m_crtc.status = 0;
 	}
 
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(2400);
+	m_beeper->set_state(0);
 
 	#ifdef USE_PROPER_I8214
 	{
@@ -2708,7 +2710,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SOUND_CONFIG(pc88_ym2608_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))

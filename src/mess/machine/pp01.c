@@ -21,7 +21,7 @@ WRITE8_MEMBER(pp01_state::pp01_video_write_mode_w)
 void pp01_state::pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part)
 {
 	UINT16 addroffset = part ? 0x1000  : 0x0000;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	if (BIT(m_video_write_mode,3)) {
 		// Copy mode
@@ -117,7 +117,7 @@ void pp01_state::pp01_set_memory(UINT8 block, UINT8 data)
 					break;
 		}
 
-		membank(bank)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + (data & 0x0F)* 0x1000);
+		membank(bank)->set_base(m_ram->pointer() + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		space.install_read_bank (startaddr, endaddr, bank);
 		space.unmap_write(startaddr, endaddr);

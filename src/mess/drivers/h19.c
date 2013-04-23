@@ -49,7 +49,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_crtc(*this, "crtc"),
 			m_ace(*this, "ins8250"),
-			m_beep(*this, BEEPER_TAG),
+			m_beep(*this, "beeper"),
 			m_p_videoram(*this, "p_videoram")
 	{ }
 
@@ -419,7 +419,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

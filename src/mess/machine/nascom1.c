@@ -257,7 +257,7 @@ void nascom1_state::machine_reset()
 
 DRIVER_INIT_MEMBER(nascom1_state,nascom1)
 {
-	switch (machine().device<ram_device>(RAM_TAG)->size())
+	switch (m_ram->size())
 	{
 	case 1 * 1024:
 		m_maincpu->space(AS_PROGRAM).nop_readwrite(
@@ -269,7 +269,7 @@ DRIVER_INIT_MEMBER(nascom1_state,nascom1)
 			0x1400, 0x4fff, "bank1");
 		m_maincpu->space(AS_PROGRAM).nop_readwrite(
 			0x5000, 0xafff);
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(m_ram->pointer());
 		break;
 
 	case 32 * 1024:
@@ -277,13 +277,13 @@ DRIVER_INIT_MEMBER(nascom1_state,nascom1)
 			0x1400, 0x8fff, "bank1");
 		m_maincpu->space(AS_PROGRAM).nop_readwrite(
 			0x9000, 0xafff);
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(m_ram->pointer());
 		break;
 
 	case 40 * 1024:
 		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(
 			0x1400, 0xafff, "bank1");
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(m_ram->pointer());
 		break;
 	}
 }

@@ -28,7 +28,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
-			m_beep(*this, BEEPER_TAG),
+			m_beep(*this, "beeper"),
 			m_bank1(*this, "bank1"),
 			m_bank2(*this, "bank2")
 		{ }
@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CARTSLOT_ADD("cart")

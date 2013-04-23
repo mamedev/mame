@@ -564,7 +564,8 @@ ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *
 		m_ppi8255(*this, "ppi8255"),
 		m_speaker(*this, "speaker"),
 		m_isabus(*this, "isa"),
-		m_pc_kbdc(*this, "pc_kbdc")
+		m_pc_kbdc(*this, "pc_kbdc"),
+		m_ram(*this, RAM_TAG)
 {
 }
 
@@ -648,8 +649,8 @@ void ibm5160_mb_device::device_start()
 	install_device(this,    0x0080, 0x0087, 0, 0, FUNC(pc_page_r), FUNC(pc_page_w) );
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));
 	/* MESS managed RAM */
-	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
-		membank( "bank10" )->set_base( machine().device<ram_device>(RAM_TAG)->pointer() );
+	if ( m_ram->pointer() )
+		membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
 IRQ_CALLBACK_MEMBER(ibm5160_mb_device::pc_irq_callback)
@@ -761,7 +762,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
 		 * 6-7  The number of floppy disk drives
 		 */
 		data = ioport("DSW0")->read() & 0xF3;
-		switch ( machine().device<ram_device>(RAM_TAG)->size() )
+		switch ( m_ram->size() )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -799,7 +800,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( machine().device<ram_device>(RAM_TAG)->size() - 64 * 1024 )
+		switch ( m_ram->size() - 64 * 1024 )
 		{
 		case 64 * 1024:     data |= 0x00; break;
 		case 128 * 1024:    data |= 0x02; break;
@@ -817,7 +818,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 		case 896 * 1024:    data |= 0x0B; break;
 		case 960 * 1024:    data |= 0x0D; break;
 		}
-		if ( machine().device<ram_device>(RAM_TAG)->size() > 960 * 1024 )
+		if ( m_ram->size() > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));

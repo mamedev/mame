@@ -36,10 +36,12 @@ class destiny_state : public driver_device
 public:
 	destiny_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<beep_device> m_beeper;
 
 	char m_led_array[21];
 
@@ -158,7 +160,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 WRITE8_MEMBER(destiny_state::sound_w)
 {
 	// a0: sound on/off
-	machine().device<beep_device>(BEEPER_TAG)->set_state(~offset & 1);
+	m_beeper->set_state(~offset & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
@@ -247,8 +249,8 @@ INPUT_PORTS_END
 
 void destiny_state::machine_start()
 {
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(800); // TODO: determine exact frequency thru schematics
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(800); // TODO: determine exact frequency thru schematics
+	m_beeper->set_state(0);
 }
 
 void destiny_state::machine_reset()
@@ -275,7 +277,7 @@ static MACHINE_CONFIG_START( destiny, destiny_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

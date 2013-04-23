@@ -11,6 +11,7 @@
 #include "machine/i8255.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 class lviv_state : public driver_device
 {
@@ -19,7 +20,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_speaker(*this, "speaker"),
-		m_cassette(*this, "cassette") { }
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG) { }
 
 	unsigned char * m_video_ram;
 	unsigned short m_colortable[1][4];
@@ -48,6 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 	void lviv_update_palette(UINT8 pal);
 	void lviv_update_memory ();
 	void lviv_setup_snapshot (UINT8 * data);

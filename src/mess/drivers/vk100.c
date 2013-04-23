@@ -159,7 +159,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_crtc(*this, "crtc"),
-		m_speaker(*this, BEEPER_TAG),
+		m_speaker(*this, "beeper"),
 		m_uart(*this, "i8251"),
 		//m_i8251_rx_timer(NULL),
 		//m_i8251_tx_timer(NULL),
@@ -1025,7 +1025,7 @@ static MACHINE_CONFIG_START( vk100, vk100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vk100 )
 
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 0.25 )
 MACHINE_CONFIG_END
 

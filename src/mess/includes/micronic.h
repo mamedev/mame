@@ -26,7 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, Z80_TAG),
 		m_lcdc(*this, HD61830_TAG),
-		m_beep(*this, BEEPER_TAG),
+		m_beep(*this, "beeper"),
 		m_rtc(*this, MC146818_TAG),
 		m_ram(*this, RAM_TAG),
 		m_ram_base(*this, "ram_base"),

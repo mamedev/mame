@@ -446,7 +446,7 @@ READ_LINE_MEMBER( studio2_state::ef4_r )
 
 WRITE_LINE_MEMBER( studio2_state::q_w )
 {
-	m_speaker->set_state(state);
+	m_beeper->set_state(state);
 }
 
 static COSMAC_INTERFACE( studio2_cosmac_intf )
@@ -550,7 +550,7 @@ static MACHINE_CONFIG_START( studio2, studio2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD( studio2_cartslot )
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( visicom, visicom_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD( studio2_cartslot )
@@ -588,7 +588,7 @@ static MACHINE_CONFIG_START( mpt02, mpt02_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CDP1864_ADD(CDP1864_TAG, CDP1864_CLOCK, mpt02_cdp1864_intf)
@@ -629,9 +629,8 @@ ROM_END
 
 TIMER_CALLBACK_MEMBER(studio2_state::setup_beep)
 {
-	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
-	speaker->set_state(0);
-	speaker->set_frequency(300);
+	m_beeper->set_state(0);
+	m_beeper->set_frequency(300);
 }
 
 DRIVER_INIT_MEMBER(studio2_state,studio2)

@@ -45,7 +45,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_framecnt(0),
-	m_beeper(*this, BEEPER_TAG),
+	m_beeper(*this, "beeper"),
 	m_cass(*this, "cassette"),
 	m_p_colorram(*this, "colorram"),
 	m_p_videoram(*this, "videoram"){ }
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

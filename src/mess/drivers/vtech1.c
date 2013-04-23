@@ -161,14 +161,15 @@ public:
 			m_speaker(*this, "speaker"),
 			m_cassette(*this, "cassette"),
 			m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
 	optional_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
 
-	UINT8 *m_ram;
+	UINT8 *m_ram_pointer;
 	UINT32 m_ram_size;
 	required_shared_ptr<UINT8> m_videoram;
 
@@ -204,6 +205,7 @@ public:
 	void vtech1_get_track();
 	void vtech1_put_track();
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 
@@ -239,7 +241,7 @@ SNAPSHOT_LOAD_MEMBER( vtech1_state, vtech1 )
 	}
 
 	/* write it to ram */
-	image.fread( &m_ram[start - 0x7800], size);
+	image.fread( &m_ram_pointer[start - 0x7800], size);
 
 	/* patch variables depending on snapshot type */
 	switch (header[21])
@@ -629,18 +631,18 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 	int id;
 
 	/* ram */
-	m_ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	m_ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	m_ram_pointer = m_ram->pointer();
+	m_ram_size = m_ram->size();
 
 	/* setup memory banking */
-	membank("bank1")->set_base(m_ram);
+	membank("bank1")->set_base(m_ram_pointer);
 
 	/* 16k memory expansion? */
 	if (m_ram_size == 18*1024 || m_ram_size == 22*1024 || m_ram_size == 32*1024)
 	{
 		offs_t base = 0x7800 + (m_ram_size - 0x4000);
 		prg.install_readwrite_bank(base, base + 0x3fff, "bank2");
-		membank("bank2")->set_base(m_ram + base - 0x7800);
+		membank("bank2")->set_base(m_ram_pointer + base - 0x7800);
 	}
 
 	/* 64k expansion? */
@@ -648,11 +650,11 @@ DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 	{
 		/* install fixed first bank */
 		prg.install_readwrite_bank(0x8000, 0xbfff, "bank2");
-		membank("bank2")->set_base(m_ram + 0x800);
+		membank("bank2")->set_base(m_ram_pointer + 0x800);
 
 		/* install the others, dynamically banked in */
 		prg.install_readwrite_bank(0xc000, 0xffff, "bank3");
-		membank("bank3")->configure_entries(0, (m_ram_size - 0x4800) / 0x4000, m_ram + 0x4800, 0x4000);
+		membank("bank3")->configure_entries(0, (m_ram_size - 0x4800) / 0x4000, m_ram_pointer + 0x4800, 0x4000);
 		membank("bank3")->set_entry(0);
 	}
 

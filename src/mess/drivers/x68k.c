@@ -1466,7 +1466,7 @@ READ16_MEMBER(x68k_state::x68k_sram_r)
 //  if(offset == 0x5a/2)  // 0x5a should be 0 if no SASI HDs are present.
 //      return 0x0000;
 	if(offset == 0x08/2)
-		return machine().device<ram_device>(RAM_TAG)->size() >> 16;  // RAM size
+		return m_ram->size() >> 16;  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1481,7 +1481,7 @@ READ16_MEMBER(x68k_state::x68k_sram_r)
 READ32_MEMBER(x68k_state::x68k_sram32_r)
 {
 	if(offset == 0x08/4)
-		return (machine().device<ram_device>(RAM_TAG)->size() & 0xffff0000);  // RAM size
+		return (m_ram->size() & 0xffff0000);  // RAM size
 #if 0
 	if(offset == 0x46/2)
 		return 0x0024;
@@ -1600,7 +1600,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
 {
 	int val = param;
 	int v;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	if(strcmp(machine().system().name,"x68030") == 0)
 		v = 0x0b;
@@ -2410,8 +2410,8 @@ MACHINE_RESET_MEMBER(x68k_state,x68000)
 	UINT8* romdata = memregion("user2")->base();
 	attotime irq_time;
 
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(),0,machine().device<ram_device>(RAM_TAG)->size());
-	memcpy(machine().device<ram_device>(RAM_TAG)->pointer(),romdata,8);
+	memset(m_ram->pointer(),0,m_ram->size());
+	memcpy(m_ram->pointer(),romdata,8);
 
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200
@@ -2468,8 +2468,8 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_emptyram_r),this));
 	space.install_write_handler(0x000000,0xbffffb,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_emptyram_w),this));
-	space.install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	space.install_readwrite_bank(0x000000,m_ram->size()-1,0xffffffff,0,"bank1");
+	membank("bank1")->set_base(m_ram->pointer());
 	space.install_read_handler(0xc00000,0xdfffff,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_gvram_r),this));
 	space.install_write_handler(0xc00000,0xdfffff,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_gvram_w),this));
 	membank("bank2")->set_base(m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
@@ -2515,8 +2515,8 @@ MACHINE_START_MEMBER(x68k_state,x68030)
 	m_spriteram = (UINT16*)(*memregion("user1"));
 	space.install_read_handler(0x000000,0xbffffb,0xffffffff,0,read16_delegate(FUNC(x68k_state::x68k_rom0_r),this),0xffffffff);
 	space.install_write_handler(0x000000,0xbffffb,0xffffffff,0,write16_delegate(FUNC(x68k_state::x68k_rom0_w),this),0xffffffff);
-	space.install_readwrite_bank(0x000000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	space.install_readwrite_bank(0x000000,m_ram->size()-1,0xffffffff,0,"bank1");
+	membank("bank1")->set_base(m_ram->pointer());
 	space.install_read_handler(0xc00000,0xdfffff,0xffffffff,0,read32_delegate(FUNC(x68k_state::x68k_gvram32_r),this));
 	space.install_write_handler(0xc00000,0xdfffff,0xffffffff,0,write32_delegate(FUNC(x68k_state::x68k_gvram32_w),this));
 	membank("bank2")->set_base(m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta

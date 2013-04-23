@@ -37,9 +37,9 @@ enum
     image_fread_memory - read image to memory
 -------------------------------------------------*/
 
-static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
+void comx35_state::image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	UINT8 *ram = image.device().machine().device<ram_device>(RAM_TAG)->pointer() + (addr - 0x4000);
+	UINT8 *ram = m_ram->pointer() + (addr - 0x4000);
 
 	image.fread(ram, count);
 }
@@ -55,7 +55,7 @@ QUICKLOAD_LOAD_MEMBER( comx35_state, comx35_comx )
 	UINT8 header[16] = {0};
 	int size = image.length();
 
-	if (size > machine().device<ram_device>(RAM_TAG)->size())
+	if (size > m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

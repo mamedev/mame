@@ -22,7 +22,8 @@ public:
 	spc1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_vdg(*this, "mc6847") ,
-		m_maincpu(*this, "maincpu") {}
+			m_maincpu(*this, "maincpu"),
+			m_ram(*this, RAM_TAG) {}
 
 	required_device<mc6847_base_device> m_vdg;
 	UINT8 m_IPLK;
@@ -44,6 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(spc1000_gmode_r);
 	DECLARE_READ8_MEMBER(spc1000_mc6847_videoram_r);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 
@@ -62,7 +64,7 @@ WRITE8_MEMBER(spc1000_state::spc1000_iplk_w)
 		membank("bank1")->set_base(mem);
 		membank("bank3")->set_base(mem);
 	} else {
-		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+		UINT8 *ram = m_ram->pointer();
 		membank("bank1")->set_base(ram);
 		membank("bank3")->set_base(ram + 0x8000);
 	}
@@ -76,7 +78,7 @@ READ8_MEMBER(spc1000_state::spc1000_iplk_r)
 		membank("bank1")->set_base(mem);
 		membank("bank3")->set_base(mem);
 	} else {
-		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+		UINT8 *ram = m_ram->pointer();
 		membank("bank1")->set_base(ram);
 		membank("bank3")->set_base(ram + 0x8000);
 	}
@@ -229,7 +231,7 @@ void spc1000_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *mem = memregion("maincpu")->base();
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	space.install_read_bank(0x0000, 0x7fff, "bank1");
 	space.install_read_bank(0x8000, 0xffff, "bank3");

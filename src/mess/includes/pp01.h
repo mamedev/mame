@@ -9,13 +9,15 @@
 
 #include "machine/pit8253.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 
 class pp01_state : public driver_device
 {
 public:
 	pp01_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	UINT8 m_video_scroll;
 	UINT8 m_memory_block[16];
@@ -44,6 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pp01_8255_portc_w);
 	DECLARE_READ8_MEMBER(pp01_8255_portc_r);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	void pp01_video_w(UINT8 block,UINT16 offset,UINT8 data,UINT8 part);
 	void pp01_set_memory(UINT8 block, UINT8 data);
 };

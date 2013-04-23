@@ -43,7 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mb8877a(*this, "mb8877a"),
 		m_pit8253(*this, "pit"),
-		m_beeper(*this, BEEPER_TAG),
+		m_beeper(*this, "beeper"),
 		m_region_tvram(*this, "tvram"),
 		m_region_gvram(*this, "gvram"),
 		m_region_chargen(*this, "chargen"),
@@ -892,7 +892,7 @@ static MACHINE_CONFIG_START( mz2000, mz2000_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

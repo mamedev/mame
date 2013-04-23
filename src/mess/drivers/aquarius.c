@@ -187,8 +187,8 @@ DRIVER_INIT_MEMBER(aquarius_state,aquarius)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		space.install_readwrite_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+		space.install_readwrite_bank(0x4000, 0x4000 + m_ram->size() - 0x1000 - 1, "bank1");
+		membank("bank1")->set_base(m_ram->pointer());
 	}
 }
 

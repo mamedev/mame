@@ -27,7 +27,8 @@ class rt1715_state : public driver_device
 public:
 	rt1715_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	int m_led1_val;
 	int m_led2_val;
@@ -41,6 +42,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 
@@ -109,8 +111,8 @@ WRITE8_MEMBER(rt1715_state::k7658_data_w)
 
 void rt1715_state::machine_start()
 {
-	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0800);
-	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank2")->set_base(m_ram->pointer() + 0x0800);
+	membank("bank3")->set_base(m_ram->pointer());
 }
 
 void rt1715_state::machine_reset()
@@ -124,7 +126,7 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 	logerror("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(m_ram->pointer());
 }
 
 /***************************************************************************

@@ -13,7 +13,7 @@
 
 #define NICK_PALETTE_SIZE   256
 
-
+#include "machine/ram.h"
 struct NICK_STATE;
 
 class ep_state : public driver_device
@@ -21,7 +21,8 @@ class ep_state : public driver_device
 public:
 	ep_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
@@ -39,6 +40,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(enterp_wd1770_drq_w);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	void enterprise_update_memory_page(address_space &space, offs_t page, int index);
 	char Nick_FetchByte(unsigned long Addr);
 	void nick_write_pixel(int ci);

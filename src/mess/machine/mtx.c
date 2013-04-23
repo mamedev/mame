@@ -74,7 +74,7 @@ void mtx_state::bankswitch(UINT8 data)
 
 	*/
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	ram_device *messram = machine().device<ram_device>(RAM_TAG);
+	ram_device *messram = m_ram;
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -366,7 +366,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 
 MACHINE_START_MEMBER(mtx_state,mtx512)
 {
-	ram_device *messram = machine().device<ram_device>(RAM_TAG);
+	ram_device *messram = m_ram;
 
 	/* find devices */
 	m_z80ctc = machine().device<z80ctc_device>(Z80CTC_TAG);

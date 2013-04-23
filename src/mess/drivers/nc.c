@@ -347,7 +347,7 @@ void nc_state::nc_refresh_memory_bank_config(int bank)
 
 			mem_bank = mem_bank & m_membank_internal_ram_mask;
 
-			addr = machine().device<ram_device>(RAM_TAG)->pointer() + (mem_bank<<14);
+			addr = m_ram->pointer() + (mem_bank<<14);
 
 			membank(bank1)->set_base(addr);
 			membank(bank5)->set_base(addr);
@@ -420,13 +420,13 @@ void nc_state::nc_common_restore_memory_from_stream()
 	if (m_file->read(&stored_size, sizeof(UINT32)) != sizeof(UINT32))
 		stored_size = 0;
 
-	if (stored_size > machine().device<ram_device>(RAM_TAG)->size())
-		restore_size = machine().device<ram_device>(RAM_TAG)->size();
+	if (stored_size > m_ram->size())
+		restore_size = m_ram->size();
 	else
 		restore_size = stored_size;
 
 	/* read as much as will fit into memory */
-	m_file->read(machine().device<ram_device>(RAM_TAG)->pointer(), restore_size);
+	m_file->read(m_ram->pointer(), restore_size);
 	/* seek over remaining data */
 	m_file->seek(SEEK_CUR,stored_size - restore_size);
 }
@@ -434,7 +434,7 @@ void nc_state::nc_common_restore_memory_from_stream()
 /* store a block of memory to the nvram file */
 void nc_state::nc_common_store_memory_to_stream()
 {
-	UINT32 size = machine().device<ram_device>(RAM_TAG)->size();
+	UINT32 size = m_ram->size();
 	if (!m_file)
 		return;
 
@@ -443,7 +443,7 @@ void nc_state::nc_common_store_memory_to_stream()
 	m_file->write(&size, sizeof(UINT32));
 
 	/* write data block */
-	m_file->write(machine().device<ram_device>(RAM_TAG)->pointer(), size);
+	m_file->write(m_ram->pointer(), size);
 }
 
 void nc_state::nc_common_open_stream_for_reading()
@@ -660,15 +660,15 @@ void nc_state::nc_sound_update(int channel)
 	int on;
 	int frequency;
 	int period;
-	const char *beeper_device = NULL;
+	beep_device *beeper_device = NULL;
 
 	switch(channel)
 	{
 		case 0:
-			beeper_device = "beep.1";
+			beeper_device = m_beeper1;
 			break;
 		case 1:
-			beeper_device = "beep.2";
+			beeper_device = m_beeper2;
 			break;
 	}
 
@@ -681,9 +681,9 @@ void nc_state::nc_sound_update(int channel)
 	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
-	machine().device<beep_device>(beeper_device)->set_state(on);
+	beeper_device->set_state(on);
 	/* set frequency */
-	machine().device<beep_device>(beeper_device)->set_frequency(frequency);
+	beeper_device->set_frequency(frequency);
 }
 
 WRITE8_MEMBER(nc_state::nc_sound_w)

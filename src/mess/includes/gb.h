@@ -8,7 +8,7 @@
 #define GB_H_
 
 #include "machine/gb_slot.h"
-
+#include "machine/ram.h"
 
 /* Interrupts */
 #define VBL_INT               0       /* V-Blank    */
@@ -116,7 +116,8 @@ public:
 		m_custom(*this, "custom"),
 		m_region_maincpu(*this, "maincpu"),
 		m_rambank(*this, "cgb_ram"),
-		m_inputs(*this, "INPUTS") { }
+		m_inputs(*this, "INPUTS"),
+		m_ram(*this, RAM_TAG) { }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -213,6 +214,7 @@ protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
+	optional_device<ram_device> m_ram;	
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();

@@ -365,7 +365,9 @@ public:
 		m_hgdc2(*this, "upd7220_btm"),
 		m_sasibus(*this, SASIBUS_TAG ":host"),
 		m_video_ram_1(*this, "video_ram_1"),
-		m_video_ram_2(*this, "video_ram_2"){ }
+		m_video_ram_2(*this, "video_ram_2"),
+		m_beeper(*this, "beeper"),
+		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
@@ -379,6 +381,8 @@ public:
 	optional_device<scsicb_device> m_sasibus;
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
+	required_device<beep_device> m_beeper;
+	optional_device<ram_device> m_ram;	
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -3109,7 +3113,7 @@ READ8_MEMBER(pc9801_state::ppi_prn_portb_r){ return ioport("DSW5")->read(); }
 
 WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 {
-	machine().device<beep_device>(BEEPER_TAG)->set_state(!(data & 0x08));
+	m_beeper->set_state(!(data & 0x08));
 }
 
 static I8255A_INTERFACE( ppi_system_intf )
@@ -3388,7 +3392,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	state_save_register_global_pointer(machine(), m_work_ram, 0xa0000);
 	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x700000);
 
-	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
+	m_ram_size = m_ram->size() - 0xa0000;
 
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
@@ -3427,8 +3431,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 			m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(2400);
+	m_beeper->set_state(0);
 
 	m_nmi_ff = 0;
 	m_mouse.control = 0xff;
@@ -3612,7 +3616,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
@@ -3677,7 +3681,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 //  MCFG_SOUND_CONFIG(pc98_ym2608_intf)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
@@ -3743,7 +3747,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 //  MCFG_SOUND_CONFIG(pc98_ym2608_intf)
 //  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

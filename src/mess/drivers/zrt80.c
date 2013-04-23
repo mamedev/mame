@@ -30,7 +30,7 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "crtc"),
 	m_8250(*this, "ins8250"),
-	m_beep(*this, BEEPER_TAG),
+	m_beep(*this, "beeper"),
 	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

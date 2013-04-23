@@ -54,7 +54,8 @@ public:
 			m_pr7820(*this, "ld_pr7820"),
 			m_22vp932(*this, "ld_22vp932") ,
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_beeper(*this, "beeper")	 { }
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -120,6 +121,7 @@ public:
 	DECLARE_WRITE16_MEMBER(serial_transmit);
 	DECLARE_READ16_MEMBER(serial_receive);
 	required_device<cpu_device> m_maincpu;
+	optional_device<beep_device> m_beeper;
 };
 
 
@@ -284,12 +286,11 @@ MACHINE_RESET_MEMBER(dlair_state,dlair)
 INTERRUPT_GEN_MEMBER(dlair_state::vblank_callback)
 {
 	/* also update the speaker on the European version */
-	beep_device *beep = machine().device<beep_device>("beep");
-	if (beep != NULL)
+	if (m_beeper != NULL)
 	{
 		z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
-		beep->set_state(1);
-		beep->set_frequency(ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
+		m_beeper->set_state(1);
+		m_beeper->set_frequency(ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
 	}
 }
 
@@ -789,7 +790,7 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 

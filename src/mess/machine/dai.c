@@ -116,12 +116,12 @@ void dai_state::machine_start()
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(dai_state::dai_bootstrap_callback),this));
 	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this)); /* timer for tms5501 */
 
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
+	memset(m_ram->pointer(), 0, m_ram->size());
 }
 
 void dai_state::machine_reset()
 {
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(m_ram->pointer());
 }
 
 /***************************************************************************

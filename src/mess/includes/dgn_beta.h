@@ -10,6 +10,7 @@
 #include "video/mc6845.h"
 #include "machine/wd17xx.h"
 #include "machine/6821pia.h"
+#include "machine/ram.h"
 
 /* Tags */
 
@@ -88,7 +89,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_mc6845(*this, "crtc"),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	required_device<mc6845_device> m_mc6845;
 	required_shared_ptr<UINT8> m_videoram;
@@ -207,6 +209,7 @@ public:
 	void ScanInKeyboard(void);
 	void dgn_beta_frame_interrupt (int data);
 	void dgn_beta_line_interrupt (int data);
+	required_device<ram_device> m_ram;
 };
 
 

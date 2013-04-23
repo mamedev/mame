@@ -1128,7 +1128,7 @@ UINT8 apple2_state::apple2_getfloatingbusvalue()
 		//CMemory::mState |= CMemory::kVBLBar; // N: VBL' is true // FIX: MESS?
 	}
 
-	return m_ram->pointer()[address % machine().device<ram_device>(RAM_TAG)->size()]; // FIX: this seems to work, but is it right!?
+	return m_ram->pointer()[address % m_ram->size()]; // FIX: this seems to work, but is it right!?
 }
 
 
@@ -2107,7 +2107,7 @@ void apple2_state::apple2_init_common()
 	if (memregion("maincpu")->bytes() < 0x8000)
 		m_a2_mask &= ~VAR_ROMSWITCH;
 
-	if (machine().device<ram_device>(RAM_TAG)->size() <= 64*1024)
+	if (m_ram->size() <= 64*1024)
 		m_a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 
 	apple2_refresh_delegates();

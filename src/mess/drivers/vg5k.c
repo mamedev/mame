@@ -66,7 +66,8 @@ public:
 			m_ef9345(*this, "ef9345"),
 			m_dac(*this, "dac"),
 			m_printer(*this, "printer"),
-			m_cassette(*this, "cassette")
+			m_cassette(*this, "cassette"),
+			m_ram(*this, RAM_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,6 +75,7 @@ public:
 	required_device<dac_device> m_dac;
 	required_device<printer_image_device> m_printer;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 
 	offs_t m_ef9345_offset;
 
@@ -339,8 +341,8 @@ DRIVER_INIT_MEMBER(vg5k_state,vg5k)
 
 	/* install expansion memory*/
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	UINT16 ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	UINT8 *ram = m_ram->pointer();
+	UINT16 ram_size = m_ram->size();
 
 	if (ram_size > 0x4000)
 		program.install_ram(0x8000, 0x3fff + ram_size, ram);

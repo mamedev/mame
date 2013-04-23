@@ -142,7 +142,7 @@ void partner_state::partner_bank_switch()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	space.install_write_bank(0x0000, 0x07ff, "bank1");
 	space.install_write_bank(0x0800, 0x3fff, "bank2");

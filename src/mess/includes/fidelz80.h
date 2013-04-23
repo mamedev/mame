@@ -19,7 +19,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_speech(*this, "speech"),
-			m_beep(*this, BEEPER_TAG),
+			m_beep(*this, "beeper"),
 			m_i8041(*this, "mcu"),
 			m_i8243(*this, "i8243")
 		{ }

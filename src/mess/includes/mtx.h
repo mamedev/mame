@@ -12,6 +12,7 @@
 #include "machine/ctronics.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76496.h"
+#include "machine/ram.h"
 
 #define Z80_TAG         "z80"
 #define Z80CTC_TAG      "z80ctc"
@@ -30,7 +31,8 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 		m_sn(*this, SN76489A_TAG),
-		m_cassette(*this, "cassette")
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -50,6 +52,7 @@ public:
 	z80ctc_device *m_z80ctc;
 	device_t *m_z80dart;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
 	centronics_device *m_centronics;
 
 	/* timers */

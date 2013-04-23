@@ -65,11 +65,13 @@ public:
 	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_rtc(*this, RP5C15_TAG)
+		m_rtc(*this, RP5C15_TAG),
+		m_beeper(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c15_device> m_rtc;
+	required_device<beep_device> m_beeper;
 
 	UINT8 *m_main_ram;
 	UINT8 *m_ipl_rom;
@@ -1806,8 +1808,8 @@ void mz2500_state::machine_reset()
 
 	m_cg_clear_flag = 0;
 
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(4096);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(4096);
+	m_beeper->set_state(0);
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
 }
@@ -1921,7 +1923,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 
 	m_old_portc = data;
 
-	machine().device<beep_device>(BEEPER_TAG)->set_state(data & 0x04);
+	m_beeper->set_state(data & 0x04);
 
 	m_screen_enable = data & 1;
 
@@ -2157,7 +2159,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 

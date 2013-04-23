@@ -12,6 +12,7 @@
 #define ELECTRON_H_
 
 #include "imagedev/cassette.h"
+#include "sound/beep.h"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -58,7 +59,8 @@ public:
 	electron_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cassette(*this, "cassette")	{ }
+		m_cassette(*this, "cassette"),
+		m_beeper(*this, "beeper")	{ }
 
 	ULA m_ula;
 	emu_timer *m_tape_timer;
@@ -84,6 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_device<beep_device> m_beeper;
 	inline UINT8 read_vram( UINT16 addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);

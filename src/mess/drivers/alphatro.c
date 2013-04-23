@@ -40,7 +40,7 @@ public:
 	m_crtc(*this, "crtc"),
 	m_usart(*this, "usart"),
 	m_cass(*this, "cassette"),
-	m_beep(*this, BEEPER_TAG),
+	m_beep(*this, "beeper"),
 	m_p_ram(*this, "p_ram"),
 	m_p_videoram(*this, "p_videoram"){ }
 
@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( alphatro, alphatro_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

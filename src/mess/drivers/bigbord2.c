@@ -98,7 +98,7 @@ public:
 	m_floppy1(*this, FLOPPY_1),
 	m_floppy2(*this, FLOPPY_2),
 	m_floppy3(*this, FLOPPY_3),
-	m_beeper(*this, BEEPER_TAG)
+	m_beeper(*this, "beeper")
 	{ }
 
 	virtual void machine_start();
@@ -712,7 +712,7 @@ static MACHINE_CONFIG_START( bigbord2, bigbord2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

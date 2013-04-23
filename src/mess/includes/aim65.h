@@ -35,9 +35,10 @@ class aim65_state : public driver_device
 public:
 	aim65_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cassette1(*this, "cassette"),
-	m_cassette2(*this, "cassette2")
+		m_maincpu(*this, "maincpu"),
+		m_cassette1(*this, "cassette"),
+		m_cassette2(*this, "cassette2"),
+		m_ram(*this, RAM_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(aim65_pia_a_w);
@@ -56,6 +57,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<ram_device> m_ram;
 	virtual void machine_start();
 	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 	void aim65_pia();

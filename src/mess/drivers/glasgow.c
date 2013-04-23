@@ -59,7 +59,7 @@ public:
 	glasgow_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mboard_state(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_beep(*this, BEEPER_TAG)
+	m_beep(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))

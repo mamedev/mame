@@ -239,7 +239,7 @@ void pcw_state::pcw_update_read_memory_block(int block, int bank)
 		space.install_read_bank(block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	membank(block_name)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine().device<ram_device>(RAM_TAG)->size()));
+	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 }
 
 
@@ -249,7 +249,7 @@ void pcw_state::pcw_update_write_memory_block(int block, int bank)
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	membank(block_name)->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + ((bank * 0x4000) % machine().device<ram_device>(RAM_TAG)->size()));
+	membank(block_name)->set_base(m_ram->pointer() + ((bank * 0x4000) % m_ram->size()));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -407,7 +407,6 @@ WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -545,14 +544,14 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* beep on */
 		case 11:
 		{
-			speaker->set_state(1);
+			m_beeper->set_state(1);
 		}
 		break;
 
 		/* beep off */
 		case 12:
 		{
-			speaker->set_state(0);
+			m_beeper->set_state(0);
 		}
 		break;
 
@@ -995,9 +994,8 @@ ADDRESS_MAP_END
 
 TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 {
-	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
-	speaker->set_state(0);
-	speaker->set_frequency(3750);
+	m_beeper->set_state(0);
+	m_beeper->set_frequency(3750);
 }
 
 
@@ -1028,9 +1026,9 @@ void pcw_state::machine_reset()
 	m_boot = 0;   // System starts up in bootstrap mode, disabled until it's possible to emulate it.
 
 	/* copy boot code into RAM - yes, it's skipping a step */
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(),0x00,machine().device<ram_device>(RAM_TAG)->size());
+	memset(m_ram->pointer(),0x00,m_ram->size());
 	for(x=0;x<256;x++)
-		machine().device<ram_device>(RAM_TAG)->pointer()[x+2] = code[x+0x300];
+		m_ram->pointer()[x+2] = code[x+0x300];
 
 	/* and hack our way past the MCU side of the boot process */
 	code[0x01] = 0x40;
@@ -1291,7 +1289,7 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_UPD765A_ADD("upd765", true, true)

@@ -46,7 +46,8 @@ public:
 			m_hgdc1(*this, "upd7220_chr"),
 			m_hgdc2(*this, "upd7220_gfx"),
 			m_fdc(*this, "upd765a"),
-			m_video_ram(*this, "video_ram")
+			m_video_ram(*this, "video_ram"),
+			m_beeper(*this, "beeper")
 	{ }
 
 	// devices
@@ -56,6 +57,8 @@ public:
 	required_device<upd7220_device> m_hgdc2;
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_video_ram;
+	required_device<beep_device> m_beeper;
+	
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
 	UINT8 *m_work_ram;
@@ -661,7 +664,7 @@ WRITE8_MEMBER(mz3500_state::mz3500_pc_w)
 	*/
 	//printf("%02x PC\n",data);
 
-	machine().device<beep_device>(BEEPER_TAG)->set_state(data & 0x10);
+	m_beeper->set_state(data & 0x10);
 
 }
 
@@ -815,8 +818,8 @@ void mz3500_state::machine_reset()
 		}
 	}
 
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(2400);
+	m_beeper->set_state(0);
 }
 
 
@@ -883,7 +886,7 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 

@@ -10,6 +10,7 @@
 #include "machine/wd17xx.h"
 #include "machine/scsicb.h"
 #include "machine/6522via.h"
+#include "machine/ram.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -393,7 +394,8 @@ public:
 	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_scsibus(*this, SCSIBUS_TAG ":host"),
-		m_maincpu(*this, "maincpu") {
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) {
 	}
 
 	required_device<scsicb_device> m_scsibus;
@@ -469,6 +471,7 @@ public:
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
 	IRQ_CALLBACK_MEMBER(int_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	UINT8 get_pixel(UINT16 x, UINT16 y);
 	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
 	UINT16 read_pixel_data(UINT16 x, UINT16 y);

@@ -2596,7 +2596,7 @@ void towns_state::driver_start()
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(towns_state::towns_irq_callback),this));
-	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,0xffffffff,0,NULL);
 
 }
 
@@ -2616,11 +2616,11 @@ void towns_state::machine_reset()
 	m_pic_master = machine().device("pic8259_master");
 	m_pic_slave = machine().device("pic8259_slave");
 	m_pit = machine().device("pit");
-	m_messram = machine().device<ram_device>(RAM_TAG);
+	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device("cdda");
 	m_scsi = machine().device<fmscsi_device>("scsi:fm");
-	m_ram = machine().device<ram_device>(RAM_TAG);
+	m_ram = m_ram;
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;

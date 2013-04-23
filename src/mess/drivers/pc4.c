@@ -233,7 +233,7 @@ static MACHINE_CONFIG_START( pc4, pc4_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( BEEPER_TAG, BEEP, 0 )
+	MCFG_SOUND_ADD( "beeper", BEEP, 0 )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_RP5C01_ADD("rtc", XTAL_32_768kHz, rtc_intf)

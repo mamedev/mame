@@ -16,6 +16,7 @@
 #include "machine/pit8253.h"
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
@@ -49,6 +50,7 @@ public:
 	required_device<speaker_sound_device>  m_speaker;
 	required_device<isa8_device>  m_isabus;
 	required_device<pc_kbdc_device>  m_pc_kbdc;
+	required_device<ram_device> m_ram;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */

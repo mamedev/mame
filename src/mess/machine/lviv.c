@@ -26,7 +26,7 @@
 
 void lviv_state::lviv_update_memory ()
 {
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	if (m_ppi_port_outputs[0][2] & 0x02)
 	{
@@ -164,7 +164,7 @@ WRITE8_MEMBER(lviv_state::lviv_io_w)
 	address_space &cpuspace = m_maincpu->space(AS_PROGRAM);
 	if (m_startup_mem_map)
 	{
-		UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+		UINT8 *ram = m_ram->pointer();
 
 		m_startup_mem_map = 0;
 
@@ -226,7 +226,7 @@ void lviv_state::machine_reset()
 
 	space.set_direct_update_handler(direct_update_delegate(FUNC(lviv_state::lviv_directoverride), this));
 
-	m_video_ram = machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000;
+	m_video_ram = m_ram->pointer() + 0xc000;
 
 	m_startup_mem_map = 1;
 
@@ -243,7 +243,7 @@ void lviv_state::machine_reset()
 
 	/*machine().scheduler().timer_pulse(TIME_IN_NSEC(200), FUNC(lviv_draw_pixel));*/
 
-	/*memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, sizeof(unsigned char)*0xffff);*/
+	/*memset(m_ram->pointer(), 0, sizeof(unsigned char)*0xffff);*/
 }
 
 
@@ -287,8 +287,8 @@ void lviv_state::lviv_setup_snapshot (UINT8 * data)
 	m_maincpu->set_state_int(I8085_PC, (hi << 8) | lo);
 
 	/* Memory dump */
-	memcpy (machine().device<ram_device>(RAM_TAG)->pointer(), data+0x0011, 0xc000);
-	memcpy (machine().device<ram_device>(RAM_TAG)->pointer()+0xc000, data+0x10011, 0x4000);
+	memcpy (m_ram->pointer(), data+0x0011, 0xc000);
+	memcpy (m_ram->pointer()+0xc000, data+0x10011, 0x4000);
 
 	/* Ports */
 	m_ppi_port_outputs[0][0] = data[0x14011+0xc0];

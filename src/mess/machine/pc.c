@@ -1076,7 +1076,7 @@ READ8_MEMBER(pc_state::pcjr_ppi_portc_r)
 
 	data&=~0x80;
 	data &= ~0x04;      /* floppy drive installed */
-	if ( machine().device<ram_device>(RAM_TAG)->size() > 64 * 1024 )    /* more than 64KB ram installed */
+	if ( m_ram->size() > 64 * 1024 )    /* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( m_ppi_portb & 0x08 ) )
@@ -1414,8 +1414,8 @@ void pc_state::mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, 
 		init_pc_common(set_keyb_int_func);
 
 	/* MESS managed RAM */
-	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
-		membank( "bank10" )->set_base( machine().device<ram_device>(RAM_TAG)->pointer() );
+	if ( m_ram->pointer() )
+		membank( "bank10" )->set_base( m_ram->pointer() );
 }
 
 

@@ -28,13 +28,13 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_ppi(*this, "ppi8255_0"),
 	m_crtc(*this, "crtc"),
-	m_beep(*this, BEEPER_TAG)
+	m_beeper(*this, "beeper")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<mc6845_device> m_crtc;
-	required_device<beep_device> m_beep;
+	required_device<beep_device> m_beeper;
 	DECLARE_WRITE8_MEMBER(multi8_6845_w);
 	DECLARE_READ8_MEMBER(key_input_r);
 	DECLARE_READ8_MEMBER(key_status_r);
@@ -629,7 +629,7 @@ static I8255_INTERFACE( ppi8255_intf_0 )
 
 WRITE8_MEMBER( multi8_state::ym2203_porta_w )
 {
-	m_beep->set_state((data & 0x08));
+	m_beeper->set_state((data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -655,8 +655,8 @@ void multi8_state::machine_start()
 
 void multi8_state::machine_reset()
 {
-	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200); //guesswork
-	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
+	m_beeper->set_frequency(1200); //guesswork
+	m_beeper->set_state(0);
 	m_mcu_init = 0;
 }
 
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
 	MCFG_SOUND_CONFIG(ym2203_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	/* Devices */

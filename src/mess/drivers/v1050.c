@@ -1012,7 +1012,7 @@ void v1050_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v1050_state::v1050_int_ack),this));
 
 	// setup memory banking
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
 	membank("bank1")->configure_entry(2, ram + 0x1c000);

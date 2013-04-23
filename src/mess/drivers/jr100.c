@@ -31,7 +31,7 @@ public:
 		m_vram(*this, "vram"),
 		m_via(*this, "via"),
 		m_cassette(*this, "cassette"),
-		m_beeper(*this, BEEPER_TAG),
+		m_beeper(*this, "beeper"),
 		m_speaker(*this, "speaker"),
 		m_region_maincpu(*this, "maincpu"),
 		m_line0(*this, "LINE0"),
@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( jr100, jr100_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_CASSETTE_ADD( "cassette", jr100_cassette_interface )

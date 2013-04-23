@@ -601,7 +601,7 @@ int c65_state::c65_fdc_r( int offset )
 READ8_MEMBER( c65_state::c65_ram_expansion_r )
 {
 	UINT8 data = 0xff;
-	if (machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
+	if (m_ram->size() > (128 * 1024))
 		data = m_expansion_ram.reg;
 	return data;
 }
@@ -611,16 +611,16 @@ WRITE8_MEMBER( c65_state::c65_ram_expansion_w )
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (space.machine().device<ram_device>(RAM_TAG)->size() > (128 * 1024))
+	if (m_ram->size() > (128 * 1024))
 	{
 		m_expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (machine().device<ram_device>(RAM_TAG)->size() - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (m_ram->size() - 128*1024) - 1;
 
 		if (data == 0x00) {
 			space.install_readwrite_bank(expansion_ram_begin, expansion_ram_end,"bank16");
-			membank("bank16")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024);
+			membank("bank16")->set_base(m_ram->pointer() + 128*1024);
 		} else {
 			space.nop_readwrite(expansion_ram_begin, expansion_ram_end);
 		}
@@ -985,7 +985,7 @@ DRIVER_INIT_MEMBER(c65_state,c65pal)
 MACHINE_START_MEMBER(c65_state,c65)
 {
 	/* clear upper memory */
-	memset(machine().device<ram_device>(RAM_TAG)->pointer() + 128*1024, 0xff, machine().device<ram_device>(RAM_TAG)->size() -  128*1024);
+	memset(m_ram->pointer() + 128*1024, 0xff, m_ram->size() -  128*1024);
 
 //removed   cbm_drive_0_config (SERIAL, 10);
 //removed   cbm_drive_1_config (SERIAL, 11);

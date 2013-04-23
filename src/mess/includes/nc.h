@@ -6,7 +6,8 @@
 
 #ifndef NC_H_
 #define NC_H_
-
+#include "machine/ram.h"
+#include "sound/beep.h"
 
 #define NC_NUM_COLOURS 4
 
@@ -30,7 +31,10 @@ class nc_state : public driver_device
 public:
 	nc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_beeper1(*this, "beep.1"),
+		m_beeper2(*this, "beep.2") { }
 
 	emu_timer *m_serial_timer;
 	char m_memory_config[4];
@@ -103,6 +107,10 @@ public:
 	void nc100_machine_stop();
 	void nc200_machine_stop();
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<beep_device> m_beeper1;
+	required_device<beep_device> m_beeper2;
+	
 	void nc200_video_set_backlight(int state);
 	void nc_card_save(device_image_interface &image);
 	int nc_card_calculate_mask(int size);

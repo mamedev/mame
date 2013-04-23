@@ -19,10 +19,13 @@ class fk1_state : public driver_device
 public:
 	fk1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_a_w);
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_b_w);
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_c_w);
@@ -297,7 +300,7 @@ WRITE8_MEMBER( fk1_state::fk1_intr_w )
 READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 {
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	space_mem.install_write_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->set_base(ram);
@@ -310,7 +313,7 @@ READ8_MEMBER( fk1_state::fk1_bank_rom_r )
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
 	space_mem.unmap_write(0x0000, 0x3fff);
 	membank("bank1")->set_base(memregion("maincpu")->base());
-	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000);
+	membank("bank2")->set_base(m_ram->pointer() + 0x10000);
 	return 0;
 }
 
@@ -421,7 +424,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
 void fk1_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	space.unmap_write(0x0000, 0x3fff);
 	membank("bank1")->set_base(memregion("maincpu")->base()); // ROM
@@ -436,7 +439,7 @@ UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 {
 	UINT8 code;
 	int y, x, b;
-	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *ram = m_ram->pointer();
 
 	for (x = 0; x < 64; x++)
 	{

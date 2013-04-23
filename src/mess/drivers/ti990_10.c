@@ -238,7 +238,7 @@ static MACHINE_CONFIG_START( ti990_10, ti990_10_state )
 
 	/* 911 VDT has a beep tone generator */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_FRAGMENT_ADD( ti990_hdc )

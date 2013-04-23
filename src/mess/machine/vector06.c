@@ -148,7 +148,7 @@ TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
 
 	if (BIT(val, 1))
 	{
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+		membank("bank1")->set_base(m_ram->pointer() + 0x0000);
 		m_maincpu->reset();
 	}
 }
@@ -177,9 +177,9 @@ void vector06_state::machine_reset()
 	space.install_write_bank(0x8000, 0xffff, "bank4");
 
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000);
-	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
-	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
-	membank("bank4")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	membank("bank2")->set_base(m_ram->pointer() + 0x0000);
+	membank("bank3")->set_base(m_ram->pointer() + 0x8000);
+	membank("bank4")->set_base(m_ram->pointer() + 0x8000);
 
 	m_keyboard_mask = 0;
 	m_color_index = 0;

@@ -11,6 +11,7 @@
 #include "machine/cbmiec.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/snapquik.h"
+#include "machine/ram.h"
 
 #define C64_MAX_ROMBANK 64 // .crt files contain multiple 'CHIPs', i.e. rom banks (of variable size) with headers. Known carts have at most 64 'CHIPs'.
 
@@ -66,7 +67,8 @@ public:
 			m_c65_chargen(*this, "c65_chargen"),
 			m_interface(*this, "interface"),
 			m_roml_writable(0),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG) { }
 
 	optional_device<cbm_iec_device> m_iec;
 
@@ -176,6 +178,7 @@ public:
 	void c65_common_driver_init(  );
 
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 /*----------- defined in machine/c65.c -----------*/

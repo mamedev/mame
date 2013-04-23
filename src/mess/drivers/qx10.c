@@ -64,9 +64,9 @@ public:
 	m_fdc(*this, "upd765"),
 	m_hgdc(*this, "upd7220"),
 	m_rtc(*this, "rtc"),
-	m_vram_bank(0)
-	,
-		m_maincpu(*this, "maincpu") { }
+	m_vram_bank(0),
+	m_maincpu(*this, "maincpu"),
+	m_ram(*this, RAM_TAG) { }
 
 	required_device<pit8253_device> m_pit_1;
 	required_device<pit8253_device> m_pit_2;
@@ -149,6 +149,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -274,7 +275,7 @@ void qx10_state::update_memory_mapping()
 	}
 	else
 	{
-		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024);
+		membank("bank1")->set_base(m_ram->pointer() + drambank*64*1024);
 	}
 	if (m_memcmos)
 	{
@@ -282,7 +283,7 @@ void qx10_state::update_memory_mapping()
 	}
 	else
 	{
-		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + drambank*64*1024 + 32*1024);
+		membank("bank2")->set_base(m_ram->pointer() + drambank*64*1024 + 32*1024);
 	}
 }
 

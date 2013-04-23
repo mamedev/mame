@@ -1288,7 +1288,7 @@ UINT32 x68k_state::screen_update_x68000(screen_device &screen, bitmap_ind16 &bit
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      m_crtc.reg[12],m_crtc.reg[13],m_crtc.reg[14],m_crtc.reg[15],m_crtc.reg[16],m_crtc.reg[17],m_crtc.reg[18],m_crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",m_ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",machine().device<ram_device>(RAM_TAG)->pointer()[0x931],machine().device<ram_device>(RAM_TAG)->pointer()[0x930],machine().device<ram_device>(RAM_TAG)->pointer()[0x933],machine().device<ram_device>(RAM_TAG)->pointer()[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",m_ram->pointer()[0x931],m_ram->pointer()[0x930],m_ram->pointer()[0x933],m_ram->pointer()[0x932]);
 #endif
 	return 0;
 }

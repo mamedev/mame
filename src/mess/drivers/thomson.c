@@ -317,7 +317,7 @@ static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping:
+/* RAM mapping:
    0x0000 - 0x3fff: 16 KB video RAM (actually 8 K x 8 bits + 8 K x 6 bits)
    0x4000 - 0x5fff:  8 KB base RAM
    0x6000 - 0x9fff: 16 KB extended RAM
@@ -784,7 +784,7 @@ static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping:
+/* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x07fff: 16 KB unbanked base RAM
    0x08000 - 0x1ffff: 6 * 16 KB banked extended RAM
@@ -975,7 +975,7 @@ static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
 /* 0x20000 - 0x247ff: 18 KB floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping:
+/* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x0bfff: 32 KB unbanked base RAM
    0x0c000 - 0x1bfff: 4 * 16 KB bank extended RAM
@@ -1182,7 +1182,7 @@ static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
 /* 0x20000 - 0x3ffff: 128 KB internal software ROM */
 /* 0x40000 - 0x447ff: 18  KB external floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping:
+/* RAM mapping:
    0x00000 - 0x03fff: 16 KB video RAM
    0x04000 - 0x07fff: 16 KB unbanked base RAM
    0x08000 - 0x2ffff: 10 * 16 KB banked extended RAM
@@ -1507,7 +1507,7 @@ static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
 /* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping: 512 KB flat (including video) */
+/* RAM mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1703,7 +1703,7 @@ static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
 /* 0x30000 - 0x33fff: 16 KB BIOS ROM */
 /* 0x34000 - 0x387ff: 18 KB external floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping: 512 KB flat (including video) */
+/* RAM mapping: 512 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -1863,7 +1863,7 @@ static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
 /* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping: 128 KB flat (including video) */
+/* RAM mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 
@@ -2178,7 +2178,7 @@ static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 /* 0x20000 - 0x2ffff: 64 KB BIOS ROM */
 /* 0x30000 - 0x347ff: 16 KB floppy / network ROM controllers */
 
-/* machine.device<ram_device>(RAM_TAG)->pointer() mapping: 128 KB flat (including video) */
+/* RAM mapping: 128 KB flat (including video) */
 
 ADDRESS_MAP_END
 

@@ -40,13 +40,14 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_hgdc(*this, "upd7220"),
 			m_cass(*this, "cassette"),
-			m_beep(*this, BEEPER_TAG),
+			m_beep(*this, "beeper"),
 			m_fdc(*this, "upd765a"),
 			m_floppy0(*this, "upd765a:0"),
 			m_floppy1(*this, "upd765a:1"),
 			m_floppy2(*this, "upd765a:2"),
 			m_floppy3(*this, "upd765a:3"),
-			m_video_ram(*this, "video_ram")
+			m_video_ram(*this, "video_ram"),
+			m_ram(*this, RAM_TAG)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +81,7 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	required_device<ram_device> m_ram;
 };
 
 /* TODO */
@@ -484,7 +486,7 @@ void a5105_state::machine_reset()
 	a5105_ab_w(space, 0, 9); // turn motor off
 	m_beep->set_frequency(500);
 
-	m_ram_base = (UINT8*)machine().device<ram_device>(RAM_TAG)->pointer();
+	m_ram_base = (UINT8*)m_ram->pointer();
 	m_rom_base = (UINT8*)memregion("maincpu")->base();
 
 	membank("bank1")->set_base(m_rom_base);
@@ -601,7 +603,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */

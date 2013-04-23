@@ -86,8 +86,8 @@ UINT32 mac_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap,
 	UINT16 *line;
 	int y, x, b;
 
-	video_base = machine().device<ram_device>(RAM_TAG)->size() - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (machine().device<ram_device>(RAM_TAG)->pointer() + video_base);
+	video_base = m_ram->size() - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (m_ram->pointer() + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -381,7 +381,7 @@ UINT32 mac_state::screen_update_macrbv(screen_device &screen, bitmap_rgb32 &bitm
 {
 	UINT32 *scanline;
 	int x, y, hres, vres;
-	UINT8 *vram8 = (UINT8 *)machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *vram8 = (UINT8 *)m_ram->pointer();
 
 	switch (m_rbv_montype)
 	{

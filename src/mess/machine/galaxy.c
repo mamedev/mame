@@ -85,7 +85,7 @@ void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 			m_maincpu->set_state_int(Z80_I,    data[0x40]);
 			m_maincpu->set_state_int(Z80_R,    (data[0x44] & 0x7f) | (data[0x48] & 0x80));
 
-			memcpy (machine().device<ram_device>(RAM_TAG)->pointer(), data + 0x084c, (machine().device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine().device<ram_device>(RAM_TAG)->size() : 0x1800);
+			memcpy (m_ram->pointer(), data + 0x084c, (m_ram->size() < 0x1800) ? m_ram->size() : 0x1800);
 
 			break;
 		case GALAXY_SNAPSHOT_V2_SIZE:
@@ -112,7 +112,7 @@ void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 			m_maincpu->set_state_int(Z80_I,    data[0x19]);
 			m_maincpu->set_state_int(Z80_R,    data[0x1a]);
 
-			memcpy (machine().device<ram_device>(RAM_TAG)->pointer(), data + 0x0834, (machine().device<ram_device>(RAM_TAG)->size() < 0x1800) ? machine().device<ram_device>(RAM_TAG)->size() : 0x1800);
+			memcpy (m_ram->pointer(), data + 0x0834, (m_ram->size() < 0x1800) ? m_ram->size() : 0x1800);
 
 			break;
 	}
@@ -155,9 +155,9 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 	space.install_readwrite_bank( 0x2800, 0x2800 + m_ram->size() - 1, "bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 
-	if (machine().device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
+	if (m_ram->size() < (6 + 48) * 1024)
 	{
-		space.nop_readwrite( 0x2800 + machine().device<ram_device>(RAM_TAG)->size(), 0xffff);
+		space.nop_readwrite( 0x2800 + m_ram->size(), 0xffff);
 	}
 
 	for ( int i = 0; i < 8; i++ )

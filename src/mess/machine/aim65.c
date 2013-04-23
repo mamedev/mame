@@ -140,7 +140,7 @@ WRITE8_MEMBER( aim65_state::aim65_riot_a_w )
 
 void aim65_state::machine_start()
 {
-	ram_device *ram = machine().device<ram_device>(RAM_TAG);
+	ram_device *ram = m_ram;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* Init RAM */

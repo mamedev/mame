@@ -714,7 +714,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED_CLASS( bigboard, xerox820, bigboard_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 

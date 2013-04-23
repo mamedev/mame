@@ -24,7 +24,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_lcdc(*this, "hd44780"),
-			m_beep(*this, BEEPER_TAG),
+			m_beep(*this, "beeper"),
 			m_pack1(*this, "pack1"),
 			m_pack2(*this, "pack2"),
 			m_sys_register(*this, "sys_register"),
