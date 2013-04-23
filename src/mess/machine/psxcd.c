@@ -321,10 +321,8 @@ WRITE8_MEMBER( psxcd_device::write )
 			if(data & 0x1f)
 			{
 				m_regs.ir &= ~(data & 0x1f);
-				if(m_regs.ir)
-					break;
 
-				if (res_queue)
+				if(res_queue && !m_regs.ir)
 				{
 					command_result *res = res_queue;
 					res_queue = res->next;
@@ -861,7 +859,10 @@ void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
 	memcpy(mainram, &m_transbuf[m_transcurr], size);
 	m_transcurr += size;
 	if(raw_sector_size <= m_transcurr)
+	{
+		m_dmaload = false;
 		m_regs.sr &= ~0x40;
+	}
 }
 
 void psxcd_device::read_sector()
