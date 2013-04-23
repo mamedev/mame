@@ -4,13 +4,17 @@ Midnight Landing (c) 1987 Taito Corporation
 
 driver by Tomasz Slanina, Phil Bennett & Angelo Salese, based on early work by David Haywood
 
-Dual 68k + 2xZ80 + tms DSP
+Dual 68k + 2xZ80 + TMS32025 DSP
+YM2151, msm5205
+TC0140SYT, other Taito ICs unknown
 no other hardware info..
 
 TODO:
+- Analog controls are very stiff;
 - Palette banking;
 - Comms between the five CPUs;
-- Gameplay looks stiff;
+- What is the unknown ROM ml_b0936 for?;
+- Emulate 'mecha drive' (motors);
 - Needs a custom artwork for the cloche status;
 - clean-ups!
 
@@ -339,94 +343,77 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 		m_mechacpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
+
 READ16_MEMBER(mlanding_state::ml_analog1_lsb_r)
 {
-	return ioport("STICKX")->read() & 0xff;
+	return ioport("STICK1")->read() & 0xff;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog2_lsb_r)
 {
-	return ioport("STICKY")->read() & 0xff;
+	return ioport("STICK2")->read() & 0xff;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog3_lsb_r)
 {
-	return (ioport("STICKZ")->read() & 0xff);
+	return ioport("STICK3")->read() & 0xff;
 }
-
-/*
-    PORT_START("IN3")
-    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
-    PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
-    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-    PORT_START("IN4")
-    PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
-    PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
-    PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
-    PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-*/
 
 /* high bits of analog inputs + "limiters"/ADC converters. */
 READ16_MEMBER(mlanding_state::ml_analog1_msb_r)
 {
-	return ((ioport("STICKY")->read() & 0xf00)>>8) | (ioport("IN2")->read() & 0xf0);
+	// d0-d3: counter 1 high bits
+	// d4: handle left
+	// d5: slot down
+	// d6: slot up
+	// d7: ?
+	UINT8 throttle = ioport("STICK1")->read();
+	UINT16 x = ioport("STICK2")->read();
+	
+	UINT8 res = 0xf0;
+
+	if (throttle & 0x80)
+		res ^= 0x2f;
+	else if (throttle > 0)
+		res ^= 0x40;
+	
+	if (!(x & 0x800) && x > 0)
+		res ^= 0x10;
+	
+	return res;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog2_msb_r)
 {
-	UINT8 res;
-	UINT16 y_adc,x_adc;
-
-	y_adc = ioport("STICKY")->read();
-	x_adc = ioport("STICKZ")->read();
-
-	res = 0;
-
-	if(x_adc == 0 || (!(x_adc & 0x800)))
-		res = 0x20;
-
-	if(y_adc == 0)
-		res|= 0x50;
-	else if(y_adc & 0x800)
-		res|= 0x10;
-	else
-		res|= 0x40;
-
-//  popmessage("%04x %04x",x_adc,y_adc);
-
-	return ((ioport("STICKZ")->read() & 0xf00)>>8) | res;
+	// d0-d3: counter 2 high bits
+	// d4-d7: ?
+	return (ioport("STICK2")->read() >> 8 & 0x0f) | 0xf0;
 }
 
 READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 {
-	UINT8 z_adc,res;
-	UINT16 x_adc;
+	// d0-d3: counter 3 high bits
+	// d4: handle up
+	// d5: handle right
+	// d6: handle down
+	// d7: ?
+	UINT16 x = ioport("STICK2")->read();
+	UINT16 y = ioport("STICK3")->read();
+	
+	UINT8 res = (y >> 8 & 0x0f) | 0xf0;
 
-	z_adc = ioport("STICKX")->read();
-	x_adc = ioport("STICKZ")->read();
-
-	res = 0;
-
-	if(z_adc == 0)
-		res = 0x60;
-	else if(z_adc & 0x80)
-		res = 0x20;
-	else
-		res = 0x40;
-
-	if(x_adc & 0x800 || x_adc == 0)
-		res|= 0x10;
-
-	return ((ioport("STICKX")->read() & 0xf00)>>8) | res;
+	if (y & 0x800)
+		res ^= 0x40;
+	else if (y > 0)
+		res ^= 0x10;
+	
+	if (x & 0x800)
+		res ^= 0x20;
+	
+	return res;
 }
+
+
 
 
 READ16_MEMBER(mlanding_state::ml_power_ram_r)
@@ -463,17 +450,17 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
 	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
 
-	AM_RANGE(0x240004, 0x240005) AM_NOP //watchdog ??
+	AM_RANGE(0x240004, 0x240005) AM_READNOP // watchdog?
 	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
 
-	/*  */
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)      //-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)      //-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog1_msb_r) // tested in service mode, dips?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)      //-60 .. 60 analog controls ?
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog2_msb_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)      // IN2/IN3 could be switched
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog1_msb_r)
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)
+	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog2_msb_r)
+
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)
+	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog3_msb_r)
 ADDRESS_MAP_END
 
 
@@ -671,47 +658,14 @@ static INPUT_PORTS_START( mlanding )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 1
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("STICK1")    /* Stick 1 (3) */
+	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(100) PORT_KEYDELTA(0x10) PORT_PLAYER(1) PORT_REVERSE
 
-	PORT_START("IN3")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 3
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slot Down") PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slot Up") PORT_TOGGLE
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("STICK2")    /* Stick 2 (4) */
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(0x80) PORT_PLAYER(1)
 
-	PORT_START("IN4")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) //high bits of counter 2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_TOGGLE
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_TOGGLE
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("STICKX")    /* Stick 1 (3) */
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_REVERSE
-
-	PORT_START("STICKY")    /* Stick 2 (4) */
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("STICKZ")    /* Stick 3 (5) */
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_START("STICK3")    /* Stick 3 (5) */
+	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0800,0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(0x80) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static const msm5205_interface msm5205_config =
