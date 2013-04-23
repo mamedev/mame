@@ -4805,6 +4805,22 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		case 0xa6e9:
 			dev->ibm8514.fgcolour = (dev->ibm8514.fgcolour & 0x00ff) | (data << 8);
 			break;
+		case 0x8128:
+		case 0xaae8:
+			dev->ibm8514.write_mask = (dev->ibm8514.write_mask & 0xff00) | data;
+			break;
+		case 0x8129:
+		case 0xaae9:
+			dev->ibm8514.write_mask = (dev->ibm8514.write_mask & 0x00ff) | (data << 8);
+			break;
+		case 0x812c:
+		case 0xaee8:
+			dev->ibm8514.read_mask = (dev->ibm8514.read_mask & 0xff00) | data;
+			break;
+		case 0x812d:
+		case 0xaee9:
+			dev->ibm8514.read_mask = (dev->ibm8514.read_mask & 0x00ff) | (data << 8);
+			break;
 		case 0xb6e8:
 		case 0x8134:
 			dev->ibm8514.bgmix = (dev->ibm8514.bgmix & 0xff00) | data;
