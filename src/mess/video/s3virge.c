@@ -255,7 +255,9 @@ void s3virge_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				s3.cr42 = data;  // bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
 				break;
 			case 0x43:
-				s3.cr43 = data;
+				s3.cr43 = data;  // bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
+				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
+				s3_define_video_mode();
 				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
@@ -360,7 +362,7 @@ bit  0-9  (911,924) HCS_STADR. Hardware Graphics Cursor Storage Start Address
           (801/5,928) For Hi/True color modes use the Horizontal Stretch bits
             (3d4h index 45h bits 2 and 3).
  */
-			case 0x4c:
+		case 0x4c:
 				s3.cursor_start_addr = (s3.cursor_start_addr & 0x00ff) | (data << 8);
 				break;
 			case 0x4d:
@@ -385,6 +387,10 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 				vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
 				svga.bank_r = svga.bank_w;
+				if((data & 0x30) != 0x00)
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x30) << 4);
+				else
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((s3.cr43 & 0x04) << 6);
 				s3_define_video_mode();
 				break;
 			case 0x53:

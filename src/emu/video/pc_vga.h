@@ -127,7 +127,7 @@ protected:
 			UINT32 start_addr_latch;
 	/**/    UINT8 protect_enable;
 	/**/    UINT8 bandwidth;
-	/**/    UINT8 offset;
+	/**/    UINT16 offset;
 	/**/    UINT8 word_mode;
 	/**/    UINT8 dw;
 	/**/    UINT8 div4;

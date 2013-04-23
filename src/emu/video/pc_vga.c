@@ -1430,7 +1430,8 @@ void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
 			recompute_params();
 			break;
 		case 0x13:
-			vga.crtc.offset = data & 0xff;
+			vga.crtc.offset &= ~0xff;
+			vga.crtc.offset |= data & 0xff;
 			break;
 		case 0x14:
 			vga.crtc.dw = (data & 0x40) >> 6;
@@ -2695,6 +2696,9 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x42: // CR42 Mode Control
 				res = s3.cr42 & 0x0f;  // bit 5 set if interlaced, leave it unset for now.
 				break;
+			case 0x43:
+				res = s3.cr43;
+				break;
 			case 0x45:
 				res = s3.cursor_mode;
 				break;
@@ -2884,6 +2888,11 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 			case 0x42:
 				s3.cr42 = data;  // bit 5 = interlace, bits 0-3 = dot clock (seems to be undocumented)
 				break;
+			case 0x43:
+				s3.cr43 = data;  // bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
+				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
+				s3_define_video_mode();
+				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
 bit    0  HWGC ENB. Hardware Graphics Cursor Enable. Set to enable the
@@ -3012,6 +3021,10 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 				vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
 				svga.bank_r = svga.bank_w;
+				if((data & 0x30) != 0x00)
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x30) << 4);
+				else
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((s3.cr43 & 0x04) << 6);
 				s3_define_video_mode();
 				break;
 			case 0x53:
