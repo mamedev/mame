@@ -169,7 +169,7 @@ static MC6845_UPDATE_ROW( vid_update_row )
 	bbc_state *state = device->machine().driver_data<bbc_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
-	logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
+	//logerror("MC6845_UPDATE_ROW: ma=%d, ra=%d, y=%d, x_count=%d\n",ma,ra,y,x_count);
 
 	if (state->m_videoULA_teletext_normal_select)
 	{
