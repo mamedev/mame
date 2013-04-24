@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+-->
 
 <!--
-
 There appear to exist some undumped N64 protos
 
-  - Air Boardin' USA,
-  - Echo Delta,
-  - Looney Tunes Space Race,
-  - Ohcouchi Gengorou Ikka,
-  - Star Soldier Vanishing Earth (Europe),
+  - Air Boardin' USA
+  - Echo Delta
+  - Looney Tunes Space Race
+  - Ohcouchi Gengorou Ikka
+  - Star Soldier Vanishing Earth (Europe)
   - Wild Waters (a more complete version than the available proto was shown)
 
 Canceled games (possibly never got to the proto stage)
@@ -20,12 +21,1597 @@ Canceled games (possibly never got to the proto stage)
   - X-Men Mutant Academy
 -->
 
+<!--
+Most of the pcbs (Resident Evil 2 being the exception) lack a marked description on the pcb itself, so I've marked them as
+"location" - "chip markings"
+to avoid pointless lines like
+"u1" - "U1"
+-->
+
+<!--
+
+Info on N64 chip labels (from The Cart Scan Repository)
+
+  Nintendo used for chip labels/imprints a coding as follows:
+
+    NUS-NEPE-0
+
+    NUS - Company (Nintendo)
+    N - Machine ID (N for N64 only, C for N64 and 64DD)
+    EP - Game ID
+    E - Region ID
+    0 - Release build (n for (n+1)th release)
+
+
+  Region codes:
+  A - NTSC region
+  E - USA
+  D - Germany
+  F - France
+  I - Italy
+  J - Japan
+  P,X,Y - PAL region
+
+-->
+
+<!-- List of confirmed carts (info from pictures) -->
+	<software name="007goldnu" cloneof="007goldn">
+		<description>007 - GoldenEye (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NGEE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NGEE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" /><!-- also found with NUS-USA/CAN-1 -->
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-ngee-0.u1" size="12582912" crc="8b70cb5b" sha1="7dd376e996d77d108316ac7ced087125c5674fa4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="007twine">
+		<description>007 - The World Is Not Enough (Euro)</description>
+		<year>2000</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="NUS-N07P-(UKV,FRA,NOE)" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-03" />
+			<feature name="u1" value="NUS-N07P-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-n07p-0.u1" size="33554432" crc="7f030d3a" sha1="441bdf924566e6475aa49bab7a199dc06d32a6d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1080snow">
+		<description>1080° Snowboarding (Euro)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NTEP-(EUR,AUS)"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NTEP-0" />
+			<feature name="u2" value="LH52V246AD" />
+			<feature name="u3" value="B4ALEJT" />
+			<feature name="u4" value="CIC-NUS-7103" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-ntep-0.u1" size="16777216" crc="b0256101" sha1="da7bcb78cf78333d7515b77f676fd45473b5b506" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1080snowu" cloneof="1080snow">
+		<description>1080° Snowboarding (Jpn, USA)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NTEJ-JPN, NUS-NTEE-USA"/>
+		<info name="release" value="19980228 (JPN)"/>
+		<info name="alt_title" value="1080°テン・エイティ スノーボーディング"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NTEA-0" />
+			<feature name="u2" value="LH52V246" />
+			<feature name="u3" value="BU9803A" />
+			<feature name="u4" value="CIC-NUS-6103" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-ntea-0.u1" size="16777216" crc="d1744951" sha1="5f837c13a2fb3c8cdfd6fb720bd4a963ab515632" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="64oozum2">
+		<description>64 Oozumou 2 (Jpn)</description>
+		<year>1999</year>
+		<publisher>Bottom Up</publisher>
+		<info name="serial" value="NUS-NO2J-JPN"/>
+		<info name="release" value="19990319"/>
+		<info name="alt_title" value="64大相撲2"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NO2J-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-no2j-0.u1" size="16777216" crc="3cd5e271" sha1="1daa89ec3f5e63e131973bab03166e4f7fb60ee9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asbase2ku" cloneof="asbase2k">
+		<description>All-Star Baseball 2000 (USA)</description>
+		<year>1999</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NBEE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NBEE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nbee-0.u1" size="16777216" crc="15063eac" sha1="c0d574af5c3523a4a804182b4d6465212fd9ee29" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asbas2k1">
+		<description>All-Star Baseball 2001 (USA)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NASE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NASE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value=" NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nase-0.u1" size="16777216" crc="3e8be0e0" sha1="353ad679666287988a0e645851ee01eff2048449" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="banjokazu1" cloneof="banjokaz">
+		<description>Banjo-Kazooie (USA)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NBKE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NBKE-0" />
+			<feature name="u2" value="BK4D-NUS" />
+			<feature name="u3" value="CIC-NUS-6103" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nbke-0.u1" size="16777216" crc="4fd43199" sha1="0ca5e28494b7d99e22ed27dfc914ec5b391cdb6b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blastcrp">
+		<description>Blast Corps (Euro)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NBCE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NBCE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nbce-0.u1" size="8388608" crc="2ff810cf" sha1="9d42be8a947e64d4862d8a7c1fae57e10c2257ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombm2nd">
+		<description>Bomberman 64 - The Second Attack! (USA)</description>
+		<year>2000</year>
+		<publisher>Vatical Entertainment</publisher>
+		<info name="serial" value="NUS-NBVE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NBVE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nbve-0.u1" size="16777216" crc="302b3135" sha1="5c2c59506aa4dfd83ce80e9e5e377f64f4f18c58" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calspeed">
+		<description>California Speed (USA)</description>
+		<year>1999</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NCLE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NCLE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-ncle-0.u1" size="16777216" crc="387b0c4c" sha1="afe86aed561560bfcf1bc7130c8341252142269b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="charliebu" cloneof="charlieb">
+		<description>Charlie Blast's Territory (USA)</description>
+		<year>1999</year>
+		<publisher>Kemco</publisher>
+		<info name="alt_title" value="Charlie Blasts Territory (cart)" />
+		<info name="serial" value="NUS-NCBE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NCBE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="4194304">
+				<rom name="nus-ncbe-0.u1" size="4194304" crc="928a2968" sha1="ca22fa616d00d6199513a52c7851cbee5cc52354" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chopatcku" cloneof="chopatck">
+		<description>Chopper Attack (USA)</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NCHE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NCHE-0" />
+			<feature name="u2" value="BK4D-NUS" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nche-0.u1" size="8388608" crc="2c22147d" sha1="ce39f1afac5efc889cbe0ae03f0ccfa9a2e5b085" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commconq">
+		<description>Command &amp; Conquer (Euro)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NCCP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NCCP-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nccp-0.u1" size="33554432" crc="ce383b3e" sha1="5ea73072575eded3954abe4a9d44623b7847c820" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commconqu" cloneof="commconq">
+		<description>Command &amp; Conquer (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NCCE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NCCE-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-ncce-0.u1" size="33554432" crc="8d23ba95" sha1="63bafa4615eb7488aec3c631021720e05376aa1c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crusnusau1" cloneof="crusnusa">
+		<description>Cruis'n USA (USA, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NCUE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NCUE-1" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ncue-1.u1" size="8388608" crc="615ac9bc" sha1="da43a6443c22a608b76b6b73602c30b0c6038379" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crusnwldu" cloneof="crusnwld">
+		<description>Cruis'n World (USA)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NCWE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NCWE-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-ncwe-0.u1" size="12582912" crc="41877d7d" sha1="a584735385485ee0b158e3206ce9b2e47feca830" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkracingu1" cloneof="dkracing">
+		<description>Diddy Kong Racing (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NDYE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NDYE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6103" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-ndye-0.u1" size="12582912" crc="9d2935a1" sha1="812807d8dc23229e736d543c3bafc7ef28519ef5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dk64">
+		<description>Donkey Kong 64 (Euro)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NDOP-"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NDOP-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-7105" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-ndop-0.u1" size="33554432" crc="fc37b06a" sha1="29fa421e7732ab990178033bc8c979aeb8fe78d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dk64u" cloneof="dk64">
+		<description>Donkey Kong 64 (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NDOE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NDOE-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-6105" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-ndoe-0.u1" size="33554432" crc="96972d67" sha1="3ead7798284c0593d8c91e09923cde03e87c6b09" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doom64u1" cloneof="doom64">
+		<description>Doom 64 (USA)</description>
+		<year>1997</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NDME-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NDME-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ndme-0.u1" size="8388608" crc="4dfb7cb6" sha1="b30f2b1b1cf70dc4b398bff26f75eedff858540d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dukenk64">
+		<description>Duke Nukem 64 (Euro)</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<info name="serial" value="NUS-NDNP-(UKV,FRA)"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NDNP-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ndnp-0.u1" size="8388608" crc="9817b026" sha1="3da4e470dc928c62fd7e0c010b9ea413321c7824" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="excitbiku1" cloneof="excitbik">
+		<description>Excitebike 64 (USA)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NMXE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NMXE-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-6103A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nmxe-0.u1" size="16777216" crc="ef78ed7e" sha1="3f65d89577ff12a47502a970a0c81b8e5bdb39e0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fzeroxj" cloneof="fzerox">
+		<description>F-Zero X (Jpn)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-CFZJ-JPN"/>
+		<info name="release" value="19980714"/>
+		<info name="alt_title" value="エフゼロ エックス"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-CFZJ-0" />
+			<feature name="u2" value="LH52V246" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-6106" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-cfzj-0.u1" size="16777216" crc="927387b6" sha1="aad380ce474a19d3823aeaaad3594ab0edd47f97" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fifa98">
+		<description>FIFA - Road to World Cup 98 (Euro)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="NUS-N8IP-UKV"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-N8IP-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-n8ip-0.u1" size="12582912" crc="2d49f99a" sha1="12a12c3b5aba1307d947ea7f72246497755b5482" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- only Brazil confirmed -->
+	<software name="fifa98u" cloneof="fifa98">
+		<description>FIFA - Road to World Cup 98 (USA, Brazil)</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="FIFA - A Caminho Da Copa 98 (Brazil)" />
+		<info name="serial" value="NUS-N8IE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-N8IE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="n/a (NUS-006 clone)" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-n8ie-0.u1" size="12582912" crc="9504b3df" sha1="7deb782823b8d14496ce9843384281d07cc814fc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fightds2">
+		<description>Fighter Destiny 2 (USA)</description>
+		<year>2000</year>
+		<publisher>South Peak</publisher>
+		<info name="serial" value="NUS-NFGE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NFGE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nfge-0.u1" size="16777216" crc="7fc19103" sha1="55af6bfb78d58700d0b97a5ef390693817195051" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiryuken" cloneof="flyindrg">
+		<description>Hiryuu no Ken Twin (Jpn)</description>
+		<year>1997</year>
+		<publisher>Culture Brain</publisher>
+		<info name="serial" value="NUS-NHKJ-JPN"/>
+		<info name="release" value="19971218"/>
+		<info name="alt_title" value="飛龍の拳ツイン"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NHKJ-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nhkj-0.u1" size="12582912" crc="4a07511c" sha1="bf68b9514a78040edd62863dfe15b75aed397cdb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iss98">
+		<description>International Superstar Soccer '98 (Euro)</description>
+		<year>1998</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="NUS-NWSP-(EUR,EUU)"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NWSP-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nwsp-0.u1" size="12582912" crc="463fe8b7" sha1="4fc51fbe034f8572b4727756778de7a27b43c81a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetforce">
+		<description>Jet Force Gemini (Euro)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NJFP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NJFP-0" />
+			<feature name="u2" value="29L1101KC-15B0" />
+			<feature name="u3" value="CIC-NUS-7105" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-njfp-0.u1" size="33554432" crc="fec297ef" sha1="3085a20258f3a554839d0007cb231bc9b96875bc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jetforceu" cloneof="jetforce">
+		<description>Jet Force Gemini (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NJFE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NJFE-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-6105" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-njfe-0.u1" size="33554432" crc="b5932174" sha1="aa7edc75952104f0b52bf1300df427835a128b01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jikkjlea">
+		<description>Jikkyou J.League Perfect Striker (Jpn)</description>
+		<year>1996</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="NUS-NJPJ-JPN"/>
+		<info name="release" value="19961220"/>
+		<info name="alt_title" value="実況J.LEAGUE パーフェクトストライカー"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NJPJ-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-njpj-0.u1" size="8388608" crc="97e1bce2" sha1="260270b33f3add84c99b5f2e4aa6f7c3f2abe93b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kobenba">
+		<description>Kobe Bryant in NBA Courtside (Euro)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NNBP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NNBP-0" />
+			<feature name="u2" value="BK16D SH" />
+			<feature name="u3" value="CIC-NUS-7103" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nnbp-0.u1" size="12582912" crc="5adef1c7" sha1="cab29e7b3d9c1993801e415b5823567b8fe2f682" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madden99u" cloneof="madden99">
+		<description>Madden NFL 99 (USA)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-N9ME-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-n9me-0.u1" size="12582912" crc="ac21a5bf" sha1="fd5da6fef67461fb5d6767d933663dcfa6e0f054" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariokrtu" cloneof="mariokrt">
+		<description>Mario Kart 64 (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NKTE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="NUS-NKTE-0 02" />
+			<feature name="u2" value="NUS-NKTE-0 12" />
+			<feature name="u3" value="BU9850" />
+			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nkte-0 02.u1" size="8388608" crc="895652e1" sha1="beb07f9d9909a22d273925a29c97ef7adc3c0b5d" offset="000000" />
+				<rom name="nus-nkte-0 12.u2" size="4194304" crc="673e021a" sha1="41a6f35a8a334b41b4346478b8043c2153f1d93e" offset="400000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marioparu" cloneof="mariopar">
+		<description>Mario Party (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-CLBE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-CLBE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-clbe-0.u1" size="33554432" crc="4717cd1b" sha1="08390db915dd689191906a13f4f736d419e2aff9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="missimpu" cloneof="missimp">
+		<description>Mission Impossible (USA)</description>
+		<year>1998</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="NUS-NMIE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NMIE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nmie-0.u1" size="12582912" crc="2dbd815d" sha1="c17c89f1a8485cfd481426800870f860c2ceae24" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="monstrck">
+		<description>Monster Truck Madness 64 (Euro)</description>
+		<year>1999</year>
+		<publisher>Rockstar Games</publisher>
+		<info name="serial" value="NUS-NM3P-EUR"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NM3P-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nm3p-0.u1" size="8388608" crc="ce6779fb" sha1="42f1702360e5381b0c94912ae3b5bb092c04297c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mk4u" cloneof="mk4">
+		<description>Mortal Kombat 4 (USA)</description>
+		<year>1998</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NM4E-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NM4E-0" />
+			<feature name="u2" value="" /><!-- bank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nm4e-0.u1" size="16777216" crc="aa865b66" sha1="5fb558a40f06365a1f759b4df718623f1f3ac3df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mktrilgyu1" cloneof="mktrilgy">
+		<description>Mortal Kombat Trilogy (USA, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Midway</publisher>
+		<info name="serial" value="NUS-NMKE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="NUS-NMKE-1 02" />
+			<feature name="u2" value="NUS-NMKE-1 12" />
+			<feature name="u3" value="" /><!-- blank slot -->
+			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nmke-1 02.u1" size="8388608" crc="da3aae5d" sha1="d13322ee9998426cad9324c16c46191a360d1b92" offset="000000" />
+				<rom name="nus-nmke-1 12.u2" size="4194304" crc="822f4ccd" sha1="ca842ce91ea9bbc8f4ee6a31bea2a99a7e633543" offset="800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbahangu" cloneof="nbahang">
+		<description>NBA Hangtime (USA)</description>
+		<year>1997</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NXGE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nxge-0.u1" size="12582912" crc="72e2aca9" sha1="2a1ef108f5345e6ca80d7f73f4ca4557e7843594" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nbaliv99u" cloneof="nbaliv99">
+		<description>NBA Live 99 (USA)</description>
+		<year>1998</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="NUS-N9BE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-N9BE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-n9be-0.u1" size="16777216" crc="74bc96be" sha1="c040aabd6a985052a6d2e9ab7b8d458233d0793f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pdarku" cloneof="pdark">
+		<description>Perfect Dark (USA, Rev. A)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NPDE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NPDE-1" />
+			<feature name="u2" value="BK16D 9851 " />
+			<feature name="u3" value="CIC-NUS-6105A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-npde-1.u1" size="33554432" crc="f85a16f1" sha1="07e74d1b42aaadc6d95b171f6bd5f16e7c641284" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesnapu" cloneof="pokesnap">
+		<description>Pokémon Snap (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NPFE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NPFE-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-6103" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-npfe-0.u1" size="16777216" crc="df387848" sha1="cfa6c20848651b686761f3bd72d5d97c3b83cca9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokestad1" cloneof="pokestad">
+		<description>Pokémon Stadium (Euro)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NPOP-EUR"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NPOP-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-7103A" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-npop-0.u1" size="33554432" crc="7a8bf040" sha1="df6d958fdf04d598194ab5821dd77655da9d0c5d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokestadu2" cloneof="pokestad">
+		<description>Pokémon Stadium (USA)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NPOE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NPOE-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-6103A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-npoe-0.u1" size="33554432" crc="3003e90c" sha1="59e8993202e6b8219a80855a400822417132cc81" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quest64" cloneof="holymagc">
+		<description>Quest 64 (USA)</description>
+		<year>1998</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NETE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NETE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nete-0.u1" size="16777216" crc="e90856e8" sha1="738f11572a72bea06cc5c6d9c0a341a288f29457" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rallychl">
+		<description>Rally Challenge 2000 (USA)</description>
+		<year>2000</year>
+		<publisher>South Peak</publisher>
+		<info name="serial" value="NUS-NWQE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-02" />
+			<feature name="u1" value="NUS-NWQE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nwqe-0.u1" size="12582912" crc="faf5c3b6" sha1="ecd309fc0826467f7b0e197743abf1c51c48910d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revil2u" cloneof="revil2">
+		<description>Resident Evil 2 (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Capcom USA</publisher>
+		<info name="serial" value="NUS-NREE-USA-1"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-04B-01" />
+			<feature name="u1" value="U1" /><!-- NUS-NREE-1 02 -->
+			<feature name="u2" value="U2" /><!-- NUS-NREE-1 12 -->
+			<feature name="u3" value="U3" /><!-- LH52V246AN -->
+			<feature name="u4" value="U4 BU9803" /><!-- LV2416 -->
+			<feature name="u5" value="U5 CIC-NUS" /><!-- CIC6102A -->
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="67108864">
+				<rom name="nus-nree-1 02.u1" size="33554432" crc="e6f9f955" sha1="e44abf4c2ef0640369ec0a25648b2c151a5a8c5a" offset="0000000" />
+				<rom name="nus-nree-1 12.u2" size="33554432" crc="622ed12d" sha1="f226fd097c594c3d3171b81934c8e2931b5561c7" offset="2000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revil2u1" cloneof="revil2">
+		<description>Resident Evil 2 (USA)</description>
+		<year>1999</year>
+		<publisher>Capcom USA</publisher>
+		<info name="serial" value="NUS-NREE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-04B-01" />
+			<feature name="u1" value="U1" /><!-- NUS-NREE-0 02 -->
+			<feature name="u2" value="U2" /><!-- NUS-NREE-0 12 -->
+			<feature name="u3" value="U3" /><!-- LH52V246AN -->
+			<feature name="u4" value="U4 BU9803" /><!-- LV2416 -->
+			<feature name="u5" value="U5 CIC-NUS" /><!-- CIC6102 -->
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="67108864">
+				<rom name="nus-nree-0 02.u1" size="33554432" crc="66495606" sha1="125ded805b134633b6778bc1d4c4e7955a4c9e93" offset="0000000" />
+				<rom name="nus-nree-0 12.u2" size="33554432" crc="7e2efb88" sha1="03bb6eb43b1ec888300250d45011d89ca1ec4e57" offset="2000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rugratsg" cloneof="rugrats">
+		<description>Rugrats - Die grosse Schatzsuche (Ger)</description>
+		<year>1999</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NRGD-NOE"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NRGD-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nrgd-0.u1" size="16777216" crc="e1d7919f" sha1="7840bdfe801fa2d8e34e120f66af59a140d3c1c3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfoxj" cloneof="lylatwar">
+		<description>Star Fox 64 (Jpn)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NFXJ-JPN"/>
+		<info name="release" value="19970427"/>
+		<info name="alt_title" value="スターフォックス64"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NFXJ-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6101" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nfxj-0.u1" size="12582912" crc="879edb89" sha1="86629def8edbcfd1c6a3de1c5172b14d1bf2f020" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starfoxu1" cloneof="lylatwar">
+		<description>Star Fox 64 (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NFXE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NFXE-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6101" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nfxe-0.u1" size="12582912" crc="363e7ee8" sha1="cff7fb46e79d35f727e4e20cc4c13492ecd2a2d7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swrogue1" cloneof="swrogue">
+		<description>Star Wars - Rogue Squadron (Euro)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NRSP-EUR, NUS-NRSP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NRSP-0" />
+			<feature name="u2" value="BK4D-NUS" />
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nrsp-0.u1" size="16777216" crc="13cc4ca4" sha1="e09ff328184b25f6a9170901fac2d0a7158ce7b9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swrogueu" cloneof="swrogue">
+		<description>Star Wars - Rogue Squadron (USA, Rev. A)</description>
+		<year>1998</year>
+		<publisher>LucasArts</publisher>
+		<info name="serial" value="NUS-NRSE-USA-1"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NRSE-1" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nrse-1.u1" size="16777216" crc="4a479574" sha1="95b9042bfe4cca5ba801fefb47ca2d7e79f4c76d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swshadowu1" cloneof="swshadow">
+		<description>Star Wars - Shadows of the Empire (USA, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSWE-USA" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="NUS-NSWE-1 02" />
+			<feature name="u2" value="NUS-NSWE-1 12" />
+			<feature name="u3" value="BU9850" />
+			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nswe-1 02.u1" size="8388608" crc="170180b2" sha1="1c7b0e71a908c77d5c516c94ca88e85a3584fa55" offset="000000" />
+				<rom name="nus-nswe-1 12.u2" size="4194304" crc="c3b0b9a3" sha1="d1acc51a79a04b0a48f7e5e02d3df12a287964d1" offset="800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swshadowu2" cloneof="swshadow">
+		<description>Star Wars - Shadows of the Empire (USA)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSWE-USA" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-02A-01" />
+			<feature name="u1" value="NUS-NSWE-0 02" />
+			<feature name="u2" value="NUS-NSWE-0 12" />
+			<feature name="u3" value="BU9850" />
+			<feature name="u4" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nswe-0 02.u1" size="8388608" crc="cfd53ca8" sha1="00191182504a864828910cb76e7652635d2f18b0" offset="000000" />
+				<rom name="nus-nswe-0 12.u2" size="4194304" crc="b509d2cb" sha1="bde74d9a98a9a89fab73ccbb32705e75421ff590" offset="800000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swracer">
+		<description>Star Wars Episode I - Racer (Euro)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NEPP-EUR, NUS-NEPP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-02" />
+			<feature name="u1" value="NUS-NEPP-0" />
+			<feature name="u2" value="BK16DA SH" />
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nepp-0.u1" size="33554432" crc="ede47e8a" sha1="d4968ce06b93705ed40ff4433279f587f62e3c26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swraceru" cloneof="swracer">
+		<description>Star Wars Episode I - Racer (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NEPE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-02" />
+			<feature name="u1" value="NUS-NEPE-0" />
+			<feature name="u2" value="BK16D SH" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nepe-0.u1" size="33554432" crc="494c667a" sha1="f7f84332057e3fde3168c34d781b8c2b8c312e57" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starcrftu" cloneof="starcrft">
+		<description>StarCraft 64 (USA)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-01" />
+			<feature name="u1" value="NUS-NSQE-0" />
+			<feature name="u2" value="29L1100KC-15B0" />
+			<feature name="u3" value="CIC-NUS-6102A" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nsqe-0.u1" size="33554432" crc="14c77369" sha1="3466ce39800b160ab8157ba1505ada238ed10d4a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm64">
+		<description>Super Mario 64 (Euro)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSMP-EUR, NUS-NSMP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NSMP-0" />
+			<feature name="u2" value="BU9850" /><!-- also found with BK4D-NUS -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nsmp-0.u1" size="8388608" crc="11fb579b" sha1="d80ee9eeb6454d53a96ceb6ed0aca3ffde045091" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm64j" cloneof="sm64">
+		<description>Super Mario 64 (Jpn)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSMJ-JPN "/>
+		<info name="release" value="19960623"/>
+		<info name="alt_title" value="スーパーマリオ64"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NSMJ-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nsmj-0.u1" size="8388608" crc="5cf7952a" sha1="1d2579dd5fb1d8263a4bcc063a651a64acc88921" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sm64u" cloneof="sm64">
+		<description>Super Mario 64 (USA, Hong Kong)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSME-USA, NUS-NSME-HKG"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NSME-0" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN, NUS-HKG" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nsme-0.u1" size="8388608" crc="42c43204" sha1="1002dd7b56aa0a59a9103f1fb3d57d6b161f8da7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smashbrou" cloneof="smashbro">
+		<description>Super Smash Bros. (USA)</description>
+		<year>1999</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NALE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NALE-0" />
+			<feature name="u2" value="LH52V246A" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-6103" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nale-0.u1" size="16777216" crc="dd2df6d9" sha1="0fd35ae9976b4fe68ece1c6f2d9156d913ccf076" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgrally2a" cloneof="tgrally2">
+		<description>TG Rally 2 (Euro)</description>
+		<year>1999</year>
+		<publisher>Kemco</publisher>
+		<info name="serial" value="NUS-NL2X-UKV"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NL2X-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nl2x-0.u1" size="12582912" crc="b5e8a1df" sha1="77baf3dd7b20c2c7faae4944d1f9d30476a25aac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2g" cloneof="toystor2">
+		<description>Toy Story 2 (Ger, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="NUS-NTHD-NOE"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NTHD-1" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101A" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nthd-1.u1" size="12582912" crc="1878086f" sha1="9786f138231509156bf23b1e9f1c327acec89b41" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokub" cloneof="turok">
+		<description>Turok - Dinosaur Hunter (USA)</description>
+		<year>1997</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NTUE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NTUE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ntue-0.u1" size="8388608" crc="777d75e6" sha1="8a5d29e062f6893af4e817b90afd5f941968df6d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokg" cloneof="turok">
+		<description>Turok - Dinosaur Hunter (Ger, Rev. B)</description>
+		<year>1997</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NTUD-NOE"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NTUD-2" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ntud-2.u1" size="8388608" crc="01f632f6" sha1="90b11d34f7dd13aea195f98ecb40f869bcefbce4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turokga" cloneof="turok">
+		<description>Turok - Dinosaur Hunter (Ger, Rev. A)</description>
+		<year>1997</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NTUD-NOE"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NTUD-1" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-7101" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-ntud-1.u1" size="8388608" crc="5a345522" sha1="e6418a4823751f78977dbc392f24f098b2e42c1a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turok2ua" cloneof="turok2">
+		<description>Turok 2 - Seeds of Evil (USA)</description>
+		<year>1998</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NT2E-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NT2E-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nt2e-0.u1" size="33554432" crc="fe3527ae" sha1="2ca5d6ba9529a57d822661ef770001276e7beb92" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vigilnt8u" cloneof="vigilnt8">
+		<description>Vigilante 8 (USA)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-06A-02" />
+			<feature name="u1" value="NUS-NV8E-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nv8e-0.u1" size="8388608" crc="b445edcd" sha1="588807afb3acda05955b6362c21ca24a5f2e70a2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="waveraceu" cloneof="waverace">
+		<description>Wave Race 64 (USA, Rev. A)</description>
+		<year>1996</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NSRE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NWRE-1" />
+			<feature name="u2" value="BU9850" />
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nwre-1.u1" size="8388608" crc="dd2bb7b6" sha1="d37f82b15669502487b3e5790e76e3ed33ef9831" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcwvsnwou" cloneof="wcwvsnwo">
+		<description>WCW vs. nWo - World Tour (USA, Rev. A)</description>
+		<year>1997</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NWNE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NWNE-1" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nwne-1.u1" size="12582912" crc="85e0c097" sha1="6ecedd03908627b4a76c3e1cc46d3567e755591d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcwvsnwou1" cloneof="wcwvsnwo">
+		<description>WCW vs. nWo - World Tour (USA)</description>
+		<year>1997</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NWNE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NWNE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="12582912">
+				<rom name="nus-nwne-0.u1" size="12582912" crc="ad6fe55f" sha1="050a85a8fb5146d0a5dd0a67d1004695f83cea36" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcwrevu" cloneof="wcwrev">
+		<description>WCW/nWo Revenge (USA)</description>
+		<year>1998</year>
+		<publisher>T*HQ</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NW2E-0" />
+			<feature name="u2" value="LH52V246A" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-6102" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nw2e-0.u1" size="16777216" crc="2257fd02" sha1="ef6cd4df563c3dbbf8e7afd890a6c4a3e0704ff6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wetrixu" cloneof="wetrix">
+		<description>Wetrix (USA)</description>
+		<year>1998</year>
+		<publisher>Ocean</publisher>
+		<info name="serial" value="NUS-NWTE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NWTE-0" />
+			<feature name="u2" value="" /><!-- blank slot -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nwte-0.u1" size="8388608" crc="4eda94c1" sha1="80cc6c54cc9517a33e90ccf0cc9f2c03d1f050ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wmania2ku" cloneof="wmania2k">
+		<description>WWF WrestleMania 2000 (USA)</description>
+		<year>1999</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NWXE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NWXE-0" />
+			<feature name="u2" value="LH52V246A" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-6102A" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nwxe-0.u1" size="33554432" crc="d514e83c" sha1="d8cf547eb81c72c748be87b6ce6b2f66c2699bd0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoshistoj" cloneof="yoshisto">
+		<description>Yoshi Story (Jpn)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NYSJ-JPN"/>
+		<info name="release" value="19971221"/>
+		<info name="alt_title" value="ヨッシーストーリー"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NYSJ-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="cart_model" value="NUS-006(JPN)" />
+			<feature name="cart_back_label" value="NUS-JPN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nysj-0.u1" size="16777216" crc="feac925c" sha1="325a1487c4be295837728dbe7809a31823ad2554" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoshisto">
+		<description>Yoshi's Story (Euro)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NYSP-EUR"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NYSP-0" />
+			<feature name="u2" value="BK16D 9851" />
+			<feature name="u3" value="CIC-NUS-7106" />
+			<feature name="cart_model" value="NUS-006(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nysp-0.u1" size="16777216" crc="21a5f264" sha1="0a480425baecc4d4fd236275384d9ee67285e8fd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoshistou" cloneof="yoshisto">
+		<description>Yoshi's Story (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NYSE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-02" />
+			<feature name="u1" value="NUS-NYSE-0" />
+			<feature name="u2" value="BK16D 985" />
+			<feature name="u3" value="CIC-NUS-6106" />
+			<feature name="cart_model" value="NUS-006(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="16777216">
+				<rom name="nus-nyse-0.u1" size="16777216" crc="01a4b1e9" sha1="2263c34ff25cce79a51693ebba109c76f6246d01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaoot1" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (Euro)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NZLP-AUS"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-NZLP-0" />
+			<feature name="u2" value="LH52V246A" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-7105" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(EUR)" />
+			<feature name="cart_back_label" value="NUS-EUR-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-nzlp-0.u1" size="33554432" crc="9852a62f" sha1="d0bdc2eb320668b4ba6893b9aefe4040a73123ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootu" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (USA, Rev. B)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-CZLE-USA" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-CZLE-2" />
+			<feature name="u2" value="LH52V246AD" />
+			<feature name="u3" value="74LV2416" />
+			<feature name="u4" value="CIC-NUS-6105" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-czle-2.u1" size="33554432" crc="3c7dbf5b" sha1="3ac86253e0c0d55486d212e647350c1527b9c92d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootu1" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (USA, Rev. A)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-CZLE-USA" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-CZLE-1" />
+			<feature name="u2" value="LH52V246A" /><!-- also found with LH52V246AD -->
+			<feature name="u3" value="8BA904M" />
+			<feature name="u4" value="CIC-NUS-6105" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-czle-1.u1" size="33554432" crc="aa07c8ba" sha1="18cd0eb65914a21d8fa08dfe71c29d865e9d728a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootu2" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (USA)</description>
+		<year>1998</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-CZGE-USA (gold cart), NUS-CZLE-USA (grey cart)" />
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-03A-01" />
+			<feature name="u1" value="NUS-CZLE-0" />
+			<feature name="u2" value="LH52V246A" />
+			<feature name="u3" value="BU9803A" />
+			<feature name="u4" value="CIC-NUS-6105" />
+			<feature name="bt1" value="CR2032" />
+			<feature name="cart_model" value="NUS-006(-01)(USA)" />
+			<feature name="cart_back_label" value="NUS-USA/CAN-1" />
+			<dataarea name="rom" size="33554432">
+				<rom name="nus-czle-0.u1" size="33554432" crc="ec95702d" sha1="79a4f053d34018e59279e6d4b83c7daccd985c87" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- List of semi-confirmed carts (from Zapatabase, information incomplete) -->
+	<software name="blastcrpu1" cloneof="blastcrp">
+		<description>Blast Corps (USA)</description>
+		<year>1997</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NBCE-USA"/>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-01A-01" />
+			<feature name="u1" value="NUS-NBCE-0" />
+			<feature name="u2" value="" /><!-- blank slot? -->
+			<feature name="u3" value="CIC-NUS-6102" />
+			<dataarea name="rom" size="8388608">
+				<rom name="nus-nbce-0.u1" size="8388608" crc="22ca221d" sha1="a6ad7fff57b10b782cede51d4558e19ad134f019" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- List of unconfirmed carts -->
 <softwarelist name="n64" description="Nintendo 64 cartridges">
 	<software name="007goldn">
 		<description>007 - GoldenEye (Euro)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NGEP-(EUR,AUS)"/>
 		<part name="cart" interface="n64_cart">
+			<feature name="cart_model" value="NUS-006(EUR)" />
 			<dataarea name="rom" size="12582912">
 				<rom name="007 - goldeneye (europe).bin" size="12582912" crc="7425ae2d" sha1="63627dba22be2b357c0e370e68dc5af56eeb0a24" offset="000000" />
 			</dataarea>
@@ -36,7 +1622,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>007 - GoldenEye (Jpn)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NGEJ"/>
+		<info name="serial" value="NUS-NGEJ-JPN"/>
 		<info name="release" value="19970823"/>
 		<info name="alt_title" value="ゴールデンアイ 007"/>
 		<part name="cart" interface="n64_cart">
@@ -46,32 +1632,11 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="007goldnu" cloneof="007goldn">
-		<description>007 - GoldenEye (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="007 - goldeneye (usa).bin" size="12582912" crc="8b70cb5b" sha1="7dd376e996d77d108316ac7ced087125c5674fa4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="007twine">
-		<description>007 - The World Is Not Enough (Euro)</description>
-		<year>2000</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="007 - the world is not enough (europe) (en,fr,de).bin" size="33554432" crc="7f030d3a" sha1="441bdf924566e6475aa49bab7a199dc06d32a6d5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="007twineu" cloneof="007twine">
 		<description>007 - The World Is Not Enough (USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="NUS-N07E-USA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="007 - the world is not enough (usa).bin" size="33554432" crc="34f0ee5b" sha1="e93005466ac84bc1d19b40673d0c50b604a8753c" offset="000000" />
@@ -79,35 +1644,10 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="1080snow">
-		<description>1080 Snowboarding (Euro)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="1080 snowboarding (europe) (en,ja,fr,de).bin" size="16777216" crc="b0256101" sha1="da7bcb78cf78333d7515b77f676fd45473b5b506" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="1080snowu" cloneof="1080snow">
-		<description>1080 Snowboarding (Jpn, USA)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NTEJ"/>
-		<info name="release" value="19980228 (JPN)"/>
-		<info name="alt_title" value="1080°テン・エイティ スノーボーディング"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="1080 snowboarding (japan, usa) (en,ja).bin" size="16777216" crc="d1744951" sha1="5f837c13a2fb3c8cdfd6fb720bd4a963ab515632" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="40winks">
 		<description>40 Winks (Euro, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>GT Interactive</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="40 winks (europe) (en,es,it) (proto).bin" size="33554432" crc="366ed851" sha1="2ea62384321e12e2b9c33196ae662a77b2125ae4" offset="000000" />
@@ -133,7 +1673,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>64 Hanafuda - Tenshi no Yakusoku (Jpn)</description>
 		<year>1999</year>
 		<publisher>Altron Corporation</publisher>
-		<info name="serial" value="NUS-NHFJ"/>
+		<info name="serial" value="NUS-NHFJ-JPN"/>
 		<info name="release" value="19991105"/>
 		<info name="alt_title" value="64花札 天使の約束"/>
 		<part name="cart" interface="n64_cart">
@@ -147,26 +1687,12 @@ Canceled games (possibly never got to the proto stage)
 		<description>64 Oozumou (Jpn)</description>
 		<year>1997</year>
 		<publisher>Bottom Up</publisher>
-		<info name="serial" value="NUS-NOSJ"/>
+		<info name="serial" value="NUS-NOSJ-JPN"/>
 		<info name="release" value="19971128"/>
 		<info name="alt_title" value="64大相撲"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="64 oozumou (japan).bin" size="16777216" crc="a6dbf8ae" sha1="da4c60c6054c374a251a7e5e718f199a37946423" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="64oozum2">
-		<description>64 Oozumou 2 (Jpn)</description>
-		<year>1999</year>
-		<publisher>Bottom Up</publisher>
-		<info name="serial" value="NUS-NO2J"/>
-		<info name="release" value="19990319"/>
-		<info name="alt_title" value="64大相撲2"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="64 oozumou 2 (japan).bin" size="16777216" crc="3cd5e271" sha1="1daa89ec3f5e63e131973bab03166e4f7fb60ee9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -409,28 +1935,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="asbase2ku" cloneof="asbase2k">
-		<description>All-Star Baseball 2000 (USA)</description>
-		<year>1999</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="all-star baseball 2000 (usa).bin" size="16777216" crc="15063eac" sha1="c0d574af5c3523a4a804182b4d6465212fd9ee29" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="asbas2k1">
-		<description>All-Star Baseball 2001 (USA)</description>
-		<year>2000</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="all-star baseball 2001 (usa).bin" size="16777216" crc="3e8be0e0" sha1="353ad679666287988a0e645851ee01eff2048449" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="armorine">
 		<description>Armorines - Project S.W.A.R.M. (Euro)</description>
 		<year>1999</year>
@@ -647,17 +2151,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="banjokazu1" cloneof="banjokaz">
-		<description>Banjo-Kazooie (USA)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="banjo-kazooie (usa).bin" size="16777216" crc="4fd43199" sha1="0ca5e28494b7d99e22ed27dfc914ec5b391cdb6b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="banjotooa" cloneof="banjotoo">
 		<description>Banjo-Tooie (Aus)</description>
 		<year>2001</year>
@@ -865,17 +2358,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="blastcrp">
-		<description>Blast Corps (Euro)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="blast corps (europe) (en,de).bin" size="8388608" crc="2ff810cf" sha1="9d42be8a947e64d4862d8a7c1fae57e10c2257ee" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blastcrpu" cloneof="blastcrp">
 		<description>Blast Corps (USA, Rev. A)</description>
 		<year>1997</year>
@@ -883,17 +2365,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="blast corps (usa) (rev a).bin" size="8388608" crc="23d415f8" sha1="80e5365bd5ee8388e38a04b23bf3db9b5e4bf06b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blastcrpu1" cloneof="blastcrp">
-		<description>Blast Corps (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="blast corps (usa).bin" size="8388608" crc="22ca221d" sha1="a6ad7fff57b10b782cede51d4558e19ad134f019" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1030,17 +2501,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="bomberman 64 (usa).bin" size="8388608" crc="50a98bdf" sha1="df52caea78cc786f896cb14e532088ec9ca6bea6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bombm2nd">
-		<description>Bomberman 64 - The Second Attack! (USA)</description>
-		<year>2000</year>
-		<publisher>Vatical Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="bomberman 64 - the second attack! (usa).bin" size="16777216" crc="302b3135" sha1="5c2c59506aa4dfd83ce80e9e5e377f64f4f18c58" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1238,17 +2698,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="calspeed">
-		<description>California Speed (USA)</description>
-		<year>1999</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="california speed (usa).bin" size="16777216" crc="387b0c4c" sha1="afe86aed561560bfcf1bc7130c8341252142269b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="calspeedp" cloneof="calspeed">
 		<description>California Speed (Euro, Prototype)</description>
 		<year>1999?</year>
@@ -1442,17 +2891,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="charliebu" cloneof="charlieb">
-		<description>Charlie Blast's Territory (USA)</description>
-		<year>1999</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="4194304">
-				<rom name="charlie blast's territory (usa).bin" size="4194304" crc="928a2968" sha1="ca22fa616d00d6199513a52c7851cbee5cc52354" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chopatck">
 		<description>Chopper Attack (Euro)</description>
 		<year>1998</year>
@@ -1460,17 +2898,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="chopper attack (europe).bin" size="8388608" crc="30ca7dbe" sha1="9d0840380c468a8458a838c0ee06c4858dcd1c9a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chopatcku" cloneof="chopatck">
-		<description>Chopper Attack (USA)</description>
-		<year>1998</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="chopper attack (usa).bin" size="8388608" crc="2c22147d" sha1="ce39f1afac5efc889cbe0ae03f0ccfa9a2e5b085" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1603,17 +3030,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="commconq">
-		<description>Command &amp; Conquer (Euro)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="command &amp; conquer (europe) (en,fr).bin" size="33554432" crc="ce383b3e" sha1="5ea73072575eded3954abe4a9d44623b7847c820" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="commconqg" cloneof="commconq">
 		<description>Command &amp; Conquer (Ger)</description>
 		<year>1999</year>
@@ -1625,21 +3041,11 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="commconqu" cloneof="commconq">
-		<description>Command &amp; Conquer (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="command &amp; conquer (usa).bin" size="33554432" crc="8d23ba95" sha1="63bafa4615eb7488aec3c631021720e05376aa1c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="conker">
 		<description>Conker's Bad Fur Day (Euro)</description>
 		<year>2001</year>
 		<publisher>T*HQ</publisher>
+		<info name="serial" value="NUS-NFUP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
 				<rom name="conker's bad fur day (europe).bin" size="67108864" crc="96dba949" sha1="175a058e739762d49aff01b4eac8784db415c711" offset="000000" />
@@ -1691,17 +3097,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="crusnusau1" cloneof="crusnusa">
-		<description>Cruis'n USA (USA, Rev. A)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="cruis'n usa (usa) (rev a).bin" size="8388608" crc="615ac9bc" sha1="da43a6443c22a608b76b6b73602c30b0c6038379" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="crusnusau2" cloneof="crusnusa">
 		<description>Cruis'n USA (USA)</description>
 		<year>1996</year>
@@ -1720,17 +3115,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="cruis'n world (europe).bin" size="12582912" crc="2a8b3094" sha1="e0efbb03b343cc9ace4e98306250436604054b6e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crusnwldu" cloneof="crusnwld">
-		<description>Cruis'n World (USA)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="cruis'n world (usa).bin" size="12582912" crc="41877d7d" sha1="a584735385485ee0b158e3206ce9b2e47feca830" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1812,8 +3196,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="darkrift">
 		<description>Dark Rift (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="dark rift (europe).bin" size="8388608" crc="375d8ffe" sha1="9c6701dd396a35649b0045c5be3dc0642c334c8c" offset="000000" />
@@ -1885,7 +3269,7 @@ Canceled games (possibly never got to the proto stage)
 		<publisher>Media Factory</publisher>
 		<info name="serial" value="NUS-NDAJ"/>
 		<info name="release" value="20010810"/>
-		<info name="alt_title" value="ダービースタリオン64 "/>
+		<info name="alt_title" value="ダービースタリオン64" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="derby stallion 64 (japan).bin" size="33554432" crc="922506ad" sha1="b404e2a26da5cf0ee2eecfd691ffb0385d08642a" offset="000000" />
@@ -1976,17 +3360,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="dkracingu1" cloneof="dkracing">
-		<description>Diddy Kong Racing (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="diddy kong racing (usa) (en,fr).bin" size="12582912" crc="9d2935a1" sha1="812807d8dc23229e736d543c3bafc7ef28519ef5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="goinquak" cloneof="quackatk">
 		<description>Donald Duck - Goin' Quackers (USA)</description>
 		<year>2000</year>
@@ -2009,17 +3382,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="dk64">
-		<description>Donkey Kong 64 (Euro)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="donkey kong 64 (europe) (en,fr,de,es).bin" size="33554432" crc="fc37b06a" sha1="29fa421e7732ab990178033bc8c979aeb8fe78d5" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dk64j" cloneof="dk64">
 		<description>Donkey Kong 64 (Jpn)</description>
 		<year>1999</year>
@@ -2034,24 +3396,13 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="dk64u1" cloneof="dk64">
+	<software name="dk64ud" cloneof="dk64">
 		<description>Donkey Kong 64 (USA, Demo Kiosk)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="donkey kong 64 (usa) (demo) (kiosk).bin" size="33554432" crc="54bb87f6" sha1="69127a8b8a0848ceeccd3712f3752eab3f9143cd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dk64u" cloneof="dk64">
-		<description>Donkey Kong 64 (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="donkey kong 64 (usa).bin" size="33554432" crc="96972d67" sha1="3ead7798284c0593d8c91e09923cde03e87c6b09" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2088,17 +3439,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="doom 64 (usa) (rev a).bin" size="8388608" crc="0f080d06" sha1="07a7dac8084f1be8b102312fcd3ee65be095109c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="doom64u1" cloneof="doom64">
-		<description>Doom 64 (USA)</description>
-		<year>1997</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="doom 64 (usa).bin" size="8388608" crc="4dfb7cb6" sha1="b30f2b1b1cf70dc4b398bff26f75eedff858540d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2275,21 +3615,11 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="dukenk64">
-		<description>Duke Nukem 64 (Euro)</description>
-		<year>1997</year>
-		<publisher>GT Interactive</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="duke nukem 64 (europe).bin" size="8388608" crc="9817b026" sha1="3da4e470dc928c62fd7e0c010b9ea413321c7824" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dukenk64f" cloneof="dukenk64">
 		<description>Duke Nukem 64 (Fra)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
+		<info name="serial" value="NUS-NDNF-FRA"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="duke nukem 64 (france).bin" size="8388608" crc="cbe8c78a" sha1="bf05f8ec1a1bb936f8cc4d32f0deada7355b16b1" offset="000000" />
@@ -2445,17 +3775,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="excitebike 64 (usa) (v1.1).bin" size="16777216" crc="820a12db" sha1="88214240204ab3c01f31c0a19d74a4eafe53c027" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="excitbiku1" cloneof="excitbik">
-		<description>Excitebike 64 (USA)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="excitebike 64 (usa).bin" size="16777216" crc="ef78ed7e" sha1="3f65d89577ff12a47502a970a0c81b8e5bdb39e0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2623,20 +3942,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="fzeroxj" cloneof="fzerox">
-		<description>F-Zero X (Jpn)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-CFZJ"/>
-		<info name="release" value="19980714"/>
-		<info name="alt_title" value="エフゼロ エックス"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="f-zero x (japan).bin" size="16777216" crc="927387b6" sha1="aad380ce474a19d3823aeaaad3594ab0edd47f97" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fzeroxu" cloneof="fzerox">
 		<description>F-Zero X (USA)</description>
 		<year>1998</year>
@@ -2706,28 +4011,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="fifa98">
-		<description>FIFA - Road to World Cup 98 (Euro)</description>
-		<year>1997</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="fifa - road to world cup 98 (europe) (en,fr,de,es,it,nl,sv).bin" size="12582912" crc="2d49f99a" sha1="12a12c3b5aba1307d947ea7f72246497755b5482" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fifa98u" cloneof="fifa98">
-		<description>FIFA - Road to World Cup 98 (USA)</description>
-		<year>1997</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="fifa - road to world cup 98 (usa) (en,fr,de,es,it,nl,sv).bin" size="12582912" crc="9504b3df" sha1="7deb782823b8d14496ce9843384281d07cc814fc" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="fifa98j" cloneof="fifa98">
 		<description>FIFA - Road to World Cup 98 - World Cup e no Michi (Jpn)</description>
 		<year>1998</year>
@@ -2782,17 +4065,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="fifa soccer 64 (usa) (en,fr,de).bin" size="8388608" crc="3b22f9f2" sha1="a27a2ba02bb02eaac999e60e3cedd67fb937b580" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fightds2">
-		<description>Fighter Destiny 2 (USA)</description>
-		<year>2000</year>
-		<publisher>South Peak</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="fighter destiny 2 (usa).bin" size="16777216" crc="7fc19103" sha1="55af6bfb78d58700d0b97a5ef390693817195051" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2945,8 +4217,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="frogger2">
 		<description>Frogger 2 (USA, Prototype Rev. A)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="frogger 2 (usa) (rev a) (proto).bin" size="33554432" crc="dc59ece7" sha1="f16b3d87c243f0e25c1f71eb8c388178757dcdf9" offset="000000" />
@@ -3162,14 +4434,15 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-<!-- reported as not working on the real hardware... bad dump? -->
+<!-- reported as not working on the real hardware, incorrect internal checksum
+     rom with the crc 5f0ad6da is fixed with a correct checksum -->
 	<software name="gloverp" cloneof="glover">
-		<description>Glover (Prototype)</description>
+		<description>Glover (Prototype, 1998-07-16)</description>
 		<year>1998</year>
 		<publisher>Hasbro Interactive</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
-				<rom name="glover (prototype).bin" size="67108864" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf" offset="000000" />
+				<rom name="glover (prototype).bin" size="67108864" crc="4c708e6d" sha1="72484ed65cc8cefe23e6536735d053b822bb7fbf" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3394,20 +4667,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="hey you, pikachu! (usa).bin" size="16777216" crc="0149e9f6" sha1="615835390e80921f37cb9c081d27fea42920fcce" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="hiryuken" cloneof="flyindrg">
-		<description>Hiryuu no Ken Twin (Jpn)</description>
-		<year>1997</year>
-		<publisher>Culture Brain</publisher>
-		<info name="serial" value="NUS-NHKJ"/>
-		<info name="release" value="19971218"/>
-		<info name="alt_title" value="飛龍の拳ツイン"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="hiryuu no ken twin (japan).bin" size="12582912" crc="4a07511c" sha1="bf68b9514a78040edd62863dfe15b75aed397cdb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3725,17 +4984,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="iss98">
-		<description>International Superstar Soccer '98 (Euro)</description>
-		<year>1998</year>
-		<publisher>Konami</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="international superstar soccer '98 (europe).bin" size="12582912" crc="463fe8b7" sha1="4fc51fbe034f8572b4727756778de7a27b43c81a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="iss98u" cloneof="iss98">
 		<description>International Superstar Soccer '98 (USA)</description>
 		<year>1998</year>
@@ -3955,17 +5203,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="jetforce">
-		<description>Jet Force Gemini (Euro)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="jet force gemini (europe) (en,fr,de,es).bin" size="33554432" crc="fec297ef" sha1="3085a20258f3a554839d0007cb231bc9b96875bc" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="jetforceu1" cloneof="jetforce">
 		<description>Jet Force Gemini (USA, Demo Kiosk)</description>
 		<year>1999</year>
@@ -3973,17 +5210,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="jet force gemini (usa) (demo) (kiosk).bin" size="33554432" crc="6e75735b" sha1="4c1eedfac94ea2041a765e60caac00abf77a678d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jetforceu" cloneof="jetforce">
-		<description>Jet Force Gemini (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="jet force gemini (usa).bin" size="33554432" crc="b5932174" sha1="aa7edc75952104f0b52bf1300df427835a128b01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4040,20 +5266,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="jikkyou j.league 1999 - perfect striker 2 (japan).bin" size="16777216" crc="8e2f8322" sha1="25033e8ebaa71316d108de450971180b544de315" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="jikkjlea">
-		<description>Jikkyou J.League Perfect Striker (Jpn)</description>
-		<year>1996</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="NUS-NJPJ (RZ002-J1)"/>
-		<info name="release" value="19961220"/>
-		<info name="alt_title" value="実況J.LEAGUE パーフェクトストライカー"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="jikkyou j.league perfect striker (japan).bin" size="8388608" crc="97e1bce2" sha1="260270b33f3add84c99b5f2e4aa6f7c3f2abe93b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4286,7 +5498,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Jikuu Senshi Turok (Jpn)</description>
 		<year>1997</year>
 		<publisher>Acclaim Japan</publisher>
-		<info name="serial" value="NUS-NTUJ"/>
+		<info name="serial" value="NUS-NTUJ-JPN"/>
 		<info name="release" value="19970530"/>
 		<info name="alt_title" value="時空戦士テュロック"/>
 		<part name="cart" interface="n64_cart">
@@ -4523,17 +5735,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="kobenba">
-		<description>Kobe Bryant in NBA Courtside (Euro)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="kobe bryant in nba courtside (europe).bin" size="12582912" crc="5adef1c7" sha1="cab29e7b3d9c1993801e415b5823567b8fe2f682" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kobenbau" cloneof="kobenba">
 		<description>Kobe Bryant's NBA Courtside (USA)</description>
 		<year>1998</year>
@@ -4624,50 +5825,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="legend of zelda, the - ocarina of time (europe) (en,fr,de) (rev a).bin" size="33554432" crc="ab0ffbae" sha1="663c34f1b2c05a09e5beffe4d0dcd440f7d49dc7" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaoot1" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time (Euro)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (europe) (en,fr,de).bin" size="33554432" crc="9852a62f" sha1="d0bdc2eb320668b4ba6893b9aefe4040a73123ff" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaootu" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time (USA, Rev. B)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (usa) (rev b).bin" size="33554432" crc="3c7dbf5b" sha1="3ac86253e0c0d55486d212e647350c1527b9c92d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaootu1" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time (USA, Rev. A)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (usa) (rev a).bin" size="33554432" crc="aa07c8ba" sha1="18cd0eb65914a21d8fa08dfe71c29d865e9d728a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaootu2" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time (USA)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="legend of zelda, the - ocarina of time (usa).bin" size="33554432" crc="ec95702d" sha1="79a4f053d34018e59279e6d4b83c7daccd985c87" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4850,17 +6007,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="madden nfl 99 (europe).bin" size="12582912" crc="5dcad836" sha1="c6d88bbf811e3973ef6b9fb8a565424abf2c15b6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="madden99u" cloneof="madden99">
-		<description>Madden NFL 99 (USA)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="madden nfl 99 (usa).bin" size="12582912" crc="ac21a5bf" sha1="fd5da6fef67461fb5d6767d933663dcfa6e0f054" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5076,17 +6222,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="mariokrtu" cloneof="mariokrt">
-		<description>Mario Kart 64 (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="mario kart 64 (usa).bin" size="12582912" crc="2bcee11c" sha1="e72fdcbb4edec32535a62b672c4559b04b07a081" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mariopho">
 		<description>Mario no Photopie (Jpn)</description>
 		<year>1998</year>
@@ -5122,17 +6257,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="mario party (japan).bin" size="33554432" crc="7d387e37" sha1="82d03c229f37b7e8af72f4ee867022e4fa0f1f99" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="marioparu" cloneof="mariopar">
-		<description>Mario Party (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="mario party (usa).bin" size="33554432" crc="4717cd1b" sha1="08390db915dd689191906a13f4f736d419e2aff9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5493,17 +6617,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="missimpu" cloneof="missimp">
-		<description>Mission Impossible (USA)</description>
-		<year>1998</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="mission impossible (usa).bin" size="12582912" crc="2dbd815d" sha1="c17c89f1a8485cfd481426800870f860c2ceae24" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="monacogpu" cloneof="monacogp">
 		<description>Monaco Grand Prix (USA)</description>
 		<year>1999</year>
@@ -5533,17 +6646,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="monopoly (usa).bin" size="8388608" crc="416b1f8f" sha1="99d176b45784ced5f469c64e065f6ea3e1176188" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="monstrck">
-		<description>Monster Truck Madness 64 (Euro)</description>
-		<year>1999</year>
-		<publisher>Rockstar Games</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="monster truck madness 64 (europe) (en,fr,de,es,it).bin" size="8388608" crc="ce6779fb" sha1="42f1702360e5381b0c94912ae3b5bb092c04297c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5580,17 +6682,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="mortal kombat 4 (europe).bin" size="16777216" crc="70b72a07" sha1="c992254964774aaaea5fbde5bf4031c5096fb554" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mk4u" cloneof="mk4">
-		<description>Mortal Kombat 4 (USA)</description>
-		<year>1998</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="mortal kombat 4 (usa).bin" size="16777216" crc="aa865b66" sha1="5fb558a40f06365a1f759b4df718623f1f3ac3df" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5635,17 +6726,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="mortal kombat trilogy (usa) (rev b).bin" size="12582912" crc="e58597d7" sha1="4092a66080afc03d7bf9779aad047aff1a56ecb6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mktrilgyu1" cloneof="mktrilgy">
-		<description>Mortal Kombat Trilogy (USA, Rev. A)</description>
-		<year>1996</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="mortal kombat trilogy (usa) (rev a).bin" size="12582912" crc="b1c6df97" sha1="0166caacee40b5caa7762036468ec86fbf46f247" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5829,17 +6909,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="nbahangu" cloneof="nbahang">
-		<description>NBA Hangtime (USA)</description>
-		<year>1997</year>
-		<publisher>Midway</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="nba hangtime (usa).bin" size="12582912" crc="72e2aca9" sha1="2a1ef108f5345e6ca80d7f73f4ca4557e7843594" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="nbazon98j" cloneof="nbapro98">
 		<description>NBA in the Zone '98 (Jpn)</description>
 		<year>1998</year>
@@ -5985,17 +7054,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="nba live 99 (europe) (en,fr,de,es,it).bin" size="16777216" crc="086e322e" sha1="eea6e4ff34beb7d0eb5692d79f4c5a1ff757853e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nbaliv99u" cloneof="nbaliv99">
-		<description>NBA Live 99 (USA)</description>
-		<year>1998</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="nba live 99 (usa) (en,fr,de,es,it).bin" size="16777216" crc="74bc96be" sha1="c040aabd6a985052a6d2e9ab7b8d458233d0793f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6405,8 +7463,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="odt">
 		<description>O.D.T. (Euro, Prototype)</description>
-		<year>19??</year>
-		<publisher>Psygnosis</publisher>
+		<year>1999</year>
+		<publisher>Infogrames</publisher><!-- cancelled -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="o.d.t. (europe) (en,fr,de,es,it) (proto).bin" size="16777216" crc="6e79473e" sha1="93dc2adb08c209fdc0bf2f007824fde79f79a638" offset="000000" />
@@ -6416,8 +7474,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="odtu" cloneof="odt">
 		<description>O.D.T. (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Infogrames</publisher><!-- cancelled -->
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="o.d.t. (usa) (en,fr,es) (proto).bin" size="16777216" crc="ae7e3a9e" sha1="9d1e073f9aad18f4a7a52cb185a50f5045bfd656" offset="000000" />
@@ -6562,6 +7620,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Paper Mario (Euro)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
+		<info name="serial" value="NUS-NMQP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="67108864">
 				<rom name="paper mario (europe) (en,fr,de,es).bin" size="67108864" crc="7cab0055" sha1="7f29b70c9cb686ae678beb40b59ee5583b095ff7" offset="000000" />
@@ -6673,17 +7732,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="perfect dark (japan).bin" size="33554432" crc="d76471db" sha1="e001af5a3069b374e0a08d1598b0833fe3128d82" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pdarku" cloneof="pdark">
-		<description>Perfect Dark (USA, Rev. A)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="perfect dark (usa) (rev a).bin" size="33554432" crc="f85a16f1" sha1="07e74d1b42aaadc6d95b171f6bd5f16e7c641284" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6937,17 +7985,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="pokesnapu" cloneof="pokesnap">
-		<description>Pokémon Snap (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="pokemon snap (usa).bin" size="16777216" crc="df387848" sha1="cfa6c20848651b686761f3bd72d5d97c3b83cca9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pokesnapus" cloneof="pokesnap">
 		<description>Pokémon Snap Station (USA, Promo)</description>
 		<year>1999</year>
@@ -6966,17 +8003,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="pokemon stadium (europe) (rev a).bin" size="33554432" crc="60f6be65" sha1="b34b5db300e0a7b9d283839b92a3a7040924130a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokestad1" cloneof="pokestad">
-		<description>Pokémon Stadium (Euro)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (europe).bin" size="33554432" crc="7a8bf040" sha1="df6d958fdf04d598194ab5821dd77655da9d0c5d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7043,17 +8069,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="pokemon stadium (usa) (rev a).bin" size="33554432" crc="9dedba0e" sha1="3fa2cf3391dad24150c514b07f8eece084cc8a31" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokestadu2" cloneof="pokestad">
-		<description>Pokémon Stadium (USA)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (usa).bin" size="33554432" crc="3003e90c" sha1="59e8993202e6b8219a80855a400822417132cc81" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7321,21 +8336,10 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="quest64" cloneof="holymagc">
-		<description>Quest 64 (USA)</description>
-		<year>1998</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="quest 64 (usa).bin" size="16777216" crc="e90856e8" sha1="738f11572a72bea06cc5c6d9c0a341a288f29457" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="racings2" cloneof="monacogp">
 		<description>Racing Simulation 2 (Ger)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="racing simulation 2 (germany).bin" size="16777216" crc="d660a56f" sha1="2cd2004b2e349773f3457dc8ae2f174f0e6fa0c0" offset="000000" />
@@ -7378,17 +8382,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="rally '99 (japan).bin" size="8388608" crc="a1c36245" sha1="920113a96dfb15e3e8ed991c42e28734efa26599" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rallychl">
-		<description>Rally Challenge 2000 (USA)</description>
-		<year>2000</year>
-		<publisher>South Peak</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="rally challenge 2000 (usa).bin" size="12582912" crc="faf5c3b6" sha1="ecd309fc0826467f7b0e197743abf1c51c48910d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7569,28 +8562,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="revil2u" cloneof="revil2">
-		<description>Resident Evil 2 (USA, Rev. A)</description>
-		<year>1999</year>
-		<publisher>Capcom USA</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="67108864">
-				<rom name="resident evil 2 (usa) (rev a).bin" size="67108864" crc="6a0d64bb" sha1="6f5fbedb304d66098732d4a7c69271baeee3ecb4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="revil2u1" cloneof="revil2">
-		<description>Resident Evil 2 (USA)</description>
-		<year>1999</year>
-		<publisher>Capcom USA</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="67108864">
-				<rom name="resident evil 2 (usa).bin" size="67108864" crc="d890979f" sha1="d173856a276cef9d43d14c1bcc9f9c383d49a938" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="roadrash">
 		<description>Road Rash 64 (Euro)</description>
 		<year>1999</year>
@@ -7758,17 +8729,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="rtl world league soccer 2000 (germany).bin" size="16777216" crc="4e3c9433" sha1="ef2e9dbb16c798df3315a925231314e1660a2f03" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rugratsg" cloneof="rugrats">
-		<description>Rugrats - Die grosse Schatzsuche (Ger)</description>
-		<year>1999</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="rugrats - die grosse schatzsuche (germany).bin" size="16777216" crc="e1d7919f" sha1="7840bdfe801fa2d8e34e120f66af59a140d3c1c3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8375,20 +9335,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="starfoxj" cloneof="lylatwar">
-		<description>Star Fox 64 (Jpn)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NFXJ"/>
-		<info name="release" value="19970427"/>
-		<info name="alt_title" value="スターフォックス64"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="star fox 64 (japan).bin" size="12582912" crc="879edb89" sha1="86629def8edbcfd1c6a3de1c5172b14d1bf2f020" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="starfoxu" cloneof="lylatwar">
 		<description>Star Fox 64 (USA, Rev. A)</description>
 		<year>1997</year>
@@ -8396,17 +9342,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="star fox 64 (usa) (rev a).bin" size="12582912" crc="d71902b0" sha1="7d6b2d10decd487a172fc4c49e44c4f71ab0d703" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="starfoxu1" cloneof="lylatwar">
-		<description>Star Fox 64 (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="star fox 64 (usa).bin" size="12582912" crc="363e7ee8" sha1="cff7fb46e79d35f727e4e20cc4c13492ecd2a2d7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8461,28 +9396,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="swrogue1" cloneof="swrogue">
-		<description>Star Wars - Rogue Squadron (Euro)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="star wars - rogue squadron (europe) (en,fr,de).bin" size="16777216" crc="13cc4ca4" sha1="e09ff328184b25f6a9170901fac2d0a7158ce7b9" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swrogueu" cloneof="swrogue">
-		<description>Star Wars - Rogue Squadron (USA, Rev. A)</description>
-		<year>1998</year>
-		<publisher>LucasArts</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="star wars - rogue squadron (usa) (rev a).bin" size="16777216" crc="4a479574" sha1="95b9042bfe4cca5ba801fefb47ca2d7e79f4c76d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="swrogueu1" cloneof="swrogue">
 		<description>Star Wars - Rogue Squadron (USA)</description>
 		<year>1998</year>
@@ -8512,28 +9425,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="star wars - shadows of the empire (usa) (rev b).bin" size="12582912" crc="f4e546d1" sha1="f3ab96424b567417722d95790f4efe30333b23f6" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swshadowu1" cloneof="swshadow">
-		<description>Star Wars - Shadows of the Empire (USA, Rev. A)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="star wars - shadows of the empire (usa) (rev a).bin" size="12582912" crc="b0dbb100" sha1="9ac4a13f7d73398e6b75feb3238f0ae84680f532" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swshadowu2" cloneof="swshadow">
-		<description>Star Wars - Shadows of the Empire (USA)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="star wars - shadows of the empire (usa).bin" size="12582912" crc="02fae534" sha1="4bf31d88277583d458fa73e4b69cbae068a227b5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8588,17 +9479,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="swracer">
-		<description>Star Wars Episode I - Racer (Euro)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="star wars episode i - racer (europe) (en,fr,de).bin" size="33554432" crc="ede47e8a" sha1="d4968ce06b93705ed40ff4433279f587f62e3c26" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="swracerj" cloneof="swracer">
 		<description>Star Wars Episode I - Racer (Jpn)</description>
 		<year>1999</year>
@@ -8609,17 +9489,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="star wars episode i - racer (japan).bin" size="33554432" crc="794412bf" sha1="4760072bb254bb7abfbf19d7664238b2cf5a6bd3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="swraceru" cloneof="swracer">
-		<description>Star Wars Episode I - Racer (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="star wars episode i - racer (usa).bin" size="33554432" crc="494c667a" sha1="f7f84332057e3fde3168c34d781b8c2b8c312e57" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8653,17 +9522,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="starcraft 64 (usa) (beta).bin" size="33554432" crc="0dab69e2" sha1="1c58ebc31a5a7d750c980d8730ea4b2a98b6e1d0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="starcrftu" cloneof="starcrft">
-		<description>StarCraft 64 (USA)</description>
-		<year>2000</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="starcraft 64 (usa).bin" size="33554432" crc="14c77369" sha1="3466ce39800b160ab8157ba1505ada238ed10d4a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8740,31 +9598,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="sm64">
-		<description>Super Mario 64 (Euro)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="super mario 64 (europe) (en,fr,de).bin" size="8388608" crc="11fb579b" sha1="d80ee9eeb6454d53a96ceb6ed0aca3ffde045091" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sm64j" cloneof="sm64">
-		<description>Super Mario 64 (Jpn)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NSMJ"/>
-		<info name="release" value="19960623"/>
-		<info name="alt_title" value="スーパーマリオ64"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="super mario 64 (japan).bin" size="8388608" crc="5cf7952a" sha1="1d2579dd5fb1d8263a4bcc063a651a64acc88921" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sm64jse" cloneof="sm64">
 		<description>Super Mario 64 (Jpn, Rev. A, Shindou Edition)</description>
 		<year>1997</year>
@@ -8775,17 +9608,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="super mario 64 (japan) (rev a) (shindou edition).bin" size="8388608" crc="bc9ff5f2" sha1="2a2b85e94581545ca3c05b8f864b488b141a8a1f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sm64u" cloneof="sm64">
-		<description>Super Mario 64 (USA)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="super mario 64 (usa).bin" size="8388608" crc="42c43204" sha1="1002dd7b56aa0a59a9103f1fb3d57d6b161f8da7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8836,17 +9658,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="super smash bros. (europe) (en,fr,de).bin" size="33554432" crc="7976248c" sha1="a582522c0a09816bf904109e014a970625c06d3c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smashbrou" cloneof="smashbro">
-		<description>Super Smash Bros. (USA)</description>
-		<year>1999</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="super smash bros. (usa).bin" size="16777216" crc="dd2df6d9" sha1="0fd35ae9976b4fe68ece1c6f2d9156d913ccf076" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9035,8 +9846,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="telefoot" cloneof="mikeowen">
 		<description>Telefoot Soccer 2000 (Fra)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>T*HQ</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="telefoot soccer 2000 (france).bin" size="16777216" crc="fad893ea" sha1="d8f7d0557319b7b24de2f9ef864a1a46f84f1dd8" offset="000000" />
@@ -9170,8 +9981,8 @@ Canceled games (possibly never got to the proto stage)
 
 	<software name="tommyth">
 		<description>Tommy Thunder (USA, Prototype)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1998</year><!-- cancelled -->
+		<publisher>Player 1</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="tommy thunder (usa) (proto).bin" size="8388608" crc="e5bc76d8" sha1="9ffb0084e560395e788dcc18d6fa3d238f0e9853" offset="000000" />
@@ -9390,8 +10201,10 @@ Canceled games (possibly never got to the proto stage)
 		<description>Top Gear Rally 2 (Euro)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
+		<info name="serial" value="NUS-N2LP-(EUR,EUU)"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
+			<feature name="cart_model" value="NUS-006(EUR)" />
 				<rom name="top gear rally 2 (europe).bin" size="12582912" crc="88c8a6ea" sha1="cdeba42c305995a7fb66b26c8daf4e135152abec" offset="000000" />
 			</dataarea>
 		</part>
@@ -9422,17 +10235,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="tgrally2a" cloneof="tgrally2">
-		<description>TG Rally 2 (Euro)</description>
-		<year>1999</year>
-		<publisher>Kemco</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="tg rally 2 (europe).bin" size="12582912" crc="b5e8a1df" sha1="77baf3dd7b20c2c7faae4944d1f9d30476a25aac" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="toystor2">
 		<description>Toy Story 2 (Euro)</description>
 		<year>1999</year>
@@ -9451,17 +10253,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
 				<rom name="toy story 2 (france).bin" size="12582912" crc="2af45190" sha1="4f08a4d02fc14e99bd13789895f7a447381e0c8c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="toystor2g" cloneof="toystor2">
-		<description>Toy Story 2 (Ger, Rev. A)</description>
-		<year>1999</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="toy story 2 (germany) (rev a).bin" size="12582912" crc="1878086f" sha1="9786f138231509156bf23b1e9f1c327acec89b41" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9542,6 +10333,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Turok - Dinosaur Hunter (Euro, Rev. B)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NTUP-EUR-1"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="turok - dinosaur hunter (europe) (rev b).bin" size="8388608" crc="03d8ca48" sha1="bfcf4fb8c268eb07eb4921712e0c8fb9ef0702ce" offset="000000" />
@@ -9567,28 +10359,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="turok - dinosaur hunter (europe).bin" size="8388608" crc="019a0c30" sha1="0ccdbfa032ae5f48c47489468b5da23cf98f6d84" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="turokg" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (Ger, Rev. B)</description>
-		<year>1997</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="turok - dinosaur hunter (germany) (rev b).bin" size="8388608" crc="01f632f6" sha1="90b11d34f7dd13aea195f98ecb40f869bcefbce4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="turokga" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (Ger, Rev. A)</description>
-		<year>1997</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="turok - dinosaur hunter (germany) (rev a).bin" size="8388608" crc="5a345522" sha1="e6418a4823751f78977dbc392f24f098b2e42c1a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9626,17 +10396,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turokub" cloneof="turok">
-		<description>Turok - Dinosaur Hunter (USA)</description>
-		<year>1997</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="turok - dinosaur hunter (usa).bin" size="8388608" crc="777d75e6" sha1="8a5d29e062f6893af4e817b90afd5f941968df6d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="turokleg" cloneof="turokrag">
 		<description>Turok - Legenden des Verlorenen Landes (Ger)</description>
 		<year>1999</year>
@@ -9652,6 +10411,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Turok - Rage Wars (Euro)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NRWX"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="turok - rage wars (europe) (en,fr,it).bin" size="8388608" crc="6331b573" sha1="a0173d69a2dfd793b8a23092d7edc79fa5a61c0c" offset="000000" />
@@ -9663,6 +10423,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Turok - Rage Wars (Euro, Alt)</description>
 		<year>1999</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NRWP-UKV"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="turok - rage wars (europe).bin" size="8388608" crc="6c391585" sha1="1dcd7b6a18e395872392e8f718d8eb8ed6f5d29d" offset="000000" />
@@ -9692,7 +10453,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turok2b" cloneof="turok2">
+	<software name="turok2p" cloneof="turok2">
 		<description>Turok 2 - Seeds of Evil (Euro, Demo Kiosk)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -9707,6 +10468,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Turok 2 - Seeds of Evil (Euro, Alt)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NT2X-EUR" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 2 - seeds of evil (europe) (en,fr,es,it).bin" size="33554432" crc="a309d9d3" sha1="b7d0dd6908acbc7bc7a2588eedbdcdfab8c210be" offset="000000" />
@@ -9718,6 +10480,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Turok 2 - Seeds of Evil (Euro)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NT2P-(EUR/NKV)" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 2 - seeds of evil (europe).bin" size="33554432" crc="9791b9cf" sha1="54fd5142f25a5fa058bdd2eb9f47ee1dfdd93b10" offset="000000" />
@@ -9758,21 +10521,11 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turok2ua" cloneof="turok2">
-		<description>Turok 2 - Seeds of Evil (USA)</description>
-		<year>1998</year>
-		<publisher>Acclaim Entertainment</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="turok 2 - seeds of evil (usa).bin" size="33554432" crc="fe3527ae" sha1="2ca5d6ba9529a57d822661ef770001276e7beb92" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="turok3">
 		<description>Turok 3 - Shadow of Oblivion (Euro)</description>
 		<year>2001</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="serial" value="NUS-NTKP-EUR"/>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 3 - shadow of oblivion (europe).bin" size="33554432" crc="3113283e" sha1="10df040ef5d6b2e9e72a1bfa2bde5c0d74f68a7f" offset="000000" />
@@ -9918,17 +10671,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="vigilnt8u" cloneof="vigilnt8">
-		<description>Vigilante 8 (USA)</description>
-		<year>1999</year>
-		<publisher>Activision</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="vigilante 8 (usa).bin" size="8388608" crc="b445edcd" sha1="588807afb3acda05955b6362c21ca24a5f2e70a2" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vigil2nd">
 		<description>Vigilante 8 - 2nd Offense (Euro)</description>
 		<year>2000</year>
@@ -9955,7 +10697,7 @@ Canceled games (possibly never got to the proto stage)
 		<description>Violence Killer - Turok New Generation (Jpn)</description>
 		<year>1999</year>
 		<publisher>Media Factory</publisher>
-		<info name="serial" value="NUS-NT2J"/>
+		<info name="serial" value="NUS-NT2J-JPN "/>
 		<info name="release" value="19990618"/>
 		<info name="alt_title" value="バイオレンスキラーTUROK NEW GENERATION"/>
 		<part name="cart" interface="n64_cart">
@@ -10156,17 +10898,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="waveraceu" cloneof="waverace">
-		<description>Wave Race 64 (USA, Rev. A)</description>
-		<year>1996</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="wave race 64 (usa) (rev a).bin" size="8388608" crc="dd2bb7b6" sha1="d37f82b15669502487b3e5790e76e3ed33ef9831" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="waveraceu1" cloneof="waverace">
 		<description>Wave Race 64 (USA)</description>
 		<year>1996</year>
@@ -10313,46 +11044,13 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="wcwvsnwou" cloneof="wcwvsnwo">
-		<description>WCW vs. nWo - World Tour (USA, Rev. A)</description>
-		<year>1997</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="wcw vs. nwo - world tour (usa) (rev a).bin" size="12582912" crc="85e0c097" sha1="6ecedd03908627b4a76c3e1cc46d3567e755591d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcwvsnwou1" cloneof="wcwvsnwo">
-		<description>WCW vs. nWo - World Tour (USA)</description>
-		<year>1997</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
-				<rom name="wcw vs. nwo - world tour (usa).bin" size="12582912" crc="ad6fe55f" sha1="050a85a8fb5146d0a5dd0a67d1004695f83cea36" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="wcwrev">
-		<description>WCW-nWo Revenge (Euro)</description>
+		<description>WCW/nWo Revenge (Euro)</description>
 		<year>1998</year>
 		<publisher>T*HQ</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216">
 				<rom name="wcw-nwo revenge (europe).bin" size="16777216" crc="0abbe702" sha1="12c5ccbbb9744226517e6eecfba0ff103e83b905" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wcwrevu" cloneof="wcwrev">
-		<description>WCW-nWo Revenge (USA)</description>
-		<year>1998</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="wcw-nwo revenge (usa).bin" size="16777216" crc="2257fd02" sha1="ef6cd4df563c3dbbf8e7afd890a6c4a3e0704ff6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10378,17 +11076,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="wetrix (japan).bin" size="4194304" crc="aebafd6d" sha1="a8d2970eb0313bdf925be994f04508373715f771" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wetrixu" cloneof="wetrix">
-		<description>Wetrix (USA)</description>
-		<year>1998</year>
-		<publisher>Ocean</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="8388608">
-				<rom name="wetrix (usa) (en,fr,de,es,it,nl).bin" size="8388608" crc="4eda94c1" sha1="80cc6c54cc9517a33e90ccf0cc9f2c03d1f050ad" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10694,17 +11381,6 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="wmania2ku" cloneof="wmania2k">
-		<description>WWF WrestleMania 2000 (USA)</description>
-		<year>1999</year>
-		<publisher>T*HQ</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="33554432">
-				<rom name="wwf wrestlemania 2000 (usa).bin" size="33554432" crc="d514e83c" sha1="d8cf547eb81c72c748be87b6ce6b2f66c2699bd0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="xena">
 		<description>Xena - Warrior Princess - The Talisman of Fate (Euro)</description>
 		<year>1999</year>
@@ -10737,42 +11413,6 @@ Canceled games (possibly never got to the proto stage)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="yakouchuu ii - satsujin kouro (japan).bin" size="33554432" crc="5c97c412" sha1="e4035072f682fe16e189e57bf6a9a35706d3028a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yoshistoj" cloneof="yoshisto">
-		<description>Yoshi Story (Jpn)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NYSJ"/>
-		<info name="release" value="19971221"/>
-		<info name="alt_title" value="ヨッシーストーリー"/>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="yoshi story (japan).bin" size="16777216" crc="feac925c" sha1="325a1487c4be295837728dbe7809a31823ad2554" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yoshisto">
-		<description>Yoshi's Story (Euro)</description>
-		<year>1998</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="yoshi's story (europe) (en,fr,de).bin" size="16777216" crc="21a5f264" sha1="0a480425baecc4d4fd236275384d9ee67285e8fd" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yoshistou" cloneof="yoshisto">
-		<description>Yoshi's Story (USA)</description>
-		<year>1997</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="16777216">
-				<rom name="yoshi's story (usa) (en,ja).bin" size="16777216" crc="01a4b1e9" sha1="2263c34ff25cce79a51693ebba109c76f6246d01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11035,17 +11675,17 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="unktest" supported="no">
-		<description>Unknown Test Cart (Jpn)</description>
-		<year>19??</year>
+	<software name="dlpnctrl" supported="no">
+		<description>Dolphin Controller Test (Jpn)</description>
+		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ドルフィン・コントローラー・テスト" />
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="8388608">
 				<rom name="unknown test.bin" size="8388608" crc="cba61bc8" sha1="b1d514c8b50aa05c688b20121783dff6069087bf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
-
 
 
 </softwarelist>
