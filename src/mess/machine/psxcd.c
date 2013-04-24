@@ -125,6 +125,7 @@ void psxcd_device::device_start()
 
 void psxcd_device::device_reset()
 {
+	next_read_event = -1;
 	stop_read();
 
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
@@ -149,7 +150,6 @@ void psxcd_device::device_reset()
 	m_regs.imr = 0x1f;
 	sechead = 0;
 	sectail = 0;
-	next_read_event = -1;
 	m_mute = false;
 	m_dmaload = false;
 	curpos.w = 0;
@@ -470,7 +470,7 @@ void psxcd_device::cdcmd_readn()
 		start_read();
 	} else
 	{
-		send_result(intr_diskerror);
+		send_result(intr_diskerror, NULL, 0, 0x80);
 	}
 }
 
@@ -609,8 +609,8 @@ void psxcd_device::cdcmd_getlocp()
 		decimal_to_bcd(loc.b[F])  // aframe
 	};
 
-		verboselog(machine(), 1, "psxcd: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
-							data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
+	verboselog(machine(), 1, "psxcd: getlocp [%02x %02x %02x %02x %02x %02x %02x %02x]\n",
+						data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 
 	send_result(intr_complete,data,8);
 }
@@ -624,17 +624,16 @@ void psxcd_device::cdcmd_gettn()
 	{
 		unsigned char data[3]=
 		{
-				status,
-				decimal_to_bcd(1),
-				decimal_to_bcd(cdrom_get_last_track(m_cdrom_handle))
+			status,
+			decimal_to_bcd(1),
+			decimal_to_bcd(cdrom_get_last_track(m_cdrom_handle))
 		};
 
 		send_result(intr_complete,data,3);
 	}
 	else
 	{
-		status |= status_error;
-		send_result(intr_diskerror);
+		send_result(intr_diskerror, NULL, 0, 0x80);
 	}
 }
 
@@ -663,8 +662,7 @@ void psxcd_device::cdcmd_gettd()
 	}
 	else
 	{
-		status |= status_error;
-		send_result(intr_diskerror);
+		send_result(intr_diskerror, NULL, 0, 0x80);
 	}
 }
 
@@ -688,17 +686,27 @@ void psxcd_device::cdcmd_seekp()
 
 void psxcd_device::cdcmd_test()
 {
-	verboselog(machine(), 1, "psxcd: test %08x\n",cmdbuf[0]);
+	verboselog(machine(), 1, "psxcd: test %02x\n", cmdbuf[0]);
 
-	static unsigned char data[4]=
+	switch(cmdbuf[0])
 	{
-		0x95,
-		0x07,
-		0x06,
-		0xff
-	};
+		case 0x20:
+			static unsigned char data[4]=
+			{
+				0x95,
+				0x07,
+				0x06,
+				0xff
+			};
 
-	send_result(intr_complete,data,4);
+			send_result(intr_complete,data,4);
+			break;
+
+		default:
+			verboselog(machine(), 0, "psxcd: unimplemented test cmd %02x", cmdbuf[0]);
+			cmd_complete(prepare_result(intr_diskerror, NULL, 0, 0x10));
+			break;
+	}
 }
 
 void psxcd_device::cdcmd_id()
@@ -707,23 +715,31 @@ void psxcd_device::cdcmd_id()
 
 	if (!open)
 	{
-		static unsigned char gamedata[8] = { 0x00, 0x00, 0x00, 0x00, 'S', 'C', 'E', 'A' };
-		static unsigned char audiodata[8] = { 0x00, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }; // drops into the audio CD player.  08 80 goes to the menu.
+		UINT8 cdid[8];
+		int irq;
+		memset(cdid, '\0', 8);
 
+		send_result(intr_complete);
 		if(cdrom_get_track_type(m_cdrom_handle, 0) == CD_TRACK_AUDIO)
 		{
-			audiodata[0] = status | status_invalid;
-			send_result(intr_acknowledge,audiodata,8);
+			irq = intr_diskerror;
+			cdid[0] = status | status_invalid;
+			cdid[1] = 0x90;
 		}
 		else
 		{
-			gamedata[0] = status;
-			send_result(intr_acknowledge,gamedata,8);
+			irq = intr_acknowledge;
+			cdid[0] = status;
+			cdid[4] = 'S';
+			cdid[5] = 'C';
+			cdid[6] = 'E';
+			cdid[7] = 'A';
 		}
-	} else
+		send_result(irq,cdid,8,default_irq_delay*3);
+	}
+	else
 	{
-		status |= status_error;
-		send_result(intr_diskerror);
+		send_result(intr_diskerror, NULL, 0, 0x80);
 	}
 }
 
@@ -739,7 +755,7 @@ void psxcd_device::cdcmd_reads()
 		start_read();
 	} else
 	{
-		send_result(intr_diskerror);
+		send_result(intr_diskerror, NULL, 0, 0x80);
 	}
 }
 
@@ -753,6 +769,7 @@ void psxcd_device::cdcmd_readtoc()
 	verboselog(machine(), 1, "psxcd: readtoc\n");
 
 	send_result(intr_complete);
+	send_result(intr_acknowledge, NULL, 0, default_irq_delay*3); // ?
 }
 
 void psxcd_device::cdcmd_unknown12()
@@ -762,10 +779,7 @@ void psxcd_device::cdcmd_unknown12()
 	if(cmdbuf[0] == 1)
 		send_result(intr_complete);
 	else
-	{
-		status |= status_error;
-		send_result(intr_diskerror);
-	}
+		send_result(intr_diskerror, NULL, 0, 0x40);
 }
 
 void psxcd_device::cdcmd_illegal17()
@@ -786,12 +800,8 @@ void psxcd_device::cdcmd_illegal1d()
 void psxcd_device::illegalcmd(UINT8 cmd)
 {
 	verboselog(machine(), 0, "psxcd: unimplemented cd command %02x\n", cmd);
-	command_result *res=global_alloc(command_result);
-	res->res=intr_diskerror;
-	res->data[0]=status | status_error;
-	res->data[1]=0x40; //invalid command
-	res->sz=2;
-	cmd_complete(res);
+
+	send_result(intr_diskerror, NULL, 0, 0x40);
 }
 
 void psxcd_device::cmd_complete(command_result *res)
@@ -808,15 +818,15 @@ void psxcd_device::cmd_complete(command_result *res)
 	else
 	{
 		res_queue = res;
-		m_regs.ir = res_queue->res & m_regs.imr; // or should it not trigger a masked irq?
-		if(m_regs.ir)
+		m_regs.ir = res_queue->res;
+		if(m_regs.ir & m_regs.imr)
 			m_irq_handler(1);
 		m_regs.sr |= 0x20;
 	}
 	res->next = NULL;
 }
 
-void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay)
+psxcd_device::command_result *psxcd_device::prepare_result(UINT8 res, UINT8 *data, int sz, UINT8 errcode)
 {
 	command_result *cr=global_alloc(command_result);
 
@@ -828,11 +838,25 @@ void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay)
 		cr->sz=sz;
 	} else
 	{
-		cr->data[0]=status;
-		cr->sz=1;
+		if((res == intr_diskerror) && errcode)
+		{
+			cr->data[0] = status | status_error;
+			cr->data[1] = errcode;
+			cr->sz = 2;
+		}
+		else
+		{
+			cr->data[0]=status;
+			cr->sz=1;
+		}
 	}
 	status &= ~status_error;
 
+	return cr;
+}
+
+void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay, UINT8 errcode)
+{
 	// Avoid returning results after sector read results -
 	// delay the sector read slightly if necessary
 
@@ -843,7 +867,7 @@ void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay)
 		m_timers[next_read_event]->adjust(attotime::from_hz(hz), 0, attotime::never);
 	}
 
-	add_system_event(event_cmd_complete, delay, (void *)cr);
+	add_system_event(event_cmd_complete, delay, prepare_result(res, data, sz, errcode));
 }
 
 void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
@@ -895,11 +919,7 @@ void psxcd_device::read_sector()
 			}
 			else
 			{
-				command_result *res=global_alloc(command_result);
-				res->res=intr_dataready;
-				res->data[0]=status;
-				res->sz=1;
-				cmd_complete(res);
+				cmd_complete(prepare_result(intr_dataready));
 				sectail++;
 				sectail %= sector_buffer_size;
 
@@ -936,11 +956,7 @@ void psxcd_device::read_sector()
 		{
 			verboselog(machine(), 1, "psxcd: autopause xa\n");
 
-			command_result *res=global_alloc(command_result);
-			res->res=intr_dataend;
-			res->data[0]=status;
-			res->sz=1;
-			cmd_complete(res);
+			cmd_complete(prepare_result(intr_dataend));
 			stop_read();
 		}
 	}
@@ -964,11 +980,7 @@ void psxcd_device::play_sector()
 			if(!cdrom_read_data(m_cdrom_handle, sector, secbuf[sectail], CD_TRACK_RAW_DONTCARE))
 			{
 				stop_read(); // assume we've reached the end
-				command_result *res=global_alloc(command_result);
-				res->res=intr_dataend;
-				res->data[0]=status;
-				res->sz=1;
-				cmd_complete(res);
+				cmd_complete(prepare_result(intr_dataend));
 				return;
 			}
 		}
@@ -997,11 +1009,7 @@ void psxcd_device::play_sector()
 				verboselog(machine(), 1, "psxcd: autopause cdda\n");
 
 				stop_read();
-				command_result *res=global_alloc(command_result);
-				res->res=intr_dataend;
-				res->data[0]=status;
-				res->sz=1;
-				cmd_complete(res);
+				cmd_complete(prepare_result(intr_dataend));
 				return;
 			}
 		}
@@ -1053,12 +1061,7 @@ void psxcd_device::start_read()
 	if(!(mode & mode_cdda) && (cdrom_get_track_type(m_cdrom_handle, cdrom_get_track(m_cdrom_handle, sector + 150)) == CD_TRACK_AUDIO))
 	{
 		stop_read();
-		command_result *res=global_alloc(command_result);
-		res->res=intr_diskerror;
-		res->data[0]=status | status_error;
-		res->data[1]=0x40;
-		res->sz=2;
-		cmd_complete(res);
+		cmd_complete(prepare_result(intr_diskerror, NULL, 0, 0x40));
 		return;
 	}
 	send_result(intr_complete);
