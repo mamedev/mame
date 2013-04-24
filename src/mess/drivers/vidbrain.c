@@ -449,14 +449,18 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	}
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
+READ8_MEMBER(vidbrain_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
 
 static UV201_INTERFACE( uv_intf )
 {
 	SCREEN_TAG,
 	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, ext_int_w),
 	DEVCB_DRIVER_LINE_MEMBER(vidbrain_state, hblank_w),
-	DEVCB_MEMORY_HANDLER(F3850_TAG, PROGRAM, memory_read_byte)
+	DEVCB_DRIVER_MEMBER(vidbrain_state, memory_read_byte)
 };
 
 

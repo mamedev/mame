@@ -75,14 +75,14 @@ class x1_state : public driver_device
 public:
 	x1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_x1_cpu(*this,"x1_cpu"),
+	m_maincpu(*this,"x1_cpu"),
 	m_cassette(*this, "cassette"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
 	m_ctc(*this, "ctc")
 	{ }
 
-	required_device<cpu_device> m_x1_cpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
@@ -223,6 +223,11 @@ public:
 	int priority_mixer_pri(int color);
 	void cmt_command( UINT8 cmd );
 	UINT16 jis_convert(int kanji_addr);
+	
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
 };
 
 /*----------- defined in machine/x1.c -----------*/

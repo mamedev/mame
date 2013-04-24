@@ -96,6 +96,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	
 
 	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
 

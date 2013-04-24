@@ -107,6 +107,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( p8k_16_daisy_interrupt );
 	DECLARE_WRITE16_MEMBER( pk8_16_sio_0_serial_transmit );
 	DECLARE_WRITE16_MEMBER( pk8_16_sio_1_serial_transmit );
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);	
 };
 
 /***************************************************************************
@@ -241,18 +245,39 @@ WRITE_LINE_MEMBER( p8k_state::p8k_dma_irq_w )
 	p8k_daisy_interrupt(state);
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
+READ8_MEMBER(p8k_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(p8k_state::memory_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER(p8k_state::io_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(p8k_state::io_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.write_byte(offset, data);
+}
 
 static Z80DMA_INTERFACE( p8k_dma_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(p8k_state, p8k_dma_irq_w),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", IO, memory_write_byte)
+	DEVCB_DRIVER_MEMBER(p8k_state, memory_read_byte),
+	DEVCB_DRIVER_MEMBER(p8k_state, memory_write_byte),
+	DEVCB_DRIVER_MEMBER(p8k_state, io_read_byte),
+	DEVCB_DRIVER_MEMBER(p8k_state, io_write_byte)
 };
 
 /* Z80 CTC 0 */

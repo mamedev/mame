@@ -111,9 +111,9 @@ static MC6845_INTERFACE( mc6845_intf )
 
 INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 {
-	//address_space &space = m_x1_cpu->space(AS_PROGRAM);
+	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	m_ram_bank = 0x00;
 	if(m_is_turbo) { m_ex_bank = 0x10; }
@@ -123,7 +123,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
 INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
 {
-	m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1twin )

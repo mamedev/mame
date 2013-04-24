@@ -100,7 +100,6 @@ enum
 	DEVCB_TYPE_NULL = 0,            // NULL callback
 	DEVCB_TYPE_IOPORT,              // I/O port read/write
 	DEVCB_TYPE_DEVICE,              // device read/write
-	DEVCB_TYPE_LEGACY_SPACE,        // legacy address space read/write
 	DEVCB_TYPE_INPUT_LINE,          // device input line write
 	DEVCB_TYPE_CONSTANT,            // constant value read
 	DEVCB_TYPE_UNMAP                // unmapped line
@@ -228,9 +227,6 @@ void devcb_stub64(device_t *device, address_space &space, offs_t offset, UINT64 
 #define DEVCB_LINE_VCC                          DEVCB_CONSTANT(1)
 
 #define DEVCB_UNMAPPED                          { DEVCB_TYPE_UNMAP, 0, NULL, NULL, NULL, NULL }
-
-// read/write handlers for a given CPU's address space
-#define DEVCB_MEMORY_HANDLER(cpu,space,func)    { DEVCB_TYPE_LEGACY_SPACE, AS_##space, (cpu), #func, NULL, NULL, func }
 
 // read handlers for an I/O port by tag
 #define DEVCB_INPUT_PORT(tag)                   { DEVCB_TYPE_IOPORT, 0, (tag), NULL, NULL, NULL, NULL }

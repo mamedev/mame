@@ -126,6 +126,8 @@ public:
 	int m_enable_rtc_int;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);	
 };
 
 class trs80m16_state : public trs80m2_state

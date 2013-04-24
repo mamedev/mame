@@ -70,7 +70,6 @@ public:
 	static ioport_port *resolve_port(const char *tag, device_t &current);
 	static device_t *resolve_device(int index, const char *tag, device_t &current);
 	static device_execute_interface *resolve_execute_interface(const char *tag, device_t &current);
-	static address_space &resolve_space(int index, const char *tag, device_t &current);
 };
 
 
@@ -130,31 +129,6 @@ device_execute_interface *devcb_resolver::resolve_execute_interface(const char *
 }
 
 
-//-------------------------------------------------
-//  resolve_space - resolve to an address space
-//  given a device tag and a space index
-//-------------------------------------------------
-
-address_space &devcb_resolver::resolve_space(int index, const char *tag, device_t &current)
-{
-	// find our target device
-	device_t *targetdev = current.siblingdevice(tag);
-	if (targetdev == NULL)
-		throw emu_fatalerror("Unable to resolve device '%s' (requested by %s '%s')", tag, current.name(), current.tag());
-
-	// make sure the target device has a memory interface
-	device_memory_interface *memory;
-	if (!targetdev->interface(memory))
-		throw emu_fatalerror("Device '%s' (requested by %s '%s') has no memory interface", tag, current.name(), current.tag());
-
-	// set the real target and function, then prime a delegate
-	if (!memory->has_space(index))
-		throw emu_fatalerror("Unable to find device '%s' space %d (requested by %s '%s')", tag, index, current.name(), current.tag());
-	return memory->space(index);
-}
-
-
-
 //**************************************************************************
 //  DEVCB RESOLVED READ LINE
 //**************************************************************************
@@ -200,12 +174,6 @@ void devcb_resolved_read_line::resolve(const devcb_read_line &desc, device_t &de
 				m_helper.read8_device = desc.readdevice;
 				*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_read8, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			m_helper.read8_space = desc.readspace;
-			*static_cast<devcb_read_line_delegate *>(this) = devcb_read_line_delegate(&devcb_resolved_read_line::from_read8, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
@@ -311,12 +279,6 @@ void devcb_resolved_write_line::resolve(const devcb_write_line &desc, device_t &
 				m_helper.write8_device = desc.writedevice;
 				*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_write8, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			m_helper.write8_space = desc.writespace;
-			*static_cast<devcb_write_line_delegate *>(this) = devcb_write_line_delegate(&devcb_resolved_write_line::to_write8, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
@@ -435,12 +397,6 @@ void devcb_resolved_read8::resolve(const devcb_read8 &desc, device_t &device)
 				m_helper.read_line = desc.readline;
 				*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_readline, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			m_helper.read8_space = desc.readspace;
-			*static_cast<devcb_read8_delegate *>(this) = devcb_read8_delegate(&devcb_resolved_read8::from_read8space, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_CONSTANT:
@@ -570,12 +526,6 @@ void devcb_resolved_write8::resolve(const devcb_write8 &desc, device_t &device)
 				m_helper.write_line = desc.writeline;
 				*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_writeline, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			m_helper.write8_space = desc.writespace;
-			*static_cast<devcb_write8_delegate *>(this) = devcb_write8_delegate(&devcb_resolved_write8::to_write8space, desc.name, this);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
@@ -719,11 +669,6 @@ void devcb_resolved_read16::resolve(const devcb_read16 &desc, device_t &device)
 			}
 			break;
 
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(desc.readspace, desc.name, m_object.space);
-			break;
-
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
 			*static_cast<devcb_read16_delegate *>(this) = devcb_read16_delegate(&devcb_resolved_read16::from_constant, "constant", this);
@@ -840,11 +785,6 @@ void devcb_resolved_write16::resolve(const devcb_write16 &desc, device_t &device
 				m_helper.write_line = desc.writeline;
 				*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(&devcb_resolved_write16::to_writeline, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_write16_delegate *>(this) = devcb_write16_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
@@ -976,11 +916,6 @@ void devcb_resolved_read32::resolve(const devcb_read32 &desc, device_t &device)
 			}
 			break;
 
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_read32_delegate *>(this) = devcb_read32_delegate(desc.readspace, desc.name, m_object.space);
-			break;
-
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
 			*static_cast<devcb_read32_delegate *>(this) = devcb_read32_delegate(&devcb_resolved_read32::from_constant, "constant", this);
@@ -1097,11 +1032,6 @@ void devcb_resolved_write32::resolve(const devcb_write32 &desc, device_t &device
 				m_helper.write_line = desc.writeline;
 				*static_cast<devcb_write32_delegate *>(this) = devcb_write32_delegate(&devcb_resolved_write32::to_writeline, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_write32_delegate *>(this) = devcb_write32_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:
@@ -1233,11 +1163,6 @@ void devcb_resolved_read64::resolve(const devcb_read64 &desc, device_t &device)
 			}
 			break;
 
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_read64_delegate *>(this) = devcb_read64_delegate(desc.readspace, desc.name, m_object.space);
-			break;
-
 		case DEVCB_TYPE_CONSTANT:
 			m_object.constant = desc.index;
 			*static_cast<devcb_read64_delegate *>(this) = devcb_read64_delegate(&devcb_resolved_read64::from_constant, "constant", this);
@@ -1354,11 +1279,6 @@ void devcb_resolved_write64::resolve(const devcb_write64 &desc, device_t &device
 				m_helper.write_line = desc.writeline;
 				*static_cast<devcb_write64_delegate *>(this) = devcb_write64_delegate(&devcb_resolved_write64::to_writeline, desc.name, this);
 			}
-			break;
-
-		case DEVCB_TYPE_LEGACY_SPACE:
-			m_object.space = &devcb_resolver::resolve_space(desc.index, desc.tag, device);
-			*static_cast<devcb_write64_delegate *>(this) = devcb_write64_delegate(desc.writespace, desc.name, m_object.space);
 			break;
 
 		case DEVCB_TYPE_INPUT_LINE:

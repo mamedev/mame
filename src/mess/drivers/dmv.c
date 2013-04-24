@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kb_ctrl_mcu_w);
 	DECLARE_READ8_MEMBER(fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);	
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
@@ -283,15 +285,24 @@ WRITE_LINE_MEMBER( dmv_state::dma_hrq_changed )
 	m_dmac->i8237_hlda_w(state);
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask)             { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
+READ8_MEMBER(dmv_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(dmv_state::memory_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.write_byte(offset, data);
+}
 
 static I8237_INTERFACE( dmv_dma8237_config )
 {
 	DEVCB_DRIVER_LINE_MEMBER(dmv_state, dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_DRIVER_MEMBER(dmv_state, memory_read_byte),
+	DEVCB_DRIVER_MEMBER(dmv_state, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_r) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(dmv_state, fdc_dma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }

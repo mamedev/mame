@@ -239,6 +239,9 @@ public:
 	void dkong_init_device_driver_data(  );
 	void braze_decrypt_rom(UINT8 *dest);
 	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<eeprom_device> m_eeprom;

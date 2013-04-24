@@ -1895,18 +1895,39 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
+READ8_MEMBER(x1_state::memory_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(x1_state::memory_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
+	return prog_space.write_byte(offset, data);
+}
+
+READ8_MEMBER(x1_state::io_read_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.read_byte(offset);
+}
+
+WRITE8_MEMBER(x1_state::io_write_byte)
+{
+	address_space& prog_space = m_maincpu->space(AS_IO);
+	return prog_space.write_byte(offset, data);
+}
 
 static Z80DMA_INTERFACE( x1_dma )
 {
 	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_HALT),
 	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("x1_cpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("x1_cpu", PROGRAM, memory_write_byte),
-	DEVCB_MEMORY_HANDLER("x1_cpu", IO, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("x1_cpu", IO, memory_write_byte)
+	DEVCB_DRIVER_MEMBER(x1_state, memory_read_byte),
+	DEVCB_DRIVER_MEMBER(x1_state, memory_write_byte),
+	DEVCB_DRIVER_MEMBER(x1_state, io_read_byte),
+	DEVCB_DRIVER_MEMBER(x1_state, io_write_byte)
 };
 
 /*************************************
@@ -1917,7 +1938,7 @@ static Z80DMA_INTERFACE( x1_dma )
 
 INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 {
-	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	m_ram_bank = 0x00;
 	if(m_is_turbo) { m_ex_bank = 0x10; }
@@ -1927,7 +1948,7 @@ INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
 INPUT_CHANGED_MEMBER(x1_state::nmi_reset)
 {
-	m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_PORTS_START( x1 )
@@ -2368,7 +2389,7 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 {
-	address_space &space = m_x1_cpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT32 key1 = ioport("key1")->read();
 	UINT32 key2 = ioport("key2")->read();
 	UINT32 key3 = ioport("key3")->read();
@@ -2386,7 +2407,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 			x1_sub_io_w(space,0,0xe6);
 			m_irq_vector = m_key_irq_vector;
 			m_key_irq_flag = 1;
-			m_x1_cpu->set_input_line(0,ASSERT_LINE);
+			m_maincpu->set_input_line(0,ASSERT_LINE);
 			m_old_key1 = key1;
 			m_old_key2 = key2;
 			m_old_key3 = key3;

@@ -2895,12 +2895,22 @@ static INPUT_PORTS_START( nightlov )
 INPUT_PORTS_END
 
 
+READ8_MEMBER(nbmj8688_state::dipsw1_r)
+{
+	return nb1413m3_dipsw1_r(space,offset);
+}
+
+READ8_MEMBER(nbmj8688_state::dipsw2_r)
+{
+	return nb1413m3_dipsw2_r(space,offset);
+}
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("maincpu", IO, nb1413m3_dipsw1_r),     // DIPSW-A read
-	DEVCB_MEMORY_HANDLER("maincpu", IO, nb1413m3_dipsw2_r),     // DIPSW-B read
+	DEVCB_DRIVER_MEMBER(nbmj8688_state, dipsw1_r),     // DIPSW-A read
+	DEVCB_DRIVER_MEMBER(nbmj8688_state, dipsw2_r),     // DIPSW-B read
 	DEVCB_NULL,
 	DEVCB_NULL
 };

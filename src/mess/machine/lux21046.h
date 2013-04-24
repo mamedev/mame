@@ -71,6 +71,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
 
+	DECLARE_READ8_MEMBER(memory_read_byte);
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
+	DECLARE_READ8_MEMBER(io_read_byte);
+	DECLARE_WRITE8_MEMBER(io_write_byte);
+
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 

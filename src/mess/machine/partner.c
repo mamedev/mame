@@ -363,16 +363,13 @@ WRITE_LINE_MEMBER(partner_state::hrq_w)
 	machine().device<i8257_device>("dma8257")->i8257_hlda_w(state);
 }
 
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
-
 I8257_INTERFACE( partner_dma )
 {
 	DEVCB_DRIVER_LINE_MEMBER(partner_state,hrq_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
+	DEVCB_DRIVER_MEMBER(radio86_state, memory_read_byte),
+	DEVCB_DRIVER_MEMBER(radio86_state, memory_write_byte),
 	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_r), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_DEVICE_HANDLER("wd1793", wd17xx_data_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
 };
