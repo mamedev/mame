@@ -60832,40 +60832,6 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="tinchoml" supported="no">
-		<description>Tin Choi Ma Lei (Chi)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mmalee2" />
-			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
-			<dataarea name="chr" size="8192">
-				<rom name="tin choi ma lei (ch) [u].chr" size="8192" crc="078a4304" sha1="05056bace92931aeaa6b86a13e44f2da75e7a765" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="65536">  <!-- CHECK THIS -->
-				<rom name="tin choi ma lei (ch) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
-				<rom name="tin choi ma lei (ch) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tinchomla" cloneof="tinchoml" supported="no">
-		<description>Tin Choi Ma Lei (Chi, Alt)</description>
-		<year>19??</year>
-		<publisher>JMH MTV Corp?</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mmalee2" />
-			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
-			<dataarea name="chr" size="8192">
-				<rom name="genius merio bros. (tin choi ma lei).chr" size="8192" crc="da934ea9" sha1="ee09df7a90c2a39cce87fdcdfa6e65aed01767ff" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="65536">  <!-- CHECK THIS -->
-				<rom name="genius merio bros. (tin choi ma lei).prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
-				<rom name="genius merio bros. (tin choi ma lei).prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="ttoons6" supported="no">
 		<description>Tiny Toon Adventures 6 (Asia)</description>
 		<year>19??</year>
@@ -63396,6 +63362,48 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<dataarea name="prg" size="34816">
 				<rom name="super mario bros malee 2 (unl) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="0x0000" status="baddump" />
 				<rom name="super mario bros malee 2 (unl) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x8000" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge -->
+			<dataarea name="wram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tinchoml" cloneof="smb">
+		<description>Tin Choi Ma Lei (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="mmalee2" />
+			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="tin choi ma lei (ch) [u].chr" size="8192" crc="078a4304" sha1="05056bace92931aeaa6b86a13e44f2da75e7a765" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="tin choi ma lei (ch) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
+				<rom name="tin choi ma lei (ch) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge -->
+			<dataarea name="wram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geniusm" cloneof="smb">
+		<description>Genius Merio Bros. (Chi)</description>
+		<year>19??</year>
+		<publisher>JMH MTV Corp?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="mmalee2" />
+			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="genius merio bros. (tin choi ma lei).chr" size="8192" crc="da934ea9" sha1="ee09df7a90c2a39cce87fdcdfa6e65aed01767ff" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="genius merio bros. (tin choi ma lei).prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="00000" status="baddump" />
+				<rom name="genius merio bros. (tin choi ma lei).prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x08000" status="baddump" />
 			</dataarea>
 			<!-- 2k WRAM on cartridge -->
 			<dataarea name="wram" size="2048">
