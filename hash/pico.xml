@@ -99,7 +99,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
 * クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
 * NHKおかあさんといっしょドレミファど～なっつ! あそびいっぱい うたいっぱい! - NHK Okaasan to Issho Doremifa Donuts! Asobi Ippai Utaippai! (Bandai - ???? - T-133090)
-* 楽しく遊んで能力アップ!! たのしい幼稚園 '95年度版 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien '95-nendo Han (Bandai - 19950725 - T-133100)
 * ウルトラヒーロー - UltraHero (Bandai - 1995xxxx - T-133110)
 * 美少女戦士セーラームーンスーパーズ - Bishoujo Senshi Sailor Moon SuperS (Bandai - 19951019 - T-133130)
 * いっしょにはしろうきかんしゃトーマス - Issho ni Hashirou Kikansha Thomas (Bandai - ???? - T-133140)
@@ -128,7 +127,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * はじめまシリーズ4 学研のおべんきょうソフト たしざん ひきざん - Hajimema Series 4 - Gakken no Obenkyou Soft - Tashizan Hikizan (Gakken - 1998xxxx - T-169070)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
-* でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
 * ドラえもん かぞえて･かんたん かず とけい - Doraemon Kazoete-Kanzan Kazu Tokei (Shogakukan - ???? - T-226050)
 * ドラえもん えんそく･いもほり･うんどうかい <10th Anniversary> - Doraemon Ensoku-Imohori-Undoukai ~10th Anniversary Edition~ (Shogakukan - 200309xx - T-226090)
@@ -516,6 +514,21 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-19960-S" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-19960-s.ic1" size="524288" crc="f5c3fe17" sha1="02aa1df927a9a1ffed62ad042f348afe2810a509" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dendaish">
+		<description>Densha Daishuugou! (Jpn)</description>
+		<year>1997</year>
+		<publisher>Yonezawa</publisher>
+		<info name="serial" value="T-193020"/>
+		<info name="alt_title" value="でんしゃ だいしゅうごう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18814-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18814-t.ic1" size="524288" crc="faee3efa" sha1="3c4d76549cefb8ac8aa66f24ad347198b819ee1a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2700,6 +2713,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tanoshi ku asonde nouryoku appu!! tanoshii youchien (japan).bin" size="524288" crc="ae02801d" sha1="19c061ba15c32ac4a9ee321263e36a87bb48157d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanoason">
+		<description>Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien '95-nendoban (Jpn)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133100"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="楽しく遊んで能力アップ!! たのしい幼稚園 '95年度版"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18095-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-18095-h.ic1" size="524288" crc="5ac3927e" sha1="f2a6ae4c7728dd6d8052d6f9425bc06e5764941a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
