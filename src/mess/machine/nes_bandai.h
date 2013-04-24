@@ -34,10 +34,17 @@ public:
 	// device-level overrides
 	virtual void device_start();
 	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(nt_r);
+	virtual DECLARE_WRITE8_MEMBER(nt_w);
 
 	virtual void pcb_reset();
 
+	virtual void ppu_latch(offs_t offset);
+
 	// TODO: add oeka kids controller emulation
+protected:
+	void update_chr();
+	UINT8 m_reg, m_latch;
 };
 
 

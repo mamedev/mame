@@ -279,7 +279,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("smb2j",            NES_SMB2J)
 	SLOT_INTERFACE_INTERNAL("smb2ja",           NES_SMB2JA)
 	SLOT_INTERFACE_INTERNAL("smb2jb",           NES_SMB2JB)
-	SLOT_INTERFACE_INTERNAL("smb2jc",           NES_SMB2JC)   // really?
+	SLOT_INTERFACE_INTERNAL("09034a",           NES_09034A)
 	SLOT_INTERFACE_INTERNAL("tobidase",         NES_TOBIDASE) // mapper 120
 	SLOT_INTERFACE_INTERNAL("mmalee2",          NES_MMALEE)    // mapper 55?
 	SLOT_INTERFACE_INTERNAL("unl_2708",         NES_2708)    // mapper 103
@@ -396,6 +396,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("ffe3",             NES_FFE3)
 	SLOT_INTERFACE_INTERNAL("ffe4",             NES_FFE4)
 	SLOT_INTERFACE_INTERNAL("ffe8",             NES_FFE8)
+SLOT_INTERFACE_INTERNAL("test",             NES_NROM)
 //
 	SLOT_INTERFACE_INTERNAL("unknown",          NES_NROM)  //  a few pirate dumps uses the wrong mapper...
 SLOT_INTERFACE_END

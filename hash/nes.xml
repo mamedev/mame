@@ -50999,20 +50999,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<!-- TC-031 is unknown. Possibly "Bridge", an unreleased proto -->
 
-	<software name="chuugokt" supported="no">
+	<software name="chuugokt" supported="partial">
 		<description>Chuugoku Taitei (Tw)</description>
 		<year>19??</year>
 		<publisher>Sachen</publisher>
 		<info name="serial" value="TC-032"/>
 		<info name="alt_title" value="中國大亨"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="somari" />
-			<feature name="pcb" value="SOMERITEAM-SL-12" />
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />	<!-- Original header was mapper 116, but it's not a SOMARI pcb... -->
 			<dataarea name="chr" size="131072">
 				<rom name="chuugoku taitei (asia) (unl).chr" size="131072" crc="d9203c08" sha1="b32ef62e4583b216aea84f7d0da0269c01b61e26" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
 				<rom name="chuugoku taitei (asia) (unl).prg" size="262144" crc="3acdcc64" sha1="32436a43d3c371ab7aa6bb5165f60ca5c006a60e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -63085,25 +63088,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="bballfds" supported="no">
-		<description>Baseball (Asia, FDS conversion?)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- mapper 253?!? -->
-			<dataarea name="prg" size="81920">
-				<rom name="baseball.prg" size="81920" crc="30296e0c" sha1="61ccce33b50ab1d6aab46cb52ee1ecaaaa3fdf0c" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="maribaby">
 		<description>Mario Baby ~ Bio Miracle Bokutte Upa (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -63167,23 +63151,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u][!].prg" size="65536" crc="ef9ea440" sha1="8ac973af9e0aae763c2d61484c6c5bf5e808891f" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- FIXME: which board should use this game?? -->
-	<software name="cluclud" supported="no">
-		<description>Clu Clu Land D (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />
-			<dataarea name="chr" size="8192">
-				<rom name="clu clu land d (j) (fds conversion).chr" size="8192" crc="64a75549" sha1="7c950e89e6df0915820fe0c3e6750c085a8aaf83" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="clu clu land d (j) (fds conversion).prg" size="32768" crc="84594123" sha1="54fce5fbfbb3ae47ce3a62f9092c0ff204cf1cec" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63310,38 +63277,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="iceclfds" supported="no">
-		<description>Ice Climber (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<dataarea name="prg" size="32768">
-				<rom name="ice climber (j) (fds conversion).prg" size="32768" crc="d8ec6353" sha1="7409b32043a0d23b5b44b96f14214bef5ba4d9ca" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="icehfds" supported="no">
-		<description>Ice Hockey (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<dataarea name="chr" size="8192">
-				<rom name="ice hockey (j) (fds conversion).chr" size="8192" crc="f10fc90a" sha1="1a2a657267de1f5bdf284d1b69ed7d4895dfb281" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="ice hockey (j) (fds conversion).prg" size="32768" crc="c02e5f1f" sha1="5244c2d123e02914590791c9ffc5e4f945d801ff" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="meikyfds">
 		<description>Meikyuu Jiin Dababa (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -63379,22 +63314,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="othelfds" supported="no">
-		<description>Othello (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<dataarea name="chr" size="8192">
-				<rom name="othello (j) (fds conversion).chr" size="8192" crc="2f7856c8" sha1="4b48c4f4782ab8e13cba6073e3c7e19f51017774" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="othello (j) (fds conversion).prg" size="32768" crc="55976042" sha1="6f7f626d3666c9890b62e64b3b5b40fd65ccc208" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="prowrfds">
 		<description>ProWres - Famicom Wrestling Association (Asia, FDS conversion)</description>
 		<year>19??</year>
@@ -63408,6 +63327,269 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="prowres (fds conversion, le05 simplified)(unl)[u][!].prg" size="32768" crc="7d219257" sha1="d46a9d1752204069cb4e0cc04338b5aa4ca54568" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2lf" cloneof="smb2fds">
+		<description>Super Mario Bros. 2 (LF36)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smb2j" />
+			<feature name="pcb" value="BTL-SMB2C" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="super mario bros. 2 (j) (lf36).chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="81920">
+				<rom name="super mario bros. 2 (j) (lf36).prg" size="81920" crc="25e0b714" sha1="7e7711b911f10b4ef325b7b25a770e1de188fe27" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2k" cloneof="smb2fds">
+		<description>Super Mario Bros. 2 (Kaiser)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7032" />
+			<feature name="pcb" value="UNL-KS7032" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="super mario bros. 2 (j) (kaiser).prg" size="131072" crc="281326ed" sha1="dc8ddb78cbb575623b701954df951f05e81388ea" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2h" cloneof="smb">
+		<description>Super Mario Bros. 2 (Super Mario Bros. Pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="super mario bros. (title hack) (unl).chr" size="8192" crc="b5a7524b" sha1="791b1c93d58c5d94df803449a2ce3e118d1adc50" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="super mario bros. (title hack) (unl).prg" size="32768" crc="ae15ebae" sha1="dc5bbe66886c0934c16a9cdedbf474f6bc5215a1" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2m" cloneof="smb">
+		<description>Super Mario Bros Malee 2</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="mmalee2" />
+			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="super mario bros malee 2 (unl) [u].chr" size="8192" crc="b5a7524b" sha1="791b1c93d58c5d94df803449a2ce3e118d1adc50" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="34816">
+				<rom name="super mario bros malee 2 (unl) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="0x0000" status="baddump" />
+				<rom name="super mario bros malee 2 (unl) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x8000" status="baddump" />
+			</dataarea>
+			<!-- 2k WRAM on cartridge -->
+			<dataarea name="wram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2fdsa" cloneof="smb2fds">
+		<description>Super Mario Bros. 2 (FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smb2ja" />
+			<feature name="pcb" value="BTL-SMB2A" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="8192">
+				<rom name="super mario bros 2 (lost levels) (unl).chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="super mario bros 2 (lost levels) (unl).prg" size="65536" crc="bead254c" sha1="167e2b9629edefadea54564accaeceb4c08afc55" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smb2fdsb" cloneof="smb2fds">
+		<description>Super Mario Bros. 2 (FDS conversion, Alt PCB)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smb2jb" />
+			<feature name="pcb" value="BTL-SMB2B" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="super mario bros. (alt levels).prg" size="131072" crc="313491ed" sha1="0ffe5aa3fbee72601bd629849a30379937d170d7" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tobidfds">
+		<description>Tobidase Daisakusen (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tobidase" />
+			<feature name="pcb" value="BTL-TOBIDASEDAISAKUSEN" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="98304">
+				<rom name="tobidase daisakusen (fds conversion).prg" size="98304" crc="ee82b3ea" sha1="7fcf28158dfb991aa47d35fdec1512a7947c989e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vballfdsa" cloneof="volley" supported="no">
+		<description>Volleyball (Asia, FDS conversion, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smb2j" />
+			<feature name="pcb" value="UNL-SMB2J" />
+			<dataarea name="chr" size="8192">
+				<rom name="volleyball (fds conversion) (unl) [u].chr" size="8192" crc="0101a6fb" sha1="fd7338e3802b897172f0f22e7f5a191bc68dd6d2" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="volleyball (fds conversion) (unl) [u].prg" size="32768" crc="d4fb2cd8" sha1="56cacee106de0116857421081c778ebc9d480aa0" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanacfds">
+		<description>Zanac (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="09034a" />
+			<feature name="pcb" value="UNL-SMB2J" />
+			<dataarea name="prg" size="49152">
+				<rom name="zanac (kaiser) (fds conversion) (unl).prg0" size="32768" crc="e485c52f" sha1="257dffd53691b70b26bd2b6770dd7ca38f2b917a" offset="0x0000" status="baddump" />
+				<rom name="zanac (kaiser) (fds conversion) (unl).prg1" size="16384" crc="bedba7cc" sha1="8d759c768b7e93ca852f107f4ce48c2c979fd618" offset="0x8000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zanacfdsa" cloneof="zanacfds">
+		<description>Zanac (Asia, FDS conversion, Alt)</description>
+		<year>19??</year>
+		<publisher>Kaiser</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ks7012" />
+			<feature name="pcb" value="UNL-KS7012" />
+			<dataarea name="prg" size="65536">
+				<rom name="zanac (kaiser) (fds conversion) (unl).prg" size="65536" crc="e912ce65" sha1="a92278c445cf02c88652a608327a48f59fe83979" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Are these supposed to work? -->
+
+
+	<software name="bballfds" supported="no">
+		<description>Baseball (Asia, FDS conversion?)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unknown" />
+			<feature name="pcb" value="UNKNOWN" /> <!-- mapper 253?!? -->
+			<dataarea name="prg" size="81920">
+				<rom name="baseball.prg" size="81920" crc="30296e0c" sha1="61ccce33b50ab1d6aab46cb52ee1ecaaaa3fdf0c" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FIXME: which board should use this game?? -->
+	<software name="cluclud" supported="no">
+		<description>Clu Clu Land D (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="test" />
+			<feature name="pcb" value="UNKNOWN" />
+			<dataarea name="chr" size="8192">
+				<rom name="clu clu land d (j) (fds conversion).chr" size="8192" crc="64a75549" sha1="7c950e89e6df0915820fe0c3e6750c085a8aaf83" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="clu clu land d (j) (fds conversion).prg" size="32768" crc="84594123" sha1="54fce5fbfbb3ae47ce3a62f9092c0ff204cf1cec" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceclfds" supported="no">
+		<description>Ice Climber (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="prg" size="32768">
+				<rom name="ice climber (j) (fds conversion).prg" size="32768" crc="d8ec6353" sha1="7409b32043a0d23b5b44b96f14214bef5ba4d9ca" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icehfds" supported="no">
+		<description>Ice Hockey (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="chr" size="8192">
+				<rom name="ice hockey (j) (fds conversion).chr" size="8192" crc="f10fc90a" sha1="1a2a657267de1f5bdf284d1b69ed7d4895dfb281" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="ice hockey (j) (fds conversion).prg" size="32768" crc="c02e5f1f" sha1="5244c2d123e02914590791c9ffc5e4f945d801ff" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othelfds" supported="no">
+		<description>Othello (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<dataarea name="chr" size="8192">
+				<rom name="othello (j) (fds conversion).chr" size="8192" crc="2f7856c8" sha1="4b48c4f4782ab8e13cba6073e3c7e19f51017774" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="32768">
+				<rom name="othello (j) (fds conversion).prg" size="32768" crc="55976042" sha1="6f7f626d3666c9890b62e64b3b5b40fd65ccc208" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63495,19 +63677,19 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="tobidfds">
-		<description>Tobidase Daisakusen (Asia, FDS conversion)</description>
+	<software name="smb2fdsc" cloneof="smb2fds" supported="no">
+		<description>Super Mario Bros. 2 (FDS pirate, Alt 3)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="tobidase" />
-			<feature name="pcb" value="BTL-TOBIDASEDAISAKUSEN" />
+			<feature name="slot" value="smb2j" />
+			<feature name="pcb" value="UNL-SMB2J" />
 			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="98304">
-				<rom name="tobidase daisakusen (fds conversion).prg" size="98304" crc="ee82b3ea" sha1="7fcf28158dfb991aa47d35fdec1512a7947c989e" offset="00000" status="baddump" />
+			<dataarea name="chr" size="8192">
+				<rom name="super mario bros. 2j (unl) [u].chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<dataarea name="prg" size="81920">
+				<rom name="super mario bros. 2j (unl) [u].prg" size="81920" crc="04f65d2f" sha1="1168f5f0642dc5473c1fa5ff6ca3091cd33da860" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63563,57 +63745,6 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="vballfdsa" cloneof="volley" supported="no">
-		<description>Volleyball (Asia, FDS conversion, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2j" />
-			<feature name="pcb" value="UNL-SMB2J" />
-			<dataarea name="chr" size="8192">
-				<rom name="volleyball (fds conversion) (unl) [u].chr" size="8192" crc="0101a6fb" sha1="fd7338e3802b897172f0f22e7f5a191bc68dd6d2" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="volleyball (fds conversion) (unl) [u].prg" size="32768" crc="d4fb2cd8" sha1="56cacee106de0116857421081c778ebc9d480aa0" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zanacfds" supported="no">
-		<description>Zanac (Asia, FDS conversion)</description>
-		<year>19??</year>
-		<publisher>Whirlwind Manu</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2j" />
-			<feature name="pcb" value="UNL-SMB2J" />
-			<dataarea name="prg" size="49152">
-				<rom name="zanac (kaiser) (fds conversion) (unl).prg0" size="32768" crc="e485c52f" sha1="257dffd53691b70b26bd2b6770dd7ca38f2b917a" offset="0x0000" status="baddump" />
-				<rom name="zanac (kaiser) (fds conversion) (unl).prg1" size="16384" crc="bedba7cc" sha1="8d759c768b7e93ca852f107f4ce48c2c979fd618" offset="0x8000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zanacfdsa" cloneof="zanacfds">
-		<description>Zanac (Asia, FDS conversion, Alt)</description>
-		<year>19??</year>
-		<publisher>Kaiser</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ks7012" />
-			<feature name="pcb" value="UNL-KS7012" />
-			<dataarea name="prg" size="65536">
-				<rom name="zanac (kaiser) (fds conversion) (unl).prg" size="65536" crc="e912ce65" sha1="a92278c445cf02c88652a608327a48f59fe83979" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
-		</part>
-	</software>
 
 <!-- DR PCJR -->
 
@@ -69281,129 +69412,6 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super fighter (contra 2 hack) (unl).prg" size="131072" crc="97184902" sha1="45d9421fe40c05605017a36aba6c4b2614ef264a" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2fdsa" cloneof="smb2fds">
-		<description>Super Mario Bros. 2 (FDS pirate, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2ja" />
-			<feature name="pcb" value="BTL-SMB2A" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="super mario bros 2 (lost levels) (unl).chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="65536">
-				<rom name="super mario bros 2 (lost levels) (unl).prg" size="65536" crc="bead254c" sha1="167e2b9629edefadea54564accaeceb4c08afc55" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2fdsb" cloneof="smb2fds" supported="partial">
-		<description>Super Mario Bros. 2 (FDS pirate, Alt 2)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2jb" />
-			<feature name="pcb" value="BTL-SMB2B" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="super mario bros. (alt levels).prg" size="131072" crc="313491ed" sha1="0ffe5aa3fbee72601bd629849a30379937d170d7" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2fdsc" cloneof="smb2fds" supported="no">
-		<description>Super Mario Bros. 2 (FDS pirate, Alt 3)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2jc" />
-			<feature name="pcb" value="UNL-SMB2J" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="super mario bros. 2j (unl) [u].chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="81920">
-				<rom name="super mario bros. 2j (unl) [u].prg" size="81920" crc="04f65d2f" sha1="1168f5f0642dc5473c1fa5ff6ca3091cd33da860" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2lf" cloneof="smb2fds" supported="no">
-		<description>Super Mario Bros. 2 (LF36)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2jc" />
-			<feature name="pcb" value="BTL-SMB2C" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="super mario bros. 2 (j) (lf36).chr" size="8192" crc="f9fe2697" sha1="f5ec342a44c909d99d46ae311a4b77ed00e645eb" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="81920">
-				<rom name="super mario bros. 2 (j) (lf36).prg" size="81920" crc="25e0b714" sha1="7e7711b911f10b4ef325b7b25a770e1de188fe27" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2k" cloneof="smb2fds">
-		<description>Super Mario Bros. 2 (Kaiser)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ks7032" />
-			<feature name="pcb" value="UNL-KS7032" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="prg" size="131072">
-				<rom name="super mario bros. 2 (j) (kaiser).prg" size="131072" crc="281326ed" sha1="dc8ddb78cbb575623b701954df951f05e81388ea" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2h" cloneof="smb">
-		<description>Super Mario Bros. 2 (Super Mario Bros. Pirate)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="nrom" />
-			<feature name="pcb" value="NES-NROM-256" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="super mario bros. (title hack) (unl).chr" size="8192" crc="b5a7524b" sha1="791b1c93d58c5d94df803449a2ce3e118d1adc50" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="super mario bros. (title hack) (unl).prg" size="32768" crc="ae15ebae" sha1="dc5bbe66886c0934c16a9cdedbf474f6bc5215a1" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="smb2m" cloneof="smb" supported="no">
-		<description>Super Mario Bros Malee 2 (Super Mario Bros. Pirate)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="mmalee2" />
-			<feature name="pcb" value="BTL-MARIO1-MALEE2" />
-			<feature name="mirroring" value="vertical" />
-			<dataarea name="chr" size="8192">
-				<rom name="super mario bros malee 2 (unl) [u].chr" size="8192" crc="b5a7524b" sha1="791b1c93d58c5d94df803449a2ce3e118d1adc50" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="34816">
-				<rom name="super mario bros malee 2 (unl) [u].prg0" size="32768" crc="ddf910b2" sha1="3977f975b2db0fba6cce8621d7d49a2b86ff2c43" offset="0x0000" status="baddump" />
-				<rom name="super mario bros malee 2 (unl) [u].prg1" size="2048" crc="2ee84bd0" sha1="51239bdc89ee3f1b7c9b17a63bff1fc20a36b244" offset="0x8000" status="baddump" />
-			</dataarea>
-			<!-- 2k WRAM on cartridge -->
-			<dataarea name="wram" size="2048">
 			</dataarea>
 		</part>
 	</software>

@@ -160,15 +160,21 @@ class nes_smb2j_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
+	
 	// device-level overrides
 	virtual void device_start();
+	virtual DECLARE_READ8_MEMBER(read_l);
+	virtual DECLARE_READ8_MEMBER(read_m);
+	virtual DECLARE_WRITE8_MEMBER(write_ex);
+	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-
+	
+	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
-
+	
 private:
-	void prgram_bank8_x(int start, int bank);
+	UINT16 m_irq_count;
+	int m_irq_enable;
 };
 
 
@@ -217,28 +223,23 @@ private:
 };
 
 
-// ======================> nes_smb2jc_device
+// ======================> nes_09034a_device
 
-class nes_smb2jc_device : public nes_nrom_device
+class nes_09034a_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_smb2jc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
+	nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
 	// device-level overrides
 	virtual void device_start();
-	virtual DECLARE_READ8_MEMBER(read_l);
-	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
+	virtual DECLARE_READ8_MEMBER(read_m);
+	
 	virtual void pcb_reset();
-
+	
 private:
-	UINT16 m_irq_count;
-	int m_irq_enable;
-	UINT8 m_prg_base;
+	UINT8 m_reg;
 };
 
 
@@ -421,7 +422,7 @@ extern const device_type NES_WHIRLWIND_2706;
 extern const device_type NES_SMB2J;
 extern const device_type NES_SMB2JA;
 extern const device_type NES_SMB2JB;
-extern const device_type NES_SMB2JC;
+extern const device_type NES_09034A;
 extern const device_type NES_TOBIDASE;
 extern const device_type NES_LH32;
 extern const device_type NES_LH10;

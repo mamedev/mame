@@ -78,6 +78,12 @@ void nes_ffe3_device::pcb_reset()
 void nes_ffe4_device::device_start()
 {
 	common_start();
+	
+	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	save_pointer(NAME(m_exram), 0x8000);
+	save_item(NAME(m_exram_enabled));
+	save_item(NAME(m_exram_bank));
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_latch));
@@ -89,6 +95,9 @@ void nes_ffe4_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(7);
 	chr8(0, m_chr_source);
+
+	m_exram_enabled = 0;
+	m_exram_bank = 0;
 
 	m_latch = 0;
 	m_irq_enable = 0;
@@ -102,6 +111,10 @@ void nes_ffe8_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0xff);
 	chr8(0, m_chr_source);
+
+	// extra vram is not used by this board, so these will remain always zero
+	m_exram_enabled = 0;
+	m_exram_bank = 0;
 
 	m_latch = 0;
 	m_irq_enable = 0;
@@ -158,10 +171,10 @@ void nes_ffe4_device::hblank_irq(int scanline, int vblank, int blanked)
 		if ((0xffff - m_irq_count) < 114)
 		{
 			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_irq_count = 0xffff;
+			m_irq_count = 0;
 			m_irq_enable = 0;
 		}
-		m_irq_count -= 114;
+		m_irq_count += 114;
 	}
 }
 
@@ -180,7 +193,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 			break;
 
 		case 0x401:
-			m_irq_enable = data & 0x01;
+			m_irq_enable = 0;
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;
@@ -192,6 +205,26 @@ WRITE8_MEMBER(nes_ffe4_device::write_l)
 	}
 }
 
+WRITE8_MEMBER(nes_ffe4_device::chr_w)
+{
+	int bank = offset >> 10;
+	if (m_exram_enabled)
+		m_exram[(m_exram_bank * 0x2000) + (bank * 0x400) + (offset & 0x3ff)] = data;
+
+	if (m_chr_src[bank] == CHRRAM)
+		m_chr_access[bank][offset & 0x3ff] = data;
+}
+
+READ8_MEMBER(nes_ffe4_device::chr_r)
+{
+	int bank = offset >> 10;
+	if (m_exram_enabled)
+		return m_exram[(m_exram_bank * 0x2000) + (bank * 0x400) + (offset & 0x3ff)];
+
+	return m_chr_access[bank][offset & 0x3ff];
+}
+
+
 WRITE8_MEMBER(nes_ffe4_device::write_h)
 {
 	LOG_MMC(("mapper6 write_h, offset: %04x, data: %02x\n", offset, data));
@@ -199,12 +232,20 @@ WRITE8_MEMBER(nes_ffe4_device::write_h)
 	if (!m_latch)  // when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
 		prg16_89ab(data >> 2);
-		// chr8(data & 0x03, ???);
-		// due to lack of info on the exact behavior, we simply act as if m_latch=1
-		if (m_chr_source == CHRROM)
-			chr8(data & 0x03, CHRROM);
+
+		// This part is not fully documented, so we proceed a bit blindly...
+		if (data & 0x03 == 0)
+		{
+			m_exram_enabled = 0;
+			chr8(0, CHRRAM);
+		}
+		else
+		{
+			m_exram_enabled = 1;
+			m_exram_bank = data & 0x03;
+		}
 	}
-	else if (m_chr_source == CHRROM)            // otherwise, we can use CHRROM (when present)
+	else // otherwise, we use CHRROM (shall we check if it's present?)
 		chr8(data, CHRROM);
 }
 
@@ -215,8 +256,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_h)
  Known Boards: FFE8 Copier Board
  Games: Hacked versions of games
 
- In MESS: Supported?. IRQ support is just a guess (used to
- use MMC3 IRQ but it was wrong and it never enabled it)
+ In MESS: Partially Supported.
 
  -------------------------------------------------*/
 
@@ -234,7 +274,7 @@ WRITE8_MEMBER(nes_ffe8_device::write_l)
 			break;
 
 		case 0x401:
-			m_irq_enable = data & 0x01;
+			m_irq_enable = 0;
 			break;
 		case 0x402:
 			m_irq_count = (m_irq_count & 0xff00) | data;

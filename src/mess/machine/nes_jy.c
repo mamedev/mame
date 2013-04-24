@@ -163,13 +163,17 @@ READ8_MEMBER(nes_jy_typea_device::chr_r)
 	switch (offset & 0xff8)
 	{
 		case 0xfd0:
+			m_chr_latch[BIT(offset, 12)] = (bank & 0x4);
+			if ((m_reg[0] & 0x18) == 0x08)      // 4KB mode is the only one using these latches!
+				update_chr_latches();
+			break;
 		case 0xfe8:
-//          m_chr_latch[BIT(offset, 12)] = ((bank & 0x4) | 0x2) & (offset >> 4);
+			m_chr_latch[BIT(offset, 12)] = (bank & 0x4) | 0x2;
+			if ((m_reg[0] & 0x18) == 0x08)      // 4KB mode is the only one using these latches!
+				update_chr_latches();
 			break;
 	}
 
-	if ((m_reg[0] & 0x18) == 0x08)      // 4KB mode is the only one using these latches!
-		update_chr_latches();
 
 	return val;
 }
@@ -199,7 +203,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 
 	if (m_irq_up)
 	{
-		if ((m_irq_prescale & m_irq_prescale_mask) == m_irq_prescale)
+		if ((m_irq_prescale & m_irq_prescale_mask) == m_irq_prescale_mask)
 		{
 			clock = TRUE;
 			m_irq_prescale = (m_irq_prescale_mask == 7) ? (m_irq_prescale & 0xf8) : 0;
@@ -363,9 +367,14 @@ void nes_jy_typea_device::update_extra_chr()
 	{
 		// Block mode enabled: in this case lower bits select a 256KB page inside CHRROM
 		// and the low bytes of m_mmc_vrom_bank select the banks inside such a page
-		int mode = (m_reg[0] & 0x18) >> 3;
-		m_extra_chr_mask = 0x00ff >> (mode ^ 0x3);
-		m_extra_chr_bank = ((m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2)) << (mode + 5);
+		m_extra_chr_bank = ((m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2));
+		switch (m_reg[0] & 0x18)
+		{
+			case 0x00: m_extra_chr_bank <<= 5; m_extra_chr_mask = 0x1f; break;
+			case 0x08: m_extra_chr_bank <<= 6; m_extra_chr_mask = 0x3f; break;
+			case 0x10: m_extra_chr_bank <<= 7; m_extra_chr_mask = 0x7f; break;
+			case 0x18: m_extra_chr_bank <<= 8; m_extra_chr_mask = 0xff; break;
+		}
 	}
 }
 
@@ -506,7 +515,7 @@ WRITE8_MEMBER(nes_jy_typea_device::write_h)
 					break;
 				case 2:
 					m_irq_enable = 0;
-						break;
+					break;
 				case 3:
 					m_irq_enable = 1;
 					break;

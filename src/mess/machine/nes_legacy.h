@@ -33,6 +33,8 @@ public:
 	virtual void device_start();
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_READ8_MEMBER(chr_r);
+	virtual DECLARE_WRITE8_MEMBER(chr_w);
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
@@ -42,6 +44,9 @@ protected:
 	int m_irq_enable;
 
 	UINT8 m_latch;
+	UINT8 *m_exram;
+	int m_exram_enabled;
+	int m_exram_bank;
 };
 
 

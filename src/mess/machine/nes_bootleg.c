@@ -49,7 +49,7 @@ const device_type NES_WHIRLWIND_2706 = &device_creator<nes_whirl2706_device>;
 const device_type NES_SMB2J = &device_creator<nes_smb2j_device>;
 const device_type NES_SMB2JA = &device_creator<nes_smb2ja_device>;
 const device_type NES_SMB2JB = &device_creator<nes_smb2jb_device>;
-const device_type NES_SMB2JC = &device_creator<nes_smb2jc_device>;
+const device_type NES_09034A = &device_creator<nes_09034a_device>;
 const device_type NES_TOBIDASE = &device_creator<nes_tobidase_device>;
 const device_type NES_LH32 = &device_creator<nes_lh32_device>;
 const device_type NES_LH10 = &device_creator<nes_lh10_device>;
@@ -110,8 +110,8 @@ nes_smb2jb_device::nes_smb2jb_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_smb2jc_device::nes_smb2jc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_nrom_device(mconfig, NES_SMB2JC, "NES Cart Super Mario Bros. 2 Jpn (Alt 3) PCB", tag, owner, clock, "nes_smb2jc", __FILE__)
+nes_09034a_device::nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_09034A, "NES Cart 09-034A PCB", tag, owner, clock, "nes_09034a", __FILE__)
 {
 }
 
@@ -287,13 +287,21 @@ void nes_whirl2706_device::pcb_reset()
 void nes_smb2j_device::device_start()
 {
 	common_start();
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
 }
 
 void nes_smb2j_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
 	chr8(0, m_chr_source);
+	prg8_89(1);
+	prg8_ab(0);
+	prg8_cd(0);
+	prg8_ef(9);
+	
+	m_irq_enable = 0;
+	m_irq_count = 0;
 }
 
 void nes_smb2ja_device::device_start()
@@ -336,28 +344,19 @@ void nes_smb2jb_device::pcb_reset()
 	m_irq_count = 0;
 }
 
-void nes_smb2jc_device::device_start()
+void nes_09034a_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_prg_base));
+	save_item(NAME(m_reg));
 }
 
-void nes_smb2jc_device::pcb_reset()
+void nes_09034a_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	prg32(0);
 	chr8(0, m_chr_source);
-	prg8_89(1);
-	prg8_ab(0);
-	prg8_cd(0);
-	prg8_ef(9);
-
-	m_irq_enable = 0;
-	m_irq_count = 0;
-	m_prg_base = 1;
+	m_reg = 0;
 }
-
 
 void nes_tobidase_device::device_start()
 {
@@ -889,103 +888,18 @@ READ8_MEMBER(nes_whirl2706_device::read_m)
  Games: Super Mario Bros. 2 Pirate (LF36)
 
  iNES: mapper 43
-
- This is actually strange. There is one variant of
- mappers 43 games which maps the PRG linearly from
- 0x5000 to 0xffff and then can switch the upper 32K
- part (0x8000-0xffff). These are games with 80K of
- PRG (SMB2 conversions only? also the Zanac FDS even
- if has smaller PRG?).
- Then there is a second variant (Volleyball FDS) with
- only 32K of PRG which do not switches PRG (no 0x4200
- writes) and probably mirrors lower 12K in 0x5000-0x7fff.
- The Zanac FDS conversion might not belong to this
- board...
-
- In any case, for the moment we split the two variants
- in smb2j and smb2jc!
-
- In MESS: Unsupported? The only image I found is not working
- (not even in NEStopia). Partially supported the
- smb2jc variant (to be investigated...)
+ 
+ In MESS: Supported.
 
  -------------------------------------------------*/
 
-/* This PCB can map PRG RAM to 0x8000-0xdfff like MMC5 */
-void nes_smb2j_device::prgram_bank8_x(int start, int bank)
-{
-	assert(start < 4);
-	assert(bank >= 0);
-
-	bank &= (m_prgram_size / 0x2000) - 1;
-
-	// PRG RAM is mapped after PRG ROM
-	m_prg_bank[start] = m_prg_chunks + bank;
-	m_prg_bank_mem[start]->set_entry(m_prg_bank[start]);
-}
-
-WRITE8_MEMBER(nes_smb2j_device::write_h)
-{
-	int bank = (((offset >> 8) & 0x03) * 0x20) + (offset & 0x1f);
-
-	LOG_MMC(("smb2j_w, offset: %04x, data: %02x\n", offset, data));
-
-	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	if (offset & 0x0800)
-	{
-		if (offset & 0x1000)
-		{
-			if (bank * 2 >= m_prg_chunks)
-			{
-				prgram_bank8_x(2, 0);
-				prgram_bank8_x(3, 0);
-			}
-			else
-			{
-				LOG_MMC(("smb2j_w, selecting upper 16KB bank of #%02x\n", bank));
-				prg16_cdef(2 * bank + 1);
-			}
-		}
-		else
-		{
-			if (bank * 2 >= m_prg_chunks)
-			{
-				prgram_bank8_x(0, 0);
-				prgram_bank8_x(1, 0);
-			}
-			else
-			{
-				LOG_MMC(("smb2j_w, selecting lower 16KB bank of #%02x\n", bank));
-				prg16_89ab(2 * bank);
-			}
-		}
-	}
-	else
-	{
-		if (bank * 2 >= m_prg_chunks)
-		{
-			prgram_bank8_x(0, 0);
-			prgram_bank8_x(1, 0);
-			prgram_bank8_x(2, 0);
-			prgram_bank8_x(3, 0);
-		}
-		else
-		{
-			LOG_MMC(("smb2j_w, selecting 32KB bank #%02x\n", bank));
-			prg32(bank);
-		}
-	}
-}
-
-
-void nes_smb2jc_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_smb2j_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (m_irq_enable)
 	{
-		if ((0xfff - m_irq_count) <= 114)
+		if ((0xfff - m_irq_count) < 114)
 		{
-			m_irq_count = (m_irq_count + 1) & 0xfff;
+			m_irq_count = (m_irq_count + 114) & 0xfff;
 			m_irq_enable = 0;
 			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
@@ -993,47 +907,56 @@ void nes_smb2jc_device::hblank_irq(int scanline, int vblank, int blanked)
 			m_irq_count += 114;
 	}
 }
-WRITE8_MEMBER(nes_smb2jc_device::write_l)
-{
-	LOG_MMC(("smb2jc write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
-	if (offset == 0x122)
+WRITE8_MEMBER(nes_smb2j_device::write_l)
+{
+	LOG_MMC(("smb2j write_l, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+	
+	if (offset == 0x122)	// $4122
+		m_irq_enable = data & 3;	// maybe also m_irq_count = 0?!?
+}
+
+WRITE8_MEMBER(nes_smb2j_device::write_h)
+{
+	LOG_MMC(("smb2j write_h, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset == 0x122)	// $8122 too?
 		m_irq_enable = data & 3;
 }
 
-WRITE8_MEMBER(nes_smb2jc_device::write_ex)
+WRITE8_MEMBER(nes_smb2j_device::write_ex)
 {
-	LOG_MMC(("smb2jc write_ex, offset: %04x, data: %02x\n", offset, data));
-
+	LOG_MMC(("smb2j write_ex, offset: %04x, data: %02x\n", offset, data));
+	
 	if (offset == 2)
 	{
 		int temp = 0;
-
+		
 		// According to hardware tests
 		if (data & 1)
 			temp = 3;
 		else
 			temp = 4 + ((data & 7) >> 1);
-
+		
 		prg8_cd(temp);
 	}
 }
 
-READ8_MEMBER(nes_smb2jc_device::read_l)
+READ8_MEMBER(nes_smb2j_device::read_l)
 {
-	LOG_MMC(("smb2jc read_l, offset: %04x\n", offset));
+	LOG_MMC(("smb2j read_l, offset: %04x\n", offset));
 	offset += 0x100;
-
+	
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
-
-	return ((offset + 0x4000) & 0xff00) >> 8;
+	
+	return ((offset + 0x4000) & 0xff00) >> 8;	// open bus
 }
 
-READ8_MEMBER(nes_smb2jc_device::read_m)
+READ8_MEMBER(nes_smb2j_device::read_m)
 {
-	LOG_MMC(("smb2jc read_m, offset: %04x\n", offset));
+	LOG_MMC(("smb2j read_m, offset: %04x\n", offset));
 	return m_prg[0x4000 + offset];
 }
 
@@ -1107,17 +1030,14 @@ void nes_smb2jb_device::hblank_irq(int scanline, int vblank, int blanked)
 {
 	if (m_irq_enable)
 	{
-		if (m_irq_count < 0x1000)
+		if ((0xfff - m_irq_count) < 114)
 		{
-			if ((0x1000 - m_irq_count) <= 114)
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			else
-				m_irq_count += 114;
+			m_irq_count = (m_irq_count + 114) & 0xfff;
+			m_irq_enable = 0;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			m_irq_count += 114;
-
-		m_irq_count &= 0xffff;   // according to docs is 16bit counter -> it wraps only after 0xffff?
 	}
 }
 
@@ -1158,6 +1078,40 @@ WRITE8_MEMBER(nes_smb2jb_device::write_ex)
 		prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
 		prg8_cd(prg);
 	}
+}
+
+/*-------------------------------------------------
+ 
+ (UNL-)09-034A
+ 
+ Games: Zanac FDS conversion with two PRG chips and
+ no CHRROM (apparently also a Volleyball FDS conversion
+ but the ones we have do not seem to be on this hw
+ Originally dumps were marked as UNL-SMB2J pcb
+
+ 
+ iNES: 
+ 
+ In MESS: Supported (for Zanac)
+ 
+ -------------------------------------------------*/
+
+WRITE8_MEMBER(nes_09034a_device::write_ex)
+{
+	LOG_MMC(("09-034a write_ex, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset == 7)	// $4027
+	{
+		m_reg = data & 1;
+		if (m_chr_source == CHRRAM)		// zanac has no CHRROM and is wired differently so to access the second PRG chip
+			m_reg += 4;
+	}
+}
+
+READ8_MEMBER(nes_09034a_device::read_m)
+{
+	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
+	return m_prg[(m_reg * 0x2000) + offset];
 }
 
 /*-------------------------------------------------

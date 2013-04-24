@@ -127,13 +127,18 @@ void nes_karaokestudio_device::pcb_reset()
 void nes_oekakids_device::device_start()
 {
 	common_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
 }
 
 void nes_oekakids_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg32(0);
-	chr8(0, m_chr_source);
+	chr4_0(0, CHRRAM);
+	chr4_4(3, CHRRAM);
+	set_nt_mirroring(PPU_MIRROR_LOW);
+	m_latch = 0;
+	m_reg = 0;
 }
 
 void nes_lz93d50_device::device_start()
@@ -230,13 +235,62 @@ WRITE8_MEMBER(nes_karaokestudio_device::write_h)
 
  -------------------------------------------------*/
 
+
+WRITE8_MEMBER(nes_oekakids_device::nt_w)
+{
+	int page = ((offset & 0xc00) >> 10);
+
+#if 0
+	if (offset < 0x1000 && (m_latch != (offset & 0x300) >> 8))
+	{
+		m_latch = (offset & 0x300) >> 8;
+		update_chr();
+	}
+#endif
+	
+	m_nt_access[page][offset & 0x3ff] = data;
+}
+
+READ8_MEMBER(nes_oekakids_device::nt_r)
+{
+	int page = ((offset & 0xc00) >> 10);
+	
+#if 0
+	if (offset < 0x1000 && (m_latch != (offset & 0x300) >> 8))
+	{
+		m_latch = (offset & 0x300) >> 8;
+		update_chr();
+	}
+#endif
+	
+	return m_nt_access[page][offset & 0x3ff];
+}
+
+void nes_oekakids_device::update_chr()
+{	
+	chr4_0(m_reg | m_latch, CHRRAM);
+	chr4_4(m_reg | 0x03, CHRRAM);
+}
+
+// this only monitors accesses to $2007 while we would need to monitor accesses to $2006...
+void nes_oekakids_device::ppu_latch(offs_t offset)
+{
+#if 0
+	if ((offset & 0x3000) == 0x2000)
+	{
+		m_latch = (offset & 0x300) >> 8;
+		update_chr();
+	}
+#endif
+}
+
 WRITE8_MEMBER(nes_oekakids_device::write_h)
 {
 	LOG_MMC(("oeka kids write_h, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(data);
-	chr4_0(0x00 | (data & 0x04), CHRRAM);
-	chr4_4(0x03 | (data & 0x04), CHRRAM);
+	m_reg = (data & 0x04);
+	update_chr();
 }
 
 /*-------------------------------------------------

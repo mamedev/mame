@@ -193,7 +193,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2j",            UNL_SMB2J },
 	{ "smb2ja",           BTL_SMB2JA },
 	{ "smb2jb",           BTL_SMB2JB },
-	{ "smb2jc",           BTL_SMB2JC },  // really?
+	{ "09034a",           BTL_09034A },
 	{ "tobidase",         BTL_TOBIDASE },  // mapper 120
 	{ "dbz5",             REXSOFT_DBZ5 },
 	{ "sl1632",           REXSOFT_SL1632 },
@@ -307,6 +307,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
+	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
 
