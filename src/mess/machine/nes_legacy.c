@@ -234,7 +234,7 @@ WRITE8_MEMBER(nes_ffe4_device::write_h)
 		prg16_89ab(data >> 2);
 
 		// This part is not fully documented, so we proceed a bit blindly...
-		if (data & 0x03 == 0)
+		if ((data & 0x03) == 0)
 		{
 			m_exram_enabled = 0;
 			chr8(0, CHRRAM);
