@@ -360,7 +360,7 @@ public:
 	virtual void pcb_reset();
 
 protected:
-	UINT8 m_reg[2];
+	UINT8 m_reg[4];
 };
 
 
