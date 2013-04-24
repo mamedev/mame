@@ -55,6 +55,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 -->
 
 <!-- List of confirmed carts (info from pictures) -->
+<softwarelist name="n64" description="Nintendo 64 cartridges">
 	<software name="007goldnu" cloneof="007goldn">
 		<description>007 - GoldenEye (USA)</description>
 		<year>1997</year>
@@ -1604,7 +1605,6 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 <!-- List of unconfirmed carts -->
-<softwarelist name="n64" description="Nintendo 64 cartridges">
 	<software name="007goldn">
 		<description>007 - GoldenEye (Euro)</description>
 		<year>1997</year>
