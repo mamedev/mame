@@ -76,17 +76,22 @@ class gammagic_state : public driver_device
 public:
 	gammagic_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_pit8254(*this, "pit8254" ),
+		m_pic8259_1(*this, "pic8259_1" ),
+		m_pic8259_2(*this,  "pic8259_2" ),
+		m_dma8237_1(*this, "dma8237_1" ),
+		m_dma8237_2(*this, "dma8237_2" ),		
 		m_maincpu(*this, "maincpu") { }
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t    *m_pit8254;
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
-	i8237_device    *m_dma8237_1;
-	i8237_device    *m_dma8237_2;
+	required_device<device_t> m_pit8254;
+	required_device<device_t> m_pic8259_1;
+	required_device<device_t> m_pic8259_2;
+	required_device<i8237_device> m_dma8237_1;
+	required_device<i8237_device> m_dma8237_2;
 
 	emu_timer *m_atapi_timer;
 	//SCSIInstance *m_inserted_cdrom;
@@ -104,113 +109,125 @@ public:
 	DECLARE_DRIVER_INIT(gammagic);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	DECLARE_READ8_MEMBER(get_out2);
+	DECLARE_READ8_MEMBER(at_page8_r);
+	DECLARE_WRITE8_MEMBER(at_page8_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ8_MEMBER(at_dma8237_2_r);
+	DECLARE_WRITE8_MEMBER(at_dma8237_2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void set_dma_channel(int channel, int state);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);	
+	DECLARE_WRITE_LINE_MEMBER(gammagic_pic8259_1_set_int_line);
+	DECLARE_READ8_MEMBER(get_slave_ack);
+	
+	virtual void machine_start();
+	virtual void machine_reset();
+	void atapi_init();
 	required_device<cpu_device> m_maincpu;
 };
 
-//static void atapi_irq(running_machine &machine, int state);
-
-static READ8_DEVICE_HANDLER(at_dma8237_2_r)
+READ8_MEMBER(gammagic_state::at_dma8237_2_r)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	return state->m_dma8237_2->i8237_r(space, offset / 2);
+	return m_dma8237_2->i8237_r(space, offset / 2);
 }
 
-static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
+WRITE8_MEMBER(gammagic_state::at_dma8237_2_w)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	state->m_dma8237_2->i8237_w(space, offset / 2, data);
+	m_dma8237_2->i8237_w(space, offset / 2, data);
 }
 
-static READ8_HANDLER(at_page8_r)
+READ8_MEMBER(gammagic_state::at_page8_r)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
-static WRITE8_HANDLER(at_page8_w)
+
+WRITE8_MEMBER(gammagic_state::at_page8_w)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
+
+WRITE_LINE_MEMBER(gammagic_state::pc_dma_hrq_changed)
 {
-	gammagic_state *drvstate = device->machine().driver_data<gammagic_state>();
-	drvstate->m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	drvstate->m_dma8237_1->i8237_hlda_w( state );
+	m_dma8237_1->i8237_hlda_w(state);
 }
 
-static READ8_HANDLER( pc_dma_read_byte )
+
+READ8_MEMBER(gammagic_state::pc_dma_read_byte)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space.read_byte(page_offset + offset);
 }
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+
+WRITE8_MEMBER(gammagic_state::pc_dma_write_byte)
 {
-	gammagic_state *state = space.machine().driver_data<gammagic_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
 	space.write_byte(page_offset + offset, data);
 }
 
-static void set_dma_channel(device_t *device, int channel, int state)
+void gammagic_state::set_dma_channel(int channel, int state)
 {
-	gammagic_state *drvstate = device->machine().driver_data<gammagic_state>();
-	if (!state) drvstate->m_dma_channel = channel;
+	if (!state) m_dma_channel = channel;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack1_w ) { set_dma_channel(device, 1, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack2_w ) { set_dma_channel(device, 2, state); }
-static WRITE_LINE_DEVICE_HANDLER( pc_dack3_w ) { set_dma_channel(device, 3, state); }
+WRITE_LINE_MEMBER(gammagic_state::pc_dack0_w){ set_dma_channel(0, state); }
+WRITE_LINE_MEMBER(gammagic_state::pc_dack1_w){ set_dma_channel(1, state); }
+WRITE_LINE_MEMBER(gammagic_state::pc_dack2_w){ set_dma_channel(2, state); }
+WRITE_LINE_MEMBER(gammagic_state::pc_dack3_w){ set_dma_channel(3, state); }
 
 static I8237_INTERFACE( dma8237_1_config )
 {
-	DEVCB_LINE(pc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(gammagic_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(gammagic_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
+	{ DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(gammagic_state,pc_dack3_w) }
 };
 
 static I8237_INTERFACE( dma8237_2_config )
@@ -224,40 +241,39 @@ static I8237_INTERFACE( dma8237_2_config )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 /*
-static READ32_HANDLER( atapi_r )
+READ32_MEMBER( gammagic_state::atapi_r )
 {
-    gammagic_state *state = space.machine().driver_data<gammagic_state>();
-    UINT8 *atapi_regs = state->m_atapi_regs;
+    UINT8 *atapi_regs = m_atapi_regs;
     //running_machine &machine = space.machine();
     int reg, data;
 
     if (mem_mask == 0x0000ffff) // word-wide command read
     {
-      logerror("ATAPI: packet read = %04x\n", state->m_atapi_data[state->m_atapi_data_ptr]);
+      logerror("ATAPI: packet read = %04x\n", m_atapi_data[m_atapi_data_ptr]);
 
         // assert IRQ and drop DRQ
-        if (state->m_atapi_data_ptr == 0 && state->m_atapi_data_len == 0)
+        if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
         {
             // get the data from the device
-            if( state->m_atapi_xferlen > 0 )
+            if( m_atapi_xferlen > 0 )
             {
-                SCSIReadData( state->m_inserted_cdrom, state->m_atapi_data, state->m_atapi_xferlen );
-                state->m_atapi_data_len = state->m_atapi_xferlen;
+                SCSIReadData( m_inserted_cdrom, m_atapi_data, m_atapi_xferlen );
+                m_atapi_data_len = m_atapi_xferlen;
             }
 
-            if (state->m_atapi_xfermod > MAX_TRANSFER_SIZE)
+            if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
             {
-                state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
-                state->m_atapi_xfermod = state->m_atapi_xfermod - MAX_TRANSFER_SIZE;
+                m_atapi_xferlen = MAX_TRANSFER_SIZE;
+                m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
             }
             else
             {
-                state->m_atapi_xferlen = state->m_atapi_xfermod;
-                state->m_atapi_xfermod = 0;
+                m_atapi_xferlen = m_atapi_xfermod;
+                m_atapi_xfermod = 0;
             }
 
-            //verboselog\\( machine, 2, "atapi_r: atapi_xferlen=%d\n", state->m_atapi_xferlen );
-            if( state->m_atapi_xferlen != 0 )
+            //verboselog\\( machine, 2, "atapi_r: atapi_xferlen=%d\n", m_atapi_xferlen );
+            if( m_atapi_xferlen != 0 )
             {
                 atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
                 atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -269,23 +285,23 @@ static READ32_HANDLER( atapi_r )
                 atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
             }
 
-            atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-            atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+            atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+            atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
             atapi_irq(space.machine(), ASSERT_LINE);
         }
 
-        if( state->m_atapi_data_ptr < state->m_atapi_data_len )
+        if( m_atapi_data_ptr < m_atapi_data_len )
         {
-            data = state->m_atapi_data[state->m_atapi_data_ptr++];
-            data |= ( state->m_atapi_data[state->m_atapi_data_ptr++] << 8 );
-            if( state->m_atapi_data_ptr >= state->m_atapi_data_len )
+            data = m_atapi_data[m_atapi_data_ptr++];
+            data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
+            if( m_atapi_data_ptr >= m_atapi_data_len )
             {
 
-                state->m_atapi_data_ptr = 0;
-                state->m_atapi_data_len = 0;
+                m_atapi_data_ptr = 0;
+                m_atapi_data_len = 0;
 
-                if( state->m_atapi_xferlen == 0 )
+                if( m_atapi_xferlen == 0 )
                 {
                     atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
                     atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -330,24 +346,23 @@ static READ32_HANDLER( atapi_r )
     return data;
 }
 
-static WRITE32_HANDLER( atapi_w )
+WRITE32_MEMBER( gammagic_state::atapi_w )
 {
-    gammagic_state *state = space.machine().driver_data<gammagic_state>();
-    UINT8 *atapi_regs = state->m_atapi_regs;
-    UINT8 *atapi_data = state->m_atapi_data;
+    UINT8 *atapi_regs = m_atapi_regs;
+    UINT8 *atapi_data = m_atapi_data;
     int reg;
     if (mem_mask == 0x0000ffff) // word-wide command write
     {
-        atapi_data[state->m_atapi_data_ptr++] = data & 0xff;
-        atapi_data[state->m_atapi_data_ptr++] = data >> 8;
+        atapi_data[m_atapi_data_ptr++] = data & 0xff;
+        atapi_data[m_atapi_data_ptr++] = data >> 8;
 
-        if (state->m_atapi_cdata_wait)
+        if (m_atapi_cdata_wait)
         {
-            logerror("ATAPI: waiting, ptr %d wait %d\n", state->m_atapi_data_ptr, state->m_atapi_cdata_wait);
-            if (state->m_atapi_data_ptr == state->m_atapi_cdata_wait)
+            logerror("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+            if (m_atapi_data_ptr == m_atapi_cdata_wait)
             {
                 // send it to the device
-                SCSIWriteData( state->m_inserted_cdrom, atapi_data, state->m_atapi_cdata_wait );
+                SCSIWriteData( m_inserted_cdrom, atapi_data, m_atapi_cdata_wait );
 
                 // assert IRQ
                 atapi_irq(space.machine(), ASSERT_LINE);
@@ -357,35 +372,35 @@ static WRITE32_HANDLER( atapi_w )
             }
         }
 
-        else if ( state->m_atapi_data_ptr == 12 )
+        else if ( m_atapi_data_ptr == 12 )
         {
             int phase;
             // reset data pointer for reading SCSI results
-            state->m_atapi_data_ptr = 0;
-            state->m_atapi_data_len = 0;
+            m_atapi_data_ptr = 0;
+            m_atapi_data_len = 0;
 
             // send it to the SCSI device
-            SCSISetCommand( state->m_inserted_cdrom, state->m_atapi_data, 12 );
-            SCSIExecCommand( state->m_inserted_cdrom, &state->m_atapi_xferlen );
-            SCSIGetPhase( state->m_inserted_cdrom, &phase );
+            SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
+            SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
+            SCSIGetPhase( m_inserted_cdrom, &phase );
 
-            if (state->m_atapi_xferlen != -1)
+            if (m_atapi_xferlen != -1)
             {
-                        logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, state->m_atapi_xferlen);
+                        logerror("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
 
                 // store the returned command length in the ATAPI regs, splitting into
                 // multiple transfers if necessary
-                state->m_atapi_xfermod = 0;
-                if (state->m_atapi_xferlen > MAX_TRANSFER_SIZE)
+                m_atapi_xfermod = 0;
+                if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
                 {
-                    state->m_atapi_xfermod = state->m_atapi_xferlen - MAX_TRANSFER_SIZE;
-                    state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
+                    m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
+                    m_atapi_xferlen = MAX_TRANSFER_SIZE;
                 }
 
-                atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-                atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+                atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+                atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-                if (state->m_atapi_xferlen == 0)
+                if (m_atapi_xferlen == 0)
                 {
                     // if no data to return, set the registers properly
                     atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
@@ -401,7 +416,7 @@ static WRITE32_HANDLER( atapi_w )
                 switch( phase )
                 {
                 case SCSI_PHASE_DATAOUT:
-                    state->m_atapi_cdata_wait = state->m_atapi_xferlen;
+                    m_atapi_cdata_wait = m_atapi_xferlen;
                     break;
                 }
 
@@ -415,7 +430,7 @@ static WRITE32_HANDLER( atapi_w )
 
                     case 0x45: // PLAY
                         atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-                        state->m_atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
+                        m_atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
                         break;
                 }
 
@@ -466,27 +481,27 @@ static WRITE32_HANDLER( atapi_w )
                     atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
                     atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
-                    state->m_atapi_data_ptr = 0;
-                    state->m_atapi_data_len = 0;
+                    m_atapi_data_ptr = 0;
+                    m_atapi_data_len = 0;
 
                     // we have no data
-                    state->m_atapi_xferlen = 0;
-                    state->m_atapi_xfermod = 0;
+                    m_atapi_xferlen = 0;
+                    m_atapi_xfermod = 0;
 
-                    state->m_atapi_cdata_wait = 0;
+                    m_atapi_cdata_wait = 0;
                     break;
 
                 case 0xa1:  // IDENTIFY PACKET DEVICE
                     atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
-                    state->m_atapi_data_ptr = 0;
-                    state->m_atapi_data_len = 512;
+                    m_atapi_data_ptr = 0;
+                    m_atapi_data_len = 512;
 
                     // we have no data
-                    state->m_atapi_xferlen = 0;
-                    state->m_atapi_xfermod = 0;
+                    m_atapi_xferlen = 0;
+                    m_atapi_xfermod = 0;
 
-                    memset( atapi_data, 0, state->m_atapi_data_len );
+                    memset( atapi_data, 0, m_atapi_data_len );
 
                     atapi_data[ 0 ^ 1 ] = 0x85; // ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
                     atapi_data[ 1 ^ 1 ] = 0x80; // ATAPI device, removable media
@@ -532,8 +547,8 @@ static WRITE32_HANDLER( atapi_w )
                 case 0xef:  // SET FEATURES
                     atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
-                    state->m_atapi_data_ptr = 0;
-                    state->m_atapi_data_len = 0;
+                    m_atapi_data_ptr = 0;
+                    m_atapi_data_len = 0;
 
                     atapi_irq(space.machine(), ASSERT_LINE);
                     break;
@@ -561,9 +576,9 @@ static ADDRESS_MAP_START( gammagic_io, AS_IO, 32, gammagic_state)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE8_LEGACY(at_page8_r, at_page8_w, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 	AM_RANGE(0x00f0, 0x01ef) AM_NOP
 	//AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(atapi_r, atapi_w)
@@ -632,57 +647,44 @@ IRQ_CALLBACK_MEMBER(gammagic_state::irq_callback)
 	return pic8259_acknowledge(m_pic8259_1);
 }
 
-static MACHINE_START(gammagic)
+void gammagic_state::machine_start()
 {
-	gammagic_state *state = machine.driver_data<gammagic_state>();
-	state->m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),state));
-
-	state->m_pit8254 = machine.device( "pit8254" );
-	state->m_pic8259_1 = machine.device( "pic8259_1" );
-	state->m_pic8259_2 = machine.device( "pic8259_2" );
-	state->m_dma8237_1 = machine.device<i8237_device>( "dma8237_1" );
-	state->m_dma8237_2 = machine.device<i8237_device>( "dma8237_2" );
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),this));
 }
 
-static MACHINE_RESET( gammagic )
+void gammagic_state::machine_reset()
 {
-	//gammagic_state *state = machine.driver_data<gammagic_state>();
-
 	//void *cd;
-	//SCSIGetDevice( state->m_inserted_cdrom, &cd );
+	//SCSIGetDevice( m_inserted_cdrom, &cd );
 
 }
 
 
-/*static void atapi_irq(running_machine &machine, int state)
+/*void gammagic_state::atapi_irq(int state)
 {
-    gammagic_state *drvstate = machine.driver_data<gammagic_state>();
-    pic8259_ir6_w(drvstate->m_pic8259_2, state);
+    pic8259_ir6_w(m_pic8259_2, state);
 }
 
-static void atapi_exit(running_machine& machine)
+void gammagic_state::atapi_exit(running_machine& machine)
 {
-    gammagic_state *state = machine.driver_data<gammagic_state>();
-    SCSIDeleteInstance(state->m_inserted_cdrom);
+    SCSIDeleteInstance(m_inserted_cdrom);
 
 }
 */
 
-static void atapi_init(running_machine &machine)
+void gammagic_state::atapi_init()
 {
-	gammagic_state *state = machine.driver_data<gammagic_state>();
+	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+	m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
+	m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
+	m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
+	m_atapi_data_ptr = 0;
+	m_atapi_data_len = 0;
+	m_atapi_cdata_wait = 0;
 
-	state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
-	state->m_atapi_regs[ATAPI_REG_ERRFEAT] = 1;
-	state->m_atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
-	state->m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
-	state->m_atapi_data_ptr = 0;
-	state->m_atapi_data_len = 0;
-	state->m_atapi_cdata_wait = 0;
+	//SCSIAllocInstance( machine, &SCSIClassCr589, &m_inserted_cdrom, ":cdrom" );
 
-	//SCSIAllocInstance( machine, &SCSIClassCr589, &state->m_inserted_cdrom, ":cdrom" );
-
-	//machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(atapi_exit), &machine));
 
 }
 
@@ -693,26 +695,24 @@ static void atapi_init(running_machine &machine)
  *
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( gammagic_pic8259_1_set_int_line )
+WRITE_LINE_MEMBER(gammagic_state::gammagic_pic8259_1_set_int_line)
 {
-	gammagic_state *drvstate = device->machine().driver_data<gammagic_state>();
-	drvstate->m_maincpu->set_input_line( 0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static READ8_DEVICE_HANDLER( get_slave_ack )
+READ8_MEMBER(gammagic_state::get_slave_ack)
 {
-	gammagic_state *state = device->machine().driver_data<gammagic_state>();
 	if (offset==2) {
-		return pic8259_acknowledge(state->m_pic8259_2);
+		return pic8259_acknowledge(m_pic8259_2);
 	}
 	return 0x00;
 }
 
 static const struct pic8259_interface gammagic_pic8259_1_config =
 {
-	DEVCB_LINE(gammagic_pic8259_1_set_int_line),
+	DEVCB_DRIVER_LINE_MEMBER(gammagic_state,gammagic_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_HANDLER(get_slave_ack)
+	DEVCB_DRIVER_MEMBER(gammagic_state,get_slave_ack)
 };
 
 static const struct pic8259_interface gammagic_pic8259_2_config =
@@ -768,8 +768,6 @@ static MACHINE_CONFIG_START( gammagic, gammagic_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
 	MCFG_CPU_PROGRAM_MAP(gammagic_map)
 	MCFG_CPU_IO_MAP(gammagic_io)
-	MCFG_MACHINE_START(gammagic)
-	MCFG_MACHINE_RESET( gammagic )
 	MCFG_PIT8254_ADD( "pit8254", gammagic_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
@@ -791,7 +789,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(gammagic_state,gammagic)
 {
-	atapi_init(machine());
+	atapi_init();
 }
 
 ROM_START( gammagic )
