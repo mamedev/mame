@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( sym1_map, AS_PROGRAM, 8, sym1_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAMBANK("bank4") AM_SHARE("ram_3k")
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_SHARE("monitor")       /* U20 Monitor ROM */
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)      /* U25 VIA #1 */
-	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)  /* U27 RIOT */
+	AM_RANGE(0xa400, 0xa40f) AM_DEVREADWRITE("riot", riot6532_device, read, write)  /* U27 RIOT */
 	AM_RANGE(0xa600, 0xa67f) AM_RAMBANK("bank5") AM_SHARE("riot_ram")  /* U27 RIOT RAM */
 	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)      /* U28 VIA #2 */
 	AM_RANGE(0xac00, 0xac0f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)      /* U29 VIA #3 */

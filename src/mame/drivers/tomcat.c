@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)
 	AM_RANGE(0x30e0, 0x30e0) AM_NOP // COINRD Inputs: D7 = Coin L, D6 = Coin R, D5 = SOUNDFLAG
 	AM_RANGE(0x5000, 0x507f) AM_RAM // 6532 ram
-	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x5080, 0x509f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x6000, 0x601f) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_NOP // main sound program rom

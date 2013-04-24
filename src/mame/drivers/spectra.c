@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( spectra_map, AS_PROGRAM, 8, spectra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("ram") // battery backed, 2x 5101L
 	AM_RANGE(0x0100, 0x017f) AM_RAM // RIOT RAM
-	AM_RANGE(0x0180, 0x019f) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0180, 0x019f) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x0400, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 

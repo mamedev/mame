@@ -156,12 +156,6 @@ void riot6532_device::timer_end()
     riot6532_w - master I/O write access
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( riot6532_w )
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	via->reg_w(offset, data);
-}
-
 WRITE8_MEMBER( riot6532_device::write )
 {
 	reg_w(offset, data);
@@ -246,12 +240,6 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 /*-------------------------------------------------
     riot6532_r - master I/O read access
 -------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( riot6532_r )
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	return via->reg_r(offset);
-}
 
 READ8_MEMBER( riot6532_device::read )
 {
@@ -343,12 +331,6 @@ UINT8 riot6532_device::reg_r(UINT8 offset, bool debugger_access)
     porta_in_set - set port A input value
 -------------------------------------------------*/
 
-void riot6532_porta_in_set(device_t *device, UINT8 data, UINT8 mask)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	via->porta_in_set(data, mask);
-}
-
 void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
 {
 	m_port[0].m_in = (m_port[0].m_in & ~mask) | (data & mask);
@@ -360,12 +342,6 @@ void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
     portb_in_set - set port B input value
 -------------------------------------------------*/
 
-void riot6532_portb_in_set(device_t *device, UINT8 data, UINT8 mask)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	via->portb_in_set(data, mask);
-}
-
 void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
 {
 	m_port[1].m_in = (m_port[1].m_in & ~mask) | (data & mask);
@@ -375,12 +351,6 @@ void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
 /*-------------------------------------------------
     porta_in_get - return port A input value
 -------------------------------------------------*/
-
-UINT8 riot6532_porta_in_get(device_t *device)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	return via->porta_in_get();
-}
 
 UINT8 riot6532_device::porta_in_get()
 {
@@ -392,12 +362,6 @@ UINT8 riot6532_device::porta_in_get()
     portb_in_get - return port B input value
 -------------------------------------------------*/
 
-UINT8 riot6532_portb_in_get(device_t *device)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	return via->portb_in_get();
-}
-
 UINT8 riot6532_device::portb_in_get()
 {
 	return m_port[1].m_in;
@@ -408,12 +372,6 @@ UINT8 riot6532_device::portb_in_get()
     porta_in_get - return port A output value
 -------------------------------------------------*/
 
-UINT8 riot6532_porta_out_get(device_t *device)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	return via->porta_out_get();
-}
-
 UINT8 riot6532_device::porta_out_get()
 {
 	return m_port[0].m_out;
@@ -423,12 +381,6 @@ UINT8 riot6532_device::porta_out_get()
 /*-------------------------------------------------
     portb_in_get - return port B output value
 -------------------------------------------------*/
-
-UINT8 riot6532_portb_out_get(device_t *device)
-{
-	riot6532_device *via = downcast<riot6532_device *>(device);
-	return via->portb_out_get();
-}
 
 UINT8 riot6532_device::portb_out_get()
 {

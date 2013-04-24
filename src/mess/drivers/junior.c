@@ -61,7 +61,7 @@ static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
 	AM_RANGE(0x1a00, 0x1a7f) AM_RAM // 6532 RAM
-	AM_RANGE(0x1a80, 0x1aff) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1a80, 0x1aff) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM // Monitor
 ADDRESS_MAP_END
 
@@ -143,7 +143,7 @@ READ8_MEMBER( junior_state::junior_riot_a_r )
 
 READ8_MEMBER( junior_state::junior_riot_b_r )
 {
-	if ( riot6532_portb_out_get(m_riot) & 0x20 )
+	if ( m_riot->portb_out_get() & 0x20 )
 		return 0xFF;
 
 	return 0x7F;

@@ -113,22 +113,4 @@ private:
 // device type definition
 extern const device_type RIOT6532;
 
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-DECLARE_READ8_DEVICE_HANDLER( riot6532_r );
-DECLARE_WRITE8_DEVICE_HANDLER( riot6532_w );
-
-void riot6532_porta_in_set(device_t *device, UINT8 data, UINT8 mask);
-void riot6532_portb_in_set(device_t *device, UINT8 data, UINT8 mask);
-
-UINT8 riot6532_porta_in_get(device_t *device);
-UINT8 riot6532_portb_in_get(device_t *device);
-
-UINT8 riot6532_porta_out_get(device_t *device);
-UINT8 riot6532_portb_out_get(device_t *device);
-
 #endif

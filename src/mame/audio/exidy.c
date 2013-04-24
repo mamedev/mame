@@ -81,7 +81,7 @@ struct exidy_sound_state
 	UINT8 m_riot_irq_state;
 
 	/* 6532 variables */
-	device_t *m_riot;
+	riot6532_device *m_riot;
 
 	struct sh6840_timer_channel m_sh6840_timer[3];
 	INT16 m_sh6840_volume[3];
@@ -532,7 +532,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 
 	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), riot6532_porta_out_get(state->m_riot));
+		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), state->m_riot->porta_out_get());
 		tms5220_data_w(state->m_tms, space, 0, data);
 	}
 }
@@ -563,7 +563,7 @@ static WRITE8_DEVICE_HANDLER( r6532_portb_w )
 static READ8_DEVICE_HANDLER( r6532_portb_r )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	UINT8 newdata = riot6532_portb_in_get(state->m_riot);
+	UINT8 newdata = state->m_riot->portb_in_get();
 	if (state->m_tms != NULL)
 	{
 		newdata &= ~0x0c;
@@ -843,7 +843,7 @@ static DEVICE_START( venture_common_sh_start )
 
 	DEVICE_START_CALL(common_sh_start);
 
-	state->m_riot = machine.device("riot");
+	state->m_riot = machine.device<riot6532_device>("riot");
 
 	state->m_has_sh8253  = TRUE;
 	state->m_tms = NULL;
@@ -935,7 +935,7 @@ void venture_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("custom", exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x2000, 0x27ff) AM_DEVWRITE_LEGACY("custom", exidy_sound_filter_w)
@@ -977,7 +977,7 @@ static WRITE8_DEVICE_HANDLER( mtrap_voiceio_w )
 		hc55516_digit_w(state->m_cvsd, data & 1);
 
 	if (!(offset & 0x20))
-		riot6532_portb_in_set(state->m_riot, data & 1, 0xff);
+		state->m_riot->portb_in_set(data & 1, 0xff);
 }
 
 
@@ -987,7 +987,7 @@ static READ8_DEVICE_HANDLER( mtrap_voiceio_r )
 
 	if (!(offset & 0x80))
 	{
-		UINT8 porta = riot6532_porta_out_get(state->m_riot);
+		UINT8 porta = state->m_riot->porta_out_get();
 		UINT8 data = (porta & 0x06) >> 1;
 		data |= (porta & 0x01) << 2;
 		data |= (porta & 0x08);
@@ -1201,7 +1201,7 @@ void victory_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_LEGACY("custom", exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP

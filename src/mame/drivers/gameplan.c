@@ -148,13 +148,13 @@ WRITE8_MEMBER(gameplan_state::audio_reset_w)
 
 WRITE8_MEMBER(gameplan_state::audio_cmd_w)
 {
-	riot6532_porta_in_set(m_riot, data, 0x7f);
+	m_riot->porta_in_set(data, 0x7f);
 }
 
 
 WRITE8_MEMBER(gameplan_state::audio_trigger_w)
 {
-	riot6532_porta_in_set(m_riot, data << 7, 0x80);
+	m_riot->porta_in_set(data << 7, 0x80);
 }
 
 
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
@@ -235,7 +235,7 @@ ADDRESS_MAP_END
 /* same as Gameplan, but larger ROM */
 static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
@@ -973,8 +973,6 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_START_MEMBER(gameplan_state,gameplan)
 {
-	m_riot = machine().device("riot");
-
 	/* register for save states */
 	save_item(NAME(m_current_port));
 	save_item(NAME(m_video_x));

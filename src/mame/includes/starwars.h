@@ -12,13 +12,14 @@ class starwars_state : public driver_device
 public:
 	starwars_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_riot(*this, "riot"),
 		m_mathram(*this, "mathram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu")  { }
 
 	UINT8 m_sound_data;
 	UINT8 m_main_data;
-	device_t *m_riot;
+	required_device<riot6532_device> m_riot;
 	UINT8 *m_slapstic_source;
 	UINT8 *m_slapstic_base;
 	UINT8 m_slapstic_current_bank;
@@ -85,4 +86,3 @@ void starwars_mproc_reset(running_machine &machine);
 /*----------- defined in audio/starwars.c -----------*/
 
 extern const riot6532_interface starwars_riot6532_intf;
-SOUND_START( starwars );

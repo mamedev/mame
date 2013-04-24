@@ -7,6 +7,7 @@ driver by Chris Moore
 ***************************************************************************/
 
 #include "machine/6522via.h"
+#include "machine/6532riot.h"
 
 #define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
 #define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)
@@ -29,6 +30,7 @@ public:
 			m_trvquest_question(*this, "trvquest_q"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_riot(*this, "riot"),
 			m_via_0(*this, "via6522_0"),
 			m_via_1(*this, "via6522_1"),
 			m_via_2(*this, "via6522_2") { }
@@ -49,7 +51,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	device_t *m_riot;
+	optional_device<riot6532_device> m_riot;
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_device<via6522_device> m_via_2;
