@@ -75,6 +75,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual DECLARE_READ8_MEMBER(n340_loread);
 	virtual DECLARE_WRITE8_MEMBER(n340_lowrite);
 	virtual DECLARE_WRITE8_MEMBER(n340_hiwrite);
@@ -82,13 +83,15 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_l) { n340_lowrite(space, offset, data, mem_mask); }
 	virtual DECLARE_WRITE8_MEMBER(write_h) { n340_hiwrite(space, offset, data, mem_mask); }
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
 protected:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-
+	
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
+	
 	// Namcot-163 chip contains 8K of internal ram, possibly battery backed up (not emulated yet)
 	// was it also present in 175 & 340 chips?
 	UINT8 *m_n163_ram;

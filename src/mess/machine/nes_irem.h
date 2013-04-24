@@ -81,14 +81,17 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
 protected:
 	UINT16     m_irq_count, m_irq_count_latch;
 	int        m_irq_enable;
+	
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 

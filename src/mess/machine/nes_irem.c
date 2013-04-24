@@ -130,6 +130,9 @@ void nes_g101_device::pcb_reset()
 void nes_h3001_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
@@ -270,19 +273,23 @@ WRITE8_MEMBER(nes_g101_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_h3001_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	if (m_irq_enable)
-	{
-		m_irq_count -= 114;
 
-		if (m_irq_count <= 114)
+void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
 		{
-			m_irq_enable = 0;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			// 16bit counter, IRQ fired when the counter reaches 0
+			// after firing, the counter is *not* reloaded and does not wrap
+			if (m_irq_count > 0)
+				m_irq_count--;
+				
+			if (!m_irq_count)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_irq_enable = 0;
+			}
 		}
 	}
 }

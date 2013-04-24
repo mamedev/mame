@@ -144,6 +144,9 @@ void nes_oekakids_device::pcb_reset()
 void nes_lz93d50_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -162,6 +165,9 @@ void nes_lz93d50_device::pcb_reset()
 void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_i2c_mem));
@@ -184,6 +190,9 @@ void nes_lz93d50_24c01_device::pcb_reset()
 void nes_fjump2_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_reg));
 }
 
@@ -316,21 +325,26 @@ WRITE8_MEMBER(nes_oekakids_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_lz93d50_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_lz93d50_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* 114 is the number of cycles per scanline */
-	/* TODO: change to reflect the actual number of cycles spent */
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		if (m_irq_count <= 114)
+		if (m_irq_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_irq_count = (0xffff - 114 + m_irq_count);   // wrap around the 16 bits counter
+			// 16bit counter, IRQ fired when the counter goes from 1 to 0
+			// after firing, the counter is *not* reloaded, but next clock 
+			// counter wraps around from 0 to 0xffff			
+			if (!m_irq_count)
+				m_irq_count = 0xffff;
+			else
+				m_irq_count--;
+			
+			if (!m_irq_count)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_irq_enable = 0;
+			}
 		}
-		m_irq_count -= 114;
 	}
 }
 
@@ -470,6 +484,18 @@ void nes_fjump2_device::set_prg()
 
 	prg16_89ab(prg_base | m_reg[8]);
 	prg16_cdef(prg_base | 0x0f);
+}
+
+READ8_MEMBER(nes_fjump2_device::read_m) 
+{ 
+	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
+	return m_battery[offset & (m_battery_size - 1)];
+}
+
+WRITE8_MEMBER(nes_fjump2_device::write_m) 
+{ 
+	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
+	m_battery[offset & (m_battery_size - 1)] = data;
 }
 
 WRITE8_MEMBER(nes_fjump2_device::write_h)

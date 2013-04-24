@@ -145,6 +145,9 @@ void nes_namcot3425_device::pcb_reset()
 void nes_namcot340_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 
@@ -170,6 +173,9 @@ void nes_namcot340_device::pcb_reset()
 void nes_namcot175_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_enable));
@@ -197,6 +203,9 @@ void nes_namcot175_device::pcb_reset()
 void nes_namcot163_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_protect));
@@ -393,20 +402,17 @@ WRITE8_MEMBER(nes_namcot3425_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_namcot340_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		if (m_irq_count >= (0x7fff - 114))
+		if (m_irq_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_irq_count = 0;
+			if (m_irq_count == 0x7fff)	// counter does not wrap to 0!
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			else
+				m_irq_count++;
 		}
-		else
-			m_irq_count += 114;
 	}
 }
 

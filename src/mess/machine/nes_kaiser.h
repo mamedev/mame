@@ -51,11 +51,11 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual DECLARE_READ8_MEMBER(read_m);
 	virtual DECLARE_WRITE8_MEMBER(ks7032_write);
 	virtual DECLARE_WRITE8_MEMBER(write_h) { ks7032_write(space, offset, data, mem_mask); }
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
 protected:
@@ -66,6 +66,9 @@ protected:
 
 	UINT16 m_irq_count;
 	int m_irq_enable;
+	
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 
@@ -93,11 +96,11 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual DECLARE_READ8_MEMBER(read_ex);
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
 private:
@@ -106,6 +109,9 @@ private:
 	UINT16 m_irq_count;
 	UINT8 m_irq_status;
 	int m_irq_enable;
+	
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 

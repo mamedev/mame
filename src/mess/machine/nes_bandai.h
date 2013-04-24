@@ -59,16 +59,19 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual DECLARE_WRITE8_MEMBER(lz93d50_write);
 	virtual DECLARE_WRITE8_MEMBER(write_h) { lz93d50_write(space, offset, data, mem_mask); }
 	virtual DECLARE_WRITE8_MEMBER(write_m);
 
-	virtual void hblank_irq(int scanline, int vblank, int blanked);
 	virtual void pcb_reset();
 
 protected:
 	UINT16     m_irq_count;
 	int        m_irq_enable;
+	
+	static const device_timer_id TIMER_IRQ = 0;
+	emu_timer *irq_timer;
 };
 
 
@@ -138,6 +141,8 @@ public:
 
 	// device-level overrides
 	virtual void device_start();
+	virtual DECLARE_READ8_MEMBER(read_m);
+	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
 	virtual void pcb_reset();

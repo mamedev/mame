@@ -208,6 +208,9 @@ void nes_jf19_device::pcb_reset()
 void nes_ss88006_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
 	save_item(NAME(m_irq_enable));
@@ -421,51 +424,53 @@ WRITE8_MEMBER(nes_jf19_adpcm_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_ss88006_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* Increment & check the IRQ scanline counter */
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, m_irq_count));
-		if (m_irq_mode & 0x08)
+		if (m_irq_enable)
 		{
-			if ((m_irq_count & 0x000f) < 114)    // always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
+			if (m_irq_mode & 0x08)	// 4bits counter
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				m_irq_count = (m_irq_count & ~0x000f) | (0x0f - (114 & 0x0f) + (m_irq_count & 0x000f)); // sort of wrap around the counter
+				if (!(m_irq_count & 0x000f))
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = (m_irq_count & 0xfff0) | 0x000f;
+				}
+				else
+					m_irq_count = (m_irq_count & 0xfff0) | ((m_irq_count & 0x000f) - 1);
 			}
-			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
-		}
-		else if (m_irq_mode & 0x04)
-		{
-			if ((m_irq_count & 0x00ff) < 114)
+			else if (m_irq_mode & 0x04)	// 8bits counter
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				m_irq_count = (m_irq_count & ~0x00ff) | (0xff - 114 + (m_irq_count & 0x00ff)); // wrap around the 8 bits counter
+				if (!(m_irq_count & 0x00ff))
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = (m_irq_count & 0xff00) | 0x00ff;
+				}
+				else
+					m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) - 1);
 			}
-			else
-				m_irq_count -= 114;
-		}
-		else if (m_irq_mode & 0x02)
-		{
-			if ((m_irq_count & 0x0fff)  < 114)
+			else if (m_irq_mode & 0x02)	// 12bits counter
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-				m_irq_count = (m_irq_count & ~0x0fff) | (0xfff - 114 + (m_irq_count & 0x0fff));    // wrap around the 12 bits counter
+				if (!(m_irq_count & 0x0fff))
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = (m_irq_count & 0xf000) | 0x0fff;
+				}
+				else
+					m_irq_count = (m_irq_count & 0xf000) | ((m_irq_count & 0x0fff) - 1);
 			}
-			else
-				m_irq_count -= 114;
+			else 	// 16bits counter
+			{
+				if (!m_irq_count)
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = 0xffff;
+				}
+				else
+					m_irq_count = m_irq_count - 1;
+			}
 		}
-		else if (m_irq_count < 114)
-		{
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_irq_count = (0xffff - 114 + m_irq_count);   // wrap around the 16 bits counter
-		}
-		else
-			m_irq_count -= 114;
 	}
 }
 
@@ -529,7 +534,6 @@ WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
 		case 0x6003:
 			m_irq_count_latch = (m_irq_count_latch & 0x0fff) | ((data & 0x0f) << 12);
 			break;
-
 		case 0x7000:
 			m_irq_count = m_irq_count_latch;
 			break;

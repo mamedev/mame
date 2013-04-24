@@ -122,6 +122,9 @@ void nes_sunsoft_2_device::pcb_reset()
 void nes_sunsoft_3_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_toggle));
 	save_item(NAME(m_irq_count));
@@ -163,6 +166,11 @@ void nes_sunsoft_4_device::pcb_reset()
 void nes_sunsoft_fme7_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	// this has to be hardcoded because some some scanline code only suits NTSC... it will be fixed with PPU rewrite
+	irq_timer->adjust(attotime::zero, 0, attotime::from_hz((21477272.724 / 12)));
+//	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
@@ -255,23 +263,22 @@ WRITE8_MEMBER(nes_sunsoft_2_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_sunsoft_3_device::hblank_irq( int scanline, int vblank, int blanked )
+
+void nes_sunsoft_3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
-	 produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		if (m_irq_count <= 114)
+		if (m_irq_enable)
 		{
-			m_irq_enable = 0;
-			m_irq_count = 0xffff;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			if (!m_irq_count)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_irq_count = 0xffff;
+				m_irq_enable = 0;
+			}
+			else
+				m_irq_count--;
 		}
-		else
-			m_irq_count -= 114;
 	}
 }
 
@@ -449,28 +456,21 @@ READ8_MEMBER(nes_sunsoft_4_device::read_m)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-void nes_sunsoft_fme7_device::hblank_irq( int scanline, int vblank, int blanked )
+void nes_sunsoft_fme7_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* TODO: change to reflect the actual number of cycles spent */
-	if ((m_irq_enable & 0x80) && (m_irq_enable & 0x01))
+	if (id == TIMER_IRQ)
 	{
-		if (m_irq_count <= 114)
+		if ((m_irq_enable & 0x80)) // bit7, counter decrement
 		{
-			m_irq_count = 0xffff;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			if (!m_irq_count)
+			{
+				m_irq_count = 0xffff;
+				if (m_irq_enable & 0x01) // bit0, trigger enable
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			}
+			else
+				m_irq_count--;
 		}
-		else
-			m_irq_count -= 114;
-	}
-	else if (m_irq_enable & 0x01)    // if enable bit 7 is not set, only decrement the counter!
-	{
-		if (m_irq_count <= 114)
-			m_irq_count = 0xffff;
-		else
-			m_irq_count -= 114;
 	}
 }
 

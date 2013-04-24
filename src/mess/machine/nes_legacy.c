@@ -78,7 +78,9 @@ void nes_ffe3_device::pcb_reset()
 void nes_ffe4_device::device_start()
 {
 	common_start();
-	
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+
 	m_exram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
 	save_pointer(NAME(m_exram), 0x8000);
 	save_item(NAME(m_exram_enabled));
@@ -158,23 +160,21 @@ WRITE8_MEMBER(nes_ffe3_device::write_h)
 
  -------------------------------------------------*/
 
-/* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
- we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
- there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-
-void nes_ffe4_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_ffe4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// 114 is the number of cycles per scanline
-	// TODO: change to reflect the actual number of cycles spent
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		if ((0xffff - m_irq_count) < 114)
+		if (m_irq_enable)
 		{
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
-			m_irq_count = 0;
-			m_irq_enable = 0;
+			if (m_irq_count == 0xffff)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_irq_count = 0;
+				m_irq_enable = 0;
+			}
+			else
+				m_irq_count++;
 		}
-		m_irq_count += 114;
 	}
 }
 

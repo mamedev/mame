@@ -427,6 +427,9 @@ void nes_tf1201_device::pcb_reset()
 void nes_cityfight_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_prg_reg));
 	save_item(NAME(m_prg_mode));
 	save_item(NAME(m_irq_enable));
@@ -1235,17 +1238,20 @@ WRITE8_MEMBER(nes_tf1201_device::write_h)
 
  -------------------------------------------------*/
 
-void nes_cityfight_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_cityfight_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (m_irq_enable)
+	if (id == TIMER_IRQ)
 	{
-		if (m_irq_count <= 114)
+		if (m_irq_enable)
 		{
-			m_irq_count = 0xffff;
-			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+			if (!m_irq_count)
+			{
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				m_irq_count = 0xffff;
+			}
+			else
+				m_irq_count--;
 		}
-		else
-			m_irq_count -= 114;
 	}
 }
 
