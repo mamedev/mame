@@ -10203,8 +10203,8 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NUS-N2LP-(EUR,EUU)"/>
 		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="12582912">
 			<feature name="cart_model" value="NUS-006(EUR)" />
+			<dataarea name="rom" size="12582912">
 				<rom name="top gear rally 2 (europe).bin" size="12582912" crc="88c8a6ea" sha1="cdeba42c305995a7fb66b26c8daf4e135152abec" offset="000000" />
 			</dataarea>
 		</part>
