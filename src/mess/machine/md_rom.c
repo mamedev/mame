@@ -527,13 +527,9 @@ READ16_MEMBER(md_rom_cm2in1_device::read)
 READ16_MEMBER(md_rom_mcpirate_device::read)
 {
 	if (offset < 0x400000/2)
-	{
-		return m_rom[offset + (m_bank * 0x10000)/2];
-	}
+		return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom_size - 1))/2];
 	else
-	{
 		return read(space, offset - 0x400000/2, 0xffff);
-	}
 }
 
 WRITE16_MEMBER(md_rom_mcpirate_device::write_a13)
@@ -623,8 +619,12 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 		}
 		return 0;
 	}
-
-	return m_rom[offset & 0x1fffff/2];
+	
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_chinf3_device::write)
@@ -650,13 +650,18 @@ WRITE16_MEMBER(md_rom_chinf3_device::write)
 
 READ16_MEMBER(md_rom_elfwor_device::read)
 {
-	/* It returns (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006).
-	 It is probably best to add handlers for all 4 addresses. */
+	// It returns (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006).
+	// It is probably best to add handlers for all 4 addresses
 	if (offset == 0x400000/2)   return 0x5500;
 	if (offset == 0x400002/2)   return 0x0f00;
 	if (offset == 0x400004/2)   return 0xc900;
 	if (offset == 0x400006/2)   return 0x1800;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -669,7 +674,12 @@ READ16_MEMBER(md_rom_smouse_device::read)
 	if (offset == 0x400002/2)   return 0x0f00;
 	if (offset == 0x400004/2)   return 0xaa00;
 	if (offset == 0x400006/2)   return 0xf000;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -682,7 +692,12 @@ READ16_MEMBER(md_rom_yasech_device::read)
 	if (offset == 0x400002/2)   return 0x9800;
 	if (offset == 0x400004/2)   return 0xc900;
 	if (offset == 0x400006/2)   return 0x1800;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -697,7 +712,12 @@ READ16_MEMBER(md_rom_kof98_device::read)
 	if (offset == 0x488880/2)   return 0xaa00;
 	if (offset == 0x4a8820/2)   return 0x0a00;
 	if (offset == 0x4f8820/2)   return 0x0000;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -720,7 +740,12 @@ READ16_MEMBER(md_rom_lion2_device::read)
 {
 	if (offset == 0x400002/2)   return m_prot1_data;
 	if (offset == 0x400006/2)   return m_prot2_data;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_lion2_device::write)
@@ -756,7 +781,10 @@ READ16_MEMBER(md_rom_lion3_device::read)
 		return 0;
 	}
 
-	return m_rom[MD_ADDR(offset)];
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_lion3_device::write)
@@ -815,7 +843,12 @@ READ16_MEMBER(md_rom_mjlov_device::read)
 {
 	if (offset == 0x400000/2)   return 0x9000;
 	if (offset == 0x401000/2)   return 0xd300;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 
@@ -827,7 +860,12 @@ READ16_MEMBER(md_rom_sbubl_device::read)
 {
 	if (offset == 0x400000/2)   return 0x5500;
 	if (offset == 0x400002/2)   return 0x0f00;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -839,7 +877,12 @@ READ16_MEMBER(md_rom_soulb_device::read)
 	if (offset == 0x400002/2)   return 0x9800;
 	if (offset == 0x400004/2)   return 0xc900;
 	if (offset == 0x400006/2)   return 0xf000;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -852,7 +895,12 @@ READ16_MEMBER(md_rom_pokestad_device::read)
 {
 	if (offset < 0x100000/2)
 		return m_rom[MD_POKESTAD_ADDR(offset)];
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_pokestad_device::write)
@@ -880,8 +928,8 @@ READ16_MEMBER(md_rom_pokea_device::read_a13)
 READ16_MEMBER(md_rom_realtec_device::read)
 {
 	if (offset < (m_bank_size * 0x20000))   // two banks of same (variable) size at the bottom of the rom
-		return m_rom[offset + (m_bank_addr * 0x20000)/2];
-	return m_rom[(offset & 0x1fff/2) + 0x7e000/2];  // otherwise it accesses the final 8k of the image
+		return m_rom[MD_ADDR(offset + (m_bank_addr * 0x20000)/2)];
+	return m_rom[MD_ADDR((offset & 0x1fff/2) + 0x7e000/2)];  // otherwise it accesses the final 8k of the image
 }
 
 WRITE16_MEMBER(md_rom_realtec_device::write)
@@ -911,7 +959,12 @@ READ16_MEMBER(md_rom_redcl_device::read)
 {
 	if (offset == 0x400000/2)   return 0x55 << 8;
 	if (offset == 0x400004/2)   return -0x56 << 8;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -934,7 +987,12 @@ READ16_MEMBER(md_rom_squir_device::read)
 {
 	if ((offset >= 0x400000/2) && (offset < 0x400008/2))
 		return m_latch;
-	return m_rom[MD_ADDR(offset)];
+
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_squir_device::write)
@@ -1133,7 +1191,11 @@ READ16_MEMBER(md_rom_topf_device::read)
 	if (offset >= 0x60000/2 && offset < 0x68000/2)
 		return m_rom[offset + (m_bank[2] * 0x110000)/2];
 
-	return m_rom[offset];
+	// non-protection accesses
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_topf_device::write)
@@ -1163,7 +1225,7 @@ WRITE16_MEMBER(md_rom_topf_device::write)
 
 READ16_MEMBER(md_rom_radica_device::read)
 {
-	return m_rom[m_bank * 0x10000/2 + offset];
+	return m_rom[(((m_bank * 0x10000) + (offset << 1)) & (m_rom_size - 1))/2];
 }
 
 READ16_MEMBER(md_rom_radica_device::read_a13)
