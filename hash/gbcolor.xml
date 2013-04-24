@@ -927,7 +927,6 @@ List of verified retail cartridges rom dumps
 		<publisher>Crave Entertainment</publisher>
 		<info name="serial" value="DMG-AEBE-USA, DMG-AEBP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
-		<part name="cart" interface="gameboy_cart">
 			<feature name="pcb" value="DMG-A07-01" />
 			<feature name="u1" value="U1 2M/4M/8M MROM" />
 			<feature name="u2" value="U2 MBC5" />
