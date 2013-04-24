@@ -928,8 +928,8 @@ READ16_MEMBER(md_rom_pokea_device::read_a13)
 READ16_MEMBER(md_rom_realtec_device::read)
 {
 	if (offset < (m_bank_size * 0x20000))   // two banks of same (variable) size at the bottom of the rom
-		return m_rom[MD_ADDR(offset + (m_bank_addr * 0x20000)/2)];
-	return m_rom[MD_ADDR((offset & 0x1fff/2) + 0x7e000/2)];  // otherwise it accesses the final 8k of the image
+		return m_rom[MD_ADDR((offset + (m_bank_addr * 0x20000)/2))];
+	return m_rom[MD_ADDR(((offset & 0x1fff/2) + 0x7e000/2))];  // otherwise it accesses the final 8k of the image
 }
 
 WRITE16_MEMBER(md_rom_realtec_device::write)
