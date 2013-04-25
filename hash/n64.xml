@@ -2765,6 +2765,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="cvaniau1" cloneof="cvania">
+		<description>Castlevania (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Konami</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="castlevania (usa) (rev b).bin" size="12582912" crc="bf911b10" sha1="f542a9d2134a7066676422376a129b1970865f5d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniau2" cloneof="cvania">
 		<description>Castlevania (USA)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
@@ -2834,6 +2845,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="chtwistu" cloneof="chtwist">
+		<description>Chameleon Twist (USA, Rev. A)</description>
+		<year>1998</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="chameleon twist (usa)(v1.1).bin" size="12582912" crc="c0345565" sha1="115cd6c1c75eb1f4b4e5debfcbace61e94647579" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chtwistu1" cloneof="chtwist">
 		<description>Chameleon Twist (USA)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
@@ -8068,7 +8090,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
-				<rom name="pokemon stadium (usa) (rev a).bin" size="33554432" crc="9dedba0e" sha1="3fa2cf3391dad24150c514b07f8eece084cc8a31" offset="000000" />
+				<rom name="pokemon stadium (usa) (rev a).bin" size="33554432" crc="7bb7489f" sha1="d5b479461cd45db31e896143519c85b7136cfe2e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
