@@ -1391,7 +1391,13 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 }
 
 
-
+//
+// Serial processor control
+// x--- ---- - Motor OFF(0)/ON(1)
+// -x-- ---- - Cassette(0)/RS243 input(1)
+// --xx x--- - Receive baud rate generator control
+// ---- -xxx - Transmit baud rate generator control
+//
 WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 {
 	m_serproc_data = data;
