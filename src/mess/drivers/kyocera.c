@@ -42,6 +42,10 @@
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
 
+	10 FOR A=0 TO 255
+	20 PRINT CHR$(A);
+	30 NEXT A
+
 */
 
 /*
@@ -1511,14 +1515,9 @@ ROM_START( kc85 )
 	ROM_CART_LOAD("cart", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
 ROM_END
 
-// This BIOS is 99% bad: it contains no Japanese keyboard layout and if you enter the following BASIC program
-// 10 FOR A=0 TO 255
-// 20 PRINT CHR$(A);
-// 30 NEXT A
-// there are no Japanese characters printed out (contrary to what can be seen at Takeda's emu page)
 ROM_START( pc8201 )
 	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, BAD_DUMP CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
+	ROM_LOAD( "3256a41-3b1 n 82 basic.rom0", 0x0000, 0x8000, CRC(3dbaa484) SHA1(9886a973faa639ca9e0ba478790bab20e5163495) )
 
 	ROM_REGION( 0x8000, "option", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart1", 0x0000, 0x8000, ROM_MIRROR | ROM_OPTIONAL)
@@ -1602,7 +1601,7 @@ COMP( 1983, m10,        kc85,   0,      kc85,       olivm10, driver_device, 0,  
 //COMP( 1983, m10m,     kc85,   0,      kc85,       olivm10, driver_device,    0,      "Olivetti",             "M-10 Modem (US)", 0 )
 COMP( 1983, trsm100,    0,      0,      trsm100,    kc85, driver_device,        0,      "Tandy Radio Shack",    "TRS-80 Model 100", 0 )
 COMP( 1986, tandy102,   trsm100,0,      tandy102,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 102", 0 )
-COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", 0 )
+COMP( 1983, pc8201,     0,      0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8201 (Japan)", GAME_NOT_WORKING ) // keyboard layout wrong
 COMP( 1983, pc8201a,    pc8201, 0,      pc8201,     pc8201a, driver_device, 0,      "Nippon Electronic Company",                    "PC-8201A", 0 )
 COMP( 1987, npc8300,    pc8201, 0,      pc8201,     pc8201a, driver_device,    0,      "Nippon Electronic Company",                  "PC-8300", GAME_NOT_WORKING )
 COMP( 1984, tandy200,   0,      0,      tandy200,   kc85, driver_device,        0,      "Tandy Radio Shack",    "Tandy 200", 0 )
