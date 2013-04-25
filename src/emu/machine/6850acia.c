@@ -125,6 +125,7 @@ void acia6850_device::device_start()
 	save_item(NAME(m_rts));
 	save_item(NAME(m_brk));
 	save_item(NAME(m_status_read));
+	save_item(NAME(m_dcd_triggered));
 }
 
 
@@ -161,6 +162,7 @@ void acia6850_device::device_reset()
 
 	m_bits = 0;
 	m_tx_int = 0;
+	m_dcd_triggered = false;
 
 	m_out_irq_func(CLEAR_LINE);
 
@@ -215,6 +217,35 @@ READ8_MEMBER( acia6850_device::status_read )
 	}
 
 	return status;
+}
+
+
+//-------------------------------------------------
+//  Handle DCD input changes
+//-------------------------------------------------
+
+void acia6850_device::check_dcd_input()
+{
+	int dcd = m_in_dcd_func();
+
+	if (dcd)
+	{
+		// IRQ from DCD is edge triggered
+		if ( ! ( m_status & ACIA6850_STATUS_DCD ) )
+		{
+			m_status |= ACIA6850_STATUS_DCD;
+			m_dcd_triggered = true;
+
+			// Asserting DCD clears RDRF
+			m_status &= ~ACIA6850_STATUS_RDRF;
+
+			check_interrupts();
+		}
+	}
+	else if ((m_status & (ACIA6850_STATUS_DCD | ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
+	{
+		m_status &= ~ACIA6850_STATUS_DCD;
+	}
 }
 
 
@@ -318,7 +349,7 @@ WRITE8_MEMBER( acia6850_device::control_write )
 void acia6850_device::check_interrupts()
 {
 	int irq = (m_tx_int && (m_status & ACIA6850_STATUS_TDRE) && (~m_status & ACIA6850_STATUS_CTS)) ||
-		((m_ctrl & 0x80) && ((m_status & (ACIA6850_STATUS_RDRF|ACIA6850_STATUS_DCD)) || m_overrun));
+		((m_ctrl & 0x80) && (((m_status & ACIA6850_STATUS_RDRF) || m_dcd_triggered) || m_overrun));
 
 	if (irq != m_irq)
 	{
@@ -335,6 +366,7 @@ void acia6850_device::check_interrupts()
 			m_out_irq_func(CLEAR_LINE);
 		}
 	}
+	m_dcd_triggered = false;
 }
 
 
@@ -369,15 +401,11 @@ READ8_MEMBER( acia6850_device::data_read )
 
 	if (m_status_read)
 	{
-		int dcd = m_in_dcd_func();
-
 		m_status_read = 0;
-		m_status &= ~(ACIA6850_STATUS_OVRN | ACIA6850_STATUS_DCD);
 
-		if (dcd)
-		{
-			m_status |= ACIA6850_STATUS_DCD;
-		}
+		m_status &= ~ACIA6850_STATUS_OVRN;
+
+		check_dcd_input();
 	}
 
 	if (m_overrun == 1)
@@ -542,17 +570,7 @@ void acia6850_device::tx_clock_in()
 
 void acia6850_device::rx_tick()
 {
-	int dcd = m_in_dcd_func();
-
-	if (dcd)
-	{
-		m_status |= ACIA6850_STATUS_DCD;
-		check_interrupts();
-	}
-	else if ((m_status & (ACIA6850_STATUS_DCD | ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
-	{
-		m_status &= ~ACIA6850_STATUS_DCD;
-	}
+	check_dcd_input();
 
 	if (m_status & ACIA6850_STATUS_DCD)
 	{
@@ -687,17 +705,7 @@ void acia6850_device::rx_tick()
 
 void acia6850_device::rx_clock_in()
 {
-	int dcd = m_in_dcd_func();
-
-	if (dcd)
-	{
-		m_status |= ACIA6850_STATUS_DCD;
-		check_interrupts();
-	}
-	else if ((m_status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
-	{
-		m_status &= ~ACIA6850_STATUS_DCD;
-	}
+	check_dcd_input();
 
 	m_rx_counter ++;
 
