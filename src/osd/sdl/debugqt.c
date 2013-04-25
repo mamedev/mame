@@ -19,10 +19,10 @@
 #include "config.h"
 #include "debugger.h"
 
-#include "debugqtmainwindow.h"
-#include "debugqtmemorywindow.h"
-#include "debugqtdasmwindow.h"
 #include "debugqtlogwindow.h"
+#include "debugqtmainwindow.h"
+#include "debugqtdasmwindow.h"
+#include "debugqtmemorywindow.h"
 
 
 //============================================================
@@ -41,7 +41,8 @@ MainWindow* mainQtWindow = NULL;
 //============================================================
 
 // Global variable used to feed the xml configuration callbacks
-std::vector<WindowQtConfig> xmlConfigurations;
+simple_list<WindowQtConfig> xmlConfigurations;
+
 
 static void xml_configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
@@ -55,18 +56,17 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 	if (parentnode == NULL)
 		return;
 
-	xmlConfigurations.clear();
+	xmlConfigurations.reset();
 
 	// Configuration load
 	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
 	{
-		WindowQtConfig config;
+		WindowQtConfig& config = xmlConfigurations.append(*global_alloc(WindowQtConfig));
 		config.m_size.setX(xml_get_attribute_int(wnode, "size_x", config.m_size.x()));
 		config.m_size.setY(xml_get_attribute_int(wnode, "size_y", config.m_size.y()));
 		config.m_position.setX(xml_get_attribute_int(wnode, "position_x", config.m_position.x()));
 		config.m_position.setY(xml_get_attribute_int(wnode, "position_y", config.m_position.y()));
 		config.m_type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", config.m_type);
-		xmlConfigurations.push_back(config);
 	}
 }
 
@@ -77,7 +77,7 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
 
-	for (int i = 0; i < xmlConfigurations.size(); i++)
+	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
 	{
 		// Create an xml node
 		xml_data_node *debugger_node;
@@ -85,18 +85,18 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 		if (debugger_node == NULL)
 			continue;
 
-		xml_set_attribute_int(debugger_node, "type", xmlConfigurations[i].m_type);
-		xml_set_attribute_int(debugger_node, "position_x", xmlConfigurations[i].m_position.x());
-		xml_set_attribute_int(debugger_node, "position_y", xmlConfigurations[i].m_position.y());
-		xml_set_attribute_int(debugger_node, "size_x", xmlConfigurations[i].m_size.x());
-		xml_set_attribute_int(debugger_node, "size_y", xmlConfigurations[i].m_size.y());
+		xml_set_attribute_int(debugger_node, "type", config->m_type);
+		xml_set_attribute_int(debugger_node, "position_x", config->m_position.x());
+		xml_set_attribute_int(debugger_node, "position_y", config->m_position.y());
+		xml_set_attribute_int(debugger_node, "size_x", config->m_size.x());
+		xml_set_attribute_int(debugger_node, "size_y", config->m_size.y());
 	}
 }
 
 
 static void gather_save_configurations()
 {
-	xmlConfigurations.clear();
+	xmlConfigurations.reset();
 
 	// Loop over all the open windows
 	foreach (QWidget* widget, QApplication::topLevelWidgets())
@@ -118,13 +118,12 @@ static void gather_save_configurations()
 		else if (dynamic_cast<LogWindow*>(widget))
 			type = WindowQtConfig::WIN_TYPE_LOG;
 
-		WindowQtConfig config;
+		WindowQtConfig& config = xmlConfigurations.append(*global_alloc(WindowQtConfig));
 		config.m_type = type;
 		config.m_position.setX(widget->geometry().topLeft().x());
 		config.m_position.setY(widget->geometry().topLeft().y());
 		config.m_size.setX(widget->size().width());
 		config.m_size.setY(widget->size().height());
-		xmlConfigurations.push_back(config);
 	}
 }
 
@@ -133,31 +132,27 @@ static void gather_save_configurations()
 //  Utilities
 //============================================================
 
-static void load_and_clear_main_window_config(std::vector<WindowQtConfig>& configs)
+static void load_and_clear_main_window_config(simple_list<WindowQtConfig>& configList)
 {
-	if (configs.size() == 0)
-		return;
-
-	int i = 0;
-	for (i = 0; i < configs.size(); i++)
+	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
 	{
-		if (configs[i].m_type == WindowQtConfig::WIN_TYPE_MAIN)
+		if (config->m_type == WindowQtConfig::WIN_TYPE_MAIN)
 		{
-			mainQtWindow->setGeometry(configs[i].m_position.x(), configs[i].m_position.y(),
-										configs[i].m_size.x(), configs[i].m_size.y());
+			mainQtWindow->setGeometry(config->m_position.x(), config->m_position.y(),
+									  config->m_size.x(), config->m_size.y());
+			configList.remove(*config);
 			break;
 		}
 	}
-	configs.erase(configs.begin()+i);
 }
 
 
-static void setup_additional_startup_windows(running_machine& machine, std::vector<WindowQtConfig>& configs)
+static void setup_additional_startup_windows(running_machine& machine, simple_list<WindowQtConfig>& configList)
 {
-	for (int i = 0; i < configs.size(); i++)
+	for (WindowQtConfig* config = xmlConfigurations.first(); config != NULL; config = config->next())
 	{
 		WindowQt* foo = NULL;
-		switch (configs[i].m_type)
+		switch (config->m_type)
 		{
 			case WindowQtConfig::WIN_TYPE_MEMORY:
 				foo = new MemoryWindow(&machine); break;
@@ -167,8 +162,8 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 				foo = new LogWindow(&machine); break;
 			default: break;
 		}
-		foo->setGeometry(configs[i].m_position.x(), configs[i].m_position.y(),
-							configs[i].m_size.x(), configs[i].m_size.y());
+		foo->setGeometry(config->m_position.x(), config->m_position.y(),
+						 config->m_size.x(), config->m_size.y());
 		foo->show();
 	}
 }
@@ -199,7 +194,7 @@ void sdl_osd_interface::init_debugger()
 	}
 	else
 	{
-		// If you're doing a hard reset, clear out existing widgets & get ready for re-init
+		// If you've done a hard reset, clear out existing widgets & get ready for re-init
 		foreach (QWidget* widget, QApplication::topLevelWidgets())
 		{
 			if (!widget->isWindow() || widget->windowType() != Qt::Window)
@@ -296,6 +291,7 @@ void debugwin_update_during_game(running_machine &machine)
 
 
 #else
+
 
 
 #include "sdlinc.h"

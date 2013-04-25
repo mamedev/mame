@@ -53,13 +53,12 @@ protected:
 };
 
 
-//=======================================================================
-//  A way to store the configuration of a window long enough to use it.
-//=======================================================================
+//=========================================================================
+//  A way to store the configuration of a window long enough to read/write.
+//=========================================================================
 class WindowQtConfig
 {
 public:
-	// This is a holdover from the old debugger - TODO: remove
 	enum WindowType
 	{
 		WIN_TYPE_MAIN       = 0x01,
@@ -73,13 +72,18 @@ public:
 	WindowQtConfig() :
 		m_type(WIN_TYPE_MAIN),
 		m_size(800, 600),
-		m_position(120, 120)
+		m_position(120, 120),
+		m_next(NULL)
 	{}
 	~WindowQtConfig() {}
 
 	WindowType m_type;
 	QPoint m_size;
 	QPoint m_position;
+
+    // Dues for becoming a member of a simple_list
+    WindowQtConfig* next() const { return m_next; }
+    WindowQtConfig* m_next;
 };
 
 #endif
