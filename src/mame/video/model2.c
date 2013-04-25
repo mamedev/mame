@@ -90,7 +90,7 @@
 #include "video/poly.h"
 #include "includes/model2.h"
 
-#define DEBUG 0
+#define MODEL2_VIDEO_DEBUG 0
 
 
 #define pz      p[0]
@@ -1022,7 +1022,7 @@ static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, cons
 	if ( raster->tri_list_index == 0 )
 		return;
 
-#if DEBUG
+#if MODEL2_VIDEO_DEBUG
 	if (machine.input().code_pressed(KEYCODE_Q))
 	{
 		UINT32  i;
