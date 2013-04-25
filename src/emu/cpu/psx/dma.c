@@ -173,10 +173,13 @@ void psxdma_device::dma_finished( int index )
 				// the hardware.
 				// Mametesters.org: psyforce0105u5red, raystorm0111u1red
 				if ((n_nextaddress & 0xffffff) != 0xffffff)
-					if (n_address == m_ram[ (n_nextaddress & 0xffffff) / 4])
+				{
+					if (n_address == m_ram[ (n_nextaddress & n_adrmask) / 4] ||
+						n_address == (n_nextaddress & n_adrmask) )
+					{
 						break;
-				if (n_address == (n_nextaddress & 0xffffff) )
-					break;
+					}
+				}
 				n_address = ( n_nextaddress & 0xffffff );
 
 				n_total += ( n_size + 1 );
