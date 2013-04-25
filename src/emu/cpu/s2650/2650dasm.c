@@ -272,14 +272,14 @@ CPU_DISASSEMBLE( s2650 )
 			break;
 		case 0x12:
 #if HJB
-			sprintf(buffer, "ld   psu,r0");
+			sprintf(buffer, "ld   r0,psu");
 #else
 			sprintf(buffer, "spsu");
 #endif
 			break;
 		case 0x13:
 #if HJB
-			sprintf(buffer, "ld   psl,r0");
+			sprintf(buffer, "ld   r0,psl");
 #else
 			sprintf(buffer, "spsl");
 #endif
@@ -583,14 +583,14 @@ CPU_DISASSEMBLE( s2650 )
 			break;
 		case 0x92:
 #if HJB
-			sprintf(buffer, "ld   r0,psu");
+			sprintf(buffer, "ld   psu,r0");
 #else
 			sprintf(buffer, "lpsu");
 #endif
 			break;
 		case 0x93:
 #if HJB
-			sprintf(buffer, "ld   r0,psl");
+			sprintf(buffer, "ld   psl,r0");
 #else
 			sprintf(buffer, "lpsl");
 #endif
