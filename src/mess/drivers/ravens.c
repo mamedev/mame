@@ -10,6 +10,9 @@ http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
         2013-04-23 Skeleton driver.
 
 
+No instructions, no schematics - it's all guesswork.
+
+
 Version 0.9
 -----------
 Hardware:
@@ -23,8 +26,23 @@ There is a XTAL of unknown frequency.
 
 There is a cassette interface..
 
+The buttons are labelled CMD, RUN, GOTO, RST, F, MON, PC, NXT but at
+this time not all buttons are identified.
+
+What is known:
+- Press NXT to read memory. Press NXT again to read the next address.
+- Press PC and it says PCxxxx
+- Press CMD, it says CND=, you can choose one of these:
+-- A displays value of a register. Press A again to see more registers.
+-- B sets a breakpoint
+-- C clears a breakpoint
+-- D dumps blocks to tape
+-- E examine tape file
+-- F fetch (load) from tape
+
 ToDo:
-- Everything
+- Fix display of 8 round leds
+- Cassette
 
 Version V2.0
 ------------
@@ -32,9 +50,9 @@ This used a terminal interface with a few non-standard control codes.
 The pushbuttons and LEDs appear to have been done away with.
 
 Commands (must be in uppercase):
-A    ?
-B    ?
-C    ?
+A    Examine memory; press C to alter memory
+B    Set breakpoint?
+C    View breakpoint?
 D    Dump to screen
 E    Execute
 I    ?
@@ -42,11 +60,13 @@ L    Load
 R    ?
 V    ?
 
+ToDo:
+- Cassette
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-//#include "sound/speaker.h"
 #include "machine/terminal.h"
 #include "ravens.lh"
 
@@ -56,33 +76,33 @@ class ravens_state : public driver_device
 public:
 	ravens_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-//	, m_speaker(*this, "speaker")
-	, m_terminal(*this, TERMINAL_TAG)
+		m_maincpu(*this, "maincpu"),
+		m_terminal(*this, TERMINAL_TAG)
 	{ }
 
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
+	DECLARE_WRITE8_MEMBER(port1b_w);
+	DECLARE_WRITE8_MEMBER(port1c_w);
+	DECLARE_WRITE8_MEMBER(display_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-//	UINT8 m_last_key;
+	DECLARE_MACHINE_RESET(ravens2);
+	UINT8 m_term_char;
 	UINT8 m_term_data;
-//	bool m_speaker_state;
 	required_device<cpu_device> m_maincpu;
-//	required_device<speaker_sound_device> m_speaker;
 	optional_device<generic_terminal_device> m_terminal;
 };
 
-WRITE8_MEMBER( ravens_state::leds_w )
+WRITE8_MEMBER( ravens_state::display_w )
 {
 	output_set_digit_value(offset, data);
 }
 
-//WRITE8_MEMBER( ravens_state::port06_w )
-//{
-//	m_speaker_state ^=1;
-//	speaker_level_w(m_speaker, m_speaker_state);
-//}
+WRITE8_MEMBER( ravens_state::leds_w )
+{
+	output_set_digit_value(6, data);
+}
 
 READ8_MEMBER( ravens_state::port07_r )
 {
@@ -93,39 +113,61 @@ READ8_MEMBER( ravens_state::port07_r )
 
 READ8_MEMBER( ravens_state::port17_r )
 {
-	UINT8 keyin, i, data = 0x80;
+	UINT8 keyin, i;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
-				return i;
+				return i | 0x80;
 
 	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
-				return i | 8;
+				return i | 0x88;
 
 	keyin = ioport("X2")->read();
+	if (!BIT(keyin, 0))
+		machine().firstcpu->reset();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
-				return i<<4;
+				return (i<<4) | 0x80;
 
-	keyin = ioport("X3")->read();
-	if (keyin != 0xff)
-		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
-				return (i | 8)<<4;
-
-//	if (data == m_last_key)
-//		data &= 0x7f;
-//	else
-//		m_last_key = data;
-
-	return data;
+	return 0;
 }
+
+WRITE8_MEMBER( ravens_state::port1b_w )
+{
+	if (BIT(data, 7))
+		return;
+	else
+	if ((data == 0x08 && m_term_char == 0x20))
+		data = 0x0c; // FormFeed
+	else
+	if ((data == 0x0a && m_term_char == 0x20))
+		data = 0x0a; // LineFeed
+	else
+	if ((data == 0x01 && m_term_char == 0xc2))
+		data = 0x0d; // CarriageReturn
+	else
+		data = m_term_char;
+
+	m_terminal->write(space, 0, data);
+}
+
+WRITE8_MEMBER( ravens_state::port1c_w )
+{
+	m_term_char = data;
+}
+
+MACHINE_RESET_MEMBER( ravens_state, ravens2 )
+{
+	m_term_data = 0x80;
+	output_set_digit_value(6, 0);
+}
+
 
 static ADDRESS_MAP_START( ravens_mem, AS_PROGRAM, 8, ravens_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -135,8 +177,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x10, 0x15) AM_WRITE(leds_w) // 6-led display
-//	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w)  // speaker (NOT a keyclick)
+	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
+	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
 	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(ravens_cass_in,ravens_cass_out)
 	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
@@ -144,9 +186,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x07, 0x07) AM_READ(port07_r) // pushbuttons
-	AM_RANGE(0x1b, 0x1b) AM_WRITENOP // signals a character is being sent to terminal, we dont need
-	AM_RANGE(0x1c, 0x1c) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
+	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
+	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
+	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
 	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(ravens_cass_in,ravens_cass_out)
 	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
 ADDRESS_MAP_END
@@ -174,17 +216,19 @@ static INPUT_PORTS_START( ravens )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("X2")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0xCF, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("X3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RST") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NXT") PORT_CODE(KEYCODE_UP) PORT_CHAR('^')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PC")  PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CMD") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("???") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 INPUT_PORTS_END
 
 WRITE8_MEMBER( ravens_state::kbd_put )
 {
+	if (data > 0x60) data -= 0x20; // fold to uppercase
 	m_term_data = data;
 }
 
@@ -201,11 +245,6 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
-
-	/* sound hardware */
-//	MCFG_SPEAKER_STANDARD_MONO("mono")
-//	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ravens2, ravens_state )
@@ -213,14 +252,10 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens2_io)
+	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-
-	/* sound hardware */
-//	MCFG_SPEAKER_STANDARD_MONO("mono")
-//	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -237,5 +272,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS        INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1985, ravens,  0,       0,       ravens,  ravens, driver_device, 0,     "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0,     "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1985, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

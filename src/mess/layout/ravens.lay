@@ -2,7 +2,7 @@
 <mamelayout version="2">
 	<element name="digit" defstate="0">
 		<led7seg>
-			<color red="0.75" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.0" blue="0.0" />
 		</led7seg>
 	</element>
 	<element name="background">
@@ -15,14 +15,20 @@
 	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="00" top="00" right="400" bottom="100" />
+			<bounds left="00" top="00" right="430" bottom="100" />
 		</bezel>
 
+		<!-- This is actually 8 rounds LEDs, but a digit will do for now -->
+		<bezel name="digit6" element="digit">
+			<bounds x="370" y="10" width="50" height="80" />
+		</bezel>
+
+		<!-- 6-digit display -->
 		<bezel name="digit0" element="digit">
-			<bounds x="340" y="10" width="50" height="80" />
+			<bounds x="310" y="10" width="50" height="80" />
 		</bezel>
 		<bezel name="digit1" element="digit">
-			<bounds x="280" y="10" width="50" height="80" />
+			<bounds x="250" y="10" width="50" height="80" />
 		</bezel>
 		<bezel name="digit2" element="digit">
 			<bounds x="190" y="10" width="50" height="80" />
