@@ -124,9 +124,9 @@ Notes (couriersud)
  *
  *************************************/
 
-#define DEBUG       (0)
+#define M10_DEBUG       (0)
 
-#define LOG(x) do { if (DEBUG) printf x; } while (0)
+#define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
 
 WRITE8_MEMBER(m10_state::ic8j1_output_changed)
 {
@@ -233,7 +233,7 @@ MACHINE_RESET_MEMBER(m10_state,m10)
 
 WRITE8_MEMBER(m10_state::m10_ctrl_w)
 {
-#if DEBUG
+#if M10_DEBUG
 	if (data & 0x40)
 		popmessage("ctrl: %02x",data);
 #endif
@@ -308,7 +308,7 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
 
 WRITE8_MEMBER(m10_state::m11_ctrl_w)
 {
-#if DEBUG
+#if M10_DEBUG
 	if (data & 0x4c)
 		popmessage("M11 ctrl: %02x",data);
 #endif
@@ -339,7 +339,7 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
 
 WRITE8_MEMBER(m10_state::m15_ctrl_w)
 {
-#if DEBUG
+#if M10_DEBUG
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
@@ -365,7 +365,7 @@ WRITE8_MEMBER(m10_state::m15_ctrl_w)
 
 WRITE8_MEMBER(m10_state::m10_a500_w)
 {
-#if DEBUG
+#if M10_DEBUG
 	if (data & 0xfc)
 		popmessage("a500: %02x",data);
 #endif
@@ -378,7 +378,7 @@ WRITE8_MEMBER(m10_state::m11_a100_w)
 
 	// should a falling bit stop a sample?
 	// This port is written to about 20x per vblank
-#if DEBUG
+#if M10_DEBUG
 	if ((m_last & 0xe8) != (data & 0xe8))
 		popmessage("A100: %02x\n", data);
 #endif
@@ -423,7 +423,7 @@ WRITE8_MEMBER(m10_state::m15_a100_w)
 	// 0x20: computer car changes lane
 	// 0x40: dot
 
-#if DEBUG
+#if M10_DEBUG
 	if ((m_last & 0x82) != (data & 0x82))
 		popmessage("A100: %02x\n", data);
 #endif
