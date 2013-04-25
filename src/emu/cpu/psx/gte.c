@@ -235,8 +235,7 @@ void gte::setcp2dr( UINT32 pc, int reg, UINT32 value )
 		break;
 
 	case 31:
-		value = m_cp2dr[ reg ].d;
-		break;
+		return;
 	}
 
 	m_cp2dr[ reg ].d = value;
