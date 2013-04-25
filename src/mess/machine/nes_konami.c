@@ -62,28 +62,28 @@ nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, co
 {
 }
 
-nes_konami_vrc3_device::nes_konami_vrc3_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
-{
-}
-
 nes_konami_vrc3_device::nes_konami_vrc3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_VRC3, "NES Cart Konami VRC-3 PCB", tag, owner, clock, "nes_vrc3", __FILE__)
 {
 }
 
+nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
 nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_konami_vrc3_device(mconfig, NES_VRC4, "NES Cart Konami VRC-4 PCB", tag, owner, clock, "nes_vrc4", __FILE__)
+					: nes_nrom_device(mconfig, NES_VRC4, "NES Cart Konami VRC-4 PCB", tag, owner, clock, "nes_vrc4", __FILE__)
 {
 }
 
 nes_konami_vrc6_device::nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_konami_vrc3_device(mconfig, NES_VRC6, "NES Cart Konami VRC-6 PCB", tag, owner, clock, "nes_vrc6", __FILE__)
+					: nes_konami_vrc4_device(mconfig, NES_VRC6, "NES Cart Konami VRC-6 PCB", tag, owner, clock, "nes_vrc6", __FILE__)
 {
 }
 
 nes_konami_vrc7_device::nes_konami_vrc7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_konami_vrc3_device(mconfig, NES_VRC7, "NES Cart Konami VRC-7 PCB", tag, owner, clock, "nes_vrc7", __FILE__)
+					: nes_konami_vrc4_device(mconfig, NES_VRC7, "NES Cart Konami VRC-7 PCB", tag, owner, clock, "nes_vrc7", __FILE__)
 {
 }
 
@@ -126,6 +126,10 @@ void nes_konami_vrc2_device::pcb_reset()
 void nes_konami_vrc3_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+
+	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_enable_latch));
 	save_item(NAME(m_irq_count));
@@ -139,6 +143,7 @@ void nes_konami_vrc3_device::pcb_reset()
 	prg16_cdef(m_prg_chunks - 1);
 	chr8(0, m_chr_source);
 
+	m_irq_mode = 0;
 	m_irq_enable = 0;
 	m_irq_enable_latch = 0;
 	m_irq_count = 0;
@@ -149,7 +154,11 @@ void nes_konami_vrc3_device::pcb_reset()
 void nes_konami_vrc4_device::device_start()
 {
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
 	save_item(NAME(m_irq_mode));
+	save_item(NAME(m_irq_prescale));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_enable_latch));
 	save_item(NAME(m_irq_count));
@@ -167,6 +176,7 @@ void nes_konami_vrc4_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_irq_mode = 0;
+	m_irq_prescale = 341;
 	m_irq_enable = 0;
 	m_irq_enable_latch = 0;
 	m_irq_count = 0;
@@ -182,6 +192,11 @@ void nes_konami_vrc7_device::device_start()
 	m_ym2413 = device().subdevice("ym");
 
 	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
+	save_item(NAME(m_irq_mode));
+	save_item(NAME(m_irq_prescale));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_enable_latch));
 	save_item(NAME(m_irq_count));
@@ -197,6 +212,8 @@ void nes_konami_vrc7_device::pcb_reset()
 	prg8_ef(0xff);
 	chr8(0, m_chr_source);
 
+	m_irq_mode = 0;
+	m_irq_prescale = 341;
 	m_irq_enable = 0;
 	m_irq_enable_latch = 0;
 	m_irq_count = 0;
@@ -333,18 +350,37 @@ WRITE8_MEMBER(nes_konami_vrc2_device::write_h)
 
  iNES: mapper 73
 
- In MESS: Supported. It also uses konami_irq.
+ In MESS: Supported.
 
  -------------------------------------------------*/
 
-void nes_konami_vrc3_device::hblank_irq(int scanline, int vblank, int blanked)
+void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	/* Increment & check the IRQ scanline counter */
-	if (m_irq_enable && (++m_irq_count == 0x100))
+	if (id == TIMER_IRQ)
 	{
-		m_irq_count = m_irq_count_latch;
-		m_irq_enable = m_irq_enable_latch;
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		if (m_irq_enable)
+		{
+			if (m_irq_mode)	// 8bits mode
+			{
+				if ((m_irq_count & 0x00ff) == 0xff)
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = m_irq_count_latch;
+				}
+				else
+					m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) + 1);
+			}
+			else	// 16bits mode
+			{
+				if (m_irq_count == 0xffff)
+				{
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					m_irq_count = m_irq_count_latch;
+				}
+				else
+					m_irq_count++;
+			}
+		}
 	}
 }
 
@@ -355,21 +391,26 @@ WRITE8_MEMBER(nes_konami_vrc3_device::write_h)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
+			m_irq_count_latch = (m_irq_count_latch & 0xfff0) | ((data & 0x0f) << 0);
+			break;
 		case 0x1000:
-			/* dunno which address controls these */
-			m_irq_count_latch = data;
-			m_irq_enable_latch = data;
+			m_irq_count_latch = (m_irq_count_latch & 0xff0f) | ((data & 0x0f) << 4);
 			break;
 		case 0x2000:
-			m_irq_enable = data;
+			m_irq_count_latch = (m_irq_count_latch & 0xf0ff) | ((data & 0x0f) << 8);
 			break;
 		case 0x3000:
-			m_irq_count &= ~0x0f;
-			m_irq_count |= data & 0x0f;
+			m_irq_count_latch = (m_irq_count_latch & 0x0fff) | ((data & 0x0f) << 12);
 			break;
 		case 0x4000:
-			m_irq_count &= ~0xf0;
-			m_irq_count |= (data & 0x0f) << 4;
+			m_irq_mode = data & 0x04;
+			m_irq_enable = data & 0x02;
+			m_irq_enable_latch = data & 0x01;
+			if (data & 0x02)
+				m_irq_count = m_irq_count_latch;
+			break;
+		case 0x5000:
+			m_irq_enable = m_irq_enable_latch;
 			break;
 		case 0x7000:
 			prg16_89ab(data);
@@ -387,6 +428,42 @@ WRITE8_MEMBER(nes_konami_vrc3_device::write_h)
  In MESS: Supported
 
  -------------------------------------------------*/
+
+void nes_konami_vrc4_device::irq_tick()
+{
+	if (m_irq_count == 0xff)
+	{
+		m_irq_count = m_irq_count_latch;
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	}
+	else
+		m_irq_count++;
+}
+
+void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			if (m_irq_mode)	// cycle mode
+				irq_tick();
+			else	// scanline mode 
+			{
+				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order). 
+				// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
+				// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
+				if (m_irq_prescale < 3)
+				{
+					m_irq_prescale += 341;
+					irq_tick();
+				}
+
+				m_irq_prescale -= 3;
+			}
+		}
+	}
+}
 
 void nes_konami_vrc4_device::set_prg()
 {

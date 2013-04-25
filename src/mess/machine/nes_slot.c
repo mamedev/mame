@@ -734,7 +734,7 @@ void device_nes_cart_interface::nes_banks_restore()
 		chr1_x(i, m_chr_orig[i] / 0x400, m_chr_src[i]);
 
 	for (int i = 0; i < 4; i++)
-		set_nt_page(i, m_nt_src[i], m_nt_orig[i], m_nt_writable[i]);
+		set_nt_page(i, m_nt_src[i], m_nt_orig[i] / 0x400, m_nt_writable[i]);
 
 	set_nt_mirroring(m_mirroring);
 }

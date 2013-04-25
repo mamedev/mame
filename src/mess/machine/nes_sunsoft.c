@@ -314,12 +314,12 @@ WRITE8_MEMBER(nes_sunsoft_3_device::write_h)
 			break;
 		case 0x6800:
 			switch (data & 3)
-		{
-			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-		}
+			{
+				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+			}
 			break;
 		case 0x7800:
 			prg16_89ab(data);
