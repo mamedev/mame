@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
     UNDUMPED / TO BE REDUMPED LIST
@@ -18960,7 +18960,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			<feature name="u5" value="SN74LS74AN" />
 			<feature name="u6" value="X24C01P" />
 			<dataarea name="rom" size="524288">
-				<rom name="nhlpa93 h9306.u1" size="524288" crc="cbbf4262" sha1="8efc1cacb079ea223966dda065c16c49e584cac2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="nhlpa93 h9306 (Alt).u1" size="524288" crc="cbbf4262" sha1="8efc1cacb079ea223966dda065c16c49e584cac2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

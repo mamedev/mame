@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 -->
@@ -208,16 +208,16 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<description>Blast Corps (Euro)</description>
 		<year>1997</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="NUS-NBCE-USA"/>
+		<info name="serial" value="NUS-NBCP-USA"/>
 		<part name="cart" interface="n64_cart">
 			<feature name="pcb" value="NUS-01A-01" />
-			<feature name="u1" value="NUS-NBCE-0" />
+			<feature name="u1" value="NUS-NBCP-0" />
 			<feature name="u2" value="BU9850" />
 			<feature name="u3" value="CIC-NUS-6102" />
 			<feature name="cart_model" value="NUS-006(USA)" />
 			<feature name="cart_back_label" value="NUS-USA/CAN" />
 			<dataarea name="rom" size="8388608">
-				<rom name="nus-nbce-0.u1" size="8388608" crc="2ff810cf" sha1="9d42be8a947e64d4862d8a7c1fae57e10c2257ee" offset="000000" />
+				<rom name="nus-nbcp-0.u1" size="8388608" crc="2ff810cf" sha1="9d42be8a947e64d4862d8a7c1fae57e10c2257ee" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2770,7 +2770,7 @@ Info on N64 chip labels (from The Cart Scan Repository)
 		<publisher>Konami</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912">
-				<rom name="castlevania (usa) (rev b).bin" size="12582912" crc="bf911b10" sha1="f542a9d2134a7066676422376a129b1970865f5d" offset="000000" />
+				<rom name="castlevania (usa) (rev a).bin" size="12582912" crc="bf911b10" sha1="f542a9d2134a7066676422376a129b1970865f5d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
