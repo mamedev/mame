@@ -12,6 +12,8 @@ http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
 
 No instructions, no schematics - it's all guesswork.
 
+The cassette saves a noise but it returns a bad load.
+
 
 Version 0.9
 -----------
@@ -23,8 +25,6 @@ Hardware:
 
 The few photos show the CPU and a number of ordinary 74LSxxx chips.
 There is a XTAL of unknown frequency.
-
-There is a cassette interface..
 
 The buttons are labelled CMD, RUN, GOTO, RST, F, MON, PC, NXT but at
 this time not all buttons are identified.
@@ -40,6 +40,9 @@ What is known:
 -- E examine tape file
 -- F fetch (load) from tape
 
+Quickload: Load the program then press Y. There are 6 that work and
+           6 that do nothing.
+
 ToDo:
 - Fix display of 8 round leds
 - Cassette
@@ -47,18 +50,19 @@ ToDo:
 Version V2.0
 ------------
 This used a terminal interface with a few non-standard control codes.
-The pushbuttons and LEDs appear to have been done away with.
+The pushbuttons and LEDs appear to have been done away with. The list
+is the same as on the CD2650.
 
 Commands (must be in uppercase):
 A    Examine memory; press C to alter memory
 B    Set breakpoint?
 C    View breakpoint?
-D    Dump to screen
+D    Dump to screen and tape (at the same time)
 E    Execute
 I    ?
 L    Load
 R    ?
-V    ?
+V    Verify?
 
 ToDo:
 - Cassette
@@ -67,7 +71,10 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/terminal.h"
+#include "sound/wave.h"
 #include "ravens.lh"
 
 
@@ -77,8 +84,8 @@ public:
 	ravens_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG)
-	{ }
+		m_terminal(*this, TERMINAL_TAG),
+		m_cass(*this, "cassette") { }
 
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_READ8_MEMBER(port17_r);
@@ -88,11 +95,25 @@ public:
 	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_MACHINE_RESET(ravens2);
+	DECLARE_READ8_MEMBER(cass_r);
+	DECLARE_WRITE8_MEMBER(cass_w);
+	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	UINT8 m_term_char;
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
+	required_device<cassette_image_device> m_cass;
 };
+
+WRITE8_MEMBER( ravens_state::cass_w )
+{
+	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+}
+
+READ8_MEMBER( ravens_state::cass_r )
+{
+	return (m_cass->input() > 0.03) ? 1 : 0;
+}
 
 WRITE8_MEMBER( ravens_state::display_w )
 {
@@ -173,6 +194,7 @@ static ADDRESS_MAP_START( ravens_mem, AS_PROGRAM, 8, ravens_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x1fff) AM_RAM
+	AM_RANGE( 0x2000, 0x7FFF) AM_RAM // for quickload, optional
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
@@ -180,8 +202,7 @@ static ADDRESS_MAP_START( ravens_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(leds_w) // LED output port
 	AM_RANGE(0x10, 0x15) AM_WRITE(display_w) // 6-led display
 	AM_RANGE(0x17, 0x17) AM_READ(port17_r) // pushbuttons
-	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(ravens_cass_in,ravens_cass_out)
-	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
@@ -189,8 +210,7 @@ static ADDRESS_MAP_START( ravens2_io, AS_IO, 8, ravens_state )
 	AM_RANGE(0x07, 0x07) AM_READ(port07_r)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(port1c_w)
-	//AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(ravens_cass_in,ravens_cass_out)
-	AM_RANGE(0x102, 0x103) AM_NOP // stops error log filling up while using debug
+	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r,cass_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -237,6 +257,90 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(ravens_state, kbd_put)
 };
 
+QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	int i;
+	int quick_addr = 0x100;
+	int exec_addr;
+	int quick_length;
+	UINT8 *quick_data;
+	int read_;
+
+	quick_length = image.length();
+	quick_data = (UINT8*)malloc(quick_length);
+	if (!quick_data)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+		image.message(" Cannot open file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	read_ = image.fread( quick_data, quick_length);
+	if (read_ != quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+		image.message(" Cannot read the file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_data[0] != 0xc6)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+		image.message(" Invalid header");
+		return IMAGE_INIT_FAIL;
+	}
+
+	exec_addr = quick_data[1] * 256 + quick_data[2];
+
+	if (exec_addr >= quick_length)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+		image.message(" Exec address beyond end of file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length < 0x0900)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.message(" File too short");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (quick_length > 0x8000)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.message(" File too long");
+		return IMAGE_INIT_FAIL;
+	}
+
+//	read_ = 0x1000;
+//	if (quick_length < 0x1000)
+//		read_ = quick_length;
+
+	for (i = quick_addr; i < read_; i++)
+		space.write_byte(i, quick_data[i]);
+
+//	read_ = 0x1780;
+//	if (quick_length < 0x1780)
+//		read_ = quick_length;
+
+//	if (quick_length > 0x157f)
+//		for (i = 0x1580; i < read_; i++)
+//			space.write_byte(i, quick_data[i]);
+
+//	if (quick_length > 0x17ff)
+//		for (i = 0x1800; i < quick_length; i++)
+//			space.write_byte(i, quick_data[i]);
+
+	/* display a message about the loaded quickload */
+	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+	// Start the quickload
+	m_maincpu->set_pc(exec_addr);
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( ravens, ravens_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
@@ -245,6 +349,15 @@ static MACHINE_CONFIG_START( ravens, ravens_state )
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_ravens)
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ravens2, ravens_state )
@@ -256,6 +369,12 @@ static MACHINE_CONFIG_START( ravens2, ravens_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
+
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -272,5 +391,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME     PARENT   COMPAT   MACHINE  INPUT   CLASS        INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1985, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1984, ravens,  0,       0,       ravens,  ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V0.9", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
 COMP( 1985, ravens2, ravens,  0,       ravens2, ravens, driver_device, 0, "Joseph Glagla and Dieter Feiler", "Ravensburger Selbstbaucomputer V2.0", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

@@ -8,11 +8,9 @@
         The system only uses 1000-14FF for videoram and 17F0-17FF for
         scratch ram. All other ram is optional.
 
-        All commands must be in upper case. They are A,B,C,D,E,I,L,R,V.
-        L,D,V appear to be commands to load, dump and verify tapes.
-        The in and output lines for tapes are SENSE and FLAG, which is
-        the usual with S2650 systems. The remaining commands have
-        unknown functions.
+        All commands must be in upper case. See the RAVENS2 driver for
+        a list of the monitor commands. Some commands have slightly different
+        numeric inputs, and the D command doesn't seem to work.
 
         TODO
         - Lots, probably. The computer is a complete mystery. No pictures,

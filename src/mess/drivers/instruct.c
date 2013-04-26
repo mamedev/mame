@@ -43,6 +43,7 @@
       not in the matrix, but are connected to hardware directly. This needs
       to be emulated. (SENS key done)
     - Connect 10 toggle switches and 10 round red leds.
+    - Hook up the Interrupt Block unit (no info available).
 
 ****************************************************************************/
 
@@ -59,7 +60,8 @@ public:
 	instruct_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_ram(*this, "p_ram"),
+	m_p_loram(*this, "loram"),
+	m_p_hiram(*this, "hiram"),
 	m_cass(*this, "cassette")
 	{ }
 
@@ -71,11 +73,13 @@ public:
 	DECLARE_WRITE8_MEMBER(portf9_w);
 	DECLARE_WRITE8_MEMBER(portfa_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( instruct );
+	INTERRUPT_GEN_MEMBER(t2l_int);
 	virtual void machine_reset();
 	UINT8 m_digit;
 	bool m_valid_digit;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_loram;
+	required_shared_ptr<UINT8> m_p_hiram;
 	required_device<cassette_image_device> m_cass;
 };
 
@@ -139,12 +143,17 @@ READ8_MEMBER( instruct_state::sense_r )
 	return ( (m_cass->input() > 0.03) ? 1 : 0) | (ioport("HW")->read() & 1);
 }
 
+INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
+{
+	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x2e); // unknown vector, guess
+}
+
 static ADDRESS_MAP_START( instruct_mem, AS_PROGRAM, 8, instruct_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("p_ram") // 512 bytes onboard ram
+	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("loram") // 512 bytes onboard ram
 	AM_RANGE(0x0200, 0x177f) AM_RAM // expansion ram needed by quickloads
 	AM_RANGE(0x1780, 0x17ff) AM_RAM // 128 bytes in s2656 chip
-	AM_RANGE(0x1800, 0x1fff) AM_ROM
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("hiram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( instruct_io, AS_IO, 8, instruct_state )
@@ -212,9 +221,10 @@ INPUT_PORTS_END
 
 void instruct_state::machine_reset()
 {
-	// copy the roms into ram so it can boot
-	UINT8* ROM = memregion("maincpu")->base();
-	memcpy(m_p_ram, ROM+0x1800, 0x0200);
+	UINT8* rom = memregion("user1")->base();
+	memcpy(m_p_loram, rom, 0x200);
+	memcpy(m_p_hiram, rom, 0x800);
+	m_maincpu->reset();
 }
 
 QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
@@ -292,6 +302,7 @@ static MACHINE_CONFIG_START( instruct, instruct_state )
 	MCFG_CPU_ADD("maincpu",S2650, XTAL_3_579545MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(instruct_mem)
 	MCFG_CPU_IO_MAP(instruct_io)
+	MCFG_CPU_PERIODIC_INT_DRIVER(instruct_state, t2l_int, 50)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_instruct)
@@ -308,8 +319,8 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( instruct )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "instruct.rom", 0x1800, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
+	ROM_REGION( 0x0800, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "instruct.rom", 0x0000, 0x0800, CRC(131715a6) SHA1(4930b87d09046113ab172ba3fb31f5e455068ec7) )
 ROM_END
 
 /* Driver */
