@@ -105,8 +105,8 @@ public:
 	int m_speed_meter;
 	int m_brake_meter;
 
-	DECLARE_READ32_MEMBER(mcu_comm_r);
-	DECLARE_WRITE32_MEMBER(mcu_comm_w);
+	DECLARE_READ8_MEMBER(mcu_comm_r);
+	DECLARE_WRITE8_MEMBER(mcu_comm_w);
 	DECLARE_READ32_MEMBER(dsp_shared_r);
 	DECLARE_WRITE32_MEMBER(dsp_shared_w);
 	DECLARE_READ32_MEMBER(snd_share_r);
@@ -114,6 +114,7 @@ public:
 	DECLARE_READ8_MEMBER(jc_pcbid_r);
 	DECLARE_READ8_MEMBER(jc_lan_r);
 	DECLARE_WRITE8_MEMBER(jc_lan_w);
+	DECLARE_WRITE8_MEMBER(jc_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(dendego_speedmeter_w);
 	DECLARE_WRITE8_MEMBER(dendego_brakemeter_w);
 
@@ -166,8 +167,6 @@ public:
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri);
 	void taitojc_clear_frame();
 	void debug_dsp_command();
-	UINT8 mcu_comm_reg_r(address_space &space, int reg);
-	void mcu_comm_reg_w(address_space &space, int reg, UINT8 data);
 };
 
 

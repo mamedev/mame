@@ -12,10 +12,11 @@ Taito custom chips on this hardware:
 - TC0870HVP      : Vertex processor?
 
 TODO:
-- games are running too slow compared to pcb recordings, easily noticeable on sidebs/sidebs2
+- games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
+  for example the selection screens are too fast, and the driving is almost twice as slow
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
-- dendego attract mode train doesn't ride
+- dendego attract mode train doesn't ride, demo mode doesn't set the throttle, but it does set the brake pressure
 - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
@@ -567,9 +568,6 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 	}
 #endif
 
-	if (offset == 0x1ff8/4)
-		m_maincpu->set_input_line(6, CLEAR_LINE);
-
 	if (offset == 0x1ffc/4)
 	{
 		if ((data & 0x80000) == 0)
@@ -599,99 +597,40 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 
 
 
-UINT8 taitojc_state::mcu_comm_reg_r(address_space &space, int reg)
+READ8_MEMBER(taitojc_state::mcu_comm_r)
 {
-	UINT8 r = 0;
-
-	switch (reg)
+	switch (offset)
 	{
 		case 0x03:
-		{
-			r = m_mcu_data_main;
-			break;
-		}
+			return m_mcu_data_main;
+
 		case 0x04:
-		{
-			r = m_mcu_comm_main | 0x14;
-			break;
-		}
+			return m_mcu_comm_main | 0x14;
+
 		default:
-		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, space.device().safe_pc());
+			logerror("mcu_comm_r: %02X at %08X\n", offset, space.device().safe_pc());
 			break;
-		}
 	}
 
-	return r;
+	return 0;
 }
 
-void taitojc_state::mcu_comm_reg_w(address_space &space, int reg, UINT8 data)
+WRITE8_MEMBER(taitojc_state::mcu_comm_w)
 {
-	switch (reg)
+	switch (offset)
 	{
 		case 0x00:
-		{
 			m_mcu_data_hc11 = data;
 			m_mcu_comm_hc11 &= ~0x04;
 			m_mcu_comm_main &= ~0x20;
 			break;
-		}
+
 		case 0x04:
-		{
 			break;
-		}
+
 		default:
-		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, space.device().safe_pc());
+			logerror("mcu_comm_w: %02X, %02X at %08X\n", offset, data, space.device().safe_pc());
 			break;
-		}
-	}
-}
-
-READ32_MEMBER(taitojc_state::mcu_comm_r)
-{
-	UINT32 r = 0;
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mcu_comm_reg_r(space, reg + 0) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mcu_comm_reg_r(space, reg + 1) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mcu_comm_reg_r(space, reg + 2) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mcu_comm_reg_r(space, reg + 3) << 0;
-	}
-
-	return r;
-}
-
-WRITE32_MEMBER(taitojc_state::mcu_comm_w)
-{
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		mcu_comm_reg_w(space, reg + 0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mcu_comm_reg_w(space, reg + 1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mcu_comm_reg_w(space, reg + 2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mcu_comm_reg_w(space, reg + 3, (data >> 0) & 0xff);
 	}
 }
 
@@ -734,6 +673,14 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 }
 
 
+WRITE8_MEMBER(taitojc_state::jc_irq_ack_w)
+{
+	// gets written to at the end of irq6 routine
+	// writes $02 or $06, depending on a value in DSP RAM, what does it mean?
+	m_maincpu->set_input_line(6, CLEAR_LINE);
+}
+
+
 /*
 
 Some games (Dangerous Curves, Side by Side, Side by Side 2) were released as Twin cabinets,
@@ -761,11 +708,11 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
 	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_SHARE("objlist")
 	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r, 0xffffffff)
-	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
+	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE8(mcu_comm_r, mcu_comm_w, 0xffffffff)
 	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_SHARE("palette_ram")
 	AM_RANGE(0x06600000, 0x0660001f) AM_DEVREADWRITE8_LEGACY("tc0640fio", tc0640fio_r, tc0640fio_w, 0xff000000)
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
+	AM_RANGE(0x06800000, 0x06800003) AM_WRITE8(jc_irq_ack_w, 0x00ff0000)
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
@@ -987,11 +934,8 @@ WRITE16_MEMBER(taitojc_state::dsp_texture_w)
 	int x, y;
 	//mame_printf_debug("texture write %08X, %04X\n", dsp_addr1, data);
 
-	x = (m_dsp_tex_offset >> 0) & 0x1f;
-	y = (m_dsp_tex_offset >> 5) & 0x1f;
-
-	x += (m_dsp_tex_offset & 0x400) ? 0x20 : 0;
-	y += (m_dsp_tex_offset & 0x800) ? 0x20 : 0;
+	x = (m_dsp_tex_offset >> 0 & 0x1f) | (m_dsp_tex_offset >> 5 & 0x20);
+	y = (m_dsp_tex_offset >> 5 & 0x1f) | (m_dsp_tex_offset >> 6 & 0x20);
 
 	index = (((m_texture_y * 32) + y) * 2048) + ((m_texture_x * 32) + x);
 	m_texture[index] = data & 0xff;
@@ -1039,7 +983,7 @@ READ16_MEMBER(taitojc_state::dsp_to_main_r)
 
 WRITE16_MEMBER(taitojc_state::dsp_to_main_w)
 {
-	m_maincpu->set_input_line(6, ASSERT_LINE);
+	m_maincpu->set_input_line(6, ASSERT_LINE); // probably not correct to do it here
 
 	COMBINE_DATA(&m_dsp_shared_ram[0x7fe]);
 }
@@ -1090,7 +1034,9 @@ static INPUT_PORTS_START( common )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x02, 0x02, "Dev Skip RAM Test" ) // skips mainram test on page 1 of POST
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1115,7 +1061,9 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // debug related in dendego/sidebs
+	PORT_DIPNAME( 0x40, 0x40, "Dev Debug" ) // debug related in dendego/sidebs
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -1247,7 +1195,7 @@ void taitojc_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
 {
-	device.execute().set_input_line_and_vector(2, HOLD_LINE, 130);
+	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
 }
 
 static const tc0640fio_interface taitojc_io_intf =
@@ -1268,7 +1216,7 @@ static MACHINE_CONFIG_START( taitojc, taitojc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state,  taitojc_vblank)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
 
 	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // 8MHz, MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
