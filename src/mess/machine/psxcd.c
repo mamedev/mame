@@ -441,7 +441,7 @@ void psxcd_device::cdcmd_play()
 	if (!curpos.w)
 		curpos.b[S] = 2;
 
-	verboselog(machine(), 1, "psxcd: play %02x %02x %02x => %d\n", loc.b[M], loc.b[S], loc.b[F], msf_to_lba_ps(loc.w));
+	verboselog(machine(), 1, "psxcd: play %02x %02x %02x => %d\n", decimal_to_bcd(loc.b[M]), decimal_to_bcd(loc.b[S]), decimal_to_bcd(loc.b[F]), msf_to_lba_ps(loc.w));
 
 	stop_read();
 	start_play();
@@ -593,7 +593,7 @@ void psxcd_device::cdcmd_getlocl()
 void psxcd_device::cdcmd_getlocp()
 {
 	CDPOS tloc, start;
-	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(loc.w) + 150) + 1;
+	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(loc.w)) + 1;
 	start.w = (track == 1) ? 0x000200 : lba_to_msf_ps(cdrom_get_track_start(m_cdrom_handle, track - 1));
 	tloc.w = sub_loc(loc, start);
 
@@ -872,17 +872,33 @@ void psxcd_device::send_result(UINT8 res, UINT8 *data, int sz, int delay, UINT8 
 
 void psxcd_device::start_dma(UINT8 *mainram, UINT32 size)
 {
+	UINT32 sector_size;
 	verboselog(machine(), 1, "psxcd: start dma %d bytes at %d\n", size, m_transcurr);
 
 	if(!m_dmaload)
 		return;
 
-	if(size > (raw_sector_size - m_transcurr))
-		size = (raw_sector_size - m_transcurr);
+	switch(mode & mode_size_mask)
+	{
+		case 0x00:
+		default:
+			sector_size = 2048 + 24;
+			break;
+		case 0x10:
+			sector_size = 2328 + 12;
+			break;
+		case 0x20:
+			sector_size = 2340 + 12;
+			break;
+	}
+
+	if(size > (sector_size - m_transcurr))
+		size = (sector_size - m_transcurr);
 
 	memcpy(mainram, &m_transbuf[m_transcurr], size);
 	m_transcurr += size;
-	if(raw_sector_size <= m_transcurr)
+
+	if(sector_size <= m_transcurr)
 	{
 		m_dmaload = false;
 		m_regs.sr &= ~0x40;
@@ -1082,7 +1098,7 @@ void psxcd_device::start_read()
 
 void psxcd_device::start_play()
 {
-	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w) + 150);
+	UINT8 track = cdrom_get_track(m_cdrom_handle, msf_to_lba_ps(curpos.w));
 
 	if(cdrom_get_track_type(m_cdrom_handle, track) != CD_TRACK_AUDIO)
 		verboselog(machine(), 0, "psxcd: playing data track\n");
