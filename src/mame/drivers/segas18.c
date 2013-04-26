@@ -2331,7 +2331,7 @@ DRIVER_INIT_MEMBER(segas18_state,wwally)
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,              INPUT,    INIT,                             MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR, NAME,      PARENT,   MACHINE,              INPUT,    INIT,                       MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 2 Players, FD1094 317-0154)", 0 )
 GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (World, 3 Players, FD1094 317-0148)", 0 )
 GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state,generic_5874, ROT0,   "Sega", "Alien Storm (US, 3 Players, FD1094 317-0147)", 0 )
@@ -2352,7 +2352,7 @@ GAME( 1990, lghostu,   lghost,   system18_fd1094,      lghost,   segas18_state,l
 GAME( 1990, mwalk,     0,        system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (World, FD1094/8751 317-0159)", 0 )
 GAME( 1990, mwalku,    mwalk,    system18_fd1094_i8751,mwalka,   segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (US, FD1094/8751 317-0158)", 0 )
 GAME( 1990, mwalkj,    mwalk,    system18_fd1094_i8751,mwalk,    segas18_state,generic_5874, ROT0,   "Sega", "Michael Jackson's Moonwalker (Japan, FD1094/8751 317-0157)", 0 )
-GAME( 1989, pontoon,   0,        system18,             shdancer, segas18_state,generic_5874, ROT0,   "Sega", "Pontoon", GAME_NOT_WORKING )
+GAME( 1989, pontoon,   0,        system18_fd1094,      shdancer, segas18_state,generic_5874, ROT0,   "Sega", "Pontoon (FD1094 317-0153)", GAME_NOT_WORKING ) // satellite/networked gambling game?
 GAME( 1989, shdancer,  0,        system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (World)", 0 )
 GAME( 1989, shdancerj, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (Japan)", 0 )
 GAME( 1989, shdancer1, shdancer, system18,             shdancer, segas18_state,generic_shad, ROT0,   "Sega", "Shadow Dancer (US)", 0 )
