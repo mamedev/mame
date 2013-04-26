@@ -108,10 +108,10 @@ private:
 	UINT8 cmdbuf[64], mode, secbuf[sector_buffer_size][raw_sector_size];
 	UINT8 filter_file, filter_channel, lastsechdr[8], status;
 	int rdp;
-	UINT8 sechead, sectail;
+	UINT8 m_cursec, sectail;
 	UINT16 m_transcurr;
 	UINT8 m_transbuf[raw_sector_size];
-	command_result *res_queue;
+	command_result *res_queue, *m_int1;
 
 	struct {
 		UINT8 sr, ir, imr;

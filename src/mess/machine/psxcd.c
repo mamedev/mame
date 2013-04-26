@@ -148,10 +148,11 @@ void psxcd_device::device_reset()
 	m_regs.sr = 0x18;
 	m_regs.ir = 0;
 	m_regs.imr = 0x1f;
-	sechead = 0;
 	sectail = 0;
+	m_cursec = 0;
 	m_mute = false;
 	m_dmaload = false;
+	m_int1 = NULL;
 	curpos.w = 0;
 }
 
@@ -281,14 +282,12 @@ WRITE8_MEMBER( psxcd_device::write )
 		case 0x03:
 			if((data & 0x80) && !m_dmaload)
 			{
-				if(sechead == sectail)
-					break;
-
 				m_dmaload = true;
-				memcpy(m_transbuf, secbuf[sechead], raw_sector_size);
+				memcpy(m_transbuf, secbuf[m_cursec], raw_sector_size);
 				m_regs.sr |= 0x40;
-				sechead++;
-				sechead %= sector_buffer_size;
+
+				m_cursec++;
+				m_cursec %= sector_buffer_size;
 
 				switch(mode & mode_size_mask)
 				{
@@ -325,6 +324,9 @@ WRITE8_MEMBER( psxcd_device::write )
 				if(res_queue && !m_regs.ir)
 				{
 					command_result *res = res_queue;
+					if(res == m_int1)
+						m_int1 = NULL;
+
 					res_queue = res->next;
 					global_free(res);
 					m_regs.sr &= ~0x20;
@@ -935,12 +937,13 @@ void psxcd_device::read_sector()
 			}
 			else
 			{
-				cmd_complete(prepare_result(intr_dataready));
+				if(!m_int1)
+					m_cursec = sectail;
+
+				m_int1 = prepare_result(intr_dataready);
+				cmd_complete(m_int1);
 				sectail++;
 				sectail %= sector_buffer_size;
-
-				if(sectail == sechead)
-					verboselog(machine(), 0, "psxcd: sector buffer overrun\n");
 			}
 
 			curpos.b[F]++;
@@ -1083,7 +1086,7 @@ void psxcd_device::start_read()
 	send_result(intr_complete);
 	status |= status_reading;	
 
-	sechead=sectail=0;
+	m_cursec=sectail=0;
 
 	unsigned int cyc=read_sector_cycles;
 	if (mode&mode_double_speed) cyc>>=1;
@@ -1105,7 +1108,7 @@ void psxcd_device::start_play()
 
 	status|=status_playing;
 
-	sechead=sectail=0;
+	m_cursec=sectail=0;
 
 	if (mode&mode_autopause)
 	{
