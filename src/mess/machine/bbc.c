@@ -1292,7 +1292,7 @@ const uPD7002_interface bbc_uPD7002 =
 
 void bbc_state::MC6850_Receive_Clock(int new_clock)
 {
-	m_rxd = new_clock;
+	m_rxd_cass = new_clock;
 
 	//
 	// Somehow the "serial processor" generates 16 clock signals towards
@@ -1317,7 +1317,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 			//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
 			logerror ("Cassette length %d\n",m_wav_len);
 			m_nr_high_tones = 0;
-			m_dcd = 0;
+			m_dcd_cass = 0;
 			m_len0=0;
 			m_len1=0;
 			m_len2=0;
@@ -1339,7 +1339,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 			/* Clock a 0 onto the serial line */
 			logerror("Serial value 0\n");
 			m_nr_high_tones = 0;
-			m_dcd = 0;
+			m_dcd_cass = 0;
 			MC6850_Receive_Clock(0);
 			m_len0=0;
 			m_len1=0;
@@ -1354,7 +1354,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 			m_nr_high_tones++;
 			if ( m_nr_high_tones > 100 )
 			{
-				m_dcd = 1;
+				m_dcd_cass = 1;
 			}
 			MC6850_Receive_Clock(1);
 			m_len0=0;
@@ -1987,10 +1987,10 @@ DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcb_cart )
 DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
 	m_Master=0;
-	m_rxd = 0;
-	m_dcd = 0;
-	m_txd = 0;
-	m_cts = 1;
+	m_rxd_cass = 0;
+	m_rxd_rs423 = 0;
+	m_dcd_cass = 0;
+	m_cts_rs423 = 1;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
@@ -1999,10 +1999,10 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 DRIVER_INIT_MEMBER(bbc_state,bbcm)
 {
 	m_Master=1;
-	m_rxd = 0;
-	m_dcd = 0;
-	m_txd = 0;
-	m_cts = 1;
+	m_rxd_cass = 0;
+	m_rxd_rs423 = 0;
+	m_dcd_cass = 0;
+	m_cts_rs423 = 1;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));

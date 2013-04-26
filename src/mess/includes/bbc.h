@@ -161,10 +161,10 @@ public:
 	int m_len3;
 	int m_mc6850_clock;
 	UINT8 m_serproc_data;
-	int m_dcd;
-	int m_rxd;
-	int m_txd;
-	int m_cts;
+	int m_dcd_cass;
+	int m_rxd_cass;
+	int m_rxd_rs423;
+	int m_cts_rs423;
 	UINT32 m_nr_high_tones;
 	emu_timer *m_tape_timer;
 
@@ -327,9 +327,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
-	DECLARE_READ_LINE_MEMBER(bbc_rxd_r) { return m_rxd; }
-	DECLARE_READ_LINE_MEMBER(bbc_dcd_r) { return m_dcd; }
-	DECLARE_READ_LINE_MEMBER(bbc_cts_r) { return m_cts; }
+	DECLARE_READ_LINE_MEMBER(bbc_rxd_r) { return ( m_serproc_data & 0x40 ) ? m_rxd_rs423 : m_rxd_cass; }
+	DECLARE_READ_LINE_MEMBER(bbc_dcd_r) { return ( m_serproc_data & 0x40 ) ? 0 : m_dcd_cass; }
+	DECLARE_READ_LINE_MEMBER(bbc_cts_r) { return ( m_serproc_data & 0x40 ) ? m_cts_rs423 : 1; }
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
 
