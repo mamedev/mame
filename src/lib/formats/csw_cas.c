@@ -57,7 +57,7 @@ static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
 	UINT8       *in_ptr;
 	int         bsize=0;
 
-	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER) ) )
+	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER)-1 ) )
 	{
 		LOG_FORMATS( "csw_cas_to_wav_size: cassette image has incompatible header\n" );
 		goto cleanup;
