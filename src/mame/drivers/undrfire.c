@@ -725,7 +725,7 @@ static const tc0480scp_interface undrfire_tc0480scp_intf =
 static MACHINE_CONFIG_START( undrfire, undrfire_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
@@ -754,11 +754,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cbombers, undrfire_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpua_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, 16000000)   /* 16 MHz */
+	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 

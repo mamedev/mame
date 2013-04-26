@@ -5540,7 +5540,7 @@ ROM_END
    ROM5   C409
    ROM6   59B6
 
-Note: There is a chance that the "2nd Edition" graphics roms night be different.
+Note: There is a chance that the "2nd Edition" graphics roms might be different.
 */
 ROM_START( spooky )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -5633,7 +5633,7 @@ ROM_END
 
 /* Fruit Bonus 3G
 
-Version 1.0.1 roms need dumping. Program ROM was reflashed (updated) to v1.0.3
+Version 1.0.1 roms need dumping. The board was reflashed (updated) to v1.0.3
 
    ROM    SUM16 printed on rom label
    --------------------------------------------
