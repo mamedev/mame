@@ -40,28 +40,31 @@ static UINT32 get_leuint32(const void *ptr)
 
 static int mycaslen;
 
-static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
-UINT32 SampleRate;
-UINT32 NumberOfPulses;
-UINT8  MajorRevision;
-UINT8  MinorRevision;
-UINT8  CompressionType;
-UINT8  Flags;
-UINT8  HeaderExtensionLength;
-UINT8 *gz_ptr = NULL;
+static int csw_cas_to_wav_size( const UINT8 *casdata, int caslen )
+{
+	UINT32 SampleRate;
+	UINT32 NumberOfPulses;
+	UINT8  MajorRevision;
+	UINT8  MinorRevision;
+	UINT8  CompressionType;
+	UINT8  Flags;
+	UINT8  HeaderExtensionLength;
+	UINT8  *gz_ptr = NULL;
 
-int         total_size;
-z_stream    d_stream;
-int         err;
-UINT8       *in_ptr;
-int         bsize=0;
+	int         total_size;
+	z_stream    d_stream;
+	int         err;
+	UINT8       *in_ptr;
+	int         bsize=0;
 
-	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER) ) ) {
+	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER) ) )
+	{
 		LOG_FORMATS( "csw_cas_to_wav_size: cassette image has incompatible header\n" );
 		goto cleanup;
 	}
 
-	if (casdata[0x16]!=0x1a) {
+	if (casdata[0x16]!=0x1a)
+	{
 		LOG_FORMATS( "csw_cas_to_wav_size: Terminator Code Not Found\n" );
 		goto cleanup;
 	}
@@ -71,7 +74,8 @@ int         bsize=0;
 
 	LOG_FORMATS("Version %d : %d\n",MajorRevision,MinorRevision);
 
-	if (casdata[0x17]!=2){
+	if (casdata[0x17]!=2)
+	{
 		LOG_FORMATS( "csw_cas_to_wav_size: Unsuported Major Version\n" );
 		goto cleanup;
 	}
@@ -110,7 +114,8 @@ int         bsize=0;
 	d_stream.data_type=0;
 
 	err = inflateInit( &d_stream );
-	if ( err != Z_OK ) {
+	if ( err != Z_OK )
+	{
 		LOG_FORMATS( "inflateInit2 error: %d\n", err );
 		goto cleanup;
 	}
@@ -122,9 +127,11 @@ int         bsize=0;
 		d_stream.next_out = gz_ptr;
 		d_stream.avail_out=1;
 		err=inflate( &d_stream, Z_SYNC_FLUSH );
-		if (err==Z_OK) {
+		if (err==Z_OK)
+		{
 			bsize=gz_ptr[0];
-			if (bsize==0) {
+			if (bsize==0)
+			{
 				d_stream.avail_out=4;
 				d_stream.next_out = gz_ptr;
 				err=inflate( &d_stream, Z_SYNC_FLUSH );
@@ -135,55 +142,52 @@ int         bsize=0;
 	}
 	while (err==Z_OK);
 
-	if ( err != Z_STREAM_END ) {
+	if ( err != Z_STREAM_END )
+	{
 		LOG_FORMATS( "inflate error: %d\n", err );
 		goto cleanup;
 	}
 
 	err = inflateEnd( &d_stream );
-	if ( err != Z_OK ) {
+	if ( err != Z_OK )
+	{
 		LOG_FORMATS( "inflateEnd error: %d\n", err );
 		goto cleanup;
 	}
 
-
-
-
-
-
-	if ( gz_ptr ) {
+	if ( gz_ptr )
+	{
 		free( gz_ptr );
 		gz_ptr = NULL;
 	}
-
-
 
 	return total_size;
 
 cleanup:
-	if ( gz_ptr ) {
+	if ( gz_ptr )
+	{
 		free( gz_ptr );
 		gz_ptr = NULL;
 	}
 	return -1;
-
 }
 
-static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
-UINT32 SampleRate;
-UINT32 NumberOfPulses;
-UINT8  CompressionType;
-UINT8  Flags;
-UINT8  HeaderExtensionLength;
-INT8   Bit;
+static int csw_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes )
+{
+	UINT32 SampleRate;
+	UINT32 NumberOfPulses;
+	UINT8  CompressionType;
+	UINT8  Flags;
+	UINT8  HeaderExtensionLength;
+	INT8   Bit;
 
-UINT8 *gz_ptr = NULL;
-int         total_size;
-z_stream    d_stream;
-int         err;
-UINT8       *in_ptr;
-int         bsize=0;
-int     i;
+	UINT8 *gz_ptr = NULL;
+	int         total_size;
+	z_stream    d_stream;
+	int         err;
+	UINT8       *in_ptr;
+	int         bsize=0;
+	int     i;
 
 
 	LOG_FORMATS("Length %d\n",length);
@@ -201,7 +205,9 @@ int     i;
 	if ((Flags&0)==0)
 	{
 		Bit=-100;
-	} else {
+	}
+	else
+	{
 		Bit=100;
 	}
 
@@ -212,7 +218,6 @@ int     i;
 	in_ptr = (UINT8*) bytes+0x34+HeaderExtensionLength;
 
 	gz_ptr = (UINT8*)malloc( 8 );
-
 
 	d_stream.next_in = (unsigned char *)in_ptr;
 	d_stream.avail_in = mycaslen - ( in_ptr - bytes );
@@ -228,7 +233,8 @@ int     i;
 	d_stream.data_type=0;
 
 	err = inflateInit( &d_stream );
-	if ( err != Z_OK ) {
+	if ( err != Z_OK )
+	{
 		LOG_FORMATS( "inflateInit2 error: %d\n", err );
 		goto cleanup;
 	}
@@ -240,9 +246,11 @@ int     i;
 		d_stream.next_out = gz_ptr;
 		d_stream.avail_out=1;
 		err=inflate( &d_stream, Z_SYNC_FLUSH );
-		if (err==Z_OK) {
+		if (err==Z_OK)
+		{
 			bsize=gz_ptr[0];
-			if (bsize==0) {
+			if (bsize==0)
+			{
 				d_stream.avail_out=4;
 				d_stream.next_out = gz_ptr;
 				err=inflate( &d_stream, Z_SYNC_FLUSH );
@@ -257,39 +265,33 @@ int     i;
 	}
 	while (err==Z_OK);
 
-	if ( err != Z_STREAM_END ) {
+	if ( err != Z_STREAM_END )
+	{
 		LOG_FORMATS( "inflate error: %d\n", err );
 		goto cleanup;
 	}
 
 	err = inflateEnd( &d_stream );
-	if ( err != Z_OK ) {
+	if ( err != Z_OK )
+	{
 		LOG_FORMATS( "inflateEnd error: %d\n", err );
 		goto cleanup;
 	}
 
-
-
-
-
-
-	if ( gz_ptr ) {
+	if ( gz_ptr )
+	{
 		free( gz_ptr );
 		gz_ptr = NULL;
 	}
 
-
-
-
 	return length;
 
-
-
-	cleanup:
-		if ( gz_ptr ) {
-			free( gz_ptr );
-			gz_ptr = NULL;
-		}
+cleanup:
+	if ( gz_ptr )
+	{
+		free( gz_ptr );
+		gz_ptr = NULL;
+	}
 	return -1;
 }
 
@@ -304,11 +306,13 @@ static const struct CassetteLegacyWaveFiller csw_legacy_fill_wave = {
 	0                       /* trailer_samples */
 };
 
-static casserr_t csw_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts ) {
+static casserr_t csw_cassette_identify( cassette_image *cassette, struct CassetteOptions *opts )
+{
 	return cassette_legacy_identify( cassette, opts, &csw_legacy_fill_wave );
 }
 
-static casserr_t csw_cassette_load( cassette_image *cassette ) {
+static casserr_t csw_cassette_load( cassette_image *cassette )
+{
 	return cassette_legacy_construct( cassette, &csw_legacy_fill_wave );
 }
 
