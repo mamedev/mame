@@ -833,8 +833,10 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
-	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP(taitogn_map)
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)

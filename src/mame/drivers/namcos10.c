@@ -595,8 +595,10 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 static MACHINE_CONFIG_START( namcos10_memm, namcos10_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
-	MCFG_PSX_RAM_SIZE( 0x1000000 )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("16M")
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
@@ -610,8 +612,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
-	MCFG_PSX_RAM_SIZE( 0x1000000 )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("16M")
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 

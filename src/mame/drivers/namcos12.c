@@ -1044,9 +1044,12 @@ class namcos12_state : public driver_device
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rtc(*this, "rtc"),
-			m_sharedram(*this, "sharedram") ,
-		m_maincpu(*this, "maincpu") { }
+		m_rtc(*this, "rtc"),
+		m_sharedram(*this, "sharedram") ,
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "maincpu:ram")
+	{
+	}
 
 	required_device<rtc4543_device> m_rtc;
 	required_shared_ptr<UINT32> m_sharedram;
@@ -1102,6 +1105,7 @@ public:
 	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
 	void system11gun_install(  );
 	required_device<psxcpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1193,7 +1197,7 @@ void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, IN
 	INT32 n_ramleft;
 
 	// TODO: the check for going past the end of ram should be in dma.c
-	UINT32 m_n_psxramsize = m_maincpu->ram_size();
+	UINT32 m_n_psxramsize = m_ram->size();
 
 	if(m_has_tektagt_dma && !m_n_dmaoffset)
 	{
@@ -1621,8 +1625,10 @@ DRIVER_INIT_MEMBER(namcos12_state,ghlpanic)
 static MACHINE_CONFIG_START( coh700, namcos12_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
-	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 

@@ -535,7 +535,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_psxirq(*this, ":maincpu:irq"),
 		m_cr589(*this, ":cdrom"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "maincpu:ram")
+	{
+	}
 
 	required_device<psxirq_device> m_psxirq;
 
@@ -667,6 +670,7 @@ public:
 	void mamboagg_output_callback( int offset, int data );
 	void punchmania_output_callback( int offset, int data );
 	required_device<psxcpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 void ATTR_PRINTF(3,4)  ksys573_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -1462,7 +1466,7 @@ void ksys573_state::sys573_vblank(screen_device &screen, bool vblank_state)
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = m_maincpu->ram();
+		UINT32 *p_n_psxram = (UINT32 *) m_ram->pointer();
 
 		/* install cd */
 
@@ -1486,7 +1490,7 @@ void ksys573_state::sys573_vblank(screen_device &screen, bool vblank_state)
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = m_maincpu->ram();
+		UINT32 *p_n_psxram = (UINT32 *) m_ram->pointer();
 
 		/* 8001f850: jal $8003221c */
 		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
@@ -3056,8 +3060,10 @@ static const adc083x_interface konami573_adc_interface = {
 static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
-	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( konami573_map )
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( ksys573_state::cdrom_dma_read ), (ksys573_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( ksys573_state::cdrom_dma_write ), (ksys573_state *) owner ) )

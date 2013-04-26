@@ -817,7 +817,7 @@ device_t *device_t::replace_subdevice(device_t &old, device_type type, const cha
 	// iterate over all devices and remove any references to the old device
 	device_iterator iter(mconfig().root_device());
 	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
-		scan->m_device_map.remove(&old);
+		scan->m_device_map.reset(); //remove(&old);
 
 	// create a new device, and substitute it for the old one
 	device_t *device = (*type)(mconfig(), tag, this, clock);
@@ -840,7 +840,7 @@ void device_t::remove_subdevice(device_t &device)
 	// iterate over all devices and remove any references
 	device_iterator iter(mconfig().root_device());
 	for (device_t *scan = iter.first(); scan != NULL; scan = iter.next())
-		scan->m_device_map.remove(&device);
+		scan->m_device_map.reset(); //remove(&device);
 
 	// remove from our list
 	m_subdevice_list.remove(device);

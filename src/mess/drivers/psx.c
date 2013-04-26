@@ -25,7 +25,10 @@ class psx1_state : public driver_device
 public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "maincpu:ram")
+	{
+	}
 
 	UINT8 *m_exe_buffer;
 	int m_exe_size;
@@ -52,6 +55,7 @@ public:
 	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( psx_exe_load );
 	required_device<psxcpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
 };
 
 
@@ -113,13 +117,6 @@ int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len
 	if( n_len >= sizeof( struct PSXEXE_HEADER ) &&
 		memcmp( psxexe_header->id, "PS-X EXE", 8 ) == 0 )
 	{
-		UINT8 *p_ram;
-		UINT8 *p_psxexe;
-		UINT32 n_stack;
-		UINT32 n_ram;
-		UINT32 n_address;
-		UINT32 n_size;
-
 		psxexe_conv32( &psxexe_header->text );
 		psxexe_conv32( &psxexe_header->data );
 		psxexe_conv32( &psxexe_header->pc0 );
@@ -146,13 +143,13 @@ int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len
 		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
 		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
 
-		p_ram = (UINT8 *)m_maincpu->ram();
-		n_ram = m_maincpu->ram_size();
+		UINT8 *p_ram = m_ram->pointer();
+		UINT32 n_ram = m_ram->size();
 
-		p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
+		UINT8 *p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
 
-		n_address = psxexe_header->t_addr;
-		n_size = psxexe_header->t_size;
+		UINT32 n_address = psxexe_header->t_addr;
+		UINT32 n_size = psxexe_header->t_size;
 		while( n_size != 0 )
 		{
 			p_ram[ BYTE4_XOR_LE( n_address ) % n_ram ] = *( p_psxexe );
@@ -163,7 +160,7 @@ int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len
 
 		cpu->set_state_int( PSXCPU_PC, psxexe_header->pc0 );
 		cpu->set_state_int( PSXCPU_R28, psxexe_header->gp0 );
-		n_stack = psxexe_header->s_addr + psxexe_header->s_size;
+		UINT32 n_stack = psxexe_header->s_addr + psxexe_header->s_size;
 		if( n_stack != 0 )
 		{
 			cpu->set_state_int( PSXCPU_R29, n_stack );
@@ -249,8 +246,8 @@ int psx1_state::load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
 						( (int)p_n_file[ n_offset + 7 ] << 24 );
 
-					UINT8 *p_ram = (UINT8 *)m_maincpu->ram();
-					UINT32 n_ram = m_maincpu->ram_size();
+					UINT8 *p_ram = m_ram->pointer();
+					UINT32 n_ram = m_ram->size();
 
 					n_offset += 8;
 
@@ -496,8 +493,10 @@ DRIVER_INIT_MEMBER(psx1_state,psx)
 static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
-	MCFG_PSX_RAM_SIZE( 0x200000 )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad", NULL)
@@ -530,8 +529,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
-	MCFG_PSX_RAM_SIZE( 0x200000 )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("2M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
 	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad", NULL)

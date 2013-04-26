@@ -10,6 +10,8 @@
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
+#include "emu.h"
+#include "machine/ram.h"
 #include "dma.h"
 #include "gte.h"
 #include "irq.h"
@@ -125,9 +127,6 @@ enum
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
 	devcb = &psxcpu_device::set_cd_write_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_PSX_RAM_SIZE( size ) \
-	psxcpu_device::set_ram_size( *device, size );
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -147,7 +146,6 @@ public:
 	template<class _Object> static devcb2_base &set_spu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(object); }
-	static void set_ram_size(device_t &device, UINT32 size);
 
 	// public interfaces
 	DECLARE_WRITE32_MEMBER( berr_w );
@@ -173,15 +171,11 @@ public:
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 
-	UINT32 ram_size();
-	UINT32 *ram();
-
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_stop();
 	virtual void device_reset();
 	virtual void device_post_load();
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -319,8 +313,7 @@ protected:
 	devcb2_write16 m_spu_write_handler;
 	devcb2_read8 m_cd_read_handler;
 	devcb2_write8 m_cd_write_handler;
-	UINT32 *m_ram;
-	UINT32 m_ram_size;
+	required_device<ram_device> m_ram;
 };
 
 class cxd8530aq_device : public psxcpu_device

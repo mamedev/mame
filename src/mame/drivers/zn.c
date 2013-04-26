@@ -39,7 +39,9 @@ public:
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") {
+		m_audiocpu(*this, "audiocpu"),
+		m_ram(*this, "maincpu:ram")
+	{
 	}
 
 	required_device<psxgpu_device> m_gpu;
@@ -66,7 +68,6 @@ public:
 	DECLARE_READ32_MEMBER(znsecsel_r);
 	DECLARE_WRITE32_MEMBER(znsecsel_w);
 	DECLARE_READ32_MEMBER(boardconfig_r);
-	DECLARE_READ32_MEMBER(boardconfig_8M_r);
 	DECLARE_READ32_MEMBER(unknown_r);
 	DECLARE_WRITE32_MEMBER(coin_w);
 	DECLARE_READ32_MEMBER(capcom_kickharness_r);
@@ -136,6 +137,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<ram_device> m_ram;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -360,45 +362,29 @@ READ32_MEMBER(zn_state::boardconfig_r)
 	111----- rev=5
 	*/
 
-	if( machine().primary_screen->height() == 1024 )
-	{
-		return 64|32|8;
-	}
-	else
-	{
-		return 64|32;
-	}
-}
-
-READ32_MEMBER(zn_state::boardconfig_8M_r)
-{
-	/*
-	------00 mem=4M
-	------01 mem=4M
-	------10 mem=8M
-	------11 mem=16M
-	-----0-- smem=hM
-	-----1-- smem=2M
-	----0--- vmem=1M
-	----1--- vmem=2M
-	000----- rev=-2
-	001----- rev=-1
-	010----- rev=0
-	011----- rev=1
-	100----- rev=2
-	101----- rev=3
-	110----- rev=4
-	111----- rev=5
-	*/
+	int boardconfig = 64 | 32;
 
 	if( machine().primary_screen->height() == 1024 )
 	{
-		return 64|32|8|2;
+		boardconfig |= 8;
 	}
-	else
+
+	switch( m_ram->size() )
 	{
-		return 64|32|2;
+	case 0x400000:
+		boardconfig |= 1;
+		break;
+
+	case 0x800000:
+		boardconfig |= 2;
+		break;
+
+	case 0x1000000:
+		boardconfig |= 3;
+		break;
 	}
+
+	return boardconfig;
 }
 
 READ32_MEMBER(zn_state::unknown_r)
@@ -441,11 +427,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zn_8M_map, AS_PROGRAM, 32, zn_state )
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_8M_r)
-	AM_IMPORT_FROM(zn_map)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
 ADDRESS_MAP_END
 
@@ -470,8 +451,10 @@ void zn_state::zn_driver_init(  )
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
-	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
@@ -498,8 +481,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
-	MCFG_PSX_RAM_SIZE( 0x400000 )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
+
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("4M")
 
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
 	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
@@ -1447,9 +1432,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1000w)
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_PSX_RAM_SIZE( 0x800000 )
-	MCFG_CPU_PROGRAM_MAP(zn_8M_map)
+	MCFG_RAM_MODIFY("maincpu:ram")
+	MCFG_RAM_DEFAULT_SIZE("8M")
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000w )
 

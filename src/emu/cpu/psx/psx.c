@@ -1294,17 +1294,19 @@ void psxcpu_device::update_ram_config()
 		break;
 	}
 
-	assert( m_ram_size != 0 );
+	UINT32 ram_size = m_ram->size();
+	UINT8 *pointer = m_ram->pointer();
+
 	assert( window_size != 0 );
 
 	int start = 0;
 	while( start < window_size )
 	{
-		m_program->install_ram( start + 0x00000000, start + 0x00000000 + m_ram_size - 1, m_ram );
-		m_program->install_ram( start + 0x80000000, start + 0x80000000 + m_ram_size - 1, m_ram );
-		m_program->install_ram( start + 0xa0000000, start + 0xa0000000 + m_ram_size - 1, m_ram );
+		m_program->install_ram( start + 0x00000000, start + 0x00000000 + ram_size - 1, pointer );
+		m_program->install_ram( start + 0x80000000, start + 0x80000000 + ram_size - 1, pointer );
+		m_program->install_ram( start + 0xa0000000, start + 0xa0000000 + ram_size - 1, pointer );
 
-		start += m_ram_size;
+		start += ram_size;
 	}
 
 	m_program->install_readwrite_handler( 0x00000000 + window_size, 0x1effffff, read32_delegate( FUNC(psxcpu_device::berr_r), this ), write32_delegate( FUNC(psxcpu_device::berr_w), this ) );
@@ -1625,7 +1627,7 @@ psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, co
 	m_spu_write_handler(*this),
 	m_cd_read_handler(*this),
 	m_cd_write_handler(*this),
-	m_ram_size(0)
+	m_ram(*this, "ram")
 {
 }
 
@@ -1657,37 +1659,6 @@ cxd8606bq_device::cxd8606bq_device(const machine_config &mconfig, const char *ta
 cxd8606cq_device::cxd8606cq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: psxcpu_device(mconfig, CXD8606CQ, "CXD8606CQ", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  set_ram_size - configuration helper
-//  to set the ram size
-//-------------------------------------------------
-
-void psxcpu_device::set_ram_size(device_t &device, UINT32 ram_size)
-{
-	downcast<psxcpu_device &>(device).m_ram_size = ram_size;
-}
-
-
-//-------------------------------------------------
-//  ram_size - temporary kludge to allow
-//  access to the current ram size
-//-------------------------------------------------
-
-UINT32 psxcpu_device::ram_size()
-{
-	return m_ram_size;
-}
-
-//-------------------------------------------------
-//  ram - temporary kludge to allow
-//  access to the current ram
-//-------------------------------------------------
-
-UINT32 *psxcpu_device::ram()
-{
-	return m_ram;
 }
 
 //-------------------------------------------------
@@ -1847,27 +1818,6 @@ void psxcpu_device::device_start()
 	m_spu_write_handler.resolve_safe();
 	m_cd_read_handler.resolve_safe(0);
 	m_cd_write_handler.resolve_safe();
-
-	m_ram = global_alloc_array( UINT32, m_ram_size / 4 );
-	save_pointer( NAME(m_ram), m_ram_size / 4 );
-
-	m_ram_config = 0x800;
-	update_ram_config();
-
-	/// TODO: get dma to acess ram through the memory map?
-	psxdma_device *psxdma = subdevice<psxdma_device>( "dma" );
-	psxdma->m_ram = m_ram;
-	psxdma->m_ramsize = m_ram_size;
-}
-
-
-//-------------------------------------------------
-//  device_stop - stop the device
-//-------------------------------------------------
-
-void psxcpu_device::device_stop()
-{
-	global_free( m_ram );
 }
 
 
@@ -1877,6 +1827,14 @@ void psxcpu_device::device_stop()
 
 void psxcpu_device::device_reset()
 {
+	m_ram_config = 0x800;
+	update_ram_config();
+
+	/// TODO: get dma to access ram through the memory map?
+	psxdma_device *psxdma = subdevice<psxdma_device>( "dma" );
+	psxdma->m_ram = (UINT32 *) m_ram->pointer();
+	psxdma->m_ramsize = m_ram->size();
+
 	m_delayr = 0;
 	m_delayv = 0;
 	m_berr = 0;
@@ -3320,6 +3278,8 @@ static MACHINE_CONFIG_FRAGMENT( psx )
 
 	MCFG_DEVICE_ADD("sio1", PSX_SIO1, 0)
 	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
+
+	MCFG_RAM_ADD("ram")
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
