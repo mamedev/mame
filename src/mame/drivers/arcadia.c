@@ -77,7 +77,7 @@ public:
 	DECLARE_DRIVER_INIT(rdwr);
 	DECLARE_DRIVER_INIT(ninj);
 	DECLARE_DRIVER_INIT(airh);
-	DECLARE_DRIVER_INIT(ldrba);
+	DECLARE_DRIVER_INIT(ldrb);
 	DECLARE_DRIVER_INIT(socc);
 	void arcadia_init();
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
@@ -880,17 +880,17 @@ void arcadia_amiga_state::arcadia_init()
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(arcadia_amiga_state,none)   { arcadia_init(); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,airh)   { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl)   { arcadia_init(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dart)   { arcadia_init(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrba)  { arcadia_init(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj)   { arcadia_init(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr)   { arcadia_init(); generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr)   { arcadia_init(); generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,socc)   { arcadia_init(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg)   { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon)   { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,none) { arcadia_init(); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,airh) { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl) { arcadia_init(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,dart) { arcadia_init(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrb) { arcadia_init(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj) { arcadia_init(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr) { arcadia_init(); generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr) { arcadia_init(); generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,socc) { arcadia_init(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg) { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon) { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 
 /*************************************
  *
@@ -913,8 +913,8 @@ GAME( 1987, ar_dart2,   ar_dart, arcadia, arcadia, arcadia_amiga_state, dart,  R
 GAME( 1988, ar_fast,    ar_bios, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
 GAME( 1988, ar_fasta,   ar_fast, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.7)", 0 )
 
-GAME( 1988, ar_ldrb,    ar_bios, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
-GAME( 1988, ar_ldrba,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, ldrba, ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )
+GAME( 1988, ar_ldrb,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ldrb,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1988, ar_ldrba,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )
 GAME( 1988, ar_ldrbb,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, none,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 3)", 0 )
 
 GAME( 1987, ar_ninj,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
