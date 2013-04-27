@@ -69,6 +69,24 @@ IC7 Panasonic MN1020819DA E68-01
 
 
 
+Power Shovel additional I/O PCB info
+====================================
+
+TMP95C063F
+OKI 6295 x 2 each with a 1.056MHz resonator
+
+6.2MHz OSC
+18.4320MHz OSC
+
+HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
+LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
+74HC4040A (12-Stage Binary Ripple Counter)
+
+74-07.IC6 & 74-08.IC8 are the OKI samples and are indentical
+74-06.IC2 is the TMP95C063 program code.
+
+
+
 Rizing Ping Pong
 Taito 2002
 
@@ -2789,11 +2807,20 @@ ROM_START( pwrshovl )
 	TAITOTZ_BIOS_V111A
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
-	ROM_LOAD16_BYTE( "e74-04.ic14",   0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) )
-	ROM_LOAD16_BYTE( "e74-05.ic15",   0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) )
+	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled 74-04**
+	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled 74-04**
 
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "rumble_cpu", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_LOAD( "74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) )
+
+	ROM_REGION( 0x20000, "oki1", 0 )
+	ROM_LOAD( "74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) )
+
+	ROM_REGION( 0x20000, "oki2", 0 )
+	ROM_LOAD( "74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
