@@ -2254,12 +2254,12 @@ ROM_START( 4in1boot ) /* snow bros, tetris, hyperman 1, pacman 2 */
 	ROM_LOAD( "u78", 0x000000, 0x200000, CRC(6c1fbc9c) SHA1(067f32cae89fd4d57b90be659d2d648e557c11df) )
 ROM_END
 
-ROM_START( snowbros3 )
+ROM_START( snowbro3 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "ur4",  0x00000, 0x20000, CRC(19c13ffd) SHA1(4f9db70354bd410b7bcafa96be4591de8dc33d90) )
 	ROM_LOAD16_BYTE( "ur3",  0x00001, 0x20000, CRC(3f32fa15) SHA1(1402c173c1df142ff9dd7b859689c075813a50e5) )
 
-	/* the sound is driven by a PIC? */
+	/* the sound is driven by an MCU */
 	ROM_REGION( 0x10000, "cpu2", 0 )
 	ROM_LOAD( "sound.mcu", 0x00000, 0x10000 , NO_DUMP )
 
@@ -2274,6 +2274,28 @@ ROM_START( snowbros3 )
 	ROM_LOAD( "us5",     0x00000, 0x20000, CRC(7c6368ef) SHA1(53393c570c605f7582b61c630980041e2ed32e2d) )
 	ROM_CONTINUE(0x80000,0x60000)
 ROM_END
+
+ROM_START( ballboy )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "27c010.ur4",  0x00000, 0x20000, CRC(5fb51b99) SHA1(07e12a3bb51fbb3f192b81497460231c7b609290) )
+	ROM_LOAD16_BYTE( "27c010.ur3",  0x00001, 0x20000, CRC(a9c1fdda) SHA1(efb7eaab993f99d89d3b9c159c3b8eb18ace9c2c) )
+
+	/* the sound is driven by an MCU */
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "sound.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "27c040.ua5",        0x000000, 0x80000, CRC(0604e385) SHA1(96acbc65a8db89a7be100f852dc07ba9a0313167) )   /* 16x16 tiles */
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* 16x16 BG Tiles */
+	ROM_LOAD( "27c160.un7",        0x000000, 0x200000, CRC(4a79da4c) SHA1(59207d116d39b9ee25c51affe520f5fdff34e536) )
+	ROM_LOAD( "27c160.un8",        0x200000, 0x200000, CRC(bfef8c44) SHA1(86930cfcaedbd111d5b985e87a76d2211d2ce2ec) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	ROM_LOAD( "27c040.us5",     0x00000, 0x20000, CRC(7c6368ef) SHA1(53393c570c605f7582b61c630980041e2ed32e2d) )
+	ROM_CONTINUE(0x80000,0x60000)
+ROM_END
+
 
 /*
 
@@ -2796,4 +2818,5 @@ GAME( 1997, pzlbreak, 0,        semiprot, pzlbreak, snowbros_state, pzlbreak, RO
 GAME( 1999, moremore, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More", 0 )
 GAME( 1999, moremorp, 0,        semiprot, moremore, snowbros_state, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 )
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, snowbros_state, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
-GAME( 2002, snowbros3,snowbros, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // its basically snowbros code?...
+GAME( 2002, snowbro3, 0,        snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "Syrmex", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // hacked from SnowBros code but released as an original game
+GAME( 2003, ballboy,  snowbro3, snowbro3, snowbroj, snowbros_state, snowbro3, ROT0, "bootleg", "Ball Boy", GAME_IMPERFECT_SOUND )
