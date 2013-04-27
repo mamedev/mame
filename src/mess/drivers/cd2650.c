@@ -27,6 +27,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+#include "sound/beep.h"
 
 
 class cd2650_state : public driver_device
@@ -34,11 +35,14 @@ class cd2650_state : public driver_device
 public:
 	cd2650_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "p_videoram"),
-	m_cass(*this, "cassette") { }
+		m_maincpu(*this, "maincpu"),
+		m_p_videoram(*this, "videoram"),
+		m_beep(*this, "beeper"),
+		m_cass(*this, "cassette")
+	{ }
 
-	DECLARE_READ8_MEMBER(cd2650_keyin_r);
+	DECLARE_READ8_MEMBER(keyin_r);
+	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE8_MEMBER(cass_w);
@@ -50,9 +54,16 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<const UINT8> m_p_videoram;
+	required_device<beep_device> m_beep;
 	required_device<cassette_image_device> m_cass;
 };
 
+
+WRITE8_MEMBER( cd2650_state::beep_w )
+{
+	if (data & 7)
+		m_beep->set_state(BIT(data, 3));
+}
 
 WRITE8_MEMBER( cd2650_state::cass_w )
 {
@@ -64,7 +75,7 @@ READ8_MEMBER( cd2650_state::cass_r )
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-READ8_MEMBER( cd2650_state::cd2650_keyin_r )
+READ8_MEMBER( cd2650_state::keyin_r )
 {
 	UINT8 ret = m_term_data;
 	m_term_data = 0x80;
@@ -77,13 +88,13 @@ static ADDRESS_MAP_START(cd2650_mem, AS_PROGRAM, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x1800, 0x7fff) AM_RAM // expansion ram needed by quickloads
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READ(cd2650_keyin_r)
+	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE(keyin_r, beep_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r, cass_w)
 ADDRESS_MAP_END
 
@@ -95,6 +106,8 @@ INPUT_PORTS_END
 void cd2650_state::machine_reset()
 {
 	m_term_data = 0x80;
+	m_beep->set_frequency(950);    /* guess */
+	m_beep->set_state(0);
 }
 
 void cd2650_state::video_start()
@@ -175,72 +188,75 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	quick_data = (UINT8*)malloc(quick_length);
-	if (!quick_data)
+	if (quick_length < 0x0444)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-		image.message(" Cannot open file");
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.message(" File too short");
+	}
+	else if (quick_length > 0x8000)
+	{
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.message(" File too long");
 	}
 	else
 	{
-		read_ = image.fread( quick_data, quick_length);
-		if (read_ != quick_length)
+		quick_data = (UINT8*)malloc(quick_length);
+		if (!quick_data)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-			image.message(" Cannot read the file");
-		}
-		else if (quick_data[0] != 0x40)
-		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-			image.message(" Invalid header");
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+			image.message(" Cannot open file");
 		}
 		else
 		{
-			exec_addr = quick_data[1] * 256 + quick_data[2];
-
-			if (exec_addr >= quick_length)
+			read_ = image.fread( quick_data, quick_length);
+			if (read_ != quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-				image.message(" Exec address beyond end of file");
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
 			}
-			else if (quick_length < 0x0444)
+			else if (quick_data[0] != 0x40)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-				image.message(" File too short");
-			}
-			else if (quick_length > 0x8000)
-			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-				image.message(" File too long");
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
 			}
 			else
 			{
-				read_ = 0x1000;
-				if (quick_length < 0x1000)
-					read_ = quick_length;
+				exec_addr = quick_data[1] * 256 + quick_data[2];
 
-				for (i = quick_addr; i < read_; i++)
-					space.write_byte(i, quick_data[i]);
+				if (exec_addr >= quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+					image.message(" Exec address beyond end of file");
+				}
+				else
+				{
+					read_ = 0x1000;
+					if (quick_length < 0x1000)
+						read_ = quick_length;
 
-				read_ = 0x1780;
-				if (quick_length < 0x1780)
-					read_ = quick_length;
-
-				if (quick_length > 0x157f)
-					for (i = 0x1580; i < read_; i++)
+					for (i = quick_addr; i < read_; i++)
 						space.write_byte(i, quick_data[i]);
 
-				if (quick_length > 0x17ff)
-					for (i = 0x1800; i < quick_length; i++)
-						space.write_byte(i, quick_data[i]);
+					read_ = 0x1780;
+					if (quick_length < 0x1780)
+						read_ = quick_length;
 
-				/* display a message about the loaded quickload */
-				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+					if (quick_length > 0x157f)
+						for (i = 0x1580; i < read_; i++)
+							space.write_byte(i, quick_data[i]);
 
-				// Start the quickload
-				m_maincpu->set_pc(exec_addr);
+					if (quick_length > 0x17ff)
+						for (i = 0x1800; i < quick_length; i++)
+							space.write_byte(i, quick_data[i]);
 
-				result = IMAGE_INIT_PASS;
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+					// Start the quickload
+					m_maincpu->set_pc(exec_addr);
+
+					result = IMAGE_INIT_PASS;
+				}
 			}
 		}
 
@@ -273,9 +289,13 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", default_cassette_interface )
+
+	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
