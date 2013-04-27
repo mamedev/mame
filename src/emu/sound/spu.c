@@ -2482,12 +2482,13 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 			INT16 vl = ((sp[0]*voll)>>15);
 			INT16 vr = ((sp[1]*volr)>>15);
 
-			*(signed short *)(spu_ram+m_cd_out_ptr)=vl;
-			*(signed short *)(spu_ram+m_cd_out_ptr+0x400)=vr;
+			// if the volume adjusted samples are stored here, vibribbon does nothing
+			*(signed short *)(spu_ram+m_cd_out_ptr)=sp[0];
+			*(signed short *)(spu_ram+m_cd_out_ptr+0x400)=sp[1];
 			m_cd_out_ptr=(m_cd_out_ptr+2)&0x3ff;
 
-			if((m_cd_out_ptr == (spureg.irq_addr & ~0x401)) && (spureg.ctrl & spuctrl_irq_enable))
-				m_irq_handler(1);
+			//if((m_cd_out_ptr == ((spureg.irq_addr << 3) & ~0x400)) && (spureg.ctrl & spuctrl_irq_enable))
+			//	m_irq_handler(1);
 
 			dp[0]=clamp(dp[0]+vl);
 			dp[1]=clamp(dp[1]+vr);
@@ -2513,9 +2514,9 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 
 //      if (n>0) printf("cdda buffer underflow (n=%d cdda_in=%d spf=%d)\n",n,cdda_buffer->get_bytes_in(),cdda_spf);
 	}
-	else if((spureg.irq_addr < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
+	else if(((spureg.irq_addr << 3) < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
 	{
-		UINT16 irq_addr = spureg.irq_addr & ~0x401;
+		UINT16 irq_addr = (spureg.irq_addr << 3) & ~0x400;
 		UINT32 end = m_cd_out_ptr + (sz >> 1);
 		if(((m_cd_out_ptr < irq_addr) && (end > irq_addr)) || ((m_cd_out_ptr > (end & 0x3ff)) && ((end & 0x3ff) > irq_addr)))
 			m_irq_handler(1);
@@ -3009,7 +3010,6 @@ bool spu_device::play_xa(const unsigned int sector, const unsigned char *xa)
 	}
 
 	// Return that we processed the sector
-
 	return true;
 }
 
@@ -3052,6 +3052,9 @@ bool spu_device::play_cdda(const unsigned int sector, const unsigned char *cdda)
 		flip[i] = flip[i+1];
 		flip[i+1] = temp;
 	}
+	// this should be done in generate but sound_stream_update may not be called frequently enough
+	if(((spureg.irq_addr << 3) < 0x800) && (spureg.ctrl & spuctrl_irq_enable))
+		m_irq_handler(1);
 
 	return true;
 }

@@ -517,7 +517,7 @@ void psxcd_device::cdcmd_mute()
 	verboselog(machine(), 1, "psxcd: mute\n");
 
 	m_mute = true;
-	send_result(intr_acknowledge);
+	send_result(intr_complete);
 }
 
 void psxcd_device::cdcmd_demute()
@@ -525,7 +525,7 @@ void psxcd_device::cdcmd_demute()
 	verboselog(machine(), 1, "psxcd: demute\n");
 
 	m_mute = false;
-	send_result(intr_acknowledge);
+	send_result(intr_complete);
 }
 
 void psxcd_device::cdcmd_setfilter()
@@ -705,7 +705,7 @@ void psxcd_device::cdcmd_test()
 			break;
 
 		default:
-			verboselog(machine(), 0, "psxcd: unimplemented test cmd %02x", cmdbuf[0]);
+			verboselog(machine(), 0, "psxcd: unimplemented test cmd %02x\n", cmdbuf[0]);
 			cmd_complete(prepare_result(intr_diskerror, NULL, 0, 0x10));
 			break;
 	}
