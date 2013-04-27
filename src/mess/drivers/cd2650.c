@@ -172,6 +172,7 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
+	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
@@ -179,72 +180,74 @@ QUICKLOAD_LOAD_MEMBER( cd2650_state, cd2650 )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
 		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
 	}
-
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
+	else
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
+		read_ = image.fread( quick_data, quick_length);
+		if (read_ != quick_length)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.message(" Cannot read the file");
+		}
+		else if (quick_data[0] != 0x40)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.message(" Invalid header");
+		}
+		else
+		{
+			exec_addr = quick_data[1] * 256 + quick_data[2];
+
+			if (exec_addr >= quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.message(" Exec address beyond end of file");
+			}
+			else if (quick_length < 0x0444)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+				image.message(" File too short");
+			}
+			else if (quick_length > 0x8000)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+				image.message(" File too long");
+			}
+			else
+			{
+				read_ = 0x1000;
+				if (quick_length < 0x1000)
+					read_ = quick_length;
+
+				for (i = quick_addr; i < read_; i++)
+					space.write_byte(i, quick_data[i]);
+
+				read_ = 0x1780;
+				if (quick_length < 0x1780)
+					read_ = quick_length;
+
+				if (quick_length > 0x157f)
+					for (i = 0x1580; i < read_; i++)
+						space.write_byte(i, quick_data[i]);
+
+				if (quick_length > 0x17ff)
+					for (i = 0x1800; i < quick_length; i++)
+						space.write_byte(i, quick_data[i]);
+
+				/* display a message about the loaded quickload */
+				image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+				// Start the quickload
+				m_maincpu->set_pc(exec_addr);
+
+				result = IMAGE_INIT_PASS;
+			}
+		}
+
+		free( quick_data );
 	}
 
-	if (quick_data[0] != 0x40)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-		image.message(" Invalid header");
-		return IMAGE_INIT_FAIL;
-	}
-
-	exec_addr = quick_data[1] * 256 + quick_data[2];
-
-	if (exec_addr >= quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-		image.message(" Exec address beyond end of file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (quick_length < 0x0444)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-		image.message(" File too short");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (quick_length > 0x8000)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-		image.message(" File too long");
-		return IMAGE_INIT_FAIL;
-	}
-
-	read_ = 0x1000;
-	if (quick_length < 0x1000)
-		read_ = quick_length;
-
-	for (i = quick_addr; i < read_; i++)
-		space.write_byte(i, quick_data[i]);
-
-	read_ = 0x1780;
-	if (quick_length < 0x1780)
-		read_ = quick_length;
-
-	if (quick_length > 0x157f)
-		for (i = 0x1580; i < read_; i++)
-			space.write_byte(i, quick_data[i]);
-
-	if (quick_length > 0x17ff)
-		for (i = 0x1800; i < quick_length; i++)
-			space.write_byte(i, quick_data[i]);
-
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-	// Start the quickload
-	m_maincpu->set_pc(exec_addr);
-	return IMAGE_INIT_PASS;
+	return result;
 }
 
 static MACHINE_CONFIG_START( cd2650, cd2650_state )
