@@ -25,4 +25,24 @@ private:
 };
 
 
+//=========================================================================
+//  A way to store the configuration of a window long enough to read/write.
+//=========================================================================
+class LogWindowQtConfig : public WindowQtConfig
+{
+public:
+	LogWindowQtConfig() :
+		WindowQtConfig(WIN_TYPE_LOG)
+	{
+	}
+	
+	~LogWindowQtConfig() {}
+	
+	void buildFromQWidget(QWidget* widget);
+	void applyToQWidget(QWidget* widget);
+	void addToXmlDataNode(xml_data_node* node) const;
+	void recoverFromXmlNode(xml_data_node* node);
+};
+
+
 #endif

@@ -30,6 +30,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// The memory space combo box
 	m_memoryComboBox = new QComboBox(topSubFrame);
+	m_memoryComboBox->setObjectName("memoryregion");
 	m_memoryComboBox->setMinimumWidth(300);
 	connect(m_memoryComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(memoryRegionChanged(int)));
 
@@ -58,6 +59,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	//
 	// Create a byte-chunk group
 	QActionGroup* chunkGroup = new QActionGroup(this);
+	chunkGroup->setObjectName("chunkgroup");
 	QAction* chunkActOne  = new QAction("1-byte chunks", this);
 	chunkActOne->setObjectName("chunkActOne");
 	QAction* chunkActTwo  = new QAction("2-byte chunks", this);
@@ -78,6 +80,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// Create a address display group
 	QActionGroup* addressGroup = new QActionGroup(this);
+	addressGroup->setObjectName("addressgroup");
 	QAction* addressActLogical = new QAction("Logical Addresses", this);
 	QAction* addressActPhysical = new QAction("Physical Addresses", this);
 	addressActLogical->setCheckable(true);
@@ -91,6 +94,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 
 	// Create a reverse view radio
 	QAction* reverseAct = new QAction("Reverse View", this);
+	reverseAct->setObjectName("reverse");
 	reverseAct->setCheckable(true);
 	reverseAct->setShortcut(QKeySequence("Ctrl+R"));
 	connect(reverseAct, SIGNAL(toggled(bool)), this, SLOT(reverseChanged(bool)));
@@ -257,4 +261,71 @@ QAction* MemoryWindow::chunkSizeMenuItem(const QString& itemName)
 		}
 	}
 	return NULL;
+}
+
+
+//=========================================================================
+//  MemoryWindowQtConfig
+//=========================================================================
+void MemoryWindowQtConfig::buildFromQWidget(QWidget* widget)
+{
+	WindowQtConfig::buildFromQWidget(widget);
+	MemoryWindow* window = dynamic_cast<MemoryWindow*>(widget);
+	QComboBox* memoryRegion = window->findChild<QComboBox*>("memoryregion");
+	m_memoryRegion = memoryRegion->currentIndex();
+
+	QAction* reverse = window->findChild<QAction*>("reverse");
+	m_reverse = reverse->isChecked();
+
+	QActionGroup* addressGroup = window->findChild<QActionGroup*>("addressgroup");
+	if (addressGroup->checkedAction()->text() == "Logical Addresses")
+		m_addressMode = 0;
+	else if (addressGroup->checkedAction()->text() == "Physical Addresses")
+		m_addressMode = 1;
+
+	QActionGroup* chunkGroup = window->findChild<QActionGroup*>("chunkgroup");
+	if (chunkGroup->checkedAction()->text() == "1-byte chunks")
+		m_chunkSize = 0;
+	else if (chunkGroup->checkedAction()->text() == "2-byte chunks")
+		m_chunkSize = 1;
+	else if (chunkGroup->checkedAction()->text() == "4-byte chunks")
+		m_chunkSize = 2;
+}
+
+
+void MemoryWindowQtConfig::applyToQWidget(QWidget* widget)
+{
+	WindowQtConfig::applyToQWidget(widget);
+	MemoryWindow* window = dynamic_cast<MemoryWindow*>(widget);
+	QComboBox* memoryRegion = window->findChild<QComboBox*>("memoryregion");
+	memoryRegion->setCurrentIndex(m_memoryRegion);
+
+	QAction* reverse = window->findChild<QAction*>("reverse");
+	if (m_reverse) reverse->trigger();
+
+	QActionGroup* addressGroup = window->findChild<QActionGroup*>("addressgroup");
+	addressGroup->actions()[m_addressMode]->trigger();
+
+	QActionGroup* chunkGroup = window->findChild<QActionGroup*>("chunkgroup");
+	chunkGroup->actions()[m_chunkSize]->trigger();
+}
+
+
+void MemoryWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+{
+	WindowQtConfig::addToXmlDataNode(node);
+	xml_set_attribute_int(node, "memoryregion", m_memoryRegion);
+	xml_set_attribute_int(node, "reverse", m_reverse);
+	xml_set_attribute_int(node, "addressmode", m_addressMode);
+	xml_set_attribute_int(node, "chunksize", m_chunkSize);
+}
+
+
+void MemoryWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+{
+	WindowQtConfig::recoverFromXmlNode(node);
+	m_memoryRegion = xml_get_attribute_int(node, "memoryregion", m_memoryRegion);
+	m_reverse = xml_get_attribute_int(node, "reverse", m_reverse);
+	m_addressMode = xml_get_attribute_int(node, "addressmode", m_addressMode);
+	m_chunkSize = xml_get_attribute_int(node, "chunksize", m_chunkSize);
 }

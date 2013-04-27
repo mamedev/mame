@@ -30,6 +30,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// The cpu combo box
 	m_cpuComboBox = new QComboBox(topSubFrame);
+	m_cpuComboBox->setObjectName("cpu");
 	m_cpuComboBox->setMinimumWidth(300);
 	connect(m_cpuComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(cpuChanged(int)));
 
@@ -76,6 +77,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 
 	// Right bar options
 	QActionGroup* rightBarGroup = new QActionGroup(this);
+	rightBarGroup->setObjectName("rightbargroup");
 	QAction* rightActRaw = new QAction("Raw Opcodes", this);
 	QAction* rightActEncrypted = new QAction("Encrypted Opcodes", this);
 	QAction* rightActComments = new QAction("Comments", this);
@@ -201,4 +203,49 @@ void DasmWindow::populateComboBox()
 	{
 		m_cpuComboBox->addItem(source->name());
 	}
+}
+
+
+//=========================================================================
+//  DasmWindowQtConfig
+//=========================================================================
+void DasmWindowQtConfig::buildFromQWidget(QWidget* widget)
+{
+	WindowQtConfig::buildFromQWidget(widget);
+	DasmWindow* window = dynamic_cast<DasmWindow*>(widget);
+	QComboBox* cpu = window->findChild<QComboBox*>("cpu");
+	m_cpu = cpu->currentIndex();
+
+	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	if (rightBarGroup->checkedAction()->text() == "Raw Opcodes")
+		m_rightBar = 0;
+	else if (rightBarGroup->checkedAction()->text() == "Encrypted Opcodes")
+		m_rightBar = 1;
+	else if (rightBarGroup->checkedAction()->text() == "Comments")
+		m_rightBar = 2;
+}
+
+void DasmWindowQtConfig::applyToQWidget(QWidget* widget)
+{
+	WindowQtConfig::applyToQWidget(widget);
+	DasmWindow* window = dynamic_cast<DasmWindow*>(widget);
+	QComboBox* cpu = window->findChild<QComboBox*>("cpu");
+	cpu->setCurrentIndex(m_cpu);
+
+	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	rightBarGroup->actions()[m_rightBar]->trigger();
+}
+
+void DasmWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+{
+	WindowQtConfig::addToXmlDataNode(node);
+	xml_set_attribute_int(node, "cpu", m_cpu);
+	xml_set_attribute_int(node, "rightbar", m_rightBar);
+}
+
+void DasmWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+{
+	WindowQtConfig::recoverFromXmlNode(node);
+	m_cpu = xml_get_attribute_int(node, "cpu", m_cpu);
+	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
 }

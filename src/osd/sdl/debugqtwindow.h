@@ -4,6 +4,7 @@
 #include <QtGui/QtGui>
 
 #include "emu.h"
+#include "config.h"
 
 
 //============================================================
@@ -63,27 +64,35 @@ public:
 	{
 		WIN_TYPE_MAIN       = 0x01,
 		WIN_TYPE_MEMORY     = 0x02,
-		WIN_TYPE_DISASM     = 0x04,
+		WIN_TYPE_DASM       = 0x04,
 		WIN_TYPE_LOG        = 0x08,
 		WIN_TYPE_UNKNOWN    = 0x10,
 	};
 
 public:
-	WindowQtConfig() :
-		m_type(WIN_TYPE_MAIN),
+	WindowQtConfig(const WindowType& type=WIN_TYPE_UNKNOWN) :
+		m_type(type),
 		m_size(800, 600),
 		m_position(120, 120),
 		m_next(NULL)
 	{}
-	~WindowQtConfig() {}
-
+	virtual ~WindowQtConfig() {}
+	
+	// Settings
 	WindowType m_type;
 	QPoint m_size;
 	QPoint m_position;
-
-    // Dues for becoming a member of a simple_list
-    WindowQtConfig* next() const { return m_next; }
-    WindowQtConfig* m_next;
+	
+	// Dues for becoming a member of a simple_list
+	WindowQtConfig* m_next;
+	WindowQtConfig* next() const { return m_next; }
+	
+	
+	virtual void buildFromQWidget(QWidget* widget);
+	virtual void applyToQWidget(QWidget* widget);
+	virtual void addToXmlDataNode(xml_data_node* node) const;
+	virtual void recoverFromXmlNode(xml_data_node* node);
 };
+
 
 #endif

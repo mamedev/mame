@@ -50,6 +50,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// Right bar options
 	QActionGroup* rightBarGroup = new QActionGroup(this);
+	rightBarGroup->setObjectName("rightbargroup");
 	QAction* rightActRaw = new QAction("Raw Opcodes", this);
 	QAction* rightActEncrypted = new QAction("Encrypted Opcodes", this);
 	QAction* rightActComments = new QAction("Comments", this);
@@ -83,6 +84,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// The processor dock
 	QDockWidget* cpuDock = new QDockWidget("processor", this);
+	cpuDock->setObjectName("cpudock");
 	cpuDock->setAllowedAreas(Qt::LeftDockWidgetArea);
 	m_procFrame = new ProcessorDockWidget(m_machine, cpuDock);
 	cpuDock->setWidget(dynamic_cast<QWidget*>(m_procFrame));
@@ -92,6 +94,7 @@ MainWindow::MainWindow(running_machine* machine, QWidget* parent) :
 
 	// The disassembly dock
 	QDockWidget* dasmDock = new QDockWidget("dasm", this);
+	dasmDock->setObjectName("dasmdock");
 	dasmDock->setAllowedAreas(Qt::TopDockWidgetArea);
 	m_dasmFrame = new DasmDockWidget(m_machine, dasmDock);
 	dasmDock->setWidget(m_dasmFrame);
@@ -122,6 +125,9 @@ void MainWindow::setProcessor(device_t* processor)
 void MainWindow::closeEvent(QCloseEvent* event)
 {
 	debugActQuit();
+	
+	// Insure the window doesn't disappear before we get a chance to save its parameters
+	event->ignore();
 }
 
 
@@ -317,4 +323,51 @@ void MainWindow::addToHistory(const QString& command)
 	{
 		m_inputHistory.push_back(m_inputEdit->text());
 	}
+}
+
+
+//=========================================================================
+//  MainWindowQtConfig
+//=========================================================================
+void MainWindowQtConfig::buildFromQWidget(QWidget* widget)
+{
+	WindowQtConfig::buildFromQWidget(widget);
+	MainWindow* window = dynamic_cast<MainWindow*>(widget);
+	m_windowState = window->saveState();
+
+	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	if (rightBarGroup->checkedAction()->text() == "Raw Opcodes")
+		m_rightBar = 0;
+	else if (rightBarGroup->checkedAction()->text() == "Encrypted Opcodes")
+		m_rightBar = 1;
+	else if (rightBarGroup->checkedAction()->text() == "Comments")
+		m_rightBar = 2;
+}
+
+
+void MainWindowQtConfig::applyToQWidget(QWidget* widget)
+{
+	WindowQtConfig::applyToQWidget(widget);
+	MainWindow* window = dynamic_cast<MainWindow*>(widget);
+	window->restoreState(m_windowState);
+
+	QActionGroup* rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
+	rightBarGroup->actions()[m_rightBar]->trigger();
+}
+
+
+void MainWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+{
+	WindowQtConfig::addToXmlDataNode(node);
+	xml_set_attribute_int(node, "rightbar", m_rightBar);
+	xml_set_attribute(node, "qtwindowstate", m_windowState.toPercentEncoding().data());
+}
+
+
+void MainWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+{
+	WindowQtConfig::recoverFromXmlNode(node);
+	const char* state = xml_get_attribute_string(node, "qtwindowstate", "");
+	m_windowState = QByteArray::fromPercentEncoding(state);
+	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
 }

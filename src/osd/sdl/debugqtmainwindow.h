@@ -160,4 +160,30 @@ private:
 };
 
 
+//=========================================================================
+//  A way to store the configuration of a window long enough to read/write.
+//=========================================================================
+class MainWindowQtConfig : public WindowQtConfig
+{
+public:
+	MainWindowQtConfig() :
+		WindowQtConfig(WIN_TYPE_MAIN),
+		m_rightBar(0),
+		m_windowState()
+	{}
+	
+	~MainWindowQtConfig() {}
+	
+	// Settings
+	int m_rightBar;
+	QByteArray m_windowState;
+	
+	void buildFromQWidget(QWidget* widget);
+	void applyToQWidget(QWidget* widget);
+	void addToXmlDataNode(xml_data_node* node) const;
+	void recoverFromXmlNode(xml_data_node* node);
+};
+
+
+
 #endif

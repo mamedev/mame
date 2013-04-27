@@ -34,3 +34,30 @@ LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
 
 	setCentralWidget(mainWindowFrame);
 }
+
+
+//=========================================================================
+//  LogWindowQtConfig
+//=========================================================================
+void LogWindowQtConfig::buildFromQWidget(QWidget* widget)
+{
+	WindowQtConfig::buildFromQWidget(widget);
+}
+
+
+void LogWindowQtConfig::applyToQWidget(QWidget* widget)
+{
+	WindowQtConfig::applyToQWidget(widget);
+}
+
+
+void LogWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+{
+	WindowQtConfig::addToXmlDataNode(node);
+}
+
+
+void LogWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+{
+	WindowQtConfig::recoverFromXmlNode(node);
+}

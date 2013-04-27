@@ -46,8 +46,6 @@ simple_list<WindowQtConfig> xmlConfigurations;
 
 static void xml_configuration_load(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	xml_data_node *wnode;
-
 	// We only care about game files
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
@@ -59,21 +57,27 @@ static void xml_configuration_load(running_machine &machine, int config_type, xm
 	xmlConfigurations.reset();
 
 	// Configuration load
+	xml_data_node* wnode = NULL;
 	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
 	{
-		WindowQtConfig& config = xmlConfigurations.append(*global_alloc(WindowQtConfig));
-		config.m_size.setX(xml_get_attribute_int(wnode, "size_x", config.m_size.x()));
-		config.m_size.setY(xml_get_attribute_int(wnode, "size_y", config.m_size.y()));
-		config.m_position.setX(xml_get_attribute_int(wnode, "position_x", config.m_position.x()));
-		config.m_position.setY(xml_get_attribute_int(wnode, "position_y", config.m_position.y()));
-		config.m_type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", config.m_type);
+		WindowQtConfig* config = NULL;
+		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", WindowQtConfig::WIN_TYPE_UNKNOWN);
+		switch (type)
+		{
+			case WindowQtConfig::WIN_TYPE_MAIN:   config = &xmlConfigurations.append(*global_alloc(MainWindowQtConfig)); break;
+			case WindowQtConfig::WIN_TYPE_MEMORY: config = &xmlConfigurations.append(*global_alloc(MemoryWindowQtConfig)); break;
+			case WindowQtConfig::WIN_TYPE_DASM:   config = &xmlConfigurations.append(*global_alloc(DasmWindowQtConfig)); break;
+			case WindowQtConfig::WIN_TYPE_LOG:    config = &xmlConfigurations.append(*global_alloc(LogWindowQtConfig)); break;
+			default: break;
+		}
+		config->recoverFromXmlNode(wnode);
 	}
 }
 
 
 static void xml_configuration_save(running_machine &machine, int config_type, xml_data_node *parentnode)
 {
-	// We only care about game files
+	// We only write to game configurations
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
 
@@ -85,11 +89,8 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 		if (debugger_node == NULL)
 			continue;
 
-		xml_set_attribute_int(debugger_node, "type", config->m_type);
-		xml_set_attribute_int(debugger_node, "position_x", config->m_position.x());
-		xml_set_attribute_int(debugger_node, "position_y", config->m_position.y());
-		xml_set_attribute_int(debugger_node, "size_x", config->m_size.x());
-		xml_set_attribute_int(debugger_node, "size_y", config->m_size.y());
+		// Insert the appropriate information
+		config->addToXmlDataNode(debugger_node);
 	}
 }
 
@@ -108,22 +109,17 @@ static void gather_save_configurations()
 			continue;
 
 		// Figure out its type
-		WindowQtConfig::WindowType type = WindowQtConfig::WIN_TYPE_UNKNOWN;
+		WindowQtConfig* config = NULL;
 		if (dynamic_cast<MainWindow*>(widget))
-			type = WindowQtConfig::WIN_TYPE_MAIN;
+			config = &xmlConfigurations.append(*global_alloc(MainWindowQtConfig));
 		else if (dynamic_cast<MemoryWindow*>(widget))
-			type = WindowQtConfig::WIN_TYPE_MEMORY;
+			config = &xmlConfigurations.append(*global_alloc(MemoryWindowQtConfig));
 		else if (dynamic_cast<DasmWindow*>(widget))
-			type = WindowQtConfig::WIN_TYPE_DISASM;
+			config = &xmlConfigurations.append(*global_alloc(DasmWindowQtConfig));
 		else if (dynamic_cast<LogWindow*>(widget))
-			type = WindowQtConfig::WIN_TYPE_LOG;
+			config = &xmlConfigurations.append(*global_alloc(LogWindowQtConfig));
 
-		WindowQtConfig& config = xmlConfigurations.append(*global_alloc(WindowQtConfig));
-		config.m_type = type;
-		config.m_position.setX(widget->geometry().topLeft().x());
-		config.m_position.setY(widget->geometry().topLeft().y());
-		config.m_size.setX(widget->size().width());
-		config.m_size.setY(widget->size().height());
+		config->buildFromQWidget(widget);
 	}
 }
 
@@ -138,8 +134,7 @@ static void load_and_clear_main_window_config(simple_list<WindowQtConfig>& confi
 	{
 		if (config->m_type == WindowQtConfig::WIN_TYPE_MAIN)
 		{
-			mainQtWindow->setGeometry(config->m_position.x(), config->m_position.y(),
-									  config->m_size.x(), config->m_size.y());
+			config->applyToQWidget(mainQtWindow);
 			configList.remove(*config);
 			break;
 		}
@@ -156,14 +151,13 @@ static void setup_additional_startup_windows(running_machine& machine, simple_li
 		{
 			case WindowQtConfig::WIN_TYPE_MEMORY:
 				foo = new MemoryWindow(&machine); break;
-			case WindowQtConfig::WIN_TYPE_DISASM:
+			case WindowQtConfig::WIN_TYPE_DASM:
 				foo = new DasmWindow(&machine); break;
 			case WindowQtConfig::WIN_TYPE_LOG:
 				foo = new LogWindow(&machine); break;
 			default: break;
 		}
-		foo->setGeometry(config->m_position.x(), config->m_position.y(),
-						 config->m_size.x(), config->m_size.y());
+		config->applyToQWidget(foo);
 		foo->show();
 	}
 }
