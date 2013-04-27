@@ -266,79 +266,69 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
+	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	quick_data = (UINT8*)malloc(quick_length);
-	if (!quick_data)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (quick_data[0] != 0xc6)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-		image.message(" Invalid header");
-		return IMAGE_INIT_FAIL;
-	}
-
-	exec_addr = quick_data[1] * 256 + quick_data[2];
-
-	if (exec_addr >= quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-		image.message(" Exec address beyond end of file");
-		return IMAGE_INIT_FAIL;
-	}
-
 	if (quick_length < 0x0900)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		image.message(" File too short");
-		return IMAGE_INIT_FAIL;
 	}
-
-	if (quick_length > 0x8000)
+	else if (quick_length > 0x8000)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
 		image.message(" File too long");
-		return IMAGE_INIT_FAIL;
+	}
+	else
+	{
+		quick_data = (UINT8*)malloc(quick_length);
+		if (!quick_data)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+			image.message(" Cannot open file");
+		}
+		else
+		{
+			read_ = image.fread( quick_data, quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else if (quick_data[0] != 0xc6)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
+			}
+			else
+			{
+				exec_addr = quick_data[1] * 256 + quick_data[2];
+
+				if (exec_addr >= quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+					image.message(" Exec address beyond end of file");
+				}
+				else
+				{
+					for (i = quick_addr; i < read_; i++)
+						space.write_byte(i, quick_data[i]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+					// Start the quickload
+					m_maincpu->set_pc(exec_addr);
+
+					result = IMAGE_INIT_PASS;
+				}
+			}
+		}
+
+		free( quick_data );
 	}
 
-//	read_ = 0x1000;
-//	if (quick_length < 0x1000)
-//		read_ = quick_length;
-
-	for (i = quick_addr; i < read_; i++)
-		space.write_byte(i, quick_data[i]);
-
-//	read_ = 0x1780;
-//	if (quick_length < 0x1780)
-//		read_ = quick_length;
-
-//	if (quick_length > 0x157f)
-//		for (i = 0x1580; i < read_; i++)
-//			space.write_byte(i, quick_data[i]);
-
-//	if (quick_length > 0x17ff)
-//		for (i = 0x1800; i < quick_length; i++)
-//			space.write_byte(i, quick_data[i]);
-
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-	// Start the quickload
-	m_maincpu->set_pc(exec_addr);
-	return IMAGE_INIT_PASS;
+	return result;
 }
 
 static MACHINE_CONFIG_START( ravens, ravens_state )
@@ -380,7 +370,10 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( ravens )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "mon_v0.9.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8))
+	ROM_SYSTEM_BIOS( 0, "v1.0", "V1.0" )
+	ROMX_LOAD( "mon_v1.0.bin", 0x0000, 0x0800, CRC(785eb1ad) SHA1(c316b8ac32ab6aa37746af37b9f81a23367fedd8), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v0.9", "V0.9" )
+	ROMX_LOAD( "mon_v0_9.bin", 0x0000, 0x07b5, CRC(2f9b9178) SHA1(ec2ebbc80ee9ff2502c1409ab4f99127032ed724), ROM_BIOS(2))
 ROM_END
 
 ROM_START( ravens2 )
