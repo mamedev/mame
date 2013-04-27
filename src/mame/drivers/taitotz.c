@@ -82,8 +82,8 @@ HIN239CB (+5v Powered RS-232 Transmitter/Receiver - 120kbps)
 LC321664AM-80 (1Meg (65536 words x 16bits) DRAM)
 74HC4040A (12-Stage Binary Ripple Counter)
 
-74-07.IC6 & 74-08.IC8 are the OKI samples and are indentical
-74-06.IC2 is the TMP95C063 program code.
+E74-07.IC6 & E74-08.IC8 are the OKI samples and are indentical
+E74-06.IC2 is the TMP95C063 program code.
 
 
 
@@ -2814,13 +2814,13 @@ ROM_START( pwrshovl )
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
-	ROM_LOAD( "74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) )
+	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki1", 0 )
-	ROM_LOAD( "74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) )
+	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
 	ROM_REGION( 0x20000, "oki2", 0 )
-	ROM_LOAD( "74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) )
+	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
