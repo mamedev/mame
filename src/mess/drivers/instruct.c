@@ -231,70 +231,74 @@ QUICKLOAD_LOAD_MEMBER( instruct_state, instruct )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
-	int quick_addr = 0x0100;
+	int quick_addr = 0x100;
 	int exec_addr;
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
+	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
-	quick_data = (UINT8*)malloc(quick_length);
-	if (!quick_data)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
-		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (quick_data[0] != 0xc5)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-		image.message(" Invalid header");
-		return IMAGE_INIT_FAIL;
-	}
-
-	exec_addr = quick_data[1] * 256 + quick_data[2];
-
-	if (exec_addr >= quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-		image.message(" Exec address beyond end of file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (quick_length < 0x104)
+	if (quick_length < 0x0104)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
 		image.message(" File too short");
-		return IMAGE_INIT_FAIL;
 	}
-
-	if (quick_length > 0x17c0)
+	else if (quick_length > 0x17c0)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
 		image.message(" File too long");
-		return IMAGE_INIT_FAIL;
 	}
-
-	for (i = quick_addr; i < quick_length; i++)
+	else
 	{
-		space.write_byte(i, quick_data[i]);
+		quick_data = (UINT8*)malloc(quick_length);
+		if (!quick_data)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
+			image.message(" Cannot open file");
+		}
+		else
+		{
+			read_ = image.fread( quick_data, quick_length);
+			if (read_ != quick_length)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+				image.message(" Cannot read the file");
+			}
+			else if (quick_data[0] != 0xc5)
+			{
+				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+				image.message(" Invalid header");
+			}
+			else
+			{
+				exec_addr = quick_data[1] * 256 + quick_data[2];
+
+				if (exec_addr >= quick_length)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+					image.message(" Exec address beyond end of file");
+				}
+				else
+				{
+					for (i = quick_addr; i < read_; i++)
+						space.write_byte(i, quick_data[i]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+					// Start the quickload
+					m_maincpu->set_pc(exec_addr);
+
+					result = IMAGE_INIT_PASS;
+				}
+			}
+		}
+
+		free( quick_data );
 	}
 
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-	// Start the quickload
-	m_maincpu->set_pc(exec_addr);
-	return IMAGE_INIT_PASS;
+	return result;
 }
 
 static MACHINE_CONFIG_START( instruct, instruct_state )
