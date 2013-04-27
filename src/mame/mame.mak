@@ -1825,6 +1825,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gei.o \
 	$(DRIVERS)/globalfr.o \
 	$(DRIVERS)/globalvr.o \
+	$(DRIVERS)/gluck2.o \
 	$(DRIVERS)/goldngam.o \
 	$(DRIVERS)/goldnpkr.o \
 	$(DRIVERS)/good.o \
