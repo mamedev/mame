@@ -353,6 +353,9 @@ UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 
 UINT32 taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// update controller state in artwork
+	static const UINT8 dendego_mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
+	static const UINT8 dendego_brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
+
 	UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
 	int level;
 	for (level = 5; level > 0; level--)
