@@ -2813,7 +2813,7 @@ ROM_START( pwrshovl )
 	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
-	ROM_REGION( 0x20000, "rumble_cpu", 0 ) // another TMP95C063F, not hooked up yet
+	ROM_REGION( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
 	ROM_LOAD( "74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) )
 
 	ROM_REGION( 0x20000, "oki1", 0 )
