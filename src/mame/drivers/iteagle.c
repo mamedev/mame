@@ -4,24 +4,83 @@
 
     skeleton by R. Belmont
 
-    Known games on this hardware:
-	    * Golden Tee Fore! (2000)
-	    * Golden Tee Fore! 2002 (2001)
-	    * Golden Tee Fore! 2003 (2002)
-        * Golden Tee Fore! 2004 (2003)
-    	* Silver Strike Bowling (2004)
-    	* Golden Tee Fore! 2005 (2004)
-    	* Golden Tee Fore! Complete (2005)
+    Known games on this hardware and their security chip IDs:
+		* E2-LED0    (c) 2000     Golden Tee Fore!
+		* E2-BBH0    (c) 2000     Big Buck Hunter
+		* G42-US-U   (c) 2001     Golden Tee Fore! 2002
+		* BB15-US    (c) 2002     Big Buck Hunter: Shooter's Challenge (AKA Big Buck Hunter v1.5)
+		* BBH2-US    (c) 2002     Big Buck Hunter II: Sportsman's Paradise
+		* CK1-US     (C) 2002     Carnival King
+		* G43-US-U   (c) 2002     Golden Tee Fore! 2003
+		* G44-US-U   (c) 2003     Golden Tee Fore! 2004
+		* G45-US-U   (c) 2004     Golden Tee Fore! 2005
+		* CW-US-U    (c) 2005     Big Buck Hunter: Call of the Wild
+		* G4C-US-U   (c) 2006     Golden Tee Complete
+    	* ????????   (c) ????     Virtual Pool (not on IT's website master list but known to exist)
+ 
+	Valid regions: US = USA, CAN = Canada, ENG = England, EUR = Euro, SWD = Sweden, AUS = Australia, NZ  = New Zealand, SA  = South Africa
  
     Hardware overview:
         * NEC VR4310 CPU (similar to the N64's VR4300)
         * NEC VR4373 "Nile 3" system controller / PCI bridge
-        * 3DFX Voodoo Banshee video
+    	* 3DFX Voodoo Banshee video
+    	* Creative/Ensoniq AudioPCI ES1373 audio
+    	* Atmel 90S2313 AVR-based microcontroller for protection
+    	* STM48T02 NVRAM
+    	* Conexant CX88168 modem
  
     TODO:
 		* Everything (need new PCI subsystem to do this right) 
  
 ***************************************************************************/
+
+/* 
+ 
+Big Buck Hunter II
+Incredible Technologies 2004
+
+PCB Layout
+----------
+
+(main board sticker)
+M/N:SC336
+B/O:H1
+Serial#:8434570
+DOM:2003.05.02
+IC:125A-0005
+Multi-Tech Systems, Inc.
+www.multitech.com
+
+                                          |---------------------|
+|-----------------------------------------|       JAMMA         |----|
+|           PAL(E2-CARD1)                                            |-|
+|                                                                    | |
+|RJ45  4MHz  7.3728MHz                        DSW51(4)               | |VGA IN <--|
+|                 AM85C30                                            |-|          |
+|  ATMEL                     POWER_CONN                     |---|    |            |
+| 90S2313                                  IDE40            |VGA-OUT---->---------|
+| (BH2-AUS-U)     STM48T02                              |---|---|---||
+|                                          IDE40        |14.31818MHz||
+|RJ45        DSW5(4)                                    |48LC1M16A1 ||
+|-------------|   48LC1M16A1         |-------|17550APC  |48LC1M16A1 ||
+|CONNEXANT    |   48LC1M16A1         |XILINX |(RED1.U26)|48LC1M16A1 ||
+|SMART SCM/336|   48LC1M16A1         |SPARTAN|          |48LC1M16A1 ||
+|CX88168-12   |   48LC1M16A1         |XC2550 |          |48LC1M16A1 ||
+|             |   48LC1M16A1         |-------|          |48LC1M16A1 ||
+|SMART DAA    |   48LC1M16A1                            |48LC1M16A1 ||
+|20463-11     |   48LC1M16A1                            |48LC1M16A1 ||
+|-------------|   48LC1M16A1                            ||--------| ||
+|    |--------|  |-----------|                          ||BGA     | ||
+|    |QFP120  |  |           |      27C080              ||WITH    | ||
+|    |WITH    |  |NEC        |      (EAGLE U15 V2.08    ||HEATSINK| ||
+|    |HEATSINK|  |UPD65907GC |      (C)2004 IT, INC)    ||--------| ||
+|    |        |  |-012-NMU   |                          |-----------||
+|    |        |  |VRC 4373   |                                       |
+|    |--------|  |REV1.0     |                        CREATIVE       |
+|PAL(E2-RE53)    |-----------|                        ES1373         |
+|--------------------------------------------------------------------| 
+ 
+*/
 
 #include "emu.h"
 #include "cpu/mips/mips3.h"
