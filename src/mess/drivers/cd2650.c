@@ -78,9 +78,9 @@ READ8_MEMBER( cd2650_state::cass_r )
 READ8_MEMBER( cd2650_state::keyin_r )
 {
 	UINT8 ret = m_term_data;
-	m_term_data = 0x80;
-	if ((ret > 0x60) && (ret < 0x7b))
+	if ((ret > 0x5f) && (ret < 0x80))
 		ret -= 0x20; // upper case only
+	m_term_data = ret | 0x80;
 	return ret;
 }
 
@@ -94,6 +94,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cd2650_io, AS_IO, 8, cd2650_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	//AM_RANGE(0x80, 0x84) disk i/o
 	AM_RANGE(S2650_DATA_PORT,S2650_DATA_PORT) AM_READWRITE(keyin_r, beep_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_FO_PORT) AM_READWRITE(cass_r, cass_w)
 ADDRESS_MAP_END
@@ -135,19 +136,16 @@ UINT32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			for (x = 0; x < 80; x++)
 			{
 				gfx = 0;
-				if (ra < 9)
+				if ((ra) && (ra < 9))
 				{
 					mem = offset + y + (x<<4);
 
 					if (mem > 0x4ff)
 						mem -= 0x500;
 
-					chr = m_p_videoram[mem];
+					chr = m_p_videoram[mem] & 0x3f;
 
-					if (chr < 0x20)
-						chr |= 0x40;
-
-					gfx = m_p_chargen[(chr<<4) | ra ];
+					gfx = m_p_chargen[(BITSWAP8(chr,7,6,2,1,0,3,4,5)<<3) | (ra-1) ];
 				}
 
 				/* Display a scanline of a character */
@@ -164,6 +162,24 @@ UINT32 cd2650_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	return 0;
 }
+
+/* F4 Character Displayer */
+static const gfx_layout cd2650_charlayout =
+{
+	8, 8,                  /* 8 x 12 characters */
+	64,                    /* 256 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( cd2650 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, cd2650_charlayout, 0, 1 )
+GFXDECODE_END
 
 WRITE8_MEMBER( cd2650_state::kbd_put )
 {
@@ -279,6 +295,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SCREEN_UPDATE_DRIVER(cd2650_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 160)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 159)
+	MCFG_GFXDECODE(cd2650)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
@@ -303,9 +320,21 @@ ROM_START( cd2650 )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "cd2650.rom", 0x0000, 0x0400, CRC(5397328e) SHA1(7106fdb60e1ad2bc5e8e45527f348c23296e8d6a))
 
-	/* character generator not dumped, using the one from 'c10' for now */
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_REGION( 0x0200, "chargen", 0 )
+	ROM_LOAD( "char.rom",   0x0000, 0x0200, CRC(9b75db2a) SHA1(4367c01afa503d7cba0c38078fde0b95392c6c2c))
+
+	// various unused roms found on Amigan site
+	ROM_REGION( 0xea00, "user1", 0 )
+	ROM_LOAD( "char2.rom",        0x0000, 0x0400, CRC(b450eea8) SHA1(c1bdba52c2dc5698cad03b6b884b942a083465ed))
+	ROM_LOAD( "supervisor.bin",   0x0400, 0x03ff, CRC(2bcbced4) SHA1(cec7582ba0a908d4ef39f9bd6bfa33a282b88c71))
+	ROM_LOAD( "01a_cd_boots.bin", 0x6c00, 0x0200, CRC(5336c62f) SHA1(e94cf7be01ea806ff7c7b90aee1a4e88f4f1ba9f))
+	ROM_LOAD( "01a_cd_dos.bin",   0x1000, 0x2000, CRC(3f177cdd) SHA1(01afd77ad2f065158cbe032aa26682cb20afe7d8))
+	ROM_LOAD( "01a_cd_pop.bin",   0x3000, 0x1000, CRC(d8f44f11) SHA1(605ab5a045290fa5b99ff4fc8fbfa2a3f202578f))
+	ROM_LOAD( "01b_cd_alp.bin",   0x4000, 0x2a00, CRC(b05568bb) SHA1(29e74633c0cd731c0be25313288cfffdae374236))
+	ROM_LOAD( "01b_cd_basic.bin", 0x7000, 0x3b00, CRC(0cf1e3d8) SHA1(3421e679c238aeea49cd170b34a6f344da4770a6))
+	ROM_LOAD( "01b_cd_mon_m.bin", 0x0800, 0x0400, CRC(f6f19c08) SHA1(1984d85d57fc2a6c5a3bd51fbc58540d7129a0ae))
+	ROM_LOAD( "01b_cd_mon_o.bin", 0x0c00, 0x0400, CRC(9d40b4dc) SHA1(35cffcbd983b7b37c878a15af44100568d0659d1))
+	ROM_LOAD( "02b_cd_alp.bin",   0xc000, 0x2a00, CRC(a66b7f32) SHA1(2588f9244b0ec6b861dcebe666d37d3fa88dd043))
 ROM_END
 
 /* Driver */
