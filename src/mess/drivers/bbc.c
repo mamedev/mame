@@ -743,9 +743,9 @@ static ACIA6850_INTERFACE( bbc_acia6850_interface )
 	0,
 	0,
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_rxd_r),
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_txd_w),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_cts_r),
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_rts_w),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbc_dcd_r),
 	DEVCB_DRIVER_LINE_MEMBER(bbc_state,bbcb_acia6850_irq_w)
 };

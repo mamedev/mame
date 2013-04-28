@@ -1307,69 +1307,133 @@ void bbc_state::MC6850_Receive_Clock(int new_clock)
 
 TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 {
-	double dev_val = m_cassette->input();
-
-	// look for edges on the cassette wave
-	if (((dev_val>=0.0) && (m_last_dev_val<0.0)) || ((dev_val<0.0) && (m_last_dev_val>=0.0)))
+	if ( m_cass_out_enabled )
 	{
-		if (m_wav_len>(9*3))
-		{
-			//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
-			logerror ("Cassette length %d\n",m_wav_len);
-			m_nr_high_tones = 0;
-			m_dcd_cass = 0;
-			m_len0=0;
-			m_len1=0;
-			m_len2=0;
-			m_len3=0;
-			m_wav_len=0;
+		// 0 = 18-18 18-17-1
+		// 1 = 9-9-9-9 9-9-9-8-1
 
+		switch ( m_cass_out_samples_to_go )
+		{
+			case 0:
+				if ( m_cass_out_phase == 0 )
+				{
+					// get bit value
+					m_cass_out_bit = m_txd;
+					if ( m_cass_out_bit )
+					{
+						m_cass_out_phase = 3;
+						m_cass_out_samples_to_go = 9;
+					}
+					else
+					{
+						m_cass_out_phase = 1;
+						m_cass_out_samples_to_go = 18;
+					}
+					m_cassette->output( +1.0 );
+				}
+				else
+				{
+					// switch phase
+					m_cass_out_phase--;
+					m_cass_out_samples_to_go = m_cass_out_bit ? 9 : 18;
+					m_cassette->output( ( m_cass_out_phase & 1 ) ? +1.0 : -1.0 );
+				}
+				break;
+			case 1:
+				if ( m_cass_out_phase == 0 )
+				{
+					m_cassette->output( 0.0 );
+				}
+				break;
 		}
 
-		m_len3=m_len2;
-		m_len2=m_len1;
-		m_len1=m_len0;
-		m_len0=m_wav_len;
-
-		m_wav_len=0;
-		logerror ("cassette  %d  %d  %d  %d\n",m_len3,m_len2,m_len1,m_len0);
-
-		if ((m_len0+m_len1)>=(18+18-5))
-		{
-			/* Clock a 0 onto the serial line */
-			logerror("Serial value 0\n");
-			m_nr_high_tones = 0;
-			m_dcd_cass = 0;
-			MC6850_Receive_Clock(0);
-			m_len0=0;
-			m_len1=0;
-			m_len2=0;
-			m_len3=0;
-		}
-
-		if (((m_len0+m_len1+m_len2+m_len3)<=41) && (m_len3!=0))
-		{
-			/* Clock a 1 onto the serial line */
-			logerror("Serial value 1\n");
-			m_nr_high_tones++;
-			if ( m_nr_high_tones > 100 )
-			{
-				m_dcd_cass = 1;
-			}
-			MC6850_Receive_Clock(1);
-			m_len0=0;
-			m_len1=0;
-			m_len2=0;
-			m_len3=0;
-		}
-
-
+		m_cass_out_samples_to_go--;
 	}
+	else
+	{
+		double dev_val = m_cassette->input();
 
-	m_wav_len++;
-	m_last_dev_val=dev_val;
+		// look for edges on the cassette wave
+		if (((dev_val>=0.0) && (m_last_dev_val<0.0)) || ((dev_val<0.0) && (m_last_dev_val>=0.0)))
+		{
+			if (m_wav_len>(9*3))
+			{
+				//this is to long to recive anything so reset the serial IC. This is a hack, this should be done as a timer in the MC6850 code.
+				logerror ("Cassette length %d\n",m_wav_len);
+				m_nr_high_tones = 0;
+				m_dcd_cass = 0;
+				m_len0=0;
+				m_len1=0;
+				m_len2=0;
+				m_len3=0;
+				m_wav_len=0;
 
+			}
+
+			m_len3=m_len2;
+			m_len2=m_len1;
+			m_len1=m_len0;
+			m_len0=m_wav_len;
+
+			m_wav_len=0;
+			logerror ("cassette  %d  %d  %d  %d\n",m_len3,m_len2,m_len1,m_len0);
+
+			if ((m_len0+m_len1)>=(18+18-5))
+			{
+				/* Clock a 0 onto the serial line */
+				logerror("Serial value 0\n");
+				m_nr_high_tones = 0;
+				m_dcd_cass = 0;
+				MC6850_Receive_Clock(0);
+				m_len0=0;
+				m_len1=0;
+				m_len2=0;
+				m_len3=0;
+			}
+
+			if (((m_len0+m_len1+m_len2+m_len3)<=41) && (m_len3!=0))
+			{
+				/* Clock a 1 onto the serial line */
+				logerror("Serial value 1\n");
+				m_nr_high_tones++;
+				if ( m_nr_high_tones > 100 )
+				{
+					m_dcd_cass = 1;
+				}
+				MC6850_Receive_Clock(1);
+				m_len0=0;
+				m_len1=0;
+				m_len2=0;
+				m_len3=0;
+			}
+
+
+		}
+
+		m_wav_len++;
+		m_last_dev_val=dev_val;
+	}
 }
+
+
+WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
+{
+	if ( m_serproc_data & 0x40 )
+	{
+		m_cass_out_enabled = 0;
+	}
+	else
+	{
+		m_cass_out_enabled = state ? 0 : 1;
+	}
+}
+
+
+WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
+{
+	m_txd = state;
+}
+
 
 void bbc_state::BBC_Cassette_motor(unsigned char status)
 {
@@ -1387,6 +1451,8 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 		m_len2 = 0;
 		m_len3 = 0;
 		m_wav_len = 0;
+		m_cass_out_phase = 0;
+		m_cass_out_samples_to_go = 4;
 	}
 }
 
@@ -1397,11 +1463,46 @@ void bbc_state::BBC_Cassette_motor(unsigned char status)
 // -x-- ---- - Cassette(0)/RS243 input(1)
 // --xx x--- - Receive baud rate generator control
 // ---- -xxx - Transmit baud rate generator control
+//             These possible settings apply to both the receive
+//             and transmit baud generator control bits:
+//             000 - 16MHz / 13 /   1 - 19200 baud
+//             001 - 16MHz / 13 /  16 -  1200 baud
+//             010 - 16MHz / 13 /   4 -  4800 baud
+//             011 - 16MHz / 13 / 128 -   150 baud
+//             100 - 16MHz / 13 /   2 -  9600 baud
+//             101 - 16MHz / 13 /  64 -   300 baud
+//             110 - 16MHz / 13 /   8 -  2400 baud
+//             110 - 16MHz / 13 / 256 -    75 baud
 //
 WRITE8_MEMBER(bbc_state::bbc_SerialULA_w)
 {
+	static const int serial_clocks[8] =
+	{
+		XTAL_16MHz / 13 / 1,    // 000
+		XTAL_16MHz / 13 / 16,   // 001
+		XTAL_16MHz / 13 / 4,    // 010
+		XTAL_16MHz / 13 / 128,  // 011
+		XTAL_16MHz / 13 / 2,    // 100
+		XTAL_16MHz / 13 / 64,   // 101
+		XTAL_16MHz / 13 / 8,    // 110
+		XTAL_16MHz / 13 / 256   // 111
+	};
+
 	m_serproc_data = data;
 	BBC_Cassette_motor(m_serproc_data & 0x80);
+
+	// Set transmit clock rate
+	m_acia->set_tx_clock( serial_clocks[ data & 0x07 ] );
+
+	if ( data & 0x40 )
+	{
+		// Set receive clock rate
+		m_acia->set_rx_clock( serial_clocks[ ( data >> 3 ) & 0x07 ] );
+	}
+	else
+	{
+		m_acia->set_rx_clock( 0 );
+	}
 }
 
 /**************************************
@@ -1993,6 +2094,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 	m_cts_rs423 = 1;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
+	m_cass_out_enabled = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
 }
 
@@ -2005,6 +2107,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 	m_cts_rs423 = 1;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
+	m_cass_out_enabled = 0;
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bbc_state::bbc_tape_timer_cb),this));
 }
 
