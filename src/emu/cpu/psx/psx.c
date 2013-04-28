@@ -3280,6 +3280,7 @@ static MACHINE_CONFIG_FRAGMENT( psx )
 	MCFG_PSX_SIO_IRQ_HANDLER(DEVWRITELINE("irq", psxirq_device, intin8))
 
 	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
