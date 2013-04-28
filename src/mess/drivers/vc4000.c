@@ -533,6 +533,7 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
+	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
@@ -540,90 +541,93 @@ QUICKLOAD_LOAD_MEMBER( vc4000_state,vc4000)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
 		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
-	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
-	}
-
-	if (mame_stricmp(image.filetype(), "tvc")==0)
-	{
-		if (quick_data[0] != 2)
-		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-			image.message(" Invalid header");
-			return IMAGE_INIT_FAIL;
-		}
-
-		quick_addr = quick_data[1] * 256 + quick_data[2];
-		exec_addr = quick_data[3] * 256 + quick_data[4];
-
-		space.write_byte(0x08be, quick_data[3]);
-		space.write_byte(0x08bf, quick_data[4]);
-
-		for (i = 0; i < quick_length - 5; i++)
-			if ((quick_addr + i) < 0x1600)
-				space.write_byte(i + quick_addr, quick_data[i+5]);
-
-		/* display a message about the loaded quickload */
-		image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
-
-		// Start the quickload
-		m_maincpu->set_pc(exec_addr);
-		return IMAGE_INIT_PASS;
 	}
 	else
-	if (mame_stricmp(image.filetype(), "pgm")==0)
 	{
-		if (quick_data[0] != 0)
+		read_ = image.fread( quick_data, quick_length);
+		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
-			image.message(" Invalid header");
-			return IMAGE_INIT_FAIL;
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.message(" Cannot read the file");
 		}
-
-		exec_addr = quick_data[1] * 256 + quick_data[2];
-
-		if (exec_addr >= quick_length)
+		else
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
-			image.message(" Exec address beyond end of file");
-			return IMAGE_INIT_FAIL;
+			if (mame_stricmp(image.filetype(), "tvc")==0)
+			{
+				if (quick_data[0] != 2)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+					image.message(" Invalid header");
+				}
+				else
+				{
+					quick_addr = quick_data[1] * 256 + quick_data[2];
+					exec_addr = quick_data[3] * 256 + quick_data[4];
+
+					space.write_byte(0x08be, quick_data[3]);
+					space.write_byte(0x08bf, quick_data[4]);
+
+					for (i = 0; i < quick_length - 5; i++)
+						if ((quick_addr + i) < 0x1600)
+							space.write_byte(i + quick_addr, quick_data[i+5]);
+
+					/* display a message about the loaded quickload */
+					image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length-5,quick_addr,quick_addr+quick_length-5,exec_addr);
+
+					// Start the quickload
+					m_maincpu->set_pc(exec_addr);
+					result = IMAGE_INIT_PASS;
+				}
+			}
+			else
+			if (mame_stricmp(image.filetype(), "pgm")==0)
+			{
+				if (quick_data[0] != 0)
+				{
+					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+					image.message(" Invalid header");
+				}
+				else
+				{
+					exec_addr = quick_data[1] * 256 + quick_data[2];
+
+					if (exec_addr >= quick_length)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+						image.message(" Exec address beyond end of file");
+					}
+					else
+					if (quick_length < 0x904)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+						image.message(" File too short");
+					}
+					else
+					// some programs store data in PVI memory and other random places. This is not supported.
+					if (quick_length > 0x1600)
+					{
+						image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+						image.message(" File too long");
+					}
+					else
+					{
+						for (i = quick_addr; i < quick_length; i++)
+							if (i < 0x1600)
+								space.write_byte(i, quick_data[i]);
+
+						/* display a message about the loaded quickload */
+						image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
+
+						// Start the quickload
+						m_maincpu->set_pc(exec_addr);
+						result = IMAGE_INIT_PASS;
+					}
+				}
+			}
 		}
-
-		if (quick_length < 0x904)
-		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
-			image.message(" File too short");
-			return IMAGE_INIT_FAIL;
-		}
-
-		// some programs store data in PVI memory and other random places. This is not supported.
-		if (quick_length > 0x1600)
-		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
-			image.message(" File too long");
-			return IMAGE_INIT_FAIL;
-		}
-
-		for (i = quick_addr; i < quick_length; i++)
-			if (i < 0x1600)
-				space.write_byte(i, quick_data[i]);
-
-		/* display a message about the loaded quickload */
-		image.message(" Quickload: size=%04X : exec=%04X",quick_length,exec_addr);
-
-		// Start the quickload
-		m_maincpu->set_pc(exec_addr);
-		return IMAGE_INIT_PASS;
+		free (quick_data);
 	}
-	else
-		return IMAGE_INIT_FAIL;
+	return result;
 }
 
 

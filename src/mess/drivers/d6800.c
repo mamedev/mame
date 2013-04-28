@@ -338,11 +338,12 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
-	int quick_addr = 0x0200;
+	int quick_addr = 0x200;
 	int exec_addr = 0xc000;
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
+	int result = IMAGE_INIT_FAIL;
 
 	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
@@ -350,27 +351,34 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot open file");
 		image.message(" Cannot open file");
-		return IMAGE_INIT_FAIL;
 	}
-
-	read_ = image.fread( quick_data, quick_length);
-	if (read_ != quick_length)
+	else
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
-		image.message(" Cannot read the file");
-		return IMAGE_INIT_FAIL;
+		read_ = image.fread( quick_data, quick_length);
+		if (read_ != quick_length)
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.message(" Cannot read the file");
+		}
+		else
+		{
+			for (i = 0; i < quick_length; i++)
+				if ((quick_addr + i) < 0x800)
+					space.write_byte(i + quick_addr, quick_data[i]);
+
+			/* display a message about the loaded quickload */
+			image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
+
+			// Start the quickload
+			m_maincpu->set_pc(exec_addr);
+
+			result = IMAGE_INIT_PASS;
+		}
+
+		free( quick_data );
 	}
 
-	for (i = 0; i < quick_length; i++)
-		if ((quick_addr + i) < 0x800)
-			space.write_byte(i + quick_addr, quick_data[i]);
-
-	/* display a message about the loaded quickload */
-	image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
-
-	// Start the quickload
-	m_maincpu->set_pc(exec_addr);
-	return IMAGE_INIT_PASS;
+	return result;
 }
 
 static MACHINE_CONFIG_START( d6800, d6800_state )
