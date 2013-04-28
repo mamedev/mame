@@ -62,7 +62,7 @@ www.multitech.com
 | (BH2-AUS-U)     STM48T02                              |---|---|---||
 |                                          IDE40        |14.31818MHz||
 |RJ45        DSW5(4)                                    |48LC1M16A1 ||
-|-------------|   48LC1M16A1         |-------|17550APC  |48LC1M16A1 ||
+|-------------|   48LC1M16A1         |-------|17S50APC  |48LC1M16A1 ||
 |CONNEXANT    |   48LC1M16A1         |XILINX |(RED1.U26)|48LC1M16A1 ||
 |SMART SCM/336|   48LC1M16A1         |SPARTAN|          |48LC1M16A1 ||
 |CX88168-12   |   48LC1M16A1         |XC2550 |          |48LC1M16A1 ||
@@ -70,7 +70,7 @@ www.multitech.com
 |SMART DAA    |   48LC1M16A1                            |48LC1M16A1 ||
 |20463-11     |   48LC1M16A1                            |48LC1M16A1 ||
 |-------------|   48LC1M16A1                            ||--------| ||
-|    |--------|  |-----------|                          ||BGA     | ||
+|    |--------|  |-----------|              AT93C46.U61 ||BGA     | ||
 |    |QFP120  |  |           |      27C080              ||WITH    | ||
 |    |WITH    |  |NEC        |      (EAGLE U15 V2.08    ||HEATSINK| ||
 |    |HEATSINK|  |UPD65907GC |      (C)2004 IT, INC)    ||--------| ||
