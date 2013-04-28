@@ -2,6 +2,20 @@
     Diet Go Go
 
     Driver by Bryan McPhail and David Haywood.
+
+Hold both START buttons on bootup to display version notice.
+
+Diet Go Go (Japan)   DATA EAST
+
+NAME    LOCATION   TYPE
+-----------------------
+JW-02    14M       27C512
+JW-01-2  5H        27C2001
+JW-00-2  4H         "
+PAL16L8B 7H
+PAL16L8B 6H
+PAL16R6A 11H
+
 */
 
 #include "emu.h"
@@ -226,124 +240,103 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
+
 /* Diet Go Go */
-
-ROM_START( dietgou )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_BYTE( "jx.00",    0x000001, 0x040000, CRC(1a9de04f) SHA1(7ce1e7cf4cdce2b02da4df2a6ae9a9e665e24422) )
-	ROM_LOAD16_BYTE( "jx.01",    0x000000, 0x040000, CRC(79c097c8) SHA1(be49055ee324535e1118d243bd49e74ec1d2a2d7) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "jx.02",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "may00",    0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "may01",    0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
-	ROM_LOAD16_BYTE( "may02",    0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "may03",    0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
-
-	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16l8b.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-ROM_END
-
-/*
-
-Diet Go Go (Euro version 1.1)
-
-Alternative program ROMs only
-
-Hold both START buttons on bootup to display version notice.
-
-*/
-
-ROM_START( dietgoe )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_BYTE( "jy00-1.4h",    0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
-	ROM_LOAD16_BYTE( "jy01-1.5h",    0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "jy02.m14",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "may00",    0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "may01",    0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
-	ROM_LOAD16_BYTE( "may02",    0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "may03",    0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
-
-	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16l8b.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
-ROM_END
 
 ROM_START( dietgo )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_BYTE( "jy00-2.h4",    0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
-	ROM_LOAD16_BYTE( "jy01-2.h5",    0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
+	ROM_LOAD16_BYTE( "jy_00-2.h4", 0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
+	ROM_LOAD16_BYTE( "jy_01-2.h5", 0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "jy02.m14",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
+	ROM_LOAD( "jy_02.m14", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "may00",    0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
+	ROM_LOAD( "may00", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "may01",    0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
-	ROM_LOAD16_BYTE( "may02",    0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
+	ROM_LOAD16_BYTE( "may01", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
+	ROM_LOAD16_BYTE( "may02", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "may03",    0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+	ROM_LOAD( "may03", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "pal16l8b.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16l8b.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "pal16r6a.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-/*
+ROM_START( dietgoe ) // weird, still version 1.1 but different (earlier) date
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "jy_00-1.4h", 0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
+	ROM_LOAD16_BYTE( "jy_01-1.5h", 0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
 
-               DIET GO GO    DATA EAST
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jy_02.m14", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "may00", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
 
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "may01", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
+	ROM_LOAD16_BYTE( "may02", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
-NAME    LOCATION   TYPE
------------------------
-JW-02    14M       27C512
-JW-01-2  5H        27C2001
-JW-00-2  4H         "
-PAL16L8B 7H
-PAL16L8B 6H
-PAL16R6A 11H
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "may03", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
-*/
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
+ROM_START( dietgou )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
+	ROM_LOAD16_BYTE( "jx_00-.4h", 0x000001, 0x040000, CRC(1a9de04f) SHA1(7ce1e7cf4cdce2b02da4df2a6ae9a9e665e24422) )
+	ROM_LOAD16_BYTE( "jx_01-.5h", 0x000000, 0x040000, CRC(79c097c8) SHA1(be49055ee324535e1118d243bd49e74ec1d2a2d7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jx_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) ) /* Same as other regions but different label */
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "may00", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "may01", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
+	ROM_LOAD16_BYTE( "may02", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_LOAD( "may03", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
+ROM_END
 
 ROM_START( dietgoj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* DE102 code (encrypted) */
-	ROM_LOAD16_BYTE( "jw-00-2.4h",    0x000001, 0x040000, CRC(e6ba6c49) SHA1(d5eaea81f1353c58c03faae67428f7ee98e766b1) )
-	ROM_LOAD16_BYTE( "jw-01-2.5h",    0x000000, 0x040000, CRC(684a3d57) SHA1(bd7a57ba837a1dc8f92b5ebcb46e50db1f98524f) )
+	ROM_LOAD16_BYTE( "jw_00-2.4h", 0x000001, 0x040000, CRC(e6ba6c49) SHA1(d5eaea81f1353c58c03faae67428f7ee98e766b1) )
+	ROM_LOAD16_BYTE( "jw_01-2.5h", 0x000000, 0x040000, CRC(684a3d57) SHA1(bd7a57ba837a1dc8f92b5ebcb46e50db1f98524f) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "jx.02",    0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
+	ROM_LOAD( "jw_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) ) /* Same as other regions but different label */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "may00",    0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
+	ROM_LOAD( "may00", 0x00000, 0x100000, CRC(234d1f8d) SHA1(42d23aad20df20cbd2359cc12bdd47636b2027d3) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "may01",    0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
-	ROM_LOAD16_BYTE( "may02",    0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
+	ROM_LOAD16_BYTE( "may01", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
+	ROM_LOAD16_BYTE( "may02", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "may03",    0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+	ROM_LOAD( "may03", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16l8b_vd-00.6h",  0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16l8b_vd-01.7h",  0x0200, 0x0104, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "pal16r6a_vd-02.11h", 0x0400, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
 
@@ -354,6 +347,6 @@ DRIVER_INIT_MEMBER(dietgo_state,dietgo)
 }
 
 GAME( 1992, dietgo,   0,      dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)" , GAME_SUPPORTS_SAVE ) // weird, still version 1.1 but different date
+GAME( 1992, dietgoe,  dietgo, dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Euro v1.1 1992.08.04)" , GAME_SUPPORTS_SAVE )
 GAME( 1992, dietgou,  dietgo, dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (USA v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )
 GAME( 1992, dietgoj,  dietgo, dietgo, dietgo, dietgo_state,  dietgo,    ROT0, "Data East Corporation", "Diet Go Go (Japan v1.1 1992.09.26)", GAME_SUPPORTS_SAVE )
