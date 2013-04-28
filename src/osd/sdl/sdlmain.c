@@ -67,8 +67,10 @@
 //============================================================
 
 #ifndef INI_PATH
-#if defined(SDLMAME_WIN32) || defined(SDLMAME_MACOSX) || defined(SDLMAME_OS2)
+#if defined(SDLMAME_WIN32) || defined(SDLMAME_OS2)
 	#define INI_PATH ".;ini"
+#elif defined(SDLMAME_MACOSX)
+	#define INI_PATH "$HOME/Library/Application Support/APP_NAME;$HOME/.APP_NAME;.;ini"
 #else
 	#define INI_PATH "$HOME/.APP_NAME;.;ini"
 #endif // MACOSX
