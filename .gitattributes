@@ -3394,6 +3394,7 @@ src/mame/drivers/phoenix.c svneol=native#text/plain
 src/mame/drivers/photon.c svneol=native#text/plain
 src/mame/drivers/photon2.c svneol=native#text/plain
 src/mame/drivers/photoply.c svneol=native#text/plain
+src/mame/drivers/pinball2k.c svneol=native#text/plain
 src/mame/drivers/pingpong.c svneol=native#text/plain
 src/mame/drivers/pinkiri8.c svneol=native#text/plain
 src/mame/drivers/pipedrm.c svneol=native#text/plain

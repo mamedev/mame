@@ -1055,6 +1055,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/midyunit.o $(MACHINE)/midyunit.o $(VIDEO)/midyunit.o \
 	$(DRIVERS)/midzeus.o $(VIDEO)/midzeus.o $(VIDEO)/midzeus2.o \
 	$(DRIVERS)/omegrace.o \
+    $(DRIVERS)/pinball2k.o \
 	$(DRIVERS)/seattle.o \
 	$(DRIVERS)/tmaster.o \
 	$(DRIVERS)/vegas.o $(DRIVERS)/wmg.o \

@@ -7801,6 +7801,11 @@ tm8k902         // (c) 2000 Midway Games
 galgbios        // (c) 1998 Creative Electronics & Software (CES)
 galgame2        // (c) 1998 Creative Electronics & Software (CES) / Namco
 
+// Williams/Bally/Midway Pinball 2000
+swe1pb
+rfmpb
+rfmpbr2
+
 // Creative Electronics & Software
 tapatune
 hrclass
