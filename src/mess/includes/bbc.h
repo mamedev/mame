@@ -334,7 +334,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
 	DECLARE_READ_LINE_MEMBER(bbc_rxd_r) { return ( m_serproc_data & 0x40 ) ? m_rxd_rs423 : m_rxd_cass; }
 	DECLARE_READ_LINE_MEMBER(bbc_dcd_r) { return ( m_serproc_data & 0x40 ) ? 0 : m_dcd_cass; }
-	DECLARE_READ_LINE_MEMBER(bbc_cts_r) { return ( m_serproc_data & 0x40 ) ? m_cts_rs423 : 1; }
+	DECLARE_READ_LINE_MEMBER(bbc_cts_r) { return ( m_serproc_data & 0x40 ) ? m_cts_rs423 : 0; }
 	DECLARE_WRITE_LINE_MEMBER(bbc_rts_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_txd_w);
 

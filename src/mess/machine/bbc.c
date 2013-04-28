@@ -2091,7 +2091,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbc)
 	m_rxd_cass = 0;
 	m_rxd_rs423 = 0;
 	m_dcd_cass = 0;
-	m_cts_rs423 = 1;
+	m_cts_rs423 = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
@@ -2104,7 +2104,7 @@ DRIVER_INIT_MEMBER(bbc_state,bbcm)
 	m_rxd_cass = 0;
 	m_rxd_rs423 = 0;
 	m_dcd_cass = 0;
-	m_cts_rs423 = 1;
+	m_cts_rs423 = 0;
 	m_nr_high_tones = 0;
 	m_serproc_data = 0;
 	m_cass_out_enabled = 0;
