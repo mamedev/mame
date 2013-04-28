@@ -61,6 +61,12 @@
         minus. The orange digits show the current data at that address. To alter
         data, just type it in and press UP.
 
+        To play the reflexes game, hold UP, press 1, release UP, release 1.
+        The display will show A--0 (or some random number in the last position).
+        Press any odd-numbered key (B is convenient), and read off the reaction time.
+        After a short delay it will show '--' again, this is the signal to react.
+        It doesn't seem to reset the counters each time around.
+
         TODO:
         - Find missing roms
         - Add optional hardware listed above
@@ -135,6 +141,7 @@ static ADDRESS_MAP_START( dolphunk_mem, AS_PROGRAM, 8, dolphunk_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x01ff) AM_ROM
 	AM_RANGE( 0x0200, 0x02ff) AM_RAM
+	AM_RANGE( 0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dolphunk_io, AS_IO, 8, dolphunk_state )
@@ -193,8 +200,16 @@ MACHINE_CONFIG_END
 ROM_START( dolphunk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, CRC(a8811f48) SHA1(233c629dc20fac286c8c1559e461bb0b742a675e) )
+	// This one is used in winarcadia but it is a bad dump, we use the corrected one above
+	//ROM_LOAD( "dolphin_mo.rom", 0x0000, 0x0100, BAD_DUMP CRC(1ac4ac18) SHA1(62a63de6fcd6cd5fcee930d31c73fe603647f06c) )
+
 	ROM_LOAD( "dolphin_moni.rom", 0x0100, 0x0100, NO_DUMP )
-	ROM_LOAD_OPTIONAL( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
+
+	//ROM_LOAD_OPTIONAL( "dolphin_mona.rom", 0x0c00, 0x0400, NO_DUMP )
+	// This rom is a bugfixed and relocated version of the game found on the Amigan site
+	ROM_LOAD_OPTIONAL( "reflexes.bin", 0x0c00, 0x0400, CRC(14a1557d) SHA1(789d10551f1bb3472057901fa3cee0c6bfe220ac) )
+	// This the original
+	//ROM_LOAD( "reflexes.bin", 0x0c00, 0x0072, CRC(c4bed94b) SHA1(cf525755a1dbce6a4681353be692ddf0346f323b) )
 ROM_END
 
 /* Driver */
