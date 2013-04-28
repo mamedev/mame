@@ -2,6 +2,7 @@
 #define __NES_KONAMI_H
 
 #include "machine/nes_nxrom.h"
+#include "audio/vrc6.h"
 
 
 // ======================> nes_konami_vrc1_device
@@ -111,9 +112,11 @@ public:
 	nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
+	virtual void device_start();
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
-	// TODO: emulate sound capabilities!
+	required_device<vrc6snd_device> m_vrc6snd;
 };
 
 

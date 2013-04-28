@@ -39,6 +39,7 @@
 
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 
+#define N2A03_DEFAULTCLOCK (21477272.724 / 12)
 
 //-------------------------------------------------
 //  constructor
@@ -78,7 +79,8 @@ nes_konami_vrc4_device::nes_konami_vrc4_device(const machine_config &mconfig, co
 }
 
 nes_konami_vrc6_device::nes_konami_vrc6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_konami_vrc4_device(mconfig, NES_VRC6, "NES Cart Konami VRC-6 PCB", tag, owner, clock, "nes_vrc6", __FILE__)
+					: nes_konami_vrc4_device(mconfig, NES_VRC6, "NES Cart Konami VRC-6 PCB", tag, owner, clock, "nes_vrc6", __FILE__),
+					m_vrc6snd(*this, "vrc6snd")
 {
 }
 
@@ -185,6 +187,11 @@ void nes_konami_vrc4_device::pcb_reset()
 	m_latch = 0;
 	m_mmc_prg_bank = 0;
 	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
+}
+
+void nes_konami_vrc6_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
 }
 
 void nes_konami_vrc7_device::device_start()
@@ -573,9 +580,11 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 		case 0x4000:
 			prg8_cd(data);
 			break;
-		case 0x1000:
-		case 0x2000:
-			LOG_MMC(("Konami VRC-6 Sound write, offset: %04x, data: %02x\n", (offset & 0x7000) | add_lines, data));
+		case 0x1000:	// pulse 1 & global control
+			m_vrc6snd->write(space, add_lines>>8, data);
+			break;
+		case 0x2000:	// pulse 2
+			m_vrc6snd->write(space, (add_lines>>8) | 0x100, data);
 			break;
 		case 0x3000:
 			if (add_lines == 0x300)
@@ -588,8 +597,10 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 					case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 			}
-			else
-				LOG_MMC(("Konami VRC-6 Sound write, offset: %04x, data: %02x\n", (offset & 0x7000) | add_lines, data));
+			else	// saw 
+			{
+				m_vrc6snd->write(space, (add_lines>>8) | 0x200, data);
+			}
 			break;
 		case 0x5000:
 		case 0x6000:
@@ -621,6 +632,25 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 			logerror("VRC-6 write_h uncaught write, addr: %04x value: %02x\n", ((offset & 0x7000) | add_lines) + 0x8000, data);
 			break;
 	}
+}
+
+static MACHINE_CONFIG_FRAGMENT( vrc6 )
+
+	// additional sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("addon")
+
+	MCFG_SOUND_ADD("vrc6snd", VRC6, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
+MACHINE_CONFIG_END
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor nes_konami_vrc6_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( vrc6 );
 }
 
 /*-------------------------------------------------

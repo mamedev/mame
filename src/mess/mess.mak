@@ -1425,6 +1425,7 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes_jy.o  \
 	$(MESS_MACHINE)/nes_kaiser.o  \
 	$(MESS_MACHINE)/nes_konami.o  \
+	$(MESS_AUDIO)/vrc6.o          \
 	$(MESS_MACHINE)/nes_legacy.o  \
 	$(MESS_MACHINE)/nes_multigame.o  \
 	$(MESS_MACHINE)/nes_namcot.o  \
