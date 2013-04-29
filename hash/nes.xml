@@ -63462,18 +63462,20 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="vballfdsa" cloneof="volley" supported="no">
+	<software name="vballfds" cloneof="volley" supported="no">
 		<description>Volleyball (Asia, FDS conversion, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smb2j" />
+			<feature name="slot" value="09034a" />
 			<feature name="pcb" value="UNL-SMB2J" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="volleyball (fds conversion) (unl) [u].chr" size="8192" crc="0101a6fb" sha1="fd7338e3802b897172f0f22e7f5a191bc68dd6d2" offset="00000" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="32768">
-				<rom name="volleyball (fds conversion) (unl) [u].prg" size="32768" crc="d4fb2cd8" sha1="56cacee106de0116857421081c778ebc9d480aa0" offset="00000" status="baddump" />
+			<dataarea name="prg" size="40960">
+				<rom name="volleyball (fds conversion) (unl) [u].prg0" size="32768" crc="d4fb2cd8" sha1="56cacee106de0116857421081c778ebc9d480aa0" offset="0x0000" status="baddump" />
+				<rom name="volleyball (fds conversion) (unl) [u].prg1" size="8192" crc="b160e5eb" sha1="c5564e86cd50468745c8dff34398f95422a6d877" offset="0x8000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -63718,7 +63720,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="vballfds" cloneof="volley" supported="no">
+	<software name="vballfdsa" cloneof="volley" supported="no">
 		<description>Volleyball (Asia, FDS conversion)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>

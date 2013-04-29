@@ -3,19 +3,60 @@
  
  Nintendo NES/FC cart emulation
  (through slot devices)
- 
- TODO: add notes about driver connections + about open bus (and our sketchy implementation) + about bus conflict...
-  
- ***********************************************************************************************************/
 
-/*****************************************************************************************
+ The driver exposes address ranges
+ 0x4100-0x5fff to read_l/write_l
+ 0x6000-0x7fff to read_m/write_m (here are *usually* installed NVRAM & WRAM, if any)
+ 0x8000-0xffff to write_h (reads are directed to 4 x 8K PRG banks)
+ Default implementations of these handlers are available here, to be rewritten by PCB-specific ones when needed.
  
- Notes to be merged / split...
+ Additional handlers are available, but have to be manually installed at machine_start
+ * read_ex/write_ex for address range 0x4020-0x40ff
+ * read_h for address range 0x8000-0xffff when a cart does some protection or address scramble before reading ROM
 
- Many information about the mappers below come from the wonderful doc written by Disch.
+ PPU exposes address ranges
+ 0x0000-0x1fff to chr_r/chr_w
+ 0x2000-0x3eff to nt_r/nt_w
+ Default implementations of these handlers are available here, to be rewritten by PCB-specific ones when needed.
+
+ Plus a few of latch functions are available: ppu_latch (see MMC2), hblank_irq and scanline_irq (see e.g. MMC3),
+ but these might be subject to future changes when the PPU is revisited.
+ 
+ Notes:
+ - Differently from later systems (like SNES or MD), it is uncommon to find PRG ROMs of NES games which are not a 
+   power of 2K, so we do not perform any mirroring by default.
+   A bunch of pcb types, though, come with 1.5MB of PRG (some Waixing translations) or with multiple PRG chips 
+   having peculiar size (32K + 16K, 32K + 8K, 32K + 2K). Hence, if such a configuration is detected, we provide 
+   a m_prg_bank_map array to handle internally PRG mirroring up to the next power of 2K, as long as the size is 
+   a multiple of 8K (i.e. the unit chunk for standard PRG). 
+   For the case of PRG chips which are not-multiple of 8K (e.g. UNL-MARIO2-MALEE pcb), the handling has to be 
+   handled in the pcb-specific code!
+ - Our open bus emulation is very sketchy, by simply returning the higher 8bits of the accessed address. This seems
+   enough for most games (only two sets have issues with this). A slightly better implementation is almost ready
+   to fix these two remaining cases, but I plan to revisit the whole implementation in an accurate way at a later
+   stage
+ - Bus conflict is implemented based on latest tests by Blargg. There is some uncertainty about AxROM behavior
+   (some AOROM pcbs suffers from bus conflict, some do not... since no AOROM game is known to glitch due to lack 
+   of bus conflict it seems safe to emulate the board without bus conflict, but eventually it would be good to
+   differentiate the real variants)
+
+
+ Many information about the mappers/pcbs come from the wonderful doc written by Disch.
  Current info (when used) are based on v0.6.1 of his docs.
  You can find the latest version of the doc at http://www.romhacking.net/docs/362/
  
+ A lot of details have been based on the researches carried on at NesDev forums (by Blargg, Quietust and many more) 
+ and collected on the NesDev Wiki http://wiki.nesdev.com/
+ 
+ Particular thanks go to
+ - Martin Freij for his work on NEStopia
+ - Cah4e3 for his efforts on FCEUMM and the reverse engineering of pirate boards
+ - BootGod, lidnariq and naruko for the PCB tests which made possible
+
+ 
+ ***********************************************************************************************************/
+
+/*****************************************************************************************
  
  A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than
  a kind of boards. In these cases (and only in these cases) we exploit nes.hsi to set up accordingly
@@ -118,12 +159,12 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 		m_prg = auto_alloc_array_clear(machine, UINT8, size);
 		m_prg_size = size;
 		m_prg_chunks = size / 0x4000;
-		if (size % 0x4000)
+		if (size % 0x2000)
 		{
 			// A few pirate carts have PRG made of 32K + 2K or some weird similar config
 			// in this case we treat the banking as if this 'extra' PRG is not present and
 			// the pcb code has to handle it by accessing directly m_prg!
-			printf("Warning! The loaded PRG has size not a multiple of 16KB (0x%X)\n", (UINT32)size);
+			printf("Warning! The loaded PRG has size not a multiple of 8KB (0x%X)\n", (UINT32)size);
 			m_prg_chunks--;
 		}
 

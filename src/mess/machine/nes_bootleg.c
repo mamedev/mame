@@ -1109,14 +1109,13 @@ WRITE8_MEMBER(nes_smb2jb_device::write_ex)
  (UNL-)09-034A
  
  Games: Zanac FDS conversion with two PRG chips and
- no CHRROM (apparently also a Volleyball FDS conversion
- but the ones we have do not seem to be on this hw
+ no CHRROM and Volleyball FDS conversion with two PRG 
+ chips and CHRROM.
  Originally dumps were marked as UNL-SMB2J pcb
-
  
  iNES: 
  
- In MESS: Supported (for Zanac)
+ In MESS: Supported.
  
  -------------------------------------------------*/
 
@@ -1125,17 +1124,14 @@ WRITE8_MEMBER(nes_09034a_device::write_ex)
 	LOG_MMC(("09-034a write_ex, offset: %04x, data: %02x\n", offset, data));
 	
 	if (offset == 7)	// $4027
-	{
 		m_reg = data & 1;
-		if (m_chr_source == CHRRAM)		// zanac has no CHRROM and is wired differently so to access the second PRG chip
-			m_reg += 4;
-	}
 }
 
 READ8_MEMBER(nes_09034a_device::read_m)
 {
 	LOG_MMC(("09-034a read_m, offset: %04x\n", offset));
-	return m_prg[(m_reg * 0x2000) + offset];
+	// in 0x6000-0x7fff is mapped the 2nd PRG chip which starts after 32K (hence the +4)
+	return m_prg[((m_reg + 4) * 0x2000) + offset];
 }
 
 /*-------------------------------------------------
