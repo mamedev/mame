@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
 
@@ -4303,7 +4303,7 @@
 		</part>
 	</software>
 
-	<software name="ghostb">
+	<software name="ghostbst">
 		<description>Ghostbusters</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>

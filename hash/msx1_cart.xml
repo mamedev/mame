@@ -536,7 +536,7 @@ Xyzolog - Electric Software
 		</part>
 	</software>
 
-	<software name="flighsim">
+	<software name="fsim">
 		<description>Flight Simulator - Gyorai Kougeki (Jpn)</description>
 		<year>1988</year>
 		<publisher>subLOGIC</publisher>
@@ -6887,7 +6887,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 <!-- Title screen differs from the one depicted at http://www.generation-msx.nl/msxdb/softwareinfo/497 -->
-	<software name="jetset">
+	<software name="jetsetw">
 		<description>Jet Set Willy (Jpn)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>
@@ -6900,7 +6900,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="jetseta" cloneof="jetset">
+	<software name="jetsetwa" cloneof="jetsetw">
 		<description>Jet Set Willy (Jpn, Alt)</description>
 		<year>1985</year>
 		<publisher>Hudson Soft</publisher>

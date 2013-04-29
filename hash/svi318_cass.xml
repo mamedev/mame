@@ -4,8 +4,7 @@
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
                     : http://www.samdal.com/svsoftware.htm
 
-These Cassettes is not dumped:
-
+These Cassettes are not dumped:
 
 SD-253T SVjungle
 SD-238T Othello
@@ -29,9 +28,9 @@ SD-292T Ninja
 	<!--Official Software-->
 	<software name="telebuny">
 		<description>Telebunny</description>
-		<!--SD-241T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-241T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -42,9 +41,9 @@ SD-292T Ninja
 
 	<software name="sasa">
 		<description>Sasa</description>
-		<!--SD-243T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-243T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -55,9 +54,9 @@ SD-292T Ninja
 
 	<software name="kungfu">
 		<description>Kung Fu Master</description>
-		<!--SD-293T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-293T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -68,9 +67,9 @@ SD-292T Ninja
 
 	<software name="tetrahor">
 		<description>Tetra Horror</description>
-		<!--SD-216T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-216T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -81,9 +80,9 @@ SD-292T Ninja
 
 	<software name="oldmac">
 		<description>Old Mac Farmer</description>
-		<!--SD-211T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-211T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -94,9 +93,9 @@ SD-292T Ninja
 
 	<software name="turboat">
 		<description>Turboat</description>
-		<!--SD-242T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-242T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -107,9 +106,9 @@ SD-292T Ninja
 
 	<software name="spectron">
 		<description>Spectron</description>
-		<!--SD-234T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-234T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
@@ -120,9 +119,9 @@ SD-292T Ninja
 
 	<software name="armraslt">
 		<description>Armoured Assualt</description>
-		<!--SD-233T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-233T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16384">
@@ -133,9 +132,9 @@ SD-292T Ninja
 
 	<software name="nybbltz">
 		<description>New York Bomb Blitz</description>
-		<!--SD-219T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-219T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8042">
@@ -146,9 +145,9 @@ SD-292T Ninja
 
 	<software name="rescue">
 		<description>Rescue</description>
-		<!--SD-257T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-257T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7303">
@@ -159,9 +158,9 @@ SD-292T Ninja
 
 	<software name="minigolf">
 		<description>Mini Golf</description>
-		<!--SD-260T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-260T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8126">
@@ -172,9 +171,9 @@ SD-292T Ninja
 
 	<software name="junoland">
 		<description>Juno Lander</description>
-		<!--SD-260T-->
 		<year>1983</year>
 		<publisher>SIL</publisher>
+		<info name="serial" value="SD-260T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7992">
@@ -185,9 +184,9 @@ SD-292T Ninja
 
 	<software name="sdairy">
 		<description>Spectra Dairy</description>
-		<!--SD-228T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-228T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8554">
@@ -198,9 +197,9 @@ SD-292T Ninja
 
 	<software name="shomecon">
 		<description>Spectra Home Economist</description>
-		<!--SD-229T-->
 		<year>1983</year>
 		<publisher>Intellisoft</publisher>
+		<info name="serial" value="SD-229T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10467">
@@ -211,9 +210,9 @@ SD-292T Ninja
 
 	<software name="srecipe">
 		<description>Spectra Recipe Management</description>
-		<!--SD-239T-->
 		<year>1983</year>
 		<publisher>Intellisoft</publisher>
+		<info name="serial" value="SD-239T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7903">
@@ -224,9 +223,9 @@ SD-292T Ninja
 
 	<software name="filecab">
 		<description>Spectra File Cabinet</description>
-		<!--SD-225T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-225T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11944">
@@ -237,9 +236,9 @@ SD-292T Ninja
 
 	<software name="justwrit">
 		<description>Just Write JR</description>
-		<!--SD-294C Should be a cartridge but a Tape dump exist-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-294C Should be a cartridge but a Tape dump exist" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -250,9 +249,9 @@ SD-292T Ninja
 
 	<software name="compatab">
 		<description>Compatability</description>
-		<!--SD-308T-->
 		<year>1983</year>
 		<publisher>SIL</publisher>
+		<info name="serial" value="SD-308T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7170">
@@ -263,9 +262,9 @@ SD-292T Ninja
 
 	<software name="biorythm">
 		<description>Biorythm SVI</description>
-		<!--SD-301T-->
 		<year>1983</year>
 		<publisher>SIL</publisher>
+		<info name="serial" value="SD-301T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8845">
@@ -276,9 +275,9 @@ SD-292T Ninja
 
 	<software name="swingman">
 		<description>Swing Man</description>
-		<!--SD-221T-->
 		<year>1983</year>
 		<publisher>Softy</publisher>
+		<info name="serial" value="SD-221T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11919">
@@ -289,9 +288,9 @@ SD-292T Ninja
 
 	<software name="muscmntr">
 		<description>Music Mentor</description>
-		<!--SD-236T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-236T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -302,9 +301,9 @@ SD-292T Ninja
 
 	<software name="starword">
 		<description>Star Words</description>
-		<!--SD-256T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-256T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="15975">
@@ -315,9 +314,9 @@ SD-292T Ninja
 
 	<software name="nomis">
 		<description>Nomis</description>
-		<!--SD-255T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-255T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10151">
@@ -328,9 +327,9 @@ SD-292T Ninja
 
 	<software name="firstep">
 		<description>First Steps</description>
-		<!--SD-222T-->
 		<year>1983</year>
 		<publisher>Softy</publisher>
+		<info name="serial" value="SD-222T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="19433">
@@ -341,9 +340,9 @@ SD-292T Ninja
 
 	<software name="findit">
 		<description>Findit</description>
-		<!--SD-252T-->
 		<year>1984</year>
 		<publisher>Spectravideo Israel</publisher>
+		<info name="serial" value="SD-252T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11547">
@@ -354,9 +353,9 @@ SD-292T Ninja
 
 	<software name="muncmath">
 		<description>Munch-a-Math</description>
-		<!--SD-254T-->
 		<year>1984</year>
 		<publisher>Spectravideo Israel</publisher>
+		<info name="serial" value="SD-254T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9399">
@@ -367,9 +366,9 @@ SD-292T Ninja
 
 	<software name="fontedit">
 		<description>Spectra Font Editor</description>
-		<!--SD-267T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-267T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7631">
@@ -380,9 +379,9 @@ SD-292T Ninja
 
 	<software name="crunch">
 		<description>Crunch</description>
-		<!--SD-349T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-349T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6877">
@@ -393,9 +392,9 @@ SD-292T Ninja
 
 	<software name="emrglndg">
 		<description>Emergency Landing</description>
-		<!--SD-311T-->
 		<year>1984</year>
 		<publisher>John McLachlan</publisher>
+		<info name="serial" value="SD-311T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="2764">
@@ -406,9 +405,9 @@ SD-292T Ninja
 
 	<software name="ghostrap">
 		<description>Ghostrap</description>
-		<!--SD-347T-->
 		<year>1983</year>
 		<publisher>Yoga Computing</publisher>
+		<info name="serial" value="SD-347T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="8857">
@@ -419,9 +418,9 @@ SD-292T Ninja
 
 	<software name="grphmstr">
 		<description>Graph Master</description>
-		<!--SD-617T not sure if it is the same one as it boots it says graph master 2-->
 		<year>1983</year>
 		<publisher>Yoga Computing</publisher>
+		<info name="serial" value="SD-617T not sure if it is the same one as it boots it says graph master 2" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="11049">
@@ -432,9 +431,9 @@ SD-292T Ninja
 
 	<software name="grvdggr">
 		<description>Grave Digger</description>
-		<!--SD-333T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-333T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6658">
@@ -445,9 +444,9 @@ SD-292T Ninja
 
 	<software name="hrsrcr">
 		<description>Horse Race</description>
-		<!--SD-326T-->
 		<year>1983</year>
 		<publisher>SIL</publisher>
+		<info name="serial" value="SD-326T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6417">
@@ -458,9 +457,9 @@ SD-292T Ninja
 
 	<software name="jmpgjck">
 		<description>Jumping Jack</description>
-		<!--SD-348T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-348T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9228">
@@ -471,9 +470,9 @@ SD-292T Ninja
 
 	<software name="jngljim">
 		<description>Jungle Jim</description>
-		<!--SD-663T-->
 		<year>1984</year>
 		<publisher>TM Software</publisher>
+		<info name="serial" value="SD-663T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="23763">
@@ -484,9 +483,9 @@ SD-292T Ninja
 
 	<software name="kllrcar">
 		<description>Killer Car</description>
-		<!--SD-663T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-663T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="9709">
@@ -497,9 +496,9 @@ SD-292T Ninja
 
 	<software name="kiwictry">
 		<description>Kiwi Country - South Island</description>
-		<!--SD-343T-->
 		<year>1984</year>
 		<publisher>Waitaki Software</publisher>
+		<info name="serial" value="SD-343T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10756">
@@ -510,9 +509,9 @@ SD-292T Ninja
 
 	<software name="logit">
 		<description>Logit</description>
-		<!--SD-342T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-342T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7332">
@@ -523,9 +522,9 @@ SD-292T Ninja
 
 	<software name="mmrytrnr">
 		<description>Memory Trainer</description>
-		<!--SD-315T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-315T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="1946">
@@ -536,9 +535,9 @@ SD-292T Ninja
 
 	<software name="moonlndr">
 		<description>Moon Lander</description>
-		<!--SD-314T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-314T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="4576">
@@ -549,9 +548,9 @@ SD-292T Ninja
 
 	<software name="mscmpsr">
 		<description>Music Composer</description>
-		<!--SD-316T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-316T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="1902">
@@ -562,9 +561,9 @@ SD-292T Ninja
 
 	<software name="parajump">
 		<description>Para-Jump</description>
-		<!--SD-669T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-669T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6016">
@@ -575,9 +574,9 @@ SD-292T Ninja
 
 	<software name="plntptrl">
 		<description>Planet Patrol</description>
-		<!--SD-669T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-669T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="17124">
@@ -588,9 +587,9 @@ SD-292T Ninja
 
 	<software name="roulette">
 		<description>Roulette</description>
-		<!--SD-669T-->
 		<year>1985</year>
 		<publisher>Intersoft</publisher>
+		<info name="serial" value="SD-669T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="20450">
@@ -601,9 +600,9 @@ SD-292T Ninja
 
 	<software name="spctrbrk">
 		<description>Spectra Break</description>
-		<!--SD-???T-->
 		<year>1983</year>
 		<publisher>SIL</publisher>
+		<info name="serial" value="SD-???T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6266">
@@ -614,9 +613,9 @@ SD-292T Ninja
 
 	<software name="cryptcub">
 		<description>Spectra Cryptic Cube</description>
-		<!--SD-245T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-245T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="6823">
@@ -627,9 +626,9 @@ SD-292T Ninja
 
 	<software name="trader">
 		<description>Spectra Trader</description>
-		<!--SD-245T-->
 		<year>1984</year>
 		<publisher>A.C. Hunt</publisher>
+		<info name="serial" value="SD-245T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10420">
@@ -640,9 +639,9 @@ SD-292T Ninja
 
 	<software name="spctrmnd">
 		<description>Spectramind</description>
-		<!--SD-245T-->
 		<year>1984</year>
 		<publisher>C.A.E.</publisher>
+		<info name="serial" value="SD-245T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="3027">
@@ -653,9 +652,9 @@ SD-292T Ninja
 
 	<software name="adresbok">
 		<description>Address Book</description>
-		<!--SD-269T-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-269T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="10828">
@@ -666,9 +665,9 @@ SD-292T Ninja
 
 	<software name="treasure">
 		<description>Treasure Chest</description>
-		<!--SD-323T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-323T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="2860">
@@ -679,9 +678,9 @@ SD-292T Ninja
 
 	<software name="unclealb">
 		<description>Uncle Albert</description>
-		<!--SD-341T-->
 		<year>1984</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-341T" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="4164">
@@ -693,9 +692,9 @@ SD-292T Ninja
 	<!-- Released as a cartridge but exist as a tape image too-->
 	<software name="flipper">
 		<description>Flipper Slipper</description>
-		<!--SD-291C-->
 		<year>1984</year>
 		<publisher>John McLachlan</publisher>
+		<info name="serial" value="SD-291C" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -706,9 +705,9 @@ SD-292T Ninja
 
 	<software name="frntfrdd">
 		<description>Frantic Freddy</description>
-		<!--SD-232C-->
 		<year>1984</year>
 		<publisher>John McLachlan</publisher>
+		<info name="serial" value="SD-232C" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="16700">
@@ -719,9 +718,9 @@ SD-292T Ninja
 
 	<software name="sectrlph">
 		<description>Sector Alpha</description>
-		<!--SD-220C-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-220C" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -732,9 +731,9 @@ SD-292T Ninja
 
 	<software name="scrsfrce">
 		<description>Super Cross Force</description>
-		<!--SD-220C-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD-220C" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="32768">
@@ -759,9 +758,9 @@ SD-292T Ninja
 
 	<software name="dialuis2">
 		<description>Diamond Luis Editor</description>
-		<!--Diamond Luis II-->
 		<year>1986</year>
 		<publisher>Ikesoft</publisher>
+		<info name="serial" value="Diamond Luis II" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33546">
@@ -906,9 +905,9 @@ SD-292T Ninja
 
 	<software name="cpk">
 		<description>Cabbage Patch Kids</description>
-		<!--RC 716-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 716" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33158">
@@ -921,9 +920,9 @@ SD-292T Ninja
 
 	<software name="circusc">
 		<description>Circus Charlie</description>
-		<!--RC 712-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 712" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
@@ -934,9 +933,9 @@ SD-292T Ninja
 
 	<software name="comicbak">
 		<description>Comic Bakery</description>
-		<!--RC 714-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 714" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -947,9 +946,9 @@ SD-292T Ninja
 
 	<software name="hyperol">
 		<description>Hyper Olympic 1</description>
-		<!--RC 710-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 710" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -960,9 +959,9 @@ SD-292T Ninja
 
 	<software name="trackfld">
 		<description>Track and Field 1</description>
-		<!--RC 710-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 710" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33161">
@@ -973,9 +972,9 @@ SD-292T Ninja
 
 	<software name="hyperol2">
 		<description>Hyper Olympic 2</description>
-		<!--RC 711-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 711" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33157">
@@ -986,9 +985,9 @@ SD-292T Ninja
 
 	<software name="hprrlly">
 		<description>Hyper Rally</description>
-		<!--RC 718-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 718" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -999,9 +998,9 @@ SD-292T Ninja
 
 	<software name="hyperspt">
 		<description>Hyper Sports 1</description>
-		<!--RC 715-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 715" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
@@ -1012,9 +1011,9 @@ SD-292T Ninja
 
 	<software name="hypersp2">
 		<description>Hyper Sports 2</description>
-		<!--RC 717-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 717" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33156">
@@ -1023,11 +1022,11 @@ SD-292T Ninja
 		</part>
 	</software>
 
-	<software name="knghtmre">
+	<software name="knightmr">
 		<description>Knightmare</description>
-		<!--RC 717-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 717" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
@@ -1038,9 +1037,9 @@ SD-292T Ninja
 
 	<software name="baseball">
 		<description>Konami's Baseball</description>
-		<!--RC 724-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 724" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1051,9 +1050,9 @@ SD-292T Ninja
 
 	<software name="boxing">
 		<description>Konami's Boxing</description>
-		<!--RC 736-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 736" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
@@ -1064,9 +1063,9 @@ SD-292T Ninja
 
 	<software name="pingpong">
 		<description>Konami's Ping Pong</description>
-		<!--RC 724-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 724" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1077,9 +1076,9 @@ SD-292T Ninja
 
 	<software name="soccer">
 		<description>Konami's Soccer</description>
-		<!--RC 732-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 732" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">
@@ -1090,9 +1089,9 @@ SD-292T Ninja
 
 	<software name="tennis">
 		<description>Konami's Tennis</description>
-		<!--RC 720-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 720" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1103,9 +1102,9 @@ SD-292T Ninja
 
 	<software name="mgcltree">
 		<description>Magical Tree</description>
-		<!--RC 713-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 713" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33154">
@@ -1116,9 +1115,9 @@ SD-292T Ninja
 
 	<software name="mopirngr">
 		<description>Mopi Ranger</description>
-		<!--RC 728-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 728" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1129,9 +1128,9 @@ SD-292T Ninja
 
 	<software name="roadfght">
 		<description>Road Fighter</description>
-		<!--RC 730-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 730" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1142,9 +1141,9 @@ SD-292T Ninja
 
 	<software name="skyjag">
 		<description>Sky Jaguar</description>
-		<!--RC 721-->
 		<year>1984</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 721" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="33150">
@@ -1155,9 +1154,9 @@ SD-292T Ninja
 
 	<software name="yiear1">
 		<description>Yie Ar Kung-Fu</description>
-		<!--RC 725-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 725" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="36864">
@@ -1168,9 +1167,9 @@ SD-292T Ninja
 
 	<software name="yiear2">
 		<description>Yie Ar Kung-Fu II - The Emperor Yie-Gah</description>
-		<!--RC 737-->
 		<year>1985</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC 737" />
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="53248">

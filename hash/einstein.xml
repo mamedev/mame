@@ -603,7 +603,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="fligtsim">
+	<software name="fsim">
 		<description>Flight Simulation</description>
 		<year>1985</year>
 		<publisher>ScreenSoft</publisher>
@@ -692,7 +692,7 @@ Xtal Systems (Xtal Research)
 		</part>
 	</software>
 
-	<software name="jswilly">
+	<software name="jetsetw">
 		<description>Jet Set Willy</description>
 		<year>19??</year>
 		<publisher>Software Projects</publisher>

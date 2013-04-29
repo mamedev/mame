@@ -6687,7 +6687,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="ghostb">
+	<software name="ghostbst">
 		<description>Ghostbusters</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
@@ -6699,7 +6699,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="ghostbe" cloneof="ghostb">
+	<software name="ghostbste" cloneof="ghostbst">
 		<description>Ghostbusters (PAL)</description>
 		<year>1985</year>
 		<publisher>Activision</publisher>
@@ -6711,7 +6711,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="ghostb2">
+	<software name="ghostbs2">
 		<description>Ghostbusters II (PAL)</description>
 		<year>1992</year>
 		<publisher>Salu</publisher>
@@ -6723,7 +6723,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="ghostb2a" cloneof="ghostb2">
+	<software name="ghostbs2a" cloneof="ghostbs2">
 		<description>Ghostbusters II (PAL) (Alt Tune)</description>
 		<year>1992</year>
 		<publisher>Salu</publisher>

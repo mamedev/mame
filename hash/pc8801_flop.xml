@@ -12350,7 +12350,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		</part>
 	</software>
 
-	<software name="flighsim">
+	<software name="fsim">
 		<!-- Alt. Title: Flight Simulator with Torpedo Attack (Box) -->
 		<description>Flight Simulator with Gyorai Kogeki</description>
 		<year>1988</year>
@@ -19932,7 +19932,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		</part>
 	</software>
 
-	<software name="littleco">
+	<software name="littlecp">
 		<description>Little Computer People</description>
 		<year>1987</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>

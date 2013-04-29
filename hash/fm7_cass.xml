@@ -631,7 +631,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="flighsim">
+	<software name="fsim">
 		<description>Flight Simulator</description>
 		<year>1983</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>

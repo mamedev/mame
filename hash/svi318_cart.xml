@@ -3,7 +3,7 @@
 <!--
 Info Taken from here: http://www.samdal.com/SVIDOCS/SVI_Softwares_for_SVI318-328.pdf
 
-These Cartridges is not dumped:
+These Cartridges are not dumped:
 Just Write JR. SD294C
 Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
@@ -14,9 +14,9 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
 	<software name="flipper">
 		<description>Flipper Slipper</description>
-		<!--ID-No: SD291C-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD291C" />
 
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
@@ -28,9 +28,9 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
 	<software name="ffreddy">
 		<description>Frantic Freddy</description>
-		<!--ID-No: SD232C-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD232C" />
 
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
@@ -55,11 +55,11 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 	</software>
 	-->
 
-	<software name="sectora">
-		<description>Sector Aplha</description>
-		<!--ID-No: SD220C-->
+	<software name="secalpha">
+		<description>Sector Alpha</description>
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD220C" />
 
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">
@@ -69,11 +69,11 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
 	</software>
 
-	<software name="scrsfrce">
+	<software name="supxfrce">
 		<description>Super Cross Force</description>
-		<!--ID-No: SD237C-->
 		<year>1983</year>
 		<publisher>Spectravideo</publisher>
+		<info name="serial" value="SD237C" />
 
 		<part name="cart" interface="svi318_cart">
 			<dataarea name="rom" size="32768">

@@ -3413,7 +3413,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only Euro is confirmed -->
-	<software name="krusty">
+	<software name="krustyfh">
 		<description>Krusty's Super Fun House (Euro, USA, Rev. A)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -3428,7 +3428,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 
 <!-- Only USA is confirmed -->
-	<software name="krusty1" cloneof="krusty">
+	<software name="krustyfh1" cloneof="krustyfh">
 		<description>Krusty's Super Fun House (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Flying Edge</publisher>
@@ -28670,8 +28670,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 <!-- dumps which need ad hoc handlers to be installed in the emulator -->
 
+<!-- This cart is missing the higher bank containing Dragon Ball game -->
 	<software name="12in1">
-		<description>12 in 1</description>
+		<description>12 in 1 (Incomplete Dump)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -28682,7 +28683,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="4in1pb">
+	<software name="4in1">
 		<description>4 in 1 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28960,7 +28961,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="s19in1">
+	<software name="s19in1" supported="partial">
 		<description>Super 19 in 1 (Pirate)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

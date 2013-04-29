@@ -243,7 +243,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="deflktor">
+	<software name="deflektr">
 		<description>Deflektor (Prototype)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -278,7 +278,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="flgtsim2" supported="partial">
+	<software name="fsim2" supported="partial">
 		<description>Flight Simulator 2</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -290,7 +290,7 @@ Compiled by K1W1
 		</part>
 	</software>
 
-	<software name="flgtsim2d" cloneof="flgtsim2">
+	<software name="fsim2d" cloneof="fsim2">
 		<description>Flight Simulator 2 (Demo Cartridge)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>

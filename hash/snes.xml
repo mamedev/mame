@@ -201,15 +201,15 @@ L***   : 2 ROM chips, the largest being 32Mb
 *X***  : Evaluation board with "SA1" special chip
 
 **0*   :  No SRAM chip
-**1*   : 1 SRAM chip (16Kb)
-**2*   : 1 SRAM chip (32Kb)
-**3*   : 1 SRAM chip (64Kb)
-**4*   : 1 SRAM chip (128Kb)
-**5*   : 1 SRAM chip (256Kb)
-**6*   : 1 SRAM chip (512Kb)
-**7*   : 1 SRAM chip (1Mb)
-**8*   : 1 FLASH chip (2Mb)
-**9*   : 1 FLASH chip (1Mb)
+**1*   : 1 SRAM chip (16 Kibit)
+**2*   : 1 SRAM chip (32 Kibit)
+**3*   : 1 SRAM chip (64 Kibit)
+**4*   : 1 SRAM chip (128 Kibit)
+**5*   : 1 SRAM chip (256 Kibit)
+**6*   : 1 SRAM chip (512 Kibit)
+**7*   : 1 SRAM chip (512 Kibit or 1 Mibit)
+**8*   : 1 FLASH chip (2 Mibit)
+**9*   : 1 FLASH chip (1 Mibit)
 
 ***B   : "74LS139" or "74LS157" memory address decoder chip for SRAM (often 74F139 in evaluation boards)
 ***C   : "RTC" memory address decoder chip for SRAM
@@ -274,7 +274,7 @@ Known revisions and their timeline approximaions (W.I.P):
 
 -?                 ⊆ t(F413)
 -?                 ⊆ t(F413A)
--?                 ⊆ t(F413B)
+- 1995/42,1995/42  ⊆ t(F413B)
 -->
 
 <!--
@@ -10355,7 +10355,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 GSU-2" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="F413B 9542 C" />
 			<feature name="battery" value="none" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH, SNSP-NOE" />
@@ -15316,7 +15316,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9449 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
@@ -15324,7 +15324,7 @@ List of perfect retail cartridges rom dumps
 			<dataarea name="rom" size="524288">
 				<rom name="shvc-66-0.u1" size="524288" crc="052167cc" sha1="4b5725aeb7f770feadda6cfec5e609ff57fce363" offset="0x000000" />
 			</dataarea>
-			<dataarea name="nvram" size="131072">   <!-- The game expects 4x32kb of NVRAM to pass initial checks... Double check this! -->
+			<dataarea name="nvram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -21215,7 +21215,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="F411B 9543 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-028" />
 			<feature name="cart_back_label" value="G736879 BSC-JPN" />
@@ -22971,7 +22971,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 512K/1M SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="F411B 9611 a" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-040" />
 			<feature name="cart_back_label" value="G744238 BSC-JPN-1" />
