@@ -518,13 +518,8 @@ DRIVER_INIT_MEMBER(megazone_state,megazone)
 	konami1_decode(machine(), "maincpu");
 }
 
-/* these just display a Konami copyright, no logo */
-GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, megazonea, megazone, megazone, megazona, megazone_state, megazone, ROT90, "Konami",                       "Mega Zone (Konami set 2)", GAME_SUPPORTS_SAVE )
-
-/* these display Konami and Kosuka copyright, no logo */
-GAME( 1983, megazoneb, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1983, megazonec, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami / Kosuka",              "Mega Zone (Kosuka set 2)", GAME_SUPPORTS_SAVE )
-
-/* this displays Konami and Kosuka copyright with a Konami / Interlogic logo */
-GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami / Interlogic / Kosuka", "Mega Zone (Interlogic / Kosuka)", GAME_SUPPORTS_SAVE )
+GAME( 1983, megazone, 0,         megazone, megazone, megazone_state, megazone, ROT90, "Konami", "Mega Zone (Konami set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, megazonea, megazone, megazone, megazona, megazone_state, megazone, ROT90, "Konami", "Mega Zone (Konami set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, megazoneb, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1983, megazonec, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Kosuka license)", "Mega Zone (Kosuka set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, megazonei, megazone, megazone, megazone, megazone_state, megazone, ROT90, "Konami (Interlogic license)", "Mega Zone (Interlogic)", GAME_SUPPORTS_SAVE )

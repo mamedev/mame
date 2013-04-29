@@ -2775,7 +2775,7 @@ GAME( 1996, tekken3aa, tekken3,  coh700,   namcos12, namcos12_state, namcos12, R
 GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC014 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Asia, LG2/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC014 */
 GAME( 1997, lbgrandeja,lbgrande, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Libero Grande (Japan, LG1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* KC014 */
-GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Tomy / Namco",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC019 */
+GAME( 1997, toukon3,   0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC019 */
 GAME( 1998, soulclbr,  0,        coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12, namcos12_state, namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) /* KC020 */
