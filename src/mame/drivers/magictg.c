@@ -900,8 +900,8 @@ static const voodoo_config voodoo_1_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"mips",//           cputag;
-	NULL,//             vblank;
-	NULL,//             stall;
+	DEVCB_NULL,//             vblank;
+	DEVCB_NULL//             stall;
 };
 
 static const voodoo_config voodoo_2_intf =
@@ -911,8 +911,8 @@ static const voodoo_config voodoo_2_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"mips",//           cputag;
-	NULL,//vblank_assert                vblank;
-	NULL,// voodoo_stall            stall;
+	DEVCB_NULL,//vblank_assert                vblank;
+	DEVCB_NULL// voodoo_stall            stall;
 };
 /*************************************
  *

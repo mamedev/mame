@@ -127,27 +127,6 @@
 #include "spacezap.lh"
 #include "tenpindx.lh"
 
-
-/*************************************
- *
- *  Machine setup
- *
- *************************************/
-
-static MACHINE_START( astrocde )
-{
-	astrocde_state *state = machine.driver_data<astrocde_state>();
-	state_save_register_global(machine, state->m_port_1_last);
-	state_save_register_global(machine, state->m_port_2_last);
-	state_save_register_global(machine, state->m_ram_write_enable);
-	state_save_register_global(machine, state->m_input_select);
-	state_save_register_global(machine, state->m_profpac_bank);
-
-	state->m_port_1_last = state->m_port_2_last = 0xff;
-}
-
-
-
 /*************************************
  *
  *  Protected RAM
@@ -1288,8 +1267,6 @@ static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
 	/* each game has its own map */
-
-	MCFG_MACHINE_START(astrocde)
 
 	/* video hardware */
 	MCFG_PALETTE_LENGTH(512)

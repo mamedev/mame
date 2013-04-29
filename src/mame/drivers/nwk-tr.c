@@ -255,6 +255,7 @@ public:
 	DECLARE_WRITE32_MEMBER(lanc2_w);
 	DECLARE_READ32_MEMBER(dsp_dataram_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_DRIVER_INIT(nwktr);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -278,10 +279,9 @@ WRITE32_MEMBER(nwktr_state::paletteram32_w)
 	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(device_t *device, int param)
+WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
 {
-	nwktr_state *drvstate = device->machine().driver_data<nwktr_state>();
-	drvstate->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 
@@ -725,8 +725,8 @@ static const voodoo_config voodoo_intf =
 	2,//                tmumem1;
 	"screen",//         screen;
 	"dsp",//            cputag;
-	voodoo_vblank_0,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(nwktr_state,voodoo_vblank_0),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( nwktr, nwktr_state )

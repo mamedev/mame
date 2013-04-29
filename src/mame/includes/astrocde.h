@@ -135,6 +135,7 @@ public:
 	inline void increment_dest(UINT8 curwidth);
 	void execute_blit(address_space &space);
 	void init_sparklestar();
+	virtual void machine_start();
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
 	optional_device<samples_device> m_samples;

@@ -1006,15 +1006,15 @@ static TIMER_CALLBACK( vblank_off_callback )
 		{
 			v->reg[intrCtrl].u |= 0x200;        // VSYNC int (falling) active
 
-			if (v->fbi.vblank_client != NULL)
-				(*v->fbi.vblank_client)(v->device, FALSE);
+			if (!v->fbi.vblank_client.isnull())
+				v->fbi.vblank_client(FALSE);
 
 		}
 	}
 	else
 	{
-		if (v->fbi.vblank_client != NULL)
-			(*v->fbi.vblank_client)(v->device, FALSE);
+		if (!v->fbi.vblank_client.isnull())
+			v->fbi.vblank_client(FALSE);
 	}
 
 	/* go to the end of the next frame */
@@ -1033,7 +1033,7 @@ static TIMER_CALLBACK( vblank_callback )
 	{
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
 		flush_fifos(v, machine.time());
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
+		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");		
 	}
 
 	/* increment the count */
@@ -1062,14 +1062,14 @@ static TIMER_CALLBACK( vblank_callback )
 		{
 			v->reg[intrCtrl].u |= 0x100;        // VSYNC int (rising) active
 
-			if (v->fbi.vblank_client != NULL)
-				(*v->fbi.vblank_client)(v->device, TRUE);
+			if (!v->fbi.vblank_client.isnull())
+				v->fbi.vblank_client(TRUE);
 		}
 	}
 	else
 	{
-		if (v->fbi.vblank_client != NULL)
-			(*v->fbi.vblank_client)(v->device, TRUE);
+		if (!v->fbi.vblank_client.isnull())
+			v->fbi.vblank_client(TRUE);
 	}
 }
 
@@ -2173,8 +2173,8 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 		v->pci.stall_state = NOT_STALLED;
 
 		/* either call the callback, or trigger the trigger */
-		if (v->pci.stall_callback)
-			(*v->pci.stall_callback)(v->device, FALSE);
+		if (!v->pci.stall_callback.isnull())
+			v->pci.stall_callback(FALSE);
 		else
 			v->device->machine().scheduler().trigger(v->trigger);
 	}
@@ -2197,8 +2197,8 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 	v->stats.stalls++;
 
 	/* either call the callback, or spin the CPU */
-	if (v->pci.stall_callback)
-		(*v->pci.stall_callback)(v->device, TRUE);
+	if (!v->pci.stall_callback.isnull())
+		v->pci.stall_callback(TRUE);
 	else
 		v->cpu->execute().spin_until_trigger(v->trigger);
 
@@ -2554,8 +2554,8 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 			v->reg[intrCtrl].u &= ~0x80000000;
 
 			// TODO: rename vblank_client for less confusion?
-			if (v->fbi.vblank_client != NULL)
-				(*v->fbi.vblank_client)(v->device, TRUE);
+			if (!v->fbi.vblank_client.isnull())
+				v->fbi.vblank_client(TRUE);
 			break;
 
 		/* gamma table access -- Voodoo/Voodoo2 only */
@@ -4902,8 +4902,8 @@ static void common_start_voodoo(device_t *device, UINT8 type)
 
 	/* copy config data */
 	v->freq = device->clock();
-	v->fbi.vblank_client = config->vblank;
-	v->pci.stall_callback = config->stall;
+	v->fbi.vblank_client.resolve(config->vblank,*device);
+	v->pci.stall_callback.resolve(config->stall,*device);
 
 	/* create a multiprocessor work queue */
 	v->poly = poly_alloc(device->machine(), 64, sizeof(poly_extra_data), 0);

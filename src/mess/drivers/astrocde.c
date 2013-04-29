@@ -25,7 +25,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(set_write_protect);
 };
 
-
 /*************************************
  *
  *  Memory maps

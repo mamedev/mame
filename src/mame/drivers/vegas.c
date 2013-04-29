@@ -490,6 +490,7 @@ public:
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 	DECLARE_DRIVER_INIT(gauntleg);
 	DECLARE_DRIVER_INIT(cartfury);
 	DECLARE_DRIVER_INIT(tenthdeg);
@@ -1255,15 +1256,14 @@ void vegas_state::update_sio_irqs()
 }
 
 
-static void vblank_assert(device_t *device, int state)
+WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 {
-	vegas_state *drvstate = device->machine().driver_data<vegas_state>();
-	if (!drvstate->m_vblank_state && state)
+	if (!m_vblank_state && state)
 	{
-		drvstate->m_sio_irq_state |= 0x20;
-		drvstate->update_sio_irqs();
+		m_sio_irq_state |= 0x20;
+		update_sio_irqs();
 	}
-	drvstate->m_vblank_state = state;
+	m_vblank_state = state;
 
 	/* if we have stalled DMA, restart */
 //  if (dma_pending_on_vblank[0]) { perform_dma(0); }
@@ -2226,8 +2226,8 @@ static const voodoo_config voodoo_intf =
 	4,//                tmumem1;
 	"screen",//     screen;
 	"maincpu",//            cputag;
-	vblank_assert,//    vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(vegas_state,vblank_assert),//    vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( vegascore, vegas_state )
@@ -2284,8 +2284,8 @@ static const voodoo_config vegasban_voodoo_intf =
 	0,//                tmumem1;
 	"screen",//     screen;
 	"maincpu",//            cputag;
-	vblank_assert,//    vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(vegas_state,vblank_assert),//    vblank;
+	DEVCB_NULL//             stall;
 };
 static MACHINE_CONFIG_DERIVED( vegasban, vegascore )
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)

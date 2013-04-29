@@ -67,10 +67,6 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*voodoo_vblank_func)(device_t *device, int state);
-typedef void (*voodoo_stall_func)(device_t *device, int state);
-
-
 struct voodoo_config
 {
 	UINT8               fbmem;
@@ -78,8 +74,8 @@ struct voodoo_config
 	UINT8               tmumem1;
 	const char *        screen;
 	const char *        cputag;
-	voodoo_vblank_func  vblank;
-	voodoo_stall_func   stall;
+	devcb_write_line 	vblank;
+	devcb_write_line    stall;
 };
 
 

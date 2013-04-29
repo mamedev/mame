@@ -1118,8 +1118,8 @@ static const voodoo_config voodoo_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"maincpu",//        cputag;
-	NULL,//             vblank;
-	NULL,//             stall;
+	DEVCB_NULL,//             vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( funkball, funkball_state )

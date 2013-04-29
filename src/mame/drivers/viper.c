@@ -344,6 +344,7 @@ public:
 	DECLARE_WRITE64_MEMBER(cf_card_w);
 	DECLARE_READ64_MEMBER(ata_r);
 	DECLARE_WRITE64_MEMBER(ata_w);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
 	virtual void machine_start();
@@ -1996,10 +1997,9 @@ INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 	//mpc8240_interrupt(device.machine, MPC8240_IRQ3);
 }
 
-static void voodoo_vblank(device_t *device, int state)
+WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
 {
-	viper_state *drvstate = device->machine().driver_data<viper_state>();
-	drvstate->mpc8240_interrupt(MPC8240_IRQ4);
+	mpc8240_interrupt(MPC8240_IRQ4);
 }
 
 void viper_state::machine_start()
@@ -2040,8 +2040,8 @@ static const voodoo_config voodoo_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"maincpu",//        cputag;
-	voodoo_vblank,//    vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(viper_state,voodoo_vblank),//    vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( viper, viper_state )

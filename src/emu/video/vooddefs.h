@@ -1476,7 +1476,7 @@ struct pci_state
 	fifo_state          fifo;                   /* PCI FIFO */
 	UINT32              init_enable;            /* initEnable value */
 	UINT8               stall_state;            /* state of the system if we're stalled */
-	voodoo_stall_func   stall_callback;         /* callback for stalling/unstalling */
+	devcb_resolved_write_line    stall_callback;         /* callback for stalling/unstalling */
 	UINT8               op_pending;             /* true if an operation is pending */
 	attotime            op_end_time;            /* time when the pending operation ends */
 	emu_timer *         continue_timer;         /* timer to use to continue processing */
@@ -1592,7 +1592,7 @@ struct fbi_state
 	UINT8               vblank_swap_pending;    /* a swap is pending, waiting for a vblank */
 	UINT8               vblank_swap;            /* swap when we hit this count */
 	UINT8               vblank_dont_swap;       /* don't actually swap when we hit this point */
-	voodoo_vblank_func  vblank_client;          /* client callback */
+	devcb_resolved_write_line    vblank_client;          /* client callback */
 
 	/* triangle setup info */
 	UINT8               cheating_allowed;       /* allow cheating? */

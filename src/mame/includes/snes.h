@@ -364,7 +364,6 @@
 
 
 #define SNES_CPU_REG(a) m_cpu_regs[a - 0x4200]  // regs 0x4200-0x421f
-#define SNES_CPU_REG_STATE(a) state->m_cpu_regs[a - 0x4200] // regs 0x4200-0x421f
 
 /* (PPU) Video related */
 
@@ -703,6 +702,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
 	virtual void video_start();
+	void snes_init_timers();
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 /* Special chips, checked at init and used in memory handlers */
@@ -747,12 +749,6 @@ enum
 	SNES_OAM,
 	SNES_COLOR
 };
-
-/*----------- defined in machine/snes.c -----------*/
-
-
-extern MACHINE_START( snes );
-extern MACHINE_RESET( snes );
 
 DECLARE_READ8_HANDLER( snes_open_bus_r );
 

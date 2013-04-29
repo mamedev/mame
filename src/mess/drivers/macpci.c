@@ -79,14 +79,6 @@ static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET( pippin )
-{
-}
-
-static VIDEO_START( pippin )
-{
-}
-
 UINT32 macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
@@ -109,8 +101,6 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pippin_mem)
 
-	MCFG_MACHINE_RESET(pippin)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -121,8 +111,6 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(pippin)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

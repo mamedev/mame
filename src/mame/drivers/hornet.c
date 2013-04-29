@@ -372,6 +372,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	DECLARE_DRIVER_INIT(hornet);
 	DECLARE_DRIVER_INIT(hornet_2board);
 	virtual void machine_start();
@@ -433,13 +435,12 @@ WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 	k037122_reg_w(k037122, space, offset, data, mem_mask);
 }
 
-static void voodoo_vblank_0(device_t *device, int param)
+WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_0)
 {
-	hornet_state *drvstate = device->machine().driver_data<hornet_state>();
-	drvstate->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static void voodoo_vblank_1(device_t *device, int param)
+WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
 {
 }
 
@@ -1000,8 +1001,8 @@ static const voodoo_config hornet_voodoo_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"dsp",//            cputag;
-	voodoo_vblank_0,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_0),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( hornet, hornet_state )
@@ -1079,8 +1080,8 @@ static const voodoo_config voodoo_l_intf =
 	0,//                tmumem1;
 	"lscreen",//        screen;
 	"dsp",//            cputag;
-	voodoo_vblank_0,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_0),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static const voodoo_config voodoo_r_intf =
@@ -1090,8 +1091,8 @@ static const voodoo_config voodoo_r_intf =
 	0,//                tmumem1;
 	"rscreen",//        screen;
 	"dsp2",//           cputag;
-	voodoo_vblank_1,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(hornet_state,voodoo_vblank_1),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )

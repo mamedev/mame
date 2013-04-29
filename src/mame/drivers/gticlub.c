@@ -263,6 +263,8 @@ public:
 	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
 	DECLARE_READ32_MEMBER(dsp_dataram1_r);
 	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
 	void init_hangplt_common();
 	DECLARE_DRIVER_INIT(hangplt);
 	DECLARE_DRIVER_INIT(hangpltu);
@@ -287,16 +289,14 @@ WRITE32_MEMBER(gticlub_state::paletteram32_w)
 	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(device_t *device, int param)
+WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_0)
 {
-	gticlub_state *state = device->machine().driver_data<gticlub_state>();
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, param ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void voodoo_vblank_1(device_t *device, int param)
+WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
 {
-	gticlub_state *state = device->machine().driver_data<gticlub_state>();
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
@@ -907,8 +907,8 @@ static const voodoo_config voodoo_l_intf =
 	2,//                tmumem1;
 	"lscreen",//        screen;
 	"dsp",//            cputag;
-	voodoo_vblank_0,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(gticlub_state,voodoo_vblank_0),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static const voodoo_config voodoo_r_intf =
@@ -918,8 +918,8 @@ static const voodoo_config voodoo_r_intf =
 	2,//                tmumem1;
 	"rscreen",//        screen;
 	"dsp2",//           cputag;
-	voodoo_vblank_1,//  vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(gticlub_state,voodoo_vblank_1),//  vblank;
+	DEVCB_NULL//             stall;
 };
 
 static MACHINE_CONFIG_START( hangplt, gticlub_state )

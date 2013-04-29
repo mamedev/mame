@@ -481,6 +481,8 @@ public:
 	DECLARE_WRITE32_MEMBER(widget_w);
 	DECLARE_READ32_MEMBER(seattle_ide_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);	
 	DECLARE_DRIVER_INIT(sfrush);
 	DECLARE_DRIVER_INIT(blitz2k);
 	DECLARE_DRIVER_INIT(carnevil);
@@ -777,17 +779,16 @@ WRITE32_MEMBER(seattle_state::vblank_clear_w)
 }
 
 
-static void vblank_assert(device_t *device, int state)
+WRITE_LINE_MEMBER(seattle_state::vblank_assert)
 {
-	seattle_state *drvstate = device->machine().driver_data<seattle_state>();
 	/* cache the raw state */
-	drvstate->m_vblank_state = state;
+	m_vblank_state = state;
 
 	/* latch on the correct polarity transition */
-	if ((state && !(*drvstate->m_interrupt_enable & 0x100)) || (!state && (*drvstate->m_interrupt_enable & 0x100)))
+	if ((state && !(*m_interrupt_enable & 0x100)) || (!state && (*m_interrupt_enable & 0x100)))
 	{
-		drvstate->m_vblank_latch = 1;
-		drvstate->update_vblank_irq();
+		m_vblank_latch = 1;
+		update_vblank_irq();
 	}
 }
 
@@ -1363,24 +1364,23 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 }
 
 
-static void voodoo_stall(device_t *device, int stall)
+WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 {
-	seattle_state *state = device->machine().driver_data<seattle_state>();
 	/* set the new state */
-	state->m_voodoo_stalled = stall;
+	m_voodoo_stalled = state;
 
 	/* if we're stalling and DMA is active, take note */
-	if (stall)
+	if (state)
 	{
-		if (state->m_galileo.dma_active != -1)
+		if (m_galileo.dma_active != -1)
 		{
-			if (LOG_DMA) logerror("Stalling DMA%d on voodoo\n", state->m_galileo.dma_active);
-			state->m_galileo.dma_stalled_on_voodoo[state->m_galileo.dma_active] = TRUE;
+			if (LOG_DMA) logerror("Stalling DMA%d on voodoo\n", m_galileo.dma_active);
+			m_galileo.dma_stalled_on_voodoo[m_galileo.dma_active] = TRUE;
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", state->m_maincpu->pc());
-			state->m_maincpu->spin_until_trigger(45678);
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", m_maincpu->pc());
+			m_maincpu->spin_until_trigger(45678);
 		}
 	}
 
@@ -1391,33 +1391,33 @@ static void voodoo_stall(device_t *device, int stall)
 
 		/* loop over any active DMAs and resume them */
 		for (which = 0; which < 4; which++)
-			if (state->m_galileo.dma_stalled_on_voodoo[which])
+			if (m_galileo.dma_stalled_on_voodoo[which])
 			{
-				address_space &space = state->m_maincpu->space(AS_PROGRAM);
+				address_space &space = m_maincpu->space(AS_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
-				state->m_galileo.dma_stalled_on_voodoo[which] = FALSE;
+				m_galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				state->galileo_perform_dma(space, which);
+				galileo_perform_dma(space, which);
 				break;
 			}
 
 		/* if we finished all our pending DMAs, then we can resume CPU operations */
-		if (!state->m_voodoo_stalled)
+		if (!m_voodoo_stalled)
 		{
 			/* if the CPU had a pending write, do it now */
-			if (state->m_cpu_stalled_on_voodoo)
+			if (m_cpu_stalled_on_voodoo)
 			{
-				address_space &space = device->machine().firstcpu->space(AS_PROGRAM);
-				voodoo_w(device, space, state->m_cpu_stalled_offset, state->m_cpu_stalled_data, state->m_cpu_stalled_mem_mask);
+				address_space &space = machine().firstcpu->space(AS_PROGRAM);
+				voodoo_w(m_voodoo, space, m_cpu_stalled_offset, m_cpu_stalled_data, m_cpu_stalled_mem_mask);
 			}
-			state->m_cpu_stalled_on_voodoo = FALSE;
+			m_cpu_stalled_on_voodoo = FALSE;
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
-			device->machine().scheduler().trigger(45678);
+			machine().scheduler().trigger(45678);
 		}
 	}
 }
@@ -2518,8 +2518,8 @@ static const voodoo_config voodoo_intf =
 	0,//                tmumem1;
 	"screen",//         screen;
 	"maincpu",//            cputag;
-	vblank_assert,//    vblank;
-	voodoo_stall,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(seattle_state,vblank_assert),//    vblank;
+	DEVCB_DRIVER_LINE_MEMBER(seattle_state,voodoo_stall)//             stall;
 };
 
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
@@ -2595,8 +2595,8 @@ static const voodoo_config voodoo_2_intf =
 	4,//                tmumem1;
 	"screen",//         screen;
 	"maincpu",//            cputag;
-	vblank_assert,//    vblank;
-	voodoo_stall,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(seattle_state,vblank_assert),//    vblank;
+	DEVCB_DRIVER_LINE_MEMBER(seattle_state,voodoo_stall)//             stall;
 };
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )

@@ -10,6 +10,23 @@
 #include "sound/astrocde.h"
 #include "video/resnet.h"
 
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
+void astrocde_state::machine_start()
+{
+	state_save_register_global(machine(), m_port_1_last);
+	state_save_register_global(machine(), m_port_2_last);
+	state_save_register_global(machine(), m_ram_write_enable);
+	state_save_register_global(machine(), m_input_select);
+	state_save_register_global(machine(), m_profpac_bank);
+
+	m_port_1_last = m_port_2_last = 0xff;
+}
+
 
 
 /*************************************

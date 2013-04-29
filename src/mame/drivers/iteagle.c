@@ -101,7 +101,9 @@ public:
 
 	DECLARE_DRIVER_INIT(iteagle);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	DECLARE_WRITE_LINE_MEMBER(vblank_assert);	
 	UINT32 screen_update_iteagle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void machine_start();
 };
 
 
@@ -111,24 +113,11 @@ public:
  *
  *************************************/
 
-static MACHINE_START( gtfore )
+void iteagle_state::machine_start()
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(machine.device("maincpu"), MIPS3DRC_FASTEST_OPTIONS);
+	mips3drc_set_options(m_maincpu, MIPS3DRC_FASTEST_OPTIONS);
 }
-
-
-
-/*************************************
- *
- *  Machine init
- *
- *************************************/
-
-static MACHINE_RESET( gtfore )
-{
-}
-
 
 
 /*************************************
@@ -167,7 +156,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, iteagle_state )
 	AM_RANGE(0x1fc00000, 0x1fcfffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
-static void vblank_assert(device_t *device, int state)
+WRITE_LINE_MEMBER(iteagle_state::vblank_assert)
 {
 }
 
@@ -193,8 +182,8 @@ static const voodoo_config iteagle_voodoo_intf =
 	0,//                tmumem1;
 	"screen",//     screen;
 	"maincpu",//            cputag;
-	vblank_assert,//    vblank;
-	NULL,//             stall;
+	DEVCB_DRIVER_LINE_MEMBER(iteagle_state,vblank_assert),//    vblank;
+	DEVCB_NULL//             stall;
 };
 
 static const mips3_config r4310_config =
@@ -209,9 +198,6 @@ static MACHINE_CONFIG_START( gtfore, iteagle_state )
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)
 	MCFG_CPU_CONFIG(r4310_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-
-	MCFG_MACHINE_START(gtfore)
-	MCFG_MACHINE_RESET(gtfore)
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF, iteagle_state, ide_interrupt))

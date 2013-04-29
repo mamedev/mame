@@ -174,6 +174,7 @@ public:
 	DECLARE_DRIVER_INIT(sblast2b);
 	DECLARE_DRIVER_INIT(ffight2b);
 	DECLARE_DRIVER_INIT(endless);
+	DECLARE_MACHINE_RESET(ffight2b);
 };
 
 
@@ -633,9 +634,6 @@ static MACHINE_CONFIG_START( kinstb, snesb_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_MACHINE_START( snes )
-	MCFG_MACHINE_RESET( snes )
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
@@ -648,18 +646,17 @@ static MACHINE_CONFIG_START( kinstb, snesb_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
-MACHINE_RESET( ffight2b )
+MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 {
-	snesb_state *state = machine.driver_data<snesb_state>();
-	address_space &cpu0space = state->m_maincpu->space(AS_PROGRAM);
-	MACHINE_RESET_CALL( snes );
+	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
+	snes_state::machine_reset();
 
 	/* Hack: avoid starting with 55 credits. It's either a work RAM init fault or MCU clears it by his own, hard to tell ... */
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
 static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
-	MCFG_MACHINE_RESET( ffight2b )
+	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(snesb_state,kinstb)

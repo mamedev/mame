@@ -435,14 +435,14 @@ INPUT_PORTS_END
 
 void sfcbox_state::machine_start()
 {
-	MACHINE_START_CALL_LEGACY(snes);
+	snes_state::machine_start();
 
 	m_is_sfcbox = 1;
 }
 
 void sfcbox_state::machine_reset()
 {
-	MACHINE_RESET_CALL_LEGACY( snes );
+	snes_state::machine_reset();
 
 	/* start with both CPUs disabled */
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
