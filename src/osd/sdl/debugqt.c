@@ -210,8 +210,14 @@ void sdl_osd_interface::init_debugger()
 //  Core functionality
 //============================================================
 
+#ifdef SDLMAME_UNIX
+extern int sdl_entered_debugger;
+#endif
+
 void sdl_osd_interface::wait_for_debugger(device_t &device, bool firststop)
 {
+	sdl_entered_debugger = 1;
+
 	// Dialog initialization
 	if (oneShot)
 	{

@@ -81,6 +81,10 @@
 //  Global variables
 //============================================================
 
+#ifdef SDLMAME_UNIX
+int sdl_entered_debugger;
+#endif
+
 //============================================================
 //  Local variables
 //============================================================
@@ -332,6 +336,7 @@ int main(int argc, char *argv[])
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
 	#ifdef SDLMAME_UNIX
+	sdl_entered_debugger = 0;
 	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
 	if (TTF_Init() == -1)
 	{
@@ -386,7 +391,11 @@ int main(int argc, char *argv[])
 	#ifdef SDLMAME_UNIX
 	#if (!defined(SDLMAME_MACOSX)) && (!defined(SDLMAME_HAIKU))
 	TTF_Quit();
-	FcFini();
+
+	if (!sdl_entered_debugger)
+	{
+		FcFini();
+	}
 	#endif
 	#endif
 
