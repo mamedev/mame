@@ -16,4 +16,6 @@ protected:
 public:
 	DECLARE_DRIVER_INIT(sc5);
 	INTERRUPT_GEN_MEMBER(sc5_fake_timer_int);
+	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_ym_irqhandler);
+
 };

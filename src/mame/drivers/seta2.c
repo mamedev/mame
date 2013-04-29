@@ -116,6 +116,7 @@ reelquak:
 #include "machine/eeprom.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/mcf5206e.h"
 
 /***************************************************************************
 
@@ -545,31 +546,6 @@ READ16_MEMBER(seta2_state::spriteram16_word_r)
 
 // Main CPU
 
-// ColdFire peripherals
-
-enum {
-	CF_PPDAT    =   0x1c8/4,
-	CF_MBSR     =   0x1ec/4
-};
-
-WRITE32_MEMBER(seta2_state::coldfire_regs_w)
-{
-	COMBINE_DATA( &m_coldfire_regs[offset] );
-}
-
-READ32_MEMBER(seta2_state::coldfire_regs_r)
-{
-	switch( offset )
-	{
-		case CF_MBSR:
-			return machine().rand();
-
-		case CF_PPDAT:
-			return ioport("BATTERY")->read() << 16;
-	}
-
-	return m_coldfire_regs[offset];
-}
 
 READ32_MEMBER(seta2_state::funcube_debug_r)
 {
@@ -615,7 +591,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
 
-	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE(coldfire_regs_r, coldfire_regs_w ) AM_SHARE("coldfire_regs") // Module
+	AM_RANGE(0xf0000000, 0xf00001ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, seta2_coldfire_regs_r, seta2_coldfire_regs_w) // technically this can be moved with MBAR
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM    // SRAM
 ADDRESS_MAP_END
 
@@ -634,7 +610,7 @@ static ADDRESS_MAP_START( funcube2_map, AS_PROGRAM, 32, seta2_state )
 
 	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE(funcube_nvram_dword_r, funcube_nvram_dword_w )
 
-	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE(coldfire_regs_r, coldfire_regs_w ) AM_SHARE("coldfire_regs") // Module
+	AM_RANGE(0xf0000000, 0xf00001ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, seta2_coldfire_regs_r, seta2_coldfire_regs_w) // technically this can be moved with MBAR
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM    // SRAM
 ADDRESS_MAP_END
 
@@ -2211,6 +2187,8 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
 	MCFG_CPU_IO_MAP(funcube_sub_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta2_state, funcube_sub_timer_irq,  60*10)
+
+	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

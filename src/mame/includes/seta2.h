@@ -10,7 +10,6 @@ public:
 			m_nvram(*this, "nvram") ,
 		m_spriteram(*this, "spriteram", 0),
 		m_vregs(*this, "vregs", 0),
-		m_coldfire_regs(*this, "coldfire_regs"),
 		m_funcube_outputs(*this, "funcube_outputs"),
 		m_funcube_leds(*this, "funcube_leds"),
 		m_oki(*this, "oki"),
@@ -21,7 +20,6 @@ public:
 
 	optional_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_vregs;
-	optional_shared_ptr<UINT32> m_coldfire_regs;
 
 	optional_shared_ptr<UINT8> m_funcube_outputs;
 	optional_shared_ptr<UINT8> m_funcube_leds;
