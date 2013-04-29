@@ -341,7 +341,7 @@ void nes_lz93d50_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			
 			if (!m_irq_count)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 				m_irq_enable = 0;
 			}
 		}
@@ -372,6 +372,7 @@ WRITE8_MEMBER(nes_lz93d50_device::lz93d50_write)
 			break;
 		case 0x0a:
 			m_irq_enable = data & 0x01;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x0b:
 			m_irq_count = (m_irq_count & 0xff00) | data;

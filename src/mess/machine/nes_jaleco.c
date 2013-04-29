@@ -434,7 +434,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x000f))
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xfff0) | 0x000f;
 				}
 				else
@@ -444,7 +444,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x00ff))
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xff00) | 0x00ff;
 				}
 				else
@@ -454,7 +454,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!(m_irq_count & 0x0fff))
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = (m_irq_count & 0xf000) | 0x0fff;
 				}
 				else
@@ -464,7 +464,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			{
 				if (!m_irq_count)
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = 0xffff;
 				}
 				else
@@ -536,10 +536,12 @@ WRITE8_MEMBER(nes_ss88006_device::ss88006_write)
 			break;
 		case 0x7000:
 			m_irq_count = m_irq_count_latch;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x7001:
 			m_irq_enable = data & 0x01;
 			m_irq_mode = data & 0x0e;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 0x7002:

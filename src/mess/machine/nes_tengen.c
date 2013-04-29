@@ -181,7 +181,7 @@ inline void nes_tengen032_device::irq_clock(int blanked)
 			m_irq_count--;
 			if (m_irq_enable && !blanked && !m_irq_count)
 			{
-				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 			}
 		}
 	}
@@ -313,6 +313,7 @@ WRITE8_MEMBER(nes_tengen032_device::tengen032_write)
 
 		case 0x6000:
 			m_irq_enable = 0;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 0x6001:

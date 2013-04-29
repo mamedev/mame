@@ -371,7 +371,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 			{
 				if ((m_irq_count & 0x00ff) == 0xff)
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = m_irq_count_latch;
 				}
 				else
@@ -381,7 +381,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 			{
 				if (m_irq_count == 0xffff)
 				{
-					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 					m_irq_count = m_irq_count_latch;
 				}
 				else
@@ -415,9 +415,11 @@ WRITE8_MEMBER(nes_konami_vrc3_device::write_h)
 			m_irq_enable_latch = data & 0x01;
 			if (data & 0x02)
 				m_irq_count = m_irq_count_latch;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x5000:
 			m_irq_enable = m_irq_enable_latch;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x7000:
 			prg16_89ab(data);
@@ -441,7 +443,7 @@ void nes_konami_vrc4_device::irq_tick()
 	if (m_irq_count == 0xff)
 	{
 		m_irq_count = m_irq_count_latch;
-		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 		m_irq_count++;
@@ -538,14 +540,16 @@ WRITE8_MEMBER(nes_konami_vrc4_device::write_h)
 					m_irq_count_latch = (m_irq_count_latch & 0x0f) | ((data & 0x0f) << 4);
 					break;
 				case 0x200:
-					m_irq_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
+					m_irq_mode = data & 0x04;
 					m_irq_enable = data & 0x02;
 					m_irq_enable_latch = data & 0x01;
 					if (data & 0x02)
 						m_irq_count = m_irq_count_latch;
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 					break;
 				case 0x300:
 					m_irq_enable = m_irq_enable_latch;
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 					break;
 			}
 			break;
@@ -614,14 +618,16 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 					m_irq_count_latch = data;
 					break;
 				case 0x100:
-					m_irq_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
+					m_irq_mode = data & 0x04;
 					m_irq_enable = data & 0x02;
 					m_irq_enable_latch = data & 0x01;
 					if (data & 0x02)
 						m_irq_count = m_irq_count_latch;
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 					break;
 				case 0x200:
 					m_irq_enable = m_irq_enable_latch;
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 					break;
 				default:
 					logerror("VRC-6 write_h uncaught write, addr: %04x value: %02x\n", ((offset & 0x7000) | add_lines) + 0x8000, data);
@@ -727,14 +733,16 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 			m_irq_count_latch = data;
 			break;
 		case 0x7000:
-			m_irq_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			m_irq_mode = data & 0x04;
 			m_irq_enable = data & 0x02;
 			m_irq_enable_latch = data & 0x01;
 			if (data & 0x02)
 				m_irq_count = m_irq_count_latch;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 0x7008: case 0x7010: case 0x7018:
 			m_irq_enable = m_irq_enable_latch;
+			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		default:
@@ -764,15 +772,12 @@ WRITE8_MEMBER(nes_konami_vrc7_device::write_h)
 
 // FIXME: we currently emulate this as a base YM2413!
 
-
-#define VRC7_NTSC_CLOCK (21477272.724 / 12)
-
 static MACHINE_CONFIG_FRAGMENT( vrc7 )
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
-	MCFG_SOUND_ADD("ym", YM2413, VRC7_NTSC_CLOCK)
+	MCFG_SOUND_ADD("ym", YM2413, N2A03_DEFAULTCLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.5)
 MACHINE_CONFIG_END
 
