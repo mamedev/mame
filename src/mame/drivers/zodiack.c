@@ -21,10 +21,6 @@ Notes:
   All it does is scanning the whole 64k z80 space via all those pop opcodes ...
   DE register values are always discarded ... bug in coding or ROM patch?
 
-TODO:
-
-- Verify Z80 and AY8910 clock speeds
-
 ============================================================================
 
 Zodiack
@@ -85,11 +81,20 @@ Notes:
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/zodiack.h"
+
+#define PIXEL_CLOCK         (XTAL_18_432MHz/3)
+
+#define HTOTAL              (396)
+#define HBEND               (0)
+#define HBSTART             (256)
+
+#define VTOTAL              (256)
+#define VBEND               (16)
+#define VBSTART             (240)
 
 
 WRITE8_MEMBER( zodiack_state::nmi_mask_w )
@@ -555,22 +560,19 @@ void zodiack_state::machine_reset()
 static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zodiack_state, zodiack_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)   /* 1.78975 MHz??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60)    /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(zodiack_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MCFG_GFXDECODE(zodiack)
 	MCFG_PALETTE_LENGTH(4*8+2*8+2*1)
@@ -580,7 +582,7 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -694,8 +696,9 @@ ROM_START( bounty )
 	ROM_LOAD( "mb7051.2b",   0x0020, 0x0020, CRC(465e31d4) SHA1(d47a4aa0e8931dcd8f85017ef04c2f6ad79f5725) )
 ROM_END
 
-GAME( 1983, zodiack,  0, zodiack, zodiack, driver_device,  0, ROT270, "Orca (Esco Trading Co)",                           "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )   /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, driver_device, 0, ROT270, "Orca / Thunderbolt",                               "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )   /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, percuss, moguchan, driver_device, 0, ROT270, "Orca (Eastern Commerce Inc. license) (bootleg?)",  "Moguchan", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0, percuss, percuss, driver_device,  0, ROT270, "Orca (bootleg?)",                                  "The Percussor", GAME_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, percuss, bounty, driver_device,   0, ROT180, "Orca",                                             "The Bounty", GAME_SUPPORTS_SAVE )
+
+GAME( 1983, zodiack,  0, zodiack, zodiack,  driver_device, 0, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1983, dogfight, 0, zodiack, dogfight, driver_device, 0, ROT270, "Orca / Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1982, moguchan, 0, percuss, moguchan, driver_device, 0, ROT270, "Orca (Eastern Commerce Inc. license)", "Mogu Chan (bootleg?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0, percuss, percuss,  driver_device, 0, ROT270, "Orca (bootleg?)", "The Percussor", GAME_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0, percuss, bounty,   driver_device, 0, ROT180, "Orca", "The Bounty", GAME_SUPPORTS_SAVE )
