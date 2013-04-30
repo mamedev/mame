@@ -9,6 +9,8 @@
 #ifndef __QSOUND_H__
 #define __QSOUND_H__
 
+#include "cpu/dsp16/dsp16.h"
+
 #define QSOUND_CLOCK 4000000    /* default 4MHz clock */
 
 #define QSOUND_CLOCKDIV 166     /* Clock divider */
@@ -55,7 +57,7 @@ struct QSOUND_CHANNEL
 // ======================> qsound_device
 
 class qsound_device : public device_t,
-						public device_sound_interface
+					  public device_sound_interface
 {
 public:
 	qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -63,6 +65,8 @@ public:
 
 protected:
 	// device-level overrides
+	const rom_entry *device_rom_region() const;
+	machine_config_constructor device_mconfig_additions() const;
 	virtual void device_start();
 	virtual void device_stop();
 
@@ -82,6 +86,7 @@ private:
 	QSOUND_CHANNEL m_channel[QSOUND_CHANNELS];
 	UINT32 m_sample_rom_length;
 	QSOUND_SRC_SAMPLE *m_sample_rom;    // Q sound sample ROM
+	dsp16_device *m_cpu;
 
 	int m_pan_table[33];    // Pan volume table
 	float m_frq_ratio;      // Frequency ratio

@@ -444,7 +444,7 @@ SOUNDOBJS += $(SOUNDOBJ)/qs1000.o
 #-------------------------------------------------
 
 ifneq ($(filter QSOUND,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/qsound.o
+SOUNDOBJS += $(SOUNDOBJ)/qsound.o $(CPUOBJ)/dsp16/dsp16.o $(CPUOBJ)/dsp16/dsp16dis.o
 endif
 
 

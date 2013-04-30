@@ -322,6 +322,11 @@ void dsp16_device::execute_set_input(int inputnum, int state)
 
 void dsp16_device::execute_run()
 {
+	// HACK TO MAKE CPU DO NOTHING.
+	// REMOVE IF DEVELOPING CPU CORE.
+	m_icount = 0;
+	return;
+
 	do
 	{
 		// debugging

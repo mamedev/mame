@@ -45,6 +45,39 @@ const device_type QSOUND = &device_creator<qsound_device>;
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// program map for the DSP (points to internal 4096 words of internal ROM)
+static ADDRESS_MAP_START( dsp16_program_map, AS_PROGRAM, 16, qsound_device )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+
+// data map for the DSP (the dsp16 appears to use 2048 words of internal RAM)
+static ADDRESS_MAP_START( dsp16_data_map, AS_DATA, 16, qsound_device )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+ADDRESS_MAP_END
+
+
+// machine fragment
+static MACHINE_CONFIG_FRAGMENT( qsound )
+	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
+	MCFG_CPU_DATA_MAP(dsp16_data_map)
+MACHINE_CONFIG_END
+
+
+// ROM definition for the Qsound program ROM
+// NOTE: ROM is marked as bad since a handful of questionable bits haven't been fully examined.
+ROM_START( qsound )
+	ROM_REGION( 0x2000, "qsound", 0 )
+	ROM_LOAD16_WORD( "qsound.bin", 0x0000, 0x2000, BAD_DUMP CRC(059c847d) SHA1(229cead1be2f86733dd80573d4983ba482355ece) )
+ROM_END
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -53,16 +86,39 @@ const device_type QSOUND = &device_creator<qsound_device>;
 //-------------------------------------------------
 
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_data(0),
-		m_stream(NULL),
-		m_sample_rom_length(0),
-		m_sample_rom(NULL),
-		m_frq_ratio(0.0f),
-		m_fpRawDataL(NULL),
-		m_fpRawDataR(NULL)
+	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock, "qsound"),
+	  device_sound_interface(mconfig, *this),
+	  m_data(0),
+	  m_stream(NULL),
+	  m_sample_rom_length(0),
+	  m_sample_rom(NULL),
+	  m_cpu(NULL),
+	  m_frq_ratio(0.0f),
+	  m_fpRawDataL(NULL),
+	  m_fpRawDataR(NULL)
 {
+}
+
+
+//-------------------------------------------------
+//  rom_region - return a pointer to the device's
+//  internal ROM region
+//-------------------------------------------------
+
+const rom_entry *qsound_device::device_rom_region() const
+{
+	return ROM_NAME( qsound );
+}
+
+
+//-------------------------------------------------
+//  machine_config_additions - return a pointer to
+//  the device's machine fragment
+//-------------------------------------------------
+
+machine_config_constructor qsound_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( qsound );
 }
 
 
@@ -73,6 +129,9 @@ qsound_device::qsound_device(const machine_config &mconfig, const char *tag, dev
 void qsound_device::device_start()
 {
 	int i;
+
+	// find our CPU
+	m_cpu = subdevice<dsp16_device>("qsound");
 
 	m_sample_rom = (QSOUND_SRC_SAMPLE *)*region();
 	m_sample_rom_length = region()->bytes();
