@@ -21,6 +21,11 @@ Notes:
   All it does is scanning the whole 64k z80 space via all those pop opcodes ...
   DE register values are always discarded ... bug in coding or ROM patch?
 
+TODO:
+- improve video emulation (especially moguchan colors)
+- where do the sound related irqs come from exactly?
+- can eventually be merged with espial.c
+
 ============================================================================
 
 Zodiack
@@ -99,7 +104,7 @@ Notes:
 
 WRITE8_MEMBER( zodiack_state::nmi_mask_w )
 {
-	m_nmi_enable = (data & 1) ^ 1;
+	m_main_nmi_enabled = (data & 1) ^ 1;
 }
 
 WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
@@ -107,16 +112,10 @@ WRITE8_MEMBER( zodiack_state::sound_nmi_enable_w )
 	m_sound_nmi_enabled = data & 1;
 }
 
-
-TIMER_DEVICE_CALLBACK_MEMBER(zodiack_state::zodiack_scanline)
+INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_main_nmi_gen)
 {
-	int scanline = param;
-
-	if(scanline == 240 && m_nmi_enable) // vblank-out irq
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-
-	if(scanline == 0 ) // vblank-in irq
-		m_maincpu->set_input_line(0, HOLD_LINE);
+	if (m_main_nmi_enabled)
+		nmi_line_pulse(device);
 }
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
@@ -547,13 +546,15 @@ GFXDECODE_END
 void zodiack_state::machine_start()
 {
 	save_item(NAME(m_sound_nmi_enabled));
-	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_main_nmi_enabled));
+	save_item(NAME(m_flipscreen));
 }
 
 void zodiack_state::machine_reset()
 {
-	m_sound_nmi_enabled = FALSE;
-	m_nmi_enable = 0;
+	m_sound_nmi_enabled = 0;
+	m_main_nmi_enabled = 0;
+	m_flipscreen = 0;
 }
 
 
@@ -562,12 +563,13 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", zodiack_state, zodiack_scanline, "screen", 0, 1)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", zodiack_state, zodiack_main_nmi_gen)
+	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, irq0_line_hold, 1*60) // sound related - unknown source, timing is guessed
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60)    /* IRQs are triggered by the main CPU */
+	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -584,9 +586,6 @@ static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED_CLASS( percuss, zodiack, percuss_state )
 MACHINE_CONFIG_END
 
 
@@ -697,8 +696,18 @@ ROM_START( bounty )
 ROM_END
 
 
-GAME( 1983, zodiack,  0, zodiack, zodiack,  driver_device, 0, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1983, dogfight, 0, zodiack, dogfight, driver_device, 0, ROT270, "Orca / Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
-GAME( 1982, moguchan, 0, percuss, moguchan, driver_device, 0, ROT270, "Orca (Eastern Commerce Inc. license)", "Mogu Chan (bootleg?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
-GAME( 1981, percuss,  0, percuss, percuss,  driver_device, 0, ROT270, "Orca", "The Percussor (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1982, bounty,   0, percuss, bounty,   driver_device, 0, ROT180, "Orca", "The Bounty", GAME_SUPPORTS_SAVE )
+DRIVER_INIT_MEMBER(zodiack_state,zodiack)
+{
+	m_percuss_hardware = false;
+}
+
+DRIVER_INIT_MEMBER(zodiack_state,percuss)
+{
+	m_percuss_hardware = true;
+}
+
+GAME( 1983, zodiack,  0, zodiack, zodiack,  zodiack_state, zodiack, ROT270, "Orca (Esco Trading Co., Inc. license)", "Zodiack", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1983, dogfight, 0, zodiack, dogfight, zodiack_state, zodiack, ROT270, "Orca / Thunderbolt", "Dog Fight (Thunderbolt)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE ) /* bullet color needs to be verified */
+GAME( 1982, moguchan, 0, zodiack, moguchan, zodiack_state, percuss, ROT270, "Orca (Eastern Commerce Inc. license)", "Mogu Chan (bootleg?)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* license copyright taken from ROM string at $0b5c */
+GAME( 1981, percuss,  0, zodiack, percuss,  zodiack_state, percuss, ROT270, "Orca", "The Percussor", GAME_SUPPORTS_SAVE )
+GAME( 1982, bounty,   0, zodiack, bounty,   zodiack_state, percuss, ROT180, "Orca", "The Bounty", GAME_SUPPORTS_SAVE )

@@ -1,4 +1,3 @@
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
@@ -14,7 +13,7 @@ public:
 			m_attributeram(*this, "attributeram"),
 			m_spriteram(*this, "spriteram"),
 			m_bulletsram(*this, "bulletsram")
-	{ m_percuss_hardware = 0; }
+	{ }
 
 	// in drivers/zodiack.c
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -41,40 +40,27 @@ public:
 	required_shared_ptr<UINT8> m_attributeram;
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_bulletsram;
-	// currently this driver uses generic palette handling
 
 	// state
-	// video-related
-	tilemap_t   *m_bg_tilemap;
-	tilemap_t   *m_fg_tilemap;
-
-	// sound-related
-	UINT8     m_nmi_enable;
-	UINT8     m_sound_nmi_enabled;
-
-	// misc
-	int       m_percuss_hardware;
+	tilemap_t *m_bg_tilemap;
+	tilemap_t *m_fg_tilemap;
+	UINT8 m_main_nmi_enabled;
+	UINT8 m_sound_nmi_enabled;
+	UINT8 m_flipscreen;
+	bool m_percuss_hardware;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
-
-	// driver_device overrides
 	virtual void machine_start();
 	virtual void machine_reset();
-public:
 	virtual void video_start();
+
+	DECLARE_DRIVER_INIT(zodiack);
+	DECLARE_DRIVER_INIT(percuss);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_PALETTE_INIT(zodiack);
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(zodiack_scanline);
+	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
 };
 
-class percuss_state : public zodiack_state
-{
-public:
-	percuss_state(const machine_config &mconfig, device_type type, const char *tag)
-		: zodiack_state(mconfig, type, tag)
-	{ m_percuss_hardware = 1; }
-};
