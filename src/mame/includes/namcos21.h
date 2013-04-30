@@ -46,7 +46,7 @@ public:
 	required_shared_ptr<UINT16> m_mpSharedRAM1;
 	required_shared_ptr<UINT8> m_mpDualPortRAM;
 	optional_shared_ptr<UINT16> m_master_dsp_code;
-	
+
 	optional_device<cpu_device> m_dsp;
 
 	UINT8 *m_videoram;

@@ -256,7 +256,6 @@ INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
 
 void pbaction_state::machine_start()
 {
-
 	save_item(NAME(m_scroll));
 }
 

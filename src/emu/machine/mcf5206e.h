@@ -18,8 +18,7 @@
 ***************************************************************************/
 
 #define MCFG_MCF5206E_PERIPHERAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MCF5206E_PERIPHERAL, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MCF5206E_PERIPHERAL, 0)
 
 /***************************************************************************
     TYPE DEFINITIONS

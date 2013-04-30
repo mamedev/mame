@@ -181,7 +181,7 @@ WRITE8_MEMBER(nes_somari_device::mmc1_w)
 		update_mirror();
 		update_prg();
 		update_chr();
-		
+
 		m_count = 0;
 	}
 }
@@ -287,7 +287,7 @@ void nes_somari_device::update_prg()
 			break;
 		case SOMARI_MMC3_MODE:
 			{
-				UINT8 prg_flip = (m_latch & 0x40) ? 2 : 0;				
+				UINT8 prg_flip = (m_latch & 0x40) ? 2 : 0;
 				prg8_x(0, m_mmc_prg_bank[0 ^ prg_flip]);
 				prg8_x(1, m_mmc_prg_bank[1]);
 				prg8_x(2, m_mmc_prg_bank[2 ^ prg_flip]);
@@ -295,7 +295,7 @@ void nes_somari_device::update_prg()
 			}
 			break;
 		case SOMARI_MMC1_MODE:
-//		case SOMARI_MMC1_MODE_AGAIN:
+//      case SOMARI_MMC1_MODE_AGAIN:
 			{
 				UINT8 prg_offset = m_mmc1_reg[1] & 0x10;
 
@@ -341,7 +341,7 @@ void nes_somari_device::update_chr()
 			}
 			break;
 		case SOMARI_MMC1_MODE:
-//		case SOMARI_MMC1_MODE_AGAIN:
+//      case SOMARI_MMC1_MODE_AGAIN:
 			if (BIT(m_mmc1_reg[0], 4))
 			{
 				chr4_0(m_mmc1_reg[1] & 0x1f, CHRROM);
@@ -364,7 +364,7 @@ void nes_somari_device::update_mirror()
 			set_nt_mirroring(m_mmc3_mirror_reg ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case SOMARI_MMC1_MODE:
-//		case SOMARI_MMC1_MODE_AGAIN:
+//      case SOMARI_MMC1_MODE_AGAIN:
 			switch (m_mmc1_reg[0] & 0x03)
 			{
 				case 0x00: set_nt_mirroring(PPU_MIRROR_LOW); break;

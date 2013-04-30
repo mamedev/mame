@@ -229,7 +229,7 @@ protected:
 	void iic_resume();
 	void s3c240x_machine_start();
 	void s3c240x_machine_reset();
-	inline rgb_t s3c240x_get_color_5551( UINT16 data);	
+	inline rgb_t s3c240x_get_color_5551( UINT16 data);
 	UINT32 s3c240x_lcd_dma_read( );
 	void s3c240x_lcd_render_01( );
 	void s3c240x_lcd_render_02( );

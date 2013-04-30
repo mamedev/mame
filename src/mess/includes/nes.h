@@ -249,7 +249,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("gs2004",           NES_GS2004)
 	SLOT_INTERFACE_INTERNAL("gs2013",           NES_GS2013)
 	SLOT_INTERFACE_INTERNAL("tf9in1",           NES_TF9IN1)
-	SLOT_INTERFACE_INTERNAL("3dblock",          NES_3DBLOCK)	// NROM + IRQ?
+	SLOT_INTERFACE_INTERNAL("3dblock",          NES_3DBLOCK)    // NROM + IRQ?
 	SLOT_INTERFACE_INTERNAL("racermate",        NES_RACERMATE)   // mapper 168
 	SLOT_INTERFACE_INTERNAL("agci_50282",       NES_AGCI_50282)
 	SLOT_INTERFACE_INTERNAL("dreamtech01",      NES_DREAMTECH01)
@@ -283,7 +283,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("tobidase",         NES_TOBIDASE) // mapper 120
 	SLOT_INTERFACE_INTERNAL("mmalee2",          NES_MMALEE)    // mapper 55?
 	SLOT_INTERFACE_INTERNAL("unl_2708",         NES_2708)    // mapper 103
-	SLOT_INTERFACE_INTERNAL("unl_lh32",         NES_LH32)	// used by Monty no Doki Doki Daidassou FDS conversion
+	SLOT_INTERFACE_INTERNAL("unl_lh32",         NES_LH32)   // used by Monty no Doki Doki Daidassou FDS conversion
 	SLOT_INTERFACE_INTERNAL("unl_lh10",         NES_LH10)    // used in Fuuun Shaolin Kyo (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("unl_ac08",         NES_AC08) //  used by Green Beret FDS conversion
 	SLOT_INTERFACE_INTERNAL("unl_bb",           NES_UNL_BB) //  used by a few FDS conversions

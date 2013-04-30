@@ -236,7 +236,6 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
-
 	save_item(NAME(m_banksel));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_scroll));

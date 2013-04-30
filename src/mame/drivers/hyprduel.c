@@ -628,7 +628,6 @@ void hyprduel_state::machine_reset()
 
 MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 {
-
 	save_item(NAME(m_blitter_bit));
 	save_item(NAME(m_requested_int));
 	save_item(NAME(m_subcpu_resetline));

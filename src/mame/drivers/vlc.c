@@ -696,7 +696,7 @@ static const duart68681_config nevada_duart40_68681_config =
 *     Machine Reset      *
 *************************/
 
- void nevada_state::machine_reset()
+	void nevada_state::machine_reset()
 {
 	m_duart18_68681 = machine().device( "duart18_68681" );
 	m_duart39_68681 = machine().device( "duart39_68681" );

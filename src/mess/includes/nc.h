@@ -110,7 +110,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper1;
 	required_device<beep_device> m_beeper2;
-	
+
 	void nc200_video_set_backlight(int state);
 	void nc_card_save(device_image_interface &image);
 	int nc_card_calculate_mask(int size);

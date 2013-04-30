@@ -263,7 +263,6 @@ INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
 
 void kncljoe_state::machine_start()
 {
-
 	save_item(NAME(m_port1));
 	save_item(NAME(m_port2));
 	save_item(NAME(m_tile_bank));

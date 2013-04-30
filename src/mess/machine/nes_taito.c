@@ -13,11 +13,11 @@
  * Taito TC0190FMC+PAL16R4 [mapper 48]
  * Taito X1-005 [mapper 80, 207]
  * Taito X1-017 [mapper 82]
- 
+
  TODO:
  - Akira does not work. Investigate why!
  - Don Doko Don 2 freezes when you get to the first boss
- 
+
 
  ***********************************************************************************************************/
 

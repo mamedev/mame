@@ -56,7 +56,7 @@ public:
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	required_shared_ptr<UINT8> m_spriteram;
-	
+
 	optional_device<msm5205_device> m_msm;
 
 	/* video-related */

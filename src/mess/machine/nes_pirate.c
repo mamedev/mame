@@ -11,7 +11,7 @@
 
  TODO:
  - Are the scrolling glitches (check status bar) in Magic Dragon correct? FWIW, NEStopia behaves similarly
- 
+
  ***********************************************************************************************************/
 
 
@@ -429,7 +429,7 @@ void nes_cityfight_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_prg_reg));
 	save_item(NAME(m_prg_mode));
 	save_item(NAME(m_irq_enable));

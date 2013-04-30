@@ -148,7 +148,7 @@ public:
 	char m_battles_customio_command_count;
 	char m_battles_customio_data;
 	char m_battles_sound_played;
-	
+
 	optional_device<cpu_device> m_subcpu3;
 };
 

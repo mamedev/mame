@@ -9,8 +9,8 @@ struct upd71071_intf
 	int clock;
 	devcb_write_line    m_out_hreq_cb;
 	devcb_write_line    m_out_eop_cb;
-	devcb_read16		m_dma_read[4];
-	devcb_write16 		m_dma_write[4];
+	devcb_read16        m_dma_read[4];
+	devcb_write16       m_dma_write[4];
 	devcb_write_line    m_out_dack_cb[4];
 };
 

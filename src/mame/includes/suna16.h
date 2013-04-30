@@ -18,9 +18,9 @@ public:
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
 	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;	
+	required_device<dac_device> m_dac2;
 	optional_device<dac_device> m_dac3;
-	optional_device<dac_device> m_dac4;	
+	optional_device<dac_device> m_dac4;
 	UINT8 m_prot;
 	UINT16 *m_paletteram;
 	int m_color_bank;

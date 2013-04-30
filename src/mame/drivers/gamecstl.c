@@ -730,7 +730,7 @@ static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

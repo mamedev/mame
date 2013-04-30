@@ -159,7 +159,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 	}
 }
 
-READ8_MEMBER(bebox_state::bebox_get_out2) 
+READ8_MEMBER(bebox_state::bebox_get_out2)
 {
 	return pit8253_get_output(machine().device("pit8254"), 2 );
 }
@@ -171,7 +171,7 @@ static const struct kbdc8042_interface bebox_8042_interface =
 	DEVCB_NULL,
 	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_keyboard_interrupt),
 	DEVCB_NULL,
-	
+
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(bebox_state,bebox_get_out2)
 };

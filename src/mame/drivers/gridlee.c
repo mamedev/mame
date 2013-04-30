@@ -135,7 +135,6 @@ TIMER_CALLBACK_MEMBER(gridlee_state::firq_timer_tick)
 
 void gridlee_state::machine_start()
 {
-
 	/* create the polynomial tables */
 	poly17_init();
 

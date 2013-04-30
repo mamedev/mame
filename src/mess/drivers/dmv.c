@@ -49,7 +49,7 @@ public:
 	DECLARE_READ8_MEMBER(fdc_dma_r);
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
 	DECLARE_READ8_MEMBER(memory_read_byte);
-	DECLARE_WRITE8_MEMBER(memory_write_byte);	
+	DECLARE_WRITE8_MEMBER(memory_write_byte);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);

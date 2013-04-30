@@ -763,10 +763,10 @@ static MACHINE_CONFIG_START( voyager, voyager_state )
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
 
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 MACHINE_CONFIG_END

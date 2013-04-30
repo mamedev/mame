@@ -25,7 +25,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_bg_data;
-	
+
 	optional_device<msm5205_device> m_msm;
 	UINT8 *  m_pf1_data;
 	UINT8 *  m_row;

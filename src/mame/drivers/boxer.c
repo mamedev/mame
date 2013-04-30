@@ -428,7 +428,6 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
-
 	save_item(NAME(m_pot_state));
 	save_item(NAME(m_pot_latch));
 }

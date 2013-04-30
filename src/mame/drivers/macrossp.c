@@ -593,7 +593,6 @@ static const es5506_interface es5506_config =
 
 void macrossp_state::machine_start()
 {
-
 	save_item(NAME(m_sndpending));
 	save_item(NAME(m_snd_toggle));
 	save_item(NAME(m_fade_effect));

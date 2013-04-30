@@ -729,7 +729,6 @@ MACHINE_START_MEMBER(ladybug_state,ladybug)
 
 MACHINE_START_MEMBER(ladybug_state,sraider)
 {
-
 	save_item(NAME(m_grid_color));
 	save_item(NAME(m_sound_low));
 	save_item(NAME(m_sound_high));

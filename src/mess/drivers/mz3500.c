@@ -58,7 +58,7 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_shared_ptr<UINT8> m_video_ram;
 	required_device<beep_device> m_beeper;
-	
+
 	UINT8 *m_ipl_rom;
 	UINT8 *m_basic_rom;
 	UINT8 *m_work_ram;

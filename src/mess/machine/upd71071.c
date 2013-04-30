@@ -110,8 +110,8 @@ struct upd71071_t
 	const upd71071_intf* intf;
 	devcb_resolved_write_line   m_out_hreq_func;
 	devcb_resolved_write_line   m_out_eop_func;
-	devcb_resolved_read16		m_dma_read[4];
-	devcb_resolved_write16 		m_dma_write[4];	
+	devcb_resolved_read16       m_dma_read[4];
+	devcb_resolved_write16      m_dma_write[4];
 	devcb_resolved_write_line   m_out_dack_func[4];
 	int m_hreq;
 	int m_eop;

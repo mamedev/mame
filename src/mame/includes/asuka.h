@@ -42,7 +42,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<msm5205_device> m_msm;	
+	optional_device<msm5205_device> m_msm;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<tc0100scn_device> m_tc0100scn;
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);

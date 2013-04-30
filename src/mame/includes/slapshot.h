@@ -58,7 +58,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;	
+	required_device<cpu_device> m_audiocpu;
 	required_device<tc0140syt_device> m_tc0140syt;
 	required_device<tc0480scp_device> m_tc0480scp;
 	required_device<tc0360pri_device> m_tc0360pri;

@@ -326,7 +326,6 @@ static const msm5205_interface msm5205_config =
 
 void ashnojoe_state::machine_start()
 {
-
 	save_item(NAME(m_adpcm_byte));
 	save_item(NAME(m_soundlatch_status));
 	save_item(NAME(m_msm5205_vclk_toggle));

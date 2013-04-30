@@ -15,8 +15,8 @@ class europc_pc_state : public pc_state
 public:
 	europc_pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc_state(mconfig, type, tag),
-		  m_jim_state(0),
-		  m_port61(0) { }
+			m_jim_state(0),
+			m_port61(0) { }
 
 	DECLARE_WRITE8_MEMBER( europc_pio_w );
 	DECLARE_READ8_MEMBER( europc_pio_r );
@@ -27,9 +27,9 @@ public:
 
 	DECLARE_READ8_MEMBER( europc_rtc_r );
 	DECLARE_WRITE8_MEMBER( europc_rtc_w );
-	
+
 	TIMER_CALLBACK_MEMBER(europc_rtc_timer);
-	
+
 	DECLARE_DRIVER_INIT(europc);
 
 	void europc_rtc_set_time();

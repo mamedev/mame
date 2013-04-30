@@ -149,9 +149,9 @@ WRITE8_MEMBER( palmz22_state::s3c2410_nand_data_w )
 /*
 READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
 {
-	UINT8 data = m_nand->is_busy();
-	verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
-	return data;
+    UINT8 data = m_nand->is_busy();
+    verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
+    return data;
 }
 */
 

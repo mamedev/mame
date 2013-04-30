@@ -49,7 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(s3c2440_nand_data_w );
 	DECLARE_WRITE16_MEMBER(s3c2440_i2s_data_w );
 	DECLARE_READ32_MEMBER(s3c2440_adc_data_r );
-	
+
 };
 
 inline void ATTR_PRINTF(3,4) mini2440_state::verboselog( int n_level, const char *s_fmt, ...)

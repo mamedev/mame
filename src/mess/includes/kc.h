@@ -149,7 +149,7 @@ public:
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
-	
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
 };
 

@@ -1498,9 +1498,9 @@ static const struct kbdc8042_interface at8042 =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	
+
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(ip22_state,ip22_get_out2)	
+	DEVCB_DRIVER_MEMBER(ip22_state,ip22_get_out2)
 };
 
 DRIVER_INIT_MEMBER(ip22_state,ip225015)
@@ -1642,7 +1642,7 @@ static MACHINE_CONFIG_START( ip225015, ip22_state )
 	MCFG_SOUND_MODIFY( "scsi:cdrom:cdda" )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^rspeaker", 1.0)
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 

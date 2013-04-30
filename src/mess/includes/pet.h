@@ -128,9 +128,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
 
 	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
-	
+
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
-	
+
 	enum
 	{
 		SEL0 = 0,

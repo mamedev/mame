@@ -210,7 +210,7 @@ void nes_ss88006_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_mmc_prg_bank));
 	save_item(NAME(m_mmc_vrom_bank));
 	save_item(NAME(m_irq_enable));
@@ -430,7 +430,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_mode & 0x08)	// 4bits counter
+			if (m_irq_mode & 0x08)  // 4bits counter
 			{
 				if (!(m_irq_count & 0x000f))
 				{
@@ -440,7 +440,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				else
 					m_irq_count = (m_irq_count & 0xfff0) | ((m_irq_count & 0x000f) - 1);
 			}
-			else if (m_irq_mode & 0x04)	// 8bits counter
+			else if (m_irq_mode & 0x04) // 8bits counter
 			{
 				if (!(m_irq_count & 0x00ff))
 				{
@@ -450,7 +450,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				else
 					m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) - 1);
 			}
-			else if (m_irq_mode & 0x02)	// 12bits counter
+			else if (m_irq_mode & 0x02) // 12bits counter
 			{
 				if (!(m_irq_count & 0x0fff))
 				{
@@ -460,7 +460,7 @@ void nes_ss88006_device::device_timer(emu_timer &timer, device_timer_id id, int 
 				else
 					m_irq_count = (m_irq_count & 0xf000) | ((m_irq_count & 0x0fff) - 1);
 			}
-			else 	// 16bits counter
+			else    // 16bits counter
 			{
 				if (!m_irq_count)
 				{

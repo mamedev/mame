@@ -515,7 +515,7 @@ static INPUT_PORTS_START( medlanes )
 	PORT_DIPSETTING(    0x01, "3 seconds" )
 	PORT_DIPSETTING(    0x03, "5 seconds" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // dupe
+//  PORT_DIPSETTING(    0x02, DEF_STR( Off ) ) // dupe
 	PORT_BIT( 0x9C, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x20, 0x00, "Video Invert" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )

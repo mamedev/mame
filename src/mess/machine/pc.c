@@ -1407,7 +1407,7 @@ void pc_state::init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
 	m_pc_keyb_int_cb = set_keyb_int_func;
 	m_pc_keyb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pc_keyb_timer),this));
 }
- 
+
 void pc_state::mess_init_pc_common(void (*set_keyb_int_func)(running_machine &, int))
 {
 	if ( set_keyb_int_func != NULL )
@@ -1530,7 +1530,7 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 {
 	pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_delayed_pic8259_irq),this));
 	m_pcjr_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_fdc_watchdog),this));
-	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));	
+	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
@@ -1838,5 +1838,5 @@ void pc_state::pc_turbo_setup(double off_speed, double on_speed)
 	m_turbo_cur_val = -1;
 	m_turbo_off_speed = off_speed;
 	m_turbo_on_speed = on_speed;
-	machine().scheduler().timer_pulse(attotime::from_msec(100), timer_expired_delegate(FUNC(pc_state::pc_turbo_callback),this));	
+	machine().scheduler().timer_pulse(attotime::from_msec(100), timer_expired_delegate(FUNC(pc_state::pc_turbo_callback),this));
 }

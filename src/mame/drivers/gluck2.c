@@ -189,7 +189,7 @@
 
 
 #define MASTER_CLOCK    XTAL_10MHz
-#define SND_CLOCK		XTAL_3_579545MHz
+#define SND_CLOCK       XTAL_3_579545MHz
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -250,8 +250,8 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_gluck2_tile_info)
 */
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );	/* bits 1-6-7 handle the gfx banks */
-	int color = (attr & 0x3c) >> 2;								/* bits 2-3-4-5 handle the color */
+	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   /* bits 1-6-7 handle the gfx banks */
+	int color = (attr & 0x3c) >> 2;                             /* bits 2-3-4-5 handle the color */
 
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( gluck2_map, AS_PROGRAM, 8, gluck2_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x084b) AM_NOP	/* see below */
+	AM_RANGE(0x0844, 0x084b) AM_NOP /* see below */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(gluck2_videoram_w) AM_SHARE("videoram") /* 6116 #1 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(gluck2_colorram_w) AM_SHARE("colorram") /* 6116 #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW1")
@@ -367,7 +367,7 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	PORT_NAME("Note In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  PORT_NAME("Note In")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
@@ -391,78 +391,78 @@ static INPUT_PORTS_START( gluck2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_R) PORT_NAME("Reset")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SW1")	// 2000
-	PORT_DIPNAME( 0x01, 0x01, "Paytable" )		PORT_DIPLOCATION("SW1:1")
+	PORT_START("SW1")   // 2000
+	PORT_DIPNAME( 0x01, 0x01, "Paytable" )      PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "Strings and Numbers" )
 	PORT_DIPSETTING(    0x00, "Only Numbers" )
-	PORT_DIPNAME( 0x02, 0x02, "SW1:2" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "SW1:2" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "SW1:3" )			PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "SW1:3" )         PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "SW1:4" )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "SW1:4" )         PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "SW1:5" )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "SW1:5" )         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "SW1:6" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "SW1:6" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "SW1:7" )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "SW1:7" )         PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "SW1:8" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "SW1:8" )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SW2")	// 3D01: AY8910 port B
-	PORT_DIPNAME( 0x01, 0x01, "SW2:8" )			PORT_DIPLOCATION("SW2:8")
+	PORT_START("SW2")   // 3D01: AY8910 port B
+	PORT_DIPNAME( 0x01, 0x01, "SW2:8" )         PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x02, "Bet Max" )		PORT_DIPLOCATION("SW2:7, 6")
+	PORT_DIPNAME( 0x06, 0x02, "Bet Max" )       PORT_DIPLOCATION("SW2:7, 6")
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x02, "20" )
 	PORT_DIPSETTING(    0x04, "30" )
 	PORT_DIPSETTING(    0x06, "40" )
-	PORT_DIPNAME( 0x08, 0x08, "SW2:5" )			PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x08, 0x08, "SW2:5" )         PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "SW2:4" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x10, 0x10, "SW2:4" )         PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "SW2:3" )			PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x20, 0x20, "SW2:3" )         PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Note In" )		PORT_DIPLOCATION("SW2:2, 1")
+	PORT_DIPNAME( 0xc0, 0xc0, "Note In" )       PORT_DIPLOCATION("SW2:2, 1")
 	PORT_DIPSETTING(    0x00, "10" )
 	PORT_DIPSETTING(    0x40, "20" )
 	PORT_DIPSETTING(    0x80, "50" )
 	PORT_DIPSETTING(    0xc0, "100" )
 
-	PORT_START("SW3")	// 3D01: AY8910 port A
-	PORT_DIPNAME( 0x01, 0x01, "SW3:1" )			PORT_DIPLOCATION("SW3:1")
+	PORT_START("SW3")   // 3D01: AY8910 port A
+	PORT_DIPNAME( 0x01, 0x01, "SW3:1" )         PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "SW3:8" )			PORT_DIPLOCATION("SW3:8")
+	PORT_DIPNAME( 0x02, 0x02, "SW3:8" )         PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Graphics" )		PORT_DIPLOCATION("SW3:7")
+	PORT_DIPNAME( 0x04, 0x04, "Graphics" )      PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x04, "Turtles" )
 	PORT_DIPSETTING(    0x00, "Cards" )
-	PORT_DIPNAME( 0x18, 0x18, "Coin In" )		PORT_DIPLOCATION("SW3:6, 5")
+	PORT_DIPNAME( 0x18, 0x18, "Coin In" )       PORT_DIPLOCATION("SW3:6, 5")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x18, "10" )
-	PORT_DIPNAME( 0x20, 0x20, "SW3:4" )			PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x20, 0x20, "SW3:4" )         PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "SW3:3" )			PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x40, 0x40, "SW3:3" )         PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "SW3:2" )			PORT_DIPLOCATION("SW3:2")
+	PORT_DIPNAME( 0x80, 0x80, "SW3:2" )         PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -476,7 +476,7 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8, 8,
-	256,	// 0x100 tiles per bank.
+	256,    // 0x100 tiles per bank.
 	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -535,7 +535,7 @@ static const ay8910_interface ay8910_intf =
 /*  Output ports have a minimal activity during init.
     They seems unused (at least for Good Luck II)
 */
-	DEVCB_NULL,				
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -574,7 +574,7 @@ static MACHINE_CONFIG_START( gluck2, gluck2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* guess */
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -597,7 +597,7 @@ ROM_START( gluck2 )
 	ROM_LOAD( "2.u32",  0x08000, 0x8000, CRC(6a621a98) SHA1(9c83eab9f0858735e0176e5335651dd2dc620229) )
 	ROM_LOAD( "1.u31",  0x10000, 0x8000, CRC(ea33db1a) SHA1(69c67944f5e8bd060335b5e14628c0e0828271a4) )
 
-	ROM_REGION( 0x0300, "proms", 0 )	// RGB
+	ROM_REGION( 0x0300, "proms", 0 )    // RGB
 	ROM_LOAD( "v1.u27",  0x0000, 0x0100, CRC(1aa5479f) SHA1(246cc99e7b351d5546060807b8a0b8acfe2f8e39) )
 	ROM_LOAD( "v2.u26",  0x0100, 0x0100, CRC(8da53489) SHA1(b90f5dd4bc5b64009e8bfad8f79f23d4020e537b) )
 	ROM_LOAD( "v3.u25",  0x0200, 0x0100, CRC(a4d2c9c3) SHA1(a799875b8b92391696419081244da2e56216e024) )

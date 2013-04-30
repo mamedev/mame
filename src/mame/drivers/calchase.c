@@ -925,9 +925,9 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, NULL, intel82439tx_pci_r, intel82439tx_pci_w)
 	MCFG_PCI_BUS_LEGACY_DEVICE(7, NULL, intel82371ab_pci_r, intel82371ab_pci_w)
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_trident_vga )
 

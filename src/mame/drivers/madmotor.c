@@ -220,7 +220,6 @@ GFXDECODE_END
 
 void madmotor_state::machine_start()
 {
-
 	save_item(NAME(m_flipscreen));
 }
 

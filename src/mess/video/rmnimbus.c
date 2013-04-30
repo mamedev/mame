@@ -82,7 +82,7 @@ static void video_regdump(running_machine &machine, int ref, int params, const c
 */
 
 READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
-{	
+{
 	int     pc=space.device().safe_pc();
 	UINT16  result;
 
@@ -242,7 +242,7 @@ UINT16 rmnimbus_state::read_reg_00A()
 */
 
 WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
-{	
+{
 	int pc=space.device().safe_pc();
 
 	if(offset<reg028)

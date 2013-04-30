@@ -2011,8 +2011,8 @@ DEVICE_START( s3c44b0 )
 	s3c44b0->sda_w.resolve(s3c44b0->iface->i2c.sda_w, *device);
 	s3c44b0->adc_data_r.resolve(s3c44b0->iface->adc.data_r, *device);
 	s3c44b0->i2s_data_w.resolve(s3c44b0->iface->i2s.data_w, *device);
-	
-	
+
+
 	s3c44b0->space = &space;
 	s3c44b0->cpu = downcast<cpu_device *>(device->machine().device( "maincpu"));
 	for (int i = 0; i < 6; i++) s3c44b0->pwm.timer[i] = machine.scheduler().timer_alloc(FUNC(s3c44b0_pwm_timer_exp), (void*)device);

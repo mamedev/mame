@@ -308,7 +308,6 @@ GFXDECODE_END
 
 void mgolf_state::machine_start()
 {
-
 	save_item(NAME(m_prev));
 	save_item(NAME(m_mask));
 }

@@ -110,7 +110,7 @@ public:
 private:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
@@ -163,7 +163,7 @@ class nes_smb2j_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_smb2j_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -172,13 +172,13 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
-	
+
 	virtual void pcb_reset();
-	
+
 private:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
@@ -203,7 +203,7 @@ public:
 private:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
@@ -229,7 +229,7 @@ public:
 private:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
@@ -242,14 +242,14 @@ class nes_09034a_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_09034a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
 	virtual DECLARE_READ8_MEMBER(read_m);
-	
+
 	virtual void pcb_reset();
-	
+
 private:
 	UINT8 m_reg;
 };

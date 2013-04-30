@@ -168,4 +168,3 @@ public:
 	void taitojc_clear_frame();
 	void debug_dsp_command();
 };
-

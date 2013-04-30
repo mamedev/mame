@@ -758,7 +758,6 @@ static const ym3526_interface ym3526_config =
 
 void karnov_state::machine_start()
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_scroll));
 

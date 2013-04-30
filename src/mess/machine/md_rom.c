@@ -619,7 +619,7 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 		}
 		return 0;
 	}
-	
+
 	// non-protection accesses
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];

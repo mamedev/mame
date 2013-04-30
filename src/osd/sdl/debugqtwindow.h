@@ -77,17 +77,17 @@ public:
 		m_next(NULL)
 	{}
 	virtual ~WindowQtConfig() {}
-	
+
 	// Settings
 	WindowType m_type;
 	QPoint m_size;
 	QPoint m_position;
-	
+
 	// Dues for becoming a member of a simple_list
 	WindowQtConfig* m_next;
 	WindowQtConfig* next() const { return m_next; }
-	
-	
+
+
 	virtual void buildFromQWidget(QWidget* widget);
 	virtual void applyToQWidget(QWidget* widget);
 	virtual void addToXmlDataNode(xml_data_node* node) const;

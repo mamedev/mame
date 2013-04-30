@@ -212,12 +212,12 @@ READ8_MEMBER( europc_pc_state::europc_pio_r )
    reg 9:
    reg a:
    reg b: 0x10 written
-	bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
-	bit 2: internal video on
-	bit 4: color
-	bit 6,7: clock
+    bit 0,1: 0 video startup mode: 0=specialadapter, 1=color40, 2=color80, 3=monochrom
+    bit 2: internal video on
+    bit 4: color
+    bit 6,7: clock
    reg c:
-	bit 0,1: language/country
+    bit 0,1: language/country
    reg d: xor checksum
    reg e:
    reg 0f: 01 status ok, when not 01 written

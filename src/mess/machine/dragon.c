@@ -146,6 +146,6 @@ void dragon64_state::page_rom(bool romswitch)
 	offs_t offset = romswitch
 		? 0x0000    // This is the 32k mode basic(64)/boot rom(alpha)
 		: 0x8000;   // This is the 64k mode basic(64)/basic rom(alpha)
-	m_sam->set_bank_offset(1, offset);		// 0x8000-0x9FFF
-	m_sam->set_bank_offset(2, offset);		// 0xA000-0xBFFF
+	m_sam->set_bank_offset(1, offset);      // 0x8000-0x9FFF
+	m_sam->set_bank_offset(2, offset);      // 0xA000-0xBFFF
 }

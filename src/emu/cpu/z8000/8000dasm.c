@@ -81,8 +81,8 @@ static const char *const ints[4] = {
 	"",    "vi",  "nvi",   "vi,nvi"
 };
 
-int z8k_segm;								/* Current disassembler mode: 0 - non-segmented, 1 - segmented */
-int z8k_segm_mode = Z8K_SEGM_MODE_AUTO;		/* User disassembler mode setting: segmented, non-segmented, auto */
+int z8k_segm;                               /* Current disassembler mode: 0 - non-segmented, 1 - segmented */
+int z8k_segm_mode = Z8K_SEGM_MODE_AUTO;     /* User disassembler mode setting: segmented, non-segmented, auto */
 
 void z8k_disass_mode(running_machine &machine, int ref, int params, const char *param[])
 {

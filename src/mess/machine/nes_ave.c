@@ -115,11 +115,11 @@ void nes_maxi15_device::pcb_reset()
 
  iNES: mapper 34
 
- Notice that in this board the bankswitch regs 
+ Notice that in this board the bankswitch regs
  overlaps WRAM, so that writes to the regs are
  then readable back in WRAM (WRAM is tested by
  Impossible Mission II at start)
- 
+
  In MESS: Supported.
 
  -------------------------------------------------*/
@@ -127,7 +127,7 @@ void nes_maxi15_device::pcb_reset()
 WRITE8_MEMBER(nes_nina001_device::write_m)
 {
 	LOG_MMC(("nina-001 write_m, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x1ffd:

@@ -17,7 +17,7 @@ public:
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),		
+		m_audiocpu(*this, "audiocpu"),
 		m_k054539(*this, "k054539"),
 		m_filter1l(*this, "filter1l"),
 		m_filter1r(*this, "filter1r"),

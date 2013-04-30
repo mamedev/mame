@@ -138,7 +138,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
-	
+
 	// memory state
 	int m_loram;
 	int m_hiram;

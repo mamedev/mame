@@ -42,7 +42,7 @@ public:
 	required_device<simutrek_special_device> m_laserdisc;
 	required_device<cpu_device> m_rotatecpu;
 	required_device<cpu_device> m_linecpu;
-	required_device<cpu_device> m_soundcpu;	
+	required_device<cpu_device> m_soundcpu;
 	rgb_t *m_colormap;
 	DECLARE_WRITE16_MEMBER(palette_w);
 	DECLARE_READ16_MEMBER(line_r);

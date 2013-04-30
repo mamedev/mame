@@ -325,7 +325,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(ladybug_state,redclash)
 {
-
 	save_item(NAME(m_star_speed));
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_stars_enable));

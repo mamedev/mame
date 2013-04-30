@@ -89,7 +89,7 @@ static osd_dir_entry_type get_attributes_enttype(int attributes, char *path)
 		case DT_REG:
 			return ENTTYPE_FILE;
 
-		case DT_LNK: 
+		case DT_LNK:
 		{
 			struct stat s;
 

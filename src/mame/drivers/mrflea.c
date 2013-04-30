@@ -327,7 +327,6 @@ static const ay8910_interface mrflea_ay8910_interface_1 =
 
 void mrflea_state::machine_start()
 {
-
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_io));
 	save_item(NAME(m_main));

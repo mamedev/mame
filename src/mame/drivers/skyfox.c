@@ -219,7 +219,6 @@ INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
 
 void skyfox_state::machine_start()
 {
-
 	save_item(NAME(m_bg_pos));
 	save_item(NAME(m_bg_ctrl));
 }

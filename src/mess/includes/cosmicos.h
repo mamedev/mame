@@ -110,7 +110,7 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(cosmicos_direct_update_handler);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
-	
+
 	void set_cdp1802_mode(int mode);
 	void clear_input_data();
 	void set_ram_mode();

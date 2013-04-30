@@ -2423,7 +2423,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fitegolfu )
-        PORT_INCLUDE( fitegolf )
+		PORT_INCLUDE( fitegolf )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Shot Time" )                 PORT_DIPLOCATION("DSW2:1")
@@ -4630,7 +4630,7 @@ ROM_START( fitegolf )
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
-ROM_START( fitegolfu )	/*  Later US version containing enhancements to make the game a little easier */
+ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the game a little easier */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "np45.128", 0x0000, 0x4000, CRC(16e8e763) SHA1(0b5296f2a91a7f3176b7461ca4958865ce998241) )
 	ROM_LOAD( "mn45.256", 0x4000, 0x8000, CRC(a4fa09d5) SHA1(ae7f0cb47de06006ae71252c4201a93a01a26887) )

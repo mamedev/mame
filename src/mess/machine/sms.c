@@ -1512,7 +1512,6 @@ int sms_state::detect_tvdraw( UINT8 *rom )
 
 int sms_state::detect_lphaser_xoffset( UINT8 *rom )
 {
-
 	static const UINT8 signatures[6][16] =
 	{
 		/* Spacegun */

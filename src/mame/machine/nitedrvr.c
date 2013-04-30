@@ -272,7 +272,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 
 void nitedrvr_state::machine_start()
 {
-
 	save_item(NAME(m_gear));
 	save_item(NAME(m_track));
 	save_item(NAME(m_steering_buf));

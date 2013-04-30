@@ -171,7 +171,7 @@ void cgenie_state::machine_start()
 #define FF_BGD  (FF_BGD0 | FF_BGD1 | FF_BGD2)
 
 WRITE8_MEMBER( cgenie_state::cgenie_port_ff_w )
-{	
+{
 	int port_ff_changed = m_port_ff ^ data;
 
 	m_cassette->output(data & 0x01 ? -1.0 : 1.0 );
@@ -243,7 +243,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_port_ff_w )
 
 
 READ8_MEMBER( cgenie_state::cgenie_port_ff_r )
-{	
+{
 	UINT8   data = m_port_ff & ~0x01;
 
 	data |= m_cass_bit;
@@ -264,12 +264,12 @@ int cgenie_state::cgenie_port_xx_r( int offset )
 
 
 READ8_MEMBER( cgenie_state::cgenie_psg_port_a_r )
-{	
+{
 	return m_psg_a_inp;
 }
 
 READ8_MEMBER( cgenie_state::cgenie_psg_port_b_r )
-{	
+{
 	if( m_psg_a_out < 0xd0 )
 	{
 		/* comparator value */
@@ -314,7 +314,7 @@ READ8_MEMBER( cgenie_state::cgenie_psg_port_b_r )
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_psg_port_a_w )
-{	
+{
 	m_psg_a_out = data;
 }
 
@@ -396,7 +396,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_data_w )
 }
 
 READ8_MEMBER( cgenie_state::cgenie_irq_status_r )
-{	
+{
 	int result = m_irq_status;
 
 	m_irq_status &= ~(IRQ_TIMER | IRQ_FDC);
@@ -441,7 +441,7 @@ const wd17xx_interface cgenie_wd17xx_interface =
 };
 
 WRITE8_MEMBER( cgenie_state::cgenie_motor_w )
-{	
+{
 	device_t *fdc = machine().device("wd179x");
 	UINT8 drive = 255;
 
@@ -514,7 +514,7 @@ int cgenie_state::cgenie_videoram_r( int offset )
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_videoram_w )
-{	
+{
 	UINT8 *videoram = m_videoram;
 	/* write to video RAM */
 	if( data == videoram[offset] )
@@ -528,7 +528,7 @@ READ8_MEMBER( cgenie_state::cgenie_colorram_r )
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_colorram_w )
-{	
+{
 	/* only bits 0 to 3 */
 	data &= 15;
 	/* nothing changed ? */
@@ -542,12 +542,12 @@ WRITE8_MEMBER( cgenie_state::cgenie_colorram_w )
 }
 
 READ8_MEMBER( cgenie_state::cgenie_fontram_r )
-{	
+{
 	return m_fontram[offset];
 }
 
 WRITE8_MEMBER( cgenie_state::cgenie_fontram_w )
-{	
+{
 	UINT8 *dp;
 
 	if( data == m_fontram[offset] )

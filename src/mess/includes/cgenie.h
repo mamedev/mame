@@ -85,7 +85,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	
+
 	void cgenie_offset_xy();
 	int cgenie_get_register(int indx);
 	void cgenie_mode_select(int mode);
@@ -131,7 +131,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER( cgenie_index_w );
 	DECLARE_WRITE8_MEMBER( cgenie_register_w );
-	
+
 };
 
 

@@ -495,7 +495,6 @@ static const ay8910_interface ay8910_config =
 
 void kyugo_state::machine_start()
 {
-
 	save_item(NAME(m_scroll_x_lo));
 	save_item(NAME(m_scroll_x_hi));
 	save_item(NAME(m_scroll_y));

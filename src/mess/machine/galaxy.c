@@ -62,7 +62,6 @@ IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 
 void galaxy_state::galaxy_setup_snapshot (const UINT8 * data, UINT32 size)
 {
-
 	switch (size)
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:

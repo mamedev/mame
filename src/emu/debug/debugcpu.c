@@ -2672,7 +2672,7 @@ bool device_debug::comment_remove(offs_t addr)
 
 const char *device_debug::comment_text(offs_t addr) const
 {
-	const UINT32 crc = compute_opcode_crc32(addr); 
+	const UINT32 crc = compute_opcode_crc32(addr);
 	dasm_comment* comment = m_comment_set.find(dasm_comment(addr, crc, "", 0));
 	if (comment == NULL) return NULL;
 	return comment->m_text;
@@ -3523,7 +3523,7 @@ void device_debug::tracer::flush()
 
 device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const UINT32& crc)
 	: m_address(address),
-	  m_crc(crc)
+		m_crc(crc)
 {
 }
 
@@ -3533,7 +3533,7 @@ device_debug::dasm_pc_tag::dasm_pc_tag(const offs_t& address, const UINT32& crc)
 
 device_debug::dasm_comment::dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color)
 	: dasm_pc_tag(address, crc),
-	  m_text(text),
-	  m_color(color)
+		m_text(text),
+		m_color(color)
 {
 }

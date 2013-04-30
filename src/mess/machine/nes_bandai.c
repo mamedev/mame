@@ -146,7 +146,7 @@ void nes_lz93d50_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -167,7 +167,7 @@ void nes_lz93d50_24c01_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_i2c_mem));
@@ -192,7 +192,7 @@ void nes_fjump2_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_reg));
 }
 
@@ -256,14 +256,14 @@ WRITE8_MEMBER(nes_oekakids_device::nt_w)
 		update_chr();
 	}
 #endif
-	
+
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
 READ8_MEMBER(nes_oekakids_device::nt_r)
 {
 	int page = ((offset & 0xc00) >> 10);
-	
+
 #if 0
 	if (offset < 0x1000 && (m_latch != (offset & 0x300) >> 8))
 	{
@@ -271,12 +271,12 @@ READ8_MEMBER(nes_oekakids_device::nt_r)
 		update_chr();
 	}
 #endif
-	
+
 	return m_nt_access[page][offset & 0x3ff];
 }
 
 void nes_oekakids_device::update_chr()
-{	
+{
 	chr4_0(m_reg | m_latch, CHRRAM);
 	chr4_4(m_reg | 0x03, CHRRAM);
 }
@@ -332,13 +332,13 @@ void nes_lz93d50_device::device_timer(emu_timer &timer, device_timer_id id, int 
 		if (m_irq_enable)
 		{
 			// 16bit counter, IRQ fired when the counter goes from 1 to 0
-			// after firing, the counter is *not* reloaded, but next clock 
-			// counter wraps around from 0 to 0xffff			
+			// after firing, the counter is *not* reloaded, but next clock
+			// counter wraps around from 0 to 0xffff
 			if (!m_irq_count)
 				m_irq_count = 0xffff;
 			else
 				m_irq_count--;
-			
+
 			if (!m_irq_count)
 			{
 				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
@@ -487,14 +487,14 @@ void nes_fjump2_device::set_prg()
 	prg16_cdef(prg_base | 0x0f);
 }
 
-READ8_MEMBER(nes_fjump2_device::read_m) 
-{ 
+READ8_MEMBER(nes_fjump2_device::read_m)
+{
 	LOG_MMC(("fjump2 read_m, offset: %04x\n", offset));
 	return m_battery[offset & (m_battery_size - 1)];
 }
 
-WRITE8_MEMBER(nes_fjump2_device::write_m) 
-{ 
+WRITE8_MEMBER(nes_fjump2_device::write_m)
+{
 	LOG_MMC(("fjump2 write_m, offset: %04x, data: %02x\n", offset, data));
 	m_battery[offset & (m_battery_size - 1)] = data;
 }

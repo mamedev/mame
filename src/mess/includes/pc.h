@@ -166,14 +166,14 @@ public:
 	int m_turbo_cur_val;
 	double m_turbo_off_speed;
 	double m_turbo_on_speed;
-	
+
 	// keyboard
 	void init_pc_common(void (*set_keyb_int_func)(running_machine &, int));
 	TIMER_CALLBACK_MEMBER( pc_keyb_timer );
 	void pc_keyboard();
 	UINT8 pc_keyb_read();
 	void pc_keyb_set_clock(int on);
-	void pc_keyb_clear();	
+	void pc_keyb_clear();
 	void (*m_pc_keyb_int_cb)(running_machine &, int);
 	emu_timer *m_pc_keyb_timer;
 	UINT8 m_pc_keyb_data;

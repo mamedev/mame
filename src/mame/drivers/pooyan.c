@@ -172,7 +172,6 @@ GFXDECODE_END
 
 void pooyan_state::machine_start()
 {
-
 	save_item(NAME(m_irq_enable));
 }
 

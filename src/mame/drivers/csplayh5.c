@@ -85,7 +85,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;	
+	required_device<dac_device> m_dac2;
 };
 
 

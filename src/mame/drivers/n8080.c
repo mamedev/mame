@@ -468,7 +468,6 @@ static I8085_CONFIG( n8080_cpu_config )
 
 MACHINE_START_MEMBER(n8080_state,n8080)
 {
-
 	save_item(NAME(m_shift_data));
 	save_item(NAME(m_shift_bits));
 	save_item(NAME(m_inte));

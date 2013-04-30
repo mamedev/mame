@@ -262,7 +262,6 @@ static const ym3526_interface ym3526_config =
 
 void metlclsh_state::machine_start()
 {
-
 	save_item(NAME(m_write_mask));
 	save_item(NAME(m_gfxbank));
 }

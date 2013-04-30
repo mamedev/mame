@@ -538,7 +538,7 @@ static MACHINE_CONFIG_START( queen, queen_state )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 

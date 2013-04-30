@@ -31,7 +31,7 @@ public:
 	void set_latch_in(UINT8 new_latch) { data_high_in=new_latch; }
 	UINT8 get_latch_out() { return data_high_out; }
 	void set_latch_out(UINT8 new_latch) { data_high_out=new_latch; }
-	
+
 
 protected:
 	// device-level overrides
@@ -41,11 +41,11 @@ protected:
 
 private:
 	// internal state
-//	bool m_is_primary;
-	
+//  bool m_is_primary;
+
 	// Interupt request
-	UINT8	irq;
-	
+	UINT8   irq;
+
 	// Data latch for high byte in and out
 	UINT8 data_high_in;
 	UINT8 data_high_out;

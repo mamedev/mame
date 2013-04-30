@@ -607,7 +607,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(pipedrm_state,pipedrm)
 {
-
 	/* initialize main Z80 bank */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x2000);
 	membank("bank1")->set_entry(0);

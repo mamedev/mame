@@ -375,7 +375,6 @@ void flyball_state::palette_init()
 
 void flyball_state::machine_start()
 {
-
 	save_item(NAME(m_pitcher_vert));
 	save_item(NAME(m_pitcher_horz));
 	save_item(NAME(m_pitcher_pic));

@@ -13,7 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_dsw_sel16(*this, "dsw_sel16"),
 			m_protection1(*this, "protection1"),
-			m_protection2(*this, "protection2"),						
+			m_protection2(*this, "protection2"),
 			m_maincpu(*this, "maincpu"),
 			m_soundcpu(*this, "soundcpu"),
 			m_oki(*this, "oki"),

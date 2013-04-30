@@ -2510,7 +2510,7 @@ honeydol        // (c) 1995 Barko Corp
 twinadv         // (c) 1995 Barko Corp
 twinadvk        // (c) 1995 Barko Corp
 snowbro3        // (c) 2002 Syrmex
-ballboy			// bootleg
+ballboy         // bootleg
 // SemiCom games on "SnowBros"-like hardware
 finalttr        // (c) 1993 Jeil Computer System
 hyperpac        // (c) 1995 SemiCom
@@ -5083,7 +5083,7 @@ drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
 derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
 shootplm        // 2001.?? Shootout Pool Medal
 				// 2001.?? Star Horse 2001
-shaktmsp		// 2001.?? Shakatto Tambourine 2K1 SPR
+shaktmsp        // 2001.?? Shakatto Tambourine 2K1 SPR
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
@@ -8741,7 +8741,7 @@ brickznv4       // (c) 1992 SunA
 bestbest        // (c) 1994 SunA
 sunaq           // (c) 1994 SunA
 bssoccer        // (c) 1996 SunA
-bssoccera		// (c) 1996 SunA
+bssoccera       // (c) 1996 SunA
 uballoon        // (c) 1996 SunA
 go2000          // (c) 2000 SA
 
@@ -9279,7 +9279,7 @@ puzlstar        // (c) 1999 Puzzle Star
 olds            // (c) 1999 Oriental Legend Super / Special
 olds100         //
 olds100a        //
-olds103t		//
+olds103t        //
 kov2            // (c) 2000 Knights of Valor 2
 kov2106         //
 kov2103         //
@@ -9291,21 +9291,21 @@ kov2p205        //
 ddp2            // (c) 2001 DoDonPachi 2 - Bee Storm
 ddp2101         //
 ddp2100         //
-ddp2hk			//
-ddp2101hk		//
-ddp2100hk		//
-ddp2k			//
-ddp2101k		//
-ddp2100k		//
-ddp2j			//
-ddp2101j		//
-ddp2100j		//
-ddp2t			//
-ddp2101t		//
-ddp2100t		//
-ddp2c			//
-ddp2101c		//
-ddp2100c		//
+ddp2hk          //
+ddp2101hk       //
+ddp2100hk       //
+ddp2k           //
+ddp2101k        //
+ddp2100k        //
+ddp2j           //
+ddp2101j        //
+ddp2100j        //
+ddp2t           //
+ddp2101t        //
+ddp2100t        //
+ddp2c           //
+ddp2101c        //
+ddp2100c        //
 puzzli2         // (c) 1999 Puzzli 2
 puzzli2s        // (c) 2001 Puzzli 2 Super
 martmast        // (c) 2001 Martial Masters

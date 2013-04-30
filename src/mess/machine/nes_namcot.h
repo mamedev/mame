@@ -88,10 +88,10 @@ public:
 protected:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
-	
+
 	// Namcot-163 chip contains 8K of internal ram, possibly battery backed up (not emulated yet)
 	// was it also present in 175 & 340 chips?
 	UINT8 *m_n163_ram;

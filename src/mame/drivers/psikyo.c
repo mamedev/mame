@@ -1010,7 +1010,6 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
-
 	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_z80_nmi));
 	save_item(NAME(m_mcu_status));

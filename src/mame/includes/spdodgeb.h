@@ -61,5 +61,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(spd_adpcm_int_2);
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
-	required_device<msm5205_device> m_msm2;	
+	required_device<msm5205_device> m_msm2;
 };

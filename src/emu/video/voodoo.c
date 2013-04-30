@@ -1033,7 +1033,7 @@ static TIMER_CALLBACK( vblank_callback )
 	{
 		if (LOG_VBLANK_SWAP) logerror("---- vblank flush begin\n");
 		flush_fifos(v, machine.time());
-		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");		
+		if (LOG_VBLANK_SWAP) logerror("---- vblank flush end\n");
 	}
 
 	/* increment the count */

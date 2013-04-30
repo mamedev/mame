@@ -398,7 +398,7 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END
 

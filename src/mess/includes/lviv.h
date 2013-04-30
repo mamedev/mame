@@ -56,7 +56,7 @@ public:
 	void lviv_setup_snapshot (UINT8 * data);
 	void dump_registers();
 	int lviv_verify_snapshot (UINT8 * data, UINT32 size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );	
+	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );
 };
 
 

@@ -1315,7 +1315,7 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 void genesis_vdp_sndirqline_callback_segac2(running_machine &machine, bool state)
 {
 	segac2_state *drvstate = machine.driver_data<segac2_state>();
-	
+
 	if (state==true)
 		drvstate->m_maincpu->set_input_line(6, HOLD_LINE);
 }

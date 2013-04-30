@@ -506,7 +506,6 @@ GFXDECODE_END
 
 void atarifb_state::machine_start()
 {
-
 	save_item(NAME(m_CTRLD));
 	save_item(NAME(m_sign_x_1));
 	save_item(NAME(m_sign_x_2));

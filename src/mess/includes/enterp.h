@@ -64,7 +64,7 @@ public:
 	void Nick_UpdateLPT();
 	void Nick_ReloadLPT();
 	void Nick_DoLine();
-	void Nick_DoScreen(bitmap_ind16 &bm);	
+	void Nick_DoScreen(bitmap_ind16 &bm);
 };
 
 

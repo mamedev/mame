@@ -49,7 +49,7 @@ Year + Game         PCB             Notes
 ***************************************************************************/
 
 WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
-{	
+{
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;

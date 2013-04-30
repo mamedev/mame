@@ -110,7 +110,7 @@ public:
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);
-	DECLARE_WRITE8_MEMBER(io_write_byte);	
+	DECLARE_WRITE8_MEMBER(io_write_byte);
 };
 
 /***************************************************************************

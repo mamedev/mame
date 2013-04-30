@@ -578,7 +578,6 @@ MACHINE_START_MEMBER(champbas_state,champbas)
 
 MACHINE_START_MEMBER(champbas_state,exctsccr)
 {
-
 	// FIXME
 	machine().scheduler().timer_pulse(attotime::from_hz(75), timer_expired_delegate(FUNC(champbas_state::exctsccr_fm_callback),this)); /* updates fm */
 

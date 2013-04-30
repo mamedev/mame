@@ -1429,7 +1429,6 @@ INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
 
 void mazerbla_state::machine_start()
 {
-
 	save_item(NAME(m_vcu_video_reg));
 	save_item(NAME(m_vcu_gfx_addr));
 	save_item(NAME(m_vcu_gfx_param_addr));

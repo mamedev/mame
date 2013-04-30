@@ -80,7 +80,7 @@ public:
 		m_pic8259_1(*this, "pic8259_1" ),
 		m_pic8259_2(*this,  "pic8259_2" ),
 		m_dma8237_1(*this, "dma8237_1" ),
-		m_dma8237_2(*this, "dma8237_2" ),		
+		m_dma8237_2(*this, "dma8237_2" ),
 		m_maincpu(*this, "maincpu") { }
 
 	int m_dma_channel;
@@ -120,10 +120,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);	
+	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
 	DECLARE_WRITE_LINE_MEMBER(gammagic_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	void atapi_init();
@@ -781,7 +781,7 @@ static MACHINE_CONFIG_START( gammagic, gammagic_state )
 //  MCFG_PCI_BUS_DEVICE(1, "i82371sb", i82371sb_pci_read, i82371sb_pci_write)
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 
 MACHINE_CONFIG_END

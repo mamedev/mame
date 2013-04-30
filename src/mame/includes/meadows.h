@@ -15,7 +15,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_dac(*this, "dac"),
-		m_samples(*this, "samples")	{ }
+		m_samples(*this, "samples") { }
 
 	optional_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_videoram;

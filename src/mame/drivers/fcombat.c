@@ -257,7 +257,6 @@ GFXDECODE_END
 
 void fcombat_state::machine_start()
 {
-
 	save_item(NAME(m_cocktail_flip));
 	save_item(NAME(m_char_palette));
 	save_item(NAME(m_sprite_palette));

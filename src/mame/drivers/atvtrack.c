@@ -148,7 +148,7 @@ WRITE64_MEMBER(atvtrack_state::area1_w)
 //  old = m_area1_data[addr];
 	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
-		if (data & 4) {			
+		if (data & 4) {
 			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}

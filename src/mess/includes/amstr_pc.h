@@ -14,7 +14,7 @@ class amstrad_pc_state : public pc_state
 public:
 	amstrad_pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc_state(mconfig, type, tag)
-		  { m_mouse.x =0; m_mouse.y=0;}
+			{ m_mouse.x =0; m_mouse.y=0;}
 
 	DECLARE_READ8_MEMBER( pc1640_port60_r );
 	DECLARE_WRITE8_MEMBER( pc1640_port60_w );
@@ -30,12 +30,12 @@ public:
 	DECLARE_READ8_MEMBER( pc1640_port3d0_r );
 	DECLARE_READ8_MEMBER( pc1640_port4278_r );
 	DECLARE_READ8_MEMBER( pc1640_port278_r );
-	
+
 	DECLARE_DRIVER_INIT(pc1512);
-	DECLARE_DRIVER_INIT(pc1640);	
+	DECLARE_DRIVER_INIT(pc1640);
 	DECLARE_DRIVER_INIT(ppc512);
 	DECLARE_DRIVER_INIT(pc200);
-	
+
 private:
 	struct {
 		UINT8 x,y; //byte clipping needed
@@ -47,7 +47,7 @@ private:
 	UINT8 m_port62;
 	UINT8 m_port65;
 
-	int m_dipstate;	
+	int m_dipstate;
 };
 
 INPUT_PORTS_EXTERN( amstrad_keyboard );

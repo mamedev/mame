@@ -540,7 +540,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 
 void ddragon3_state::machine_start()
 {
-
 	save_item(NAME(m_vreg));
 	save_item(NAME(m_bg_scrollx));
 	save_item(NAME(m_bg_scrolly));

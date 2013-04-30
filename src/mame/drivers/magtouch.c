@@ -199,7 +199,7 @@ INPUT_PORTS_END
 void magtouch_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(magtouch_state::irq_callback),this));
-	
+
 	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
 	membank("rombank")->set_entry(0);
 

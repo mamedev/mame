@@ -162,7 +162,7 @@ public:
 	DECLARE_READ8_MEMBER( c65_read_io );
 	DECLARE_READ8_MEMBER( c65_read_io_dc00 );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c65 );
-	
+
 	int c64_paddle_read( device_t *device, address_space &space, int which );
 	void c65_nmi(  );
 	void c65_irq( int level );

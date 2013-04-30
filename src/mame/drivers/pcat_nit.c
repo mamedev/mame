@@ -111,7 +111,7 @@ public:
 	DECLARE_READ8_MEMBER(pcat_nit_io_r);
 	DECLARE_WRITE_LINE_MEMBER(at_com_interrupt_1);
 	DECLARE_DRIVER_INIT(pcat_nit);
-	virtual void machine_start();	
+	virtual void machine_start();
 };
 
 WRITE_LINE_MEMBER(pcat_nit_state::microtouch_out)

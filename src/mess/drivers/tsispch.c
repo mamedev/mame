@@ -207,7 +207,7 @@ WRITE8_MEMBER( tsispch_state::peripheral_w )
 	and (probably) the p0-to-ir0 masking of the upd77p20; there are two
 	unknown and seemingly unused bits as well.
 	see the top of the file for more info.
-	*/	
+	*/
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
 #ifdef DEBUG_PARAM

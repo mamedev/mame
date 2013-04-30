@@ -338,7 +338,6 @@ static const ym3812_interface ym3812_config =
 
 void oneshot_state::machine_start()
 {
-
 	save_item(NAME(m_gun_x_p1));
 	save_item(NAME(m_gun_y_p1));
 	save_item(NAME(m_gun_x_p2));

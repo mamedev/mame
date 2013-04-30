@@ -17,7 +17,7 @@ class merlin_state : public driver_device
 public:
 	merlin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_speaker(*this, "speaker") ,
+			m_speaker(*this, "speaker") ,
 		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start();

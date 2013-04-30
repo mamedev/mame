@@ -425,7 +425,6 @@ GFXDECODE_END
 
 void cop01_state::machine_start()
 {
-
 	save_item(NAME(m_pulse));
 	save_item(NAME(m_timer));
 	save_item(NAME(m_vreg));

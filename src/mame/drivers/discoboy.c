@@ -456,7 +456,6 @@ GFXDECODE_END
 
 void discoboy_state::machine_start()
 {
-
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_00));
 	save_item(NAME(m_gfxbank));

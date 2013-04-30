@@ -1387,7 +1387,7 @@ void zn_state::atpsx_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 {
 	device_t *ide = machine().device("ide");
 
-//	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
+//  logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
 
 	if (n_address < 0x10000)
 	{

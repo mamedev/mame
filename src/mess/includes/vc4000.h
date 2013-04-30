@@ -90,7 +90,7 @@ public:
 #else
 		m_joys(*this, "JOYS"),
 		m_config(*this, "CONFIG") { }
-#endif	
+#endif
 
 	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
 	DECLARE_READ8_MEMBER(vc4000_key_r);

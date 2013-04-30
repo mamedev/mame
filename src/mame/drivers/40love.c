@@ -968,7 +968,6 @@ static const msm5232_interface msm5232_config =
 
 MACHINE_START_MEMBER(fortyl_state,40love)
 {
-
 	/* video */
 	save_item(NAME(m_pix1));
 	save_item(NAME(m_pix2));

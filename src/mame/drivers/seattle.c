@@ -482,7 +482,7 @@ public:
 	DECLARE_READ32_MEMBER(seattle_ide_r);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);	
+	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);
 	DECLARE_DRIVER_INIT(sfrush);
 	DECLARE_DRIVER_INIT(blitz2k);
 	DECLARE_DRIVER_INIT(carnevil);

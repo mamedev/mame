@@ -11,7 +11,7 @@ class eprom_state : public atarigen_state
 public:
 	eprom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
-		  m_extra(*this, "extra") { }
+			m_extra(*this, "extra") { }
 
 	int             m_screen_intensity;
 	int             m_video_disable;

@@ -478,7 +478,7 @@ WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
 }
 
 WRITE8_MEMBER(opwolf_state::opwolf_adpcm_b_w)
-{	
+{
 	int start;
 	int end;
 

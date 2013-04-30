@@ -14,7 +14,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_pc080sn(*this, "pc080sn"),
-		m_pc090oj(*this, "pc090oj")	{ }
+		m_pc090oj(*this, "pc090oj") { }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_spriteram;

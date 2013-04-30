@@ -238,7 +238,7 @@ void nes_smb3p_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -292,7 +292,7 @@ void nes_smb2j_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -305,7 +305,7 @@ void nes_smb2j_device::pcb_reset()
 	prg8_ab(0);
 	prg8_cd(0);
 	prg8_ef(9);
-	
+
 	m_irq_enable = 0;
 	m_irq_count = 0;
 }
@@ -315,7 +315,7 @@ void nes_smb2ja_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -338,7 +338,7 @@ void nes_smb2jb_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 }
@@ -903,7 +903,7 @@ READ8_MEMBER(nes_whirl2706_device::read_m)
  Games: Super Mario Bros. 2 Pirate (LF36)
 
  iNES: mapper 43
- 
+
  In MESS: Supported.
 
  -------------------------------------------------*/
@@ -930,33 +930,33 @@ WRITE8_MEMBER(nes_smb2j_device::write_l)
 {
 	LOG_MMC(("smb2j write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
-	if (offset == 0x122)	// $4122
-		m_irq_enable = data & 3;	// maybe also m_irq_count = 0?!?
+
+	if (offset == 0x122)    // $4122
+		m_irq_enable = data & 3;    // maybe also m_irq_count = 0?!?
 }
 
 WRITE8_MEMBER(nes_smb2j_device::write_h)
 {
 	LOG_MMC(("smb2j write_h, offset: %04x, data: %02x\n", offset, data));
-	
-	if (offset == 0x122)	// $8122 too?
+
+	if (offset == 0x122)    // $8122 too?
 		m_irq_enable = data & 3;
 }
 
 WRITE8_MEMBER(nes_smb2j_device::write_ex)
 {
 	LOG_MMC(("smb2j write_ex, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset == 2)
 	{
 		int temp = 0;
-		
+
 		// According to hardware tests
 		if (data & 1)
 			temp = 3;
 		else
 			temp = 4 + ((data & 7) >> 1);
-		
+
 		prg8_cd(temp);
 	}
 }
@@ -965,11 +965,11 @@ READ8_MEMBER(nes_smb2j_device::read_l)
 {
 	LOG_MMC(("smb2j read_l, offset: %04x\n", offset));
 	offset += 0x100;
-	
+
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
-	
-	return ((offset + 0x4000) & 0xff00) >> 8;	// open bus
+
+	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
 }
 
 READ8_MEMBER(nes_smb2j_device::read_m)
@@ -1105,25 +1105,25 @@ WRITE8_MEMBER(nes_smb2jb_device::write_ex)
 }
 
 /*-------------------------------------------------
- 
+
  (UNL-)09-034A
- 
+
  Games: Zanac FDS conversion with two PRG chips and
- no CHRROM and Volleyball FDS conversion with two PRG 
+ no CHRROM and Volleyball FDS conversion with two PRG
  chips and CHRROM.
  Originally dumps were marked as UNL-SMB2J pcb
- 
- iNES: 
- 
+
+ iNES:
+
  In MESS: Supported.
- 
+
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_09034a_device::write_ex)
 {
 	LOG_MMC(("09-034a write_ex, offset: %04x, data: %02x\n", offset, data));
-	
-	if (offset == 7)	// $4027
+
+	if (offset == 7)    // $4027
 		m_reg = data & 1;
 }
 

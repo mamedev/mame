@@ -287,7 +287,6 @@ GFXDECODE_END
 
 void aquarium_state::machine_start()
 {
-
 	save_item(NAME(m_aquarium_snd_ack));
 }
 

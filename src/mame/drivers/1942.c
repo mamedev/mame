@@ -238,7 +238,6 @@ GFXDECODE_END
 
 void _1942_state::machine_start()
 {
-
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_scroll));
 }

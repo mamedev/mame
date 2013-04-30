@@ -4028,7 +4028,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="670115 REV 3" />
 			<feature name="ic1" value="MORTAL KOMBAT VER 1.00 S220, MORTAL KOMBAT S215 VER 1.00" />
-            <!-- USA cart, on a REV 4 PCB has chip labeled as MPR-15748-SM -->
+			<!-- USA cart, on a REV 4 PCB has chip labeled as MPR-15748-SM -->
 			<dataarea name="rom" size="2097152">
 				<rom name="mortal kombat ver 1.00 s220.ic1" size="2097152" crc="1aa3a207" sha1="c098bf38ddd755ab7caa4612d025be2039009eb2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -7882,10 +7882,10 @@ but dumps still have to be confirmed.
 		<part name="cart" interface="megadriv_cart">
 			<!-- The PCB contains 4 different ROMs, but it is unknown how the dump should be split (maybe we can reconstruct that from the checksums?)  -->
 			<feature name="pcb" value="" />
-			<feature name="u1" value="MO 1 6/26 56 CE41" />	<!-- The 56 might be a 95 written upside down -->
+			<feature name="u1" value="MO 1 6/26 56 CE41" /> <!-- The 56 might be a 95 written upside down -->
 			<feature name="u2" value="Real Monsters 7-7-95" />
 			<feature name="u3" value="(unmarked eeprom)" />
-			<feature name="u4" value="MO 2 6/26 56 FD68" />	<!-- The 56 might be a 95 written upside down -->
+			<feature name="u4" value="MO 2 6/26 56 FD68" /> <!-- The 56 might be a 95 written upside down -->
 			<feature name="u5" value="MC74HC139N" />
 			<dataarea name="rom" size="2097152">
 				<rom name="killertomatoes.5b74.bin" size="2097152" crc="f4b44b82" sha1="b0f1885e74e5aa39872f09444d82c8ebf284eba1" offset="000000" loadflag="load16_word_swap" />
@@ -30580,11 +30580,11 @@ rockman x3 (unl).bin [2/2]      xxx3.bin     [2/2]      IDENTICAL
 
 <!--
 Investigation by Eke:
-this dump has the PC pointing to $1FE1DE, which does not hold any valid 68k program data in the ROM, 
-so the game actually does not even starts when the 68k resets => either the dump is incomplete or it 
-is a bad dump, there is no way bankswitching can be "triggered" before the CPU has reseted and 
-fetches the PC, only possibility would be that this ROM area is only activated if some signal conditions 
-is met (I know that some pirate carts will need to have the !RESET lines set HIGH like with the real console, 
+this dump has the PC pointing to $1FE1DE, which does not hold any valid 68k program data in the ROM,
+so the game actually does not even starts when the 68k resets => either the dump is incomplete or it
+is a bad dump, there is no way bankswitching can be "triggered" before the CPU has reseted and
+fetches the PC, only possibility would be that this ROM area is only activated if some signal conditions
+is met (I know that some pirate carts will need to have the !RESET lines set HIGH like with the real console,
 which most dumpers ignore)
 This dump is either a bad dump or a wrongly patched one.
 -->

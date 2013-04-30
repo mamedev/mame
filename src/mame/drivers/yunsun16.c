@@ -556,7 +556,6 @@ GFXDECODE_END
 
 void yunsun16_state::machine_start()
 {
-
 	save_item(NAME(m_sprites_scrolldx));
 	save_item(NAME(m_sprites_scrolldy));
 }

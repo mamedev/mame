@@ -225,7 +225,6 @@ INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
 
 void commando_state::machine_start()
 {
-
 	save_item(NAME(m_scroll_x));
 	save_item(NAME(m_scroll_y));
 }

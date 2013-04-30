@@ -225,7 +225,7 @@ void kbdc8042_device::device_config_complete()
 		memset(&m_gate_a20_cb, 0, sizeof(m_gate_a20_cb));
 		memset(&m_input_buffer_full_func, 0, sizeof(m_input_buffer_full_func));
 		memset(&m_output_buffer_empty_cb, 0, sizeof(m_output_buffer_empty_cb));
-		memset(&m_speaker_cb, 0, sizeof(m_speaker_cb));		
+		memset(&m_speaker_cb, 0, sizeof(m_speaker_cb));
 	}
 }
 

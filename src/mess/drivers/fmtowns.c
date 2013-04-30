@@ -1930,7 +1930,6 @@ WRITE8_MEMBER(towns_state::towns_rtc_select_w)
 
 void towns_state::rtc_hour()
 {
-
 	m_towns_rtc_reg[4]++;
 	if(m_towns_rtc_reg[4] > 4 && m_towns_rtc_reg[5] == 2)
 	{
@@ -1946,7 +1945,6 @@ void towns_state::rtc_hour()
 
 void towns_state::rtc_minute()
 {
-
 	m_towns_rtc_reg[2]++;
 	if(m_towns_rtc_reg[2] > 9)
 	{

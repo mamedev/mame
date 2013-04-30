@@ -4,44 +4,44 @@
 
 As implemented by the Vintage computer forums XT-IDE controller.
 
-Card has jumpers for I/O base address, and ROM base address, for the time 
+Card has jumpers for I/O base address, and ROM base address, for the time
 being we'll emulate an I/O base of 0x300 and a ROM base of 0xC8000.
 
-If the I/O address is changed then the ROM will need to be patched. 
+If the I/O address is changed then the ROM will need to be patched.
 The opensource bios is available from :
 http://code.google.com/p/xtideuniversalbios/
 
 The data high register is connected to a pair of latches that have the MSB of
-the 16 bit data word latched into so that 16 bit IO may be performmed, this 
+the 16 bit data word latched into so that 16 bit IO may be performmed, this
 involves the following :
 
 A Data read will read the data register first, and obtain the bottom 8 bits
-of the data word, the top 8 bits will be latched at the same time these are 
+of the data word, the top 8 bits will be latched at the same time these are
 then read from the latch to the processor.
 
-A data write will first write the top 8 bits to the latch, and then the bottom 
-8 bits to the normal data register, this will also transfer the top 8 bits to 
+A data write will first write the top 8 bits to the latch, and then the bottom
+8 bits to the normal data register, this will also transfer the top 8 bits to
 the drive.
 
-IDE Register 				XTIDE rev 1		rev 2 or modded rev 1
-Data (XTIDE Data Low) 		0 				0
-Error (in), Features (out)	1 				8
-Sector Count 				2 				2
-Sector Number,  
-LBA bits 0...7, 
-LBA48 bits 24...31 			3 				10
-Low Cylinder,  
-LBA bits 8...15, 
-LBA48 bits 32...39 			4 				4
-High Cylinder,  
-LBA bits 16...23, 
-LBA48 bits 40...47 			5 				12
+IDE Register                XTIDE rev 1     rev 2 or modded rev 1
+Data (XTIDE Data Low)       0               0
+Error (in), Features (out)  1               8
+Sector Count                2               2
+Sector Number,
+LBA bits 0...7,
+LBA48 bits 24...31          3               10
+Low Cylinder,
+LBA bits 8...15,
+LBA48 bits 32...39          4               4
+High Cylinder,
+LBA bits 16...23,
+LBA48 bits 40...47          5               12
 Drive and Head Select,
-LBA28 bits 24...27 			6 				6
-Status (in), Command (out) 	7 				14
-XTIDE Data High 			8 				1
-Alternative Status (in), 
-Device Control (out) 		14 				7
+LBA28 bits 24...27          6               6
+Status (in), Command (out)  7               14
+XTIDE Data High             8               1
+Alternative Status (in),
+Device Control (out)        14              7
 
 ***************************************************************************/
 
@@ -55,10 +55,10 @@ Device Control (out) 		14 				7
 
 static READ8_DEVICE_HANDLER( ide8_r )
 {
-	ide_controller_device 	*ide = (ide_controller_device *) device;
-	isa8_ide_device			*ide8_d	= downcast<isa8_ide_device *>(device->owner());
-	UINT8	result	= 0;
-	
+	ide_controller_device   *ide = (ide_controller_device *) device;
+	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
+	UINT8   result  = 0;
+
 	if(offset == 0)
 	{
 		// Data register transfer low byte and latch high
@@ -72,17 +72,17 @@ static READ8_DEVICE_HANDLER( ide8_r )
 	else if(offset == 14)
 		result=ide->ide_controller_read(1, (offset & 0x07), 1);
 
-//	logerror("%s ide8_r: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
+//  logerror("%s ide8_r: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
 
 	return result;
 }
 
 static WRITE8_DEVICE_HANDLER( ide8_w )
 {
-	ide_controller_device 	*ide = (ide_controller_device *) device;
-	isa8_ide_device			*ide8_d	= downcast<isa8_ide_device *>(device->owner());
-	
-//	logerror("%s ide8_w: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
+	ide_controller_device   *ide = (ide_controller_device *) device;
+	isa8_ide_device         *ide8_d = downcast<isa8_ide_device *>(device->owner());
+
+//  logerror("%s ide8_w: offset=%d, data=%2X\n",device->machine().describe_context(),offset,data);
 
 	if(offset == 0)
 	{
@@ -168,7 +168,7 @@ INPUT_PORTS_END
 ROM_START( ide8 )
 	ROM_REGION(0x04000,"ide8", 0)
 	// XT-IDE universal bios from : http://code.google.com/p/xtideuniversalbios/
-	ROM_LOAD("ide_xtl.bin",  0x00000, 0x03800, CRC(68801d16) SHA1(f3f5bed385d00ac444d85f492c879aa68a864160)) 
+	ROM_LOAD("ide_xtl.bin",  0x00000, 0x03800, CRC(68801d16) SHA1(f3f5bed385d00ac444d85f492c879aa68a864160))
 ROM_END
 
 //**************************************************************************
@@ -234,10 +234,10 @@ void isa8_ide_device::device_start()
 
 void isa8_ide_device::device_reset()
 {
-	int base_address 	= ((ioport("BIOS_BASE")->read() & 0x0F) * 16 * 1024) + 0xC0000;
-	int io_address		= ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
-	irq					= (ioport("IRQ")->read() & 0x07);
-	
+	int base_address    = ((ioport("BIOS_BASE")->read() & 0x0F) * 16 * 1024) + 0xC0000;
+	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
+	irq                 = (ioport("IRQ")->read() & 0x07);
+
 	m_isa->install_rom(this, base_address, base_address + (16*1024) -1 , 0, 0, "ide8", "ide8");
 	m_isa->install_device(subdevice("ide"), io_address, io_address+15, 0, 0, FUNC(ide8_r), FUNC(ide8_w) );
 

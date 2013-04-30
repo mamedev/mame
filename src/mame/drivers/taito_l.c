@@ -139,7 +139,6 @@ void taitol_state::state_register(  )
 
 MACHINE_START_MEMBER(taitol_state,taito_l)
 {
-
 	save_item(NAME(m_rambanks));
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_empty_ram));

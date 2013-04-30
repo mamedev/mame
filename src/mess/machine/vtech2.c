@@ -332,7 +332,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( vtech2_state, laser_cart )
 }
 
 device_t *vtech2_state::laser_file()
-{	
+{
 	return machine().device(m_laser_drive ? FLOPPY_1 : FLOPPY_0);
 }
 

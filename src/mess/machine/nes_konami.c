@@ -158,7 +158,7 @@ void nes_konami_vrc4_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_prescale));
 	save_item(NAME(m_irq_enable));
@@ -201,7 +201,7 @@ void nes_konami_vrc7_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_mode));
 	save_item(NAME(m_irq_prescale));
 	save_item(NAME(m_irq_enable));
@@ -367,7 +367,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_mode)	// 8bits mode
+			if (m_irq_mode) // 8bits mode
 			{
 				if ((m_irq_count & 0x00ff) == 0xff)
 				{
@@ -377,7 +377,7 @@ void nes_konami_vrc3_device::device_timer(emu_timer &timer, device_timer_id id, 
 				else
 					m_irq_count = (m_irq_count & 0xff00) | ((m_irq_count & 0x00ff) + 1);
 			}
-			else	// 16bits mode
+			else    // 16bits mode
 			{
 				if (m_irq_count == 0xffff)
 				{
@@ -455,11 +455,11 @@ void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, 
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_mode)	// cycle mode
+			if (m_irq_mode) // cycle mode
 				irq_tick();
-			else	// scanline mode 
+			else    // scanline mode
 			{
-				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order). 
+				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
 				// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
 				// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
 				if (m_irq_prescale < 3)
@@ -584,10 +584,10 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 		case 0x4000:
 			prg8_cd(data);
 			break;
-		case 0x1000:	// pulse 1 & global control
+		case 0x1000:    // pulse 1 & global control
 			m_vrc6snd->write(space, add_lines>>8, data);
 			break;
-		case 0x2000:	// pulse 2
+		case 0x2000:    // pulse 2
 			m_vrc6snd->write(space, (add_lines>>8) | 0x100, data);
 			break;
 		case 0x3000:
@@ -601,7 +601,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 					case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
 				}
 			}
-			else	// saw 
+			else    // saw
 			{
 				m_vrc6snd->write(space, (add_lines>>8) | 0x200, data);
 			}

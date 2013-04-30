@@ -356,7 +356,6 @@ static const ym2203_interface ym2203_config =
 
 void ironhors_state::machine_start()
 {
-
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_charbank));
 	save_item(NAME(m_spriterambank));

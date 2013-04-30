@@ -1,6 +1,6 @@
 /***********************************************************************************************************
- 
- 
+
+
  Nintendo NES/FC cart emulation
  (through slot devices)
 
@@ -9,7 +9,7 @@
  0x6000-0x7fff to read_m/write_m (here are *usually* installed NVRAM & WRAM, if any)
  0x8000-0xffff to write_h (reads are directed to 4 x 8K PRG banks)
  Default implementations of these handlers are available here, to be rewritten by PCB-specific ones when needed.
- 
+
  Additional handlers are available, but have to be manually installed at machine_start
  * read_ex/write_ex for address range 0x4020-0x40ff
  * read_h for address range 0x8000-0xffff when a cart does some protection or address scramble before reading ROM
@@ -21,22 +21,22 @@
 
  Plus a few of latch functions are available: ppu_latch (see MMC2), hblank_irq and scanline_irq (see e.g. MMC3),
  but these might be subject to future changes when the PPU is revisited.
- 
+
  Notes:
- - Differently from later systems (like SNES or MD), it is uncommon to find PRG ROMs of NES games which are not a 
+ - Differently from later systems (like SNES or MD), it is uncommon to find PRG ROMs of NES games which are not a
    power of 2K, so we do not perform any mirroring by default.
-   A bunch of pcb types, though, come with 1.5MB of PRG (some Waixing translations) or with multiple PRG chips 
-   having peculiar size (32K + 16K, 32K + 8K, 32K + 2K). Hence, if such a configuration is detected, we provide 
-   a m_prg_bank_map array to handle internally PRG mirroring up to the next power of 2K, as long as the size is 
-   a multiple of 8K (i.e. the unit chunk for standard PRG). 
-   For the case of PRG chips which are not-multiple of 8K (e.g. UNL-MARIO2-MALEE pcb), the handling has to be 
+   A bunch of pcb types, though, come with 1.5MB of PRG (some Waixing translations) or with multiple PRG chips
+   having peculiar size (32K + 16K, 32K + 8K, 32K + 2K). Hence, if such a configuration is detected, we provide
+   a m_prg_bank_map array to handle internally PRG mirroring up to the next power of 2K, as long as the size is
+   a multiple of 8K (i.e. the unit chunk for standard PRG).
+   For the case of PRG chips which are not-multiple of 8K (e.g. UNL-MARIO2-MALEE pcb), the handling has to be
    handled in the pcb-specific code!
  - Our open bus emulation is very sketchy, by simply returning the higher 8bits of the accessed address. This seems
    enough for most games (only two sets have issues with this). A slightly better implementation is almost ready
    to fix these two remaining cases, but I plan to revisit the whole implementation in an accurate way at a later
    stage
  - Bus conflict is implemented based on latest tests by Blargg. There is some uncertainty about AxROM behavior
-   (some AOROM pcbs suffers from bus conflict, some do not... since no AOROM game is known to glitch due to lack 
+   (some AOROM pcbs suffers from bus conflict, some do not... since no AOROM game is known to glitch due to lack
    of bus conflict it seems safe to emulate the board without bus conflict, but eventually it would be good to
    differentiate the real variants)
 
@@ -44,20 +44,20 @@
  Many information about the mappers/pcbs come from the wonderful doc written by Disch.
  Current info (when used) are based on v0.6.1 of his docs.
  You can find the latest version of the doc at http://www.romhacking.net/docs/362/
- 
- A lot of details have been based on the researches carried on at NesDev forums (by Blargg, Quietust and many more) 
+
+ A lot of details have been based on the researches carried on at NesDev forums (by Blargg, Quietust and many more)
  and collected on the NesDev Wiki http://wiki.nesdev.com/
- 
+
  Particular thanks go to
  - Martin Freij for his work on NEStopia
  - Cah4e3 for his efforts on FCEUMM and the reverse engineering of pirate boards
  - BootGod, lidnariq and naruko for the PCB tests which made possible
 
- 
+
  ***********************************************************************************************************/
 
 /*****************************************************************************************
- 
+
  A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than
  a kind of boards. In these cases (and only in these cases) we exploit nes.hsi to set up accordingly
  emulation. Games which requires this hack are the following:
@@ -69,14 +69,14 @@
  * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
  * 153 - Famicom Jump II uses a different board (or the same in a very different way)
  * 242 - DQ8 has no mirroring (missing graphics is due to other reasons though)
- 
+
  crc_hacks have been added also to handle a few wiring settings which would require submappers:
  * CHR protection pins for mapper 185
  * VRC-2, VRC-4 and VRC-6 line wiring
- 
+
  Remember that the MMC # does not equal the mapper #. In particular, Mapper 4 is
  in fact MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
- 
+
  ****************************************************************************************/
 
 
@@ -170,14 +170,14 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 
 		m_prg_mask = ((m_prg_chunks << 1) - 1);
 
-//		printf("first mask %x!\n", m_prg_mask);
+//      printf("first mask %x!\n", m_prg_mask);
 		if ((m_prg_chunks << 1) & m_prg_mask)
 		{
 			int mask_bits = 0, temp = (m_prg_chunks << 1), mapsize;
 			// contrary to what happens with later systems, like e.g. SNES or MD,
 			// only half a dozen of NES carts have PRG which is not a power of 2
 			// so we use this bank_map only as an exception
-//			printf("uneven rom!\n");
+//          printf("uneven rom!\n");
 
 			// 1. redefine mask as (next power of 2)-1
 			for (; temp; )
@@ -186,7 +186,7 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 				temp >>= 1;
 			}
 			m_prg_mask = (1 << mask_bits) - 1;
-//			printf("new mask %x!\n", m_prg_mask);
+//          printf("new mask %x!\n", m_prg_mask);
 			mapsize = (1 << mask_bits)/2;
 
 			// 2. create a bank_map for banks in the range mask/2 -> mask
@@ -196,7 +196,7 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 			int j;
 			for (j = mapsize; j < (m_prg_chunks << 1); j++)
 				m_prg_bank_map[j - mapsize] = j;
-			
+
 			while (j % mapsize)
 			{
 				int k = 0, repeat_banks;
@@ -207,14 +207,14 @@ void device_nes_cart_interface::prg_alloc(running_machine &machine, size_t size)
 					m_prg_bank_map[(j - mapsize) + l] = m_prg_bank_map[(j - mapsize) + l - repeat_banks];
 				j += repeat_banks;
 			}
-				
+
 			// check bank map!
-//			for (int i = 0; i < mapsize; i++)
-//			{
-//				printf("bank %3d = %3d\t", i, m_prg_bank_map[i]);
-//				if ((i%8) == 7)
-//					printf("\n");
-//			}
+//          for (int i = 0; i < mapsize; i++)
+//          {
+//              printf("bank %3d = %3d\t", i, m_prg_bank_map[i]);
+//              if ((i%8) == 7)
+//                  printf("\n");
+//          }
 		}
 	}
 }
@@ -275,10 +275,10 @@ inline int device_nes_cart_interface::prg_8k_bank_num(int bank_8k)
 		return bank_8k;
 
 	// case 2: otherwise return a mirror using the bank_map!
-//	UINT8 temp = bank_8k;
+//  UINT8 temp = bank_8k;
 	bank_8k &= m_prg_mask;
 	bank_8k -= (m_prg_mask/2 + 1);
-//	printf("bank: accessed %x (top: %x), returned %x\n", temp, (m_prg_chunks << 1) - 1, m_prg_bank_map[bank_8k]);
+//  printf("bank: accessed %x (top: %x), returned %x\n", temp, (m_prg_chunks << 1) - 1, m_prg_bank_map[bank_8k]);
 	return m_prg_bank_map[bank_8k];
 }
 
@@ -289,7 +289,7 @@ inline void device_nes_cart_interface::update_prg_banks(int prg_bank_start, int 
 		assert(prg_bank >= 0);
 		assert(prg_bank < ARRAY_LENGTH(m_prg_bank));
 		assert(prg_bank < ARRAY_LENGTH(m_prg_bank_mem));
-		
+
 		m_prg_bank_mem[prg_bank]->set_entry(m_prg_bank[prg_bank]);
 	}
 }
@@ -299,7 +299,7 @@ void device_nes_cart_interface::prg32(int bank)
 	/* if there is only 16k PRG, return */
 	if (!(m_prg_chunks >> 1))
 		return;
-	
+
 	/* assumes that bank references a 32k chunk */
 	bank = prg_8k_bank_num(bank * 4);
 
@@ -314,7 +314,7 @@ void device_nes_cart_interface::prg16_89ab(int bank)
 {
 	/* assumes that bank references a 16k chunk */
 	bank = prg_8k_bank_num(bank * 2);
-	
+
 	m_prg_bank[0] = bank + 0;
 	m_prg_bank[1] = bank + 1;
 	update_prg_banks(0, 1);
@@ -324,7 +324,7 @@ void device_nes_cart_interface::prg16_cdef(int bank)
 {
 	/* assumes that bank references a 16k chunk */
 	bank = prg_8k_bank_num(bank * 2);
-	
+
 	m_prg_bank[2] = bank + 0;
 	m_prg_bank[3] = bank + 1;
 	update_prg_banks(2, 3);
@@ -334,7 +334,7 @@ void device_nes_cart_interface::prg8_89(int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank = prg_8k_bank_num(bank);
-	
+
 	m_prg_bank[0] = bank;
 	update_prg_banks(0, 0);
 }
@@ -343,7 +343,7 @@ void device_nes_cart_interface::prg8_ab(int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank = prg_8k_bank_num(bank);
-	
+
 	m_prg_bank[1] = bank;
 	update_prg_banks(1, 1);
 }
@@ -352,7 +352,7 @@ void device_nes_cart_interface::prg8_cd(int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank = prg_8k_bank_num(bank);
-	
+
 	m_prg_bank[2] = bank;
 	update_prg_banks(2, 2);
 }
@@ -361,7 +361,7 @@ void device_nes_cart_interface::prg8_ef(int bank)
 {
 	/* assumes that bank references an 8k chunk */
 	bank = prg_8k_bank_num(bank);
-	
+
 	m_prg_bank[3] = bank;
 	update_prg_banks(3, 3);
 }
@@ -370,10 +370,10 @@ void device_nes_cart_interface::prg8_ef(int bank)
 void device_nes_cart_interface::prg8_x(int start, int bank)
 {
 	assert(start < 4);
-	
+
 	/* assumes that bank references an 8k chunk */
 	bank = prg_8k_bank_num(bank);
-	
+
 	m_prg_bank[start] = bank;
 	update_prg_banks(start, start);
 }
@@ -386,7 +386,7 @@ inline void device_nes_cart_interface::chr_sanity_check( int source )
 {
 	if (source == CHRRAM && m_vram == NULL)
 		fatalerror("CHRRAM bankswitch with no VRAM\n");
-	
+
 	if (source == CHRROM && m_vrom == NULL)
 		fatalerror("CHRROM bankswitch with no VROM\n");
 }
@@ -394,7 +394,7 @@ inline void device_nes_cart_interface::chr_sanity_check( int source )
 void device_nes_cart_interface::chr8(int bank, int source)
 {
 	chr_sanity_check(source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= (m_vram_chunks - 1);
@@ -420,7 +420,7 @@ void device_nes_cart_interface::chr8(int bank, int source)
 void device_nes_cart_interface::chr4_x(int start, int bank, int source)
 {
 	chr_sanity_check(source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((m_vram_chunks << 1) - 1);
@@ -446,7 +446,7 @@ void device_nes_cart_interface::chr4_x(int start, int bank, int source)
 void device_nes_cart_interface::chr2_x(int start, int bank, int source)
 {
 	chr_sanity_check(source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((m_vram_chunks << 2) - 1);
@@ -472,7 +472,7 @@ void device_nes_cart_interface::chr2_x(int start, int bank, int source)
 void device_nes_cart_interface::chr1_x(int start, int bank, int source)
 {
 	chr_sanity_check(source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((m_vram_chunks << 3) - 1);
@@ -517,16 +517,16 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 			base_ptr = m_ciram;
 			break;
 	}
-	
+
 	page &= 3; /* mask down to the 4 logical pages */
 	m_nt_src[page] = source;
-	
+
 	if (base_ptr != NULL)
 	{
 		m_nt_orig[page] = bank * 0x400;
 		m_nt_access[page] = base_ptr + m_nt_orig[page];
 	}
-	
+
 	m_nt_writable[page] = writable;
 }
 
@@ -541,21 +541,21 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 			set_nt_page(2, CIRAM, 0, 1);
 			set_nt_page(3, CIRAM, 1, 1);
 			break;
-			
+
 		case PPU_MIRROR_HORZ:
 			set_nt_page(0, CIRAM, 0, 1);
 			set_nt_page(1, CIRAM, 0, 1);
 			set_nt_page(2, CIRAM, 1, 1);
 			set_nt_page(3, CIRAM, 1, 1);
 			break;
-			
+
 		case PPU_MIRROR_HIGH:
 			set_nt_page(0, CIRAM, 1, 1);
 			set_nt_page(1, CIRAM, 1, 1);
 			set_nt_page(2, CIRAM, 1, 1);
 			set_nt_page(3, CIRAM, 1, 1);
 			break;
-			
+
 		case PPU_MIRROR_LOW:
 			set_nt_page(0, CIRAM, 0, 1);
 			set_nt_page(1, CIRAM, 0, 1);
@@ -570,7 +570,7 @@ void device_nes_cart_interface::set_nt_mirroring(int mirroring)
 			set_nt_page(2, CART_NTRAM, 2, 1);
 			set_nt_page(3, CART_NTRAM, 3, 1);
 			break;
-			
+
 		case PPU_MIRROR_NONE:
 		default:
 			set_nt_page(0, CIRAM, 0, 1);
@@ -596,7 +596,7 @@ UINT8 device_nes_cart_interface::hi_access_rom(UINT32 offset)
 
 // Helper function for the few mappers subject to bus conflict at write.
 // Tests by blargg showed that in many of the boards suffering of CPU/ROM
-// conflicts the behaviour can be accurately emulated by writing not the 
+// conflicts the behaviour can be accurately emulated by writing not the
 // original data, but data & rom[offset]
 UINT8 device_nes_cart_interface::account_bus_conflict(UINT32 offset, UINT8 data)
 {
@@ -604,7 +604,7 @@ UINT8 device_nes_cart_interface::account_bus_conflict(UINT32 offset, UINT8 data)
 	// so we allow to set m_bus_conflict to FALSE at loading time when necessary
 	if (m_bus_conflict)
 		return data & hi_access_rom(offset);
-	else 
+	else
 		return data;
 }
 
@@ -616,7 +616,7 @@ UINT8 device_nes_cart_interface::account_bus_conflict(UINT32 offset, UINT8 data)
 WRITE8_MEMBER(device_nes_cart_interface::chr_w)
 {
 	int bank = offset >> 10;
-	
+
 	if (m_chr_src[bank] == CHRRAM)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
@@ -631,10 +631,10 @@ READ8_MEMBER(device_nes_cart_interface::chr_r)
 WRITE8_MEMBER(device_nes_cart_interface::nt_w)
 {
 	int page = ((offset & 0xc00) >> 10);
-	
+
 	if (!m_nt_writable[page])
 		return;
-	
+
 	m_nt_access[page][offset & 0x3ff] = data;
 }
 
@@ -649,40 +649,40 @@ READ8_MEMBER(device_nes_cart_interface::nt_r)
 //  Base memory accessors (emulating open bus
 //  behaviour and/or WRAM accesses)
 //  Open bus emulation is defective, but it should
-//  be enough for the few cases known to rely on 
+//  be enough for the few cases known to rely on
 //  this (more in the comments at the top of the
 //  source)
 //-------------------------------------------------
 
-READ8_MEMBER(device_nes_cart_interface::read_l) 
-{ 
-	return ((offset + 0x4100) & 0xff00) >> 8;	// open bus
+READ8_MEMBER(device_nes_cart_interface::read_l)
+{
+	return ((offset + 0x4100) & 0xff00) >> 8;   // open bus
 }
 
-READ8_MEMBER(device_nes_cart_interface::read_m) 
-{ 
+READ8_MEMBER(device_nes_cart_interface::read_m)
+{
 	if (m_battery)
 		return m_battery[offset & (m_battery_size - 1)];
 	if (m_prgram)
 		return m_prgram[offset & (m_prgram_size - 1)];
-	
-	return ((offset + 0x6000) & 0xff00) >> 8;	// open bus
+
+	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_l) 
-{ 
+WRITE8_MEMBER(device_nes_cart_interface::write_l)
+{
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_m) 
-{ 
+WRITE8_MEMBER(device_nes_cart_interface::write_m)
+{
 	if (m_battery)
 		m_battery[offset & (m_battery_size - 1)] = data;
 	if (m_prgram)
 		m_prgram[offset & (m_prgram_size - 1)] = data;
 }
 
-WRITE8_MEMBER(device_nes_cart_interface::write_h) 
-{ 
+WRITE8_MEMBER(device_nes_cart_interface::write_h)
+{
 }
 
 
@@ -743,11 +743,11 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, UINT8 *ciram
 		m_prg_bank_mem[i]->set_entry(i);
 		m_prg_bank[i] = i;
 	}
-	
+
 	// Setup CHR
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	chr8(0, m_chr_source);
-	
+
 	// Setup NT
 	m_ciram = ciram_ptr;
 
@@ -846,9 +846,9 @@ void nes_cart_slot_device::pcb_reset()
 
 
 /*-------------------------------------------------
- 
+
  Load from xml list and identify the required slot device
- 
+
  -------------------------------------------------*/
 
 /* Include emulation of NES PCBs for softlist */
@@ -856,9 +856,9 @@ void nes_cart_slot_device::pcb_reset()
 
 
 /*-------------------------------------------------
- 
+
  Load .unf files (UNIF boards) and identify the required slot device
- 
+
  -------------------------------------------------*/
 
 /* Include emulation of UNIF Boards for .unf files */
@@ -866,9 +866,9 @@ void nes_cart_slot_device::pcb_reset()
 
 
 /*-------------------------------------------------
- 
+
  Load .nes files (iNES mappers) and identify the required slot devices
- 
+
  -------------------------------------------------*/
 
 /* Include emulation of iNES Mappers for .nes files */
@@ -975,10 +975,10 @@ const char * nes_cart_slot_device::get_default_card_software(const machine_confi
 
 		if ((ROM[0] == 'U') && (ROM[1] == 'N') && (ROM[2] == 'I') && (ROM[3] == 'F'))
 			slot_string = get_default_card_unif(ROM, len);
-		
+
 		global_free(ROM);
 		clear();
-		
+
 		return slot_string;
 	}
 	else
@@ -1058,10 +1058,9 @@ WRITE8_MEMBER(nes_cart_slot_device::write_ex)
 //-------------------------------------------------
 
 void nes_partialhash(hash_collection &dest, const unsigned char *data,
-					 unsigned long length, const char *functions)
+						unsigned long length, const char *functions)
 {
 	if (length <= 16)
 		return;
 	dest.compute(&data[16], length - 16, functions);
 }
-

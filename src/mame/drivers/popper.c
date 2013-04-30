@@ -311,7 +311,6 @@ GFXDECODE_END
 
 void popper_state::machine_start()
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_e002));
 	save_item(NAME(m_gfx_bank));

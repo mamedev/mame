@@ -110,7 +110,7 @@ public:
 #define HP48_IO_8(x)   (m_io[(x)] | (m_io[(x)+1] << 4))
 #define HP48_IO_12(x)  (m_io[(x)] | (m_io[(x)+1] << 4) | (m_io[(x)+2] << 8))
 #define HP48_IO_20(x)  (m_io[(x)] | (m_io[(x)+1] << 4) | (m_io[(x)+2] << 8) | \
-					   (m_io[(x)+3] << 12) | (m_io[(x)+4] << 16))
+						(m_io[(x)+3] << 12) | (m_io[(x)+4] << 16))
 
 
 /*----------- defined in machine/hp48.c -----------*/

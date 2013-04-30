@@ -132,5 +132,5 @@ public:
 	void mscoutm_inputportsel_w(int data);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;	
+	required_device<dac_device> m_dac2;
 };

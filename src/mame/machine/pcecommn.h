@@ -24,7 +24,7 @@ public:
 	DECLARE_DRIVER_INIT(pce_common);
 
 	required_device<cpu_device> m_maincpu;
-	
+
 	virtual UINT8 joy_read();
 private:
 	UINT8 m_io_port_options;    /*driver-specific options for the PCE*/

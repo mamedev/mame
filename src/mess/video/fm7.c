@@ -645,7 +645,7 @@ READ8_MEMBER(fm7_state::fm7_vram_r)
 		return 0xff;
 
 	if(m_alu.command & 0x80) // ALU active, writes to VRAM even when reading it (go figure)
-	{		
+	{
 		fm7_alu_function(offset+page);
 	}
 

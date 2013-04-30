@@ -60,7 +60,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
-		m_beeper(*this, "beeper")	{ }
+		m_beeper(*this, "beeper")   { }
 
 	ULA m_ula;
 	emu_timer *m_tape_timer;

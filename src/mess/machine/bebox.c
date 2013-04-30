@@ -1016,7 +1016,7 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 	space_0.install_readwrite_bank(0, m_ram->size() - 1, 0, 0x02000000, "bank3");
 	space_1.install_readwrite_bank(0, m_ram->size() - 1, 0, 0x02000000, "bank3");
 	membank("bank3")->set_base(m_ram->pointer());
-	
+
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then
 	 * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never

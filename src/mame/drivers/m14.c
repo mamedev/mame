@@ -316,7 +316,6 @@ INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
 
 void m14_state::machine_start()
 {
-
 	save_item(NAME(m_hop_mux));
 }
 

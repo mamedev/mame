@@ -54,7 +54,6 @@ void tx0_state::screen_eof_tx0(screen_device &screen, bool state)
 */
 void tx0_state::tx0_plot(int x, int y)
 {
-
 	/* compute pixel coordinates and plot */
 	x = x*crt_window_width/0777;
 	y = y*crt_window_height/0777;

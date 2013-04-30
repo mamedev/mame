@@ -53,7 +53,7 @@ public:
 			m_main_gpu_wait(NULL),
 			m_joystick_data(0),
 			m_eeprom_bit_count(0),
-			m_protection_check(0) ,		
+			m_protection_check(0) ,
 		m_eeprom(*this, "eeprom") { }
 
 	// devices

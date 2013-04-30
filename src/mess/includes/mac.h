@@ -398,7 +398,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
 	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
-	
+
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 
 	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);

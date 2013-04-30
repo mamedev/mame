@@ -32,7 +32,7 @@ public:
 		m_trom(*this, "saa505x"),
 		m_cassette(*this, "cassette"),
 		m_acia(*this, "acia6850"),
-		m_ACCCON_IRR(CLEAR_LINE),		
+		m_ACCCON_IRR(CLEAR_LINE),
 		m_via_system_irq(CLEAR_LINE),
 		m_via_user_irq(CLEAR_LINE),
 		m_acia_irq(CLEAR_LINE),
@@ -374,7 +374,7 @@ protected:
 	void MC6850_Receive_Clock(int new_clock);
 	void BBC_Cassette_motor(unsigned char status);
 	void bbc_update_fdq_int(int state);
-public:	
+public:
 	unsigned int calculate_video_address(int ma,int ra);
 };
 

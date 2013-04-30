@@ -423,7 +423,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(_2mindril_state,drill)
 {
-
 	save_item(NAME(m_defender_sensor));
 	save_item(NAME(m_shutter_sensor));
 }

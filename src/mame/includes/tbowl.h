@@ -66,5 +66,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<msm5205_device> m_msm1;
-	required_device<msm5205_device> m_msm2;		
+	required_device<msm5205_device> m_msm2;
 };

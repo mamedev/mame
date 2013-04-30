@@ -240,7 +240,6 @@ GFXDECODE_END
 
 void amspdwy_state::machine_start()
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_wheel_old));
 	save_item(NAME(m_wheel_return));

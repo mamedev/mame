@@ -707,7 +707,6 @@ TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 
 void mac_state::kbd_shift_out(int data)
 {
-
 	if (m_kbd_comm == TRUE)
 	{
 		m_kbd_shift_reg = data;
@@ -746,7 +745,6 @@ TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
 */
 void mac_state::keyboard_receive(int val)
 {
-
 	switch (val)
 	{
 	case 0x10:
@@ -2025,7 +2023,6 @@ READ32_MEMBER(mac_state::mac_read_id)
 
 void mac_state::mac_driver_init(model_t model)
 {
-
 	m_overlay = 1;
 	m_scsi_interrupt = 0;
 	m_model = model;

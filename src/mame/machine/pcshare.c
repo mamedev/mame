@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( pcat_base_state::pc_dma_hrq_changed )
 READ8_MEMBER(pcat_base_state::pc_dma_read_byte)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
-	
+
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
@@ -246,6 +246,6 @@ MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
 //  MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
 MACHINE_CONFIG_END

@@ -324,9 +324,9 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 		m_dma_active = 1;
 		machine().scheduler().timer_set(attotime::from_msec(20), timer_expired_delegate(FUNC(mlanding_state::dma_complete),this));
 	}
-	
+
 	// 0 (falling edge?) starts cpus in this order:
-	
+
 	if (!(data & 0x40)) // $09b0 d6: sub cpu
 		m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
@@ -369,17 +369,17 @@ READ16_MEMBER(mlanding_state::ml_analog1_msb_r)
 	// d7: ?
 	UINT8 throttle = ioport("STICK1")->read();
 	UINT16 x = ioport("STICK2")->read();
-	
+
 	UINT8 res = 0xf0;
 
 	if (throttle & 0x80)
 		res ^= 0x2f;
 	else if (throttle > 0)
 		res ^= 0x40;
-	
+
 	if (!(x & 0x800) && x > 0)
 		res ^= 0x10;
-	
+
 	return res;
 }
 
@@ -399,17 +399,17 @@ READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 	// d7: ?
 	UINT16 x = ioport("STICK2")->read();
 	UINT16 y = ioport("STICK3")->read();
-	
+
 	UINT8 res = (y >> 8 & 0x0f) | 0xf0;
 
 	if (y & 0x800)
 		res ^= 0x40;
 	else if (y > 0)
 		res ^= 0x10;
-	
+
 	if (x & 0x800)
 		res ^= 0x20;
-	
+
 	return res;
 }
 
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
-//	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITENOP // ?
+//  AM_RANGE(0x1d0002, 0x1d0003) AM_WRITENOP // ?
 
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)

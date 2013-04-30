@@ -11,7 +11,7 @@ public:
 		m_dma8237_1(*this, "dma8237_1"),
 		m_pic8259_1(*this, "pic8259_1"),
 		m_pic8259_2(*this, "pic8259_2"),
-		m_pit8254(*this, "pit8254")	{ }
+		m_pit8254(*this, "pit8254") { }
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -20,7 +20,7 @@ public:
 	required_device<pic8259_device> m_pic8259_1;
 	required_device<pic8259_device> m_pic8259_2;
 	required_device<pit8254_device> m_pit8254;
-	
+
 	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);

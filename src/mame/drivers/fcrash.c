@@ -1382,7 +1382,6 @@ MACHINE_START_MEMBER(cps_state,sgyxz)
 
 MACHINE_START_MEMBER(cps_state,kodb)
 {
-
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
 	m_layer_mask_reg[1] = 0x2c;

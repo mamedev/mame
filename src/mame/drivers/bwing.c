@@ -331,7 +331,6 @@ GFXDECODE_END
 
 void bwing_state::machine_start()
 {
-
 	save_item(NAME(m_palatch));
 	save_item(NAME(m_srbank));
 	save_item(NAME(m_mapmask));

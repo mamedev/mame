@@ -74,7 +74,7 @@ struct voodoo_config
 	UINT8               tmumem1;
 	const char *        screen;
 	const char *        cputag;
-	devcb_write_line 	vblank;
+	devcb_write_line    vblank;
 	devcb_write_line    stall;
 };
 

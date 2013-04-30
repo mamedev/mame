@@ -569,7 +569,6 @@ GFXDECODE_END
 
 void angelkds_state::machine_start()
 {
-
 	save_item(NAME(m_layer_ctrl));
 	save_item(NAME(m_txbank));
 	save_item(NAME(m_bgbotbank));

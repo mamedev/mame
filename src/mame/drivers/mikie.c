@@ -247,7 +247,6 @@ static const sn76496_config psg_intf =
 
 void mikie_state::machine_start()
 {
-
 	save_item(NAME(m_palettebank));
 	save_item(NAME(m_last_irq));
 }

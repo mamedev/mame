@@ -394,7 +394,6 @@ GFXDECODE_END
 
 void egghunt_state::machine_start()
 {
-
 	save_item(NAME(m_gfx_banking));
 	save_item(NAME(m_okibanking));
 	save_item(NAME(m_vidram_bank));

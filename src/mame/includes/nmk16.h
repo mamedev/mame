@@ -182,5 +182,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki1;
-	optional_device<okim6295_device> m_oki2;	
+	optional_device<okim6295_device> m_oki2;
 };

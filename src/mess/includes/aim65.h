@@ -61,7 +61,7 @@ public:
 	virtual void machine_start();
 	TIMER_CALLBACK_MEMBER(aim65_printer_timer);
 	void aim65_pia();
-	
+
 	DECLARE_WRITE16_MEMBER(aim65_update_ds1);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds2);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds3);

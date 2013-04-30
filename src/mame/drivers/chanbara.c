@@ -385,7 +385,6 @@ static const ym2203_interface ym2203_config =
 
 void chanbara_state::machine_start()
 {
-
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_scrollhi));
 }

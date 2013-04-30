@@ -132,7 +132,7 @@ void nes_h3001_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
@@ -162,9 +162,9 @@ void nes_h3001_device::pcb_reset()
  Games: Napoleon Senki
 
  iNES: mapper 77
- 
+
  This board should use 2KB of CHRRAM as NTRAM, instead
- of using directly 4-screen mirroring, but for the 
+ of using directly 4-screen mirroring, but for the
  moment we cheat in this way...
 
  -------------------------------------------------*/
@@ -185,7 +185,7 @@ WRITE8_MEMBER(nes_lrog017_device::write_h)
  Irem Holy Diver board emulation
 
  iNES: mapper 78 (shared with JF-16)
- 
+
  -------------------------------------------------*/
 
 WRITE8_MEMBER(nes_holydivr_device::write_h)
@@ -284,7 +284,7 @@ void nes_h3001_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 			// after firing, the counter is *not* reloaded and does not wrap
 			if (m_irq_count > 0)
 				m_irq_count--;
-				
+
 			if (!m_irq_count)
 			{
 				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);

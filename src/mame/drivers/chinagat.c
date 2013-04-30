@@ -239,7 +239,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
 }
 
 WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
-{	
+{
 	/* i8748 Port 2 write */
 	UINT8 *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
 
@@ -291,7 +291,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_m5205_clk_w )
 	/* to the xtal pins of the MSM5205 */
 
 	/* Actually, T0 output clk mode is not supported by the i8048 core */
-#if 0	
+#if 0
 	m_m5205_clk++;
 	if (m_m5205_clk == 8)
 	{

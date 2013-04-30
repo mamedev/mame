@@ -238,7 +238,7 @@ WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
-	
+
 	m_msm->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
 	m_msm->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
 	m_msm->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
@@ -429,7 +429,6 @@ static const msm5232_interface msm5232_config =
 
 void msisaac_state::machine_start()
 {
-
 	/* video */
 	save_item(NAME(m_bg2_textbank));
 	/* sound */

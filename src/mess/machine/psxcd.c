@@ -1084,7 +1084,7 @@ void psxcd_device::start_read()
 		return;
 	}
 	send_result(intr_complete);
-	status |= status_reading;	
+	status |= status_reading;
 
 	m_cursec=sectail=0;
 

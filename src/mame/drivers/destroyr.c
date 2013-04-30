@@ -433,7 +433,6 @@ void destroyr_state::palette_init()
 
 void destroyr_state::machine_start()
 {
-
 	save_item(NAME(m_cursor));
 	save_item(NAME(m_wavemod));
 	save_item(NAME(m_attract));

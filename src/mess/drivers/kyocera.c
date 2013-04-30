@@ -42,9 +42,9 @@
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
 
-	10 FOR A=0 TO 255
-	20 PRINT CHR$(A);
-	30 NEXT A
+    10 FOR A=0 TO 255
+    20 PRINT CHR$(A);
+    30 NEXT A
 
 */
 

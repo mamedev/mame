@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( mediagx, mediagx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-	
+
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;

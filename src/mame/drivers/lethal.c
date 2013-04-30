@@ -580,7 +580,7 @@ void lethal_state::machine_start()
 	membank("bank1")->set_entry(0);
 
 	m_generic_paletteram_8.allocate(0x3800 + 0x02);
-	
+
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layer_colorbase));

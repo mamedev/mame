@@ -673,7 +673,7 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	#if ENABLE_VGA
 	MCFG_FRAGMENT_ADD( pcvideo_vga )

@@ -29,7 +29,7 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cassette(*this, "cassette"),
 			m_rom(*this, CDP1802_TAG),
-			m_run(*this, "RUN"),			
+			m_run(*this, "RUN"),
 			m_ram(*this, RAM_TAG),
 			m_beeper(*this, "beeper")
 	{ }

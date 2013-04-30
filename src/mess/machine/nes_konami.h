@@ -65,7 +65,7 @@ private:
 	UINT16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };
@@ -95,9 +95,9 @@ protected:
 	void irq_tick();
 	UINT16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
-	int m_irq_mode; 
+	int m_irq_mode;
 	int m_irq_prescale;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };

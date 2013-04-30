@@ -2488,7 +2488,7 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 			m_cd_out_ptr=(m_cd_out_ptr+2)&0x3ff;
 
 			//if((m_cd_out_ptr == ((spureg.irq_addr << 3) & ~0x400)) && (spureg.ctrl & spuctrl_irq_enable))
-			//	m_irq_handler(1);
+			//  m_irq_handler(1);
 
 			dp[0]=clamp(dp[0]+vl);
 			dp[1]=clamp(dp[1]+vr);

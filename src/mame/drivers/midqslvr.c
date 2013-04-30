@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END

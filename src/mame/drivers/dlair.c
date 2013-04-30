@@ -55,7 +55,7 @@ public:
 			m_22vp932(*this, "ld_22vp932") ,
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
-		m_beeper(*this, "beeper")	 { }
+		m_beeper(*this, "beeper")    { }
 
 	void laserdisc_data_w(UINT8 data)
 	{

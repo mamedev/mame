@@ -328,7 +328,6 @@ static const ym3812_interface ym3812_config =
 
 void crospang_state::machine_start()
 {
-
 	save_item(NAME(m_bestri_tilebank));
 
 }

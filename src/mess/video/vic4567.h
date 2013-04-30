@@ -25,14 +25,14 @@ struct vic3_interface
 	const char         *screen;
 	const char         *cpu;
 
-	vic3_type 		   type;
+	vic3_type          type;
 
 	devcb_read8        x_cb;
 	devcb_read8        y_cb;
-	devcb_read8		   button_cb;
+	devcb_read8        button_cb;
 
 	devcb_read8        dma_read;
-	devcb_read8		   dma_read_color;
+	devcb_read8        dma_read_color;
 	devcb_write_line   irq;
 
 	devcb_write8       port_changed;

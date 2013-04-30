@@ -34,7 +34,7 @@ public:
 	void partner_window_2(UINT8 bank_num, UINT16 offset,UINT8 *rom);
 	void partner_iomap_bank(UINT8 *rom);
 	void partner_bank_switch();
-	required_device<ram_device> m_ram;	
+	required_device<ram_device> m_ram;
 };
 
 

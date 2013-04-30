@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 
 /*Sound Functions*/
 WRITE8_MEMBER(gladiatr_state::glad_adpcm_w)
-{	
+{
 	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */

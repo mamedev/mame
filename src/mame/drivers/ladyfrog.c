@@ -275,7 +275,6 @@ GFXDECODE_END
 
 void ladyfrog_state::machine_start()
 {
-
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_sound_nmi_enable));

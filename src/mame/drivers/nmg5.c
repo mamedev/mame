@@ -987,7 +987,6 @@ static const ym3812_interface ym3812_intf =
 
 void nmg5_state::machine_start()
 {
-
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_priority_reg));
 	save_item(NAME(m_input_data));

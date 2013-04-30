@@ -228,7 +228,6 @@ GFXDECODE_END
 
 void ginganin_state::machine_start()
 {
-
 	save_item(NAME(m_layers_ctrl));
 	save_item(NAME(m_flipscreen));
 }

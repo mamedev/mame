@@ -38,7 +38,7 @@ extern void z8k_disass_mode(running_machine &machine, int ref, int params, const
 
 /* possible values for z8k_segm_mode */
 #define Z8K_SEGM_MODE_NONSEG 0
-#define Z8K_SEGM_MODE_SEG	 1
-#define Z8K_SEGM_MODE_AUTO	 2
+#define Z8K_SEGM_MODE_SEG    1
+#define Z8K_SEGM_MODE_AUTO   2
 
 #endif /* __Z8000_H__ */

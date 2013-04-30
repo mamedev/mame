@@ -271,7 +271,6 @@ WRITE_LINE_MEMBER(blockout_state::irq_handler)
 
 void blockout_state::machine_start()
 {
-
 	save_item(NAME(m_color));
 }
 

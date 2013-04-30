@@ -876,7 +876,6 @@ static const ay8910_interface ay8910_config =
 
 void nightgal_state::machine_start()
 {
-
 	save_item(NAME(m_nsc_latch));
 	save_item(NAME(m_z80_latch));
 	save_item(NAME(m_mux_data));

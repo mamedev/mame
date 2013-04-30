@@ -1240,7 +1240,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cps_state,cps2)
 {
-
 	if (m_audiocpu != NULL) // gigaman2 has no audiocpu
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }

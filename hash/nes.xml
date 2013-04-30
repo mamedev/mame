@@ -51007,7 +51007,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="中國大亨"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />	<!-- Original header was mapper 116, but it's not a SOMARI pcb... -->
+			<feature name="pcb" value="NES-TLROM" />    <!-- Original header was mapper 116, but it's not a SOMARI pcb... -->
 			<dataarea name="chr" size="131072">
 				<rom name="chuugoku taitei (asia) (unl).chr" size="131072" crc="d9203c08" sha1="b32ef62e4583b216aea84f7d0da0269c01b61e26" offset="00000" status="baddump" />
 			</dataarea>
@@ -54017,7 +54017,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1109"/>
 		<info name="alt_title" value="神鬼传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="hengg_srich" />	<!-- it seems to work even with FS-304... investigate relation between the two... -->
+			<feature name="slot" value="hengg_srich" /> <!-- it seems to work even with FS-304... investigate relation between the two... -->
 			<feature name="pcb" value="HENGGEDIANZI" /> <!-- header says mapper 162, which should be a modified version of 163... -->
 			<dataarea name="prg" size="1048576">
 				<rom name="mummy (es-1109) (c).prg" size="1048576" crc="08fbf3f0" sha1="6dc200340d4b7b9397e4d4f28fa307059ce834ec" offset="00000" status="baddump" />

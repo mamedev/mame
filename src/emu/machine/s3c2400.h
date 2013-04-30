@@ -753,7 +753,7 @@ struct s3c24xx_t
 	devcb_resolved_write8 address_w;
 	devcb_resolved_read8  nand_data_r;
 	devcb_resolved_write8 nand_data_w;
-	
+
 };
 
 #endif

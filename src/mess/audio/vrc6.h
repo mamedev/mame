@@ -57,5 +57,3 @@ extern const device_type VRC6;
 
 
 #endif /* __VRC6_H__ */
-
-

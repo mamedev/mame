@@ -1777,7 +1777,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cave_state,cave)
 {
-
 	save_item(NAME(m_soundbuf_len));
 	save_item(NAME(m_soundbuf_data));
 

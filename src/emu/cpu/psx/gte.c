@@ -296,7 +296,7 @@ INT32 gte::BOUNDS( int44 value, int max_flag, int min_flag )
 	{
 		FLAG |= max_flag;
 	}
-	
+
 	if( value.negative_overflow() )
 	{
 		FLAG |= min_flag;

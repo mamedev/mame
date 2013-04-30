@@ -15,7 +15,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dsp(*this, "dsp")	{ }
+		m_dsp(*this, "dsp") { }
 
 	int m_unk_reset_port;
 	required_shared_ptr<UINT16> m_colorram1;

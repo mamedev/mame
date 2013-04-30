@@ -89,7 +89,7 @@ public:
 protected:
 	UINT16     m_irq_count, m_irq_count_latch;
 	int        m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
 };

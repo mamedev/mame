@@ -9,7 +9,7 @@ public:
 		m_mcu_sharedram(*this, "mcu_sharedram"),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
-		m_audiocpu(*this, "audiocpu"),		
+		m_audiocpu(*this, "audiocpu"),
 		m_slave(*this, "slave"){ }
 
 	/* memory pointers */

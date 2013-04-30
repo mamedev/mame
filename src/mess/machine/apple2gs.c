@@ -1793,7 +1793,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_E104xx_w ) { apple2gs_Exxxxx_w(space, of
 WRITE8_MEMBER( apple2gs_state::apple2gs_E12xxx_w ) { apple2gs_Exxxxx_w(space, offset + 0x12000, data, mem_mask); }
 
 WRITE8_MEMBER( apple2gs_state::apple2gs_slowmem_w )
-{	
+{
 	m_slowmem[offset] = data;
 
 	if ((offset >= 0x19e00) && (offset < 0x19fff))
@@ -1810,7 +1810,7 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_slowmem_w )
 // Because the bank address multiplexes on the 65816 data bus, reading a memory area
 // which doesn't drive the bus results in reading back the bank number.
 READ8_MEMBER(apple2gs_state::apple2gs_bank_echo_r)
-{	
+{
 	return m_echo_bank + (offset>>16);
 }
 

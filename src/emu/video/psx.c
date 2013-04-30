@@ -1347,8 +1347,7 @@ INLINE int CullVertex( int a, int b )
 			n_leftpoint = n_point; \
 		} \
 	} \
-	n_rightpoint = n_leftpoint; \
-
+	n_rightpoint = n_leftpoint;
 void psxgpu_device::FlatPolygon( int n_points )
 {
 	INT16 n_y;

@@ -2373,7 +2373,6 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_disk_w)
 
 void rmnimbus_state::hdc_reset()
 {
-
 	m_nimbus_drives.reg410_in=0;
 	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_req_r() ? 0 : HDC_REQ_MASK);
 	m_nimbus_drives.reg410_in |= (m_scsibus->scsi_cd_r()  ? 0 : HDC_CD_MASK);
@@ -2386,7 +2385,6 @@ void rmnimbus_state::hdc_reset()
 
 void rmnimbus_state::hdc_ctrl_write(UINT8 data)
 {
-
 	// If we enable the HDC interupt, and an interrupt is pending, go deal with it.
 	if(((data & HDC_IRQ_MASK) && (~m_nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
 		((~m_nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
@@ -2400,7 +2398,6 @@ void rmnimbus_state::hdc_ctrl_write(UINT8 data)
 
 void rmnimbus_state::hdc_post_rw()
 {
-
 	if((m_nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
 		m_scsibus->scsi_ack_w(1);
 

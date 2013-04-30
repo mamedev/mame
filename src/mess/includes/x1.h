@@ -223,7 +223,7 @@ public:
 	int priority_mixer_pri(int color);
 	void cmt_command( UINT8 cmd );
 	UINT16 jis_convert(int kanji_addr);
-	
+
 	DECLARE_READ8_MEMBER(memory_read_byte);
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	DECLARE_READ8_MEMBER(io_read_byte);

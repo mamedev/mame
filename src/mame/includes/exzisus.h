@@ -18,7 +18,7 @@ public:
 	required_shared_ptr<UINT8> m_objectram0;
 	required_shared_ptr<UINT8> m_videoram0;
 	required_device<cpu_device> m_cpuc;
-	
+
 	int m_cpua_bank;
 	int m_cpub_bank;
 

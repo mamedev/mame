@@ -12,14 +12,14 @@
 enum
 {
 	STD_NROM = 0,
-	STD_AXROM, STD_AMROM, STD_BXROM, 
+	STD_AXROM, STD_AMROM, STD_BXROM,
 	STD_CNROM, STD_CPROM,
 	STD_EXROM, STD_FXROM, STD_GXROM,
 	STD_HKROM, STD_PXROM,
 	STD_SXROM, STD_TXROM, STD_TXSROM,
-	STD_TKROM, STD_TQROM, 
+	STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
-	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT, 
+	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
 	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
 	/* Discrete components boards (by various manufacturer) */
 	DIS_74X161X138, DIS_74X139X74,
@@ -77,7 +77,7 @@ enum
 	TXC_22211, TXC_DUMARACING, TXC_MJBLOCK,
 	TXC_COMMANDOS, TXC_TW, TXC_STRIKEW,
 	/* Multigame Carts */
-	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, 
+	BMC_64IN1NR, BMC_190IN1, BMC_A65AS,
 	BMC_HIK8IN1, BMC_NOVEL1, BMC_NOVEL2, BMC_S24IN1SC03, BMC_T262,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
@@ -85,10 +85,10 @@ enum
 	BMC_15IN1, BMC_SUPERHIK_300IN1, BMC_SUPERGUN_20IN1,
 	BMC_GOLDENCARD_6IN1, BMC_72IN1, BMC_SUPER_42IN1, BMC_76IN1,
 	BMC_31IN1, BMC_22GAMES, BMC_20IN1, BMC_110IN1,
-	BMC_70IN1, BMC_800IN1, BMC_1200IN1, 
+	BMC_70IN1, BMC_800IN1, BMC_1200IN1,
 	BMC_GKA, BMC_GKB, BMC_VT5201, BMC_BENSHIENG, BMC_810544,
 	BMC_NTD_03, BMC_G63IN1, BMC_FK23C, BMC_FK23CA, BMC_PJOY84,
-	BMC_POWERFUL_255, BMC_11160, BMC_G146, BMC_8157, BMC_830118C, 
+	BMC_POWERFUL_255, BMC_11160, BMC_G146, BMC_8157, BMC_830118C,
 	BMC_411120C, BMC_GOLD150, BMC_GOLD260, BMC_CH001, BMC_SUPER22,
 	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET,
 	/* Unlicensed */
@@ -97,7 +97,7 @@ enum
 	UNL_UXROM, UNL_MK2, UNL_XIAOZY, UNL_KOF96,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K, UNL_LH32, UNL_LH10,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_2708,
-	UNL_MALISB, UNL_BB, UNL_AC08, UNL_A9746, UNL_WORLDHERO, 
+	UNL_MALISB, UNL_BB, UNL_AC08, UNL_A9746, UNL_WORLDHERO,
 	UNL_43272, UNL_TF1201, UNL_CITYFIGHT,
 	/* Bootleg boards */
 	BTL_SMB2JA, BTL_MARIOBABY, BTL_AISENSHINICOL, BTL_TOBIDASE,
@@ -108,7 +108,7 @@ enum
 	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12,
 	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1,
 	KAISER_KS7058, KAISER_KS7032, KAISER_KS7022, KAISER_KS7017, KAISER_KS7012, KAISER_KS7013B, KAISER_KS202,
-	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, CONY_BOARD, YOKO_BOARD, 
+	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, CONY_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
 	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
 	WAIXING_TYPE_E, WAIXING_TYPE_F, WAIXING_TYPE_G, WAIXING_TYPE_H, WAIXING_TYPE_H1,
@@ -164,7 +164,7 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_ex) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_m); 
+	virtual DECLARE_WRITE8_MEMBER(write_m);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 	virtual DECLARE_WRITE8_MEMBER(write_ex) { }
 
@@ -188,7 +188,7 @@ public:
 	bool get_trainer() { return m_has_trainer; }
 	void set_trainer(bool val) { m_has_trainer = val; }
 
-	void set_ce(int mask, int state) { 	m_ce_mask = mask; m_ce_state = state; }
+	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
@@ -211,12 +211,12 @@ public:
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
 	virtual void scanline_irq(int scanline, int vblank, int blanked) {}
 
-	virtual void pcb_reset() {}	// many pcb expect specific PRG/CHR banking at start
+	virtual void pcb_reset() {} // many pcb expect specific PRG/CHR banking at start
 	void pcb_start(running_machine &machine, UINT8 *ciram_ptr);
 	void pcb_reg_postload(running_machine &machine);
 	void nes_banks_restore();
 
-	UINT8 hi_access_rom(UINT32 offset);				// helper ROM access for a bunch of PCB reading 0x8000-0xffff for protection too
+	UINT8 hi_access_rom(UINT32 offset);             // helper ROM access for a bunch of PCB reading 0x8000-0xffff for protection too
 	UINT8 account_bus_conflict(UINT32 offset, UINT8 data);
 
 protected:
@@ -228,13 +228,13 @@ protected:
 	UINT8 *m_vram;
 	UINT8 *m_battery;
 	UINT8 *m_ciram;
-	
+
 	UINT32 m_prg_size;
 	UINT32 m_prgram_size;
 	UINT32 m_vrom_size;
 	UINT32 m_vram_size;
 	UINT32 m_battery_size;
-		
+
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	UINT8 *m_mapper_sram;
@@ -247,10 +247,10 @@ protected:
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
-	
+
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
-	bool m_x1_005_alt_mirroring;	// temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
+	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
 
 	// PRG
@@ -271,12 +271,12 @@ protected:
 	void prg8_ef(int bank);
 	void prg8_x(int start, int bank);
 
-	
+
 	// CHR
-	int m_chr_source;	// global source for the 8 VROM banks
+	int m_chr_source;   // global source for the 8 VROM banks
 	inline void chr_sanity_check(int source);
 
-	//these were previously called chr_map. they are a quick banking structure, 
+	//these were previously called chr_map. they are a quick banking structure,
 	//because some of these change multiple times per scanline!
 	int m_chr_src[8]; //defines source of base pointer
 	int m_chr_orig[8]; //defines offset of 0x400 byte segment at base pointer
@@ -305,7 +305,7 @@ protected:
 	void chr1_6(int bank, int source) { chr1_x(6, bank, source); };
 	void chr1_7(int bank, int source) { chr1_x(7, bank, source); };
 
-	
+
 	// NameTable & Mirroring
 	//these were previously called nt_page. they are a quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 	int m_nt_src[4];
@@ -375,7 +375,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ex);
 
 	int get_pcb_id() { return m_pcb_id; };
-	
+
 	void pcb_start(UINT8 *ciram_ptr);
 	void pcb_reset();
 

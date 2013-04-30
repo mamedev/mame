@@ -306,7 +306,6 @@ MACHINE_RESET_MEMBER(gaiden_state,raiga)
 
 MACHINE_START_MEMBER(gaiden_state,raiga)
 {
-
 	save_item(NAME(m_prot));
 	save_item(NAME(m_jumpcode));
 

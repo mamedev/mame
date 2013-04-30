@@ -19,12 +19,12 @@
 
  The Kaiser KS7057 bootleg board is emulated in nes_mmc3_clones.c
 
- 
+
  TODO:
- - FCEUmm lists more Kaiser PCBs: 
-   * KS7030 (for Yume Koujou Doki Doki Panic by Kaiser?) 
+ - FCEUmm lists more Kaiser PCBs:
+   * KS7030 (for Yume Koujou Doki Doki Panic by Kaiser?)
    * KS7031 (for Dracula II?)
-   * KS7037 
+   * KS7037
    but there seem to be no available dumps...
 
  ***********************************************************************************************************/
@@ -134,7 +134,7 @@ void nes_ks7032_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -160,7 +160,7 @@ void nes_ks7017_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));

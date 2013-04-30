@@ -263,7 +263,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_interrupt)
 
 void kas89_state::machine_start()
 {
-
 	output_set_lamp_value(37, 0);   /* turning off the operator led */
 }
 

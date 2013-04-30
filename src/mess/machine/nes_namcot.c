@@ -147,7 +147,7 @@ void nes_namcot340_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 
@@ -175,7 +175,7 @@ void nes_namcot175_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_enable));
@@ -205,7 +205,7 @@ void nes_namcot163_device::device_start()
 	common_start();
 	irq_timer = timer_alloc(TIMER_IRQ);
 	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
-	
+
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_wram_protect));
@@ -408,7 +408,7 @@ void nes_namcot340_device::device_timer(emu_timer &timer, device_timer_id id, in
 	{
 		if (m_irq_enable)
 		{
-			if (m_irq_count == 0x7fff)	// counter does not wrap to 0!
+			if (m_irq_count == 0x7fff)  // counter does not wrap to 0!
 				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 			else
 				m_irq_count++;

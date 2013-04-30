@@ -656,7 +656,6 @@ static const ymf278b_interface ymf278b_config =
 
 void psikyo4_state::machine_start()
 {
-
 	save_item(NAME(m_oldbrt1));
 	save_item(NAME(m_oldbrt2));
 }

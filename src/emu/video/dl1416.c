@@ -127,7 +127,7 @@ INLINE dl1416_state *get_safe_token(device_t *device)
 static DEVICE_START( dl1416 )
 {
 	dl1416_state *dl1416 = get_safe_token(device);
-	
+
 	/* register for state saving */
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->chip_enable);
 	state_save_register_item(device->machine(), "dl1416", device->tag(), 0, dl1416->cursor_enable);

@@ -169,7 +169,6 @@ GFXDECODE_END
 
 void kopunch_state::machine_start()
 {
-
 	save_item(NAME(m_gfxbank));
 }
 

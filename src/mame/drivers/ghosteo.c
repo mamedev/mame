@@ -86,7 +86,7 @@ public:
 		m_system_memory(*this, "systememory"),
 		m_i2cmem(*this, "i2cmem"),
 		m_s3c2410(*this, "s3c2410"),
-		m_maincpu(*this, "maincpu")	{ }
+		m_maincpu(*this, "maincpu") { }
 
 	required_shared_ptr<UINT32> m_system_memory;
 	required_device<i2cmem_device> m_i2cmem;
@@ -599,7 +599,7 @@ void ghosteo_state::machine_start()
 
 void ghosteo_state::machine_reset()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));	
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
 }
 
 static MACHINE_CONFIG_START( ghosteo, ghosteo_state )

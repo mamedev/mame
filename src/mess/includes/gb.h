@@ -214,7 +214,7 @@ protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
-	optional_device<ram_device> m_ram;	
+	optional_device<ram_device> m_ram;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();

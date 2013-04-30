@@ -45,7 +45,7 @@ public:
 	optional_device<decospr_device> m_sprgen;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
-	
+
 	optional_device<eeprom_device> m_eeprom;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;

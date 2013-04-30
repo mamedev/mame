@@ -73,7 +73,6 @@ WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 
 void crgolf_state::machine_start()
 {
-
 	/* configure the banking */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x2000);
 	membank("bank1")->set_entry(0);

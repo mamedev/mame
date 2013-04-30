@@ -3,7 +3,7 @@
   "Fruit" (c) ???? (DOSBox runs it with half the screen missing)
 
   preliminary driver by R. Belmont
- 
+
   Hardware:
   - ST STPCD0166BTC3 486/66 + PC + VGA all on one chip
   - 4x AS4LC1M16E5-60TC 1M x 16 EDO DRAM
@@ -553,9 +553,9 @@ static MACHINE_CONFIG_START( fruitpc, fruitpc_state )
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
-	
+
 	MCFG_KBDC8042_ADD("kbdc", at8042)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
@@ -569,9 +569,9 @@ DRIVER_INIT_MEMBER(fruitpc_state,fruitpc)
 
 ROM_START( fruitpc )
 	ROM_REGION( 0x20000, "bios", 0 )
-	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) ) 
+	ROM_LOAD( "at-gs001.bin", 0x000000, 0x020000, CRC(7dec34d0) SHA1(81d194d67fef9f6531bd3cd1ee0baacb5c2558bf) )
 
-	DISK_REGION( "drive_0" )	// 8 MB Compact Flash card
+	DISK_REGION( "drive_0" )    // 8 MB Compact Flash card
 	DISK_IMAGE( "fruit", 0,SHA1(df250ff06a97fa141a4144034f7035ac2947c53c) )
 ROM_END
 

@@ -333,7 +333,7 @@ void primo_state::primo_setup_pp (UINT8* quickload_data, UINT32 quickload_size)
 {
 	int i;
 
-	
+
 	UINT16 load_addr;
 	UINT16 start_addr;
 

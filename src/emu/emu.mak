@@ -251,7 +251,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/pc16552d.o    \
 	$(EMUMACHINE)/pcf8593.o     \
 	$(EMUMACHINE)/pci.o         \
-	$(EMUMACHINE)/pckeybrd.o 	\
+	$(EMUMACHINE)/pckeybrd.o    \
 	$(EMUMACHINE)/pd4990a.o     \
 	$(EMUMACHINE)/pic8259.o     \
 	$(EMUMACHINE)/pit8253.o     \

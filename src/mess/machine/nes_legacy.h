@@ -42,10 +42,10 @@ public:
 protected:
 	UINT16 m_irq_count;
 	int m_irq_enable;
-	
+
 	static const device_timer_id TIMER_IRQ = 0;
 	emu_timer *irq_timer;
-	
+
 	UINT8 m_latch;
 	UINT8 *m_exram;
 	int m_exram_enabled;

@@ -450,7 +450,6 @@ INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
 
 void ddayjlc_state::machine_start()
 {
-
 	save_item(NAME(m_char_bank));
 	save_item(NAME(m_bgadr));
 	save_item(NAME(m_sound_nmi_enable));

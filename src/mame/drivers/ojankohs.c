@@ -56,7 +56,7 @@ WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_adpcm_reset_w)
-{	
+{
 	m_adpcm_reset = BIT(data, 0);
 	m_vclk_left = 0;
 

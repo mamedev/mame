@@ -303,7 +303,6 @@ GFXDECODE_END
 
 void munchmo_state::machine_start()
 {
-
 	save_item(NAME(m_palette_bank));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_nmi_enable));

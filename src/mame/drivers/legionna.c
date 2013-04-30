@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 
 WRITE8_MEMBER(legionna_state::okim_rombank_w)
-{	
+{
 //  popmessage("%08x",0x40000 * (data & 0x07));
 	m_oki->set_bank_base(0x40000 * (data & 0x7));
 }

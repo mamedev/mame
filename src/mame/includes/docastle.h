@@ -32,7 +32,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	optional_device<msm5205_device> m_msm;
-	
+
 	DECLARE_READ8_MEMBER(docastle_shared0_r);
 	DECLARE_READ8_MEMBER(docastle_shared1_r);
 	DECLARE_WRITE8_MEMBER(docastle_shared0_w);

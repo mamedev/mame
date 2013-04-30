@@ -25,7 +25,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	
+
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_a_w);
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_b_w);
 	DECLARE_WRITE8_MEMBER(fk1_ppi_1_c_w);

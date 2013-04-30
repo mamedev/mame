@@ -207,7 +207,6 @@ GFXDECODE_END
 
 void dogfgt_state::machine_start()
 {
-
 	save_item(NAME(m_bm_plane));
 	save_item(NAME(m_lastflip));
 	save_item(NAME(m_pixcolor));

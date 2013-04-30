@@ -59,13 +59,13 @@ public:
 	}
 
 	~MemoryWindowQtConfig() {}
-	
+
 	// Settings
 	int m_reverse;
 	int m_addressMode;
 	int m_chunkSize;
 	int m_memoryRegion;
-	
+
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
 	void addToXmlDataNode(xml_data_node* node) const;

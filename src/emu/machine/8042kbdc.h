@@ -34,18 +34,18 @@ enum kbdc8042_type_t
 
 struct kbdc8042_interface
 {
-	kbdc8042_type_t 	m_keybtype;
+	kbdc8042_type_t     m_keybtype;
 	// interface to the host pc
 	devcb_write_line    m_system_reset_cb;
 	devcb_write_line    m_gate_a20_cb;
 	devcb_write_line    m_input_buffer_full_cb;
 	devcb_write_line    m_output_buffer_empty_cb;
-	
-	devcb_write8		m_speaker_cb;
-	devcb_read8			m_getout2_cb;
+
+	devcb_write8        m_speaker_cb;
+	devcb_read8         m_getout2_cb;
 };
 
-// ======================> kbdc8042_device 
+// ======================> kbdc8042_device
 
 class kbdc8042_device : public device_t,
 						public kbdc8042_interface
@@ -53,7 +53,7 @@ class kbdc8042_device : public device_t,
 public:
 	// construction/destruction
 	kbdc8042_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
@@ -68,7 +68,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete();
-	
+
 	UINT8 m_inport, m_outport, m_data, m_command;
 
 	struct {
@@ -93,14 +93,14 @@ protected:
 	int m_offset1;
 
 	int m_poll_delay;
-	
+
 	devcb_resolved_write_line   m_system_reset_func;
 	devcb_resolved_write_line   m_gate_a20_func;
 	devcb_resolved_write_line   m_input_buffer_full_func;
 	devcb_resolved_write_line   m_output_buffer_empty_func;
-	
-	devcb_resolved_write8		m_speaker_func;
-	devcb_resolved_read8		m_getout2_func;
+
+	devcb_resolved_write8       m_speaker_func;
+	devcb_resolved_read8        m_getout2_func;
 };
 
 // device type definition

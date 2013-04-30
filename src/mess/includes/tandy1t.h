@@ -23,18 +23,18 @@ public:
 	DECLARE_READ8_MEMBER( tandy1000_bank_r );
 	DECLARE_WRITE8_MEMBER( tandy1000_bank_w );
 
-	int tandy1000_read_eeprom();	
+	int tandy1000_read_eeprom();
 	void tandy1000_write_eeprom(UINT8 data);
 	void tandy1000_set_bios_bank();
-	
-	DECLARE_MACHINE_RESET(tandy1000rl);	
-	
+
+	DECLARE_MACHINE_RESET(tandy1000rl);
+
 	struct
 	{
 		UINT8 low, high;
-	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */	
-	
-private:	
+	} m_eeprom_ee[0x40]; /* only 0 to 4 used in hx, addressing seems to allow this */
+
+private:
 	int m_eeprom_state;
 	int m_eeprom_clock;
 	UINT8 m_eeprom_oper;

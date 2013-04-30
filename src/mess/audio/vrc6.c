@@ -4,17 +4,17 @@
     Konami VRC6 additional sound channels
 
     Emulation by R. Belmont
- 
+
     References:
     http://wiki.nesdev.com/w/index.php/VRC6_audio
-	http://nesdev.com/vrcvi.txt 
- 
+    http://nesdev.com/vrcvi.txt
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "vrc6.h"
 
-#define DISABLE_VRC6_SOUND		// not ready yet
+#define DISABLE_VRC6_SOUND      // not ready yet
 
 // device type definition
 const device_type VRC6 = &device_creator<vrc6snd_device>;
@@ -29,7 +29,7 @@ const device_type VRC6 = &device_creator<vrc6snd_device>;
 
 vrc6snd_device::vrc6snd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VRC6, "VRC6 sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this)
 {
 }
 
@@ -175,7 +175,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		{
 			m_ticks[2]--;
 			if (m_ticks[2] == 0)
-    		{
+			{
 				m_ticks[2] = m_sawfrql | (m_sawfrqh & 0xf)<<4;
 
 				// only update on even steps
@@ -199,7 +199,7 @@ void vrc6snd_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		}
 
 		// sum 2 4-bit pulses, 1 5-bit saw = unsigned 6 bit output
- 		tmp = (INT16)(UINT8)(m_output[0] + m_output[1] + m_output[2]);
+		tmp = (INT16)(UINT8)(m_output[0] + m_output[1] + m_output[2]);
 		tmp <<= 8;
 
 		out[i] = tmp;
@@ -316,5 +316,3 @@ WRITE8_MEMBER( vrc6snd_device::write )
 	}
 
 }
-
-

@@ -18,11 +18,11 @@
 
 
  Known issues on specific mappers:
- 
+
  * 004 Mendel Palace has never worked properly
  * 004 Ninja Gaiden 2 has flashing bg graphics in the second level
  * 119 Pin Bot has glitches when the ball is in the upper half of the screen
- 
+
  ***********************************************************************************************************/
 
 

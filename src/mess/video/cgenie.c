@@ -57,7 +57,7 @@ void cgenie_state::cgenie_offset_xy()
   Write to an indexed register of the 6845 CRTC
 ***************************************************************************/
 WRITE8_MEMBER( cgenie_state::cgenie_register_w )
-{	
+{
 	//int addr;
 
 	switch (m_crt.idx)
@@ -166,7 +166,7 @@ WRITE8_MEMBER( cgenie_state::cgenie_index_w )
   Read from an indexed register of the 6845 CRTC
 ***************************************************************************/
 READ8_MEMBER( cgenie_state::cgenie_register_r )
-{	
+{
 	return cgenie_get_register(m_crt.idx);
 }
 
@@ -217,7 +217,7 @@ int cgenie_state::cgenie_get_register(int indx)
   Read the index register of the 6845 CRTC
 ***************************************************************************/
 READ8_MEMBER( cgenie_state::cgenie_index_r )
-{	
+{
 	return m_crt.idx;
 }
 
