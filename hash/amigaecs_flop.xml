@@ -10,13 +10,14 @@
 
 <softwarelist name="amigaecs_flop" description="Amiga ECS disk images">
 
-	<software name="cm2s9697" supported="no">
+	<software name="cmang2up" supported="no">
 		<!-- SPS (CAPS) release 1997 -->
-		<description>Championship Manager 2 - Including Season 96/97 Updates (v1.57, sold as a1200 game) (Euro)</description>
+		<description>Championship Manager 2 - Including Special Season 96/97 Updates (Euro, v1.57)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1997</year>
 		<publisher>Eidos Interactive</publisher>
+		<info name="usage" value="Requires ECS" />  <!-- This was sold as A1200 game, but it only requires ECS -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1032864">
@@ -37,21 +38,22 @@
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1995</year>
-		<publisher>Empire Interactive Entertainment</publisher>
+		<publisher>Empire Interactive</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk AGA" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps242)coala_datadiskaga.ipf" size="1049180" crc="4eea11cb" sha1="ba37c92d89901e1244790597362c992118fc940c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk ECS" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps242)coala_datadiskecs.ipf" size="1049180" crc="6db4cc54" sha1="6506666c04371255b52e45fe35a547b4177d9973" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps242)coala_programdisk.ipf" size="1049180" crc="60ec0f35" sha1="226951589bef83a368d9961f70d83fbc4d674d35" offset="0"/>
 			</dataarea>
@@ -60,11 +62,12 @@
 
 	<software name="epic" supported="no">
 		<!-- SPS (CAPS) release 1820 -->
-		<description>Epic (A600 HD) (Euro)</description>
+		<description>Epic (Euro, A600 HD)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
-		<publisher>Ocean Software</publisher>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -90,10 +93,10 @@
 		<description>F1 World Championship Edition (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
-		<year>1993</year>
+		<year>1995</year>
 		<publisher>Domark</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2061)f1worldchampionshipedition.ipf" size="1049180" crc="7265c995" sha1="1b89b3e019f8be8f94ec9f2afa0e90ea8f9c8d20" offset="0"/>
 			</dataarea>
@@ -105,8 +108,9 @@
 		<description>Fatman - The Caped Consumer (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, ECS, PAL) -->
-		<year>1993</year>
+		<year>1994</year>
 		<publisher>Black Legend</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -134,20 +138,21 @@
 	</software>
 
 	<software name="gloomdx" supported="no">
-	<!-- SPS (CAPS) release 1330 -->
+		<!-- SPS (CAPS) release 1330 -->
 		<description>Gloom Deluxe (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS,AGA, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS,AGA, PAL) -->
 		<year>1996</year>
-		<publisher>Guildhall Leisure Services</publisher>
+		<publisher>Guildhall</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1330)gloomdeluxe_datadisk.ipf" size="1049612" crc="fb9287b6" sha1="6410c550ab20e9adf09d364d52323ba4b00a70d3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1330)gloomdeluxe_programdisk.ipf" size="1049612" crc="bff6d892" sha1="4310358ed992038523b4cbbb29f4ef811ba4954e" offset="0"/>
 			</dataarea>
@@ -155,12 +160,13 @@
 	</software>
 
 	<software name="his1418" supported="no">
-	<!-- SPS (CAPS) release 1569 -->
+		<!-- SPS (CAPS) release 1569 -->
 		<description>Historyline - 1914-1918 (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Blue Byte</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -206,12 +212,13 @@
 	</software>
 
 	<software name="his1418f" cloneof="his1418" supported="no">
-	<!-- SPS (CAPS) release 2700 -->
+		<!-- SPS (CAPS) release 2700 -->
 		<description>Historyline - 1914-1918 (Fra)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Blue Byte</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -257,12 +264,13 @@
 	</software>
 
 	<software name="his1418g" cloneof="his1418" supported="no">
-	<!-- SPS (CAPS) release 336 -->
+		<!-- SPS (CAPS) release 336 -->
 		<description>Historyline - 1914-1918 (Ger)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Blue Byte</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -308,38 +316,39 @@
 	</software>
 
 	<software name="ishar3" supported="no">
-	<!-- SPS (CAPS) release 2749 -->
-		<description>Ishar 3 - The Seven Gates of Infinity (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- SPS (CAPS) release 2749 -->
+		<description>Ishar III - The Seven Gates of Infinity (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Silmarils</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="a6e18ad1" sha1="2e7cc1e4f5e450bfa5ab7d207f530c48d04b7cbd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="9c840f46" sha1="aaf6a62944c746b54ef2ec970c047cc7402368b4" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="52839d05" sha1="a8c6901fed617281249aab00b42d2ed7bed3e665" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="40efa4eb" sha1="ef8f25027266504fb52379752a4f4190da5550c8" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2749)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="17e14050" sha1="de62d5ff3f00cc2082205f3604a7d842f242cf5e" offset="0"/>
 			</dataarea>
@@ -347,65 +356,67 @@
 	</software>
 
 	<software name="ishar3f" cloneof="ishar3" supported="no">
-	<!-- SPS (CAPS) release 2664 -->
-		<description>Ishar 3 - The Seven Gates of Infinity (Equipe Speciale) (Fra)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- SPS (CAPS) release 2664 -->
+		<description>Ishar III - The Seven Gates of Infinity (Fra, Equipe Speciale)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Silmarils</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diska.ipf" size="1049180" crc="c050464e" sha1="4d4b21bbef7eb183ba32a1e9a02880e3fca7505c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskb.ipf" size="1049180" crc="52c182c2" sha1="3dacb6f5d27b08b893f1e3bd227265fcad3984be" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskc.ipf" size="1049180" crc="3bab1d53" sha1="59d4555df75ad2952ec5c99619f944a8be478965" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diskd.ipf" size="1049180" crc="d52d5bc5" sha1="ee452e30f5e5cda5b8d7df2f53be8544413556a6" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_diske.ipf" size="1049180" crc="c3e5e16a" sha1="f1c4ecda3299fb350c1366765bc5a5a9dd2fdd9b" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
+			<feature name="part_id" value="Equipe Speciale" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2664)ishar3-thesevengatesofinfinity_equipespeciale.ipf" size="1049180" crc="7b23caa7" sha1="5cefd297814bdbc4abb5e06a77bd0d5f00610771" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="manudble" supported="no">
-	<!-- SPS (CAPS) release 1851 -->
+	<software name="mandoubl" supported="no">
+		<!-- SPS (CAPS) release 1851 -->
 		<description>Manchester United - The Double (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
-		<publisher>Krisalis Software</publisher>
+		<publisher>Krisalis</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1851)manchesterunited-thedouble_datadisk.ipf" size="1049612" crc="32055500" sha1="1bb97b89ce7e2f4b27c44986be65a45c19bfea70" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1851)manchesterunited-thedouble_programdisk.ipf" size="1049612" crc="ee64a3cd" sha1="12aa705ba33b1b2db23e430c560705752eb60b49" offset="0"/>
 			</dataarea>
@@ -414,13 +425,13 @@
 
 
 	<software name="produzen" supported="no">
-	<!-- SPS (CAPS) release 558 -->
+		<!-- SPS (CAPS) release 558 -->
 		<description>Der Produzent - Die Welt des Films (Ger)</description>
-	<!-- Produzent, Der - Die Welt des Films -->
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1996</year>
 		<publisher>Games 4 Europe</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -454,12 +465,13 @@
 	</software>
 
 	<software name="rallyc" supported="no">
-	<!-- SPS (CAPS) release 2357 -->
+		<!-- SPS (CAPS) release 2357 -->
 		<description>Rally Championships (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
 		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -487,12 +499,13 @@
 	</software>
 
 	<software name="reunion" supported="no">
-	<!-- SPS (CAPS) release 569 -->
+		<!-- SPS (CAPS) release 569 -->
 		<description>Reunion (Ger)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
-		<publisher>Grandslam Video</publisher>
+		<publisher>Grandslam</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -524,7 +537,7 @@
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps569)reunion_maindisk.ipf" size="1049612" crc="7d25a6b8" sha1="45e0f1ec6a12bde7fe5f43bc11366e9c7c74b3fc" offset="0"/>
 			</dataarea>
@@ -532,12 +545,13 @@
 	</software>
 
 	<software name="rotr" supported="no">
-	<!-- SPS (CAPS) release 1365 -->
+		<!-- SPS (CAPS) release 1365 -->
 		<description>Rise of the Robots (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1994</year>
-		<publisher>Time Warner Interactive</publisher>
+		<publisher>Mirage</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1039595">
@@ -581,32 +595,34 @@
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 8" />
+			<feature name="part_id" value="Install" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1365)riseoftherobots_install.ipf" size="1049612" crc="0d0b311b" sha1="fab4a1bfa8e736bb358bf2309caf3259f618dc9c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 9" />
+			<feature name="part_id" value="Intro A" />
 			<dataarea name="flop" size="1039595">
 				<rom name="(sps1365)riseoftherobots_introa.ipf" size="1039595" crc="6598f2c0" sha1="601cb8cd627afd0b9c8654fb3bcc1a9c73285b07" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 10" />
+			<feature name="part_id" value="Intro B" />
 			<dataarea name="flop" size="1039532">
 				<rom name="(sps1365)riseoftherobots_introb.ipf" size="1039532" crc="9b310978" sha1="d0c4c2cafcda9ef2912a33ed250461bd053c869c" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sillyput" supported="no">
-	<!-- SPS (CAPS) release 1336 -->
-		<description>Silly Putty (Euro)</description><!-- working title of Putty, prototype? -->
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+<!-- From EAB: Silly Putty was the title for the A600 pack-in release, while it was titles Putty for standalone release -->
+	<software name="silputty" supported="no">
+		<!-- SPS (CAPS) release 1336 -->
+		<description>Silly Putty (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
-		<publisher>System 3 Software</publisher>
+		<publisher>System 3</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -628,12 +644,13 @@
 	</software>
 
 	<software name="snapper" supported="no">
-	<!-- SPS (CAPS) release 2534 -->
+		<!-- SPS (CAPS) release 2534 -->
 		<description>Snapperazzi (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1993</year>
 		<publisher>Alternative Software</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -648,13 +665,14 @@
 		</part>
 	</software>
 
-	<software name="trivial" supported="no">
-	<!-- SPS (CAPS) release 1841 -->
-		<description>Trivial Pursuit - The Language Laboratory Edition &amp; Amiga Text (A600 HD) (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+	<software name="trivlle" supported="no">
+		<!-- SPS (CAPS) release 1841 -->
+		<description>Trivial Pursuit - The Language Laboratory Edition (Euro, A600 HD)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
 		<publisher>Domark</publisher>
+		<info name="usage" value="Requires ECS, includes Amiga Text" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -670,12 +688,13 @@
 	</software>
 
 	<software name="trolls" supported="no">
-	<!-- SPS (CAPS) release 155 -->
+		<!-- SPS (CAPS) release 155 -->
 		<description>Trolls (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1992</year>
 		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -691,12 +710,13 @@
 	</software>
 
 	<software name="turbotrx" supported="no">
-	<!-- SPS (CAPS) release 156 -->
+		<!-- SPS (CAPS) release 156 -->
 		<description>Turbo Trax (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Arcane Entertainment</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -718,12 +738,13 @@
 	</software>
 
 	<software name="whizz" supported="no">
-	<!-- SPS (CAPS) release 409 -->
+		<!-- SPS (CAPS) release 409 -->
 		<description>Whizz (Euro)</description>
-	<!-- retail, standalone -->
-	<!-- (Amiga, ECS, PAL) -->
+		<!-- retail, standalone -->
+		<!-- (Amiga, ECS, PAL) -->
 		<year>1995</year>
 		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires ECS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">

@@ -11,43 +11,48 @@
 
 <softwarelist name="amigaaga_flop" description="Amiga AGA disk images">
 
-	<software name="1869" supported="no">
+	<software name="1869_a" supported="no">
 		<!-- SPS (CAPS) release 1653 -->
-		<description>1869: Erlebte Geschichte Teil I (EU) (de)</description>
+		<description>1869 - Erlebte Geschichte Teil I (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1992</year>
 		<publisher>Max Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1653)1869_diska.ipf" size="1049612" crc="2e7951d5" sha1="0a64bba884df6800348a7c315c423d07c0bca974" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1653)1869_diskb.ipf" size="1049612" crc="f79d6985" sha1="8e926557c3ad9f1400fd346b4415de8c180a8efb" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1653)1869_diskc.ipf" size="1049612" crc="3da3bf18" sha1="062c8e5fcfb8f9d34408fd7a3c9895b37476cac9" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1653)1869_diskd.ipf" size="1049612" crc="506bf25a" sha1="8fff550b0dfdaddd43ca1afe6a505ed7f0cced4f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="airbucka" supported="no">
-		<description>Air Bucks (europe) (v1.2)</description>
+	<software name="airbuc_a" supported="no">
+		<!-- SPS (CAPS) release 2567 -->
+		<description>Air Bucks (Euro, v1.2)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Impressions</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -64,11 +69,12 @@
 
 	<software name="aladdin" supported="no">
 		<!-- SPS (CAPS) release 420 -->
-		<description>Aladdin (EU) (en)</description>
+		<description>Aladdin (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
-		<publisher>Virgin</publisher>
+		<publisher>Virgin Interactive</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -89,13 +95,14 @@
 		</part>
 	</software>
 
-	<software name="alfredag" supported="no">
+	<software name="alfred_a" supported="no">
 		<!-- SPS (CAPS) release 623 -->
-		<description>Alfred Chicken (AGA) (EU) (en)</description>
+		<description>Alfred Chicken (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -110,73 +117,14 @@
 		</part>
 	</software>
 
-	<software name="ab3d2" supported="no">
-		<!-- SPS (CAPS) release 280 -->
-		<description>Alien Breed 3D II: The Killing Grounds (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps280)alienbreed3dii_programdisk2mb.ipf" size="1049180" crc="598d21de" sha1="7b70d2f69017ad8ef7a077aeda6a570d9a708344" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps280)alienbreed3dii_programdisk4mb.ipf" size="1049180" crc="c7539e0f" sha1="dbbd811707d2d219c1064d16072d9fed51da3649" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps280)alienbreed3dii_gameeditors.ipf" size="1049180" crc="bd2d23b6" sha1="82748d5d6570928cb5da9a383dea5d4dd4b41b2c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps280)alienbreed3dii_levelsdisk.ipf" size="1049180" crc="819483c9" sha1="362456ead0c79bfe38d997fe74a0e65b461a0625" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps280)alienbreed3dii_soundfxdisk.ipf" size="1049180" crc="802ab741" sha1="e56549475a2e10ad310e67a7c0a759ea67e2c66d" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ab3d" supported="no">
-		<!-- SPS (CAPS) release 624 -->
-		<description>Alien Breed 3D (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps624)alienbreed3d_disk1of2.ipf" size="1049612" crc="e391471b" sha1="55fc46344045210d900ac801d815c9c4239e9008" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps624)alienbreed3d_disk2of2.ipf" size="1049612" crc="b51cc4e3" sha1="bbf7265742c44098aaa00557bc5296baf722b0c3" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="abred2ag" supported="no">
+	<software name="abred2_a" supported="no">
 		<!-- SPS (CAPS) release 44 -->
-		<description>Alien Breed II: The Horror Continues (AGA) (EU) (en)</description>
+		<description>Alien Breed II - The Horror Continues (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Team 17</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1139240">
@@ -197,13 +145,76 @@
 		</part>
 	</software>
 
-	<software name="lemm3" supported="no">
-		<!-- SPS (CAPS) release 625 -->
-		<description>All New World of Lemmings (EU) (en)</description>
+	<software name="abre3d" supported="no">
+		<!-- SPS (CAPS) release 624 -->
+		<description>Alien Breed 3D (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps624)alienbreed3d_disk1of2.ipf" size="1049612" crc="e391471b" sha1="55fc46344045210d900ac801d815c9c4239e9008" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps624)alienbreed3d_disk2of2.ipf" size="1049612" crc="b51cc4e3" sha1="bbf7265742c44098aaa00557bc5296baf722b0c3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abre3d2" supported="no">
+		<!-- SPS (CAPS) release 280 -->
+		<description>Alien Breed 3D II - The Killing Grounds (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1996</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk 2MB" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps280)alienbreed3dii_programdisk2mb.ipf" size="1049180" crc="598d21de" sha1="7b70d2f69017ad8ef7a077aeda6a570d9a708344" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk 4MB" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps280)alienbreed3dii_programdisk4mb.ipf" size="1049180" crc="c7539e0f" sha1="dbbd811707d2d219c1064d16072d9fed51da3649" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Game Editors" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps280)alienbreed3dii_gameeditors.ipf" size="1049180" crc="bd2d23b6" sha1="82748d5d6570928cb5da9a383dea5d4dd4b41b2c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Levels Disk" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps280)alienbreed3dii_levelsdisk.ipf" size="1049180" crc="819483c9" sha1="362456ead0c79bfe38d997fe74a0e65b461a0625" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Sound FX Disk" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps280)alienbreed3dii_soundfxdisk.ipf" size="1049180" crc="802ab741" sha1="e56549475a2e10ad310e67a7c0a759ea67e2c66d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemming3" supported="no">
+		<!-- SPS (CAPS) release 625 -->
+		<description>All New World of Lemmings (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1995</year>
+		<publisher>Psygnosis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -232,11 +243,12 @@
 
 	<software name="banshee" supported="no">
 		<!-- SPS (CAPS) release 633 -->
-		<description>Banshee (EU) (en)</description>
+		<description>Banshee (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Core Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -263,13 +275,14 @@
 		</part>
 	</software>
 
-	<software name="biingag" supported="no">
+	<software name="biing_a" supported="no">
 		<!-- SPS (CAPS) release 442 -->
-		<description>Biing! (AGA) (EU) (de)</description>
+		<description>Biing! - Sex, Intrigen und Skalpelle (Ger, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Magic Bytes</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -386,13 +399,14 @@
 		</part>
 	</software>
 
-	<software name="bloodnag" supported="no">
+	<software name="bloodn_a" supported="no">
 		<!-- SPS (CAPS) release 1667 -->
-		<description>BloodNet - A Cyberpunk Gothic (v1.00) (EU) (en)</description>
+		<description>BloodNet - A Cyberpunk Gothic (Euro, v1.00)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Microprose ~ GameTek</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -467,13 +481,14 @@
 		</part>
 	</software>
 
-	<software name="bodybaga" supported="no">
+	<software name="bblow_a" supported="no">
 		<!-- SPS (CAPS) release 1322 -->
-		<description>Body Blows (EU) (en)</description>
+		<description>Body Blows (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1132656">
@@ -494,13 +509,14 @@
 		</part>
 	</software>
 
-	<software name="bblowgag" supported="no">
+	<software name="bblowg_a" supported="no">
 		<!-- SPS (CAPS) release 440 -->
-		<description>Body Blows Galactic (AGA) (EU) (en)</description>
+		<description>Body Blows Galactic (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1139672">
@@ -517,11 +533,12 @@
 
 	<software name="breathle" supported="no">
 		<!-- SPS (CAPS) release 178 -->
-		<description>Breathless (EU) (en)</description>
+		<description>Breathless (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Power Computing</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -542,13 +559,14 @@
 		</part>
 	</software>
 
-	<software name="brianlag" supported="no">
+	<software name="brian_a" supported="no">
 		<!-- SPS (CAPS) release 843 -->
-		<description>Brian the Lion (AGA) (EU) (en)</description>
+		<description>Brian the Lion (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -571,11 +589,12 @@
 
 	<software name="brutaldx" supported="no">
 		<!-- SPS (CAPS) release 1837 -->
-		<description>Brutal Football - Deluxe Edition (EU) (en)</description>
+		<description>Brutal Football - Deluxe Edition (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Millennium</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -596,13 +615,14 @@
 		</part>
 	</software>
 
-	<software name="bubbleag" supported="no">
+	<software name="bubble_a" supported="no">
 		<!-- SPS (CAPS) release 210 -->
-		<description>Bubble and Squeak (AGA) (EU) (en)</description>
+		<description>Bubble and Squeak (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Audiogenic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048872">
@@ -617,79 +637,82 @@
 		</part>
 	</software>
 
-	<software name="burningr" supported="no">
+	<software name="brubber" supported="no">
 		<!-- SPS (CAPS) release 2181 -->
-		<description>Burning Rubber (EU) (en)</description>
+		<description>Burning Rubber (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Intro Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2181)burningrubber_disk1-introdisk.ipf" size="1049612" crc="528bdd49" sha1="632b7bb14f0be67c83f78d1975f9e8ef68bb3c4f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 - Main Disk" />
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps2181)burningrubber_disk2-maindisk.ipf" size="1049304" crc="f306bc10" sha1="7be95ceb83b71e5ce2c2e18b760626ffb64689d6" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk 3 - Euro Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2181)burningrubber_disk3-eurodisk.ipf" size="1049612" crc="33c17dc1" sha1="037825cdccdd33baf0b5bdcc3d291e956134ab8e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk 4 - USA Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2181)burningrubber_disk4-usadisk.ipf" size="1049612" crc="a45ef524" sha1="ffc51ba076b115b73981d52026655b23e50a9434" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="burntaga" supported="no">
+	<software name="burnt_a" supported="no">
 		<!-- SPS (CAPS) release 2213 -->
-		<description>Burntime (AGA) (EU) (en)</description>
+		<description>Burntime (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Max Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2213)burntime_diska.ipf" size="1049612" crc="7c1a9657" sha1="175ee11b476170c6d167deffd1fe26a6e19aa643" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2213)burntime_diskb.ipf" size="1049612" crc="c20e5077" sha1="3bfd2934b83896a95db5ee1180256da48fab9294" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2213)burntime_diskc.ipf" size="1049612" crc="675bc4cd" sha1="fa1ac6a6d7a3e60290c5a8b18cccd973c70284c5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2213)burntime_diskd.ipf" size="1049612" crc="92abbab2" sha1="8064a8eebc355ce2074624be70cf1cd209b3b271" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="burntagaa" cloneof="burntaga" supported="no">
+	<software name="burnt_ag" cloneof="burnt_a" supported="no">
 		<!-- SPS (CAPS) release 2348 -->
-		<description>Burntime (AGA) (EU) (de)</description>
+		<description>Burntime (Ger, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Max Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -716,13 +739,14 @@
 		</part>
 	</software>
 
-	<software name="capitalp" supported="no">
+	<software name="captpuni" supported="no">
 		<!-- SPS (CAPS) release 1758 -->
-		<description>Capital Punishment (v1.0) (EU) (en, de)</description>
+		<description>Capital Punishment (Euro, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>PXL</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -767,14 +791,14 @@
 		</part>
 	</software>
 
-	<software name="chaoseag" supported="no">
+	<software name="chaose_a" supported="no">
 		<!-- SPS (CAPS) release 1324 -->
-		<description>The Chaos Engine (AGA) (EU) (en)</description>
-		<!-- Chaos Engine, The -->
+		<description>The Chaos Engine (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Renegade</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1127132">
@@ -789,14 +813,14 @@
 		</part>
 	</software>
 
-	<software name="chaon2ag" supported="no">
+	<software name="chaos2_a" supported="no">
 		<!-- SPS (CAPS) release 173 -->
-		<description>The Chaos Engine 2 (AGA) (EU) (en)</description>
-		<!-- Chaos Engine 2, The -->
+		<description>The Chaos Engine 2 (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Renegade</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -817,13 +841,14 @@
 		</part>
 	</software>
 
-	<software name="christag" supported="no">
+	<software name="columb_a" supported="no">
 		<!-- SPS (CAPS) release 448 -->
-		<description>Christoph Kolumbus (EU) (de)</description>
+		<description>Christoph Kolumbus (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Software 2000</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -862,46 +887,48 @@
 		</part>
 	</software>
 
-	<software name="civaga" supported="no">
+	<software name="civilz_a" supported="no">
 		<!-- SPS (CAPS) release 1633 -->
-		<description>Civilization (v855e.01) (EU) (en)</description>
+		<description>Civilization (Euro, AGA, v.855e.01)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Software Demon</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1633)civilization_diska.ipf" size="1049612" crc="2d4fa0b8" sha1="91976ffca9cec198e1ba332fc033fffa6a10d2d4" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1633)civilization_diskb.ipf" size="1049612" crc="e2d809c0" sha1="a3d12ac2f5f4118df62eb56071d3a478b4baed6e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1633)civilization_diskc.ipf" size="1049612" crc="00467613" sha1="f7f4929da43b5f7e6d8bf6ce7256d390a78b6554" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1633)civilization_diskd.ipf" size="1049612" crc="e9cd4587" sha1="ca7b3243e6af899dc6cdc381d4783189a7b9ce34" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="clockaga" supported="no">
+	<software name="clockw_a" supported="no">
 		<!-- SPS (CAPS) release 1900 -->
-		<description>Clockwiser (AGA) (EU) (en)</description>
+		<description>Clockwiser (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Rasputin</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -916,14 +943,14 @@
 		</part>
 	</software>
 
-	<software name="clouaga" supported="no">
+	<software name="clueg_a" supported="no">
 		<!-- SPS (CAPS) release 451 -->
-		<description>Der Clou! (AGA) (EU) (de)</description>
-		<!-- Clou!, Der -->
+		<description>Der Clou! (Ger, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Max Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -956,13 +983,14 @@
 		</part>
 	</software>
 
-	<software name="dgenaga" supported="no">
+	<software name="dgen_a" supported="no">
 		<!-- SPS (CAPS) release 457 -->
-		<description>D/Generation (EU) (en)</description>
+		<description>D/Generation (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -977,13 +1005,14 @@
 		</part>
 	</software>
 
-	<software name="dangraga" supported="no">
+	<software name="dangst_a" supported="no">
 		<!-- SPS (CAPS) release 1020 -->
-		<description>Dangerous Streets (AGA) (EU) (en)</description>
+		<description>Dangerous Streets (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1004,13 +1033,36 @@
 		</part>
 	</software>
 
-	<software name="dennisag" supported="no">
-		<!-- SPS (CAPS) release 1093 -->
-		<description>Dennis (Desktop Dynamite) (EU) (en)</description>
+	<software name="dennis_a" supported="no">
+		<!-- SPS (CAPS) release 1867 -->
+		<description>Dennis (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1049304">
+				<rom name="(sps1867)dennis_diska.ipf" size="1049304" crc="b8ae7b21" sha1="4bc93a77feb145ab40b75d75a1da98c5b6cc0e4e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1867)dennis_diskb.ipf" size="1049612" crc="12215afb" sha1="3df6d30df39a1b97564f4d82a03ad07d240572e5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dennis_add" cloneof="dennis_a" supported="no">
+		<!-- SPS (CAPS) release 1093 -->
+		<description>Dennis (Euro, AGA, Desktop Dynamite Pack)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -1025,34 +1077,14 @@
 		</part>
 	</software>
 
-	<software name="dennisaga" cloneof="dennisag" supported="no">
-		<!-- SPS (CAPS) release 1867 -->
-		<description>Dennis (AGA) (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049304">
-				<rom name="(sps1867)dennis_diska.ipf" size="1049304" crc="b8ae7b21" sha1="4bc93a77feb145ab40b75d75a1da98c5b6cc0e4e" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1867)dennis_diskb.ipf" size="1049612" crc="12215afb" sha1="3df6d30df39a1b97564f4d82a03ad07d240572e5" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="diggers" supported="no">
 		<!-- SPS (CAPS) release 1172 -->
-		<description>Diggers (14.9.93) (EU) (en, de, fr, it)</description>
+		<description>Diggers (Euro, 19930914)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Millennium</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1079,13 +1111,14 @@
 		</part>
 	</software>
 
-	<software name="dreamaga" supported="no">
+	<software name="dreamw_a" supported="no">
 		<!-- SPS (CAPS) release 1815 -->
-		<description>DreamWeb (AGA) (EU) (en)</description>
+		<description>DreamWeb (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Empire Interactive</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1118,13 +1151,14 @@
 		</part>
 	</software>
 
-	<software name="erbender" supported="no">
+	<software name="erbnerde" supported="no">
 		<!-- SPS (CAPS) release 476 -->
-		<description>Erben der Erde: Die Grosse Suche (EU) (de)</description>
+		<description>Erben der Erde - Die große Suche (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Softgold</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1192,7 +1226,7 @@
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 12" />
+			<feature name="part_id" value="Install Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps476)erbendererde_installdisk.ipf" size="1049612" crc="f4d05dff" sha1="e4e2352621a43646e96f6d52818fb295da9eef41" offset="0"/>
 			</dataarea>
@@ -1200,28 +1234,29 @@
 
 	</software>
 
-	<software name="exiledis" supported="no">
+	<software name="exiledd" supported="no">
 		<!-- SPS (CAPS) release 2763 -->
-		<description>Exile Discovery Disk A1200 (EU) (en)</description>
+		<description>Exile Discovery Disk A1200 (Euro)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Audiogenic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2763)exilediscoverydiska1200.ipf" size="1049180" crc="25af1f7e" sha1="42de2628569982d38c7c5a072a5ae7573a565915" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="exileag" supported="no">
+	<software name="exile_a" supported="no">
 		<!-- SPS (CAPS) release 885 -->
-		<description>Exile (AGA) (EU) (en)</description>
+		<description>Exile (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Audiogenic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048872">
@@ -1236,13 +1271,14 @@
 		</part>
 	</software>
 
-	<software name="fatmanag" supported="no">
+	<software name="fatman_a" supported="no">
 		<!-- SPS (CAPS) release 480 -->
-		<description>Fatman - The Caped Consumer (AGA) (EU) (en)</description>
+		<description>Fatman - The Caped Consumer (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Black Legend</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1271,32 +1307,34 @@
 
 	<software name="fears" supported="no">
 		<!-- SPS (CAPS) release 1288 -->
-		<description>Fears (EU) (en)</description>
+		<description>Fears (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Manyk</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="986994">
 				<rom name="(sps1288)fears_programdisk.ipf" size="986994" crc="b6df5ae7" sha1="2ad448f7a46f0723a600437c2a7b160fe7e25ebc" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="997532">
 				<rom name="(sps1288)fears_datadisk.ipf" size="997532" crc="af044872" sha1="01bf9697c4a97b0e90bbdbcef391a6a0034f39dd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="footglry" supported="no">
+	<software name="fbglory" supported="no">
 		<!-- SPS (CAPS) release 122 -->
-		<description>Football Glory (EU) (en)</description>
+		<description>Football Glory (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Black Legend</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -1319,19 +1357,20 @@
 
 	<software name="gloom" supported="no">
 		<!-- SPS (CAPS) release 124 -->
-		<description>Gloom (EU) (en)</description>
+		<description>Gloom (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Guildhall</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps124)gloom_programdisk.ipf" size="1049180" crc="99b9149d" sha1="4ad1ba91599113f2c8dbd8be6dcee2e050980dc0" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps124)gloom_datadisk.ipf" size="1049180" crc="9716f9c6" sha1="fb341ed152881556a8238d80afe1ea050426c61f" offset="0"/>
 			</dataarea>
@@ -1340,32 +1379,34 @@
 
 	<software name="guardian" supported="no">
 		<!-- SPS (CAPS) release 835 -->
-		<description>Guardian (EU) (en)</description>
+		<description>Guardian (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Acid</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps835)guardian_programdisk.ipf" size="1049612" crc="051bb6b4" sha1="f05b8d43838b365d3dc832c4eb7497ec8faf30b5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk" />
 			<dataarea name="flop" size="1009772">
 				<rom name="(sps835)guardian_datadisk.ipf" size="1009772" crc="2c03e337" sha1="57bd906063dfa70a08a648b3bb5763ad29dad685" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="gshp2kag" supported="no">
+	<software name="gshp2k_a" supported="no">
 		<!-- SPS (CAPS) release 371 -->
-		<description>Gunship 2000 (EU) (en)</description>
+		<description>Gunship 2000 (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1392,13 +1433,14 @@
 		</part>
 	</software>
 
-	<software name="heimd2ag" supported="no">
+	<software name="heimd2_a" supported="no">
 		<!-- SPS (CAPS) release 1166 -->
-		<description>Heimdall 2 (AGA) (EU) (en, de, fr, it)</description>
+		<description>Heimdall 2 - Into the Hall of Worlds (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Core Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048872">
@@ -1445,11 +1487,12 @@
 
 	<software name="highseas" supported="no">
 		<!-- SPS (CAPS) release 2108 -->
-		<description>High Seas Trader (EU) (en)</description>
+		<description>High Seas Trader (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Impressions</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -1476,13 +1519,14 @@
 		</part>
 	</software>
 
-	<software name="humans2" supported="no">
+	<software name="humans3" supported="no">
 		<!-- SPS (CAPS) release 2382 -->
-		<description>Humans III: Evolution - Lost in Time (EU) (en)</description>
+		<description>Humans III - Evolution - Lost in Time (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1509,34 +1553,36 @@
 		</part>
 	</software>
 
-	<software name="im2025ag" supported="no">
+	<software name="im2025_a" supported="no">
 		<!-- SPS (CAPS) release 1833 -->
-		<description>Impossible Mission 2025 - The Special Edition (AGA) (EU) (en, de, fr, it, es)</description>
+		<description>Impossible Mission 2025 - The Special Edition (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1833)impossiblemission2025-thespecialedition_diska.ipf" size="1049612" crc="d42ea32f" sha1="a5ffc02ac6b13dca4e1210ea9bf0234f41da3671" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1833)impossiblemission2025-thespecialedition_diskb.ipf" size="1049612" crc="c49d5abc" sha1="f9ed588a114e76551275a7212ac59bdbdea8da99" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ishar2ag" supported="no">
+	<software name="ishar2_a" supported="no">
 		<!-- SPS (CAPS) release 787 -->
-		<description>Ishar 2: Messengers of Doom (AGA) (EU) (en, fr, de)</description>
+		<description>Ishar 2 - Messengers of Doom (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Silmarils</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1563,13 +1609,14 @@
 		</part>
 	</software>
 
-	<software name="ishar3ag" supported="no">
+	<software name="ishar3_a" supported="no">
 		<!-- SPS (CAPS) release 2245 -->
-		<description>Ishar 3: The Seven Gates of Infinity (EU) (en, fr, de)</description>
+		<description>Ishar III - The Seven Gates of Infinity (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Silmarils</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1620,13 +1667,14 @@
 		</part>
 	</software>
 
-	<software name="jamespo3" supported="no">
+	<software name="jpond3_a" supported="no">
 		<!-- SPS (CAPS) release 688 -->
-		<description>James Pond 3: Operation Starfish (ados) (EU) (en)</description>
+		<description>James Pond³ - Operation Starfish (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Millennium</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1647,28 +1695,29 @@
 		</part>
 	</software>
 
-	<software name="jpnd2aga" supported="no">
+	<software name="jpond2_a" supported="no">
 		<!-- SPS (CAPS) release 1354 -->
-		<description>James Pond II: Codename RoboCod (AGA) (EU) (en)</description>
+		<description>James Pond II - Codename RoboCod (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Millennium</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1354)jamespondii-codenamerobocod.ipf" size="1049612" crc="5482b055" sha1="a2b6c653dabc1bcddc316092d1be49fd6ad747bd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="jungleag" supported="no">
+	<software name="jstrik_a" supported="no">
 		<!-- SPS (CAPS) release 2581 -->
-		<description>Jungle Strike (AGA) (EU) (en)</description>
+		<description>Jungle Strike (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -1689,13 +1738,14 @@
 		</part>
 	</software>
 
-	<software name="jurasaga" supported="no">
+	<software name="jpark_a" supported="no">
 		<!-- SPS (CAPS) release 836 -->
-		<description>Jurassic Park (AGA) (EU) (en)</description>
+		<description>Jurassic Park (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1139364">
@@ -1722,13 +1772,36 @@
 		</part>
 	</software>
 
-	<software name="ko3ecag" supported="no">
-		<!-- SPS (CAPS) release 1896 -->
-		<description>Kick Off 3: European Challenge (Soccer Stars '96) (EU) (en, de, fr, it, es)</description>
+	<software name="koff3_a" supported="no">
+		<!-- SPS (CAPS) release 1854 -->
+		<description>Kick Off 3 (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Anco</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049874">
+				<rom name="(sps1854)kickoff3_disc1of2.ipf" size="1049874" crc="4c20701c" sha1="bb9c7d2d0d39370fc25341ae95893471e4ab74da" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1854)kickoff3_disc2of2.ipf" size="1049612" crc="457b09ad" sha1="b2f8f4d80dd7fd15b2e81ed34256d3679994d3cc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koff3e_a" supported="no">
+		<!-- SPS (CAPS) release 1896 -->
+		<description>Kick Off 3 - European Challenge (Euro, AGA, Soccer Stars '96)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1994</year>
+		<publisher>Anco</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1749,34 +1822,14 @@
 		</part>
 	</software>
 
-	<software name="ko3aga" supported="no">
-		<!-- SPS (CAPS) release 1854 -->
-		<description>Kick Off 3 (AGA) (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049874">
-				<rom name="(sps1854)kickoff3_disc1of2.ipf" size="1049874" crc="4c20701c" sha1="bb9c7d2d0d39370fc25341ae95893471e4ab74da" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1854)kickoff3_disc2of2.ipf" size="1049612" crc="457b09ad" sha1="b2f8f4d80dd7fd15b2e81ed34256d3679994d3cc" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="legends" supported="no">
 		<!-- SPS (CAPS) release 1346 -->
-		<description>Legends (EU) (en, fr, de)</description>
+		<description>Legends (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Manyk</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -1817,12 +1870,12 @@
 
 	<software name="lionking" supported="no">
 		<!-- SPS (CAPS) release 527 -->
-		<description>The Lion King (EU) (en)</description>
-		<!-- Lion King, The -->
+		<description>The Lion King (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1849,13 +1902,14 @@
 		</part>
 	</software>
 
-	<software name="lotreaga" supported="no">
+	<software name="lrealm_a" supported="no">
 		<!-- SPS (CAPS) release 2445 -->
-		<description>Lords of the Realm (EU) (fr)</description>
+		<description>Lords of the Realm (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Impressions</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -1882,13 +1936,14 @@
 		</part>
 	</software>
 
-	<software name="marvinsm" supported="no">
+	<software name="marvin" supported="no">
 		<!-- SPS (CAPS) release 1152 -->
-		<description>Marvin's Marvellous Adventure (EU) (en, de, fr, it)</description>
+		<description>Marvin's Marvellous Adventure (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -1915,15 +1970,16 @@
 		</part>
 	</software>
 
-	<software name="morphag" supported="no">
+	<software name="morph_a" supported="no">
 		<!-- SPS (CAPS) release 1070 -->
-		<description>Morph (AGA) (EU) (en)</description>
+		<description>Morph (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Millennium</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk 1 - Install" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1070)morph_disk1-install.ipf" size="1049612" crc="9d68eb6d" sha1="9d77e2576839195d20b8415e970815f8bced79be" offset="0"/>
 			</dataarea>
@@ -1936,30 +1992,31 @@
 		</part>
 	</software>
 
-	<software name="naughtyo" supported="no">
+	<software name="naugt1_a" supported="no">
 		<!-- SPS (CAPS) release 1715 -->
-		<description>Naughty Ones (AGA) (EU) (en)</description>
+		<description>Naughty Ones (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Interactivision</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1715)naughtyones.ipf" size="1049612" crc="a262b416" sha1="4b98febe1395b1e00646aa61a04d7d187c0543fe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="nigelaga" supported="no">
+	<software name="mansel_a" supported="no">
 		<!-- SPS (CAPS) release 138 -->
-		<description>Nigel Mansell's World Championship (AGA) (EU) (en)</description>
+		<description>Nigel Mansell's World Championship (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps138)nigelmansellworldchampionshipa1200_gamedisk.ipf" size="1049180" crc="1c70a58d" sha1="8e1905c3f80307e4d741bf3856d6771a47b14561" offset="0"/>
 			</dataarea>
@@ -1972,13 +2029,14 @@
 		</part>
 	</software>
 
-	<software name="otballl" supported="no">
+	<software name="otball_a" supported="no">
 		<!-- SPS (CAPS) release 2110 -->
-		<description>On The Ball League Edition (AGA) (EU) (en)</description>
+		<description>On The Ball League Edition (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sports</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2005,13 +2063,14 @@
 		</part>
 	</software>
 
-	<software name="otbwcaga" supported="no">
+	<software name="otbalw_a" supported="no">
 		<!-- SPS (CAPS) release 2595 -->
-		<description>On The Ball World Cup Edition (AGA) (EU) (en)</description>
+		<description>On The Ball World Cup Edition (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Sports</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2044,13 +2103,14 @@
 		</part>
 	</software>
 
-	<software name="oscarag" supported="no">
+	<software name="oscar_a" supported="no">
 		<!-- SPS (CAPS) release 1095 -->
-		<description>Oscar (Desktop Dynamite) (EU) (en)</description>
+		<description>Oscar (Euro, AGA, Desktop Dynamite)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2073,11 +2133,12 @@
 
 	<software name="overkill" supported="no">
 		<!-- SPS (CAPS) release 707 -->
-		<description>Overkill (EU) (en)</description>
+		<description>Overkill (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2092,13 +2153,14 @@
 		</part>
 	</software>
 
-	<software name="pgaeurag" supported="no">
+	<software name="pgaeur_a" supported="no">
 		<!-- SPS (CAPS) release 2435 -->
-		<description>PGA European Tour (AGA) (EU) (en)</description>
+		<description>PGA European Tour (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2113,61 +2175,143 @@
 		</part>
 	</software>
 
-	<software name="pierrele" supported="no">
+	<software name="outlunch" supported="no">
 		<!-- SPS (CAPS) release 548 -->
-		<description>Pierre le Chef is... Out to Lunch (EU) (en)</description>
+		<description>Pierre le Chef is... Out to Lunch (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="620180">
 				<rom name="(sps548)outtolunch_diska.ipf" size="620180" crc="5de877f4" sha1="be0643d53babd6a3730dc44ba3a549a725582895" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="965412">
 				<rom name="(sps548)outtolunch_diskb.ipf" size="965412" crc="d646fde3" sha1="d9a8a7395975083d33a4dfd053ef77777ee7048e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pbmani" supported="no">
-		<!-- SPS (CAPS) release 804 -->
-		<description>Pinball Mania (A1200 SW Package) (EU) (en)</description>
+	<!-- has manual protection -->
+	<software name="pbfant_a" supported="no">
+		<!-- SPS (CAPS) release 47 -->
+		<description>Pinball Fantasies (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps804)pinballmania_disk1of3.ipf" size="1049612" crc="3be5e233" sha1="4fcc2d907d0bb15956fe83a56f99112a1c2af569" offset="0"/>
+				<rom name="(sps47)pinballfantasiesaga_pf1.ipf" size="1049612" crc="60e23065" sha1="0d401004a02c6e8af2532b0180ce42a3725c69ce" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps804)pinballmania_disk2of3.ipf" size="1049612" crc="fc49661b" sha1="9788580bee9cb68ff0c019aa10e4828ee2b53393" offset="0"/>
+				<rom name="(sps47)pinballfantasiesaga_pf2.ipf" size="1049612" crc="64e3b549" sha1="44d59c0660170eba8dee54d710cfec1f598a7a90" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps804)pinballmania_disk3of3.ipf" size="1049612" crc="9b0d8ebe" sha1="17d5239b7b628dd3edc82c6f9edd0b1007085ee1" offset="0"/>
+				<rom name="(sps47)pinballfantasiesaga_pf3.ipf" size="1049612" crc="2a0d1c66" sha1="df95ae4ed9bda2d0563958c26fc23fdd5fe6f3d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps47)pinballfantasiesaga_pf4.ipf" size="1049612" crc="e5ab9484" sha1="83151b5738844bdc668c80b20dd2d742668063fb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pbmania" cloneof="pbmani" supported="no">
-		<!-- SPS (CAPS) release 896 -->
-		<description>Pinball Mania (EU) (en)</description>
+	<software name="pbfantu_a" cloneof="pbfant_a" supported="no">
+		<!-- SPS (CAPS) release 2025 -->
+		<description>Pinball Fantasies (USA, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="usage" value="Requires AGA" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2025)pinballfantasies_pf1.ipf" size="1049612" crc="cd554f84" sha1="232440a7a92854a011557b722d9715d8f256f97b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2025)pinballfantasies_pf2.ipf" size="1049612" crc="a676fc1b" sha1="7a337f1ce90eb42783d74159552e7226461858c7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2025)pinballfantasies_pf3.ipf" size="1049612" crc="3c2e31fb" sha1="3a4ba2ee0c01246fbab938aa4ecc790cfbdc69f9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2025)pinballfantasies_pf4.ipf" size="1049612" crc="4f4bfe3a" sha1="3b320636e0e884b8b8f6800e8ac46f95ec6a28aa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- severe gfx problems -->
+	<software name="pbillusn" supported="no">
+		<!-- SPS (CAPS) release 710 -->
+		<description>Pinball Illusions (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1995</year>
+		<publisher>21st Century Entertainment</publisher>
+		<info name="usage" value="Requires AGA" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps710)pinballillusions_disk1.ipf" size="1049612" crc="0cf8949b" sha1="8970859b71aefdb13d47c9b16b279f52405dae4c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps710)pinballillusions_disk2.ipf" size="1049612" crc="93ce1135" sha1="5dad662b278a45e4720043407bbf22c0a9932df5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps710)pinballillusions_disk3.ipf" size="1049612" crc="282ea51d" sha1="39f78c077ee27f213ff3f07a991ba165212d780f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps710)pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbmania" supported="no">
+		<!-- SPS (CAPS) release 896 -->
+		<description>Pinball Mania (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1995</year>
+		<publisher>21st Century</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1050140">
@@ -2188,46 +2332,76 @@
 		</part>
 	</software>
 
-	<software name="pbalpaga" supported="no">
-		<!-- SPS (CAPS) release 2327 -->
-		<description>Pinball Prelude (AGA) (EU) (en)</description>
+	<software name="pbmania1" cloneof="pbmania" supported="no">
+		<!-- SPS (CAPS) release 804 -->
+		<description>Pinball Mania (Euro, A1200 SW Package)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>21st Century</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps804)pinballmania_disk1of3.ipf" size="1049612" crc="3be5e233" sha1="4fcc2d907d0bb15956fe83a56f99112a1c2af569" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps804)pinballmania_disk2of3.ipf" size="1049612" crc="fc49661b" sha1="9788580bee9cb68ff0c019aa10e4828ee2b53393" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps804)pinballmania_disk3of3.ipf" size="1049612" crc="9b0d8ebe" sha1="17d5239b7b628dd3edc82c6f9edd0b1007085ee1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbprel_a" supported="no">
+		<!-- SPS (CAPS) release 2327 -->
+		<description>Pinball Prelude (Euro, AGA)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1996</year>
+		<publisher>Effigy Software</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Past)" />
 			<dataarea name="flop" size="1019114">
 				<rom name="(sps2327)pinballprelude_disc1(past).ipf" size="1019114" crc="0e587922" sha1="27a47d38f54a183803cb09e32f88e1fe81f41bdd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk 2 (Present)" />
 			<dataarea name="flop" size="974496">
 				<rom name="(sps2327)pinballprelude_disc2(present).ipf" size="974496" crc="5937bce7" sha1="5b028855de2b2680ffcdf910ced42a730b6abb34" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk 3 (Future)" />
 			<dataarea name="flop" size="1038236">
 				<rom name="(sps2327)pinballprelude_disc3(future).ipf" size="1038236" crc="82169fac" sha1="e8b2e7b3676085200e37ee4d17ad4c950b4d5742" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk 4 (Install)" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2327)pinballprelude_disc4(install).ipf" size="1049612" crc="1d7cad60" sha1="2a98ab0af183ecb19405cca07009456e75568ad7" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="premm3ag" supported="no">
+	<software name="pmang3_a" supported="no">
 		<!-- SPS (CAPS) release 2021 -->
-		<description>Premier Manager 3 (AGA) (EU) (en)</description>
+		<description>Premier Manager 3 (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2248,13 +2422,14 @@
 		</part>
 	</software>
 
-	<software name="reunioag" supported="no">
+	<software name="reuni_a" supported="no">
 		<!-- SPS (CAPS) release 568 -->
-		<description>Reunion (AGA) (EU) (de)</description>
+		<description>Reunion (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Grandslam</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2304,20 +2479,21 @@
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 9" />
+			<feature name="part_id" value="Main Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps568)reunion_maindisk.ipf" size="1049612" crc="773c1060" sha1="7d9ee670162e2600be3aba4b54df80d937924067" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="rotraga" supported="no">
+	<software name="rotr_a" supported="no">
 		<!-- SPS (CAPS) release 1763 -->
-		<description>Rise of the Robots (AGA) (EU) (en)</description>
+		<description>Rise of the Robots (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Mirage</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1039595">
@@ -2361,37 +2537,37 @@
 			</dataarea>
 		</part>
 		<part name="flop8" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 8" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1039595">
 				<rom name="(sps1763)riseoftherobots_dska.ipf" size="1039595" crc="e3bbde9b" sha1="63e93a7a913cd71e7881717a37a9ca7246b6cddd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop9" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 9" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1039532">
 				<rom name="(sps1763)riseoftherobots_dskb.ipf" size="1039532" crc="bb89b78f" sha1="c32865a89412f6b7e8280b11926795a7575b8085" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop10" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 10" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1039532">
 				<rom name="(sps1763)riseoftherobots_dskc.ipf" size="1039532" crc="f2dccfe6" sha1="b9982aab99941736343a5714f2d21e5710f5dfbe" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop11" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 11" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1039532">
 				<rom name="(sps1763)riseoftherobots_dskd.ipf" size="1039532" crc="20e50520" sha1="75c0bdf01a6d8cbda0339df7d4824d17e71871cd" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop12" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 12" />
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1039532">
 				<rom name="(sps1763)riseoftherobots_dske.ipf" size="1039532" crc="54e370b9" sha1="9a4cb61574f4b692280ef1a391ce4b54870b81a7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop13" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 13" />
+			<feature name="part_id" value="Disk Install" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1763)riseoftherobots_install.ipf" size="1049612" crc="040fe136" sha1="98da0ec6247b8c413298f38913682bdbfcdc739c" offset="0"/>
 			</dataarea>
@@ -2400,11 +2576,12 @@
 
 	<software name="roadkill" supported="no">
 		<!-- SPS (CAPS) release 1108 -->
-		<description>Roadkill (EU) (en)</description>
+		<description>Roadkill (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Acid</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -2425,51 +2602,52 @@
 		</part>
 	</software>
 
-	<software name="robinson" supported="no">
+	<software name="robins_a" supported="no">
 		<!-- SPS (CAPS) release 1866 -->
-		<description>Robinson's Requiem (24.8.94) (EU) (en, de, fr)</description>
+		<description>Robinson's Requiem (Euro, AGA, 19940824)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Silmarils</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diska.ipf" size="1049612" crc="997c887a" sha1="a344bc8aca68295e63bf54a493bcbeb035ccce95" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diskb.ipf" size="1049612" crc="799ecff7" sha1="8b3b263171beca45c906856ed055967e1797fbb1" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diskc.ipf" size="1049612" crc="3ccc9fa3" sha1="62910d86e3152f716f450001cb539a466f23d5db" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Disk D" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diskd.ipf" size="1049612" crc="b2424019" sha1="a9be5efbcc3d844fd58406012d0f4dd0e4b32ada" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
+			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diske.ipf" size="1049612" crc="79c47563" sha1="47b7e508d900f4ecbedf59ab4f218435d8603e70" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
+			<feature name="part_id" value="Disk F" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diskf.ipf" size="1049612" crc="92403a86" sha1="ea88c510fdeb73ab88d48c373b747215592a8093" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop7" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 7" />
+			<feature name="part_id" value="Disk G" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1866)robinsonsrequiem_diskg.ipf" size="1049612" crc="82eecdbd" sha1="14ca84eab000a5698db2efd06735b7acb15ce402" offset="0"/>
 			</dataarea>
@@ -2478,11 +2656,12 @@
 
 	<software name="rydercup" supported="no">
 		<!-- SPS (CAPS) release 1617 -->
-		<description>Ryder Cup: Johnnie Walker (EU) (en)</description>
+		<description>Ryder Cup - Johnnie Walker (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -2503,13 +2682,14 @@
 		</part>
 	</software>
 
-	<software name="russels" supported="no">
+	<software name="russel_a" supported="no">
 		<!-- SPS (CAPS) release 2215 -->
-		<description>Rüsselsheim (EU) (de)</description>
+		<description>Rüsselsheim (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Impressions</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -2524,13 +2704,14 @@
 		</part>
 	</software>
 
-	<software name="sabretea" supported="no">
+	<software name="sabret_a" supported="no">
 		<!-- SPS (CAPS) release 1158 -->
-		<description>Sabre Team (EU) (en, de, fr, it, es)</description>
+		<description>Sabre Team (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Krisalis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2563,13 +2744,14 @@
 		</part>
 	</software>
 
-	<software name="ssamuag" supported="no">
+	<software name="secnds_a" supported="no">
 		<!-- SPS (CAPS) release 1624 -->
-		<description>Second Samurai (AGA) (EU) (en)</description>
+		<description>Second Samurai (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Psygnosis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2590,13 +2772,14 @@
 		</part>
 	</software>
 
-	<software name="shadfiag" supported="no">
+	<software name="shadfg_a" supported="no">
 		<!-- SPS (CAPS) release 203 -->
-		<description>Shadow Fighter (AGA) (EU) (en)</description>
+		<description>Shadow Fighter (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -2625,11 +2808,12 @@
 
 	<software name="shaqfu" supported="no">
 		<!-- SPS (CAPS) release 1761 -->
-		<description>Shaq-Fu (EU) (en)</description>
+		<description>Shaq Fu (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -2668,40 +2852,14 @@
 		</part>
 	</software>
 
-	<software name="simc2k" supported="no">
-		<!-- SPS (CAPS) release 575 -->
-		<description>Sim City 2000 (EU) (de)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps575)simcity2000_diskette1.ipf" size="1049612" crc="ae6d1d01" sha1="50bef1004ad153132d3d8f9b6d6b80ea03bc598c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps575)simcity2000_diskette2.ipf" size="1049612" crc="c91a8181" sha1="d9d7b84ee647db8b68411fe88acd9526ce18d125" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps575)simcity2000_diskette3.ipf" size="1049612" crc="ddb81c85" sha1="19aee80a4b882d1adde9f062bc512458302a299f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simc2ka" cloneof="simc2k" supported="no">
+	<software name="simcit2k" supported="no">
 		<!-- SPS (CAPS) release 890 -->
-		<description>Sim City 2000 (EU) (en)</description>
+		<description>Sim City 2000 (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -2722,79 +2880,42 @@
 		</part>
 	</software>
 
-	<software name="simlaga" supported="no">
-		<!-- SPS (CAPS) release 2380 -->
-		<description>Sim Life (v1.00 6.20.1993) (EU) (fr)</description>
+	<software name="simcit2kg" cloneof="simcit2k" supported="no">
+		<!-- SPS (CAPS) release 575 -->
+		<description>Sim City 2000 (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2380)simlife_disk1.ipf" size="1049612" crc="41460de3" sha1="63b0b66a1d4c938151034d4f6391137f7e1711e7" offset="0"/>
+				<rom name="(sps575)simcity2000_diskette1.ipf" size="1049612" crc="ae6d1d01" sha1="50bef1004ad153132d3d8f9b6d6b80ea03bc598c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2380)simlife_disk2.ipf" size="1049612" crc="33066a9c" sha1="cd74eb5d058c676c8d52a1d7b76bf5b17a1e969e" offset="0"/>
+				<rom name="(sps575)simcity2000_diskette2.ipf" size="1049612" crc="c91a8181" sha1="d9d7b84ee647db8b68411fe88acd9526ce18d125" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps2380)simlife_disk3.ipf" size="1049612" crc="b70cb199" sha1="a25e08f0915f003ea629805830a370f5a1978696" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2380)simlife_disk4.ipf" size="1049612" crc="d702d189" sha1="bed5c1dd2fb7fa92524df53b1ba25e67157e4309" offset="0"/>
+				<rom name="(sps575)simcity2000_diskette3.ipf" size="1049612" crc="ddb81c85" sha1="19aee80a4b882d1adde9f062bc512458302a299f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="simlagaa" cloneof="simlaga" supported="no">
-		<!-- SPS (CAPS) release 2587 -->
-		<description>Sim Life (v1.00 6.20.1993) (EU) (de)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2587)simlife_diskette1von4.ipf" size="1049612" crc="ef0d0d62" sha1="5ae0ea7d94ccdbe3f0d01cf7977ee3dd2a9d3f41" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2587)simlife_diskette2von4.ipf" size="1049612" crc="a0d77f58" sha1="69c0f66670998d2321cafd3424e6ec03769bc9a7" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2587)simlife_diskette3von4.ipf" size="1049612" crc="a17446ae" sha1="3bd931fc22a424be34362619e04d1bc7ba17156c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2587)simlife_diskette4von4.ipf" size="1049612" crc="3d68cdf9" sha1="b5f56c9ffd9f52f1cf468eab0a6e38cb151d8ead" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simlagab" cloneof="simlaga" supported="no">
+	<software name="simlif_a" supported="no">
 		<!-- SPS (CAPS) release 889 -->
-		<description>Sim Life (v1.00 6.18.1993) (EU) (en)</description>
+		<description>Sim Life (Euro, v1.00 19930620, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -2821,139 +2942,82 @@
 		</part>
 	</software>
 
-	<software name="simonaga" supported="no">
-		<!-- SPS (CAPS) release 2692 -->
-		<description>Simon the Sorcerer (AGA) (EU) (fr)</description>
+	<software name="simliff_a" cloneof="simlif_a" supported="no">
+		<!-- SPS (CAPS) release 2380 -->
+		<description>Sim Life (Fra, v1.00 19930620, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk1.ipf" size="1049180" crc="213d23c8" sha1="9213fd6b4951535a228f6a62b4945f9c765d6bf4" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk2.ipf" size="1049180" crc="359cb099" sha1="f34cf3ead5a194fe8bcdaaaed5514fe57ce87843" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk3.ipf" size="1049180" crc="37762fbe" sha1="3de3bfda325a04d44868d8c6f471935ab590ff2b" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk4.ipf" size="1049180" crc="3b26405d" sha1="c59cce4180696860654bb1eed7f26d91a26a6075" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk5.ipf" size="1049180" crc="56c67056" sha1="a9f2f76da040c9dcc5e2692cb3c6b32ab25adf5e" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk6.ipf" size="1049180" crc="2ac0f4ff" sha1="e0ad16d5a353dcfc7542ff27d0e9eddc03ccaf04" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 7" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk7.ipf" size="1049180" crc="db12e4bd" sha1="2ef371d4d27204a67f0ed9da39f6a974d4ab3d44" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 8" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk8.ipf" size="1049180" crc="48d74f96" sha1="c9ed7c6c345584d3b7e4005d3e8b04174db89978" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 9" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2692)simonthesorcerer_disk9.ipf" size="1049180" crc="9875f16e" sha1="dcc3e3b6ac56f28275bcd6ee4000817e12b0387a" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="simonagaa" cloneof="simonaga" supported="no">
-		<!-- SPS (CAPS) release 726 -->
-		<description>Simon the Sorcerer (AGA) (EU) (de)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno1.ipf" size="1049612" crc="fb0d1c70" sha1="20cddd8c22ab423b2a8f9b42ce83377800fc8521" offset="0"/>
+				<rom name="(sps2380)simlife_disk1.ipf" size="1049612" crc="41460de3" sha1="63b0b66a1d4c938151034d4f6391137f7e1711e7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno2.ipf" size="1049612" crc="4a783d59" sha1="0a953d5c223b2d05617ba2a1c780ceae441a41c1" offset="0"/>
+				<rom name="(sps2380)simlife_disk2.ipf" size="1049612" crc="33066a9c" sha1="cd74eb5d058c676c8d52a1d7b76bf5b17a1e969e" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno3.ipf" size="1049612" crc="0f07c073" sha1="1b331836b1e1c3f3b2b2ddd77ba15ae98c677318" offset="0"/>
+				<rom name="(sps2380)simlife_disk3.ipf" size="1049612" crc="b70cb199" sha1="a25e08f0915f003ea629805830a370f5a1978696" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno4.ipf" size="1049612" crc="1c0d91f5" sha1="22c1884ca258ea974460581676435160d9b31fbd" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno5.ipf" size="1049612" crc="f7e02eaa" sha1="1e5221f28647488682861bdd370d4fb1fe272d9b" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno6.ipf" size="1049612" crc="0954c270" sha1="9eabb88504316bfb3b075b96e64f18d106906b9d" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 7" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno7.ipf" size="1049612" crc="79654d90" sha1="b5eae6601b04abba176ced51cc0f02de4b4d5620" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 8" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno8.ipf" size="1049612" crc="2e50f0cd" sha1="3e58f10d1f9213eb3dd197cb9ab70f7da59bda50" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop9" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 9" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps726)simonthesorcerer_diskno9.ipf" size="1049612" crc="0a671083" sha1="f42514a07dff65f7613601862d1653dfd49d51c3" offset="0"/>
+				<rom name="(sps2380)simlife_disk4.ipf" size="1049612" crc="d702d189" sha1="bed5c1dd2fb7fa92524df53b1ba25e67157e4309" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="simonagab" cloneof="simonaga" supported="no">
+	<software name="simlifg_a" cloneof="simlif_a" supported="no">
+		<!-- SPS (CAPS) release 2587 -->
+		<description>Sim Life (Ger, v1.00 19930620, AGA)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2587)simlife_diskette1von4.ipf" size="1049612" crc="ef0d0d62" sha1="5ae0ea7d94ccdbe3f0d01cf7977ee3dd2a9d3f41" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2587)simlife_diskette2von4.ipf" size="1049612" crc="a0d77f58" sha1="69c0f66670998d2321cafd3424e6ec03769bc9a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2587)simlife_diskette3von4.ipf" size="1049612" crc="a17446ae" sha1="3bd931fc22a424be34362619e04d1bc7ba17156c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps2587)simlife_diskette4von4.ipf" size="1049612" crc="3d68cdf9" sha1="b5f56c9ffd9f52f1cf468eab0a6e38cb151d8ead" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simons_a" supported="no">
 		<!-- SPS (CAPS) release 898 -->
-		<description>Simon the Sorcerer (AGA) (EU) (en)</description>
+		<description>Simon the Sorcerer (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Adventure Soft</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3010,13 +3074,142 @@
 		</part>
 	</software>
 
-	<software name="sixthsen" supported="no">
-		<!-- SPS (CAPS) release 2560 -->
-		<description>Sixth Sense Investigations (EU) (en)</description>
+	<software name="simonsf_a" cloneof="simons_a" supported="no">
+		<!-- SPS (CAPS) release 2692 -->
+		<description>Simon the Sorcerer (Fra, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Adventure Soft</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk1.ipf" size="1049180" crc="213d23c8" sha1="9213fd6b4951535a228f6a62b4945f9c765d6bf4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk2.ipf" size="1049180" crc="359cb099" sha1="f34cf3ead5a194fe8bcdaaaed5514fe57ce87843" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk3.ipf" size="1049180" crc="37762fbe" sha1="3de3bfda325a04d44868d8c6f471935ab590ff2b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk4.ipf" size="1049180" crc="3b26405d" sha1="c59cce4180696860654bb1eed7f26d91a26a6075" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk5.ipf" size="1049180" crc="56c67056" sha1="a9f2f76da040c9dcc5e2692cb3c6b32ab25adf5e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk6.ipf" size="1049180" crc="2ac0f4ff" sha1="e0ad16d5a353dcfc7542ff27d0e9eddc03ccaf04" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk7.ipf" size="1049180" crc="db12e4bd" sha1="2ef371d4d27204a67f0ed9da39f6a974d4ab3d44" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk8.ipf" size="1049180" crc="48d74f96" sha1="c9ed7c6c345584d3b7e4005d3e8b04174db89978" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2692)simonthesorcerer_disk9.ipf" size="1049180" crc="9875f16e" sha1="dcc3e3b6ac56f28275bcd6ee4000817e12b0387a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simonsg_a" cloneof="simons_a" supported="no">
+		<!-- SPS (CAPS) release 726 -->
+		<description>Simon the Sorcerer (Ger, AGA)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1994</year>
+		<publisher>Adventure Soft</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno1.ipf" size="1049612" crc="fb0d1c70" sha1="20cddd8c22ab423b2a8f9b42ce83377800fc8521" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno2.ipf" size="1049612" crc="4a783d59" sha1="0a953d5c223b2d05617ba2a1c780ceae441a41c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno3.ipf" size="1049612" crc="0f07c073" sha1="1b331836b1e1c3f3b2b2ddd77ba15ae98c677318" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno4.ipf" size="1049612" crc="1c0d91f5" sha1="22c1884ca258ea974460581676435160d9b31fbd" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno5.ipf" size="1049612" crc="f7e02eaa" sha1="1e5221f28647488682861bdd370d4fb1fe272d9b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno6.ipf" size="1049612" crc="0954c270" sha1="9eabb88504316bfb3b075b96e64f18d106906b9d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno7.ipf" size="1049612" crc="79654d90" sha1="b5eae6601b04abba176ced51cc0f02de4b4d5620" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno8.ipf" size="1049612" crc="2e50f0cd" sha1="3e58f10d1f9213eb3dd197cb9ab70f7da59bda50" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps726)simonthesorcerer_diskno9.ipf" size="1049612" crc="0a671083" sha1="f42514a07dff65f7613601862d1653dfd49d51c3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="6sense" supported="no">
+		<!-- SPS (CAPS) release 2560 -->
+		<description>Sixth Sense Investigations (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1998</year>
+		<publisher>Epic Marketing</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3079,13 +3272,14 @@
 		</part>
 	</software>
 
-	<software name="skeleton" supported="no">
+	<software name="skelkrew" supported="no">
 		<!-- SPS (CAPS) release 725 -->
-		<description>Skeleton Krew (12.1.1995) (EU) (en)</description>
+		<description>Skeleton Krew (Euro, 19950112)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Core Design</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -3108,11 +3302,12 @@
 
 	<software name="slamtilt" supported="no">
 		<!-- SPS (CAPS) release 1151 -->
-		<description>Slamtilt (EU) (en)</description>
+		<description>Slam Tilt - The Pinball Game (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>21st Century</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3145,46 +3340,14 @@
 		</part>
 	</software>
 
-	<software name="sleepaga" supported="no">
-		<!-- SPS (CAPS) release 1880 -->
-		<description>Sleepwalker (Comic Relief) (AGA) (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049304">
-				<rom name="(sps1880)sleepwalker_disk1.ipf" size="1049304" crc="8d6e25b7" sha1="0d36e35aeae13a45fe262100fafa243ed7693baf" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1880)sleepwalker_disk2.ipf" size="1049612" crc="60ff7c51" sha1="7bc7990631c56940041f1c4b97285d3e4fc131de" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1880)sleepwalker_disk3.ipf" size="1049612" crc="a98a516a" sha1="9911658515dcafea5c9bad4c167e59d2f5706411" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1880)sleepwalker_disk4.ipf" size="1049612" crc="d47a8488" sha1="1ad5337c9d3dcca2b18189765098cccaaee5b78d" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sleepagaa" cloneof="sleepaga" supported="no">
+	<software name="sleepw_a" supported="no">
 		<!-- SPS (CAPS) release 577 -->
-		<description>Sleepwalker (AGA) (EU) (en)</description>
+		<description>Sleepwalker (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -3211,54 +3374,88 @@
 		</part>
 	</software>
 
-
-	<software name="socckaga" supported="no">
-		<!-- SPS (CAPS) release 1150 -->
-		<description>Soccer Kid (AGA) (EU) (en, de, fr, it, es)</description>
+	<software name="sleepw_acr" cloneof="sleepw_a" supported="no">
+		<!-- SPS (CAPS) release 1880 -->
+		<description>Sleepwalker (Euro, AGA, Comic Relief)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049304">
+				<rom name="(sps1880)sleepwalker_disk1.ipf" size="1049304" crc="8d6e25b7" sha1="0d36e35aeae13a45fe262100fafa243ed7693baf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1880)sleepwalker_disk2.ipf" size="1049612" crc="60ff7c51" sha1="7bc7990631c56940041f1c4b97285d3e4fc131de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1880)sleepwalker_disk3.ipf" size="1049612" crc="a98a516a" sha1="9911658515dcafea5c9bad4c167e59d2f5706411" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1880)sleepwalker_disk4.ipf" size="1049612" crc="d47a8488" sha1="1ad5337c9d3dcca2b18189765098cccaaee5b78d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sockid_a" supported="no">
+		<!-- SPS (CAPS) release 1150 -->
+		<description>Soccer Kid (Euro, AGA)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1993</year>
+		<publisher>Krisalis</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1150)soccerkid_programdisk.ipf" size="1049180" crc="b7a5eb42" sha1="5b57848362e83d4daaaf14f9058ec5acf392dd5c" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Data Disk 1" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1150)soccerkid_datadisk1.ipf" size="1049180" crc="0138b7cb" sha1="528ec5d79e02163a267b0580b574395734a3cc96" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Data Disk 2" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1150)soccerkid_datadisk2.ipf" size="1049180" crc="8afe3817" sha1="15a384bc5d50fe7eb64f31e419cf2581992eb63f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
+			<feature name="part_id" value="Data Disk 3" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1150)soccerkid_datadisk3.ipf" size="1049180" crc="6d68be55" sha1="2e0566b7740c4dd5123934043f68824f1994c328" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
+			<feature name="part_id" value="Data Disk 4" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1150)soccerkid_datadisk4.ipf" size="1049180" crc="51f0eacd" sha1="ba7ba69381fa83866b5aca6c431be8c074032f00" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sperisle" supported="no">
+	<software name="speris" supported="no">
 		<!-- SPS (CAPS) release 1337 -->
-		<description>The Speris Legacy (EU) (en)</description>
-		<!-- Speris Legacy, The -->
+		<description>The Speris Legacy (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3285,13 +3482,14 @@
 		</part>
 	</software>
 
-	<software name="starcrus" supported="no">
+	<software name="starcr_a" supported="no">
 		<!-- SPS (CAPS) release 2349 -->
-		<description>Star Crusader (EU) (en)</description>
+		<description>Star Crusader (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3356,11 +3554,12 @@
 
 	<software name="strek25" supported="no">
 		<!-- SPS (CAPS) release 1466 -->
-		<description>Star Trek - 25th Anniversary (EU) (en)</description>
+		<description>Star Trek - 25th Anniversary (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3411,70 +3610,14 @@
 		</part>
 	</software>
 
-	<software name="strek25a" cloneof="strek25" supported="no">
-		<!-- SPS (CAPS) release 1687 -->
-		<description>Star Trek - 25th Anniversary (EU) (de)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc1.ipf" size="1049612" crc="9cbd5101" sha1="600a7b314c9b49f7964898bfe08f94f831ae6f00" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc2.ipf" size="1049612" crc="b14cbed4" sha1="dd58c7d19b72f97131418bcba935c8509c8d177c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc3.ipf" size="1049612" crc="1e5ed6b2" sha1="580a8b3ae4e1a94a13d63ba83a886351f7179759" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc4.ipf" size="1049612" crc="1af581d6" sha1="45ca96dcd1a82a4041ff75bf410ebb3b3dd324a7" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc5.ipf" size="1049612" crc="b94b9d12" sha1="e8695ac0c593452b66550a9bd77ae657354b75b1" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc6.ipf" size="1049612" crc="9cf8f1d7" sha1="419fbba3ede9fc2244ce170a4b29ce9cbdc2581c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 7" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc7.ipf" size="1049612" crc="ad3bb267" sha1="79c86b3b02b2d14193036acfe4abd4a1bea0e855" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop8" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 8" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1687)startrek-25thanniversary_disc8.ipf" size="1049612" crc="d6de840f" sha1="76be9473f2744dc7d9c687537d9568a04b6a755f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="strek25b" cloneof="strek25" supported="no">
+	<software name="strek25f" cloneof="strek25" supported="no">
 		<!-- SPS (CAPS) release 1752 -->
-		<description>Star Trek - 25th Anniversary (EU) (fr)</description>
+		<description>Star Trek - 25th Anniversary (Fra)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3525,13 +3668,72 @@
 		</part>
 	</software>
 
-	<software name="subwar20" supported="no">
-		<!-- SPS (CAPS) release 146 -->
-		<description>Subwar 2050 (EU) (en)</description>
+	<software name="strek25g" cloneof="strek25" supported="no">
+		<!-- SPS (CAPS) release 1687 -->
+		<description>Star Trek - 25th Anniversary (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="usage" value="Requires AGA" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc1.ipf" size="1049612" crc="9cbd5101" sha1="600a7b314c9b49f7964898bfe08f94f831ae6f00" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc2.ipf" size="1049612" crc="b14cbed4" sha1="dd58c7d19b72f97131418bcba935c8509c8d177c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc3.ipf" size="1049612" crc="1e5ed6b2" sha1="580a8b3ae4e1a94a13d63ba83a886351f7179759" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc4.ipf" size="1049612" crc="1af581d6" sha1="45ca96dcd1a82a4041ff75bf410ebb3b3dd324a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc5.ipf" size="1049612" crc="b94b9d12" sha1="e8695ac0c593452b66550a9bd77ae657354b75b1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc6.ipf" size="1049612" crc="9cf8f1d7" sha1="419fbba3ede9fc2244ce170a4b29ce9cbdc2581c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc7.ipf" size="1049612" crc="ad3bb267" sha1="79c86b3b02b2d14193036acfe4abd4a1bea0e855" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1687)startrek-25thanniversary_disc8.ipf" size="1049612" crc="d6de840f" sha1="76be9473f2744dc7d9c687537d9568a04b6a755f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swar2050" supported="no">
+		<!-- SPS (CAPS) release 146 -->
+		<description>Subwar 2050 (Euro)</description>
+		<!-- retail, standalone -->
+		<!-- (Amiga, AGA, PAL) -->
+		<year>1995</year>
+		<publisher>Microprose</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3547,13 +3749,14 @@
 	</software>
 
 
-	<software name="superlag" supported="no">
+	<software name="slmang_a" supported="no">
 		<!-- SPS (CAPS) release 2363 -->
-		<description>Super League Manager (AGA (EU) (en)</description>
+		<description>Super League Manager (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Audiogenic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3568,13 +3771,14 @@
 		</part>
 	</software>
 
-	<software name="sstard" supported="no">
+	<software name="stardust" supported="no">
 		<!-- SPS (CAPS) release 175 -->
-		<description>Super Stardust (EU) (en)</description>
+		<description>Super Stardust (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Team 17</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1060742">
@@ -3609,11 +3813,12 @@
 
 	<software name="ssf2t" supported="no">
 		<!-- SPS (CAPS) release 735 -->
-		<description>Super Street Fighter II Turbo (EU) (en)</description>
+		<description>Super Street Fighter II Turbo (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Gametek</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3684,11 +3889,12 @@
 
 	<software name="surfninj" supported="no">
 		<!-- SPS (CAPS) release 1291 -->
-		<description>Surf Ninjas (EU) (en)</description>
+		<description>Surf Ninjas (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>MicroValue</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="985148">
@@ -3703,13 +3909,14 @@
 		</part>
 	</software>
 
-	<software name="testamen" supported="no">
+	<software name="testamnt" supported="no">
 		<!-- SPS (CAPS) release 1162 -->
-		<description>Testament (EU) (en)</description>
+		<description>Testament (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>APC&amp;TCP</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3730,13 +3937,14 @@
 		</part>
 	</software>
 
-	<software name="themeaga" supported="no">
+	<software name="themep_a" supported="no">
 		<!-- SPS (CAPS) release 153 -->
-		<description>Theme Park (EU) (en)</description>
+		<description>Theme Park (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3763,13 +3971,14 @@
 		</part>
 	</software>
 
-	<software name="tgear2ag" supported="no">
+	<software name="topgr2_a" supported="no">
 		<!-- SPS (CAPS) release 1858 -->
-		<description>Top Gear 2 (AGA) (EU) (en)</description>
+		<description>Top Gear 2 (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3784,13 +3993,14 @@
 		</part>
 	</software>
 
-	<software name="totcarag" supported="no">
+	<software name="totalc_a" supported="no">
 		<!-- SPS (CAPS) release 1926 -->
-		<description>Total Carnage (AGA) (EU) (en)</description>
+		<description>Total Carnage (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>I.C.E.</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3811,13 +4021,14 @@
 		</part>
 	</software>
 
-	<software name="towerofs" supported="no">
+	<software name="towrsoul" supported="no">
 		<!-- SPS (CAPS) release 2212 -->
-		<description>Tower of Souls (EU) (en)</description>
+		<description>Tower of Souls (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Black Legend</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3850,13 +4061,14 @@
 		</part>
 	</software>
 
-	<software name="trollaga" supported="no">
+	<software name="trolls_a" supported="no">
 		<!-- SPS (CAPS) release 996 -->
-		<description>Trolls (AGA) (EU) (en)</description>
+		<description>Trolls (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3873,38 +4085,40 @@
 
 	<software name="turbojam" supported="no">
 		<!-- SPS (CAPS) release 2767 -->
-		<description>Turbo Jam (prototype) (EU) (en)</description>
+		<description>Turbo Jam (Euro, Prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Phelios Development</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2767)turbojam_diska.ipf" size="1049180" crc="c1c8ad7e" sha1="122e1212e62eacbc0c6e26a63a0ddd175e27bddf" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2767)turbojam_diskb.ipf" size="1049180" crc="abe99732" sha1="2afac39a0c85a48d93fbac225292654f64e07f23" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2767)turbojam_diskc.ipf" size="1049180" crc="b0f565b1" sha1="de64d6a0b76892c499ddbc5025735e26c2651639" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ufoemyag" supported="no">
+	<software name="ufo_a" supported="no">
 		<!-- SPS (CAPS) release 157 -->
-		<description>UFO - Enemy Unknown (AGA) (EU) (en, de, fr)</description>
+		<description>UFO - Enemy Unknown (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3931,40 +4145,42 @@
 		</part>
 	</software>
 
-	<software name="virocpag" supported="no">
+	<software name="virocp_a" supported="no">
 		<!-- SPS (CAPS) release 1920 -->
-		<description>Virocop (AGA (EU) (en)</description>
+		<description>Virocop (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Renegade</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
+			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1920)virocop_programdisk.ipf" size="1049612" crc="5ccc6008" sha1="a96f5a993fe21309ec21e2eea21ffb4254272b75" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
+			<feature name="part_id" value="Viro Data 1" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1920)virocop_virodata1.ipf" size="1049612" crc="f5e63d8e" sha1="d538bd4dc596c051a44eeffa6e21047e73739cc3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
+			<feature name="part_id" value="Viro Data 2" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1920)virocop_virodata2.ipf" size="1049612" crc="54a1b461" sha1="1a715b0593b6d4384ed79fecf31577f025ccb4f1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="virtualk" supported="no">
+	<software name="vkart" supported="no">
 		<!-- SPS (CAPS) release 1059 -->
-		<description>Virtual Karting (EU) (en)</description>
+		<description>Virtual Karting (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>OTM</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3981,11 +4197,12 @@
 
 	<software name="watchtow" supported="no">
 		<!-- SPS (CAPS) release 1071 -->
-		<description>Watchtower (EU) (en)</description>
+		<description>Watchtower (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>OTM</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4006,13 +4223,14 @@
 		</part>
 	</software>
 
-	<software name="wembleyi" supported="no">
+	<software name="wis_a" supported="no">
 		<!-- SPS (CAPS) release 1704 -->
-		<description>Wembley International Soccer (EU) (en)</description>
+		<description>Wembley International Soccer (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Audiogenic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048746">
@@ -4027,13 +4245,14 @@
 		</part>
 	</software>
 
-	<software name="whentaga" supported="no">
+	<software name="2wwar_a" supported="no">
 		<!-- SPS (CAPS) release 1772 -->
-		<description>When Two Worlds War (v1.01) (AGA) (EU) (de)</description>
+		<description>When Two Worlds War (Euro, v1.01, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Impressions</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4048,13 +4267,14 @@
 		</part>
 	</software>
 
-	<software name="whizzag" supported="no">
+	<software name="whizz_a" supported="no">
 		<!-- SPS (CAPS) release 1315 -->
-		<description>Whizz (AGA) (EU) (en)</description>
+		<description>Whizz (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -4069,13 +4289,14 @@
 		</part>
 	</software>
 
-	<software name="whizzaga" cloneof="whizzag" supported="no">
+	<software name="whizza_a" cloneof="whizz_a" supported="no">
 		<!-- SPS (CAPS) release 803 -->
-		<description>Whizz (A1200 SW Package) (EU) (en)</description>
+		<description>Whizz (Euro, AGA, A1200 SW Package)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Flair Software</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4092,11 +4313,12 @@
 
 	<software name="wormsdc" supported="no">
 		<!-- SPS (CAPS) release 605 -->
-		<description>Worms - The Director's Cut (EU) (en)</description>
+		<description>Worms - The Director's Cut (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4117,13 +4339,14 @@
 		</part>
 	</software>
 
-	<software name="xtrmr" supported="no">
+	<software name="xtracing" supported="no">
 		<!-- SPS (CAPS) release 164 -->
-		<description>XTreme Racing (EU) (en)</description>
+		<description>XTreme Racing (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Black Magic</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -4144,55 +4367,15 @@
 		</part>
 	</software>
 
-	<software name="zool2aga" supported="no">
-		<!-- SPS (CAPS) release 2427 -->
-		<description>Zool 2 (Commodore Combat) (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2427)zool2_disk1.ipf" size="1049180" crc="c1101001" sha1="08ffa347c0dd9c0566782777404693b6c3dc3cf5" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps2427)zool2_disk2.ipf" size="1049180" crc="193355d6" sha1="6f98658435b0b2ce4f62cef5eb54114da03f9e6f" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zool2agaa" cloneof="zool2aga" supported="no">
-		<!-- SPS (CAPS) release 415 -->
-		<description>Zool 2 (AGA) (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps415)zool2aga_disk1.ipf" size="1049612" crc="14d753d4" sha1="2f682aaa4571b34bbf8a60972d15552ebad9943f" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps415)zool2aga_disk2.ipf" size="1049612" crc="3da01e1a" sha1="b61ba77576e978e20890bde1e1f68a8b07fa8014" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoolaga" supported="no">
+	<software name="zool_a" supported="no">
 		<!-- SPS (CAPS) release 1675 -->
-		<description>Zool (AGA) (EU) (en)</description>
+		<description>Zool (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
+		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1003445">
@@ -4207,80 +4390,59 @@
 		</part>
 	</software>
 
-	<!-- has manual protection -->
-	<software name="pballfna" supported="no">
-		<!-- SPS (CAPS) release 47 -->
-		<description>Pinball Fantasies (EU) (en)</description>
+	<software name="zool2_a" supported="no">
+		<!-- SPS (CAPS) release 415 -->
+		<description>Zool 2 (Euro, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
-		<publisher>21st Century Entertainment</publisher>
-
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps47)pinballfantasiesaga_pf1.ipf" size="1049612" crc="60e23065" sha1="0d401004a02c6e8af2532b0180ce42a3725c69ce" offset="0"/>
+				<rom name="(sps415)zool2aga_disk1.ipf" size="1049612" crc="14d753d4" sha1="2f682aaa4571b34bbf8a60972d15552ebad9943f" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
-				<rom name="(sps47)pinballfantasiesaga_pf2.ipf" size="1049612" crc="64e3b549" sha1="44d59c0660170eba8dee54d710cfec1f598a7a90" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps47)pinballfantasiesaga_pf3.ipf" size="1049612" crc="2a0d1c66" sha1="df95ae4ed9bda2d0563958c26fc23fdd5fe6f3d7" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps47)pinballfantasiesaga_pf4.ipf" size="1049612" crc="e5ab9484" sha1="83151b5738844bdc668c80b20dd2d742668063fb" offset="0"/>
+				<rom name="(sps415)zool2aga_disk2.ipf" size="1049612" crc="3da01e1a" sha1="b61ba77576e978e20890bde1e1f68a8b07fa8014" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pballfnaa" cloneof="pballfna" supported="no">
-		<!-- SPS (CAPS) release 2025 -->
-		<description>Pinball Fantasies (US) (en)</description>
+	<software name="zool2_acc" cloneof="zool2_a" supported="no">
+		<!-- SPS (CAPS) release 2427 -->
+		<description>Zool 2 (Euro, AGA, Commodore Combat)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
-		<publisher>21st Century Entertainment</publisher>
-
+		<publisher>Gremlin Graphics</publisher>
+		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2025)pinballfantasies_pf1.ipf" size="1049612" crc="cd554f84" sha1="232440a7a92854a011557b722d9715d8f256f97b" offset="0"/>
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2427)zool2_disk1.ipf" size="1049180" crc="c1101001" sha1="08ffa347c0dd9c0566782777404693b6c3dc3cf5" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2025)pinballfantasies_pf2.ipf" size="1049612" crc="a676fc1b" sha1="7a337f1ce90eb42783d74159552e7226461858c7" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2025)pinballfantasies_pf3.ipf" size="1049612" crc="3c2e31fb" sha1="3a4ba2ee0c01246fbab938aa4ecc790cfbdc69f9" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps2025)pinballfantasies_pf4.ipf" size="1049612" crc="4f4bfe3a" sha1="3b320636e0e884b8b8f6800e8ac46f95ec6a28aa" offset="0"/>
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps2427)zool2_disk2.ipf" size="1049180" crc="193355d6" sha1="6f98658435b0b2ce4f62cef5eb54114da03f9e6f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
+
+
+<!-- MISC IMAGES -->
 
 	<!-- unprotected -->
-	<software name="pballfnapdy" cloneof="pballfna">
-		<description>Pinball Fantasies AGA (Cracked, PDY)</description>
+	<software name="pbfant_c1" cloneof="pbfant_a" supported="no">
+		<description>Pinball Fantasies (AGA, Cracked by PDY)</description>
 		<year>1993</year>
 		<publisher>21st Century Entertainment</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4311,49 +4473,14 @@
 		</part>
 	</software>
 
-	<!-- severe gfx problems -->
-	<software name="pballill" supported="no">
-		<!-- SPS (CAPS) release 710 -->
-		<description>Pinball Illusions (EU) (en)</description>
-		<!-- retail, standalone -->
-		<!-- (Amiga, AGA, PAL) -->
-		<year>1995</year>
-		<publisher>21st Century Entertainment</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps710)pinballillusions_disk1.ipf" size="1049612" crc="0cf8949b" sha1="8970859b71aefdb13d47c9b16b279f52405dae4c" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps710)pinballillusions_disk2.ipf" size="1049612" crc="93ce1135" sha1="5dad662b278a45e4720043407bbf22c0a9932df5" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps710)pinballillusions_disk3.ipf" size="1049612" crc="282ea51d" sha1="39f78c077ee27f213ff3f07a991ba165212d780f" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps710)pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- simple 1 disk game using AGA mode -->
 	<software name="gigertet">
 		<description>Giger-Tetris</description>
 		<year>1993</year>
 		<publisher>Panic Production</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
 				<rom name="giger-tetris (1993)(panic production)(aga)(sw).adf" size="901120" crc="e58911f4" sha1="90d146454db7317e02f428aa24e01296db0ea2d4" offset="0"/>
 			</dataarea>
@@ -4361,13 +4488,13 @@
 	</software>
 
 	<!-- various gfx issues, good test case for bugfixing? -->
-	<software name="dxpacaga" supported="partial">
-		<description>Deluxe Pac-Man v1.7 AGA (1997-04-27)</description>
+	<software name="dxpac" supported="partial">
+		<description>Deluxe Pac-Man (AGA, v1.7, 19970427)</description>
 		<year>1997</year>
 		<publisher>Edgar Vigdal</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
 				<rom name="deluxe pac-man v1.7 (1997-04-27)(vigdal, edgar)(aga)(sw-r).adf" size="901120" crc="0fb6d45d" sha1="378cb7c11d8f57d812469fcc8db1a1a848e8ce63" offset="0"/>
 			</dataarea>
@@ -4375,12 +4502,12 @@
 	</software>
 
 	<software name="dxgalaga" supported="partial">
-		<description>Deluxe Galaga v2.6B AGA (1995-09-03)</description>
+		<description>Deluxe Galaga (AGA, v2.6B, 19950903)</description>
 		<year>1995</year>
 		<publisher>Edgar Vigdal</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
 				<rom name="deluxe galaga(aga)(sw-r).adf" size="901120" crc="d1ee3a25" sha1="9824ccc31a5a26f5e7ccf9ca2c36bb8c7221e7c1" offset="0"/>
 			</dataarea>
@@ -4388,37 +4515,38 @@
 	</software>
 
 	<!-- Freeware -->
-
-	<software name="rotrabit" supported="partial">
+	<software name="riserabt" supported="partial">
 		<description>Rise of the Rabbits</description>
 		<year>1997</year>
 		<publisher>Pink Pig Software</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
 				<rom name="rise of the rabbits (1997)(pink pig software)(aga).adf" size="901120" crc="402af28d" sha1="cf939d55dcdf2d01bcea8624902be5aa9df70b46" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="rotrabi2" supported="partial">
+	<software name="riserab2" supported="partial">
 		<description>Rise of the Rabbits 2</description>
 		<year>1998</year>
 		<publisher>Pink Pig Software</publisher>
+		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="901120">
 				<rom name="rise of the rabbits 2 (1998)(pink pig software)(aga).adf" size="901120" crc="90a354b2" sha1="2f016d40446c66d47df6378a48c598d18fa80599" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
+
 <!--
     <software name="blasmund" supported="partial">
         <description>Blasmundfeelings</description>
         <year>19??</year>
         <publisher>Secretly</publisher>
+        <info name="usage" value="Requires AGA" />
 
         <part name="flop1" interface="floppy_3_5">
             <feature name="part_id" value="Disk 1" />
@@ -4432,6 +4560,7 @@
         <description>Body Shop I</description>
         <year>19??</year>
         <publisher>NFA</publisher>
+        <info name="usage" value="Requires AGA" />
 
         <part name="flop1" interface="floppy_3_5">
             <feature name="part_id" value="Disk 1" />
@@ -4445,6 +4574,7 @@
         <description>Body Shop IV</description>
         <year>19??</year>
         <publisher>NFA</publisher>
+        <info name="usage" value="Requires AGA" />
 
         <part name="flop1" interface="floppy_3_5">
             <feature name="part_id" value="Disk 1" />
