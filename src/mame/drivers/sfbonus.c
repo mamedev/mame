@@ -5540,7 +5540,8 @@ ROM_END
    ROM5   C409
    ROM6   59B6
 
-Note: There is a chance that the "2nd Edition" graphics roms might be different.
+Note: There are at least two graphics roms updated for the "2nd Edition" which are currently undumped.
+      It to correct the misspelling of POINT on the play field, currently it's "PONIT".
 */
 ROM_START( spooky )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -5550,12 +5551,12 @@ ROM_START( spooky )
 	ROM_LOAD( "snrom2.bin", 0x00000, 0x40000, CRC(cd85ba2e) SHA1(16b3f9e1e86fcb30daec16a80c1ec5fafe0d1e39) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "snrom3.bin", 0x00000, 0x80000, CRC(bef6f60b) SHA1(189cbf4f6c479b0e84e08bc523b626c5c69b38c0) )
-	ROM_LOAD16_BYTE( "snrom4.bin", 0x00001, 0x80000, CRC(33b6679c) SHA1(ce6325c142e918bbc90e797867d220af06295eea) )
+	ROM_LOAD16_BYTE( "snrom3.bin", 0x00000, 0x80000, CRC(bef6f60b) SHA1(189cbf4f6c479b0e84e08bc523b626c5c69b38c0) ) /* Need to verify against a factory 2nd Edition */
+	ROM_LOAD16_BYTE( "snrom4.bin", 0x00001, 0x80000, CRC(33b6679c) SHA1(ce6325c142e918bbc90e797867d220af06295eea) ) /* Need to verify against a factory 2nd Edition */
 
 	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "snrom5.bin", 0x00000, 0x80000, CRC(5dff1e2b) SHA1(be564a980be44940144399095e39d46a06703aaf) )
-	ROM_LOAD16_BYTE( "snrom6.bin", 0x00001, 0x80000, CRC(d9d01d3b) SHA1(4acf7962ee6dd0c8a3d1f32f4b22678285417cc4) )
+	ROM_LOAD16_BYTE( "snrom5.bin", 0x00000, 0x80000, CRC(5dff1e2b) SHA1(be564a980be44940144399095e39d46a06703aaf) ) /* Need to verify against a factory 2nd Edition */
+	ROM_LOAD16_BYTE( "snrom6.bin", 0x00001, 0x80000, CRC(d9d01d3b) SHA1(4acf7962ee6dd0c8a3d1f32f4b22678285417cc4) ) /* Need to verify against a factory 2nd Edition */
 
 	ROM_REGION( 0x1000, "nvram", 0 ) /* default settings */
 	ROM_LOAD( "snd204r.id", 0x0000, 0x1000, CRC(bd1884de) SHA1(cfbed0d9bffd16769ca3d1cb6ee131bd799b5eb9) )
