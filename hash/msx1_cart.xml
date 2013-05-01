@@ -7982,7 +7982,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="loderun">
+	<software name="ldrun">
 		<description>Lode Runner (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sony</publisher>
@@ -7996,7 +7996,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="loderuna" cloneof="loderun">
+	<software name="ldruna" cloneof="ldrun">
 		<description>Lode Runner (Jpn, Alt)</description>
 		<year>1983</year>
 		<publisher>Sony</publisher>
@@ -8010,7 +8010,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="loderun2">
+	<software name="ldrun2">
 		<description>Lode Runner II (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sony</publisher>

@@ -2674,7 +2674,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="supldrun">
+	<software name="sloderun">
 		<description>Super Lode Runner (Jpn)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
