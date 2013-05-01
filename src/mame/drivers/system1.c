@@ -4926,7 +4926,7 @@ GAME( 1987, blockgal,   0,        sys1pio,  blockgal, system1_state,  blockgal, 
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1pio,  hvymetal, system1_state,  hvymetal, ROT0,   "Sega",            "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1986, gardia,     0,        sys1pio,  gardia, system1_state,    gardia,   ROT270, "Sega / Coreland", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
+GAME( 1986, gardia,     0,        sys1pio,  gardia, system1_state,    gardia,   ROT270, "Coreland / Sega", "Gardia (317-0006)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1986, brain,      0,        sys1pio,  brain, system1_state,     bank44,   ROT0,   "Coreland / Sega", "Brain", GAME_SUPPORTS_SAVE )
 
 /* System 2 */

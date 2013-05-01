@@ -6652,9 +6652,9 @@ GAME( 1987, bullet,     0,        system16b_fd1094,    bullet,   segas16b_state,
 
 // Charon
 
-GAME( 1991, cotton,     0,        system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 )
-GAME( 1991, cottonu,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 )
-GAME( 1991, cottonj,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Sega / Success", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 )
+GAME( 1991, cotton,     0,        system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 3, World, FD1094 317-0181a)", 0 )
+GAME( 1991, cottonu,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 2, US, FD1094 317-0180)", 0 )
+GAME( 1991, cottonj,    cotton,   system16b_fd1094,    cotton,   segas16b_state,generic_5704,       ROT0,   "Success / Sega", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 )
 
 GAME( 1988, ddux,       0,        system16b_fd1094,    ddux,     segas16b_state,generic_5521,       ROT0,   "Sega", "Dynamite Dux (set 2, FD1094 317-0096)", 0 )
 GAME( 1988, ddux1,      ddux,     system16b_i8751,     ddux,     segas16b_state,ddux_5704,          ROT0,   "Sega", "Dynamite Dux (set 1, 8751 317-0095)", 0 )
@@ -6731,7 +6731,7 @@ GAME( 2008, fantzn2xp,  fantzn2x, system16c,           fz2,      segas16b_state,
 
 // Custom Korean Board - these probably belong with the bootlegs...
 GAME( 1990, atomicp,    0,        atomicp,             atomicp,  segas16b_state,generic_korean,     ROT0,   "Philko", "Atomic Point (Korea)", 0) // korean clone board..
-GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,             ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
+GAME( 1990, snapper,    0,        atomicp,             snapper,  segas16b_state,snapper,            ROT0,   "Philko", "Snapper (Korea)", 0) // korean clone board..
 
 
 
