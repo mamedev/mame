@@ -10289,6 +10289,17 @@ Info on N64 chip labels (from The Cart Scan Repository)
 	</software>
 
 	<software name="toystor2u" cloneof="toystor2">
+		<description>Toy Story 2 (USA, Rev. A)</description>
+		<year>1999</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="12582912">
+				<rom name="toy story 2 (usa).bin" size="12582912" crc="a11f0f8e" sha1="e0cd3699fd9f5443d3dfa2333726eaea724d892d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toystor2ua" cloneof="toystor2">
 		<description>Toy Story 2 (USA)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
