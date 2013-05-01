@@ -18,10 +18,9 @@
     - Keyboard is a standard pc keyboard
     - Sound is stereo dac-sound, plus an analog output. Details unknown.
 
-    In non-debug mode it runs for a few seconds then freezes requiring MESS
-    to be forceably closed. In debug mode, it can be seen that a processor
-    exeception occurs, although sometimes the cpu 'just stops', causing a
-    MESS freeze. Obviously the real machine doesn't do these things.
+    This system uses a number of unemulated opcodes (A0xx). Our M68000 core
+    mishandles this scenario, doing a random jump to nearby code. This
+    continues, filling up the stack, and eventually causes a total freeze.
 
 ****************************************************************************/
 
@@ -119,7 +118,8 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 // bits 2,3 joystick in
 // bit 1 cassette in
 // bit 0 something to do with audio
-	return 0x70; // video test, screen changes colours. This is the only thing working atm.
+	return ioport("DSW")->read();
+// set dips to Off,Off,Off,On for a video test.
 }
 
 READ8_MEMBER( applix_state::applix_pa_r )
@@ -170,6 +170,20 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( applix )
+	PORT_START("DSW")
+	PORT_BIT( 0xf, 0, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x00, "Switch 0") PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x20, 0x00, "Switch 1") PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x40, 0x00, "Switch 2") PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPNAME( 0x80, 0x00, "Switch 3") PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 
@@ -228,7 +242,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 
 	for (x = 0; x < x_count; x++)
 	{
-		mem = vidbase + ma + x + ra * x_count;
+		mem = vidbase + ma*4 + x + ra*x_count;
 		chr = state->m_base[mem];
 
 		if (BIT(state->m_pa, 3))
@@ -324,5 +338,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, applix, 0,       0,     applix, applix, driver_device,   0,       "Applix Pty Ltd",   "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   CLASS         INIT    COMPANY          FULLNAME       FLAGS */
+COMP( 1986, applix, 0,       0,     applix, applix, driver_device, 0, "Applix Pty Ltd", "Applix 1616", GAME_NOT_WORKING | GAME_NO_SOUND)
