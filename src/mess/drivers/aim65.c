@@ -255,6 +255,87 @@ const dl1416_interface aim65_ds5_intf =
     MACHINE DRIVERS
 ***************************************************************************/
 
+struct aim_cart_range
+{
+	const char *tag;
+	int offset;
+};
+
+static const struct aim_cart_range aim_cart_table[] =
+{
+	{ ":z24",   0xd000 },
+	{ ":z25",   0xc000 },
+	{ ":z26",   0xb000 },
+	{ 0 }
+};
+
+DEVICE_IMAGE_LOAD_MEMBER( aim65_state, aim65_cart )
+{
+	UINT32 size;
+	UINT8 *temp_copy;
+	const struct aim_cart_range *aim_cart = &aim_cart_table[0], *this_cart;
+	
+	/* First, determine where this cart has to be loaded */
+	while (aim_cart->tag)
+	{
+		if (strcmp(aim_cart->tag, image.device().tag()) == 0)
+			break;
+		
+		aim_cart++;
+	}
+	
+	this_cart = aim_cart;
+	
+	if (!this_cart->tag)
+	{
+		astring errmsg;
+		errmsg.printf("Tag '%s' could not be found", image.device().tag());
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+		return IMAGE_INIT_FAIL;
+	}
+	
+	if (image.software_entry() == NULL)
+	{
+		size = image.length();
+		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		
+		if (size > 0x1000)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			auto_free(machine(), temp_copy);
+			return IMAGE_INIT_FAIL;
+		}
+		
+		if (image.fread(temp_copy, size) != size)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			auto_free(machine(), temp_copy);
+			return IMAGE_INIT_FAIL;
+		}
+	}
+	else
+	{
+		if (image.get_software_region(this_cart->tag + 1) == NULL)
+		{
+			astring errmsg;
+			errmsg.printf("Attempted to load file with wrong extension\nCartslot '%s' only accepts files with '.%s' extension", 
+						  this_cart->tag, this_cart->tag + 1);
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+			return IMAGE_INIT_FAIL;
+		}
+
+		size = image.get_software_region_length(this_cart->tag + 1);
+		temp_copy = auto_alloc_array(machine(), UINT8, size);
+		memcpy(temp_copy, image.get_software_region(this_cart->tag + 1), size);
+	}
+
+	memcpy(memregion("maincpu")->base() + this_cart->offset, temp_copy, size);
+	
+	auto_free(machine(), temp_copy);
+	
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_CONFIG_START( aim65, aim65_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
@@ -284,20 +365,31 @@ static MACHINE_CONFIG_START( aim65, aim65_state )
 	MCFG_CASSETTE_ADD( "cassette", aim65_1_cassette_interface )
 	MCFG_CASSETTE_ADD( "cassette2", aim65_2_cassette_interface )
 
-	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_ADD("z26")
 	MCFG_CARTSLOT_EXTENSION_LIST("z26")
+	MCFG_CARTSLOT_INTERFACE("aim65_cart")
+	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_ADD("cart2")
+
+	MCFG_CARTSLOT_ADD("z25")
 	MCFG_CARTSLOT_EXTENSION_LIST("z25")
+	MCFG_CARTSLOT_INTERFACE("aim65_cart")
+	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_ADD("cart3")
+
+	MCFG_CARTSLOT_ADD("z24")
 	MCFG_CARTSLOT_EXTENSION_LIST("z24")
+	MCFG_CARTSLOT_INTERFACE("aim65_cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(aim65_state, aim65_cart)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("1K,2K,3K")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","aim65_cart")
 MACHINE_CONFIG_END
 
 
@@ -307,9 +399,6 @@ MACHINE_CONFIG_END
 
 ROM_START( aim65 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_CART_LOAD("cart1", 0xb000, 0x1000, ROM_OPTIONAL)
-	ROM_CART_LOAD("cart2", 0xc000, 0x1000, ROM_OPTIONAL)
-	ROM_CART_LOAD("cart3", 0xd000, 0x1000, ROM_OPTIONAL)
 	ROM_SYSTEM_BIOS(0, "aim65",  "Rockwell AIM-65")
 	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(1))
 	ROMX_LOAD("aim65mon.z22", 0xf000, 0x1000, CRC(d01914b0) SHA1(e5b5ddd4cd43cce073a718ee4ba5221f2bc84eaf), ROM_BIOS(1))

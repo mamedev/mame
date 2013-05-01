@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE16_MEMBER(aim65_update_ds3);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds4);
 	DECLARE_WRITE16_MEMBER(aim65_update_ds5);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aim65_cart);
 };
 
 
