@@ -18,11 +18,17 @@
     - Keyboard is a standard pc keyboard
     - Sound is stereo dac-sound, plus an analog output. Details unknown.
 
+    In non-debug mode it runs for a few seconds then freezes requiring MESS
+    to be forceably closed. In debug mode, it can be seen that a processor
+    exeception occurs, although sometimes the cpu 'just stops', causing a
+    MESS freeze. Obviously the real machine doesn't do these things.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/mc6845.h"
+#include "machine/6522via.h"
 
 
 class applix_state : public driver_device
@@ -30,30 +36,81 @@ class applix_state : public driver_device
 public:
 	applix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc")
-	,
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		m_via(*this, "via6522"),
 		m_base(*this, "base"){ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
 	DECLARE_WRITE16_MEMBER(applix_register_w);
-	required_shared_ptr<UINT16> m_base;
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_WRITE16_MEMBER(analog_latch_w);
+	DECLARE_WRITE16_MEMBER(dac_latch_w);
+	DECLARE_WRITE16_MEMBER(video_latch_w);
+	DECLARE_READ8_MEMBER(applix_pa_r);
+	DECLARE_READ8_MEMBER(applix_pb_r);
+	DECLARE_WRITE8_MEMBER(applix_pa_w);
+	DECLARE_WRITE8_MEMBER(applix_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	UINT8 m_pa;
+	UINT8 m_pb;
+	UINT8 m_analog_latch;
+	UINT8 m_dac_latch;
+	UINT8 m_video_latch;
+	UINT8 m_palette_latch[4];
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<via6522_device> m_via;
+	required_shared_ptr<UINT16> m_base;
 };
+
+// dac-latch seems to be:
+// bit 7 cassette relay, low=on
+// bit 6,5,4 sound outputs
+// bit 3 cassette LED, low=on
+// bit 2,1,0 joystick
+WRITE16_MEMBER( applix_state::dac_latch_w )
+{//printf("%X ",data);
+	if (ACCESSING_BITS_0_7)
+		m_dac_latch = data;
+}
+
+WRITE16_MEMBER( applix_state::analog_latch_w )
+{//printf("%X ",data);
+	if (ACCESSING_BITS_0_7)
+		m_analog_latch = data;
+}
+
+//cent = odd, video = even
+WRITE16_MEMBER( applix_state::palette_w )
+{
+	offset >>= 4;
+	if (ACCESSING_BITS_0_7)
+		{} //centronics
+	else
+		m_palette_latch[offset] = (data >> 8) & 15;
+}
+
+WRITE16_MEMBER( applix_state::video_latch_w )
+{//printf("%X ",data);
+	if (ACCESSING_BITS_0_7)
+		m_video_latch = data;
+}
 
 WRITE16_MEMBER( applix_state::applix_index_w )
 {
-	m_crtc->address_w( space, offset, data >> 8 );
+	if (ACCESSING_BITS_8_15)
+		m_crtc->address_w( space, offset, data >> 8 );
 }
 
 WRITE16_MEMBER( applix_state::applix_register_w )
 {
-	m_crtc->register_w( space, offset, data >> 8 );
+	if (ACCESSING_BITS_8_15)
+		m_crtc->register_w( space, offset, data >> 8 );
 }
 
 READ16_MEMBER( applix_state::applix_inputs_r )
@@ -62,14 +119,28 @@ READ16_MEMBER( applix_state::applix_inputs_r )
 // bits 2,3 joystick in
 // bit 1 cassette in
 // bit 0 something to do with audio
-	return 0;
+	return 0x70; // video test, screen changes colours. This is the only thing working atm.
 }
 
-// dac-latch seems to be:
-// bit 7 cassette relay, low=on
-// bit 6,5,4 sound outputs
-// bit 3 cassette LED, low=on
-// bit 2,1,0 joystick
+READ8_MEMBER( applix_state::applix_pa_r )
+{
+	return m_pa;
+}
+
+READ8_MEMBER( applix_state::applix_pb_r )
+{
+	return m_pb;
+}
+
+WRITE8_MEMBER( applix_state::applix_pa_w )
+{
+	m_pa = data;
+}
+
+WRITE8_MEMBER( applix_state::applix_pb_w )
+{//printf("%X ",data);
+	m_pb = data;
+}
 
 static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -77,18 +148,15 @@ static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("base")
 	AM_RANGE(0x080000, 0x47ffff) AM_NOP //AM_RAM // expansion
 	AM_RANGE(0x500000, 0x5fffff) AM_ROM
-	//AM_RANGE(0x600000, 0x600001) centronics latch (odd), video palette entry 0 (even)
-	//AM_RANGE(0x600020, 0x600021) video palette entry 1 (even)
-	//AM_RANGE(0x600040, 0x600041) video palette entry 2 (even)
-	//AM_RANGE(0x600060, 0x600061) video palette entry 3 (even)
-	//AM_RANGE(0x600080, 0x600081) dac latch (odd)
-	//AM_RANGE(0x600100, 0x600101) video latch (=border colour, high nybble; video base, low nybble) (odd)
-	//AM_RANGE(0x600180, 0x600181) analog multiplexer latch (odd)
+	AM_RANGE(0x600000, 0x60007f) AM_WRITE(palette_w)
+	AM_RANGE(0x600080, 0x6000ff) AM_WRITE(dac_latch_w)
+	AM_RANGE(0x600100, 0x60017f) AM_WRITE(video_latch_w) //video latch (=border colour, high nybble; video base, low nybble) (odd)
+	AM_RANGE(0x600180, 0x6001ff) AM_WRITE(analog_latch_w) //analog multiplexer latch (odd)
 	//AM_RANGE(0x700000, 0x700007) z80-scc (ch b control, ch b data, ch a control, ch a data) on even addresses
-	AM_RANGE(0x700080, 0x700081) AM_READ(applix_inputs_r) //input port (odd)
-	//AM_RANGE(0x700100, 0x70011f) VIA base address (even)
-	AM_RANGE(0x700180, 0x700181) AM_WRITE(applix_index_w)
-	AM_RANGE(0x700182, 0x700183) AM_WRITE(applix_register_w)
+	AM_RANGE(0x700080, 0x7000ff) AM_READ(applix_inputs_r) //input port (odd)
+	AM_RANGE(0x700100, 0x70011f) AM_MIRROR(0x60) AM_DEVREADWRITE8("via6522", via6522_device, read, write, 0xff00)
+	AM_RANGE(0x700180, 0x700181) AM_MIRROR(0x7c) AM_WRITE(applix_index_w)
+	AM_RANGE(0x700182, 0x700183) AM_MIRROR(0x7c) AM_WRITE(applix_register_w)
 	//600000, 6FFFFF  io ports and latches
 	//700000, 7FFFFF  peripheral chips and devices
 	//800000, FFC000  optional roms
@@ -147,46 +215,42 @@ void applix_state::video_start()
 {
 }
 
-MC6845_UPDATE_ROW( applix_update_row )
+static MC6845_UPDATE_ROW( applix_update_row )
 {
-#if 0
-// This needs complete rewriting
-// Need to display a border but the mame mc6845 code doesn't allow it.
-// 640x200, display 4 of 16 colours, each 2 bits points at a palette entry.
-// 320x200, display all 16 colours, each nybble has the colour code
+// The display is bitmapped. 2 modes are supported here, 320x200x16 and 640x200x4.
+// Need to display a border colour.
 // There is a monochrome mode, but no info found as yet.
-// Display is bitmapped, no character generator.
-// The video page can be moved around to almost anywhere in memory.
 	applix_state *state = device->machine().driver_data<applix_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 chr,gfx,fg,bg;
-	UINT16 mem,x,col;
-	UINT16 colourm = (state->m_08 & 0x0e) << 7;
-	UINT32  *p = &bitmap.pix32(y);
+	UINT8 i;
+	UINT16 chr,x;
+	UINT32 mem, vidbase = (state->m_video_latch & 15) << 14, *p = &bitmap.pix32(y);
 
-	for (x = 0; x < x_count; x++)           // for each character
+	for (x = 0; x < x_count; x++)
 	{
-		UINT8 inv=0;
-		mem = (ma + x) & 0x7ff;
-		chr = state->m_videoram[mem];
-		col = state->m_colorram[mem] | colourm;                 // read a byte of colour
+		mem = vidbase + ma + x + ra * x_count;
+		chr = state->m_base[mem];
 
-		/* get pattern of pixels for that character scanline */
-		gfx = state->m_gfxram[(chr<<4) | ra] ^ inv;
-		fg = (col & 0x001f) | 64;                   // map to foreground palette
-		bg = (col & 0x07e0) >> 5;                   // and background palette
-
-		/* Display a scanline of a character (8 pixels) */
-		*p++ = palette[( gfx & 0x80 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x40 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x20 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x10 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x08 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x04 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x02 ) ? fg : bg];
-		*p++ = palette[( gfx & 0x01 ) ? fg : bg];
+		if (BIT(state->m_pa, 3))
+		// 640 x 200 x 4of16 mode
+		{
+			for (i = 0; i < 8; i++)
+			{
+				*p++ = palette[state->m_palette_latch[chr>>14]];
+				chr <<= 2;
+			}
+		}
+		else
+		// 320 x 200 x 16 mode
+		{
+			for (i = 0; i < 4; i++)
+			{
+				*p++ = palette[chr>>12];
+				*p++ = palette[chr>>12];
+				chr <<= 4;
+			}
+		}
 	}
-#endif
 }
 
 static MC6845_INTERFACE( applix_crtc )
@@ -200,8 +264,30 @@ static MC6845_INTERFACE( applix_crtc )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(applix_state, vsync_w),
 	NULL
+};
+
+WRITE_LINE_MEMBER( applix_state::vsync_w )
+{
+	m_via->write_ca2(state);
+}
+
+static const via6522_interface applix_via =
+{
+	DEVCB_DRIVER_MEMBER(applix_state, applix_pa_r), // in port A
+	DEVCB_DRIVER_MEMBER(applix_state, applix_pb_r), // in port B
+	DEVCB_NULL, // in CA1 cent ack
+	DEVCB_NULL, // in CB1 kbd clk
+	DEVCB_NULL, // in CA2 vsync
+	DEVCB_NULL, // in CB2 kdb data
+	DEVCB_DRIVER_MEMBER(applix_state, applix_pa_w),// out Port A
+	DEVCB_DRIVER_MEMBER(applix_state, applix_pb_w), // out port B
+	DEVCB_NULL, // out CA1
+	DEVCB_NULL, // out CB1
+	DEVCB_NULL, // out CA2
+	DEVCB_NULL, // out CB2
+	DEVCB_CPU_INPUT_LINE("maincpu", M68K_IRQ_2) //IRQ
 };
 
 static MACHINE_CONFIG_START( applix, applix_state )
@@ -209,18 +295,18 @@ static MACHINE_CONFIG_START( applix, applix_state )
 	MCFG_CPU_ADD("maincpu", M68000, 7500000)
 	MCFG_CPU_PROGRAM_MAP(applix_mem)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(640, 200)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-
 	MCFG_PALETTE_LENGTH(16)
 
+	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, 1875000, applix_crtc) // 6545
+	MCFG_VIA6522_ADD("via6522", 0, applix_via)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -228,10 +314,12 @@ ROM_START( applix )
 	ROM_REGION(0x1000000, "maincpu", 0)
 	ROM_LOAD16_BYTE( "1616oshv.044", 0x500000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6) )
 	ROM_LOAD16_BYTE( "1616oslv.044", 0x500001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a) )
-	//ROM_LOAD16_BYTE( "1616oshv.045", 0x520000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f) )
-	//ROM_LOAD16_BYTE( "1616oslv.045", 0x520001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6) )
-	//ROM_LOAD( "1616osv.045",  0x540000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
-	//ROM_LOAD( "1616ssdv.022", 0x560000, 0x08000, CRC(6d8e413a) SHA1(fc27d92c34f231345a387b06670f36f8c1705856) )
+
+	ROM_REGION(0x50000, "user1", 0)
+	ROM_LOAD16_BYTE( "1616oshv.045", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f) )
+	ROM_LOAD16_BYTE( "1616oslv.045", 0x00001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6) )
+	ROM_LOAD( "1616osv.045",  0x20000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
+	ROM_LOAD( "1616ssdv.022", 0x40000, 0x08000, CRC(6d8e413a) SHA1(fc27d92c34f231345a387b06670f36f8c1705856) )
 ROM_END
 
 /* Driver */
