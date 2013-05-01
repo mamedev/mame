@@ -1603,7 +1603,7 @@
 		</part>
 	</software>
 
-	<software name="finlaslt">
+	<software name="finalass">
 		<description>Final Assault</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
@@ -3176,7 +3176,7 @@
 		</part>
 	</software>
 
-	<software name="manoir">
+	<software name="mortviel">
 		<description>Le Manoir de Mortevielle</description>
 		<year>1989</year>
 		<publisher>Lankhor</publisher>
@@ -3753,7 +3753,7 @@
 		</part>
 	</software>
 
-	<software name="neuromcr">
+	<software name="neuromnc">
 		<description>Neuromancer</description>
 		<year>1989</year>
 		<publisher>Interplay</publisher>
@@ -4153,7 +4153,7 @@
 		</part>
 	</software>
 
-	<software name="policeq">
+	<software name="pquest">
 		<description>Police Quest</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
@@ -4836,7 +4836,7 @@
 		</part>
 	</software>
 
-	<software name="shangh2">
+	<software name="shangha2">
 		<description>Shanghai II - Dragon's Eye</description>
 		<year>1993</year>
 		<publisher>Big Red Computer Club</publisher>
@@ -5173,7 +5173,7 @@
 		</part>
 	</software>
 
-	<software name="spacqst2">
+	<software name="spquest2">
 		<description>Space Quest II - Vohaul's Revenge</description>
 		<year>1988</year>
 		<publisher>Sierra</publisher>
@@ -5190,7 +5190,7 @@
 		</part>
 	</software>
 
-	<software name="spacqst">
+	<software name="spquest">
 		<description>Space Quest</description>
 		<year>1987</year>
 		<publisher>Sierra</publisher>
@@ -5498,7 +5498,7 @@
 		</part>
 	</software>
 
-	<software name="strppkr2">
+	<software name="spoker2">
 		<description>Strip Poker II</description>
 		<year>1987</year>
 		<publisher>Artworx</publisher>
@@ -6253,7 +6253,7 @@
 		</part>
 	</software>
 
-	<software name="tdrive2">
+	<software name="td2">
 		<description>Test Drive II: The Duel [cr The Torcher Chamber]</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>

@@ -103,7 +103,7 @@
 	</software>
 
 	<!-- bad screen mode -->
-	<software name="sskidmk" supported="no">
+	<software name="sskid" supported="no">
 		<description>Super Skidmarks</description>
 		<year>1995</year>
 		<publisher>Guildhall Leisure</publisher>

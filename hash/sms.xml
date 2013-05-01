@@ -4493,7 +4493,7 @@
 	</software>
 
 	<software name="pitfight">
-		<description>Pit Fighter (Euro)</description>
+		<description>PitFighter - The Ultimate Challenge (Euro)</description>
 		<year>1991</year>
 		<publisher>Domark</publisher>
 		<info name="serial" value="MK-29009-50"/>
@@ -4505,7 +4505,7 @@
 	</software>
 
 	<software name="pitfightb" cloneof="pitfight">
-		<description>Pit Fighter (Bra)</description>
+		<description>PitFighter - The Ultimate Challenge (Bra)</description>
 		<year>1991</year>
 		<publisher>Tec Toy</publisher>
 		<info name="serial" value="028.250"/>

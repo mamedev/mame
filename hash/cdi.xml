@@ -594,7 +594,7 @@
 		</part>
 	</software>
 
-	<software name="defender">
+	<software name="defcrown">
 		<description>Defender of the Crown (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>Philips</publisher>
@@ -1956,7 +1956,7 @@
 		</part>
 	</software>
 
-	<software name="stripliv">
+	<software name="spokrliv">
 		<description>Strip Poker Live (Euro)</description>
 		<year>1995</year>
 		<publisher>Green Pig Production</publisher>

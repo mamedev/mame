@@ -12412,7 +12412,7 @@
 		</part>
 	</software>
 
-	<software name="mousetrp">
+	<software name="mtraphot">
 		<description>Mouse Trap Hotel (USA)</description>
 		<year>1992</year>
 		<publisher>Electro Brain</publisher>
@@ -14690,7 +14690,7 @@
 		</part>
 	</software>
 
-	<software name="pga">
+	<software name="pgaeuro">
 		<!-- Notes: SGB enhanced -->
 		<description>PGA European Tour (Euro, USA)</description>
 		<year>1995</year>
@@ -14820,7 +14820,7 @@
 		</part>
 	</software>
 
-	<software name="pinballd">
+	<software name="pbdreams">
 		<description>Pinball Dreams (Euro, USA)</description>
 		<year>1993</year>
 		<publisher>GameTek</publisher>
@@ -14833,7 +14833,7 @@
 		</part>
 	</software>
 
-	<software name="pinballf">
+	<software name="pbfantas">
 		<description>Pinball Fantasies (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -14846,7 +14846,7 @@
 		</part>
 	</software>
 
-	<software name="pinballm">
+	<software name="pbmania">
 		<description>Pinball Mania (Euro)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -14927,7 +14927,7 @@
 	</software>
 
 	<software name="pitfight">
-		<description>Pit Fighter (Euro, USA)</description>
+		<description>Pit-Fighter (Euro, USA)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="DMG-QF-USA, DMG-QF-UKV"/>
@@ -20783,7 +20783,7 @@
 		</part>
 	</software>
 
-	<software name="thunderb">
+	<software name="tbirds">
 		<description>Gerry Anderson's Thunderbirds (Jpn)</description>
 		<year>1993</year>
 		<publisher>B-AI</publisher>

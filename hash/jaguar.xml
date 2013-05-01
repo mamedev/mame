@@ -374,7 +374,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="pinballf" supported="no">
+	<software name="pbfant" supported="no">
 		<description>Pinball Fantasies</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>

@@ -5595,7 +5595,7 @@ List of perfect retail cartridges rom dumps
 	<software name="alunseru" cloneof="alunser">
 		<description>Al Unser Jr.'s Road to the Top (USA)</description>
 		<year>1994</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="serial" value="SNS-AUJE-USA" />
 		<info name="release" value="199411xx" />
 		<part name="cart" interface="snes_cart">
@@ -16931,7 +16931,7 @@ List of perfect retail cartridges rom dumps
 	<software name="mariomisg" cloneof="mariomis">
 		<description>Mario is Missing! (Ger)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="serial" value="SNSP-MU-NOE/SFRG" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-20" />
@@ -16950,7 +16950,7 @@ List of perfect retail cartridges rom dumps
 	<software name="mariomisu" cloneof="mariomis">
 		<description>Mario is Missing! (USA)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="serial" value="SNS-MU-USA" />
 		<info name="release" value="199306xx" />
 		<part name="cart" interface="snes_cart">
@@ -19631,7 +19631,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="pga" supported="no"> <!-- unemulated additional hardware (SA1) -->
+	<software name="pgaeuro" supported="no"> <!-- unemulated additional hardware (SA1) -->
 		<description>PGA European Tour (Euro)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
@@ -19655,7 +19655,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="pgau" cloneof="pga" supported="no"> <!-- unemulated additional hardware (SA1) -->
+	<software name="pgaeurou" cloneof="pgaeuro" supported="no"> <!-- unemulated additional hardware (SA1) -->
 		<description>PGA European Tour (USA)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
@@ -32199,7 +32199,7 @@ List of verified retail cartridges rom dumps
 		<!-- single cartridge source: Lord Nightmare -->
 		<description>The Miracle Piano Teaching System (USA)</description>
 		<year>1991</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="serial" value="SNS-MR-USA" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-01" />
@@ -46074,7 +46074,7 @@ List of unclassified roms
 	<software name="mariomis">
 		<description>Mario is Missing! (Euro)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -46086,7 +46086,7 @@ List of unclassified roms
 	<software name="mariomisf" cloneof="mariomis">
 		<description>Mario is Missing! (Fra)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -46098,7 +46098,7 @@ List of unclassified roms
 	<software name="mariolet">
 		<description>Mario's Early Years! - Fun with Letters (USA)</description>
 		<year>1994</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="release" value="199410xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
@@ -46111,7 +46111,7 @@ List of unclassified roms
 	<software name="marionum">
 		<description>Mario's Early Years! - Fun with Numbers (USA)</description>
 		<year>1994</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="release" value="199409xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
@@ -46137,7 +46137,7 @@ List of unclassified roms
 	<software name="mariotim">
 		<description>Mario's Time Machine (Euro)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -46149,7 +46149,7 @@ List of unclassified roms
 	<software name="mariotimg" cloneof="mariotim">
 		<description>Mario's Time Machine (Ger)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -46161,7 +46161,7 @@ List of unclassified roms
 	<software name="mariotimu" cloneof="mariotim">
 		<description>Mario's Time Machine (USA)</description>
 		<year>1993</year>
-		<publisher>Software Toolworks</publisher>
+		<publisher>The Software Toolworks</publisher>
 		<info name="release" value="199312xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -49831,7 +49831,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pgatglf" supported="no"> <!-- unemulated additional hardware (SA1) -->
+	<software name="pga" supported="no"> <!-- unemulated additional hardware (SA1) -->
 		<description>PGA Tour Golf (Euro)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -49846,7 +49846,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pgatglfj" cloneof="pgatglf">
+	<software name="pgaj" cloneof="pga">
 		<description>PGA Tour Golf (Jpn)</description>
 		<year>1992</year>
 		<publisher>Imagineer</publisher>
@@ -49863,7 +49863,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pgatglfu" cloneof="pgatglf">
+	<software name="pgau" cloneof="pga">
 		<description>PGA Tour Golf (USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
@@ -50153,7 +50153,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballdp" cloneof="pinballd">
+	<software name="pbdreamsp" cloneof="pbdreams">
 		<description>Pinball Dreams (Euro, Prototype)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -50167,7 +50167,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballd">
+	<software name="pbdreams">
 		<description>Pinball Dreams (Euro)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -50179,7 +50179,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballdu" cloneof="pinballd">
+	<software name="pbdreamsu" cloneof="pbdreams">
 		<description>Pinball Dreams (USA)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
@@ -50192,7 +50192,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballf">
+	<software name="pbfant">
 		<description>Pinball Fantasies (Euro)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -50204,7 +50204,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballfu" cloneof="pinballf">
+	<software name="pbfantu" cloneof="pbfant">
 		<description>Pinball Fantasies (USA)</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
@@ -50217,7 +50217,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="pinballp" cloneof="pinballd">
+	<software name="pbpinbal" cloneof="pbdreams">
 		<description>Pinball Pinball (Jpn)</description>
 		<year>1994</year>
 		<publisher>Coconuts Japan Entertainment</publisher>

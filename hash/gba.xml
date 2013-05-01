@@ -27974,7 +27974,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="pm2k3">
+	<software name="prman2k3">
 		<description>Premier Manager 2003-04 (Euro)</description>
 		<year>2003</year>
 		<publisher>Zoo Digital Publishing</publisher>
@@ -27987,7 +27987,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="pm2k4">
+	<software name="prman2k4">
 		<description>Premier Manager 2004-2005 (Euro)</description>
 		<year>2004</year>
 		<publisher>Zoo Digital Publishing</publisher>
@@ -28000,7 +28000,7 @@ Note: In the AGB-E05-XX and AGB-E06-XX pcbs, the chip name is hidden under the b
 		</part>
 	</software>
 
-	<software name="pm2k5">
+	<software name="prman2k5">
 		<description>Premier Manager 2005-2006 (Euro)</description>
 		<year>2005</year>
 		<publisher>Zoo Digital Publishing</publisher>
