@@ -802,11 +802,11 @@ static MACHINE_CONFIG_START( bssoccer, suna16_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)      /* Z80B at 5MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MCFG_CPU_ADD("pcm2", Z80, XTAL_32MHz/6)      /* Z80B at 5MHz */
+	MCFG_CPU_ADD("pcm2", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
@@ -860,7 +860,7 @@ static MACHINE_CONFIG_START( uballoon, suna16_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)   /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6) /* Z80B at 5MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6) /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
 	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
@@ -1047,8 +1047,8 @@ KRB-0031
 |M                 6116                    |
 |A                 YM2151         6264 6264|
 |  YM3012  Z80B                     04  03 |
-|           12                      02  01 |
-|                            32MHz         |
+|3P         12                      02  01 |
+|4P                          32MHz         |
 |  VOL                   14.318MHz 68000-10|
 +------------------------------------------+
 
