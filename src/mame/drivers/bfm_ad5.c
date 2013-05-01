@@ -1,6 +1,6 @@
 /*
 
-    Scorpion 5
+    Adder 5
      (Scorpion 5 Video Board)
 
     Skeleton Driver - For note keeping.
@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "includes/bfm_ad5.h"
-
+#include "machine/mcf5206e.h"
 
 
 extern int find_project_string(running_machine &machine, int addrxor, int mode);
@@ -54,6 +54,10 @@ static ADDRESS_MAP_START( ad5_map, AS_PROGRAM, 32, adder5_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
 	AM_RANGE(0x40000000, 0x40000fff) AM_RAM
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM
+	AM_RANGE(0x80800000, 0x8080ffff) AM_RAM
+
+	AM_RANGE(0xffff0000, 0xffff03ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
 ADDRESS_MAP_END
 
 INPUT_PORTS_START( bfm_ad5 )
@@ -69,6 +73,7 @@ MACHINE_CONFIG_START( bfm_ad5, adder5_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(ad5_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(adder5_state, ad5_fake_timer_int, 1000)
+	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */

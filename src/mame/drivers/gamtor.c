@@ -65,8 +65,7 @@ static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 //  AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_SHARE("tmapram2") // beetlem (like above, mirror?)
 
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_RAM // nvram?
-
-	AM_RANGE(0xf0000000, 0xf00001ff) AM_RAM // coldfire peripherals?
+	AM_RANGE(0xf0000000, 0xf00003ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  gaminator )

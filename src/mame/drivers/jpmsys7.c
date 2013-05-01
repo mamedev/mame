@@ -1,12 +1,14 @@
 /* Unkonwn JPM Platform */
-/* seems to be Coldfire based */
-/* only Ker - Chinq has sound roms, they seem to map in cpu space, but are missing from the rest? */
+/* seems to be Coldfire based (but not the MCF5206E, it writes to peripheral registers that would be invalid?) */
+/* only Ker - Chinq has sound roms, they seem to map in cpu space, sound roms are probably missing from the rest? */
 /* Could be Pluto 6? */
+/* todo - split sets */
 
 
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/mcf5206e.h"
 
 class jpmsys7_state : public driver_device
 {
@@ -29,8 +31,7 @@ static ADDRESS_MAP_START( jpmsys7_map, AS_PROGRAM, 32, jpmsys7_state )
 	AM_RANGE(0x20000018, 0x2000001b) AM_WRITENOP // large data upload like astra/pluto?
 	AM_RANGE(0x50000000, 0x50001fff) AM_RAM
 
-//  AM_RANGE(0xf0000000, 0xf0000fff) AM_RAM
-
+	AM_RANGE(0xf0000000, 0xf00003ff) AM_DEVREADWRITE("maincpu_onboard", mcf5206e_peripheral_device, dev_r, dev_w) // technically this can be moved with MBAR
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(  jpmsys7 )
@@ -39,6 +40,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( jpmsys7, jpmsys7_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000)  // seems to be a Coldfire of some kind
 	MCFG_CPU_PROGRAM_MAP(jpmsys7_map)
+	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound (probably DMA driven DAC) */
