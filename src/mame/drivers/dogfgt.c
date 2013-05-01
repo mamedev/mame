@@ -245,7 +245,6 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -256,7 +255,6 @@ static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 
 	MCFG_GFXDECODE(dogfgt)
 	MCFG_PALETTE_LENGTH(16+64)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -374,6 +372,6 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan",       "Acrobatic Dog-Fight", GAME_SUPPORTS_SAVE )
-GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Data East USA, Inc.", "Acrobatic Dog-Fight (USA)", GAME_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan",       "Dog-Fight (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan", "Acrobatic Dog-Fight", GAME_SUPPORTS_SAVE )
+GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", GAME_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan", "Dog-Fight (Japan)", GAME_SUPPORTS_SAVE )
