@@ -2814,6 +2814,59 @@ ROM_START( dduxbl )
 	ROM_LOAD( "dduxb01.bin", 0x0000, 0x8000, CRC(0dbef0d7) SHA1(8b9afb2fcb946cec467b1e691c267194b503f841) )
 ROM_END
 
+
+/*
+Altered Beast Bootleg
+68000P10
+Xtal 20Mzh
+
+Audio
+Z80
+2 ym2203 
+2 y3014B
+
+Rom 1 and 2 are snd
+Rom 3,4,5,6 and 7 are 68000 prg
+
+*/
+
+ROM_START( altbeastbl )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x10000, CRC(790b4b3a) SHA1(04ba18dc0117c472082f11561fb577ef6c441dfe) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x10000, CRC(0f65f25d) SHA1(2de6a4d7fe0e24d7b9605b67d0246884ff29191e) )
+	ROM_LOAD16_BYTE( "3.bin", 0x020000, 0x10000, CRC(65cdd72b) SHA1(1b120e0d509c05fd1aab9b609d4ff994a926ce92) )
+	ROM_LOAD16_BYTE( "5.bin", 0x020001, 0x10000, CRC(3393fbc4) SHA1(38be2dc0dd7f8f0ee3bc9f290dcc87b94a52957f) )
+
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_INVERT ) // tiles
+	ROM_LOAD( "12.bin", 0x00000, 0x10000,  CRC(a4967d10) SHA1(537b9ea604a38a919c111ece5dd3e55a5070d346) ) // plane 1
+	ROM_LOAD( "11.bin", 0x10000, 0x10000,  CRC(021e82ab) SHA1(bd93fe7b9d9c4ac940eeb97ee8e99522b07d80bf) )
+	ROM_LOAD( "10.bin", 0x20000, 0x10000,  CRC(1a26cf3f) SHA1(3a488ee485db7b3f27d5ed6c6e7d263d4840bd6a) ) // plane 2
+	ROM_LOAD( "9.bin",  0x30000, 0x10000,  CRC(277ef086) SHA1(d7a5e944f5287aa15d14ff940d1aca8d1e649d26) )
+	ROM_LOAD( "8.bin",  0x40000, 0x10000,  CRC(661225af) SHA1(115303efeb5676ab059600a48edf36b8a56f6c15) ) // plane 3
+	ROM_LOAD( "7.bin",  0x50000, 0x10000,  CRC(d7019da7) SHA1(682347a276e03a733608066ad911af1674a00ed9) )
+
+	ROM_REGION16_BE( 0x100000, "sprites", ROMREGION_ERASEFF ) // sprites
+	ROM_LOAD16_BYTE( "18.bin",  0x000001, 0x010000, CRC(f8b3684e) SHA1(3de2685cae5fb3c954b8440fafce313072747469) ) // == epr-11725.b1
+	ROM_LOAD16_BYTE( "22.bin",  0x000000, 0x010000, CRC(ae3c2793) SHA1(c4f46861ea63ffa3c038a1ef931479b94e5382df) ) // == epr-11729.b5
+	ROM_LOAD16_BYTE( "17.bin",  0x020001, 0x010000, CRC(3cce5419) SHA1(fccdbd6d05f5927272e7d6e5f997418d4fa2baf5) ) // == epr-11726.b2
+	ROM_LOAD16_BYTE( "21.bin",  0x020000, 0x010000, CRC(3af62b55) SHA1(9f079af88aaf2447948c9ac01c6cbd1e79539704) ) // == epr-11730.b6
+	ROM_LOAD16_BYTE( "16.bin",  0x040001, 0x010000, CRC(b0390078) SHA1(9035d9f45c67bdc802710018722943f5b63e8b5d) ) // == epr-11727.b3
+	ROM_LOAD16_BYTE( "20.bin",  0x040000, 0x010000, CRC(2a87744a) SHA1(421b3926de046ddeddad05f65fc6b5078af28dbd) ) // == epr-11731.b7
+	ROM_LOAD16_BYTE( "15.bin",  0x060001, 0x010000, CRC(f3a43fd8) SHA1(d42833ecd0c1920f1a6904d32c096f12d8622141) ) // == epr-11728.b4
+	ROM_LOAD16_BYTE( "19.bin",  0x060000, 0x010000, CRC(2fb3e355) SHA1(960e0a66b23f79833b011ea35a5a412dffb47083) ) // == epr-11732.b8
+	ROM_LOAD16_BYTE( "23.bin", 0x080001, 0x010000, CRC(676be0cb) SHA1(1e7d4c5f231992f111cc7885e97bc5a7267a5e89) ) // == epr-11717.a1
+	ROM_LOAD16_BYTE( "25.bin", 0x080000, 0x010000, CRC(802cac94) SHA1(24e5aa74ce8b6c53c78cc33a41a473df3fbce639) ) // == epr-11733.b10
+	ROM_LOAD16_BYTE( "24.bin", 0x0a0001, 0x010000, CRC(882864c2) SHA1(bd44bbdc13e5fd1b5c31c343da00a75b9dd90478) ) // == epr-11718.a2
+	ROM_LOAD16_BYTE( "26.bin", 0x0a0000, 0x010000, CRC(76c704d2) SHA1(35b393071e29b8d122d3f904b923689a7dddc808) ) // == epr-11734.b11
+	ROM_LOAD16_BYTE( "13.bin", 0x0c0001, 0x010000, CRC(339987f7) SHA1(b5650f8bdbd44510e84686b20daf70bc4a564f28) ) // == epr-11719.a3
+	ROM_LOAD16_BYTE( "14.bin", 0x0c0000, 0x010000, CRC(4fe406aa) SHA1(7f068b81f35be4cc4785824ed524d28f201ff0a5) ) // == epr-11735.b12 
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(67e09da3) SHA1(1c57048b428027fb8fae531363930ac5fed961fe) )
+	ROM_LOAD( "2.bin", 0x10000, 0x10000, CRC(7c653d8b) SHA1(f74355e12322ac3e3da1b5fc14d81908f61d01e6) )
+ROM_END
+
+
 ROM_START( eswatbl )
 	ROM_REGION( 0x080000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "eswat_c.rom", 0x000000, 0x10000, CRC(1028cc81) SHA1(24b4cd182419a44f3d6afa1c4273353024eb278f) )
@@ -3459,8 +3512,9 @@ GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,  bayroute, segas1x_bootleg_state
 GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,  bayroute, segas1x_bootleg_state,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,  goldnaxe, segas1x_bootleg_state,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (bootleg)", GAME_NOT_WORKING )
+GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", GAME_NOT_WORKING )
+GAME( 1988, altbeastbl,  altbeast,  tetrisbl,    tetris, segas1x_bootleg_state,	   dduxbl,     ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", GAME_NOT_WORKING )
 GAME( 1989, eswatbl,     eswat,     eswatbl,     eswat, segas1x_bootleg_state,     eswatbl,    ROT0,   "bootleg", "E-Swat - Cyber Police (bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND )
 GAME( 1989, fpointbl,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", GAME_NOT_WORKING )
 GAME( 1989, fpointbj,    fpoint,    fpointbl,    fpointbl, segas1x_bootleg_state,  fpointbl,   ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg)", GAME_NOT_WORKING )
