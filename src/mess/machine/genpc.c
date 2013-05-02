@@ -565,7 +565,7 @@ ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *
 		m_speaker(*this, "speaker"),
 		m_isabus(*this, "isa"),
 		m_pc_kbdc(*this, "pc_kbdc"),
-		m_ram(*this, RAM_TAG)
+		m_ram(*this, ":" RAM_TAG)
 {
 }
 
