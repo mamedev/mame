@@ -106,13 +106,13 @@ bool apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( memregion("maincpu")->base(), 0x1000);
+	fread( machine().root_device().memregion("maincpu")->base(), 0x1000);
 #ifdef LSB_FIRST
 	{   /* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *)(*memregion("maincpu"));
+		RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 		for (i=0; i < 0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -136,14 +136,14 @@ void apexc_cylinder_image_device::call_unload()
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *)(*memregion("maincpu"));
+			RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		fwrite(memregion("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().root_device().memregion("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
