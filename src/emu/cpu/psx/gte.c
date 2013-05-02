@@ -387,9 +387,14 @@ INT32 gte::Lm_D( INT64 a, int sf ) { return LIM( gte_shift( a, sf ), 0xffff, 0x0
 
 UINT32 gte::Lm_E( UINT32 result )
 {
-	if( result > 0x1ffff )
+	if( result == 0xffffffff )
 	{
 		FLAG |= ( 1 << 31 ) | ( 1 << 17 );
+		return 0x1ffff;
+	}
+
+	if( result > 0x1ffff )
+	{
 		return 0x1ffff;
 	}
 
