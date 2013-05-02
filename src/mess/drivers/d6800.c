@@ -43,7 +43,6 @@
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "sound/wave.h"
-#include "sound/dac.h"
 #include "machine/6821pia.h"
 
 
@@ -55,7 +54,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_pia(*this, "pia"),
-		m_dac(*this, "dac"),
+		m_beeper(*this, "beeper"),
 		m_videoram(*this, "videoram"),
 		m_io_x0(*this, "X0"),
 		m_io_x1(*this, "X1"),
@@ -82,7 +81,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia;
-	required_device<dac_device> m_dac;
+	required_device<beep_device> m_beeper;
 	required_shared_ptr<UINT8> m_videoram;
 	required_ioport m_io_x0;
 	required_ioport m_io_x1;
@@ -249,14 +248,15 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 {
 	/*
-	Cassette circuit consists of a 566 and a transistor. The 556 runs at 2400
-	or 1200 Hz depending on the state of the transistor. This is controlled by
-	bit 0 of the PIA. Bit 6 drives the speaker.
+        A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
+        This output drives the speaker and the output signal to the cassette player.
+        Bit 6 enables the speaker.
 	*/
 
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
+	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
+	m_beeper->set_state(BIT(data, 6));
 
-	m_dac->write_unsigned8(data);
 	m_portb = data;
 }
 
@@ -321,6 +321,7 @@ void d6800_state::machine_start()
 
 void d6800_state::machine_reset()
 {
+	m_beeper->set_state(0);
 }
 
 /* Machine Drivers */
@@ -401,7 +402,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
@@ -410,7 +411,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "ch8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "c8", 1)
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -418,6 +419,7 @@ MACHINE_CONFIG_END
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877) )
+	//ROM_FILL(0xc2eb,2,1)
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT       INIT        COMPANY             FULLNAME      FLAGS */
