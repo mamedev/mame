@@ -1741,7 +1741,7 @@ void media_identifier::identify(const char *filename)
 			if (entry->type == ENTTYPE_FILE)
 			{
 				astring curfile(filename, PATH_SEPARATOR, entry->name);
-				identify_file(curfile);
+				identify(curfile);
 			}
 
 		// close the directory and be done
