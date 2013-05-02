@@ -18,10 +18,6 @@
     - Keyboard is a standard pc keyboard
     - Sound is stereo dac-sound, plus an analog output. Details unknown.
 
-    This system uses a number of unemulated opcodes (A0xx). Our M68000 core
-    mishandles this scenario, doing a random jump to nearby code. This
-    continues, filling up the stack, and eventually causes a total freeze.
-
 ****************************************************************************/
 
 #include "emu.h"
@@ -38,7 +34,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_crtc(*this, "crtc"),
 		m_via(*this, "via6522"),
-		m_base(*this, "base"){ }
+		m_base(*this, "base"),
+		m_expansion(*this, "expansion"){ }
 
 	DECLARE_READ16_MEMBER(applix_inputs_r);
 	DECLARE_WRITE16_MEMBER(applix_index_w);
@@ -65,6 +62,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;
 	required_shared_ptr<UINT16> m_base;
+	required_shared_ptr<UINT16> m_expansion;
 };
 
 // dac-latch seems to be:
@@ -145,9 +143,9 @@ WRITE8_MEMBER( applix_state::applix_pb_w )
 static ADDRESS_MAP_START(applix_mem, AS_PROGRAM, 16, applix_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("base")
-	AM_RANGE(0x080000, 0x47ffff) AM_NOP //AM_RAM // expansion
-	AM_RANGE(0x500000, 0x5fffff) AM_ROM
+	AM_RANGE(0x000000, 0x3fffff) AM_RAM AM_SHARE("expansion") // Expansion
+	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_MIRROR(0x80000) AM_SHARE("base") // Main ram
+	AM_RANGE(0x500000, 0x51ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x600000, 0x60007f) AM_WRITE(palette_w)
 	AM_RANGE(0x600080, 0x6000ff) AM_WRITE(dac_latch_w)
 	AM_RANGE(0x600100, 0x60017f) AM_WRITE(video_latch_w) //video latch (=border colour, high nybble; video base, low nybble) (odd)
@@ -189,8 +187,8 @@ INPUT_PORTS_END
 
 void applix_state::machine_reset()
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	memcpy(m_base, RAM+0x500000, 16);
+	UINT8* ROM = memregion("maincpu")->base();
+	memcpy(m_expansion, ROM, 8);
 	m_maincpu->reset();
 }
 
@@ -325,9 +323,9 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( applix )
-	ROM_REGION(0x1000000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "1616oshv.044", 0x500000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6) )
-	ROM_LOAD16_BYTE( "1616oslv.044", 0x500001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a) )
+	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "1616oshv.044", 0x00000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6) )
+	ROM_LOAD16_BYTE( "1616oslv.044", 0x00001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a) )
 
 	ROM_REGION(0x50000, "user1", 0)
 	ROM_LOAD16_BYTE( "1616oshv.045", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f) )
