@@ -59,6 +59,7 @@ static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_devic
 	AM_RANGE(0x1e4, 0x1e7) AM_READWRITE8(MFDR_r, MFDR_w, 0xffffffff)
 	AM_RANGE(0x1e8, 0x1eb) AM_READWRITE8(MBCR_r, MBCR_w, 0xffffffff)
 	AM_RANGE(0x1ec, 0x1ef) AM_READWRITE8(MBSR_r, MBSR_w, 0xffffffff)
+	AM_RANGE(0x1f0, 0x1f3) AM_READWRITE8(MBDR_r, MBDR_w, 0xffffffff)
 ADDRESS_MAP_END
 
 
@@ -528,7 +529,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MFDR_w)
 
 READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
 {
-	static int hack = 0x00;
+	int hack = 0x00;
 
 	switch (offset)
 	{
@@ -536,7 +537,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
 	{
 		hack ^= (machine().rand()&0xff);
 		debuglog("%s: MBSR_r\n", this->machine().describe_context());
-		return m_MBSR | hack; // will loop on this after a while
+		return m_MBSR ^ hack; // will loop on this after a while
 	}
 	case 1:
 	case 2:
@@ -560,6 +561,48 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBSR_w)
 	case 2:
 	case 3:
 		debuglog("%s: invalid MBSR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		break;
+
+	}
+}
+
+
+
+
+READ8_MEMBER( mcf5206e_peripheral_device::MBDR_r)
+{
+	int hack = 0x00;
+
+	switch (offset)
+	{
+	case 0:
+	{
+		hack ^= (machine().rand()&0xff);
+		debuglog("%s: MBDR_r\n", this->machine().describe_context());
+		return m_MBDR ^ hack;
+	}
+	case 1:
+	case 2:
+	case 3:
+		debuglog("%s: invalid MBDR_r %d\n", this->machine().describe_context(), offset);
+		return 0;
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER( mcf5206e_peripheral_device::MBDR_w)
+{
+	switch (offset)
+	{
+	case 0:
+		m_MBDR = data;
+		debuglog("%s: MBDR_w %02x\n", this->machine().describe_context(), data);
+		break;
+	case 1:
+	case 2:
+	case 3:
+		debuglog("%s: invalid MBDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -614,7 +657,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 	// technically we should do the vector check in the IRQ callback as well as various checks based on the IRQ masks before asserting the interrupt
 	if (ICR & 0x80) // AVEC
 	{
-		m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
+		if (!(m_IMR & 0x0200)) m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
 	}
 
 	debuglog("timer1_callback\n");
@@ -903,8 +946,10 @@ void mcf5206e_peripheral_device::init_regs(bool first_init)
 
 	m_IMR = 0x3FFE;
 
+	m_MFDR = 0x00;
 	m_MBCR = 0x00;
 	m_MBSR = 0x00;
+	m_MBDR = 0x00;
 }
 
 /*
@@ -1025,7 +1070,7 @@ $1E0                    MADR        8       M-Bus Address Register              
 $1E4*-                  MFDR        8       M-Bus Frequency Divider Register                    00                                                  R/W
 $1E8*-                  MBCR        8       M-Bus Control Register                              00                                                  R/W
 $1EC*-                  MBSR        8       M-Bus Status Register                               00                                                  R/W
-$1F0                    MBDR        8       M-Bus Data I/O Register                             00                                                  R/W
+$1F0*-                  MBDR        8       M-Bus Data I/O Register                             00                                                  R/W
 ------------ DMA Controller -----------
 $200                    DMASAR0     32      Source Address Register 0                           00                                                  R/W
 $204                    DMADAR0     32      Destination Address Register 0                      00                                                  R/W
