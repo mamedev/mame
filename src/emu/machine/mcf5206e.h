@@ -26,12 +26,32 @@
 
 // ======================> mcf5206e_peripheral_device
 
+enum
+{
+	ICR1 = 0,
+	ICR2,
+	ICR3,
+	ICR4,
+	ICR5,
+	ICR6,
+	ICR7,
+	ICR8,
+	ICR9,
+	ICR10,
+	ICR11,
+	ICR12,
+	ICR13,
+	MAX_ICR
+};
+
 class mcf5206e_peripheral_device :  public device_t,
 									public device_memory_interface
 {
 public:
 	// construction/destruction
 	mcf5206e_peripheral_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	void ICR_info(UINT8 ICR);
 
 	DECLARE_READ32_MEMBER( dev_r );
 	DECLARE_WRITE32_MEMBER( dev_w );
@@ -111,6 +131,8 @@ public:
 	DECLARE_WRITE16_MEMBER( TMR1_w );
 	DECLARE_READ16_MEMBER( TRR1_r );
 	DECLARE_WRITE16_MEMBER( TRR1_w );
+	DECLARE_READ8_MEMBER( TER1_r );
+	DECLARE_WRITE8_MEMBER(TER1_w );
 
 	DECLARE_READ8_MEMBER( PPDDR_r );
 	DECLARE_WRITE8_MEMBER( PPDDR_w );
@@ -126,12 +148,13 @@ public:
 	DECLARE_READ8_MEMBER( MBSR_r );
 	DECLARE_WRITE8_MEMBER( MBSR_w );
 	
+	cpu_device* m_cpu;
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	virtual void device_reset() { }
+	virtual void device_reset();
 	virtual void device_post_load() { }
 	virtual void device_clock_changed() { }
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
@@ -142,19 +165,7 @@ private:
 	
 	void init_regs(bool first_init);
 
-	UINT8 m_ICR1;
-	UINT8 m_ICR2;
-	UINT8 m_ICR3;
-	UINT8 m_ICR4;
-	UINT8 m_ICR5;
-	UINT8 m_ICR6;
-	UINT8 m_ICR7;
-	UINT8 m_ICR8;
-	UINT8 m_ICR9;
-	UINT8 m_ICR10;
-	UINT8 m_ICR11;
-	UINT8 m_ICR12;
-	UINT8 m_ICR13;
+	UINT8 m_ICR[MAX_ICR];
 
 	UINT16 m_CSAR[8];
 	UINT32 m_CSMR[8];
@@ -163,8 +174,12 @@ private:
 	UINT16 m_DMCR;
 	UINT16 m_PAR;
 
+	emu_timer *timer1;
 	UINT16 m_TMR1;
 	UINT16 m_TRR1;
+	UINT8 m_TER1;
+	TIMER_CALLBACK_MEMBER(timer1_callback);
+
 
 	UINT8 m_PPDDR;
 	UINT8 m_PPDAT;

@@ -38,16 +38,9 @@ static const ymz280b_interface ymz280b_config =
 };
 
 
-INTERRUPT_GEN_MEMBER(bfm_sc5_state::sc5_fake_timer_int)
-{
-	// this should be coming from the Timer / SIM modules of the Coldfire
-	//m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c);
-}
-
 MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
 	MCFG_CPU_PROGRAM_MAP(sc5_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc5_state, sc5_fake_timer_int, 1000)
 	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
 
 	/* sound hardware */

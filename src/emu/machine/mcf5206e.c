@@ -48,6 +48,7 @@ static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_devic
 
 	AM_RANGE(0x100, 0x103) AM_READWRITE16(TMR1_r, TMR1_w, 0xffffffff)
 	AM_RANGE(0x104, 0x107) AM_READWRITE16(TRR1_r, TRR1_w, 0xffffffff)
+	AM_RANGE(0x110, 0x113) AM_READWRITE8(TER1_r, TER1_w, 0xffffffff)
 
 
 	AM_RANGE(0x1c4, 0x1c7) AM_READWRITE8(PPDDR_r, PPDDR_w, 0xffffffff)
@@ -58,22 +59,23 @@ static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_devic
 ADDRESS_MAP_END
 
 
+
 READ8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r )
 {
 	switch (offset)
 	{
 	case 0: // 0x014
 		printf("(External IRQ1/IPL1 Interrupt Vector) ICR1_r\n");
-		return m_ICR1;
+		return m_ICR[ICR1];
 	case 1: // 0x015
 		printf("(External IPL2 Interrupt Vector) ICR2_r\n");
-		return m_ICR2;
+		return m_ICR[ICR2];
 	case 2: // 0x016
 		printf("(External IPL3 Interrupt Vector) ICR3_r\n");
-		return m_ICR3;
+		return m_ICR[ICR3];
 	case 3: // 0x017
 		printf("(External IRQ4/IPL4 Interrupt Vector) ICR4_r\n");
-		return m_ICR4;
+		return m_ICR[ICR4];
 	}
 
 	return 0;
@@ -84,20 +86,24 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w )
 	switch (offset)
 	{
 	case 0: // 0x014
-		m_ICR1 = data;
+		m_ICR[ICR1] = data;
 		printf("(External IRQ1/IPL1 Interrupt Vector) ICR1_w %02x\n",data);
+		ICR_info(m_ICR[ICR1]);
 		break;
 	case 1: // 0x015
-		m_ICR2 = data;
+		m_ICR[ICR2] = data;
 		printf("(External IPL2 Interrupt Vector) ICR2_w %02x\n",data);
+		ICR_info(m_ICR[ICR2]);
 		break;
 	case 2: // 0x016
-		m_ICR3 = data;
+		m_ICR[ICR3] = data;
 		printf("(External IPL3 Interrupt Vector) ICR3_w %02x\n",data);
+		ICR_info(m_ICR[ICR3]);
 		break;
 	case 3: // 0x017
-		m_ICR4 = data;
+		m_ICR[ICR4] = data;
 		printf("(External IRQ4/IPL4 Interrupt Vector) ICR4_w %02x\n",data);
+		ICR_info(m_ICR[ICR4]);
 		break;
 	}
 }
@@ -108,16 +114,16 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r )
 	{
 	case 0: // 0x01c
 		printf("(Timer 1 Interrupt Vector) ICR9_r\n");
-		return m_ICR9;
+		return m_ICR[ICR9];
 	case 1: // 0x01d
 		printf("(Timer 2 Interrupt Vector) ICR10_r\n");
-		return m_ICR10;
+		return m_ICR[ICR10];
 	case 2: // 0x01e
 		printf("(MBUS Interrupt Vector) ICR11_r\n");
-		return m_ICR11;
+		return m_ICR[ICR11];
 	case 3: // 0x01f
 		printf("(UART1 Interrupt Vector) ICR12_r\n");
-		return m_ICR12;
+		return m_ICR[ICR12];
 	}
 
 	return 0;
@@ -128,20 +134,24 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w )
 	switch (offset)
 	{
 	case 0: // 0x01c
-		m_ICR9 = data;
+		m_ICR[ICR9] = data;
 		printf("(Timer 1 Interrupt Vector) ICR9_w %02x\n",data);
+		ICR_info(m_ICR[ICR9]);
 		break;
 	case 1: // 0x01d
-		m_ICR10 = data;
+		m_ICR[ICR10] = data;
 		printf("(Timer 2 Interrupt Vector) ICR10_w %02x\n",data);
+		ICR_info(m_ICR[ICR10]);
 		break;
 	case 2: // 0x01e
-		m_ICR11 = data;
+		m_ICR[ICR11] = data;
 		printf("(MBUS Interrupt Vector) ICR11_w %02x\n",data);
+		ICR_info(m_ICR[ICR11]);
 		break;
 	case 3: // 0x01f
-		m_ICR12 = data;
+		m_ICR[ICR12] = data;
 		printf("(UART1 Interrupt Vector) ICR12_w %02x\n",data);
+		ICR_info(m_ICR[ICR12]);
 		break;
 	}
 }
@@ -152,7 +162,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR13_r )
 	{
 	case 0: // 0x020
 		printf("(UART2 Interrupt Vector) ICR13_r\n");
-		return m_ICR13;
+		return m_ICR[ICR13];
 	case 1:
 	case 2:
 	case 3:
@@ -168,8 +178,9 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR13_w )
 	switch (offset)
 	{
 	case 0: // 0x020
-		m_ICR13 = data;
+		m_ICR[ICR13] = data;
 		printf("(UART2 Interrupt Vector) ICR13_w %02x\n",data);
+		ICR_info(m_ICR[ICR13]);
 		break;
 	case 1:
 	case 2:
@@ -540,6 +551,30 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 	}
 }
 
+void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
+{
+	printf("	(AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
+	printf("(Interrupt Level) IL : %01x | ", (ICR&0x1c)>>2); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
+	printf("(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
+	printf("(Unused bits) : %01x\n", (ICR&0x60)>>5);
+}
+
+/* The timer module seems practically the same as the 68307 one, possibly make into a common device once the code isn't a hardcoded piece of junk ;-) */
+
+TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
+{
+	UINT8 ICR = m_ICR[ICR9];
+
+	// technically we should do the vector check in the IRQ callback as well as various checks based on the IRQ masks before asserting the interrupt
+	if (ICR & 0x80) // AVEC
+	{
+		m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
+	}
+
+	printf("timer1_callback\n");
+	
+	timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
+}
 
 
 READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
@@ -564,6 +599,20 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 	case 0:
 		COMBINE_DATA(&m_TMR1);
 		printf("TMR1_w %04x %04x\n",data, mem_mask);
+
+		printf("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n",
+			(m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
+		
+		if (m_TMR1 & 0x0001)
+		{
+			timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
+		}
+		else
+		{
+			timer1->adjust(attotime::never);
+		}
+		
+		
 		break;
 	case 1:
 		printf("invalid TMR1_w %d, %04x %04x\n", offset, data, mem_mask);
@@ -597,6 +646,42 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TRR1_w)
 		break;
 	case 1:
 		printf("invalid TRR1_w %d, %04x %04x\n", offset, data, mem_mask);
+		break;
+
+	}
+}
+
+
+
+READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
+{
+	switch (offset)
+	{
+	case 1:
+		printf("TER1_r\n");
+		return 2; // hack, timer events should set bits, this just stops the code going crazy for now
+	case 0:
+	case 2:
+	case 3:
+		printf("invalid TER1_r %d\n", offset);
+		return 0;
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
+{
+	switch (offset)
+	{
+	case 1:
+		m_TER1 = data; // writes should clear the bits..
+		printf("TER1_w %02x\n",data);
+		break;
+	case 0:
+	case 2:
+	case 3:
+		printf("invalid TER1_w %d, %02x\n", offset, data);
 		break;
 
 	}
@@ -644,9 +729,18 @@ const address_space_config *mcf5206e_peripheral_device::memory_space_config(addr
 void mcf5206e_peripheral_device::device_start()
 {
 	init_regs(true);
+
+	timer1 = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( mcf5206e_peripheral_device::timer1_callback ), this) );
+
 }
 
+void mcf5206e_peripheral_device::device_reset()
+{
+	m_cpu = (cpu_device*)machine().device(":maincpu"); // hack. this device should really be attached to a modern CPU core
 
+	init_regs(false);
+	timer1->adjust(attotime::never);
+}
 
 READ32_MEMBER(mcf5206e_peripheral_device::dev_r)
 {
@@ -692,19 +786,19 @@ READ32_MEMBER(mcf5206e_peripheral_device::seta2_coldfire_regs_r)
 
 void mcf5206e_peripheral_device::init_regs(bool first_init)
 {
-	m_ICR1 =	0x04; 
-	m_ICR2 = 	0x08; 
-	m_ICR3 = 	0x0C; 
-	m_ICR4 = 	0x10; 
-	m_ICR5 = 	0x14; 
-	m_ICR6 = 	0x18; 
-	m_ICR7 = 	0x1C; 
-	m_ICR8 = 	0x1C; 
-	m_ICR9 =	0x80;
-	m_ICR10 = 	0x80;
-	m_ICR11 = 	0x80;
-	m_ICR12 =  	0x00;
-	m_ICR13 = 	0x00;
+	m_ICR[ICR1] =	0x04; 
+	m_ICR[ICR2] = 	0x08; 
+	m_ICR[ICR3] = 	0x0C; 
+	m_ICR[ICR4] = 	0x10; 
+	m_ICR[ICR5] = 	0x14; 
+	m_ICR[ICR6] = 	0x18; 
+	m_ICR[ICR7] = 	0x1C; 
+	m_ICR[ICR8] = 	0x1C; 
+	m_ICR[ICR9] =	0x80;
+	m_ICR[ICR10] = 	0x80;
+	m_ICR[ICR11] = 	0x80;
+	m_ICR[ICR12] =  	0x00;
+	m_ICR[ICR13] = 	0x00;
 
 	m_CSAR[0] =	0x0000;
 	m_CSMR[0] =	0x00000000;
