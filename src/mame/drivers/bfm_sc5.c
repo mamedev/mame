@@ -15,6 +15,66 @@
 #include "bfm_sc5.lh"
 #include "video/awpvid.h"
 
+
+
+void bfm_sc5_reset_serial_vfd(running_machine &machine)
+{
+	bfm_sc5_state *state = machine.driver_data<bfm_sc5_state>();
+
+	state->m_vfd0->reset();
+	state->vfd_old_clock = false;
+}
+
+void bfm_sc5_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data)
+{
+	bfm_sc5_state *state = machine.driver_data<bfm_sc5_state>();
+
+	// if we're turned on
+	if ( cs )
+	{
+		if ( !state->vfd_enabled )
+		{
+			bfm_sc5_reset_serial_vfd(machine);
+			state->vfd_old_clock = clock;
+			state->vfd_enabled = true;
+		}
+		else
+		{
+			// if the clock line changes
+			if ( clock != state->vfd_old_clock )
+			{
+				if ( !clock )
+				{
+				//Should move to the internal serial process when DM01 is device-ified
+//                  m_vfd0->shift_data(!data);
+					state->vfd_ser_value <<= 1;
+					if (data) state->vfd_ser_value |= 1;
+
+					state->vfd_ser_count++;
+					if ( state->vfd_ser_count == 8 )
+					{
+						state->vfd_ser_count = 0;
+					//	if (machine.device("matrix"))
+					//	{
+					//		BFM_dm01_writedata(machine,state->vfd_ser_value);
+					//	}
+					//	else
+						{
+							state->m_vfd0->write_char(state->vfd_ser_value);
+						}
+					}
+				}
+				state->vfd_old_clock = clock;
+			}
+		}
+	}
+	else
+	{
+		state->vfd_enabled = false;
+	}
+}
+
+
 static ADDRESS_MAP_START( sc5_map, AS_PROGRAM, 32, bfm_sc5_state )
 	// ROM (max size?)
 	AM_RANGE(0x00000000, 0x002fffff) AM_ROM
@@ -159,6 +219,9 @@ WRITE8_MEMBER( bfm_sc5_state::sc5_10202F0_w )
 	switch (offset)
 	{
 		case 0x0:
+			bfm_sc5_write_serial_vfd(machine(), (data &0x4)?1:0, (data &0x1)?1:0, (data&0x2) ? 0:1);
+			if (data&0xf8) printf("%s: sc5_10202F0_w %d - %02x\n", machine().describe_context(), offset, data);
+			break;
 		case 0x1:
 		case 0x2:
 		case 0x3:
