@@ -2061,6 +2061,8 @@ $(DRIVERS)/bfm_sc4.o:   $(LAYOUT)/bfm_sc4.lh \
 $(DRIVERS)/bfm_sc4h.o:  $(LAYOUT)/bfm_sc4.lh \
 			$(LAYOUT)/sc4_dmd.lh
 
+$(DRIVERS)/bfm_sc5.o:   $(LAYOUT)/bfm_sc5.lh
+
 $(DRIVERS)/bfmsys85.o:  $(LAYOUT)/bfmsys85.lh
 
 $(DRIVERS)/blockade.o:  $(LAYOUT)/blockade.lh

@@ -5,7 +5,8 @@
 #include "emu.h"
 #include "mcf5206e.h"
 
-
+//#define debuglog printf
+#define debuglog logerror
 
 static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_device )
 	
@@ -48,12 +49,14 @@ static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_devic
 
 	AM_RANGE(0x100, 0x103) AM_READWRITE16(TMR1_r, TMR1_w, 0xffffffff)
 	AM_RANGE(0x104, 0x107) AM_READWRITE16(TRR1_r, TRR1_w, 0xffffffff)
+	AM_RANGE(0x10c, 0x10f) AM_READWRITE16(TCN1_r, TCN1_w, 0xffffffff)
 	AM_RANGE(0x110, 0x113) AM_READWRITE8(TER1_r, TER1_w, 0xffffffff)
 
 
 	AM_RANGE(0x1c4, 0x1c7) AM_READWRITE8(PPDDR_r, PPDDR_w, 0xffffffff)
 	AM_RANGE(0x1c8, 0x1cb) AM_READWRITE8(PPDAT_r, PPDAT_w, 0xffffffff)
 	
+	AM_RANGE(0x1e4, 0x1e7) AM_READWRITE8(MFDR_r, MFDR_w, 0xffffffff)
 	AM_RANGE(0x1e8, 0x1eb) AM_READWRITE8(MBCR_r, MBCR_w, 0xffffffff)
 	AM_RANGE(0x1ec, 0x1ef) AM_READWRITE8(MBSR_r, MBSR_w, 0xffffffff)
 ADDRESS_MAP_END
@@ -65,16 +68,16 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_r )
 	switch (offset)
 	{
 	case 0: // 0x014
-		printf("(External IRQ1/IPL1 Interrupt Vector) ICR1_r\n");
+		debuglog("%s: (External IRQ1/IPL1 Interrupt Vector) ICR1_r\n", this->machine().describe_context());
 		return m_ICR[ICR1];
 	case 1: // 0x015
-		printf("(External IPL2 Interrupt Vector) ICR2_r\n");
+		debuglog("%s: (External IPL2 Interrupt Vector) ICR2_r\n", this->machine().describe_context());
 		return m_ICR[ICR2];
 	case 2: // 0x016
-		printf("(External IPL3 Interrupt Vector) ICR3_r\n");
+		debuglog("%s: (External IPL3 Interrupt Vector) ICR3_r\n", this->machine().describe_context());
 		return m_ICR[ICR3];
 	case 3: // 0x017
-		printf("(External IRQ4/IPL4 Interrupt Vector) ICR4_r\n");
+		debuglog("%s: (External IRQ4/IPL4 Interrupt Vector) ICR4_r\n", this->machine().describe_context());
 		return m_ICR[ICR4];
 	}
 
@@ -87,22 +90,22 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR1_ICR2_ICR3_ICR4_w )
 	{
 	case 0: // 0x014
 		m_ICR[ICR1] = data;
-		printf("(External IRQ1/IPL1 Interrupt Vector) ICR1_w %02x\n",data);
+		debuglog("%s: (External IRQ1/IPL1 Interrupt Vector) ICR1_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR1]);
 		break;
 	case 1: // 0x015
 		m_ICR[ICR2] = data;
-		printf("(External IPL2 Interrupt Vector) ICR2_w %02x\n",data);
+		debuglog("%s: (External IPL2 Interrupt Vector) ICR2_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR2]);
 		break;
 	case 2: // 0x016
 		m_ICR[ICR3] = data;
-		printf("(External IPL3 Interrupt Vector) ICR3_w %02x\n",data);
+		debuglog("%s: (External IPL3 Interrupt Vector) ICR3_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR3]);
 		break;
 	case 3: // 0x017
 		m_ICR[ICR4] = data;
-		printf("(External IRQ4/IPL4 Interrupt Vector) ICR4_w %02x\n",data);
+		debuglog("%s: (External IRQ4/IPL4 Interrupt Vector) ICR4_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR4]);
 		break;
 	}
@@ -113,16 +116,16 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_r )
 	switch (offset)
 	{
 	case 0: // 0x01c
-		printf("(Timer 1 Interrupt Vector) ICR9_r\n");
+		debuglog("%s: (Timer 1 Interrupt Vector) ICR9_r\n", this->machine().describe_context());
 		return m_ICR[ICR9];
 	case 1: // 0x01d
-		printf("(Timer 2 Interrupt Vector) ICR10_r\n");
+		debuglog("%s: (Timer 2 Interrupt Vector) ICR10_r\n", this->machine().describe_context());
 		return m_ICR[ICR10];
 	case 2: // 0x01e
-		printf("(MBUS Interrupt Vector) ICR11_r\n");
+		debuglog("%s: (MBUS Interrupt Vector) ICR11_r\n", this->machine().describe_context());
 		return m_ICR[ICR11];
 	case 3: // 0x01f
-		printf("(UART1 Interrupt Vector) ICR12_r\n");
+		debuglog("%s: (UART1 Interrupt Vector) ICR12_r\n", this->machine().describe_context());
 		return m_ICR[ICR12];
 	}
 
@@ -135,22 +138,22 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR9_ICR10_ICR11_ICR12_w )
 	{
 	case 0: // 0x01c
 		m_ICR[ICR9] = data;
-		printf("(Timer 1 Interrupt Vector) ICR9_w %02x\n",data);
+		debuglog("%s: (Timer 1 Interrupt Vector) ICR9_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR9]);
 		break;
 	case 1: // 0x01d
 		m_ICR[ICR10] = data;
-		printf("(Timer 2 Interrupt Vector) ICR10_w %02x\n",data);
+		debuglog("%s: (Timer 2 Interrupt Vector) ICR10_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR10]);
 		break;
 	case 2: // 0x01e
 		m_ICR[ICR11] = data;
-		printf("(MBUS Interrupt Vector) ICR11_w %02x\n",data);
+		debuglog("%s: (MBUS Interrupt Vector) ICR11_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR11]);
 		break;
 	case 3: // 0x01f
 		m_ICR[ICR12] = data;
-		printf("(UART1 Interrupt Vector) ICR12_w %02x\n",data);
+		debuglog("%s: (UART1 Interrupt Vector) ICR12_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR12]);
 		break;
 	}
@@ -161,12 +164,12 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR13_r )
 	switch (offset)
 	{
 	case 0: // 0x020
-		printf("(UART2 Interrupt Vector) ICR13_r\n");
+		debuglog("%s: (UART2 Interrupt Vector) ICR13_r\n", this->machine().describe_context());
 		return m_ICR[ICR13];
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid ICR13_r %d\n", offset);
+		debuglog("%s: invalid ICR13_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -179,13 +182,13 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR13_w )
 	{
 	case 0: // 0x020
 		m_ICR[ICR13] = data;
-		printf("(UART2 Interrupt Vector) ICR13_w %02x\n",data);
+		debuglog("%s: (UART2 Interrupt Vector) ICR13_w %02x\n", this->machine().describe_context(), data);
 		ICR_info(m_ICR[ICR13]);
 		break;
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid ICR13_w %d, %02x\n", offset, data);
+		debuglog("%s: invalid ICR13_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	}
 }
@@ -195,12 +198,12 @@ inline UINT16 mcf5206e_peripheral_device::CSAR_r(int which, int offset, UINT16 m
 {
 	if (offset==0)
 	{
-		printf("CSAR%d_r\n", which);
+		debuglog("%s: CSAR%d_r\n", this->machine().describe_context(), which);
 		return m_CSAR[which];
 	}
 	else
 	{
-		logerror("invalid CSAR%d_r with offset %d\n", which, offset);
+		debuglog("%s: invalid CSAR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
 		return 0;
 	}
 }
@@ -210,36 +213,36 @@ inline void mcf5206e_peripheral_device::CSAR_w(int which, int offset, UINT16 dat
 	if (offset==0)
 	{
 		COMBINE_DATA( &m_CSAR[which] );
-		printf("CSAR%d_w %04x\n", which, data);
+		debuglog("%s: CSAR%d_w %04x\n", this->machine().describe_context(), which, data);
 	}
 	else
 	{
-		logerror("invalid CSAR%d_w with offset %d %04x\n", which, offset, data);
+		debuglog("%s: invalid CSAR%d_w with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
 	}
 }
 
 inline UINT32 mcf5206e_peripheral_device::CSMR_r(int which, UINT32 mem_mask)
 {
-	printf("CSMR%d_r\n", which);
+	debuglog("%s: CSMR%d_r\n", this->machine().describe_context(), which);
 	return m_CSMR[0];
 }
 
 inline void mcf5206e_peripheral_device::CSMR_w(int which, UINT32 data, UINT32 mem_mask)
 {
 	COMBINE_DATA( &m_CSMR[0] );
-	printf("CSMR%d_w %08x\n", which, data);
+	debuglog("%s: CSMR%d_w %08x\n", this->machine().describe_context(), which, data);
 }
 
 inline UINT16 mcf5206e_peripheral_device::CSCR_r(int which, int offset, UINT16 mem_mask)
 {
 	if (offset==1)
 	{
-		printf("CSCR%d_r\n", which);
+		debuglog("%s: CSCR%d_r\n", this->machine().describe_context(), which);
 		return m_CSCR[which];
 	}
 	else
 	{
-		logerror("invalid CSCR%d_r with offset %d\n", which, offset);
+		debuglog("%s: invalid CSCR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
 		return 0;
 	}
 }
@@ -249,11 +252,11 @@ inline void mcf5206e_peripheral_device::CSCR_w(int which, int offset, UINT16 dat
 	if (offset==1)
 	{
 		COMBINE_DATA( &m_CSCR[which] );
-		printf("CSCR%d_w %04x\n", which, data);
+		debuglog("%s: CSCR%d_w %04x\n", this->machine().describe_context(), which, data);
 	}
 	else
 	{
-		logerror("invalid CSCR%d_r with offset %d %04x\n", which, offset, data);
+		debuglog("%s: invalid CSCR%d_r with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
 	}
 }
 
@@ -324,10 +327,10 @@ READ16_MEMBER( mcf5206e_peripheral_device::DMCR_r)
 	switch (offset)
 	{
 	case 1:
-		printf("DMCR_r %04x\n", mem_mask);
+		debuglog("%s: DMCR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_DMCR;
 	case 0:
-		printf("invalid DMCR_r %d %04x\n", offset, mem_mask);
+		debuglog("%s: invalid DMCR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -340,10 +343,10 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::DMCR_w)
 	{
 	case 1:
 		COMBINE_DATA(&m_DMCR);
-		printf("DMCR_w %04x %04x\n",data, mem_mask);
+		debuglog("%s: DMCR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		printf("invalid DMCR_w %d, %04x %04x\n", offset, data, mem_mask);
+		debuglog("%s: invalid DMCR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -355,10 +358,10 @@ READ16_MEMBER( mcf5206e_peripheral_device::PAR_r)
 	switch (offset)
 	{
 	case 1:
-		printf("PAR_r %04x\n", mem_mask);
+		debuglog("%s: PAR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_PAR;
 	case 0:
-		printf("invalid PAR_r %d %04x\n", offset, mem_mask);
+		debuglog("%s: invalid PAR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -371,10 +374,10 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::PAR_w)
 	{
 	case 1:
 		COMBINE_DATA(&m_PAR);
-		printf("PAR_w %04x %04x\n",data, mem_mask);
+		debuglog("%s: PAR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		printf("invalid PAR_w %d, %04x %04x\n", offset, data, mem_mask);
+		debuglog("%s: invalid PAR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -389,10 +392,10 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDDR_r)
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid PPDDR_r %d\n", offset);
+		debuglog("%s: invalid PPDDR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	case 1: // '$1C5'
-		printf("PPDDR_r\n");
+		debuglog("%s: PPDDR_r\n", this->machine().describe_context());
 		return m_PPDDR;
 	}
 
@@ -406,11 +409,11 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDDR_w)
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid PPDDR_w %d %02x\n", offset, data);
+		debuglog("%s: invalid PPDDR_w %d %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	case 1: // '$1C5'
 		m_PPDDR = data;
-		printf("PPDDR_w %02x\n", data);
+		debuglog("%s: PPDDR_w %02x\n", this->machine().describe_context(), data);
 		break;
 	}
 }
@@ -422,10 +425,10 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDAT_r)
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid PPDAT_r %d\n", offset);
+		debuglog("%s: invalid PPDAT_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	case 1: // '$1C9'
-		printf("PPDAT_r\n");
+		debuglog("%s: PPDAT_r\n", this->machine().describe_context());
 		return m_PPDAT; // should use a callback.
 	}
 
@@ -439,11 +442,11 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDAT_w)
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid PPDAT_w %d, %02x\n", offset, data);
+		debuglog("%s: invalid PPDAT_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	case 1: // '$1C9'
 		m_PPDAT = data; // should use a callback.
-		printf("PPDAT_w %02x\n", data);
+		debuglog("%s: PPDAT_w %02x\n", this->machine().describe_context(), data);
 		break;
 	}
 
@@ -455,12 +458,12 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBCR_r)
 	switch (offset)
 	{
 	case 0:
-		printf("MBCR_r\n");
+		debuglog("%s: MBCR_r\n", this->machine().describe_context());
 		return m_MBCR;
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid MBCR_r %d\n", offset);
+		debuglog("%s: invalid MBCR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -473,29 +476,72 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBCR_w)
 	{
 	case 0:
 		m_MBCR = data;
-		printf("MBCR_w %02x\n",data);
+		debuglog("%s: MBCR_w %02x\n", this->machine().describe_context(), data);
 		break;
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid MBCR_w %d, %02x\n", offset, data);
+		debuglog("%s: invalid MBCR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		break;
+
+	}
+}
+
+READ8_MEMBER( mcf5206e_peripheral_device::MFDR_r)
+{
+	switch (offset)
+	{
+	case 0:
+		debuglog("%s: MFDR_r\n", this->machine().describe_context());
+		return m_MFDR;
+	case 1:
+	case 2:
+	case 3:
+		debuglog("%s: invalid MFDR_r %d\n", this->machine().describe_context(), offset);
+		return 0;
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER( mcf5206e_peripheral_device::MFDR_w)
+{
+	switch (offset)
+	{
+	case 0:
+		m_MFDR = data;
+		debuglog("%s: MFDR_w %02x\n", this->machine().describe_context(), data);
+		break;
+	case 1:
+	case 2:
+	case 3:
+		debuglog("%s: invalid MFDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
 }
 
 
+
+
+
+
 READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
 {
+	static int hack = 0x00;
+
 	switch (offset)
 	{
 	case 0:
-		printf("MBSR_r\n");
-		return m_MBSR;
+	{
+		hack ^= (machine().rand()&0xff);
+		debuglog("%s: MBSR_r\n", this->machine().describe_context());
+		return m_MBSR | hack; // will loop on this after a while
+	}
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid MBSR_r %d\n", offset);
+		debuglog("%s: invalid MBSR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -508,12 +554,12 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBSR_w)
 	{
 	case 0:
 		m_MBSR = data;
-		printf("MBSR_w %02x\n",data);
+		debuglog("%s: MBSR_w %02x\n", this->machine().describe_context(), data);
 		break;
 	case 1:
 	case 2:
 	case 3:
-		printf("invalid MBSR_w %d, %02x\n", offset, data);
+		debuglog("%s: invalid MBSR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -526,10 +572,10 @@ READ16_MEMBER( mcf5206e_peripheral_device::IMR_r)
 	switch (offset)
 	{
 	case 1:
-		printf("IMR_r %04x\n", mem_mask);
+		debuglog("%s: IMR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_IMR;
 	case 0:
-		printf("invalid IMR_r %d %04x\n", offset, mem_mask);
+		debuglog("%s: invalid IMR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -542,10 +588,10 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 	{
 	case 1:
 		COMBINE_DATA(&m_IMR);
-		printf("IMR_w %04x %04x\n",data, mem_mask);
+		debuglog("%s: IMR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		printf("invalid IMR_w %d, %04x %04x\n", offset, data, mem_mask);
+		debuglog("%s: invalid IMR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -553,10 +599,10 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 
 void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
 {
-	printf("	(AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
-	printf("(Interrupt Level) IL : %01x | ", (ICR&0x1c)>>2); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
-	printf("(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
-	printf("(Unused bits) : %01x\n", (ICR&0x60)>>5);
+	debuglog("	(AutoVector) AVEC : %01x | ", (ICR&0x80)>>7);
+	debuglog("(Interrupt Level) IL : %01x | ", (ICR&0x1c)>>2); // if autovector (AVEC) is used then the vectors referenced are at +24 (+0x18) + IL, ie the standard 68k autovectors, otherwise vector must be provided by device
+	debuglog("(Interrupt Priority) IP : %01x |", (ICR&0x03)>>0);
+	debuglog("(Unused bits) : %01x\n", (ICR&0x60)>>5);
 }
 
 /* The timer module seems practically the same as the 68307 one, possibly make into a common device once the code isn't a hardcoded piece of junk ;-) */
@@ -571,9 +617,9 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 		m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
 	}
 
-	printf("timer1_callback\n");
+	debuglog("timer1_callback\n");
 	
-	timer1->adjust(attotime::from_seconds(1)); // completely made up value just to fire our timers for now
+	timer1->adjust(attotime::from_msec(100)); // completely made up value just to fire our timers for now
 }
 
 
@@ -582,10 +628,10 @@ READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
 	switch (offset)
 	{
 	case 0:
-		printf("TMR1_r %04x\n", mem_mask);
+		debuglog("%s: TMR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TMR1;
 	case 1:
-		printf("invalid TMR1_r %d %04x\n", offset, mem_mask);
+		debuglog("%s: invalid TMR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -598,9 +644,9 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 	{
 	case 0:
 		COMBINE_DATA(&m_TMR1);
-		printf("TMR1_w %04x %04x\n",data, mem_mask);
+		debuglog("%s: TMR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 
-		printf("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n",
+		debuglog("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n",
 			(m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
 		
 		if (m_TMR1 & 0x0001)
@@ -615,7 +661,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 		
 		break;
 	case 1:
-		printf("invalid TMR1_w %d, %04x %04x\n", offset, data, mem_mask);
+		debuglog("%s: invalid TMR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -626,10 +672,10 @@ READ16_MEMBER( mcf5206e_peripheral_device::TRR1_r)
 	switch (offset)
 	{
 	case 0:
-		printf("TRR1_r %04x\n", mem_mask);
+		debuglog("%s: TRR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TRR1;
 	case 1:
-		printf("invalid TRR1_r %d %04x\n", offset, mem_mask);
+		debuglog("%s: invalid TRR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -642,10 +688,10 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TRR1_w)
 	{
 	case 0:
 		COMBINE_DATA(&m_TRR1);
-		printf("TRR1_w %04x %04x\n",data, mem_mask);
+		debuglog("%s: TRR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 1:
-		printf("invalid TRR1_w %d, %04x %04x\n", offset, data, mem_mask);
+		debuglog("%s: invalid TRR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -658,12 +704,12 @@ READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
 	switch (offset)
 	{
 	case 1:
-		printf("TER1_r\n");
+		debuglog("%s: TER1_r\n", this->machine().describe_context());
 		return 2; // hack, timer events should set bits, this just stops the code going crazy for now
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid TER1_r %d\n", offset);
+		debuglog("%s: invalid TER1_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -676,12 +722,42 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
 	{
 	case 1:
 		m_TER1 = data; // writes should clear the bits..
-		printf("TER1_w %02x\n",data);
+		debuglog("%s: TER1_w %02x\n", this->machine().describe_context(), data);
 		break;
 	case 0:
 	case 2:
 	case 3:
-		printf("invalid TER1_w %d, %02x\n", offset, data);
+		debuglog("%s: invalid TER1_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		break;
+
+	}
+}
+
+READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
+{
+	switch (offset)
+	{
+	case 0:
+		debuglog("%s: TCN1_r %04x\n", this->machine().describe_context(), mem_mask);
+		return 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
+	case 1:
+		debuglog("%s: invalid TCN1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		return 0;
+	}
+
+	return 0;
+}
+
+WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
+{
+	switch (offset)
+	{
+	case 0:
+		COMBINE_DATA(&m_TCN1);
+		debuglog("%s: TCN1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
+		break;
+	case 1:
+		debuglog("%s: invalid TCN1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -819,6 +895,8 @@ void mcf5206e_peripheral_device::init_regs(bool first_init)
 
 	m_TMR1 = 0x0000;
 	m_TRR1 = 0xffff;
+	m_TER1 = 0x00;
+	m_TCN1 = 0x0000;
 
 	m_PPDDR = 0x00;
 	m_PPDAT = 0x00;
@@ -898,8 +976,8 @@ $0CA*-                  PAR         16      Pin Assignment Register             
 $100*-                  TMR1        16      Timer 1 Mode Register                               0000                                                R/W
 $104*-                  TRR1        16      Timer 1 Reference Register                          FFFF                                                R/W
 $108                    TCR1        16      Timer 1 Capture Register                            0000                                                R
-$10C                    TCN1        16      Timer 1 Counter                                     0000                                                R/W
-$111                    TER1        8       Timer 1 Event Register                              00                                                  R/W
+$10C*-                  TCN1        16      Timer 1 Counter                                     0000                                                R/W
+$111*-                  TER1        8       Timer 1 Event Register                              00                                                  R/W
 $120                    TMR2        16      Timer 2 Mode Register                               0000                                                R/W
 $124                    TRR2        16      Timer 2 Reference Register                          FFFF                                                R/W
 $128                    TCR2        16      Timer 2 Capture Register                            0000                                                R
@@ -944,7 +1022,7 @@ $1C5*-                  PPDDR       8       Port A Data Direction Register      
 $1C9*-                  PPDAT       8       Port A Data Register                                00                                                  R/W
 ------------ MBUS  -----------
 $1E0                    MADR        8       M-Bus Address Register                              00                                                  R/W
-$1E4                    MFDR        8       M-Bus Frequency Divider Register                    00                                                  R/W
+$1E4*-                  MFDR        8       M-Bus Frequency Divider Register                    00                                                  R/W
 $1E8*-                  MBCR        8       M-Bus Control Register                              00                                                  R/W
 $1EC*-                  MBSR        8       M-Bus Status Register                               00                                                  R/W
 $1F0                    MBDR        8       M-Bus Data I/O Register                             00                                                  R/W
