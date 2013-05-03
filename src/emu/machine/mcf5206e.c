@@ -785,7 +785,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
 	{
 	case 0:
 		debuglog("%s: TCN1_r %04x\n", this->machine().describe_context(), mem_mask);
-		return 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
+		return  machine().rand(); // 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
 	case 1:
 		invalidlog("%s: invalid TCN1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;

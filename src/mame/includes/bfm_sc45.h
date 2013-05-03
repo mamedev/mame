@@ -36,6 +36,10 @@ public:
 
 	UINT8 vfd_ser_value;
 	int vfd_ser_count;
+
+	DECLARE_WRITE8_MEMBER(mux_output_w);
+	DECLARE_WRITE8_MEMBER(mux_output2_w);
+
 };
 
 void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data);
@@ -89,8 +93,6 @@ public:
 
 	UINT8 read_input_matrix(running_machine &machine, int row);
 
-	DECLARE_WRITE8_MEMBER(mux_output_w);
-	DECLARE_WRITE8_MEMBER(mux_output2_w);
 
 	DECLARE_READ16_MEMBER(sc4_mem_r);
 	DECLARE_WRITE16_MEMBER(sc4_mem_w);

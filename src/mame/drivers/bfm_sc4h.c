@@ -234,7 +234,7 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 
 static DECLARE_WRITE8_HANDLER( bfm_sc4_reel4_w );
 
-WRITE8_MEMBER(sc4_state::mux_output_w)
+WRITE8_MEMBER(bfm_sc45_state::mux_output_w)
 {
 	int i;
 	int off = offset<<3;
@@ -246,7 +246,7 @@ WRITE8_MEMBER(sc4_state::mux_output_w)
 	output_set_indexed_value("matrix", off+i, ((data & (1 << i)) != 0));
 }
 
-WRITE8_MEMBER(sc4_state::mux_output2_w)
+WRITE8_MEMBER(bfm_sc45_state::mux_output2_w)
 {
 	int i;
 	int off = offset<<3;
