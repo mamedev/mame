@@ -5,12 +5,17 @@
 #include "emu.h"
 #include "mcf5206e.h"
 
+void CLIB_DECL nolog(const char *format, ...) {}
+
 //#define debuglog printf
 #define debuglog logerror
 
 #define invalidlog printf
 //#define invalidlog logerror
 
+//#define debuglogtimer printf
+//#define debuglogtimer logerror
+#define debuglogtimer nolog
 
 static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_device )
 	
@@ -652,7 +657,7 @@ void mcf5206e_peripheral_device::ICR_info(UINT8 ICR)
 	debuglog("(Unused bits) : %01x\n", (ICR&0x60)>>5);
 }
 
-/* The timer module seems practically the same as the 68307 one, possibly make into a common device once the code isn't a hardcoded piece of junk ;-) */
+
 
 TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 {
@@ -664,7 +669,8 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 		if (!(m_IMR & 0x0200)) m_cpu->set_input_line((ICR&0x1c)>>2, HOLD_LINE);
 	}
 
-	debuglog("timer1_callback\n");
+	debuglogtimer("timer1_callback\n");
+	m_TER1 |= 0x02;
 	
 	timer1->adjust(attotime::from_msec(10)); // completely made up value just to fire our timers for now
 }
@@ -675,7 +681,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
 	switch (offset)
 	{
 	case 0:
-		debuglog("%s: TMR1_r %04x\n", this->machine().describe_context(), mem_mask);
+		debuglogtimer("%s: TMR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TMR1;
 	case 1:
 		invalidlog("%s: invalid TMR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
@@ -691,9 +697,9 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 	{
 	case 0:
 		COMBINE_DATA(&m_TMR1);
-		debuglog("%s: TMR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
+		debuglogtimer("%s: TMR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 
-		debuglog("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
+		debuglogtimer("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
 		
 		if (m_TMR1 & 0x0001)
 		{
@@ -718,7 +724,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TRR1_r)
 	switch (offset)
 	{
 	case 0:
-		debuglog("%s: TRR1_r %04x\n", this->machine().describe_context(), mem_mask);
+		debuglogtimer("%s: TRR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TRR1;
 	case 1:
 		invalidlog("%s: invalid TRR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
@@ -734,7 +740,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TRR1_w)
 	{
 	case 0:
 		COMBINE_DATA(&m_TRR1);
-		debuglog("%s: TRR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
+		debuglogtimer("%s: TRR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 1:
 		debuglog("%s: invalid TRR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
@@ -750,8 +756,8 @@ READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
 	switch (offset)
 	{
 	case 1:
-		debuglog("%s: TER1_r\n", this->machine().describe_context());
-		return 2; // hack, timer events should set bits, this just stops the code going crazy for now
+		debuglogtimer("%s: TER1_r\n", this->machine().describe_context());
+		return m_TER1; // set on timer events, cleared by writing below
 	case 0:
 	case 2:
 	case 3:
@@ -767,8 +773,8 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
 	switch (offset)
 	{
 	case 1:
-		m_TER1 = data; // writes should clear the bits..
-		debuglog("%s: TER1_w %02x\n", this->machine().describe_context(), data);
+		m_TER1 &= ~data; // writes should clear the bits..
+		debuglogtimer("%s: TER1_w %02x\n", this->machine().describe_context(), data);
 		break;
 	case 0:
 	case 2:
@@ -784,8 +790,9 @@ READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
 	switch (offset)
 	{
 	case 0:
-		debuglog("%s: TCN1_r %04x\n", this->machine().describe_context(), mem_mask);
-		return  machine().rand(); // 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
+		debuglogtimer("%s: TCN1_r %04x\n", this->machine().describe_context(), mem_mask);
+		// return 0x9c40;
+		return 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
 	case 1:
 		invalidlog("%s: invalid TCN1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
@@ -800,7 +807,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
 	{
 	case 0:
 		COMBINE_DATA(&m_TCN1);
-		debuglog("%s: TCN1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
+		debuglogtimer("%s: TCN1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 1:
 		invalidlog("%s: invalid TCN1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
