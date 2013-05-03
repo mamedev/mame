@@ -4267,6 +4267,22 @@ ROM_START( indianbt )
 	ROM_LOAD( "mb7054.2",   0x0400, 0x0400, CRC(62cb3419) SHA1(3df65062945589f1df37359dbd3e30ae4b23f469) )
 ROM_END
 
+ROM_START( indianbtbr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.36",       0x0000, 0x0800, CRC(5cf6316b) SHA1(9812fbb7139d6f33a832a2485f9cd6422146d1ae) )
+	ROM_LOAD( "2.35",       0x0800, 0x0800, CRC(882c7421) SHA1(b2cc15c8693bd1fc74dddfcf52bf08984423f4bf) )
+	ROM_LOAD( "3.34",       0x1000, 0x0800, CRC(5c51675d) SHA1(1313e8794ee6cd0252452b96d42cff7907eeaa21) )
+	ROM_LOAD( "4.33",       0x1800, 0x0800, CRC(70ebec95) SHA1(f6e1e7a28033d89e49b88c559ea8926b1b4ff21b) )
+	ROM_LOAD( "5.32",       0x4000, 0x0800, CRC(aa12dbae) SHA1(083425b82cfdc0f037afcf293ad03b98fc6af3e5) )
+	ROM_LOAD( "6.31",       0x4800, 0x0800, CRC(d9cb1691) SHA1(c13cd8479914ba6719427b408ed589c9892f832c) )
+	ROM_LOAD( "7.42",       0x5000, 0x0800, CRC(7060ba0b) SHA1(366ce02b7b0a3391afef23b8b41cd98a91034830) )
+	ROM_LOAD( "8.41",       0x5800, 0x0800, CRC(e96699d6) SHA1(701d370ae28608221fb4d00e12877d30122c848e) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
+	ROM_LOAD( "mb7054.1",   0x0000, 0x0400, CRC(4acf4db3) SHA1(842a6c9f91806b424b7cc437670b4fe0bd57dff1) )
+	ROM_LOAD( "mb7054.2",   0x0400, 0x0400, CRC(62cb3419) SHA1(3df65062945589f1df37359dbd3e30ae4b23f469) )
+ROM_END
+
 ROM_START( shuttlei )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.13c",      0x0000, 0x0400, CRC(b6d4f0cd) SHA1(f855a793e78ff6283288c815b59e6942513ab4f8) )
@@ -4422,6 +4438,7 @@ GAME( 1980, polariso,   polaris,  polaris,   polaris,   driver_device, 0, ROT270
 GAME( 1981, polarisbr,  polaris,  polaris,   polaris,   driver_device, 0, ROT270, "Taito do Brasil", "Polaris (Brazil)", GAME_SUPPORTS_SAVE )
 GAME( 1980, ballbomb,   0,        ballbomb,  ballbomb,  driver_device, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )  /* missing clouds */
 GAME( 1980, indianbt,   0,        indianbt,  indianbt,  driver_device, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1983, indianbtbr, indianbt, indianbt,  indianbt,  driver_device, 0, ROT270, "Taito do Brasil", "Indian Battle (Brazil)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, steelwkr,   0,        steelwkr,  steelwkr,  driver_device, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1980?,galactic,   0,        galactic,  galactic,  driver_device, 0, ROT270, "Taito do Brasil", "Galactica - Batalha Espacial", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
 GAMEL(1980?,spacmiss,   galactic, galactic,  galactic,  driver_device, 0, ROT270, "bootleg?", "Space Missile - Space Fighting Game", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
