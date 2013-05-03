@@ -1,8 +1,21 @@
 /* Unkonwn JPM Platform */
-/* seems to be Coldfire based (but not the MCF5206E, it writes to peripheral registers that would be invalid?) */
 /* only Ker - Chinq has sound roms, they seem to map in cpu space, sound roms are probably missing from the rest? */
-/* Could be Pluto 6? */
+
+/* seems to be Coldfire based (but not the MCF5206E, it writes to peripheral registers that would be invalid?) */
+/* Could be Pluto 7 or 8?, doesn't seem to be Pluto 6 based on Coldfire register use, P6 is apparently 5206e (although I should check if all sets use registers in the same way) */
 /* todo - split sets */
+
+/*
+
+Info found online
+
+Pluto 5: 68340
+Pluto 6: ColdFire 5206e
+Pluto 7: ColdFire 5271
+Pluto 8: ColdFire 5475
+
+*/
+
 
 
 
