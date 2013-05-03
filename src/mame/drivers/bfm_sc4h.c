@@ -444,15 +444,15 @@ ADDRESS_MAP_END
 
 void bfm_sc4_reset_serial_vfd(running_machine &machine)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
+	bfm_sc45_state *state = machine.driver_data<bfm_sc45_state>();
 
 	state->m_vfd0->reset();
 	state->vfd_old_clock = false;
 }
 
-void bfm_sc4_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data)
+void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data)
 {
-	sc4_state *state = machine.driver_data<sc4_state>();
+	bfm_sc45_state *state = machine.driver_data<bfm_sc45_state>();
 
 	// if we're turned on
 	if ( cs )
@@ -555,7 +555,7 @@ void bfm_sc4_68307_portb_w(address_space &space, bool dedicated, UINT16 data, UI
 		// serial output to the VFD at least..
 		logerror("%08x bfm_sc4_68307_portb_w %04x %04x\n", pc, data, line_mask);
 
-		bfm_sc4_write_serial_vfd(space.machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
+		bfm_sc45_write_serial_vfd(space.machine(), (data & 0x4000)?1:0, (data & 0x1000)?1:0, !(data & 0x2000)?1:0);
 
 		bfm_sc4_reel3_w(space, 0, (data&0x0f00)>>8, 0xff);
 	}

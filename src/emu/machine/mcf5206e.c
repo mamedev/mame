@@ -8,6 +8,10 @@
 //#define debuglog printf
 #define debuglog logerror
 
+#define invalidlog printf
+//#define invalidlog logerror
+
+
 static ADDRESS_MAP_START( coldfire_regs_map, AS_0, 32, mcf5206e_peripheral_device )
 	
 	
@@ -170,7 +174,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::ICR13_r )
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid ICR13_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid ICR13_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -189,7 +193,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::ICR13_w )
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid ICR13_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid ICR13_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	}
 }
@@ -204,7 +208,7 @@ inline UINT16 mcf5206e_peripheral_device::CSAR_r(int which, int offset, UINT16 m
 	}
 	else
 	{
-		debuglog("%s: invalid CSAR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
+		invalidlog("%s: invalid CSAR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
 		return 0;
 	}
 }
@@ -218,7 +222,7 @@ inline void mcf5206e_peripheral_device::CSAR_w(int which, int offset, UINT16 dat
 	}
 	else
 	{
-		debuglog("%s: invalid CSAR%d_w with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
+		invalidlog("%s: invalid CSAR%d_w with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
 	}
 }
 
@@ -243,7 +247,7 @@ inline UINT16 mcf5206e_peripheral_device::CSCR_r(int which, int offset, UINT16 m
 	}
 	else
 	{
-		debuglog("%s: invalid CSCR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
+		invalidlog("%s: invalid CSCR%d_r with offset %d\n", this->machine().describe_context(), which, offset);
 		return 0;
 	}
 }
@@ -257,7 +261,7 @@ inline void mcf5206e_peripheral_device::CSCR_w(int which, int offset, UINT16 dat
 	}
 	else
 	{
-		debuglog("%s: invalid CSCR%d_r with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
+		invalidlog("%s: invalid CSCR%d_r with offset %d %04x\n", this->machine().describe_context(), which, offset, data);
 	}
 }
 
@@ -331,7 +335,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::DMCR_r)
 		debuglog("%s: DMCR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_DMCR;
 	case 0:
-		debuglog("%s: invalid DMCR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid DMCR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -347,7 +351,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::DMCR_w)
 		debuglog("%s: DMCR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		debuglog("%s: invalid DMCR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
+		invalidlog("%s: invalid DMCR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -362,7 +366,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::PAR_r)
 		debuglog("%s: PAR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_PAR;
 	case 0:
-		debuglog("%s: invalid PAR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid PAR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -378,7 +382,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::PAR_w)
 		debuglog("%s: PAR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		debuglog("%s: invalid PAR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
+		invalidlog("%s: invalid PAR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -393,7 +397,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDDR_r)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid PPDDR_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid PPDDR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	case 1: // '$1C5'
 		debuglog("%s: PPDDR_r\n", this->machine().describe_context());
@@ -410,7 +414,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDDR_w)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid PPDDR_w %d %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid PPDDR_w %d %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	case 1: // '$1C5'
 		m_PPDDR = data;
@@ -426,7 +430,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::PPDAT_r)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid PPDAT_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid PPDAT_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	case 1: // '$1C9'
 		debuglog("%s: PPDAT_r\n", this->machine().describe_context());
@@ -443,7 +447,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::PPDAT_w)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid PPDAT_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid PPDAT_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 	case 1: // '$1C9'
 		m_PPDAT = data; // should use a callback.
@@ -464,7 +468,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBCR_r)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBCR_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid MBCR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -482,7 +486,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBCR_w)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBCR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid MBCR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -498,7 +502,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MFDR_r)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MFDR_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid MFDR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -516,7 +520,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MFDR_w)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MFDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid MFDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -542,7 +546,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBSR_r)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBSR_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid MBSR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -560,7 +564,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBSR_w)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBSR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid MBSR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -584,7 +588,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::MBDR_r)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBDR_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid MBDR_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -602,7 +606,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::MBDR_w)
 	case 1:
 	case 2:
 	case 3:
-		debuglog("%s: invalid MBDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid MBDR_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -618,7 +622,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::IMR_r)
 		debuglog("%s: IMR_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_IMR;
 	case 0:
-		debuglog("%s: invalid IMR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid IMR_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -634,7 +638,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::IMR_w)
 		debuglog("%s: IMR_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 0:
-		debuglog("%s: invalid IMR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
+		invalidlog("%s: invalid IMR_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -662,7 +666,7 @@ TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
 
 	debuglog("timer1_callback\n");
 	
-	timer1->adjust(attotime::from_msec(100)); // completely made up value just to fire our timers for now
+	timer1->adjust(attotime::from_msec(10)); // completely made up value just to fire our timers for now
 }
 
 
@@ -674,7 +678,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TMR1_r)
 		debuglog("%s: TMR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TMR1;
 	case 1:
-		debuglog("%s: invalid TMR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid TMR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -689,8 +693,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 		COMBINE_DATA(&m_TMR1);
 		debuglog("%s: TMR1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 
-		debuglog("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n",
-			(m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
+		debuglog("	(Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);   
 		
 		if (m_TMR1 & 0x0001)
 		{
@@ -704,7 +707,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TMR1_w)
 		
 		break;
 	case 1:
-		debuglog("%s: invalid TMR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
+		invalidlog("%s: invalid TMR1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}
@@ -718,7 +721,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TRR1_r)
 		debuglog("%s: TRR1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return m_TRR1;
 	case 1:
-		debuglog("%s: invalid TRR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid TRR1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -752,7 +755,7 @@ READ8_MEMBER( mcf5206e_peripheral_device::TER1_r)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid TER1_r %d\n", this->machine().describe_context(), offset);
+		invalidlog("%s: invalid TER1_r %d\n", this->machine().describe_context(), offset);
 		return 0;
 	}
 
@@ -770,7 +773,7 @@ WRITE8_MEMBER( mcf5206e_peripheral_device::TER1_w)
 	case 0:
 	case 2:
 	case 3:
-		debuglog("%s: invalid TER1_w %d, %02x\n", this->machine().describe_context(), offset, data);
+		invalidlog("%s: invalid TER1_w %d, %02x\n", this->machine().describe_context(), offset, data);
 		break;
 
 	}
@@ -784,7 +787,7 @@ READ16_MEMBER( mcf5206e_peripheral_device::TCN1_r)
 		debuglog("%s: TCN1_r %04x\n", this->machine().describe_context(), mem_mask);
 		return 0x8ca0 -1;// m_TCN1; // this should be the counter, code has a hardcoded >= check against 8ca0.
 	case 1:
-		debuglog("%s: invalid TCN1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
+		invalidlog("%s: invalid TCN1_r %d %04x\n", this->machine().describe_context(), offset, mem_mask);
 		return 0;
 	}
 
@@ -800,7 +803,7 @@ WRITE16_MEMBER( mcf5206e_peripheral_device::TCN1_w)
 		debuglog("%s: TCN1_w %04x %04x\n", this->machine().describe_context(), data, mem_mask);
 		break;
 	case 1:
-		debuglog("%s: invalid TCN1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
+		invalidlog("%s: invalid TCN1_w %d, %04x %04x\n", this->machine().describe_context(), offset, data, mem_mask);
 		break;
 
 	}

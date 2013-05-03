@@ -10,16 +10,43 @@
 #include "machine/68681.h"
 #include "machine/nvram.h"
 
-class sc4_state : public driver_device
+// common base class for things shared between sc4 and sc5
+class bfm_sc45_state : public driver_device
+{
+public:
+	bfm_sc45_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_duart(*this, "duart68681"),
+			m_vfd0(*this, "vfd0"),
+			m_ymz(*this, "ymz")
+	{
+
+	}
+
+public:
+	required_device<legacy_cpu_device> m_maincpu;
+	required_device<duart68681_device> m_duart;
+	optional_device<bfm_bda_t> m_vfd0;
+	required_device<ymz280b_device> m_ymz;
+
+	// serial vfd
+	int vfd_enabled;
+	bool vfd_old_clock;
+
+	UINT8 vfd_ser_value;
+	int vfd_ser_count;
+};
+
+void bfm_sc45_write_serial_vfd(running_machine &machine, bool cs, bool clock, bool data);
+
+// sc4 specifics
+class sc4_state : public bfm_sc45_state
 {
 public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+		: bfm_sc45_state(mconfig, type, tag),
 			m_cpuregion(*this, "maincpu"),
-			m_duart(*this, "duart68681"),
-			m_ymz(*this, "ymz"),
-			m_maincpu(*this, "maincpu"),
-			m_vfd0(*this, "vfd0"),
 			m_nvram(*this, "nvram"),
 			m_io1(*this, "IN-0"),
 			m_io2(*this, "IN-1"),
@@ -40,18 +67,8 @@ public:
 
 	required_memory_region m_cpuregion;
 	// devices
-	required_device<duart68681_device> m_duart;
-	required_device<ymz280b_device> m_ymz;
-	required_device<legacy_cpu_device> m_maincpu;
-	optional_device<bfm_bda_t> m_vfd0;
 	required_device<nvram_device> m_nvram;
 
-	// serial vfd
-	int vfd_enabled;
-	bool vfd_old_clock;
-
-	UINT8 vfd_ser_value;
-	int vfd_ser_count;
 
 	const stepper_interface **m_reel_setup;
 	int m_reel_changed;
