@@ -136,6 +136,7 @@ Unreleased (possibly no prototypes exist):
 		</part>
 	</software>
 
+	<!-- 4MB Alpine ROM with Universal Header -->
 	<software name="fball95" supported="no">
 		<description>Arena Football '95</description>
 		<year>2006</year>
@@ -143,7 +144,7 @@ Unreleased (possibly no prototypes exist):
 		<info name="serial" value="J9003E 800108-006"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="arena football.j64" size="4194304" crc="e28756de" sha1="9c96e6c2195ce56aa930e677a041b35bd9b8bc7e" offset="000000" />
+				<rom name="arena football.j64" size="4194304" crc="199b9d83" sha1="542063a5b27659781a85821f61e85cd89ea59ab3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -748,10 +749,10 @@ Unreleased (possibly no prototypes exist):
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152">
-			<!-- below dump contains 2M of "00"
-			<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />
-			-->
-			<rom name="space war 2000 (world).j64" size="2097152" crc="45aa46ba" sha1="0e7aacd65ecd6210d914e1c00a98dce5d00569af" offset="000000" />
+				<!-- below dump contains 2M of "00"
+				<rom name="space war 2000 (world).j64" size="4194304" crc="53df6440" sha1="b5da0b1231a6e6532268c4e04f74e56f047dd5a5" offset="000000" />
+				-->
+				<rom name="space war 2000 (world).j64" size="2097152" crc="45aa46ba" sha1="0e7aacd65ecd6210d914e1c00a98dce5d00569af" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
