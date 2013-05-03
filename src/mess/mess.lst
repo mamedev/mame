@@ -164,6 +164,7 @@ d6800       // Dream 6800
 // Ensoniq
 enmirage    // 1985 Mirage Digital Multi-Sampler
 esq1        // 1986 ESQ-1 Digital Wave Synthesizer
+esqm        // 1986 ESQ-M rack-mount ESQ-1
 sq80        // 1988 SQ-80 Digital Wave Synthesizer
 eps         // 1988 EPS
 vfx         // 1989 VFX

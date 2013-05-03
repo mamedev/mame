@@ -3,8 +3,9 @@
     drivers/esq1.c
 
     Ensoniq ESQ-1 Digital Wave Synthesizer
+    Ensoniq ESQ-M (rack-mount ESQ-1)
     Ensoniq SQ-80 Cross Wave Synthesizer
-    Driver by R. Belmont
+    Driver by R. Belmont and O. Galibert
 
     Map for ESQ-1 and ESQ-m:
     0000-1fff: OS RAM
@@ -109,6 +110,68 @@ NOTES:
     35 = MODES
     36 = SPLIT / LAYER
 
+
+    Analog filters (CEM3379):
+
+    The analog part is relatively simple.  The digital part outputs 8
+    voices, which are filtered, amplified, panned then summed
+    together.
+
+    The filtering stage is a 4-level lowpass filter with a loopback:
+
+
+             +-[+]-<-[*-1]--------------------------+
+             |  |                                   |
+             ^ [*r]                                 |
+             |  |                                   |
+             |  v                                   ^
+    input ---+-[+]--[LPF]---[LPF]---[LPF]---[LPF]---+--- output
+
+    All 4 LPFs are identical, with a transconductance G:
+
+    output = 1/(1+s/G)^4 * ( (1+r)*input - r*output)
+
+    or
+
+    output = input * (1+r)/((1+s/G)^4+r)
+
+    to which the usual z-transform can be applied (see votrax.c)
+
+    G is voltage controlled through the Vfreq input, with the formula (Vfreq in mV):
+
+         G = 6060*exp(Vfreq/28.5)
+
+    That gives a cutoff frequency (f=G/(2pi)) of 5Hz at 5mV, 964Hz at
+    28.5mV and 22686Hz at 90mV.  The resistor ladder between the DAC
+    and the input seem to map 0..255 into a range of -150.4mV to
+    +83.6mV.
+
+    The resonance is controlled through the Vq input pin, and is not
+    well defined.  Reading between the lines the control seems linear
+    and tops when then circuit is self-oscillation, at r=4.
+
+    The amplification is exponential for a control voltage between 0
+    to 0.2V from -100dB to -20dB, and then linear up to 5V at 0dB.  Or
+    in other words:
+         amp(Vca) = Vca < 0.2 ? 10**(-5+20*Vca) : Vca*0.1875 + 0.0625
+
+
+    Finally the panning is not very described.  What is clear is that
+    the control voltage at 2.5V gives a gain of -6dB, the max
+    attenuation at 0/5V is -100dB.  The doc also says the gain is
+    linear between 1V and 3.5V, which makes no sense since it's not
+    symmetrical, and logarithmic afterwards, probably meaning
+    exponential, otherwise the change between 0 and 1V would be
+    minimal.  So we're going to do some assumptions:
+        - 0-1V exponential from -100Db to -30dB
+        - 1V-2.5V linear from -30dB to -6dB
+        - 2.5V-5V is 1-amp at 2.5V-v
+
+    Note that this may be incorrect, maybe to sum of squares should be
+    constant, the half-point should be at -3dB and the linearity in dB
+    space.
+ 
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -124,8 +187,195 @@ NOTES:
 
 #define WD1772_TAG      "wd1772"
 
-// QWERTYU = a few keys
-// top row 1-0 = the soft keys above and below the display (patch select)
+class esq1_filters : public device_t,
+					 public device_sound_interface
+{
+public:
+	// construction/destruction
+	esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	void set_vca(int channel, UINT8 value);
+	void set_vpan(int channel, UINT8 value);
+	void set_vq(int channel, UINT8 value);
+	void set_vfc(int channel, UINT8 value);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+private:
+	struct filter {
+		UINT8 vca, vpan, vq, vfc;
+		double amp, lamp, ramp;
+		double a[5], b[5];
+		double x[4], y[4];
+	};
+
+	filter filters[8];
+
+	sound_stream *stream;
+
+	void recalc_filter(filter &f);
+};
+
+static const device_type ESQ1_FILTERS = &device_creator<esq1_filters>;
+
+esq1_filters::esq1_filters(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ESQ1_FILTERS, "ESQ1 Filters stage", tag, owner, clock, "esq1-filters", __FILE__),
+	  device_sound_interface(mconfig, *this)
+{
+}
+
+void esq1_filters::set_vca(int channel, UINT8 value)
+{
+	if(filters[channel].vca != value) {
+		stream->update();
+		filters[channel].vca = value;
+		recalc_filter(filters[channel]);
+	}
+}
+
+void esq1_filters::set_vpan(int channel, UINT8 value)
+{
+	if(filters[channel].vpan != value) {
+		stream->update();
+		filters[channel].vpan = value;
+		recalc_filter(filters[channel]);
+	}
+}
+
+void esq1_filters::set_vq(int channel, UINT8 value)
+{
+	if(filters[channel].vq != value) {
+		stream->update();
+		filters[channel].vq = value;
+		recalc_filter(filters[channel]);
+	}
+}
+
+void esq1_filters::set_vfc(int channel, UINT8 value)
+{
+	if(filters[channel].vfc != value) {
+		stream->update();
+		filters[channel].vfc = value;
+		recalc_filter(filters[channel]);
+	}
+}
+
+void esq1_filters::recalc_filter(filter &f)
+{
+	// Filtering stage
+	//   First let's establish the control values
+	//   Some tuning may be required
+
+	double vfc = -150.4 + (83.6+150.4)*f.vfc/255;
+	double r = 4.0*f.vq/255;
+
+
+	double g = 6060*exp(vfc/28.5);
+	double zc = g/tan(g/2/44100);
+
+/*	if(f.vfc) {
+		double ff = g/(2*M_PI);
+		double fzc = 2*M_PI*ff/tan(M_PI*ff/44100);
+		fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*M_PI), zc, fzc);
+	}*/
+
+	double gzc = zc/g;
+	double gzc2 = gzc*gzc;
+	double gzc3 = gzc2*gzc;
+	double gzc4 = gzc3*gzc;
+	double r1 = 1+r;
+
+	f.a[0] = r1;
+	f.a[1] = 4*r1;
+	f.a[2] = 6*r1;
+	f.a[3] = 4*r1;
+	f.a[4] = r1;
+
+	f.b[0] =    r1 + 4*gzc + 6*gzc2 + 4*gzc3 + gzc4;
+	f.b[1] = 4*(r1 + 2*gzc          - 2*gzc3 - gzc4);
+	f.b[2] = 6*(r1         - 2*gzc2          + gzc4);
+	f.b[3] = 4*(r1 - 2*gzc          + 2*gzc3 - gzc4);
+	f.b[4] =    r1 - 4*gzc + 6*gzc2 - 4*gzc3 + gzc4;
+
+/*	if(f.vfc != 0)
+		for(int i=0; i<5; i++)
+			printf("a%d=%f\nb%d=%f\n",
+				   i, f.a[i], i, f.b[i]);*/
+
+	// Amplification stage
+	double vca = f.vca*(5.0/255.0);
+	f.amp = vca < 0.2 ? pow(10, -5+20*vca) : vca*0.1875 + 0.0625;
+
+	// Panning stage
+	//   Very approximative at best
+	//   Left/right unverified
+	double vpan = f.vpan*(5.0/255.0);
+	double vref = vpan > 2.5 ? 2.5 - vpan : vpan;
+	double pan_amp = vref < 1 ? pow(10, -5+3.5*vref) : vref*0.312 - 0.280;
+	if(vref < 2.5) {
+		f.lamp = pan_amp;
+		f.ramp = 1-pan_amp;
+	} else {
+		f.lamp = 1-pan_amp;
+		f.ramp = pan_amp;
+	}
+}
+
+void esq1_filters::device_start()
+{
+	stream = stream_alloc(8, 2, 44100);
+	memset(filters, 0, sizeof(filters));
+	for(int i=0; i<8; i++)
+		recalc_filter(filters[i]);
+}
+
+void esq1_filters::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+/*	if(0) {
+		for(int i=0; i<8; i++)
+			fprintf(stderr, " [%02x %02x %02x %02x]",
+					filters[i].vca,
+					filters[i].vpan,
+					filters[i].vq,
+					filters[i].vfc);
+		fprintf(stderr, "\n");
+	}*/
+
+	for(int i=0; i<samples; i++) {
+		double l=0, r=0;
+		for(int j=0; j<8; j++) {
+			filter &f = filters[j];
+			double x = inputs[j][i];
+			double y = (x*f.a[0]
+						+ f.x[0]*f.a[1] + f.x[1]*f.a[2] + f.x[2]*f.a[3] + f.x[3]*f.a[4]
+						- f.y[0]*f.b[1] - f.y[1]*f.b[2] - f.y[2]*f.b[3] - f.y[3]*f.b[4]) / f.b[0];
+			memmove(f.x+1, f.x, 3*sizeof(double));
+			memmove(f.y+1, f.y, 3*sizeof(double));
+			f.x[0] = x;
+			f.y[0] = y;
+			y = y * f.amp;
+			l += y * f.lamp;
+			r += y * f.ramp;
+		}
+		static double maxl = 0;
+		if(l > maxl) {
+			maxl = l;
+//			fprintf(stderr, "%f\n", maxl);
+		}
+
+//		l *= 6553;
+//		r *= 6553;
+		l *= 2;
+		r *= 2;
+		outputs[0][i] = l < -32768 ? -32768 : l > 32767 ? 32767 : int(l);
+		outputs[1][i] = r < -32768 ? -32768 : r > 32767 ? 32767 : int(r);
+	}
+}
 
 class esq1_state : public driver_device
 {
@@ -134,6 +384,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
+		m_filters(*this, "filters"),
 		m_fdc(*this, WD1772_TAG),
 		m_panel(*this, "panel"),
 		m_mdout(*this, "mdout")
@@ -141,6 +392,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<duartn68681_device> m_duart;
+	required_device<esq1_filters> m_filters;
 	optional_device<wd1772_t> m_fdc;
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<serial_port_device> m_mdout;
@@ -150,6 +402,7 @@ public:
 	DECLARE_READ8_MEMBER(seqdosram_r);
 	DECLARE_WRITE8_MEMBER(seqdosram_w);
 	DECLARE_WRITE8_MEMBER(mapper_w);
+	DECLARE_WRITE8_MEMBER(analog_w);
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
@@ -203,6 +456,18 @@ WRITE8_MEMBER(esq1_state::mapper_w)
 //    printf("mapper_state = %d\n", data ^ 1);
 }
 
+WRITE8_MEMBER(esq1_state::analog_w)
+{
+	if(!(offset & 8))
+		m_filters->set_vfc(offset & 7, data);
+	if(!(offset & 16))
+		m_filters->set_vq(offset & 7, data);
+	if(!(offset & 32))
+		m_filters->set_vpan(offset & 7, data);
+	if(!(offset & 64))
+		m_filters->set_vca(offset & 7, data);
+}
+
 READ8_MEMBER(esq1_state::seqdosram_r)
 {
 	if (m_mapper_state)
@@ -232,8 +497,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write)
-	AM_RANGE(0x6800, 0x68ff) AM_NOP
-
+	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)  // OS "high" ROM is always mapped here
 ADDRESS_MAP_END
@@ -244,6 +508,7 @@ static ADDRESS_MAP_START( sq80_map, AS_PROGRAM, 8, esq1_state )
 //  AM_RANGE(0x4000, 0x5fff) AM_READWRITE(seqdosram_r, seqdosram_w)
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write)
+	AM_RANGE(0x6800, 0x68ff) AM_WRITE(analog_w)
 	AM_RANGE(0x6c00, 0x6dff) AM_WRITE(mapper_w)
 	AM_RANGE(0x6e00, 0x6fff) AM_READWRITE(wd1772_r, wd1772_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
@@ -267,7 +532,7 @@ ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line(0, state);
+    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 };
 
 READ8_MEMBER(esq1_state::duart_input)
@@ -290,31 +555,31 @@ WRITE8_MEMBER(esq1_state::duart_output)
 // MIDI send
 WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
 {
-	m_mdout->tx(state);
+    m_mdout->tx(state);
 }
 
 WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
 {
-	m_panel->rx_w(state);
+    m_panel->rx_w(state);
 }
 
 void esq1_state::send_through_panel(UINT8 data)
 {
-	m_panel->xmit_char(data);
+    m_panel->xmit_char(data);
 }
 
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
-	if (oldval == 0 && newval == 1)
-	{
-		send_through_panel((UINT8)(FPTR)param);
-		send_through_panel((UINT8)(FPTR)0x00);
-	}
-	else if (oldval == 1 && newval == 0)
-	{
-		send_through_panel((UINT8)(FPTR)param&0x7f);
-		send_through_panel((UINT8)(FPTR)0x00);
-	}
+    if (oldval == 0 && newval == 1)
+    {
+	    send_through_panel((UINT8)(FPTR)param);
+	    send_through_panel((UINT8)(FPTR)0x00);
+    }
+    else if (oldval == 1 && newval == 0)
+    {
+	    send_through_panel((UINT8)(FPTR)param&0x7f);
+	    send_through_panel((UINT8)(FPTR)0x00);
+    }
 }
 
 static SLOT_INTERFACE_START(midiin_slot)
@@ -362,15 +627,20 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ES5503_ADD("es5503", 7000000, 8, esq1_doc_irq, esq1_adc_read)
+
+	MCFG_SOUND_ADD("filters", ESQ1_FILTERS, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(4, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(5, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(6, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(7, "rspeaker", 1.0)
+
+	MCFG_ES5503_ADD("es5503", 7000000, 8, esq1_doc_irq, esq1_adc_read)
+	MCFG_SOUND_ROUTE_EX(0, "filters", 1.0, 0)
+	MCFG_SOUND_ROUTE_EX(1, "filters", 1.0, 1)
+	MCFG_SOUND_ROUTE_EX(2, "filters", 1.0, 2)
+	MCFG_SOUND_ROUTE_EX(3, "filters", 1.0, 3)
+	MCFG_SOUND_ROUTE_EX(4, "filters", 1.0, 4)
+	MCFG_SOUND_ROUTE_EX(5, "filters", 1.0, 5)
+	MCFG_SOUND_ROUTE_EX(6, "filters", 1.0, 6)
+	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(sq80, esq1)
@@ -435,5 +705,17 @@ ROM_START( sq80 )
 	ROM_LOAD( "sq80_kpc_150.bin", 0x000000, 0x008000, CRC(8170b728) SHA1(3ad68bb03948e51b20d2e54309baa5c02a468f7c) )
 ROM_END
 
+ROM_START( esqm )
+	ROM_REGION(0x10000, "osrom", 0)
+        ROM_LOAD( "1355500157_d640_esq-m_oshi.u14", 0x8000, 0x008000, CRC(ea6a7bae) SHA1(2830f8c52dc443b4ca469dc190b33e2ff15b78e1) ) 
+
+	ROM_REGION(0x20000, "es5503", 0)
+	ROM_LOAD( "esq1wavlo.bin", 0x0000, 0x8000, CRC(4d04ac87) SHA1(867b51229b0a82c886bf3b216aa8893748236d8b) )
+	ROM_LOAD( "esq1wavhi.bin", 0x8000, 0x8000, CRC(94c554a3) SHA1(ed0318e5253637585559e8cf24c06d6115bd18f6) )
+ROM_END
+
+
 CONS( 1986, esq1, 0   , 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-1", GAME_NOT_WORKING )
+CONS( 1986, esqm, esq1, 0, esq1, esq1, driver_device, 0, "Ensoniq", "ESQ-M", GAME_NOT_WORKING )
 CONS( 1988, sq80, 0,    0, sq80, esq1, driver_device, 0, "Ensoniq", "SQ-80", GAME_NOT_WORKING )
+
