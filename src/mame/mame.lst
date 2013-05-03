@@ -5059,6 +5059,7 @@ gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
 				// 2001.03 Star Horse Progress (Rev A)
 dygolf          // 2001.04 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
+shaktmsp		// 2001.04 Shakatto Tambourine 2K1 SPR
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
@@ -5086,7 +5087,6 @@ drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
 derbyocw        // 2001.?? Derby Owners Club World Edition (Rev. D)
 shootplm        // 2001.?? Shootout Pool Medal
 				// 2001.?? Star Horse 2001
-shaktmsp        // 2001.?? Shakatto Tambourine 2K1 SPR
 vathlete        // 2002.03 Virtua Athletics / Virtua Athlete
 luptype         // 2002.04 Lupin The Third - The Typing (Rev A)
 cleoftp         // 2002.05 Cleopatra Fortune Plus
@@ -5174,7 +5174,7 @@ ngdup23e        // DIMM Firmware Updater (Rev E)
 
 // NAOMI 2
 naomi2          // 2001.?? Naomi 2 BIOS
-vstrik3         // 2001.04 Virtua Striker 3 (GD-ROM)
+vstrik3         // 2001.04 Virtua Striker 3 Ver. 2002 (GD-ROM)
 vstrik3cb       // 2001.04 Virtua Striker 3 (Rev B) (cartridge)
 vstrik3c        // 2001.04 Virtua Striker 3 (Rev C) (cartridge)
 wldrider        // 2001.05 Wild Riders
@@ -5282,13 +5282,15 @@ gekpurya        // 2003.10 Gekitou Pro Yakyuu Mizushima Shinji All Stars vs. Pro
 avalon13        // 2004.07 The Key Of Avalon 1.30 - Chaotic Sabbat (client) (Rev C)
 vs4             // 2004.10 Virtua Striker 4 (export)
 vs4j            // 2004.10 Virtua Striker 4 (Japan) (Rev E)
-avalon20        // 2004.11 The Key Of Avalon 2 - Eutaxy Commandment - Satellite (Rev B)
+avalon20        // 2004.11 The Key Of Avalon 2 - Eutaxy Commandment (client) (Rev B)
 				// 2004.?? F-Zero AX - Monster Ride Cycraft Edition
-tfupdate        // 2004.?? Triforce GDROM Boot Update (GDT-0011)
+tfupdate        // 2004.?? Triforce GDROM Boot Update
 				// 2005.08 Avalon no Kagi Ver.2.5 Kagi Seisen
 mkartagp        // 2005.12 Mario Kart Arcade Grand Prix
 				// 2005.?? Donkey Kong Jungle Fever
-vs42006         // 2006.05 Virtua Striker 4 Ver.2006
+				// 2006.01 Virtua Striker 4 Ver.2006 (Export)
+vs42006         // 2006.05 Virtua Striker 4 Ver.2006 (Japan) (Rev D)
+				// 2006.?? Firmware Update For Compact Flash Box (Rev A)
 				// 2007.03 Mario Kart Arcade Grand Prix 2
 
 // Chihiro (X-Box based)
