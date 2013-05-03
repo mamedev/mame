@@ -8213,7 +8213,7 @@ ROM_END
 // 0012A Virtua Fighter 4 (Rev A)
 /* 0012B */ GAME( 2001, vf4b,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev B) (GDS-0012B)", GAME_FLAGS )
 /* 0012C */ GAME( 2001, vf4c,     vf4,     naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Virtua Fighter 4 (Rev C) (GDS-0012C)", GAME_FLAGS )
-// 0013  Shakatto Tambourine 2K1 SPR (PIC: 253-5508-0315)
+/* 0013  */ GAME( 2001, shaktmsp,  naomigd,  naomigd, shaktamb, naomi_state, naomigd,  ROT0, "Sega", "Shakatto Tambourine 2K1 SPR (GDS-0013)", GAME_FLAGS )
 /* 0014  */ GAME( 2001, beachspi, naomi2,  naomi2gd, naomi,   naomi_state, naomi2,  ROT0, "Sega", "Beach Spikers (GDS-0014)", GAME_FLAGS )
 // 0015  Virtua Tennis 2 / Power Smash 2
 /* 0015A */ GAME( 2001, vtennis2, naomigd, naomigd,  naomi,   naomi_state, naomigd, ROT0, "Sega", "Virtua Tennis 2 / Power Smash 2 (Rev A) (GDS-0015A)", GAME_FLAGS )
