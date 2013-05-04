@@ -533,6 +533,9 @@ endif
 
 ifdef SANITIZE
 CCOMFLAGS += -fsanitize=$(SANITIZE)
+ifneq (,$(findstring thread,$(SANITIZE)))
+CCOMFLAGS += -fPIE
+endif
 endif
 
 #-------------------------------------------------
@@ -602,6 +605,9 @@ endif
 
 ifdef SANITIZE
 LDFLAGS += -fsanitize=$(SANITIZE)
+ifneq (,$(findstring thread,$(SANITIZE)))
+LDFLAGS += -pie
+endif
 endif
 
 
