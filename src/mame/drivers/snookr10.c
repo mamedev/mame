@@ -8,9 +8,10 @@
 
     Games running on this hardware:
 
-    * Snooker 10 (Ver 1.11), Sandii', 1998.
-    * Apple 10 (Ver 1.21),   Sandii', 1998.
-    * Ten Balls (Ver 1.05),  unknown, 1997.
+    * Snooker 10 (Ver 1.11),      Sandii', 1998.
+    * Apple 10 (Ver 1.21),        Sandii', 1998.
+    * Ten Balls (Ver 1.05),       unknown, 1997.
+    * Crystals Colors (Ver 1.01), unknown, 199?.
 
 
 ***********************************************************************************
@@ -350,10 +351,13 @@
     - Initial release. Support for snookr10, apple10 and tenballs.
     - Added technical/general notes.
 
+    [2013/05/04]
+    - Added Crystals Colors (Ver 1.01).
+
 
     *** TO DO ***
 
-    - Nothing. :)
+    - Decrypt Crystals Colors...
 
 
 ***********************************************************************************/
@@ -785,12 +789,28 @@ ROM_START( tenballs )
 	ROM_LOAD( "82s147.u17", 0x0000, 0x0200, CRC(20234dcc) SHA1(197937bbec0201888467e250bdba49e39aa4204a) )
 ROM_END
 
+ROM_START( crystalc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "crystals-colours1.u2", 0x8000, 0x8000, CRC(ee7a6f62) SHA1(bb3f438ca563eeb4b365d344066b10b9aedb77bb) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "crystals-colours2.u16", 0x0000, 0x8000, CRC(527c07f6) SHA1(53ceb1d0267e1d76fa1a9325c9a1d2e8e034958d) )
+	ROM_LOAD( "crystals-colours3.u15", 0x8000, 0x8000, CRC(e1003ab7) SHA1(a78bb2e1dc9d578d6a38072e2087f382cffa9f99) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "crystals-colours4.u28", 0x00000, 0x40000 , CRC(ecc6b575) SHA1(f6032e89b30aebeab9ad721608277430084256bc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s29.u17", 0x0000, 0x0200, CRC(1af53eab) SHA1(1cac837aed75a77a0b93a294b07f2a8de6fcffef) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT ROT    COMPANY    FULLNAME                FLAGS  LAYOUT */
-GAMEL( 1998, snookr10, 0,        snookr10, snookr10, driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)", 0,     layout_snookr10 )
-GAMEL( 1998, apple10,  0,        apple10,  apple10, driver_device,  0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",   0,     layout_snookr10 )
-GAMEL( 1997, tenballs, snookr10, tenballs, tenballs, driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",  0,     layout_snookr10 )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     STATE          INIT ROT    COMPANY      FULLNAME                     FLAGS     LAYOUT */
+GAMEL( 1998, snookr10, 0,        snookr10, snookr10, driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",      0,        layout_snookr10 )
+GAMEL( 1998, apple10,  0,        apple10,  apple10,  driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",        0,        layout_snookr10 )
+GAMEL( 1997, tenballs, snookr10, tenballs, tenballs, driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",       0,        layout_snookr10 )
+GAME(  199?, crystalc, 0,        snookr10, snookr10, driver_device, 0,   ROT0, "<unknown>", "Crystals Colors (Ver 1.01)", GAME_NOT_WORKING )
