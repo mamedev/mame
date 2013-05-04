@@ -119,6 +119,7 @@
   * "Unknown french poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
   * Bonne Chance! (Golden Poker prequel hardware),    198?, Unknown.
+  * Mundial/Mondial (Italian/French),                 1987, Unknown.
 
 
 ************************************************************************************
@@ -427,6 +428,20 @@
   The hardware is a sequel of Magic Fly, prequel of Golden Poker.
   The color PROM data is inverted through gates, latches or PLDs
   to get the final palette.
+
+
+  * Mundial/Mondial (Italian/French)
+
+  This game has two different programs inside the program ROM in banks of 0x4000 each.
+  The first program is meant for Italian language, while the second one is for French.
+
+  There is nothing (no writes) that point to a banking. Maybe is driven by PLDs, or
+  just routed to the unused DIP switches of the bank (4 lines of the port are used by
+  discrete sound). Otherwise should be splitted in different games.... Need to check
+  the real board behaviour.
+
+  For now, I implemented the banking and set the first program (Italian) fixed into
+  the driver init till we can get more evidence about.
 
 
 ************************************************************************************
@@ -940,6 +955,11 @@
   - Inverted the bipolar PROM data to get the proper palette.
   - Added technical notes.
 
+  - Added Mundial/Mondial (Italian/French).
+  - Implemented the program banking, but set the Italian lang
+     as default till we can get some evidence.
+  - Added technical notes.
+
 
   TODO:
 
@@ -1015,6 +1035,7 @@ public:
 	DECLARE_DRIVER_INIT(vkdlswwr);
 	DECLARE_DRIVER_INIT(vkdlswwv);
 	DECLARE_DRIVER_INIT(bchancep);
+	DECLARE_DRIVER_INIT(mondial);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	virtual void video_start();
@@ -1538,6 +1559,19 @@ static ADDRESS_MAP_START( genie_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( mondial_map, AS_PROGRAM, 8, goldnpkr_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed RAM */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
 
@@ -3279,6 +3313,75 @@ static INPUT_PORTS_START( caspoker )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mondial )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SELDSW")
+	PORT_DIPNAME( 0x01, 0x00, "Game Selector" )
+	PORT_DIPSETTING(    0x00, "Game 1 (Italian" )
+	PORT_DIPSETTING(    0x01, "Game 2 (French)" )
+
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -3759,6 +3862,20 @@ static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 
 	/* video hardware */
 	MCFG_PALETTE_INIT_OVERRIDE(goldnpkr_state,witchcrd)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( mondial, goldnpkr_base )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mondial_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -9368,18 +9485,20 @@ ROM_END
 
 
 /*
-    Bonne Chance!
-	This PCB came with PIAs 6821 for IO
 
-    Color system seems to pass the BP data through
-	gates, latches or PLDs and get finally inverted.
+  Bonne Chance!
+  This PCB came with PIAs 6821 for IO
 
-    Cards GFX are similar to Golden Poker ones,
-	but the back cards GFX are different...
+  Color system seems to pass the BP data through
+  gates, latches or PLDs and get finally inverted.
 
-    debug: bp 5042
+  Cards GFX are similar to Golden Poker ones,
+  but the back cards GFX are different...
+
+  debug: bp 5042
 
 */
+
 ROM_START( bchancep )	/* Bonne Chance! with PIAs 6821 */
 	ROM_REGION( 0x3000, "gfx", 0 )
 	ROM_LOAD( "84.bin",  0x0000, 0x1000, CRC(31f8104e) SHA1(b99f79019517ca90c48e9f303f41256d68faea91) )		/* cards deck gfx bitplane 3, identical halves */
@@ -9402,6 +9521,60 @@ ROM_START( bchancep )	/* Bonne Chance! with PIAs 6821 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "bchancep_bp.bin", 0x0000, 0x0100, CRC(70fe1582) SHA1(118c743d445a37ad760e4163b61c3c562d7adda6) )
+ROM_END
+
+/*
+
+  PCB marked "MONDIAL"
+  REV 2.1 - ALG
+
+  Sticker APP:
+  Copie prohibee.
+  loi du 3 7 1985.
+
+  1x UM6502.
+  1x UM6845.
+  2x ST EF6821P.
+
+  2x UM6116-2L
+  1x MK48202B-25 Zeropower RAM.
+
+  1x M27C256 (MBV BI)
+  1x TMS27C256 (3M)
+  2x TMS27C128 (1M. 2M)
+
+  1X Bipolar PROM.
+
+  1x LM555CN.
+  1x MAXIM MAX691CPE.
+  1x 8 DIP switches bank.
+  1x Xtal 10 MHz.
+
+  The program ROM contains 2 different programs
+  in banks of 0x4000 each.
+
+*/
+
+ROM_START( pokermon )
+	ROM_REGION( 0x18000, "maincpu", 0 )	/* using 1st bank program */
+	ROM_LOAD( "mbv_bi.bin",      0x10000, 0x8000, CRC(da00e08a) SHA1(98e52915178e29ab3ae674e6b895da14626d3dd8) )
+
+	ROM_REGION( 0x18000, "gfx", 0 )
+	ROM_LOAD( "1m.bin",  0x00000, 0x4000, CRC(1b9e73ef) SHA1(fc9b67ab4c233a7e8ec8dc799732884f74166db0) )
+	ROM_LOAD( "2m.bin",  0x08000, 0x4000, CRC(c51ace9b) SHA1(af84324c097beb0fefa54ccb7807c5ebb9acdcc3) )
+	ROM_LOAD( "3m.bin",  0x10000, 0x8000, CRC(b2237068) SHA1(ece4f089776bbd5224c63c6a41a2e86a5e89d0c5) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(                 0x0000, 0x1000, 0 )	/* filling the R-G bitplanes */
+	ROM_COPY( "gfx", 0x14800, 0x1000, 0x0800 )		/* text, numbers and soccer ball tiles */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfx", 0x00000, 0x0000, 0x0800 )	/* soccer player gfx, bitplane 1 */
+	ROM_COPY( "gfx", 0x08000, 0x0800, 0x0800 )	/* soccer player gfx, bitplane 2 */
+	ROM_COPY( "gfx", 0x12000, 0x1000, 0x0800 )	/* soccer player gfx, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
 
@@ -9833,6 +10006,21 @@ DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
 }
 
 
+DRIVER_INIT_MEMBER(goldnpkr_state, mondial)
+{
+/*  Program banking..... */
+
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+
+	membank("bank1")->set_entry(0);	// for now, fixed in italian.
+
+//	UINT8 seldsw = (ioport("SELDSW")->read() );
+//	popmessage("ROM Bank: %02X", seldsw);
+//	membank("bank1")->set_entry(seldsw);
+
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -9966,3 +10154,4 @@ GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
 
 GAME(  198?, bchancep,  0,        goldnpkr, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING )
+GAME(  1987, pokermon,  0,        mondial,  bsuerte,  goldnpkr_state, mondial,  ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
