@@ -693,7 +693,8 @@ void psxcd_device::cdcmd_test()
 	switch(cmdbuf[0])
 	{
 		case 0x20:
-			static unsigned char data[4]=
+		{
+			static UINT8 data[4]=
 			{
 				0x95,
 				0x07,
@@ -703,6 +704,7 @@ void psxcd_device::cdcmd_test()
 
 			send_result(intr_complete,data,4);
 			break;
+		}
 
 		default:
 			verboselog(machine(), 0, "psxcd: unimplemented test cmd %02x\n", cmdbuf[0]);
