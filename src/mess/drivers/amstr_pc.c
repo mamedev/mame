@@ -278,8 +278,8 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[4], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
@@ -351,8 +351,8 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 	MCFG_INS8250_ADD( "ins8250_3", ibm5150_com_interface[3], XTAL_1_8432MHz )   /* TODO: Verify model */
 	MCFG_RS232_PORT_ADD( "serport0", ibm5150_serport_config[0], amstr_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[3], amstr_com, NULL, NULL )
-	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[4], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], amstr_com, NULL, NULL )
+	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], amstr_com, NULL, NULL )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_pc200 )
