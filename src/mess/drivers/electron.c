@@ -13,9 +13,11 @@ Incomplete:
     - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
+    - Currently the cartridge support always loads the upper rom in page 12
+      and the lower rom in page 0. This might need further documentation in
+      the software list and loading code.
 
 Missing:
-    - Support for ROM images
     - Support for floppy disks
     - Other peripherals
     - Keyboard is missing the 'Break' key
@@ -26,6 +28,7 @@ Missing:
 #include "cpu/m6502/m6502.h"
 #include "includes/electron.h"
 #include "imagedev/cassette.h"
+#include "imagedev/cartslot.h"
 #include "formats/uef_cas.h"
 #include "sound/beep.h"
 
@@ -196,6 +199,14 @@ static MACHINE_CONFIG_START( electron, electron_state )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	MCFG_CASSETTE_ADD( "cassette", electron_cassette_interface )
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(electron_state, electron_cart)
+	MCFG_CARTSLOT_INTERFACE("electron_cart")
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","electron_cart")
 MACHINE_CONFIG_END
 
 

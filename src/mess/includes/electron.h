@@ -90,6 +90,7 @@ public:
 	inline UINT8 read_vram( UINT16 addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void electron_interrupt_handler(int mode, int interrupt);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( electron_cart );
 };
 
 

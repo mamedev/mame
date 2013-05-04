@@ -338,3 +338,54 @@ void electron_state::machine_start()
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(electron_state::setup_beep),this));
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler),this));
 }
+
+DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
+{
+	UINT8 *user1 = memregion("user1")->base() + 0x4000;
+
+	if (image.software_entry() == NULL)
+	{
+		UINT32 filesize = image.length();
+
+		if ( filesize != 16384 )
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size. Only size 16384 is supported");
+			return IMAGE_INIT_FAIL;
+		}
+
+		if (image.fread( user1 + 12 * 16384, filesize) != filesize)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			return IMAGE_INIT_FAIL;
+		}
+
+		return IMAGE_INIT_PASS;
+	}
+
+	int upsize = image.get_software_region_length("uprom");
+	int losize = image.get_software_region_length("lorom");
+
+	if ( upsize != 16384 && upsize != 0 )
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if ( losize != 16384 && losize != 0 )
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if ( upsize )
+	{
+		memcpy( user1 + 12 * 16384, image.get_software_region("uprom"), upsize );
+	}
+
+	if ( losize )
+	{
+		memcpy( user1 + 0 * 16384, image.get_software_region("lorom"), losize );
+	}
+
+	return IMAGE_INIT_PASS;
+}
