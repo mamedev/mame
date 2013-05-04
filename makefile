@@ -247,6 +247,9 @@ BUILD_MIDILIB = 1
 # uncomment next line to generate verbose build information
 # VERBOSE = 1
 
+# specify the sanitizer to use or leave empty to use none
+# SANITIZE = 
+
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
 # OPTIMIZE = 3
@@ -528,6 +531,9 @@ CCOMFLAGS += \
 	-Wno-self-assign-field
 endif
 
+ifdef SANITIZE
+CCOMFLAGS += -fsanitize=$(SANITIZE)
+endif
 
 #-------------------------------------------------
 # include paths
@@ -594,6 +600,9 @@ ifdef MAP
 LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
 endif
 
+ifdef SANITIZE
+LDFLAGS += -fsanitize=$(SANITIZE)
+endif
 
 
 #-------------------------------------------------
@@ -682,6 +691,10 @@ MIDI_LIB = $(OBJ)/libportmidi.a
 else
 LIBS += -lportmidi
 MIDI_LIB =
+endif
+
+ifneq (,$(findstring clang,$(CC)))
+LIBS += -lstdc++ -lpthread
 endif
 
 #-------------------------------------------------
