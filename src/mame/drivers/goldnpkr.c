@@ -10154,4 +10154,4 @@ GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
 
 GAME(  198?, bchancep,  0,        goldnpkr, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING )
-GAME(  1987, pokermon,  0,        mondial,  bsuerte,  goldnpkr_state, mondial,  ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
+GAME(  1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, mondial,  ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",    0 )
