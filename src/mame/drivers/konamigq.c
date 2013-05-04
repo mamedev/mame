@@ -197,9 +197,6 @@ static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE(pcmram_r, pcmram_w)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 /* SOUND CPU */
@@ -439,7 +436,7 @@ ROM_START( cryptklr )
 	ROM_REGION( 0x400000, "shared", 0 )
 	ROM_LOAD( "420a02.3m",    0x000000, 0x080000, CRC(2169c3c4) SHA1(6d525f10385791e19eb1897d18f0bab319640162) )
 
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
 	ROM_LOAD( "420b03.27p",   0x0000000, 0x080000, CRC(aab391b1) SHA1(bf9dc7c0c8168c22a4be266fe6a66d3738df916b) )
 
 	DISK_REGION( "scsi:disk" )

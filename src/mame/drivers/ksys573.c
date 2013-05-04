@@ -1383,9 +1383,6 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE(security_r, security_w )
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 
@@ -3768,7 +3765,7 @@ static INPUT_PORTS_START( gchgchmp )
 INPUT_PORTS_END
 
 #define SYS573_BIOS_A \
-	ROM_REGION32_LE( 0x080000, "bios", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "std",        "Standard" ) \
 	ROMX_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS( 1, "gchgchmp",   "Found on Gachagachamp" ) \

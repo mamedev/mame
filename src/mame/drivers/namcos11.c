@@ -733,9 +733,6 @@ static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_shared_r)
@@ -1332,7 +1329,7 @@ static INPUT_PORTS_START( pocketrc )
 INPUT_PORTS_END
 
 ROM_START( danceyes )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "dc1vera.2l",   0x0000000, 0x100000, CRC(b164ad67) SHA1(62a7f9bc7fb9c218e5031598512dbd1e013283b3) )
 	ROM_LOAD16_BYTE( "dc1vera.2j",   0x0000001, 0x100000, CRC(28e4cb3d) SHA1(17923c66725da1f8e77b7c08d8017160bba53eb9) )
 	ROM_LOAD16_BYTE( "dc1vera.2k",   0x0200000, 0x100000, CRC(bdd9484e) SHA1(2f85e0ac4b12b2cf4c9717fad745d2d68c27d39a) )
@@ -1358,7 +1355,7 @@ ROM_START( danceyes )
 ROM_END
 
 ROM_START( dunkmnia )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "dm2verc.2l",   0x0000000, 0x100000, CRC(f6a6c46e) SHA1(5552c3a8fb0ef18e6f0bca8d81ec68b904824a66) )
 	ROM_LOAD16_BYTE( "dm2verc.2j",   0x0000001, 0x100000, CRC(1df539ce) SHA1(89ac436c685cf26899168c73fdaccee778fd7d2d) )
 	ROM_LOAD16_BYTE( "dm1verc.2k",   0x0200000, 0x100000, CRC(c8d72f78) SHA1(30341301f0d1cdcb14f3e0672ec1165c0583fbc8) )
@@ -1384,7 +1381,7 @@ ROM_START( dunkmnia )
 ROM_END
 
 ROM_START( dunkmniajc )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "dm1verc.2l",   0x0000000, 0x100000, CRC(6c81654a) SHA1(00e84cc41b3dd49a8f0d3a364ea4a5d2662c45ff) )
 	ROM_LOAD16_BYTE( "dm1verc.2j",   0x0000001, 0x100000, CRC(10329b7e) SHA1(d214764e90c7d79abea01580e79092e34a58b695) )
 	ROM_LOAD16_BYTE( "dm1verc.2k",   0x0200000, 0x100000, CRC(c8d72f78) SHA1(30341301f0d1cdcb14f3e0672ec1165c0583fbc8) )
@@ -1409,7 +1406,7 @@ ROM_START( dunkmniajc )
 ROM_END
 
 ROM_START( myangel3 )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "kqt1vera.1j",         0x0000000, 0x200000, CRC(df7aef8a) SHA1(d4ff144bcdecc1d4a3b834d0b9c182609ad9b260) )
 	ROM_LOAD( "kqt1vera.1l",         0x0200000, 0x200000, CRC(ffc51c01) SHA1(bba2c2c1ad31039c7dc7413e51e7fc317451e1e3) )
 
@@ -1429,7 +1426,7 @@ ROM_START( myangel3 )
 ROM_END
 
 ROM_START( pocketrc )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "pkr1verb.2l",  0x000000, 0x100000, CRC(300d906a) SHA1(f521858f78284d69e6a6ec2c35a468c87dd0628c) )
 	ROM_LOAD16_BYTE( "pkr1verb.2j",  0x000001, 0x100000, CRC(d5f47526) SHA1(b1d5b6f714510d0cfcc9b32708287755f9f27ead) )
 
@@ -1447,7 +1444,7 @@ ROM_START( pocketrc )
 ROM_END
 
 ROM_START( primglex )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "pg1vera.2l",   0x0000000, 0x100000, CRC(fc15fd1a) SHA1(6ca5ebdc096cab3296dc7c1f675d78dfc7c69a05) )
 	ROM_LOAD16_BYTE( "pg1vera.2j",   0x0000001, 0x100000, CRC(79955553) SHA1(ad2dca38b06a835f8241fae0a5fa18d5874cebe4) )
 
@@ -1471,7 +1468,7 @@ ROM_START( primglex )
 ROM_END
 
 ROM_START( ptblank2ua )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "gnb3vera.2l",  0x0000000, 0x100000, CRC(57ad719a) SHA1(f22a02d33c7c23cccffb8ce2e3aca26b07ecac0a) )
 	ROM_LOAD16_BYTE( "gnb3vera.2j",  0x0000001, 0x100000, CRC(0378af98) SHA1(601444b5a0935a4b69b5ada618aaf1bc6bb12a3b) )
 	ROM_LOAD16_BYTE( "gnb3vera.2k",  0x0200000, 0x100000, CRC(e6335e4e) SHA1(9067f05d848c1c8a88967a3c6552d2d24e80672b) )
@@ -1491,7 +1488,7 @@ ROM_START( ptblank2ua )
 ROM_END
 
 ROM_START( souledge )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "so4verc.2l",   0x0000000, 0x100000, CRC(12b8ae0d) SHA1(31571023d5b77ebcd4103b8cac5ba710a3d570a0) )
 	ROM_LOAD16_BYTE( "so4verc.2j",   0x0000001, 0x100000, CRC(938262b0) SHA1(e806883e32c473a3c2bb07849126631f6d66fa66) )
 	ROM_LOAD16_BYTE( "so1verc.2k",   0x0200000, 0x100000, CRC(1789e399) SHA1(2e11869124cdfa7a66107b0e642bdc72ee0c306a) )
@@ -1517,7 +1514,7 @@ ROM_START( souledge )
 ROM_END
 
 ROM_START( souledgeuc )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "so3verc.2l",   0x0000000, 0x100000, CRC(c90e343b) SHA1(83bd2fc67493c34b408b13148f6a2feba9a44ed0) )
 	ROM_LOAD16_BYTE( "so3verc.2j",   0x0000001, 0x100000, CRC(b7466db5) SHA1(c7a4c66e61812fb6de582fe555755293d78771c7) )
 	ROM_LOAD16_BYTE( "so1verc.2k",   0x0200000, 0x100000, CRC(1789e399) SHA1(2e11869124cdfa7a66107b0e642bdc72ee0c306a) )
@@ -1543,7 +1540,7 @@ ROM_START( souledgeuc )
 ROM_END
 
 ROM_START( souledgeua )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "so3vera.2l",   0x0000000, 0x100000, CRC(19b39096) SHA1(9188cd1fd9b15e5545eb41ea2768a8bd42113379) )
 	ROM_LOAD16_BYTE( "so3vera.2j",   0x0000001, 0x100000, CRC(09eda46f) SHA1(24d04d2ba51af508ddc0656e8bb5e1335b08cc8a) )
 	ROM_LOAD16_BYTE( "so1vera.2k",   0x0200000, 0x100000, CRC(29bdc6bb) SHA1(9047792c1a21a0001024939f1c6a8c3d86948973) )
@@ -1568,7 +1565,7 @@ ROM_START( souledgeua )
 ROM_END
 
 ROM_START( souledgeaa )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "so2vera.2l",   0x0000000, 0x100000, CRC(0e9efc5c) SHA1(212b156f811174189fbf2ba908e67c6d76b9b4a6) )
 	ROM_LOAD16_BYTE( "so2vera.2j",   0x0000001, 0x100000, CRC(fda023f5) SHA1(f0a5bb1c813a5ee8629cb590e473dd0f5f1f416e) )
 	ROM_LOAD16_BYTE( "so2vera.2k",   0x0200000, 0x100000, CRC(29bdc6bb) SHA1(9047792c1a21a0001024939f1c6a8c3d86948973) )
@@ -1594,7 +1591,7 @@ ROM_START( souledgeaa )
 ROM_END
 
 ROM_START( souledgeja )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "so1vera.2l",   0x0000000, 0x100000, CRC(bafb94c8) SHA1(92461ce74a537a9801a024280e18fc3d0a5e6e5c) )
 	ROM_LOAD16_BYTE( "so1vera.2j",   0x0000001, 0x100000, CRC(abe2d28e) SHA1(e9d858c8f8651b04bc72eb6de423da4925e94250) )
 	ROM_LOAD16_BYTE( "so1vera.2k",   0x0200000, 0x100000, CRC(29bdc6bb) SHA1(9047792c1a21a0001024939f1c6a8c3d86948973) )
@@ -1620,7 +1617,7 @@ ROM_START( souledgeja )
 ROM_END
 
 ROM_START( starswep )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "stp1vera.1j",         0x0000000, 0x200000, CRC(ef83e126) SHA1(f721b43358cedad0f28af5d2b292b44043fd47a0) )
 	ROM_LOAD( "stp1vera.1l",         0x0200000, 0x200000, CRC(0ee7fe1e) SHA1(8c2f5b0e7b49dbe0e8105bf55c493acd46a4f59d) )
 
@@ -1636,7 +1633,7 @@ ROM_START( starswep )
 ROM_END
 
 ROM_START( tekken )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "te4verc.2l",   0x0000000, 0x100000, CRC(7ecb7892) SHA1(7837f2b3dbfc6b4a153ea652e8a3fd89c4daa26e) )
 	ROM_LOAD16_BYTE( "te4verc.2j",   0x0000001, 0x100000, CRC(eea3365d) SHA1(d13df90833aac48f9d9d20cddefb81f90ebab249) )
 	ROM_LOAD16_BYTE( "te1verb.2k",   0x0200000, 0x100000, CRC(b9860b29) SHA1(678889fc5c70bf66f0bd9864a20636ffb620ed0d) )
@@ -1659,7 +1656,7 @@ ROM_START( tekken )
 ROM_END
 
 ROM_START( tekkenac )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "te2verc.2l",   0x0000000, 0x100000, CRC(a24c8c57) SHA1(bf69f17310201e38aa17fb4484cdb480f26d876e) )
 	ROM_LOAD16_BYTE( "te2verc.2j",   0x0000001, 0x100000, CRC(3224c298) SHA1(8afe80af0eef52f96bf2ddb2482b06692a8f047d) )
 	ROM_LOAD16_BYTE( "te1verb.2k",   0x0200000, 0x100000, CRC(b9860b29) SHA1(678889fc5c70bf66f0bd9864a20636ffb620ed0d) )
@@ -1682,7 +1679,7 @@ ROM_START( tekkenac )
 ROM_END
 
 ROM_START( tekkenab )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "te2verb.2l",   0x0000000, 0x100000, CRC(246cfbdd) SHA1(c1bffe3c463e9eff6dcaf9937da72bff8ff33e4e) )
 	ROM_LOAD16_BYTE( "te2verb.2j",   0x0000001, 0x100000, CRC(dfa83e47) SHA1(a29d852c1b6a52c043248d7e5af04067dfa3eb40) )
 	ROM_LOAD16_BYTE( "te1verb.2k",   0x0200000, 0x100000, CRC(b9860b29) SHA1(678889fc5c70bf66f0bd9864a20636ffb620ed0d) )
@@ -1705,7 +1702,7 @@ ROM_START( tekkenab )
 ROM_END
 
 ROM_START( tekkenjb )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "te1verb.2l",   0x0000000, 0x100000, CRC(4291afee) SHA1(2e04a6c786544176e2b7e22b5f469e3548896b19) )
 	ROM_LOAD16_BYTE( "te1verb.2j",   0x0000001, 0x100000, CRC(5c534705) SHA1(2430b5c36de419822de0283c006c5af2e7cd95ef) )
 	ROM_LOAD16_BYTE( "te1verb.2k",   0x0200000, 0x100000, CRC(b9860b29) SHA1(678889fc5c70bf66f0bd9864a20636ffb620ed0d) )
@@ -1728,7 +1725,7 @@ ROM_START( tekkenjb )
 ROM_END
 
 ROM_START( tekken2 )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes3verd.2l",  0x0000000, 0x100000, CRC(0768f36c) SHA1(fe299998649eeded77ab4bda23090997f4b39734) )
 	ROM_LOAD16_BYTE( "tes3verd.2j",  0x0000001, 0x100000, CRC(d29a0545) SHA1(b969f388d141d2e5cdb021aa72024ea040f493c7) )
 	ROM_LOAD16_BYTE( "tes3verd.2k",  0x0200000, 0x100000, CRC(846ace0a) SHA1(2016b415ba771d159d63b01f3a12a6cadf23451d) )
@@ -1753,7 +1750,7 @@ ROM_START( tekken2 )
 ROM_END
 
 ROM_START( tekken2ub )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes3verb.2l",  0x0000000, 0x100000, CRC(4692075f) SHA1(d048a92040ceb57ef7462bebc2c1112b964570ec) )
 	ROM_LOAD16_BYTE( "tes3verb.2j",  0x0000001, 0x100000, CRC(db3ec640) SHA1(fc9f475232ea77abd2eb7e2e09314281264e9d38) )
 	ROM_LOAD16_BYTE( "tes1verb.2k",  0x0200000, 0x100000, CRC(668ca712) SHA1(67100db4c6a3ca62d3f62f6fcef974ce017e2c9e) )
@@ -1778,7 +1775,7 @@ ROM_START( tekken2ub )
 ROM_END
 
 ROM_START( tekken2ab )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes2verb.2l",  0x0000000, 0x100000, CRC(aa9a4503) SHA1(e6fdd34216591510593bbda0232ddc0fcd80e80b) )
 	ROM_LOAD16_BYTE( "tes2verb.2j",  0x0000001, 0x100000, CRC(63706d8c) SHA1(740cfa8b422fb663bcb412b3389da33c7f9f13be) )
 	ROM_LOAD16_BYTE( "tes1verb.2k",  0x0200000, 0x100000, CRC(668ca712) SHA1(67100db4c6a3ca62d3f62f6fcef974ce017e2c9e) )
@@ -1803,7 +1800,7 @@ ROM_START( tekken2ab )
 ROM_END
 
 ROM_START( tekken2aa )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes2vera.2l",  0x0000000, 0x100000, CRC(8bb82bf0) SHA1(ac4e0077dff4c46ea2435903c410590f91cafe7d) )
 	ROM_LOAD16_BYTE( "tes2vera.2j",  0x0000001, 0x100000, CRC(4e02f921) SHA1(15339c2626033912947d33e5f59a109e607be0bf) )
 	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
@@ -1828,7 +1825,7 @@ ROM_START( tekken2aa )
 ROM_END
 
 ROM_START( xevi3dg )
-	ROM_REGION32_LE( 0x0400000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "xv31vera.2l",  0x0000000, 0x100000, CRC(419e0f13) SHA1(876ae81c9fde18cdec792f3dfee682761ac99730) )
 	ROM_LOAD16_BYTE( "xv31vera.2j",  0x0000001, 0x100000, CRC(df95373a) SHA1(65cf85ad4dcbc8f0376ac46ee0c1037d79099843) )
 	ROM_LOAD16_BYTE( "xv31vera.2k",  0x0200000, 0x100000, CRC(3d58138e) SHA1(9203d6bdc2d968de818d5f465523cc030217dcf8) )

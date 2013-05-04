@@ -481,9 +481,6 @@ void psx1_state::cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_siz
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(psx1_state,psx)
@@ -564,7 +561,7 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 MACHINE_CONFIG_END
 
 ROM_START( psj )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "1.0j", "SCPH-1000/DTL-H1000" ) // 22091994
 	ROMX_LOAD( "ps-10j.bin",    0x0000000, 0x080000, CRC(3b601fc8) SHA1(343883a7b555646da8cee54aadd2795b6e7dd070), ROM_BIOS(1) )
@@ -593,7 +590,7 @@ ROM_START( psj )
 ROM_END
 
 ROM_START( psu )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "2.0a", "DTL-H1001 (Version 2.0 05/07/95 A)" ) // 22091994
 	ROMX_LOAD( "ps-20a.bin",    0x0000000, 0x080000, CRC(55847d8c) SHA1(649895efd79d14790eabb362e94eb0622093dfb9), ROM_BIOS(1) )
@@ -615,7 +612,7 @@ ROM_START( psu )
 ROM_END
 
 ROM_START( pse )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "2.0e", "DTL-H1002/SCPH-1002 (Version 2.0 05/10/95 E)" ) // 22091994
 	ROMX_LOAD( "ps-20e.bin",    0x0000000, 0x080000, CRC(9bb87c4b) SHA1(20b98f3d80f11cbf5a7bfd0779b0e63760ecc62c), ROM_BIOS(1) )
@@ -641,7 +638,7 @@ ROM_START( pse )
 ROM_END
 
 ROM_START( psa )
-	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
 
 	ROM_SYSTEM_BIOS( 0, "3.0a", "SCPH-5501/SCPH-7003 (Version 3.0 11/18/96 A)" ) // 04121995
 	ROMX_LOAD( "ps-30a.bin",    0x0000000, 0x080000, CRC(8d8cb7e4) SHA1(0555c6fae8906f3f09baf5988f00e55f88e9f30b), ROM_BIOS(1) )

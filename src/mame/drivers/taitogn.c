@@ -824,9 +824,6 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE(control2_w)
 	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE(gn_1fb70000_r, gn_1fb70000_w)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("mainbios", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 
@@ -987,7 +984,7 @@ INPUT_PORTS_END
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define TAITOGNET_BIOS \
-	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
 	ROM_REGION( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \

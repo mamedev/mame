@@ -643,9 +643,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
 	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
 	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 /* SPU board */
@@ -952,7 +949,7 @@ static INPUT_PORTS_START( twinkle )
 INPUT_PORTS_END
 
 #define TWINKLE_BIOS    \
-	ROM_REGION32_LE( 0x080000, "user1", 0 )\
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )\
 	ROM_LOAD( "863a03.7b",    0x000000, 0x080000, CRC(81498f73) SHA1(3599b40a5872eab3a00d345287635355fcb25a71) )\
 \
 	ROM_REGION32_LE( 0x080000, "audiocpu", 0 )\

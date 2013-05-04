@@ -204,9 +204,6 @@ static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -720,7 +717,7 @@ static INPUT_PORTS_START( kdeadeye )
 INPUT_PORTS_END
 
 #define GV_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "999a01.7e",   0x0000000, 0x080000, CRC(ad498d2d) SHA1(02a82a2fe1fba0404517c3602324bfa64e23e478) )
 
 ROM_START( konamigv )

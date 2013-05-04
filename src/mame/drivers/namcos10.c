@@ -322,11 +322,8 @@ public:
 
 static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
 	AM_RANGE(0x1f500000, 0x1f5007ff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x9f500000, 0x9f5007ff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
-	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xbf500000, 0xbf5007ff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
-	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 
@@ -353,7 +350,7 @@ WRITE32_MEMBER(namcos10_state::bank_w)
 
 READ32_MEMBER(namcos10_state::range_r)
 {
-	UINT32 data32 = ((const UINT32 *)(memregion("user1")->base()))[offset+bank_base];
+	UINT32 data32 = ((const UINT32 *)(memregion("maincpu:rom")->base()))[offset+bank_base];
 
 	UINT16 d16;
 	if(ACCESSING_BITS_16_31)
@@ -504,7 +501,7 @@ ADDRESS_MAP_END
 
 void namcos10_state::memn_driver_init(  )
 {
-	UINT8 *BIOS = (UINT8 *)memregion( "user1" )->base();
+	UINT8 *BIOS = (UINT8 *)memregion( "maincpu:rom" )->base();
 	nand_base = (UINT8 *)memregion( "user2" )->base();
 
 	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
@@ -527,7 +524,7 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
-	decrypt_bios( machine(), "user1", 0, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3 );
+	decrypt_bios( machine(), "maincpu:rom", 0, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3 );
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gjspace)
@@ -680,7 +677,7 @@ INPUT_PORTS_END
 
 
 ROM_START( mrdrilr2 )
-	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x800000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "dr21vera.1a",  0x000000, 0x800000, CRC(f93532a2) SHA1(8b72f2868978be1f0e0abd11425a3c8b2b0c4e99) )
 
 	ROM_REGION( 0x4000000, "user2", 0 ) /* main prg */
@@ -689,7 +686,7 @@ ROM_START( mrdrilr2 )
 ROM_END
 
 ROM_START( mrdrlr2a )
-	ROM_REGION32_LE( 0x800000, "user1", 0 ) /* main prg */
+	ROM_REGION32_LE( 0x800000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD( "dr22vera.1a",  0x000000, 0x800000, CRC(f2633388) SHA1(42e56c9758ee833390003d4b41956f75f5a22760) )
 
 	ROM_REGION( 0x4000000, "user2", 0 ) /* main prg */
@@ -698,7 +695,7 @@ ROM_START( mrdrlr2a )
 ROM_END
 
 ROM_START( gjspace )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
@@ -709,7 +706,7 @@ ROM_START( gjspace )
 ROM_END
 
 ROM_START( mrdrilrg )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
@@ -719,7 +716,7 @@ ROM_START( mrdrilrg )
 ROM_END
 
 ROM_START( mrdrilrga )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
@@ -729,7 +726,7 @@ ROM_START( mrdrilrga )
 ROM_END
 
 ROM_START( knpuzzle )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
@@ -739,7 +736,7 @@ ROM_START( knpuzzle )
 ROM_END
 
 ROM_START( startrgn )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
@@ -748,7 +745,7 @@ ROM_START( startrgn )
 ROM_END
 
 ROM_START( gamshara )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
@@ -757,7 +754,7 @@ ROM_START( gamshara )
 ROM_END
 
 ROM_START( ptblank3 )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
@@ -766,7 +763,7 @@ ROM_START( ptblank3 )
 ROM_END
 
 ROM_START( gunbalina )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x2100000, "user2", 0 ) /* main prg */
@@ -775,7 +772,7 @@ ROM_START( gunbalina )
 ROM_END
 
 ROM_START( chocovdr )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x5280000, "user2", 0 ) /* main prg */
@@ -787,7 +784,7 @@ ROM_START( chocovdr )
 ROM_END
 
 ROM_START( panikuru )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x3180000, "user2", 0 ) /* main prg */
@@ -797,7 +794,7 @@ ROM_START( panikuru )
 ROM_END
 
 ROM_START( nflclsfb )
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* bios */
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */

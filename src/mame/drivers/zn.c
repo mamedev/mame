@@ -422,9 +422,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
 	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
@@ -2725,7 +2722,7 @@ INPUT_PORTS_END
 /* Capcom ZN1 */
 
 #define CPZN1_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1000c.353", 0x0000000, 0x080000, CRC(50033af6) SHA1(486d92ff6c7f1e54f8e0ef41cd9116eca0e10e1a) )
 
 ROM_START( cpzn1 )
@@ -3039,7 +3036,7 @@ ROM_END
 /* Capcom ZN2 */
 
 #define CPZN2_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-3002c.353", 0x0000000, 0x080000, CRC(e860ea8b) SHA1(66e7e1d4e426466b8f48a2ba055a91b475569504) )
 
 ROM_START( cpzn2 )
@@ -3582,7 +3579,7 @@ ROM_END
 /* Tecmo */
 
 #define TPS_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1002m.353", 0x0000000, 0x080000, CRC(69ffbcb4) SHA1(03eb2febfab3fcde716defff291babd9392de965) )
 
 ROM_START( tps )
@@ -3831,7 +3828,7 @@ ROM_END
 /* video system */
 
 #define KN_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1002v.353", 0x0000000, 0x080000, CRC(5ff165f3) SHA1(8f59314c1093446b9bcb06d232244da6df78e206) )
 
 ROM_START( vspsx )
@@ -3882,7 +3879,7 @@ ROM_END
 /* Taito FX1a/FX1b */
 
 #define TAITOFX1_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1000t.353", 0x0000000, 0x080000, CRC(e3f23b6e) SHA1(e18907cf8c6ba54d96edba0a9a00487a90219e0d) )
 
 ROM_START( taitofx1 )
@@ -4249,7 +4246,7 @@ ROM_END
 /* Eighting/Raizing */
 
 #define PSARC95_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1002e.353", 0x000000, 0x080000, CRC(910f3a8b) SHA1(cd68532967a25f476a6d73473ec6b6f4df2e1689) )
 
 ROM_START( psarc95 )
@@ -4516,7 +4513,7 @@ ROM_END
 /* Atari PSX */
 
 #define TW_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1000w.353", 0x000000, 0x080000, CRC(45e8a4b4) SHA1(815488d8563c85f97fbc3384ff21f08e4c88b7b7) )
 
 ROM_START( atpsx )
@@ -4540,7 +4537,7 @@ ROM_END
 /* Acclaim PSX */
 
 #define AC_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1000a.353", 0x0000000, 0x080000, CRC(8d8d0764) SHA1(7ee83d317190bb1cef2f8f01c81eaaae47150ebb) )
 
 ROM_START( acpsx )
@@ -4603,7 +4600,7 @@ ROM_END
 /* Atlus */
 
 #define ATLUS_BIOS \
-	ROM_REGION32_LE( 0x080000, "user1", 0 ) \
+	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROM_LOAD( "coh-1001l.353", 0x000000, 0x080000, CRC(6721146b) SHA1(9511d24bfe25eb180fb2db0835b131cb4a12730e) )
 
 ROM_START( atluspsx )

@@ -154,6 +154,9 @@ public:
 	DECLARE_WRITE32_MEMBER( ram_config_w );
 	DECLARE_READ32_MEMBER( ram_config_r );
 
+	DECLARE_WRITE32_MEMBER( rom_config_w );
+	DECLARE_READ32_MEMBER( rom_config_r );
+
 	DECLARE_WRITE32_MEMBER( biu_w );
 	DECLARE_READ32_MEMBER( biu_r );
 
@@ -239,6 +242,7 @@ protected:
 	UINT32 m_bad_half_address_mask;
 	UINT32 m_bad_word_address_mask;
 	UINT32 m_ram_config;
+	UINT32 m_rom_config;
 
 	void stop();
 	UINT32 cache_readword( UINT32 offset );
@@ -269,6 +273,7 @@ protected:
 	void update_address_masks();
 	void update_scratchpad();
 	void update_ram_config();
+	void update_rom_config();
 	void update_cop0( int reg );
 	void commit_delayed_load();
 	void set_pc( unsigned pc );
@@ -314,6 +319,7 @@ protected:
 	devcb2_read8 m_cd_read_handler;
 	devcb2_write8 m_cd_write_handler;
 	required_device<ram_device> m_ram;
+	memory_region *m_rom;
 };
 
 class cxd8530aq_device : public psxcpu_device
