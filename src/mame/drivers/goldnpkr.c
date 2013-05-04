@@ -118,6 +118,7 @@
   * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
   * "Unknown french poker game",                      198?, Unknown.
   * "Unknown encrypted poker game",                   198?, Unknown.
+  * Bonne Chance! (Golden Poker prequel hardware),    198?, Unknown.
 
 
 ************************************************************************************
@@ -419,6 +420,13 @@
   |                                     |   |                                     |
   |   PM 1987 - BECK D-6330 WETZLAR     |   |   PM 1987 - BECK D-6330 WETZLAR     |
   |_____________________________________|   |_____________________________________|
+
+
+  * Bonne Chance! (Golden Poker prequel hardware)
+
+  The hardware is a sequel of Magic Fly, prequel of Golden Poker.
+  The color PROM data is inverted through gates, latches or PLDs
+  to get the final palette.
 
 
 ************************************************************************************
@@ -926,6 +934,13 @@
   - Fixed a bug in the coinage input.
 
 
+  [2013-05-04]
+
+  - Added Bonne Chance! (Golden Poker prequel hardware).
+  - Inverted the bipolar PROM data to get the proper palette.
+  - Added technical notes.
+
+
   TODO:
 
   - Missing PIA connections.
@@ -999,6 +1014,7 @@ public:
 	DECLARE_DRIVER_INIT(vkdlswwc);
 	DECLARE_DRIVER_INIT(vkdlswwr);
 	DECLARE_DRIVER_INIT(vkdlswwv);
+	DECLARE_DRIVER_INIT(bchancep);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
 	virtual void video_start();
@@ -9351,6 +9367,43 @@ ROM_START( wtchjackj )  /* Witch Jack 0.87-88 / 1996-10-02, GFX OK */
 ROM_END
 
 
+/*
+    Bonne Chance!
+	This PCB came with PIAs 6821 for IO
+
+    Color system seems to pass the BP data through
+	gates, latches or PLDs and get finally inverted.
+
+    Cards GFX are similar to Golden Poker ones,
+	but the back cards GFX are different...
+
+    debug: bp 5042
+
+*/
+ROM_START( bchancep )	/* Bonne Chance! with PIAs 6821 */
+	ROM_REGION( 0x3000, "gfx", 0 )
+	ROM_LOAD( "84.bin",  0x0000, 0x1000, CRC(31f8104e) SHA1(b99f79019517ca90c48e9f303f41256d68faea91) )		/* cards deck gfx bitplane 3, identical halves */
+	ROM_LOAD( "85.bin",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )		/* cards deck gfx bitplane 2, identical halves */
+	ROM_LOAD( "87.bin",  0x2000, 0x1000, CRC(79c3578a) SHA1(9f25749f59385e6b80684ba9d4b218eb2a546e8c) )		/* 1st half text layer, 2nd half cards deck gfx bitplane 1 */
+
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "88.bin",  0x5000, 0x1000, CRC(c617b037) SHA1(55b58496d12dc8bcaa252e8ee847dbcb7d2c417d) )
+	ROM_LOAD( "89.bin",  0x6000, 0x1000, CRC(15599de0) SHA1(5e7a87dded97ce7829759ed9524809241526b6d8) )
+	ROM_LOAD( "90.bin",  0x7000, 0x1000, CRC(86690685) SHA1(b8a8039b58f2cdfce77266ac523d87b0d627f213) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(            0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_COPY( "gfx",     0x2000, 0x1000, 0x0800 )															/* text layer and cards logo */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "gfx",     0x0000, 0x0000, 0x0800 )															/* cards deck gfx, bitplane 1 */
+	ROM_COPY( "gfx",     0x1000, 0x0800, 0x0800 )															/* cards deck gfx, bitplane 2 */
+	ROM_COPY( "gfx",     0x2800, 0x1000, 0x0800 )															/* cards deck gfx, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "bchancep_bp.bin", 0x0000, 0x0100, CRC(70fe1582) SHA1(118c743d445a37ad760e4163b61c3c562d7adda6) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -9393,7 +9446,7 @@ ROM_END
   sloco93a   --------   fast      custom     complete    only grid
 
 */
-DRIVER_INIT_MEMBER(goldnpkr_state,royale)
+DRIVER_INIT_MEMBER(goldnpkr_state, royale)
 {
 	/* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
@@ -9422,7 +9475,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,royale)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state,flcnw)
+DRIVER_INIT_MEMBER(goldnpkr_state, flcnw)
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
@@ -9439,7 +9492,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,flcnw)
 }
 
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsa)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsa)
 {
 	/* $e097-e098, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9451,7 +9504,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsa)
 	ROM[0xe098] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsb)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsb)
 {
 	/* $e87b-e87c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9463,7 +9516,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsb)
 	ROM[0xe87c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsc)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsc)
 {
 	/* $453a-453b, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9475,7 +9528,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsc)
 	ROM[0x453b] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsww)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlsww)
 {
 	/* $f2c9-f2ca, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9487,7 +9540,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsww)
 	ROM[0xf2ca] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwa)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwa)
 {
 	/* $df80-df81, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9499,7 +9552,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwa)
 	ROM[0xdf81] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwc)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwc)
 {
 	/* $e42f-e430, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9511,7 +9564,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwc)
 	ROM[0xe430] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwd)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwd)
 {
 	/* $e442-e443, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9523,7 +9576,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwd)
 	ROM[0xe443] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwh)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwh)
 {
 	/* $e4d5-e4d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9535,7 +9588,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwh)
 	ROM[0xe4d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwl)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwl)
 {
 	/* $e87c-e87d, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9547,7 +9600,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwl)
 	ROM[0xe87d] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwo)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwo)
 {
 	/* $e7d5-e7d6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9559,7 +9612,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwo)
 	ROM[0xe7d6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwp)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwp)
 {
 	/* $e7d9-e7da, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9571,7 +9624,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwp)
 	ROM[0xe7da] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwr)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwr)
 {
 	/* $e7f7-e7f8, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9583,7 +9636,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwr)
 	ROM[0xe7f8] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswws)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswws)
 {
 	/* $e8a5-e8a6, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9595,7 +9648,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswws)
 	ROM[0xe8a6] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwt)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwt)
 {
 	/* $e955-e956, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9607,7 +9660,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwt)
 	ROM[0xe956] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwu)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwu)
 {
 	/* $ee6b-ee6c, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9619,7 +9672,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwu)
 	ROM[0xee6c] = 0xea;
 }
 
-DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwv)
+DRIVER_INIT_MEMBER(goldnpkr_state, vkdlswwv)
 {
 	/* $f052-f053, NOPing the BNE-->KILL
 	   after compare with Dallas TK data
@@ -9707,7 +9760,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwv)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state,icp1db)
+DRIVER_INIT_MEMBER(goldnpkr_state, icp1db)
 {
 	/* nothing yet... */
 }
@@ -9751,7 +9804,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,icp1db)
 
 ***********************************************/
 
-DRIVER_INIT_MEMBER(goldnpkr_state,wstrike)
+DRIVER_INIT_MEMBER(goldnpkr_state, wstrike)
 {
 	/* NOPing the BNE --> $F2EA (KILL)
 	   after compare with a string inside the Dallas TK RAM
@@ -9764,47 +9817,64 @@ DRIVER_INIT_MEMBER(goldnpkr_state,wstrike)
 }
 
 
+DRIVER_INIT_MEMBER(goldnpkr_state, bchancep)
+{
+	/* Attempt to invert the color data from the bipolar PROM */
+
+	UINT8 *ROM = memregion("proms")->base();
+	int size = memregion("proms")->bytes();
+	int start = 0x0000;
+	int i;
+
+	for (i = start; i < size; i++)
+	{
+		ROM[i] = ROM[i] ^ 0x0f;
+	}
+}
+
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, driver_device, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
-GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, driver_device, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
+GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
 
-GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, driver_device, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
-GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, driver_device, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold, driver_device,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
-GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold, driver_device,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
-GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngold, driver_device,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
+GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, driver_device,  0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
+GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngold,    driver_device,  0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
 
 GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)", 0,                layout_goldnpkr )
-GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, driver_device, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
-GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, driver_device, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
-GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, driver_device, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
-GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, driver_device, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
+GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, driver_device,  0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
+GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, driver_device,  0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
+GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, driver_device,  0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
+GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, driver_device,  0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
 GAMEL( 1991, witchcde,  witchcrd, witchcrd, witchcrd, goldnpkr_state, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", 0,                layout_goldnpkr )
-GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, driver_device, 0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
-GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, driver_device, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
-GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, driver_device, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
-GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, driver_device, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
+GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
+GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, driver_device,  0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
+GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, driver_device,  0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
+GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, driver_device,  0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
 
-GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, driver_device, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",         0,                layout_goldnpkr )
-GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, driver_device, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",         GAME_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, driver_device,  0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",         0,                layout_goldnpkr )
+GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, driver_device,  0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",         GAME_NOT_WORKING, layout_goldnpkr )
 
 GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",  0,                layout_goldnpkr )
 
 GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                layout_goldnpkr )  /* Ver 184A, 2001-09-12 */
 GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                layout_goldnpkr )  /* Ver 157-SP, 1992-12-25 */
-GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, driver_device, 0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     GAME_NOT_WORKING, layout_goldnpkr )   /* Ver 157-TE, 1992-12-25 */
+GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     GAME_NOT_WORKING, layout_goldnpkr )   /* Ver 157-TE, 1992-12-25 */
 GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                layout_goldnpkr )  /* Ver 162A, 1994-04-26 */
 GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                layout_goldnpkr )  /* Ver 162B, 1994-04-26 */
-GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, driver_device, 0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     GAME_NOT_WORKING, layout_goldnpkr )   /* Ver 162A-F, 1994-04-26 */
+GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, driver_device,  0,        ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     GAME_NOT_WORKING, layout_goldnpkr )   /* Ver 162A-F, 1994-04-26 */
 GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                layout_goldnpkr )  /* Ver 162A alt, 1994-11-03 */
 GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                layout_goldnpkr )  /* Ver 162B alt, 1994-11-03 */
 GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                layout_goldnpkr )  /* Ver 165A, 1995-11-16 */
@@ -9823,74 +9893,76 @@ GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwt, 
 GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                layout_goldnpkr )  /* Ver 179A, 2000-05-10 */
 GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                layout_goldnpkr )  /* Ver 183A, 2001-06-13 */
 
-GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, driver_device, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    /* Ver 1.02, 1998-10-26 */
-GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, driver_device, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    /* Ver 0.99, 1998-04-09 */
-GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, driver_device, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    /* Ver 0.99, 1998-03-23 */
-GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, driver_device, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    /* Ver 0.99 alt, 1998-05-11 */
-GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, driver_device, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    /* Ver 0.99T, 1998-03-23 */
+GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    /* Ver 1.02, 1998-10-26 */
+GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    /* Ver 0.99, 1998-04-09 */
+GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    /* Ver 0.99, 1998-03-23 */
+GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    /* Ver 0.99 alt, 1998-05-11 */
+GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, driver_device,  0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    /* Ver 0.99T, 1998-03-23 */
 
-GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike, goldnpkr_state,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
-GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike, goldnpkr_state,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
+GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
+GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
 
-GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                       layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
-GAMEL( 1994, wtchjacka, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
-GAMEL( 1995, wtchjackb, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
-GAMEL( 1995, wtchjackc, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   GAME_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
-GAMEL( 1995, wtchjackd, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
-GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
-GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
-GAMEL( 1996, wtchjackg, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
-GAMEL( 1996, wtchjackh, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
-GAMEL( 1996, wtchjacki, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                       layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
-GAMEL( 1996, wtchjackj, wtchjack, wcrdxtnd, wtchjack, driver_device, 0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                       layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
+GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                       layout_goldnpkr )    /* Ver 0.87-89 / 1996-10-08 GFX OK */
+GAMEL( 1994, wtchjacka, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.25 / 1994-11-24 */
+GAMEL( 1995, wtchjackb, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.40 / 1995-02-27 */
+GAMEL( 1995, wtchjackc, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   GAME_NOT_WORKING,        layout_goldnpkr )    /* Ver 0.40T / 1995-02-27 */
+GAMEL( 1995, wtchjackd, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.62 / 1995-08-02 */
+GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.64 / 1995-09-13 */
+GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.65 / 1995-10-19 */
+GAMEL( 1996, wtchjackg, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70S / 1996-03-26 */
+GAMEL( 1996, wtchjackh, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )    /* Ver 0.70P / 1996-03-26 */
+GAMEL( 1996, wtchjacki, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                       layout_goldnpkr )    /* Ver 0.87 / 1996-07-16, GFX OK */
+GAMEL( 1996, wtchjackj, wtchjack, wcrdxtnd, wtchjack, driver_device,  0,        ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                       layout_goldnpkr )    /* Ver 0.87-88 / 1996-10-02, GFX OK */
 
-GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
-GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, driver_device, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
-GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, driver_device, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
-GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
-GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, driver_device, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
+GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
+GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
+GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
+GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
+GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, driver_device,  0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, driver_device, 0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, driver_device, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,   layout_goldnpkr )
-GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, driver_device, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,   layout_goldnpkr )
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, driver_device,  0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,   layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, driver_device,  0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,   layout_goldnpkr )
 GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, goldnpkr_state, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    GAME_NOT_WORKING )
 
 /*************************************** OTHER SETS ***************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker, driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
-GAMEL( 198?, royale,    0,        goldnpkr, royale, goldnpkr_state,   royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAMEL( 198?, royalea,   royale,   goldnpkr, royale, goldnpkr_state,   royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1993, sloco93,   0,        witchcrd, sloco93, driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
-GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93, driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
-GAME(  198?, maverik,   0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
-GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
-GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
-GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
-GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
-GAME(  1993, brasil93,  0,        witchcrd, bsuerte, driver_device,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )               // no lamps
-GAME(  1991, poker91,   0,        witchcrd, poker91, driver_device,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
-GAME(  198?, genie,     0,        genie,    genie, driver_device,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, driver_device, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  1987, caspoker,  0,        goldnpkr, caspoker, driver_device, 0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
+GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
+GAMEL( 198?, royale,    0,        goldnpkr, royale,   goldnpkr_state, royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, royalea,   royale,   goldnpkr, royale,   goldnpkr_state, royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
+GAME(  1993, sloco93,   0,        witchcrd, sloco93,  driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
+GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  driver_device,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
+GAME(  198?, maverik,   0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
+GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
+GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
+GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
+GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
+GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  driver_device,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )               // no lamps
+GAME(  1991, poker91,   0,        witchcrd, poker91,  driver_device,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
+GAME(  198?, genie,     0,        genie,    genie,    driver_device,  0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
+GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  1987, caspoker,  0,        goldnpkr, caspoker, driver_device,  0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
 
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )    // lacks of 2nd program ROM.
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, driver_device,  0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )    // lacks of 2nd program ROM.
 GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, goldnpkr_state, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )   // encrypted.
+
+GAME(  198?, bchancep,  0,        goldnpkr, goldnpkr, goldnpkr_state, bchancep, ROT0,   "<unknown>",                "Bonne Chance! (Golden Poker prequel hardware)", GAME_NOT_WORKING )
