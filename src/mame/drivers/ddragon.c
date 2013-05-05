@@ -407,8 +407,8 @@ WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 
 WRITE8_MEMBER(ddragon_state::dd_adpcm_w)
 {
-	device_t *adpcm = (offset & 1) ? m_adpcm2 : m_adpcm1;
-	int chip = (adpcm == m_adpcm1) ? 0 : 1;
+	int chip = offset & 1;
+	device_t *adpcm = chip ? m_adpcm2 : m_adpcm1;
 
 	switch (offset / 2)
 	{
@@ -460,7 +460,7 @@ WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
 
 WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
 {
-	dd_adpcm_int(m_adpcm2,0);
+	dd_adpcm_int(m_adpcm2,1);
 }
 
 
