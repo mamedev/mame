@@ -14,6 +14,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8155.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "cp1.lh"
 
 class cp1_state : public driver_device
@@ -53,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
 	DECLARE_WRITE8_MEMBER(putbus);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
 
 	DECLARE_READ8_MEMBER(i8155_read);
 	DECLARE_WRITE8_MEMBER(i8155_write);
@@ -266,6 +268,28 @@ void cp1_state::machine_reset()
 	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
+QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
+{
+	UINT8 *dest = (UINT8*)m_i8155->space().get_read_ptr(0);
+	char line[0x10];
+	int addr = 0;
+	while (image.fgets(line, 10) && addr < 0x100)
+	{
+		int op = 0, arg = 0;
+		if (sscanf(line, "%d.%d", &op, &arg) == 2)
+		{
+			dest[addr++] = op;
+			dest[addr++] = arg;
+		}
+		else
+		{
+			return IMAGE_INIT_FAIL;
+		}
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
 static I8155_INTERFACE( i8155_intf )
 {
 	DEVCB_NULL,                                       // port A read
@@ -299,6 +323,8 @@ static MACHINE_CONFIG_START( cp1, cp1_state )
 	MCFG_DEFAULT_LAYOUT(layout_cp1)
 
 	MCFG_CASSETTE_ADD("cassette", default_cassette_interface)
+
+	MCFG_QUICKLOAD_ADD("quickload", cp1_state, quickload, "obj", 1)
 MACHINE_CONFIG_END
 
 /* ROM definition */
