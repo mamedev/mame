@@ -117,6 +117,8 @@ public:
 	DECLARE_VIDEO_START(spi);
 	DECLARE_MACHINE_RESET(seibu386);
 	DECLARE_VIDEO_START(sys386f2);
+	DECLARE_MACHINE_START(sxx2e);
+	DECLARE_MACHINE_RESET(sxx2e);
 	DECLARE_MACHINE_START(sxx2f);
 	DECLARE_MACHINE_RESET(sxx2f);
 	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
