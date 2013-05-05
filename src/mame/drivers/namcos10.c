@@ -252,13 +252,14 @@ This PCB is used on:
                                       MEM PCB
 Game                                  Sticker       KEYCUS   ROMs Populated
 ---------------------------------------------------------------------------
-Gamshara                              10021 Ver.A   KC020A   8E, 8D
 Gekitoride-Jong Space                 10011 Ver.A   KC003A   8E, 8D, 7E, 7D
 Mr.Driller G                          DRG1  Ver.A   KC007A   8E, 8D, 7E
 Kotoba no Puzzle Mojipittan           KPM1  Ver.A   KC012A   8E, 8D, 7E
 Panicuru Panekuru                     PPA1  Ver.A   KC017A   8E, 8D, 7E
 Star Trigon                           STT1  Ver.A   KC019A   8E, 8D
-Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
+Gamshara                              10021 Ver.A   KC020A   8E, 8D
+Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A   8E, 8D, 7E, 7D, 6E
+Kono Tako                             10021 Ver.A   KC034A   8E, 8D
 
       Note
       1. The ROM PCB has locations for 16x 128MBit FlashROMs (Total capacity = 2048MBits) but usually only a few are populated.
@@ -314,6 +315,7 @@ public:
 	DECLARE_DRIVER_INIT(gamshara);
 	DECLARE_DRIVER_INIT(mrdrilrg);
 	DECLARE_DRIVER_INIT(chocovdr);
+	DECLARE_DRIVER_INIT(konotako);
 	DECLARE_MACHINE_RESET(namcos10);
 	void memn_driver_init(  );
 	required_device<cpu_device> m_maincpu;
@@ -565,9 +567,6 @@ DRIVER_INIT_MEMBER(namcos10_state,gunbalna)
 
 DRIVER_INIT_MEMBER(namcos10_state,chocovdr)
 {
-//  NOTE: none of the possible permutations show the Sony Computer Entertainment string at BIOS[0x84], very likely a bad dump
-//                                             BAD? 0 or 9                             1 or 8         0 or 9
-//                         ok!  ok!  ok!  ok!            ok!  ok!  ok!  ok!  ok!  ok!       ok!  ok!
 	decrypt_bios( machine(), "user2", 0x8400, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3, 0xc, 0xf, 0xe, 0xd, 0x8, 0xb, 0xa, 0x9 );
 	memn_driver_init();
 }
@@ -581,6 +580,12 @@ DRIVER_INIT_MEMBER(namcos10_state,panikuru)
 DRIVER_INIT_MEMBER(namcos10_state,nflclsfb)
 {
 	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9 );
+	memn_driver_init();
+}
+
+DRIVER_INIT_MEMBER(namcos10_state,konotako)
+{
+	decrypt_bios( machine(), "user2", 0x8400, 0x6, 0x7, 0x4, 0x5, 0x0, 0x1, 0x3, 0x2, 0xd, 0xc, 0xf, 0xe, 0x8, 0x9, 0xb, 0xa );
 	memn_driver_init();
 }
 
@@ -776,7 +781,7 @@ ROM_START( chocovdr )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
 
 	ROM_REGION16_LE( 0x5280000, "user2", 0 ) /* main prg */
-	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, BAD_DUMP CRC(f265b1b6) SHA1(f327e7bac0bc1bd31aa3362e36233130a6b240ea) )
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(f36eebb5) SHA1(a0464186b247b28f37005ffd9e9b7370145f67ef) )
 	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(05d01cd2) SHA1(e9947ebea24d618e8b9a69f582ef0b9d97bb4cad) )
 	ROM_LOAD( "2.7e",         0x2100000, 0x1080000, CRC(2e308d20) SHA1(4ff072f0d488b12f77ef7d119822f89b5b5a6712) )
 	ROM_LOAD( "3.7d",         0x3180000, 0x1080000, CRC(126c9e6f) SHA1(32de87f01fd1c8c26a68bf42a062f5f44bcc5a3b) )
@@ -804,6 +809,15 @@ ROM_START( nflclsfb )
 	ROM_LOAD( "3.7d",         0x3180000, 0x1080000, CRC(0a4e601d) SHA1(9c302a0b5aaf7046390982e62092b867c3a534a5) )
 ROM_END
 
+ROM_START( konotako )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 ) /* bios */
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION16_LE( 0x4200000, "user2", 0 ) /* main prg */
+	ROM_LOAD( "0.8e",         0x0000000, 0x1080000, CRC(63d23a0c) SHA1(31b54119f20827ff13ecf0cd87803a5e27eaafe7) )
+	ROM_LOAD( "1.8d",         0x1080000, 0x1080000, CRC(bdbed53c) SHA1(5773069c43642e6f334cee185a6fb6908eedcf4a) )
+ROM_END
+
 
 GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR22 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PORT_4WAY joysticks
@@ -818,3 +832,4 @@ GAME( 2002, startrgn,  0,        namcos10_memn, namcos10, namcos10_state, startr
 GAME( 2002, panikuru,  0,        namcos10_memn, namcos10, namcos10_state, panikuru, ROT0, "Namco", "Panicuru Panekuru (Japan, PPA1 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, nflclsfb,  0,        namcos10_memn, namcos10, namcos10_state, nflclsfb, ROT0, "Namco", "NFL Classic Football (NCF3 Ver.A.)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2003, gamshara,  0,        namcos10_memn, namcos10, namcos10_state, gamshara, ROT0, "Mitchell", "Gamshara (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2003, konotako,  0,        namcos10_memn, namcos10, namcos10_state, konotako, ROT0, "Mitchell", "Kono Tako (10021 Ver.A)", GAME_NOT_WORKING | GAME_NO_SOUND )
