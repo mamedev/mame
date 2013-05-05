@@ -749,7 +749,7 @@ Notes:
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
             Final Furlong 2 FFS1     KC???     -
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
-            Motocross Go!   MG1      KC???     3A, 3C, 4A, 4C, 4F and 7F not populated.
+            Motocross Go!   MG1      KC009     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
             Race On!        RO1      KC017     2M and 2F not populated.
             Time Crisis 2   TSS1     KC010     3A and 3C not populated.
