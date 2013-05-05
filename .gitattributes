@@ -6636,6 +6636,7 @@ src/mess/layout/chessmst.lay svneol=native#text/plain
 src/mess/layout/chesstrv.lay svneol=native#text/plain
 src/mess/layout/coco3.lay svneol=native#text/plain
 src/mess/layout/cosmicos.lay svneol=native#text/plain
+src/mess/layout/cp1.lay svneol=native#text/xml
 src/mess/layout/cvicny.lay svneol=native#text/plain
 src/mess/layout/dectalk.lay svneol=native#text/plain
 src/mess/layout/digel804.lay svneol=native#text/plain
