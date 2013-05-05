@@ -2618,7 +2618,6 @@ void towns_state::machine_reset()
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
 	m_cdda = machine().device("cdda");
 	m_scsi = machine().device<fmscsi_device>("scsi:fm");
-	m_ram = m_ram;
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;
 	m_nmi_mask = 0x00;
