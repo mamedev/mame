@@ -1835,11 +1835,11 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, 50000000/2)   /* Intel 386DX, 25MHz */
+	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2)   /* Intel 386DX, 25MHz */
 	MCFG_CPU_PROGRAM_MAP(spi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state,  spi_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 28636360/4)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_28_63636MHz/4)
 	MCFG_CPU_PROGRAM_MAP(spisound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -1869,10 +1869,41 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF271, 16934400)
+	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
 	MCFG_SOUND_CONFIG(ymf271_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_START_MEMBER(seibuspi_state,sxx2e)
+{
+	m_z80_rom = auto_alloc_array(machine(), UINT8, 0x40000);
+}
+
+MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
+{
+	UINT8 *rom = memregion("soundcpu")->base();
+
+	membank("bank4")->set_base(m_z80_rom);
+	membank("bank5")->set_base(m_z80_rom);
+
+	memcpy(m_z80_rom, rom, 0x40000);
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),this));
+
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
+
+	m_sb_coin_latch = 0;
+}
+
+static MACHINE_CONFIG_DERIVED( sxx2e, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz */
+
+	MCFG_MACHINE_START_OVERRIDE(seibuspi_state,sxx2e)
+	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state,sxx2e)
+
+	MCFG_DEVICE_REMOVE("flash0")
+	MCFG_DEVICE_REMOVE("flash1")
+
 MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(seibuspi_state,sxx2f)
@@ -1910,12 +1941,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measured clocks */
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
+	MCFG_CPU_CLOCK(XTAL_28_63636MHz) /* AMD AM386DX/DX-40, 28.63636MHz */
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(4915200) /* 4.9152MHz */
+	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
 
-	MCFG_SOUND_REPLACE("ymf", YMF271, 16384000) /* 16.3840MHz */
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz)
 	MCFG_SOUND_CONFIG(ymf271_config)
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -2883,62 +2914,88 @@ ROM_END
 
 ROM_START( rdftadi ) // Dream Island license
 	ROM_REGION32_LE(0x200000, "user1", 0)   /* i386 program */
-	ROM_LOAD32_BYTE("seibu__1.u0211",       0x000000, 0x080000, CRC(fc0e2885) SHA1(79621155d992d504e993bd3ee0d6ff3903bd5415) )
-	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
-	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) )
+	ROM_LOAD32_BYTE("seibu__1.u0211",       0x000000, 0x080000, CRC(fc0e2885) SHA1(79621155d992d504e993bd3ee0d6ff3903bd5415) ) // socket is silkscreened on pcb PRG0
+	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
 	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
-	ROM_LOAD24_WORD_SWAP("raiden-f__fix.u0425", 0x000000, 0x20000, BAD_DUMP CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) ) // Need to verify ROM
-	ROM_LOAD24_BYTE("seibu__7.u048",            0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
+	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
 	ROM_REGION( 0x600000, "gfx2", 0)    /* background layer roms */
-	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
-	ROM_LOAD24_BYTE("gun_dogs__bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
-	ROM_LOAD24_WORD("gun_dogs__bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
-	ROM_LOAD24_BYTE("gun_dogs__bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
 
 	ROM_REGION( 0xc00000, "gfx3", 0)    /* sprites */
-	ROM_LOAD("gun_dogs__obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
-	ROM_LOAD("gun_dogs__obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
-	ROM_LOAD("gun_dogs__obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
 
 	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)    /* sound roms */
-	ROM_LOAD("raiden-f__pcm2.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
-	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom.
-	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("raiden-f_pcm2.u0217", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
+	/* SOUND1 socket is unpopulated */
 ROM_END
 
 ROM_START( rdftam ) // Metrotainment license
 	ROM_REGION32_LE(0x200000, "user1", 0)   /* i386 program */
 	ROM_LOAD32_BYTE("seibu_1.u0211",        0x000000, 0x080000, CRC(156D8DB0) SHA1(93662B3EE494E37A56428A7AA3DAD7A957835950) ) // socket is silkscreened on pcb PRG0
-	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
-	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) )
+	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
 	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
-	ROM_LOAD24_WORD_SWAP("raiden-f__fix.u0425", 0x000000, 0x20000, BAD_DUMP CRC(cc7acfde) SHA1(1f3c40b4d2009e011e135c89aebf2b4bd05fa861) ) // Need to verify ROM
-	ROM_LOAD24_BYTE("seibu__7.u048",            0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
+	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
 	ROM_REGION( 0x600000, "gfx2", 0)    /* background layer roms */
-	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
-	ROM_LOAD24_BYTE("gun_dogs__bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
-	ROM_LOAD24_WORD("gun_dogs__bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
-	ROM_LOAD24_BYTE("gun_dogs__bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
 
 	ROM_REGION( 0xc00000, "gfx3", 0)    /* sprites */
-	ROM_LOAD("gun_dogs__obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
-	ROM_LOAD("gun_dogs__obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
-	ROM_LOAD("gun_dogs__obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
 
 	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)    /* sound roms */
-	ROM_LOAD("raiden-f__pcm2.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
-	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom.
-	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+	ROM_LOAD("raiden-f_pcm2.u0217", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
+	/* SOUND1 socket is unpopulated */
+ROM_END
+
+
+ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
+	ROM_REGION32_LE(0x200000, "user1", 0)   /* i386 program */
+	ROM_LOAD32_BYTE("seibu_1.u0259",        0x000000, 0x080000, CRC(e278dddd) SHA1(fe54a0d0f9e8596268f7f37e85d71c5c2d8b2846) ) // socket is silkscreened on pcb PRG0
+	ROM_LOAD32_BYTE("raiden-f_prg2.u0258",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f_prg34.u0262", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
+
+	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_LOAD24_WORD("raiden-f_fix.u0535", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
+	ROM_LOAD24_BYTE("seibu_fix2.u0528",   0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIX2
+
+	ROM_REGION( 0x600000, "gfx2", 0)    /* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs_bg1-d.u0526", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs_bg1-p.u0531", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs_bg2-d.u0534", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs_bg2-p.u0530", 0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0xc00000, "gfx3", 0)   /* sprites */
+	ROM_LOAD("gun_dogs_obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs_obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+
+	ROM_REGION(0x40000, "soundcpu", 0)      /* 256k for the Z80 */
+	ROM_LOAD("seibu_zprog.u1139", 0x000000, 0x20000, CRC(c1fda3e8) SHA1(c1d3a7ba0601a80534ec32249de71d33a828a162) )
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)  /* sound roms */
+	ROM_LOAD("raiden-f_pcm2.u0975", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) )
+	/* SOUND1 socket is unpopulated */
 ROM_END
 
 
@@ -3695,6 +3752,9 @@ GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, seibuspi_state, rfjet,  R
 GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, seibuspi_state, rfjet,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, seibuspi_state, rfjet,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1998, rfjett,    rfjet,   spi,      spi_2button, seibuspi_state, rfjet,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Taiwan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+
+/* SXX2E */
+GAME( 1996, rdfts,     rdft,    sxx2e,    spi_3button, seibuspi_state, rdft,   ROT270, "Seibu Kaihatsu (Explorer System Corp. license)", "Raiden Fighters (Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 /* SXX2F */
 GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, seibuspi_state, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) // title screen shows '2.1'
