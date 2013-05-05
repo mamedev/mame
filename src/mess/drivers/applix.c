@@ -240,12 +240,12 @@ static MC6845_UPDATE_ROW( applix_update_row )
 
 	for (x = 0; x < x_count; x++)
 	{
-		mem = vidbase + ma*4 + x + ra*x_count;
-		chr = state->m_base[mem];
 
 		if (BIT(state->m_pa, 3))
 		// 640 x 200 x 4of16 mode
 		{
+			mem = vidbase + ma + x + ((y%4)<<12);
+			chr = state->m_base[mem];
 			for (i = 0; i < 8; i++)
 			{
 				*p++ = palette[state->m_palette_latch[chr>>14]];
@@ -255,6 +255,8 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		else
 		// 320 x 200 x 16 mode
 		{
+			mem = vidbase + ma + x + ((y%4)<<12);
+			chr = state->m_expansion[mem];
 			for (i = 0; i < 4; i++)
 			{
 				*p++ = palette[chr>>12];
