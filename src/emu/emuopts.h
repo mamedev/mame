@@ -199,6 +199,8 @@ enum
 #define OPTION_CONFIRM_QUIT         "confirm_quit"
 #define OPTION_UI_MOUSE             "ui_mouse"
 
+#define OPTION_AUTOBOOT_COMMAND		"autoboot_command"
+#define OPTION_AUTOBOOT_DELAY		"autoboot_delay"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -352,6 +354,9 @@ public:
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }
+	
+	const char *autoboot_command() const { return value(OPTION_AUTOBOOT_COMMAND); }
+	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
 
 	// device-specific options
 	const char *device_option(device_image_interface &image);

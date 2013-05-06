@@ -232,6 +232,13 @@ const char *running_machine::describe_context()
 	return m_context;
 }
 
+TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
+{
+	if (strlen(options().autoboot_command())!=0) {
+		ioport().natkeyboard().post_utf8(options().autoboot_command());
+		ioport().natkeyboard().post_utf8("\r");	
+	}
+}
 
 //-------------------------------------------------
 //  start - initialize the emulated machine
@@ -321,6 +328,9 @@ void running_machine::start()
 
 	// set up the cheat engine
 	m_cheat = auto_alloc(*this, cheat_manager(*this));
+
+	/* allocate a timer */
+	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
 
 	// disallow save state registrations starting here
 	m_save.allow_registration(false);
@@ -839,8 +849,11 @@ void running_machine::soft_reset(void *ptr, INT32 param)
 	// call all registered reset callbacks
 	call_notifiers(MACHINE_NOTIFY_RESET);
 
+	// setup autoboot if needed
+	m_autoboot_timer->adjust(attotime(options().autoboot_delay(),0),0);
+	
 	// now we're running
-	m_current_phase = MACHINE_PHASE_RUNNING;
+	m_current_phase = MACHINE_PHASE_RUNNING;	
 }
 
 

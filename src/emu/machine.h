@@ -329,6 +329,8 @@ private:
 	void stop_all_devices();
 	void presave_all_devices();
 	void postload_all_devices();
+	
+	TIMER_CALLBACK_MEMBER(autoboot_callback);
 
 	// internal state
 	const machine_config &  m_config;               // reference to the constructed machine_config
@@ -415,6 +417,7 @@ private:
 	memory_manager          m_memory;               // memory manager
 	ioport_manager          m_ioport;               // I/O port manager
 	device_scheduler        m_scheduler;            // scheduler object
+	emu_timer           	*m_autoboot_timer;		// autoboot timer
 };
 
 
