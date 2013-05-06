@@ -63,6 +63,10 @@ The other has the secondary label 351100210 with a serial number labeled:
  S/N: SIURxxxx (xxxx=number of PCB)
  SPACE INVADERS U/R
 
+NOTE: There is known to exist a PCB labeled as K11T0976C vs the K11T0976B as listed above. This PCB
+      has the OKI PCM rom labeled as F34-03 which is different to the current set which is F34-01.
+      It's unknown if the F34-03 sample rom is an updated or corrected sample set.
+
 Both boards have the same program code and either can be set to Coin or Free Play
 as well as Up Right, Cocktail or Flip Screen from the service menu.
 
