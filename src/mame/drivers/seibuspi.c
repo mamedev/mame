@@ -2918,7 +2918,7 @@ ROM_START( rdftadi ) // Dream Island license
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
-	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
 	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
@@ -2946,7 +2946,7 @@ ROM_START( rdftam ) // Metrotainment license
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0212",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0219", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
-	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0425", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
 	ROM_LOAD24_BYTE("seibu_7.u048",       0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
 
@@ -2975,7 +2975,7 @@ ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
 	ROM_LOAD32_BYTE("raiden-f_prg2.u0258",  0x000001, 0x080000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
 	ROM_LOAD32_WORD("raiden-f_prg34.u0262", 0x000002, 0x100000, CRC(63f01d17) SHA1(74dbd0417b974583da87fc6c7a081b03fd4e16b8) ) // socket is silkscreened on pcb PRG23
 
-	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */ /* Do we need to specify an "endianess" so this works on all machines? */
+	ROM_REGION( 0x30000, "gfx1", 0) /* text layer roms */
 	ROM_LOAD24_WORD("raiden-f_fix.u0535", 0x000000, 0x20000, CRC(2be2936b) SHA1(9e719f7328a52af220b6f084c1e0990ca6e2d533) ) // socket is silkscreened on pcb FIX01
 	ROM_LOAD24_BYTE("seibu_fix2.u0528",   0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIX2
 
@@ -2991,10 +2991,10 @@ ROM_START( rdfts )    /* Single board version SXX2E Ver3.0 */
 	ROM_LOAD("gun_dogs_obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
 
 	ROM_REGION(0x40000, "soundcpu", 0)      /* 256k for the Z80 */
-	ROM_LOAD("seibu_zprog.u1139", 0x000000, 0x20000, CRC(c1fda3e8) SHA1(c1d3a7ba0601a80534ec32249de71d33a828a162) )
+	ROM_LOAD("seibu_zprg.u1139", 0x000000, 0x20000, CRC(c1fda3e8) SHA1(c1d3a7ba0601a80534ec32249de71d33a828a162) ) // pads are silkscreened ZPRG
 
 	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)  /* sound roms */
-	ROM_LOAD("raiden-f_pcm2.u0975", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) )
+	ROM_LOAD("raiden-f_pcm2.u0975", 0x000000, 0x200000, CRC(3f8d4a48) SHA1(30664a2908daaeaee58f7e157516b522c952e48d) ) // pads are silkscreened SOUND0
 	/* SOUND1 socket is unpopulated */
 ROM_END
 
