@@ -51,6 +51,7 @@ void psxcard_device::device_start()
 	m_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxcard_device::ack_timer), this));
 
 	m_ack = true;
+	m_disabled = false;
 
 	// save state registrations
 /*  save_item(NAME(pkt));
@@ -95,7 +96,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 	switch (state)
 	{
 		case state_illegal:
-			if ((to == 0x81) && is_loaded())
+			if (is_loaded())
 			{
 //              printf("CARD: begin\n");
 				state = state_command;
@@ -277,6 +278,12 @@ unsigned char psxcard_device::checksum_data(const unsigned char *buf, const unsi
 
 bool psxcard_device::call_load()
 {
+	if(m_disabled)
+	{
+		logerror("psxcard: port disabled\n");
+		return IMAGE_INIT_FAIL;
+	}
+
 	if(length() != card_size)
 		return IMAGE_INIT_FAIL;
 	return IMAGE_INIT_PASS;
@@ -286,6 +293,12 @@ bool psxcard_device::call_create(int format_type, option_resolution *format_opti
 {
 	UINT8 block[block_size];
 	int i, ret;
+
+	if(m_disabled)
+	{
+		logerror("psxcard: port disabled\n");
+		return IMAGE_INIT_FAIL;
+	}
 
 	memset(block, '\0', block_size);
 	for(i = 0; i < (card_size/block_size); i++)

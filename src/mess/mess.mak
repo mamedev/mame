@@ -1771,6 +1771,7 @@ $(MESSOBJ)/sony.a:              \
 	$(MESS_MACHINE)/psxcd.o     \
 	$(MESS_MACHINE)/psxcard.o   \
 	$(MESS_MACHINE)/psxanalog.o \
+	$(MESS_MACHINE)/psxmultitap.o \
 	$(MESS_DRIVERS)/pockstat.o  \
 	$(MESS_DRIVERS)/smc777.o    \
 

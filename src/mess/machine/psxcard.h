@@ -29,10 +29,13 @@ public:
 	virtual bool call_load();
 	virtual bool call_create(int format_type, option_resolution *format_options);
 
+	void disable(bool state) { m_disabled = state; if(state) unload(); }
+
 private:
 	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd;
 	unsigned short addr;
 	int state;
+	bool m_disabled;
 
 	UINT8 m_odata;
 	UINT8 m_idata;

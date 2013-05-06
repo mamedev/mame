@@ -20,6 +20,7 @@ class psx_controller_port_device;
 
 class device_psx_controller_interface : public device_slot_card_interface
 {
+	friend class psx_multitap_device;
 public:
 	device_psx_controller_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_psx_controller_interface();
@@ -111,6 +112,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(rx_r) { return (m_dev?m_dev->rx_r():true) && m_card->rx_r(); }
 	DECLARE_READ_LINE_MEMBER(ack_r) { return (m_dev?m_dev->ack_r():true) && m_card->ack_r(); }
 	DECLARE_READ_LINE_MEMBER(tx_r) { return m_tx; }
+
+	void disable_card(bool status);
 
 protected:
 	virtual void device_start() {}

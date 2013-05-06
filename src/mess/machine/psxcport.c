@@ -2,6 +2,7 @@
 
 #include "machine/psxcport.h"
 #include "machine/psxanalog.h"
+#include "machine/psxmultitap.h"
 
 const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_device>;
 
@@ -26,6 +27,14 @@ machine_config_constructor psx_controller_port_device::device_mconfig_additions(
 	return MACHINE_CONFIG_NAME( psx_memory_card );
 }
 
+void psx_controller_port_device::disable_card(bool state)
+{
+	if(state)
+		popmessage("Memory card port %s is disabled\n", m_card->brief_instance_name());
+
+	m_card->disable(state);
+}
+
 const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
@@ -42,10 +51,19 @@ void psxcontrollerports_device::device_start()
 	psxsiodev_device::device_start();
 }
 
+// add controllers to define so they can be connected to the multitap
+#define PSX_CONTROLLERS \
+		SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER) \
+		SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK) \
+		SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
+
 SLOT_INTERFACE_START(psx_controllers)
-	SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER)
-	SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK)
-	SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
+	PSX_CONTROLLERS
+	SLOT_INTERFACE("multitap", PSX_MULTITAP)
+SLOT_INTERFACE_END
+
+SLOT_INTERFACE_START(psx_controllers_nomulti)
+	PSX_CONTROLLERS
 SLOT_INTERFACE_END
 
 void psxcontrollerports_device::data_in( int data, int mask )
