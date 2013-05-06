@@ -317,21 +317,21 @@ ROM_START( silkroad )
 
 	ROM_REGION( 0x1800000, "gfx1", ROMREGION_INVERT )
 	/* Sprites */
-	ROM_LOAD( "rom12.bin",  0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
-	ROM_LOAD( "rom08.bin",  0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
-	ROM_LOAD( "rom04.bin",  0x1000000, 0x0200000, CRC(d9f0bbd7) SHA1(32c055ad5497c0bec5db40b528e589d7724e354f) ) // 0
+	ROM_LOAD( "rom12.rom12", 0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
+	ROM_LOAD( "rom08.rom08", 0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
+	ROM_LOAD( "rom04.rom04", 0x1000000, 0x0200000, CRC(d9f0bbd7) SHA1(32c055ad5497c0bec5db40b528e589d7724e354f) ) // 0
 
-	ROM_LOAD( "rom13.bin",  0x0200000, 0x0200000, CRC(4ca1698e) SHA1(4fffc2f2a5fb434c42463ce904fd811866c53f81) ) // 1
-	ROM_LOAD( "rom09.bin",  0x0a00000, 0x0200000, CRC(ef0b5bf4) SHA1(acd3bc5070de84608c5da0d091094382853cb048) ) // 1
-	ROM_LOAD( "rom05.bin",  0x1200000, 0x0200000, CRC(512d6e25) SHA1(fc0a56663d77bbdfbd4242e14a55563073634582) ) // 1
+	ROM_LOAD( "rom13.rom13", 0x0200000, 0x0200000, CRC(4ca1698e) SHA1(4fffc2f2a5fb434c42463ce904fd811866c53f81) ) // 1
+	ROM_LOAD( "rom09.rom09", 0x0a00000, 0x0200000, CRC(ef0b5bf4) SHA1(acd3bc5070de84608c5da0d091094382853cb048) ) // 1
+	ROM_LOAD( "rom05.rom05", 0x1200000, 0x0200000, CRC(512d6e25) SHA1(fc0a56663d77bbdfbd4242e14a55563073634582) ) // 1
 
-	ROM_LOAD( "rom14.bin",  0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
-	ROM_LOAD( "rom10.bin",  0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
-	ROM_LOAD( "rom06.bin",  0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
+	ROM_LOAD( "rom14.rom14", 0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
+	ROM_LOAD( "rom10.rom10", 0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
+	ROM_LOAD( "rom06.rom06", 0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
 	/* Backgrounds */
-	ROM_LOAD( "rom07.bin",  0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
-	ROM_LOAD( "rom11.bin",  0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
-	ROM_LOAD( "rom15.bin",  0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
+	ROM_LOAD( "rom07.rom07", 0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
+	ROM_LOAD( "rom11.rom11", 0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
+	ROM_LOAD( "rom15.rom15", 0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
@@ -357,17 +357,17 @@ ROM_START( silkroada )
 
 	ROM_REGION( 0x1800000, "gfx1", ROMREGION_INVERT )
 	/* Sprites */ // this board has these 3 ROMs instead of the 6 on the set above
-	ROM_LOAD( "unico_sr13",  0x0000000, 0x0400000, CRC(d001c3df) SHA1(ef1b1510f33401b0983093e2d8db48d3886c4fe1) ) // 0 + 1
-	ROM_LOAD( "unico_sr09",  0x0800000, 0x0400000, CRC(696d908d) SHA1(abe3ec8a53875a136f78bbed723bb89d04196427) ) // 0 + 1
-	ROM_LOAD( "unico_sr05",  0x1000000, 0x0400000, CRC(00f638c1) SHA1(cc6da13f8e82b08f8098c7636fbd1d40ee5ab132) ) // 0 + 1
+	ROM_LOAD( "unico_sr13.rom13", 0x0000000, 0x0400000, CRC(d001c3df) SHA1(ef1b1510f33401b0983093e2d8db48d3886c4fe1) ) // 0 + 1
+	ROM_LOAD( "unico_sr09.rom09", 0x0800000, 0x0400000, CRC(696d908d) SHA1(abe3ec8a53875a136f78bbed723bb89d04196427) ) // 0 + 1
+	ROM_LOAD( "unico_sr05.rom05", 0x1000000, 0x0400000, CRC(00f638c1) SHA1(cc6da13f8e82b08f8098c7636fbd1d40ee5ab132) ) // 0 + 1
 
-	ROM_LOAD( "rom14.bin",  0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
-	ROM_LOAD( "rom10.bin",  0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
-	ROM_LOAD( "rom06.bin",  0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
+	ROM_LOAD( "rom14.rom14",      0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
+	ROM_LOAD( "rom10.rom10",      0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
+	ROM_LOAD( "rom06.rom06",      0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
 	/* Backgrounds */
-	ROM_LOAD( "rom07.bin",  0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
-	ROM_LOAD( "rom11.bin",  0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
-	ROM_LOAD( "rom15.bin",  0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
+	ROM_LOAD( "rom07.rom07",      0x0600000, 0x0200000, CRC(9fc6ff9d) SHA1(51c3ca9709a01e0ad6bc76c0d674ed03f9822598) ) // 3
+	ROM_LOAD( "rom11.rom11",      0x0e00000, 0x0200000, CRC(11abaf1c) SHA1(19e86f3ebfec518a96c0520f36cfc1b525e7e55c) ) // 3
+	ROM_LOAD( "rom15.rom15",      0x1600000, 0x0200000, CRC(26a3b168) SHA1(a4b7955cc4d4fbec7c975a9456f2219ef33f1166) ) // 3
 
 	ROM_REGION( 0x080000, "user1", 0 )
 	ROM_LOAD( "rom00.bin", 0x000000, 0x080000, CRC(b10ba7ab) SHA1(a6a3ae71b803af9c31d7e97dc86cfcc123ee9a40) )
@@ -387,5 +387,5 @@ ROM_START( silkroada )
 ROM_END
 
 
-GAME( 1999, silkroad, 0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", 0 )
+GAME( 1999, silkroad,         0, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad", 0 )
 GAME( 1999, silkroada, silkroad, silkroad, silkroad, driver_device, 0, ROT0, "Unico", "The Legend of Silkroad (larger ROMs)", 0 ) // same content but fewer GFX roms of a larger size
