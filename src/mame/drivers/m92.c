@@ -1972,13 +1972,13 @@ ROM_START( nbbatman2bl )
 	ROM_LOAD( "at89c4051-24pc.mcu", 0x00000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Tiles */
-	ROM_LOAD( "4.bg_rom1",  0x100000, 0x100000, BAD_DUMP CRC(c78cd3e9) SHA1(f484399000ac604370998d11ee9e9501b8a09f1e) ) // half size, 1st half missing
+	ROM_LOAD( "4.bin",  0x000000, 0x200000, CRC(17148932) SHA1(f15777b842691dcabc6336a3c33ab6b61c83ae8b) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "2.obj_rom1", 0x000000, 0x200000, BAD_DUMP CRC(2bd35975) SHA1(9e2e2be727a24943c056acb3e2f453b3b7328c76) ) // half size, 2nd half missing
+	ROM_LOAD( "2.bin", 0x000000, 0x400000, CRC(bae2eb19) SHA1(609c805b23ceaf4cb02f4ad6192ab4dd50b89711) )
 
 	ROM_REGION( 0x200000, "irem", 0 )
-	ROM_LOAD( "3.sou_rom", 0x000000, 0x100000,  CRC(776ed65d) SHA1(0e3321c024a62fc48aa5541215af8af14c95ccc6) ) // looped music samples for OKI, don't know if it's the right size, so marking as bad as a precaution
+	ROM_LOAD( "3.sou_rom", 0x000000, 0x100000, CRC(776ed65d) SHA1(0e3321c024a62fc48aa5541215af8af14c95ccc6) ) 
 ROM_END
 
 
