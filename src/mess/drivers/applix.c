@@ -13,10 +13,11 @@
     other articles in various issues after that.
 
     TODO: everything!
-    - Required device Z8530 Z80SCC (not emulated, but it is just a dual-channel
-      serial controller, possibly just like the other ones)
+    - Serial device Z8530 Z80SCC
     - Keyboard is a standard pc keyboard
     - Sound is stereo dac-sound, plus an analog output. Details unknown.
+    - Disk controller WD1772 driven by a Z80
+    - Cassette interface
 
 ****************************************************************************/
 
@@ -244,7 +245,7 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		if (BIT(state->m_pa, 3))
 		// 640 x 200 x 4of16 mode
 		{
-			mem = vidbase + ma + x + ((y%4)<<12);
+			mem = vidbase + ma + x + (ra<<12);
 			chr = state->m_base[mem];
 			for (i = 0; i < 8; i++)
 			{
@@ -255,8 +256,8 @@ static MC6845_UPDATE_ROW( applix_update_row )
 		else
 		// 320 x 200 x 16 mode
 		{
-			mem = vidbase + ma + x + ((y%4)<<12);
-			chr = state->m_expansion[mem];
+			mem = vidbase + ma + x + (ra<<12);
+			chr = state->m_expansion[mem]; // could be m_base, we dont know yet
 			for (i = 0; i < 4; i++)
 			{
 				*p++ = palette[chr>>12];
@@ -326,14 +327,18 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( applix )
 	ROM_REGION(0x20000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "1616oshv.044", 0x00000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6) )
-	ROM_LOAD16_BYTE( "1616oslv.044", 0x00001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a) )
+	ROM_SYSTEM_BIOS(0, "v4.5a", "V4.5a")
+	ROMX_LOAD( "1616oshv.045", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "1616oslv.045", 0x00001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "v4.4a", "V4.4a")
+	ROMX_LOAD( "1616oshv.044", 0x00000, 0x10000, CRC(4a1a90d3) SHA1(4df504bbf6fc5dad76c29e9657bfa556500420a6), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "1616oslv.044", 0x00001, 0x10000, CRC(ef619994) SHA1(ff16fe9e2c99a1ffc855baf89278a97a2a2e881a), ROM_SKIP(1) | ROM_BIOS(2) )
 
-	ROM_REGION(0x50000, "user1", 0)
-	ROM_LOAD16_BYTE( "1616oshv.045", 0x00000, 0x10000, CRC(9dfb3224) SHA1(5223833a357f90b147f25826c01713269fc1945f) )
-	ROM_LOAD16_BYTE( "1616oslv.045", 0x00001, 0x10000, CRC(951bd441) SHA1(e0a38c8d0d38d84955c1de3f6a7d56ce06b063f6) )
-	ROM_LOAD( "1616osv.045",  0x20000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
-	ROM_LOAD( "1616ssdv.022", 0x40000, 0x08000, CRC(6d8e413a) SHA1(fc27d92c34f231345a387b06670f36f8c1705856) )
+	ROM_REGION(0x10000, "subcpu", 0)
+	ROM_LOAD( "1616ssdv.022", 0x0000, 0x8000, CRC(6d8e413a) SHA1(fc27d92c34f231345a387b06670f36f8c1705856) )
+
+	ROM_REGION(0x20000, "user1", 0)
+	ROM_LOAD( "1616osv.045",  0x00000, 0x20000, CRC(b9f75432) SHA1(278964e2a02b1fe26ff34f09dc040e03c1d81a6d) )
 ROM_END
 
 /* Driver */
