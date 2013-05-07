@@ -1224,6 +1224,54 @@ static INPUT_PORTS_START( fantastc )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( timefgtr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x20, 0x00, "255 Lives (Cheat)" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Extended Bonus Life" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // tilt? freeze?
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "5" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) // if 01 and 02 are both set, bonus life is 00
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // "
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "10000 50000" )
+	PORT_DIPSETTING(    0x04, "20000 50000" )
+	PORT_DIPSETTING(    0x08, "10000 60000" )
+	PORT_DIPSETTING(    0x0c, "20000 60000" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( kong )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
@@ -1257,7 +1305,7 @@ static INPUT_PORTS_START( kong )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 
@@ -4635,6 +4683,25 @@ ROM_START( fantastc )
 	ROM_LOAD( "prom-74g138", 0x0000, 0x0020, CRC(800f5718) SHA1(5387b24934c8130726180159e207943211215ae2) )
 ROM_END
 
+ROM_START( timefgtr )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "tp01",           0x0000, 0x1000, CRC(ba8b3e70) SHA1(cb930022e462319721013f343e513f4a4957b89e) )
+	ROM_LOAD( "tp02",           0x1000, 0x1000, CRC(796158c0) SHA1(bc02131a9af1773839ae0aba0225b3160ae632c4) )
+	ROM_LOAD( "tp03",           0x2000, 0x1000, CRC(fe6a1c98) SHA1(f4a4e61cc96d93cd21e79b0aa3ddc158a7a034a0) )
+	ROM_LOAD( "tp04",           0x3000, 0x1000, CRC(eff73185) SHA1(8538f1b63b051d6d3892ebedc76f45c3cf02cbab) )
+	ROM_LOAD( "tp05",           0x4000, 0x1000, CRC(85023e4a) SHA1(afc76ba15d6278c45bf50e9bafcb72a0beb69d4d) )
+	ROM_LOAD( "tp06",           0x5000, 0x1000, CRC(b6b8aaf9) SHA1(e25e59ee653b13437c412f1aeb8d7c670e34b39f) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "tp07",           0x0000, 0x1000, CRC(5f57342c) SHA1(000985613d620cbcafbd24351bd4b02f037430a9) )
+	ROM_LOAD( "tp09",           0x1000, 0x1000, CRC(636fd772) SHA1(6567992488f0125c082a164f1043c9384736c665) )
+	ROM_LOAD( "tp08",           0x2000, 0x1000, CRC(2dc3c48b) SHA1(f4ddf5fce909a1de3efbcaf2ff2e4a8d1ea06516) )
+	ROM_LOAD( "tp10",           0x3000, 0x1000, CRC(b27b450c) SHA1(16131583133fe33b61d4f51a860f41d43011bc50) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom", 0x0000, 0x0020, NO_DUMP )
+ROM_END
+
 ROM_START( kong )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "1",   0x0000, 0x1000, CRC(a206beb5) SHA1(5fea9584b4e3ae076178f6965f0743b9b90b15fc) )
@@ -6651,10 +6718,13 @@ GAME( 198?, thepitm,  thepit,   mooncrst, thepitm, galaxian_state,  thepitm,  RO
 
 /* other games on basic mooncrst hardware */
 GAME( 1982, skybase,  0,        mooncrst, skybase, galaxian_state,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
-GAME( 198?, kong,     0,        mooncrst, kong, galaxian_state,     kong,     ROT90,  "Taito do Brasil", "Kong (Brazil)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
+GAME( 198?, kong,     0,        mooncrst, kong,    galaxian_state,  kong,     ROT90,  "Taito do Brasil", "Kong (Donkey Kong conversion on Galaxian hardware)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
-GAME( 198?, fantastc, 0,        fantastc, fantastc, galaxian_state, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
+GAME( 198?, fantastc, 0,        fantastc, fantastc, galaxian_state, fantastc, ROT90,  "Taito do Brasil", "Fantastic (Galaga conversion on Galaxian hardware)", GAME_SUPPORTS_SAVE ) // rewrite of Galaga (!) not a clone
+
+/* like fantastc, plus larger spriteram, and maybe different bullet hw(?) */
+GAME( 198?, timefgtr, 0,        timefgtr, timefgtr, galaxian_state, timefgtr, ROT90,  "Taito do Brasil", "Time Fighter (Time Pilot conversion on Galaxian hardware)", GAME_SUPPORTS_SAVE | GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Time Pilot (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
 GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug, galaxian_state,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?

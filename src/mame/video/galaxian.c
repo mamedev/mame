@@ -413,6 +413,8 @@ void galaxian_state::state_save_register()
 	state_save_register_global(machine(), m_background_green);
 	state_save_register_global(machine(), m_background_blue);
 
+	state_save_register_global(machine(), m_sprites_base);
+	state_save_register_global(machine(), m_bullets_base);
 	state_save_register_global_array(machine(), m_gfxbank);
 
 	state_save_register_global(machine(), m_stars_enabled);
@@ -439,7 +441,7 @@ UINT32 galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rgb3
 
 	/* render the sprites next. Some custom pcbs (eg. zigzag, fantastc) have more than one sprite generator (ideally, this should be rendered in parallel) */
 	for (int i = 0; i < m_numspritegens; i++)
-		sprites_draw(bitmap, cliprect, &m_spriteram[0x40 + i * 0x20]);
+		sprites_draw(bitmap, cliprect, &m_spriteram[m_sprites_base + i * 0x20]);
 
 	/* if we have bullets to draw, render them following */
 	if (m_draw_bullet_ptr != NULL)

@@ -51,6 +51,7 @@ public:
 	required_shared_ptr<UINT8> m_videoram;
 
 	int m_bullets_base;
+	int m_sprites_base;
 	int m_numspritegens;
 	int m_counter_74ls161[2];
 	int m_direction[2];
@@ -205,6 +206,7 @@ public:
 	DECLARE_DRIVER_INIT(mshuttle);
 	DECLARE_DRIVER_INIT(mshuttlj);
 	DECLARE_DRIVER_INIT(fantastc);
+	DECLARE_DRIVER_INIT(timefgtr);
 	DECLARE_DRIVER_INIT(kingball);
 	DECLARE_DRIVER_INIT(scorpnmc);
 	DECLARE_DRIVER_INIT(thepitm);
@@ -237,6 +239,7 @@ public:
 	INTERRUPT_GEN_MEMBER(fakechange_interrupt_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxian_stars_blink_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
 	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *spritebase);
 	void bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *base);

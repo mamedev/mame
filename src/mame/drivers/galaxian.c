@@ -69,17 +69,6 @@ Notes:
   'BONUS SHIP' text is printed on a different line.
 
 
-TODO:
-----
-
-- Problems with Galaxian based on the observation of a real machine:
-
-  - Background humming is incorrect.  It's faster on a real machine
-  - Explosion sound is much softer.  Filter involved?
-
-- $4800-4bff in Streaking/Ghost Muncher
-
-
 
 Moon Cresta versions supported:
 ------------------------------
@@ -395,22 +384,25 @@ Stephh's notes (based on the games Z80 code and some tests) for games based on '
 
 
 
-TO DO :
--------
-
-  - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode)
-               fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
-  - zigzag   : full Dip Switches and Inputs
-  - zigzag2  : full Dip Switches and Inputs
-  - jumpbug  : full Dip Switches and Inputs
-  - jumpbugb : full Dip Switches and Inputs
-  - levers   : full Dip Switches and Inputs
-  - kingball : full Dip Switches and Inputs
-  - kingbalj : full Dip Switches and Inputs
-  - frogg    : fix read/writes at/to unmapped/wrong memory
-  - scprpng  : fix read/writes at/to unmapped/wrong memory
-  - scorpion : check whether konami filters are used
-  - explorer : check whether konami filters are used
+TODO:
+----
+- Problems with Galaxian based on the observation of a real machine:
+  - Background humming is incorrect.  It's faster on a real machine
+  - Explosion sound is much softer.  Filter involved?
+- streakng/ghostmun: $4800-4bff
+- smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
+- timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
+- zigzag   : full Dip Switches and Inputs
+- zigzag2  : full Dip Switches and Inputs
+- jumpbug  : full Dip Switches and Inputs
+- jumpbugb : full Dip Switches and Inputs
+- levers   : full Dip Switches and Inputs
+- kingball : full Dip Switches and Inputs
+- kingbalj : full Dip Switches and Inputs
+- frogg    : fix read/writes at/to unmapped/wrong memory
+- scprpng  : fix read/writes at/to unmapped/wrong memory
+- scorpion : check whether konami filters are used
+- explorer : check whether konami filters are used
 
 ***************************************************************************/
 
@@ -1474,7 +1466,27 @@ static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xfffe, 0xfffe) AM_NOP //?
+	AM_RANGE(0xfffe, 0xfffe) AM_NOP // ?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( timefgtr_map, AS_PROGRAM, 8, galaxian_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8803, 0x8803) AM_DEVWRITE_LEGACY("8910.0", ay8910_address_w)
+	AM_RANGE(0x880b, 0x880b) AM_DEVWRITE_LEGACY("8910.0", ay8910_data_w)
+	AM_RANGE(0x880c, 0x880c) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
+	AM_RANGE(0x880e, 0x880e) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_w)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
+	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xb004, 0xb004) AM_MIRROR(0x07f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
+//	AM_RANGE(0xb800, 0xb800) AM_WRITENOP // ?
+//	AM_RANGE(0xfff8, 0xffff) AM_WRITENOP // sound related?
 ADDRESS_MAP_END
 
 
@@ -2234,6 +2246,35 @@ static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
 MACHINE_CONFIG_END
 
 
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
+{
+	UINT8 split = param + 16;
+
+	// change spriteram base per each 64-line part of the screen
+	if ((split & 0x3f) == 0)
+	{
+		machine().primary_screen->update_now();
+		m_sprites_base = 0x40 | (split << 2 & 0x300);
+	}
+}
+
+static MACHINE_CONFIG_DERIVED( timefgtr, galaxian_base )
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galaxian_state, timefgtr_scanline, "screen", 0, 1)
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(timefgtr_map)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("8910.0", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_SOUND_ADD("8910.1", AY8910, GALAXIAN_PIXEL_CLOCK/3/2) // 3.072MHz
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( jumpbug, galaxian_base )
 
 	MCFG_WATCHDOG_VBLANK_INIT(0)
@@ -2720,6 +2761,7 @@ void galaxian_state::common_init(galaxian_draw_bullet_func draw_bullet,galaxian_
 	m_irq_line = INPUT_LINE_NMI;
 	m_numspritegens = 1;
 	m_bullets_base = 0x60;
+	m_sprites_base = 0x40;
 	m_frogger_adjust = FALSE;
 	m_sfx_tilemap = FALSE;
 	m_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : &galaxian_state::galaxian_draw_bullet;
@@ -3236,6 +3278,19 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 
 	for (int i = 0; i < 32; i++)
 		memcpy(romdata + i * 0x400, buf + lut_am_unscramble[i] * 0x1000 + (i & 3) * 0x400, 0x400);
+}
+
+
+DRIVER_INIT_MEMBER(galaxian_state,timefgtr)
+{
+	/* two sprite generators */ 
+	m_numspritegens = 2;
+
+	/* bullets moved from $60 to $c0 */
+	m_bullets_base = 0xc0;
+
+	/* video extensions */
+	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, NULL, &galaxian_state::upper_extend_sprite_info);
 }
 
 
