@@ -10,8 +10,6 @@
 
     NOTE that the display only updates after each 4 digits is entered, and
     you can't see what you type as you change bytes. This is by design.
-    The speaker is supposed to bleep on each keystroke, but it only gets
-    one pulse - which is almost inaudible.
 
     Function keys:
     FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
@@ -95,7 +93,6 @@ protected:
 private:
 	UINT8 m_rtc;
 	bool m_screen_on;
-	UINT8 m_kbd_s;
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -107,7 +104,7 @@ private:
 static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x0200, 0x07ff) AM_RAM
+	AM_RANGE(0x0200, 0x0fff) AM_RAM
 	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM
 ADDRESS_MAP_END
@@ -120,44 +117,52 @@ static INPUT_PORTS_START( d6800 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("Y0")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 
 	PORT_START("Y1")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 
 	PORT_START("Y2")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 
 	PORT_START("Y3")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
@@ -201,26 +206,31 @@ UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bit
 
 /* PIA6821 Interface */
 
+
 TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 {
 	m_rtc++;
-	m_maincpu->set_input_line(M6800_IRQ_LINE, (m_rtc) ? CLEAR_LINE : ASSERT_LINE);
+	if (m_rtc > 159)
+		m_rtc = 0;
+
+	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
+	m_pia->ca1_w( (data == 255) ? 0 : 1);
+	data = m_io_shift->read();
+	m_pia->ca2_w( data );
+	m_pia->cb1_w((m_rtc) ? 1 : 0);
 }
 
 
-// not used
 READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 {
-	return 1;
+	return (m_rtc) ? 1 : 0;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
 	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
 
-	m_kbd_s = (data == 15) ? 0 : 1;
-
-	return m_kbd_s;
+	return (data == 255) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
@@ -267,15 +277,10 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	lines around and reads it another way. This isolates the key that was pressed.
 	*/
 
-	m_kbd_s++;
+	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read()
+	           & m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
 
-	if (m_kbd_s == 3)
-		return 0x0f & m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
-	else
-	if (m_kbd_s == 6)
-		return 0xf0 & m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
-	else
-		return 0xff;
+	return data;
 }
 
 WRITE8_MEMBER( d6800_state::d6800_keyboard_w )
@@ -322,6 +327,7 @@ void d6800_state::machine_start()
 void d6800_state::machine_reset()
 {
 	m_beeper->set_state(0);
+	m_rtc = 0;
 }
 
 /* Machine Drivers */
@@ -364,7 +370,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 		else
 		{
 			for (i = 0; i < quick_length; i++)
-				if ((quick_addr + i) < 0x800)
+				if ((quick_addr + i) < 0x1000)
 					space.write_byte(i + quick_addr, quick_data[i]);
 
 			/* display a message about the loaded quickload */
@@ -387,14 +393,13 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_SIZE(64, 32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 63, 0, 31)
 	MCFG_SCREEN_UPDATE_DRIVER(d6800_state, screen_update_d6800)
-
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(25))
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
@@ -419,7 +424,6 @@ MACHINE_CONFIG_END
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877) )
-	//ROM_FILL(0xc2eb,2,1)
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT       INIT        COMPANY             FULLNAME      FLAGS */
