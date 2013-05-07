@@ -1668,6 +1668,7 @@ vs10yardj       // (c) 1983/1984
 vs10yardu       // (c) 1983/1984
 10yard85        // (c) 1985
 travrusa        // (c) 1983
+travrusab       // (c) 1983 I.P. (bootleg)
 motorace        // (c) 1983 Williams license
 shtrider        // (c) 1984 Seibu Kaihatsu
 shtridera       // (c) 1984 Seibu Kaihatsu
@@ -7398,8 +7399,9 @@ skyadvntj       // Alpha-68K96V  'SA' (c) 1989 Alpha Denshi Co.
 gangwars        // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 gangwarsu       // Alpha-68K96V       (c) 1989 Alpha Denshi Co.
 sbasebal        // Alpha-68K96V       (c) 1989 SNK of America licensed from Alpha
-tnextspc        // A8003 'NS' (c) 1989
-tnextspcj       // A8003 'NS' (c) 1989
+tnextspc        // A8003 'NS' (c) 1989 - MASKROM
+tnextspc2       // A8003 'NS' (c) 1989 - EPROMs
+tnextspcj       // A8003 'NS' (c) 1989 - Japan
 meijinsn        // (c) 1986 SNK
 
 // Technos games
@@ -8348,6 +8350,7 @@ netwars         // (c) 1983 Orca + Esco Trading Co license
 vastar          // (c) 1983 Sesame Japan
 vastar2         // (c) 1983 Sesame Japan
 vastar3         // (c) 1983 Sesame Japan
+vastar4         // (c) 1983 Sesame Japan
 /*
   other Orca games:
   82 Battle Cross                         Kit 2P

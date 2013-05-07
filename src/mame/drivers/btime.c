@@ -1673,21 +1673,21 @@ ROM_END
 
 ROM_START( wtennis )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tx",           0xc000, 0x0800, CRC(fd343474) SHA1(1e1fd3f20ce1c7533767344f924029c8c62139a1) )
-	ROM_LOAD( "t4",           0xd000, 0x1000, CRC(e465d82c) SHA1(c357dcf17539150425574985afa559db2e6ab834) )
-	ROM_LOAD( "t3",           0xe000, 0x1000, CRC(8f090eab) SHA1(baeef8ee05010bf44cf8865a22911f3d458df1b0) )
-	ROM_LOAD( "t2",           0xf000, 0x1000, CRC(d2f9dd30) SHA1(1faa088806e8627b5e561d8b99054d295045dcfb) )
+	ROM_LOAD( "ten14.h4",     0xc000, 0x1000, CRC(f7b27303) SHA1(043476429bcc8def412f77d1f79a01586d984bfc) )
+	ROM_LOAD( "ten4.d4",      0xd000, 0x1000, CRC(e465d82c) SHA1(c357dcf17539150425574985afa559db2e6ab834) ) // was t4
+	ROM_LOAD( "ten3.c4",      0xe000, 0x1000, CRC(8f090eab) SHA1(baeef8ee05010bf44cf8865a22911f3d458df1b0) ) // was t3
+	ROM_LOAD( "ten2.a4",      0xf000, 0x1000, CRC(d2f9dd30) SHA1(1faa088806e8627b5e561d8b99054d295045dcfb) ) // was t2
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "t1",           0xe000, 0x1000, CRC(40737ea7) SHA1(27e8474028385574035d3982f9c576bb9bb3facd) ) /* starts at 0000, not f000; 0000-01ff is RAM */
+	ROM_LOAD( "ten1.h1",      0xe000, 0x1000, CRC(40737ea7) SHA1(27e8474028385574035d3982f9c576bb9bb3facd) ) /* was t1 - starts at 0000, not f000; 0000-01ff is RAM */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "t7",           0x0000, 0x1000, CRC(aa935169) SHA1(965f41a9fcf35ac7c899e79acd0a85ab588d5831) )
-	ROM_LOAD( "t10",          0x1000, 0x1000, CRC(746be927) SHA1(a3361384437ac7c494fde92953c5aa5e3c104644) )
-	ROM_LOAD( "t6",           0x2000, 0x1000, CRC(4fb8565d) SHA1(6de865e41dcba45190af0753baebf5ab66e4eeb4) )
-	ROM_LOAD( "t9",           0x3000, 0x1000, CRC(4893286d) SHA1(f2c330286272b8d334b887bc4dd9608158249fc3) )
-	ROM_LOAD( "t5",           0x4000, 0x1000, CRC(ea1efa5d) SHA1(dd8ef1991d74778e6844a669e6de649e1130ec79) )
-	ROM_LOAD( "t8",           0x5000, 0x1000, CRC(542ace7b) SHA1(b1423d39302ad7d98c9223d8b1d6d062b7676dd9) )
+	ROM_LOAD( "ten7.l11",     0x0000, 0x1000, CRC(aa935169) SHA1(965f41a9fcf35ac7c899e79acd0a85ab588d5831) ) // was t7
+	ROM_LOAD( "ten10.m11",    0x1000, 0x1000, CRC(746be927) SHA1(a3361384437ac7c494fde92953c5aa5e3c104644) ) // was t10
+	ROM_LOAD( "ten6.l13",     0x2000, 0x1000, CRC(4fb8565d) SHA1(6de865e41dcba45190af0753baebf5ab66e4eeb4) ) // was t6
+	ROM_LOAD( "ten9.m13",     0x3000, 0x1000, CRC(4893286d) SHA1(f2c330286272b8d334b887bc4dd9608158249fc3) ) // was t9
+	ROM_LOAD( "ten5.l14",     0x4000, 0x1000, CRC(ea1efa5d) SHA1(dd8ef1991d74778e6844a669e6de649e1130ec79) ) // was t5
+	ROM_LOAD( "ten8.m14",     0x5000, 0x1000, CRC(542ace7b) SHA1(b1423d39302ad7d98c9223d8b1d6d062b7676dd9) ) // was t8
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "mb7051.m5",    0x0000, 0x0020, CRC(f051cb28) SHA1(6aebccd38ba7887caff248c8acddb8e14526f1e7) )    /* palette */

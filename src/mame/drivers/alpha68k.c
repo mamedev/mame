@@ -3077,7 +3077,7 @@ ROM_START( sbasebal )
 	ROM_LOAD( "kcbchr0.bin",     0x1e0000, 0x80000, CRC(b8a1a088) SHA1(cb21a04387431b1810130abd86a2ebf78cf09a3b) )
 ROM_END
 
-ROM_START( tnextspc )
+ROM_START( tnextspc ) /* MASKROM for gfx */
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) )
 	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) )
@@ -3090,6 +3090,35 @@ ROM_START( tnextspc )
 
 	ROM_REGION( 0x8000, "user1", 0 )
 	ROM_LOAD( "ns_2.bin",    0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) /* Colour lookup */
+
+	ROM_REGION( 0x1000, "proms", 0 ) //AT: corrected PROM order
+	ROM_LOAD( "2.p2",        0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) /* R */
+	ROM_LOAD( "3.p3",        0x0100,  0x0100,  CRC(0254533a) SHA1(d0ec0d03ed78482cd9344661eab3305640e85682) ) /* G */
+	ROM_LOAD( "1.p1",        0x0200,  0x0100,  CRC(488fd0e9) SHA1(cde18e9ca0b320ded821bea537c88424b02e8910) ) /* B */
+	ROM_LOAD( "5.p5",        0x0300,  0x0400,  CRC(9c8527bf) SHA1(6b52ab37ea6c07a4814ed33deadd59d137b5fd4d) ) /* Clut high nibble */
+	ROM_LOAD( "4.p4",        0x0700,  0x0400,  CRC(cc9ff769) SHA1(e9de0371fd8bae7f08924891d78799ace97902b1) ) /* Clut low nibble */
+ROM_END
+
+ROM_START( tnextspc2 ) /* EPROMs for gfx */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ns_4.bin", 0x00000, 0x20000, CRC(4617cba3) SHA1(615a1e67fc1c76d2be004b19a965f423b8daaf5c) ) /* b18.ic13 */
+	ROM_LOAD16_BYTE( "ns_3.bin", 0x00001, 0x20000, CRC(a6c47fef) SHA1(b7e4a0fffd5c44ed0b138c1ad04c3b6644ec463b) ) /* b17.ic11 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )   /* Sound CPU */
+	ROM_LOAD( "ns_1.bin",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) /* b1.ic129 */
+
+	ROM_REGION( 0x080000, "gfx1", 0 )   /* Graphics are odd/even interleaved */
+	ROM_LOAD16_BYTE( "b3.ic49", 0x00000, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
+	ROM_LOAD16_BYTE( "b7.ic53", 0x00001, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
+	ROM_LOAD16_BYTE( "b4.ic50", 0x20000, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )
+	ROM_LOAD16_BYTE( "b8.ic54", 0x20001, 0x10000, CRC(bf0762a0) SHA1(2fe32b1bf08dfc78668d7a12a7a67e6b2c0a2c48) )
+	ROM_LOAD16_BYTE( "b5.ic51", 0x40000, 0x10000, CRC(e487750b) SHA1(f01d15f6624822dc78ff7e1cd2fdce54568ab5dc) )
+	ROM_LOAD16_BYTE( "b9.ic55", 0x40001, 0x10000, CRC(45d730b9) SHA1(cb05942b12589e76afbbbac94cba0e8284bb3deb) )
+	ROM_LOAD16_BYTE( "b6.ic52", 0x60000, 0x10000, CRC(0618cf49) SHA1(fad33b316613b82231f8372d0faf8cf1c669ac98) )
+	ROM_LOAD16_BYTE( "b10.ic56", 0x60001, 0x10000, CRC(f48819df) SHA1(86d688590379316638ef4c3094c11629931cd69e) )
+
+	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_LOAD( "ns_2.bin",    0x0000,  0x8000,  CRC(05771d48) SHA1(9e9376b1449679f554eabf8cea023714dd1ed487) ) /* b2.ic90 - Colour lookup */
 
 	ROM_REGION( 0x1000, "proms", 0 ) //AT: corrected PROM order
 	ROM_LOAD( "2.p2",        0x0000,  0x0100,  CRC(1f388d48) SHA1(5e7dc37b4e177483f4fc65b801dca8ef132ac282) ) /* R */
@@ -3316,5 +3345,6 @@ GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state,gangw
 
 GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", GAME_SUPPORTS_SAVE | GAME_UNEMULATED_PROTECTION )
 
-GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK (Pasadena International Corp. license)",        "The Next Space (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
