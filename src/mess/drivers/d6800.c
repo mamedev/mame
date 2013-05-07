@@ -204,7 +204,7 @@ UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bit
 TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 {
 	m_rtc++;
-	m_maincpu->set_input_line(M6800_IRQ_LINE, (m_rtc > 0xf8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6800_IRQ_LINE, (m_rtc) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
