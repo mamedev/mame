@@ -12,6 +12,7 @@ Game       Description                  Mother Board   Code       Version       
 
 pbball96   Powerful Pro Baseball '96    GV999          GV017   JAPAN 1.03   96.05.27  18:00
 hyperath   Hyper Athlete                ZV610          GV021   JAPAN 1.00   96.06.09  19:00
+lacrazyc   Let's Attack Crazy Cross     ZV610          GV027   ASIA  1.10   96.01.18  12:00
 susume     Susume! Taisen Puzzle-Dama   ZV610          GV027   JAPAN 1.20   96.03.04  12:00
 btchamp    Beat the Champ               GV999          GV053   UAA01        ?
 kdeadeye   Dead Eye                     GV999          GV054   UAA01        ?
@@ -726,6 +727,15 @@ ROM_START( konamigv )
 	ROM_REGION16_BE( 0x0000080, "eeprom", ROMREGION_ERASE00 ) /* default eeprom */
 ROM_END
 
+ROM_START( lacrazyc )
+	GV_BIOS
+
+	ROM_REGION16_BE( 0x0000080, "eeprom", 0 ) /* default eeprom */
+	ROM_LOAD( "lacrazyc.25c",   0x000000, 0x000080, CRC(e20e5730) SHA1(066b49236c658a4ef2930f7bacc4b2354dd7f240) )
+	DISK_REGION( "scsi:cdrom" )
+	DISK_IMAGE_READONLY( "gv027-a1", 0, BAD_DUMP SHA1(840d0d4876cf1b814c9d8db975aa6c92e1fe4039) )
+ROM_END
+
 ROM_START( susume )
 	GV_BIOS
 
@@ -840,7 +850,8 @@ GAME( 1995, konamigv, 0, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Ko
 
 GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Powerful Baseball '96 (GV017 Japan 1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, susume,   konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp, konamigv_state,  btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
