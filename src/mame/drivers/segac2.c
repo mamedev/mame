@@ -99,9 +99,9 @@
 
 MACHINE_START_MEMBER(segac2_state,segac2)
 {
-	state_save_register_global_array(machine(), m_misc_io_data);
-	state_save_register_global(machine(), m_prot_write_buf);
-	state_save_register_global(machine(), m_prot_read_buf);
+	save_item(NAME(m_misc_io_data));
+	save_item(NAME(m_prot_write_buf));
+	save_item(NAME(m_prot_read_buf));
 }
 
 

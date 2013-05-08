@@ -317,11 +317,11 @@ void berzerk_state::machine_start()
 	create_nmi_timer();
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_magicram_control);
-	state_save_register_global(machine(), m_last_shift_data);
-	state_save_register_global(machine(), m_intercept);
-	state_save_register_global(machine(), m_irq_enabled);
-	state_save_register_global(machine(), m_nmi_enabled);
+	save_item(NAME(m_magicram_control));
+	save_item(NAME(m_last_shift_data));
+	save_item(NAME(m_intercept));
+	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_nmi_enabled));
 }
 
 

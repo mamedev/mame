@@ -69,7 +69,7 @@ void renegade_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scrolldx(256, 0);
 
-	state_save_register_global(machine(), m_scrollx);
+	save_item(NAME(m_scrollx));
 }
 
 void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

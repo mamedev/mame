@@ -131,20 +131,20 @@ void esripsys_state::video_start()
 	}
 
 	/* Register stuff for state saving */
-	state_save_register_global_pointer(machine(), line_buffer[0].colour_buf, 512);
-	state_save_register_global_pointer(machine(), line_buffer[0].intensity_buf, 512);
-	state_save_register_global_pointer(machine(), line_buffer[0].priority_buf, 512);
+	save_pointer(NAME(line_buffer[0].colour_buf), 512);
+	save_pointer(NAME(line_buffer[0].intensity_buf), 512);
+	save_pointer(NAME(line_buffer[0].priority_buf), 512);
 
-	state_save_register_global_pointer(machine(), line_buffer[1].colour_buf, 512);
-	state_save_register_global_pointer(machine(), line_buffer[1].intensity_buf, 512);
-	state_save_register_global_pointer(machine(), line_buffer[1].priority_buf, 512);
+	save_pointer(NAME(line_buffer[1].colour_buf), 512);
+	save_pointer(NAME(line_buffer[1].intensity_buf), 512);
+	save_pointer(NAME(line_buffer[1].priority_buf), 512);
 
-	state_save_register_global(machine(), m_video_firq);
-	state_save_register_global(machine(), m_bg_intensity);
-	state_save_register_global(machine(), m_hblank);
-	state_save_register_global(machine(), m_video_firq_en);
-	state_save_register_global(machine(), m_frame_vbl);
-	state_save_register_global(machine(), m_12sel);
+	save_item(NAME(m_video_firq));
+	save_item(NAME(m_bg_intensity));
+	save_item(NAME(m_hblank));
+	save_item(NAME(m_video_firq_en));
+	save_item(NAME(m_frame_vbl));
+	save_item(NAME(m_12sel));
 }
 
 UINT32 esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

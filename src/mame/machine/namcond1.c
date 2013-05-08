@@ -19,7 +19,7 @@
 
 void namcond1_state::machine_start()
 {
-	state_save_register_global(machine(), m_h8_irq5_enabled);
+	save_item(NAME(m_h8_irq5_enabled));
 }
 
 void namcond1_state::machine_reset()

@@ -169,11 +169,11 @@ INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
 void segag80v_state::machine_start()
 {
 	/* register for save states */
-	state_save_register_global_array(machine(), m_mult_data);
-	state_save_register_global(machine(), m_mult_result);
-	state_save_register_global(machine(), m_spinner_select);
-	state_save_register_global(machine(), m_spinner_sign);
-	state_save_register_global(machine(), m_spinner_count);
+	save_item(NAME(m_mult_data));
+	save_item(NAME(m_mult_result));
+	save_item(NAME(m_spinner_select));
+	save_item(NAME(m_spinner_sign));
+	save_item(NAME(m_spinner_count));
 }
 
 

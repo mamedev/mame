@@ -5850,29 +5850,29 @@ DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 {
 	m_tilemap_ram = auto_alloc_array(machine(), UINT8, 0x4000);
 	memset(m_tilemap_ram, 0xff, 0x4000);
-	state_save_register_global_pointer(machine(), m_tilemap_ram , 0x4000);
+	save_pointer(NAME(m_tilemap_ram), 0x4000);
 
 	m_reel_ram = auto_alloc_array(machine(), UINT8, 0x0800);
 	memset(m_reel_ram, 0xff ,0x0800);
-	state_save_register_global_pointer(machine(), m_reel_ram , 0x0800);
+	save_pointer(NAME(m_reel_ram), 0x0800);
 
 	m_reel2_ram = auto_alloc_array(machine(), UINT8, 0x0800);
 	memset(m_reel2_ram, 0xff, 0x0800);
-	state_save_register_global_pointer(machine(), m_reel2_ram , 0x0800);
+	save_pointer(NAME(m_reel2_ram), 0x0800);
 
 	m_reel3_ram = auto_alloc_array(machine(), UINT8, 0x0800);
 	memset(m_reel3_ram, 0xff, 0x0800);
-	state_save_register_global_pointer(machine(), m_reel3_ram , 0x0800);
+	save_pointer(NAME(m_reel3_ram), 0x0800);
 
 	m_reel4_ram = auto_alloc_array(machine(), UINT8, 0x0800);
 	memset(m_reel4_ram, 0xff, 0x0800);
-	state_save_register_global_pointer(machine(), m_reel4_ram , 0x0800);
+	save_pointer(NAME(m_reel4_ram), 0x0800);
 
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x10000);
 
 	memset(m_videoram, 0xff, 0x10000);
 
-	state_save_register_global_pointer(machine(), m_videoram, 0x10000);
+	save_pointer(NAME(m_videoram), 0x10000);
 
 	// dummy.rom helper
 	{

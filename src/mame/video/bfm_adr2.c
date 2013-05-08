@@ -196,14 +196,14 @@ VIDEO_RESET( adder2 )
 
 VIDEO_START( adder2 )
 {
-	state_save_register_global(machine, adder2_screen_page_reg);
-	state_save_register_global(machine, adder2_c101);
-	state_save_register_global(machine, adder2_rx);
-	state_save_register_global(machine, adder_vbl_triggered);
-	state_save_register_global(machine, adder2_acia_triggered);
+	machine.save().save_item(NAME(adder2_screen_page_reg));
+	machine.save().save_item(NAME(adder2_c101));
+	machine.save().save_item(NAME(adder2_rx));
+	machine.save().save_item(NAME(adder_vbl_triggered));
+	machine.save().save_item(NAME(adder2_acia_triggered));
 
-	state_save_register_global(machine, adder2_data_from_sc2);
-	state_save_register_global(machine, adder2_data_to_sc2);
+	machine.save().save_item(NAME(adder2_data_from_sc2));
+	machine.save().save_item(NAME(adder2_data_to_sc2));
 
 	state_save_register_item_array(machine, "Adder", NULL, 0, adder_ram);
 	state_save_register_item_2d_array(machine, "Adder", NULL, 0, adder_screen_ram);

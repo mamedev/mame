@@ -698,8 +698,8 @@ void install_twcup98_protection(running_machine &machine)
 
 void stv_register_protection_savestates(running_machine &machine)
 {
-	state_save_register_global_array(machine, a_bus);
-	state_save_register_global(machine, ctrl_index);
-	state_save_register_global(machine, internal_counter);
-	state_save_register_global(machine, char_offset);
+	machine.save().save_item(NAME(a_bus));
+	machine.save().save_item(NAME(ctrl_index));
+	machine.save().save_item(NAME(internal_counter));
+	machine.save().save_item(NAME(char_offset));
 }

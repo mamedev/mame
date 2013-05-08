@@ -704,12 +704,12 @@ MACHINE_START_MEMBER(twin16_state,twin16)
 	m_CPUB_register=0;
 
 	/* register for savestates */
-	state_save_register_global(machine(), m_CPUA_register);
-	state_save_register_global(machine(), m_CPUB_register);
+	save_item(NAME(m_CPUA_register));
+	save_item(NAME(m_CPUB_register));
 
-	state_save_register_global(machine(), m_sound_command);
-	state_save_register_global(machine(), m_cuebrickj_nvram_bank);
-	state_save_register_global_array(machine(), m_cuebrickj_nvram);
+	save_item(NAME(m_sound_command));
+	save_item(NAME(m_cuebrickj_nvram_bank));
+	save_item(NAME(m_cuebrickj_nvram));
 }
 
 static MACHINE_CONFIG_START( twin16, twin16_state )

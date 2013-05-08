@@ -2030,7 +2030,7 @@ static void _gxcommoninitnosprites(running_machine &machine)
 		gx_tilebanks[i] = gx_oldbanks[i] = 0;
 	}
 
-	state_save_register_global_array(machine, gx_tilebanks);
+	machine.save().save_item(NAME(gx_tilebanks));
 
 	gx_tilemode = 0;
 

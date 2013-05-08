@@ -224,8 +224,8 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 void gottlieb_state::machine_start()
 {
 	/* register for save states */
-	state_save_register_global(machine(), m_joystick_select);
-	state_save_register_global_array(machine(), m_track);
+	save_item(NAME(m_joystick_select));
+	save_item(NAME(m_track));
 
 	/* see if we have a laserdisc */
 	if (m_laserdisc != NULL)
@@ -244,18 +244,18 @@ void gottlieb_state::machine_start()
 		m_laserdisc_status = 0x38;
 
 		/* more save state registration */
-		state_save_register_global(machine(), m_laserdisc_select);
-		state_save_register_global(machine(), m_laserdisc_status);
-		state_save_register_global(machine(), m_laserdisc_philips_code);
+		save_item(NAME(m_laserdisc_select));
+		save_item(NAME(m_laserdisc_status));
+		save_item(NAME(m_laserdisc_philips_code));
 
-		state_save_register_global_pointer(machine(), m_laserdisc_audio_buffer, AUDIORAM_SIZE);
-		state_save_register_global(machine(), m_laserdisc_audio_address);
-		state_save_register_global_array(machine(), m_laserdisc_last_samples);
-		state_save_register_global(machine(), m_laserdisc_last_time);
-		state_save_register_global(machine(), m_laserdisc_last_clock);
-		state_save_register_global(machine(), m_laserdisc_zero_seen);
-		state_save_register_global(machine(), m_laserdisc_audio_bits);
-		state_save_register_global(machine(), m_laserdisc_audio_bit_count);
+		save_pointer(NAME(m_laserdisc_audio_buffer), AUDIORAM_SIZE);
+		save_item(NAME(m_laserdisc_audio_address));
+		save_item(NAME(m_laserdisc_last_samples));
+		save_item(NAME(m_laserdisc_last_time));
+		save_item(NAME(m_laserdisc_last_clock));
+		save_item(NAME(m_laserdisc_zero_seen));
+		save_item(NAME(m_laserdisc_audio_bits));
+		save_item(NAME(m_laserdisc_audio_bit_count));
 	}
 }
 

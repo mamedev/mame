@@ -1012,7 +1012,7 @@ void maygayv1_state::machine_start()
 	i82716.dram = auto_alloc_array(machine(), UINT16, 0x80000/2);   // ???
 	i82716.line_buf = auto_alloc_array(machine(), UINT8, 512);
 
-	state_save_register_global_pointer(machine(), i82716.dram, 0x40000);
+	save_pointer(NAME(i82716.dram), 0x40000);
 
 //  duart_68681_init(DUART_CLOCK, duart_irq_handler, duart_tx);
 

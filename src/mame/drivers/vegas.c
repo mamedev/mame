@@ -561,19 +561,19 @@ void vegas_state::machine_start()
 	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
 
 	/* register for save states */
-	state_save_register_global(machine(), m_nile_irq_state);
-	state_save_register_global(machine(), m_ide_irq_state);
-	state_save_register_global_array(machine(), m_pci_bridge_regs);
-	state_save_register_global_array(machine(), m_pci_ide_regs);
-	state_save_register_global_array(machine(), m_pci_3dfx_regs);
-	state_save_register_global(machine(), m_vblank_state);
-	state_save_register_global_array(machine(), m_sio_data);
-	state_save_register_global(machine(), m_sio_irq_clear);
-	state_save_register_global(machine(), m_sio_irq_enable);
-	state_save_register_global(machine(), m_sio_irq_state);
-	state_save_register_global(machine(), m_sio_led_state);
-	state_save_register_global(machine(), m_pending_analog_read);
-	state_save_register_global(machine(), m_cmos_unlocked);
+	save_item(NAME(m_nile_irq_state));
+	save_item(NAME(m_ide_irq_state));
+	save_item(NAME(m_pci_bridge_regs));
+	save_item(NAME(m_pci_ide_regs));
+	save_item(NAME(m_pci_3dfx_regs));
+	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_sio_data));
+	save_item(NAME(m_sio_irq_clear));
+	save_item(NAME(m_sio_irq_enable));
+	save_item(NAME(m_sio_irq_state));
+	save_item(NAME(m_sio_led_state));
+	save_item(NAME(m_pending_analog_read));
+	save_item(NAME(m_cmos_unlocked));
 	machine().save().register_postload(save_prepost_delegate(FUNC(vegas_state::remap_dynamic_addresses), this));
 }
 

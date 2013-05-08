@@ -304,9 +304,9 @@ static const pia6821_interface pia_audio_intf =
 void r2dtank_state::machine_start()
 {
 	/* setup for save states */
-	state_save_register_global(machine(), m_flipscreen);
-	state_save_register_global(machine(), m_ttl74123_output);
-	state_save_register_global(machine(), m_AY8910_selected);
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_ttl74123_output));
+	save_item(NAME(m_AY8910_selected));
 }
 
 

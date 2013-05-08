@@ -28,14 +28,14 @@
 
 void midtunit_state::register_state_saving()
 {
-	state_save_register_global(machine(), cmos_write_enable);
-	state_save_register_global(machine(), fake_sound_state);
-	state_save_register_global(machine(), mk_prot_index);
-	state_save_register_global(machine(), mk2_prot_data);
-	state_save_register_global_array(machine(), nbajam_prot_queue);
-	state_save_register_global(machine(), nbajam_prot_index);
-	state_save_register_global(machine(), jdredd_prot_index);
-	state_save_register_global(machine(), jdredd_prot_max);
+	save_item(NAME(cmos_write_enable));
+	save_item(NAME(fake_sound_state));
+	save_item(NAME(mk_prot_index));
+	save_item(NAME(mk2_prot_data));
+	save_item(NAME(nbajam_prot_queue));
+	save_item(NAME(nbajam_prot_index));
+	save_item(NAME(jdredd_prot_index));
+	save_item(NAME(jdredd_prot_max));
 }
 
 

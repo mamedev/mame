@@ -190,7 +190,7 @@ MACHINE_START_MEMBER(pacman_state,acitya)
 
 	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
-	state_save_register_global(machine(), m_counter);
+	save_item(NAME(m_counter));
 }
 
 

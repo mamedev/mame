@@ -159,9 +159,9 @@ void gottlieb_state::video_start()
 	machine().gfx[0]->set_source(m_charram);
 
 	/* save some state */
-	state_save_register_global(machine(), m_background_priority);
-	state_save_register_global(machine(), m_spritebank);
-	state_save_register_global(machine(), m_transparent0);
+	save_item(NAME(m_background_priority));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_transparent0));
 }
 
 VIDEO_START_MEMBER(gottlieb_state,screwloo)
@@ -185,9 +185,9 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	machine().gfx[0]->set_source(m_charram);
 
 	/* save some state */
-	state_save_register_global(machine(), m_background_priority);
-	state_save_register_global(machine(), m_spritebank);
-	state_save_register_global(machine(), m_transparent0);
+	save_item(NAME(m_background_priority));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_transparent0));
 }
 
 

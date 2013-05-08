@@ -6104,9 +6104,9 @@ int saturn_state::stv_vdp2_start ( void )
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	state_save_register_global_pointer(machine(), m_vdp2_regs, 0x040000/2);
-	state_save_register_global_pointer(machine(), m_vdp2_vram, 0x100000/4);
-	state_save_register_global_pointer(machine(), m_vdp2_cram, 0x080000/4);
+	save_pointer(NAME(m_vdp2_regs), 0x040000/2);
+	save_pointer(NAME(m_vdp2_vram), 0x100000/4);
+	save_pointer(NAME(m_vdp2_cram), 0x080000/4);
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp2_state_save_postload), this));
 
 	return 0;

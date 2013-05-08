@@ -172,8 +172,8 @@ static DEVICE_START( exidy440_sound )
 	/* reset the system */
 	state->sound_command = 0;
 	state->sound_command_ack = 1;
-	state_save_register_global(machine, state->sound_command);
-	state_save_register_global(machine, state->sound_command_ack);
+	machine.save().save_item(NAME(state->sound_command));
+	machine.save().save_item(NAME(state->sound_command_ack));
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -185,9 +185,9 @@ static DEVICE_START( exidy440_sound )
 	state->m6844_interrupt = 0x00;
 	state->m6844_chain = 0x00;
 
-	state_save_register_global(machine, state->m6844_priority);
-	state_save_register_global(machine, state->m6844_interrupt);
-	state_save_register_global(machine, state->m6844_chain);
+	machine.save().save_item(NAME(state->m6844_priority));
+	machine.save().save_item(NAME(state->m6844_interrupt));
+	machine.save().save_item(NAME(state->m6844_chain));
 
 	state->channel_frequency[0] = device->clock();   /* channels 0 and 1 are run by FCLK */
 	state->channel_frequency[1] = device->clock();

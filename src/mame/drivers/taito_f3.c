@@ -422,7 +422,7 @@ static const UINT16 recalh_eeprom[64] = {
 
 MACHINE_START_MEMBER(taito_f3_state,f3)
 {
-	state_save_register_global_array(machine(), m_coin_word);
+	save_item(NAME(m_coin_word));
 }
 
 static MACHINE_CONFIG_START( f3, taito_f3_state )

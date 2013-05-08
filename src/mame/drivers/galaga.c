@@ -876,7 +876,7 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	m_custom_mod = 0;
-	state_save_register_global(machine(), m_custom_mod);
+	save_item(NAME(m_custom_mod));
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_nmi_mask));

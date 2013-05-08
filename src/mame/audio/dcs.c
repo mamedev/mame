@@ -883,52 +883,52 @@ static TIMER_CALLBACK( dcs_reset )
 
 static void dcs_register_state(running_machine &machine)
 {
-	state_save_register_global_array(machine, dcs.sdrc.reg);
-	state_save_register_global(machine, dcs.sdrc.seed);
+	machine.save().save_item(NAME(dcs.sdrc.reg));
+	machine.save().save_item(NAME(dcs.sdrc.seed));
 
-	state_save_register_global_array(machine, dcs.dsio.reg);
-	state_save_register_global(machine, dcs.dsio.start_on_next_write);
-	state_save_register_global(machine, dcs.dsio.channelbits);
+	machine.save().save_item(NAME(dcs.dsio.reg));
+	machine.save().save_item(NAME(dcs.dsio.start_on_next_write));
+	machine.save().save_item(NAME(dcs.dsio.channelbits));
 
-	state_save_register_global(machine, dcs.channels);
-	state_save_register_global(machine, dcs.size);
-	state_save_register_global(machine, dcs.incs);
-	state_save_register_global(machine, dcs.ireg);
-	state_save_register_global(machine, dcs.ireg_base);
-	state_save_register_global_array(machine, dcs.control_regs);
+	machine.save().save_item(NAME(dcs.channels));
+	machine.save().save_item(NAME(dcs.size));
+	machine.save().save_item(NAME(dcs.incs));
+	machine.save().save_item(NAME(dcs.ireg));
+	machine.save().save_item(NAME(dcs.ireg_base));
+	machine.save().save_item(NAME(dcs.control_regs));
 
-	state_save_register_global(machine, dcs.sounddata_bank);
+	machine.save().save_item(NAME(dcs.sounddata_bank));
 
-	state_save_register_global(machine, dcs.auto_ack);
-	state_save_register_global(machine, dcs.latch_control);
-	state_save_register_global(machine, dcs.input_data);
-	state_save_register_global(machine, dcs.output_data);
-	state_save_register_global(machine, dcs.output_control);
-	state_save_register_global(machine, dcs.output_control_cycles);
-	state_save_register_global(machine, dcs.last_output_full);
-	state_save_register_global(machine, dcs.last_input_empty);
-	state_save_register_global(machine, dcs.progflags);
+	machine.save().save_item(NAME(dcs.auto_ack));
+	machine.save().save_item(NAME(dcs.latch_control));
+	machine.save().save_item(NAME(dcs.input_data));
+	machine.save().save_item(NAME(dcs.output_data));
+	machine.save().save_item(NAME(dcs.output_control));
+	machine.save().save_item(NAME(dcs.output_control_cycles));
+	machine.save().save_item(NAME(dcs.last_output_full));
+	machine.save().save_item(NAME(dcs.last_input_empty));
+	machine.save().save_item(NAME(dcs.progflags));
 
-	state_save_register_global(machine, dcs.timer_enable);
-	state_save_register_global(machine, dcs.timer_ignore);
-	state_save_register_global(machine, dcs.timer_start_cycles);
-	state_save_register_global(machine, dcs.timer_start_count);
-	state_save_register_global(machine, dcs.timer_scale);
-	state_save_register_global(machine, dcs.timer_period);
-	state_save_register_global(machine, dcs.timers_fired);
+	machine.save().save_item(NAME(dcs.timer_enable));
+	machine.save().save_item(NAME(dcs.timer_ignore));
+	machine.save().save_item(NAME(dcs.timer_start_cycles));
+	machine.save().save_item(NAME(dcs.timer_start_count));
+	machine.save().save_item(NAME(dcs.timer_scale));
+	machine.save().save_item(NAME(dcs.timer_period));
+	machine.save().save_item(NAME(dcs.timers_fired));
 
-	state_save_register_global(machine, dcs.transfer.dcs_state);
-	state_save_register_global(machine, dcs.transfer.state);
-	state_save_register_global(machine, dcs.transfer.start);
-	state_save_register_global(machine, dcs.transfer.stop);
-	state_save_register_global(machine, dcs.transfer.type);
-	state_save_register_global(machine, dcs.transfer.temp);
-	state_save_register_global(machine, dcs.transfer.writes_left);
-	state_save_register_global(machine, dcs.transfer.sum);
-	state_save_register_global(machine, dcs.transfer.fifo_entries);
+	machine.save().save_item(NAME(dcs.transfer.dcs_state));
+	machine.save().save_item(NAME(dcs.transfer.state));
+	machine.save().save_item(NAME(dcs.transfer.start));
+	machine.save().save_item(NAME(dcs.transfer.stop));
+	machine.save().save_item(NAME(dcs.transfer.type));
+	machine.save().save_item(NAME(dcs.transfer.temp));
+	machine.save().save_item(NAME(dcs.transfer.writes_left));
+	machine.save().save_item(NAME(dcs.transfer.sum));
+	machine.save().save_item(NAME(dcs.transfer.fifo_entries));
 
 	if (dcs.sram != NULL)
-		state_save_register_global_pointer(machine, dcs.sram, 0x8000*4 / sizeof(dcs.sram[0]));
+		machine.save().save_pointer(NAME(dcs.sram), 0x8000*4 / sizeof(dcs.sram[0]));
 
 	if (dcs.rev == 2)
 		machine.save().register_postload(save_prepost_delegate(FUNC(sdrc_remap_memory), &machine));

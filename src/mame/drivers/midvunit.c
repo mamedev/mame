@@ -46,13 +46,13 @@ Known to exist but not dumped:
 
 void midvunit_state::machine_start()
 {
-	state_save_register_global(machine(), m_cmos_protected);
-	state_save_register_global(machine(), m_control_data);
-	state_save_register_global(machine(), m_adc_data);
-	state_save_register_global(machine(), m_adc_shift);
-	state_save_register_global(machine(), m_last_port0);
-	state_save_register_global(machine(), m_shifter_state);
-	state_save_register_global(machine(), m_timer_rate);
+	save_item(NAME(m_cmos_protected));
+	save_item(NAME(m_control_data));
+	save_item(NAME(m_adc_data));
+	save_item(NAME(m_adc_shift));
+	save_item(NAME(m_last_port0));
+	save_item(NAME(m_shifter_state));
+	save_item(NAME(m_timer_rate));
 }
 
 

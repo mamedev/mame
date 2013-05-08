@@ -2145,14 +2145,14 @@ int saturn_state::stv_vdp1_start ( void )
 	m_vdp1.user_cliprect.set(0, 512, 0, 256);
 
 	// save state
-	state_save_register_global_pointer(machine(), m_vdp1_regs, 0x020/2);
-	state_save_register_global_pointer(machine(), m_vdp1_vram, 0x100000/4);
-	state_save_register_global(machine(), m_vdp1.fbcr_accessed);
-	state_save_register_global(machine(), m_vdp1.framebuffer_current_display);
-	state_save_register_global(machine(), m_vdp1.framebuffer_current_draw);
-	state_save_register_global(machine(), m_vdp1.framebuffer_clear_on_next_frame);
-	state_save_register_global(machine(), m_vdp1.local_x);
-	state_save_register_global(machine(), m_vdp1.local_y);
+	save_pointer(NAME(m_vdp1_regs), 0x020/2);
+	save_pointer(NAME(m_vdp1_vram), 0x100000/4);
+	save_item(NAME(m_vdp1.fbcr_accessed));
+	save_item(NAME(m_vdp1.framebuffer_current_display));
+	save_item(NAME(m_vdp1.framebuffer_current_draw));
+	save_item(NAME(m_vdp1.framebuffer_clear_on_next_frame));
+	save_item(NAME(m_vdp1.local_x));
+	save_item(NAME(m_vdp1.local_y));
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_state::stv_vdp1_state_save_postload), this));
 	return 0;
 }

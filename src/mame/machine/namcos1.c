@@ -991,9 +991,9 @@ static void namcos1_driver_init( running_machine &machine, const struct namcos1_
 	state->m_paletteram = auto_alloc_array(machine, UINT8, 0x8000);
 
 	/* Register volatile user memory for save state */
-	state_save_register_global_pointer(machine, state->m_s1ram, 0x8000);
-	state_save_register_global_pointer(machine, state->m_triram, 0x800);
-	state_save_register_global_pointer(machine, state->m_paletteram, 0x8000);
+	machine.save().save_pointer(NAME(state->m_s1ram), 0x8000);
+	machine.save().save_pointer(NAME(state->m_triram), 0x800);
+	machine.save().save_pointer(NAME(state->m_paletteram), 0x8000);
 
 	/* Point mcu & sound shared RAM to destination */
 	state->membank("bank18")->set_base(state->m_triram );

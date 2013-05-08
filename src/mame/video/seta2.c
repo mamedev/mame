@@ -454,7 +454,7 @@ VIDEO_START_MEMBER(seta2_state,seta2)
 	m_yoffset = 0;
 
 	//TODO:FIX
-	//state_save_register_global_pointer(machine(), m_vregs, 0x40);
+	//save_pointer(NAME(m_vregs), 0x40);
 }
 
 VIDEO_START_MEMBER(seta2_state,seta2_xoffset)

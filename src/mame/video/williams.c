@@ -103,14 +103,14 @@
 
 void williams_state::state_save_register()
 {
-	state_save_register_global(machine(), m_blitter_window_enable);
-	state_save_register_global(machine(), m_cocktail);
-	state_save_register_global_array(machine(), m_blitterram);
-	state_save_register_global(machine(), m_blitter_remap_index);
-	state_save_register_global(machine(), m_blaster_color0);
-	state_save_register_global(machine(), m_blaster_video_control);
-	state_save_register_global(machine(), m_tilemap_xscroll);
-	state_save_register_global(machine(), m_williams2_fg_color);
+	save_item(NAME(m_blitter_window_enable));
+	save_item(NAME(m_cocktail));
+	save_item(NAME(m_blitterram));
+	save_item(NAME(m_blitter_remap_index));
+	save_item(NAME(m_blaster_color0));
+	save_item(NAME(m_blaster_video_control));
+	save_item(NAME(m_tilemap_xscroll));
+	save_item(NAME(m_williams2_fg_color));
 }
 
 

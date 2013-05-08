@@ -556,34 +556,34 @@ void seattle_state::machine_start()
 	mips3drc_add_fastram(m_maincpu, 0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
 
 	/* register for save states */
-	state_save_register_global_array(machine(), m_galileo.reg);
-	state_save_register_global(machine(), m_galileo.dma_active);
-	state_save_register_global_array(machine(), m_galileo.dma_stalled_on_voodoo);
-	state_save_register_global_array(machine(), m_galileo.pci_bridge_regs);
-	state_save_register_global_array(machine(), m_galileo.pci_3dfx_regs);
-	state_save_register_global_array(machine(), m_galileo.pci_ide_regs);
+	save_item(NAME(m_galileo.reg));
+	save_item(NAME(m_galileo.dma_active));
+	save_item(NAME(m_galileo.dma_stalled_on_voodoo));
+	save_item(NAME(m_galileo.pci_bridge_regs));
+	save_item(NAME(m_galileo.pci_3dfx_regs));
+	save_item(NAME(m_galileo.pci_ide_regs));
 	for (index = 0; index < ARRAY_LENGTH(m_galileo.timer); index++)
 	{
 		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].count);
 		state_save_register_item(machine(), "galileo", NULL, index, m_galileo.timer[index].active);
 	}
-	state_save_register_global(machine(), m_widget.ethernet_addr);
-	state_save_register_global(machine(), m_widget.irq_num);
-	state_save_register_global(machine(), m_widget.irq_mask);
-	state_save_register_global(machine(), m_voodoo_stalled);
-	state_save_register_global(machine(), m_cpu_stalled_on_voodoo);
-	state_save_register_global(machine(), m_cpu_stalled_offset);
-	state_save_register_global(machine(), m_cpu_stalled_data);
-	state_save_register_global(machine(), m_cpu_stalled_mem_mask);
-	state_save_register_global(machine(), m_board_config);
-	state_save_register_global(machine(), m_ethernet_irq_num);
-	state_save_register_global(machine(), m_ethernet_irq_state);
-	state_save_register_global(machine(), m_vblank_irq_num);
-	state_save_register_global(machine(), m_vblank_latch);
-	state_save_register_global(machine(), m_vblank_state);
-	state_save_register_global(machine(), m_pending_analog_read);
-	state_save_register_global(machine(), m_status_leds);
-	state_save_register_global(machine(), m_cmos_write_enabled);
+	save_item(NAME(m_widget.ethernet_addr));
+	save_item(NAME(m_widget.irq_num));
+	save_item(NAME(m_widget.irq_mask));
+	save_item(NAME(m_voodoo_stalled));
+	save_item(NAME(m_cpu_stalled_on_voodoo));
+	save_item(NAME(m_cpu_stalled_offset));
+	save_item(NAME(m_cpu_stalled_data));
+	save_item(NAME(m_cpu_stalled_mem_mask));
+	save_item(NAME(m_board_config));
+	save_item(NAME(m_ethernet_irq_num));
+	save_item(NAME(m_ethernet_irq_state));
+	save_item(NAME(m_vblank_irq_num));
+	save_item(NAME(m_vblank_latch));
+	save_item(NAME(m_vblank_state));
+	save_item(NAME(m_pending_analog_read));
+	save_item(NAME(m_status_leds));
+	save_item(NAME(m_cmos_write_enabled));
 }
 
 

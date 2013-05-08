@@ -225,14 +225,14 @@
 
 void bzone_state::machine_start()
 {
-	state_save_register_global(machine(), m_analog_data);
+	save_item(NAME(m_analog_data));
 }
 
 
 MACHINE_START_MEMBER(bzone_state,redbaron)
 {
-	state_save_register_global(machine(), m_analog_data);
-	state_save_register_global(machine(), m_rb_input_select);
+	save_item(NAME(m_analog_data));
+	save_item(NAME(m_rb_input_select));
 }
 
 

@@ -341,27 +341,27 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 	m_spritemap = auto_alloc_array(machine(), UINT8, 256*256*2);
 
 	/* Set up save state */
-	state_save_register_global(machine(), m_romD_addr);
-	state_save_register_global(machine(), m_romEF_addr);
-	state_save_register_global(machine(), m_E16_add_b);
-	state_save_register_global(machine(), m_HINV);
-	state_save_register_global(machine(), m_VINV);
-	state_save_register_global(machine(), m_XSize);
-	state_save_register_global(machine(), m_YSize);
-	state_save_register_global(machine(), m_mark_1);
-	state_save_register_global(machine(), m_mark_2);
-	state_save_register_global(machine(), m_colorram_addr_hi);
-	state_save_register_global(machine(), m_ls273_g6);
-	state_save_register_global(machine(), m_ls273_j6);
-	state_save_register_global(machine(), m_romHI_addr_mid);
-	state_save_register_global(machine(), m_romHI_addr_msb);
-	state_save_register_global(machine(), m_DISP);
-	state_save_register_global(machine(), m_background_romsel);
-	state_save_register_global(machine(), m_color_A4);
-	state_save_register_global(machine(), m_ls175_b7);
-	state_save_register_global(machine(), m_ls175_e8);
-	state_save_register_global(machine(), m_ls377_data);
-	state_save_register_global(machine(), m_page);
+	save_item(NAME(m_romD_addr));
+	save_item(NAME(m_romEF_addr));
+	save_item(NAME(m_E16_add_b));
+	save_item(NAME(m_HINV));
+	save_item(NAME(m_VINV));
+	save_item(NAME(m_XSize));
+	save_item(NAME(m_YSize));
+	save_item(NAME(m_mark_1));
+	save_item(NAME(m_mark_2));
+	save_item(NAME(m_colorram_addr_hi));
+	save_item(NAME(m_ls273_g6));
+	save_item(NAME(m_ls273_j6));
+	save_item(NAME(m_romHI_addr_mid));
+	save_item(NAME(m_romHI_addr_msb));
+	save_item(NAME(m_DISP));
+	save_item(NAME(m_background_romsel));
+	save_item(NAME(m_color_A4));
+	save_item(NAME(m_ls175_b7));
+	save_item(NAME(m_ls175_e8));
+	save_item(NAME(m_ls377_data));
+	save_item(NAME(m_page));
 }
 
 

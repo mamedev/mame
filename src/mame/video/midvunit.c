@@ -55,11 +55,11 @@ void midvunit_state::video_start()
 
 	m_poly = auto_alloc(machine(), midvunit_renderer(*this));
 
-	state_save_register_global_array(machine(), m_video_regs);
-	state_save_register_global_array(machine(), m_dma_data);
-	state_save_register_global(machine(), m_dma_data_index);
-	state_save_register_global(machine(), m_page_control);
-	state_save_register_global(machine(), m_video_changed);
+	save_item(NAME(m_video_regs));
+	save_item(NAME(m_dma_data));
+	save_item(NAME(m_dma_data_index));
+	save_item(NAME(m_page_control));
+	save_item(NAME(m_video_changed));
 }
 
 

@@ -326,9 +326,9 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 void tubep_state::tubep_setup_save_state()
 {
 	/* Set up save state */
-	state_save_register_global(machine(), m_sound_latch);
-	state_save_register_global(machine(), m_ls74);
-	state_save_register_global(machine(), m_ls377);
+	save_item(NAME(m_sound_latch));
+	save_item(NAME(m_ls74));
+	save_item(NAME(m_ls377));
 }
 
 

@@ -185,14 +185,14 @@ static const gaelco_serial_interface serial_interface =
 void gaelco3d_state::machine_start()
 {
 	/* Save state support */
-	state_save_register_global(machine(), m_sound_data);
-	state_save_register_global(machine(), m_sound_status);
-	state_save_register_global_array(machine(), m_analog_ports);
-	state_save_register_global(machine(), m_framenum);
-	state_save_register_global(machine(), m_adsp_ireg);
-	state_save_register_global(machine(), m_adsp_ireg_base);
-	state_save_register_global(machine(), m_adsp_incs);
-	state_save_register_global(machine(), m_adsp_size);
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_sound_status));
+	save_item(NAME(m_analog_ports));
+	save_item(NAME(m_framenum));
+	save_item(NAME(m_adsp_ireg));
+	save_item(NAME(m_adsp_ireg_base));
+	save_item(NAME(m_adsp_incs));
+	save_item(NAME(m_adsp_size));
 }
 
 

@@ -67,15 +67,15 @@ static void m68k_gen_int(device_t *device, int state)
 
 void artmagic_state::machine_start()
 {
-	state_save_register_global(machine(), m_tms_irq);
-	state_save_register_global(machine(), m_hack_irq);
-	state_save_register_global(machine(), m_prot_input_index);
-	state_save_register_global(machine(), m_prot_output_index);
-	state_save_register_global(machine(), m_prot_output_bit);
-	state_save_register_global(machine(), m_prot_bit_index);
-	state_save_register_global(machine(), m_prot_save);
-	state_save_register_global_array(machine(), m_prot_input);
-	state_save_register_global_array(machine(), m_prot_output);
+	save_item(NAME(m_tms_irq));
+	save_item(NAME(m_hack_irq));
+	save_item(NAME(m_prot_input_index));
+	save_item(NAME(m_prot_output_index));
+	save_item(NAME(m_prot_output_bit));
+	save_item(NAME(m_prot_bit_index));
+	save_item(NAME(m_prot_save));
+	save_item(NAME(m_prot_input));
+	save_item(NAME(m_prot_output));
 }
 
 void artmagic_state::machine_reset()

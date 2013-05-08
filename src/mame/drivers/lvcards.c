@@ -82,9 +82,9 @@ TODO:
 
 MACHINE_START_MEMBER(lvcards_state,lvpoker)
 {
-	state_save_register_global(machine(), m_payout);
-	state_save_register_global(machine(), m_pulse);
-	state_save_register_global(machine(), m_result);
+	save_item(NAME(m_payout));
+	save_item(NAME(m_pulse));
+	save_item(NAME(m_result));
 }
 
 MACHINE_RESET_MEMBER(lvcards_state,lvpoker)

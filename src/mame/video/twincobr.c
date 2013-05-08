@@ -111,25 +111,25 @@ VIDEO_START_MEMBER(twincobr_state,toaplan0)
 	m_display_on = 0;
 	twincobr_display(m_display_on);
 
-	state_save_register_global_pointer(machine(), m_txvideoram16, m_txvideoram_size);
-	state_save_register_global_pointer(machine(), m_fgvideoram16, m_fgvideoram_size);
-	state_save_register_global_pointer(machine(), m_bgvideoram16, m_bgvideoram_size);
-	state_save_register_global(machine(), m_txoffs);
-	state_save_register_global(machine(), m_fgoffs);
-	state_save_register_global(machine(), m_bgoffs);
-	state_save_register_global(machine(), m_scroll_x);
-	state_save_register_global(machine(), m_scroll_y);
-	state_save_register_global(machine(), m_txscrollx);
-	state_save_register_global(machine(), m_fgscrollx);
-	state_save_register_global(machine(), m_bgscrollx);
-	state_save_register_global(machine(), m_txscrolly);
-	state_save_register_global(machine(), m_fgscrolly);
-	state_save_register_global(machine(), m_bgscrolly);
-	state_save_register_global(machine(), m_display_on);
-	state_save_register_global(machine(), m_fg_rom_bank);
-	state_save_register_global(machine(), m_bg_ram_bank);
-	state_save_register_global(machine(), m_flip_screen);
-	state_save_register_global(machine(), m_wardner_sprite_hack);
+	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
+	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);
+	save_pointer(NAME(m_bgvideoram16), m_bgvideoram_size);
+	save_item(NAME(m_txoffs));
+	save_item(NAME(m_fgoffs));
+	save_item(NAME(m_bgoffs));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
+	save_item(NAME(m_txscrollx));
+	save_item(NAME(m_fgscrollx));
+	save_item(NAME(m_bgscrollx));
+	save_item(NAME(m_txscrolly));
+	save_item(NAME(m_fgscrolly));
+	save_item(NAME(m_bgscrolly));
+	save_item(NAME(m_display_on));
+	save_item(NAME(m_fg_rom_bank));
+	save_item(NAME(m_bg_ram_bank));
+	save_item(NAME(m_flip_screen));
+	save_item(NAME(m_wardner_sprite_hack));
 	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_state::twincobr_restore_screen), this));
 }
 

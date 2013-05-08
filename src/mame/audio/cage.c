@@ -186,14 +186,14 @@ void cage_init(running_machine &machine, offs_t speedup)
 		state->dmadac[chan] = machine.device<dmadac_sound_device>(buffer);
 	}
 
-	state_save_register_global(machine, cage.cpu_to_cage_ready);
-	state_save_register_global(machine, cage.cage_to_cpu_ready);
-	state_save_register_global(machine, cage.serial_period_per_word);
-	state_save_register_global(machine, cage.dma_enabled);
-	state_save_register_global(machine, cage.dma_timer_enabled);
-	state_save_register_global_array(machine, cage.timer_enabled);
-	state_save_register_global(machine, cage.from_main);
-	state_save_register_global(machine, cage.control);
+	machine.save().save_item(NAME(cage.cpu_to_cage_ready));
+	machine.save().save_item(NAME(cage.cage_to_cpu_ready));
+	machine.save().save_item(NAME(cage.serial_period_per_word));
+	machine.save().save_item(NAME(cage.dma_enabled));
+	machine.save().save_item(NAME(cage.dma_timer_enabled));
+	machine.save().save_item(NAME(cage.timer_enabled));
+	machine.save().save_item(NAME(cage.from_main));
+	machine.save().save_item(NAME(cage.control));
 }
 
 

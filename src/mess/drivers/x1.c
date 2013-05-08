@@ -2533,9 +2533,9 @@ MACHINE_START_MEMBER(x1_state,x1)
 	m_cg_rom = memregion("cgrom")->base();
 	m_kanji_rom = memregion("kanji")->base();
 
-	state_save_register_global_pointer(machine(), m_work_ram, 0x10000*0x10);
-	state_save_register_global_pointer(machine(), m_emm_ram, 0x1000000);
-	state_save_register_global_pointer(machine(), m_pcg_ram, 0x1800);
+	save_pointer(NAME(m_work_ram), 0x10000*0x10);
+	save_pointer(NAME(m_emm_ram), 0x1000000);
+	save_pointer(NAME(m_pcg_ram), 0x1800);
 
 	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0));
 }

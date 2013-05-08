@@ -35,8 +35,8 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 		m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
 		m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
 {
-	state_save_register_global_bitmap(state.machine(), &m_screenbits);
-	state_save_register_global_bitmap(state.machine(), &m_zbuffer);
+	state.machine().save().save_item(NAME(m_screenbits));
+	state.machine().save().save_item(NAME(m_zbuffer));
 
 	/* first expand the pixel data */
 	UINT8 *src = state.memregion("gfx1")->base();
@@ -74,11 +74,10 @@ void gaelco3d_state::video_start()
 
 	/* save states */
 
-	state_save_register_global_pointer(machine(), m_palette, 32768);
-	state_save_register_global_pointer(machine(), m_polydata_buffer, MAX_POLYDATA);
-	state_save_register_global(machine(), m_polydata_count);
-
-	state_save_register_global(machine(), m_lastscan);
+	save_pointer(NAME(m_palette), 32768);
+	save_pointer(NAME(m_polydata_buffer), MAX_POLYDATA);
+	save_item(NAME(m_polydata_count));
+	save_item(NAME(m_lastscan));
 }
 
 

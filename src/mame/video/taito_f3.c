@@ -654,8 +654,8 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	memset(m_spriteram16_buffered,0,0x10000);
 	memset(m_spriteram,0,0x10000);
 
-	state_save_register_global_array(machine(), m_f3_control_0);
-	state_save_register_global_array(machine(), m_f3_control_1);
+	save_item(NAME(m_f3_control_0));
+	save_item(NAME(m_f3_control_1));
 
 	machine().gfx[0]->set_source((UINT8 *)m_f3_vram);
 	machine().gfx[3]->set_source((UINT8 *)m_f3_pivot_ram);

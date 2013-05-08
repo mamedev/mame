@@ -1092,20 +1092,20 @@ MACHINE_START_MEMBER(stv_state,stv)
 	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
 
 	// save states
-	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine(), m_NMI_reset);
-	state_save_register_global(machine(), m_en_68k);
-//  state_save_register_global(machine(), scanline);
-	state_save_register_global(machine(), m_smpc.IOSEL1);
-	state_save_register_global(machine(), m_smpc.IOSEL2);
-	state_save_register_global(machine(), m_smpc.EXLE1);
-	state_save_register_global(machine(), m_smpc.EXLE2);
-	state_save_register_global(machine(), m_smpc.PDR1);
-	state_save_register_global(machine(), m_smpc.PDR2);
-	state_save_register_global(machine(), m_port_sel);
-	state_save_register_global(machine(), m_mux_data);
-	state_save_register_global(machine(), m_scsp_last_line);
+	save_pointer(NAME(m_scu_regs), 0x100/4);
+	save_pointer(NAME(m_scsp_regs), 0x1000/2);
+	save_item(NAME(m_NMI_reset));
+	save_item(NAME(m_en_68k));
+//  save_item(NAME(scanline));
+	save_item(NAME(m_smpc.IOSEL1));
+	save_item(NAME(m_smpc.IOSEL2));
+	save_item(NAME(m_smpc.EXLE1));
+	save_item(NAME(m_smpc.EXLE2));
+	save_item(NAME(m_smpc.PDR1));
+	save_item(NAME(m_smpc.PDR2));
+	save_item(NAME(m_port_sel));
+	save_item(NAME(m_mux_data));
+	save_item(NAME(m_scsp_last_line));
 
 	stv_register_protection_savestates(machine()); // machine/stvprot.c
 

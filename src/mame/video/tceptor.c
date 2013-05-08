@@ -396,11 +396,11 @@ void tceptor_state::video_start()
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
-	state_save_register_global_pointer(machine(), m_sprite_ram_buffered, 0x200 / 2);
-	state_save_register_global(machine(), m_bg1_scroll_x);
-	state_save_register_global(machine(), m_bg1_scroll_y);
-	state_save_register_global(machine(), m_bg2_scroll_x);
-	state_save_register_global(machine(), m_bg2_scroll_y);
+	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
+	save_item(NAME(m_bg1_scroll_x));
+	save_item(NAME(m_bg1_scroll_y));
+	save_item(NAME(m_bg2_scroll_x));
+	save_item(NAME(m_bg2_scroll_y));
 }
 
 

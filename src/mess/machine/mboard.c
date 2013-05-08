@@ -264,7 +264,7 @@ void mboard_state::board_postload()
 
 void mboard_state::mboard_savestate_register()
 {
-	state_save_register_global_array(machine(),save_board);
+	save_item(NAME(save_board));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mboard_state::board_postload),this));
 	machine().save().register_presave(save_prepost_delegate(FUNC(mboard_state::board_presave),this));
 }

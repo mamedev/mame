@@ -793,7 +793,7 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(exidy_state,teetert)
 {
-	state_save_register_global(machine(), m_last_dial);
+	save_item(NAME(m_last_dial));
 }
 
 /*************************************

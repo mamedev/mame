@@ -619,9 +619,9 @@ static const k053252_interface qdrmfgp2_k053252_intf =
 
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 {
-	state_save_register_global(machine(), m_control);
-	state_save_register_global(machine(), m_pal);
-	state_save_register_global(machine(), m_gp2_irq_control);
+	save_item(NAME(m_control));
+	save_item(NAME(m_pal));
+	save_item(NAME(m_gp2_irq_control));
 }
 
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)

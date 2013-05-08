@@ -2831,7 +2831,7 @@ DRIVER_INIT_MEMBER(galaxian_state,gmgalax)
 
 	/* callback when the game select is toggled */
 	gmgalax_game_changed(*machine().ioport().first_port()->first_field(), NULL, 0, 0);
-	state_save_register_global(machine(), m_gmgalax_selected_game);
+	save_item(NAME(m_gmgalax_selected_game));
 }
 
 
@@ -3309,8 +3309,8 @@ DRIVER_INIT_MEMBER(galaxian_state,kingball)
 	space.install_write_handler(0xb002, 0xb002, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_sound2_w),this));
 	space.install_write_handler(0xb003, 0xb003, 0, 0x7f8, write8_delegate(FUNC(galaxian_state::kingball_speech_dip_w),this));
 
-	state_save_register_global(machine(), m_kingball_speech_dip);
-	state_save_register_global(machine(), m_kingball_sound);
+	save_item(NAME(m_kingball_speech_dip));
+	save_item(NAME(m_kingball_sound));
 }
 
 
@@ -3574,7 +3574,7 @@ DRIVER_INIT_MEMBER(galaxian_state,moonwar)
 	/* video extensions */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, NULL, NULL);
 
-	state_save_register_global(machine(), m_moonwar_port_select);
+	save_item(NAME(m_moonwar_port_select));
 }
 
 

@@ -93,7 +93,7 @@ void skykid_state::machine_start()
 	/* configure the banks */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x2000);
 
-	state_save_register_global(machine(), m_inputport_selected);
+	save_item(NAME(m_inputport_selected));
 }
 
 

@@ -1052,7 +1052,7 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 	save_item(NAME(m_dir));
 	save_item(NAME(m_dial));
 	save_item(NAME(m_irq_source));
-//  state_save_register_global(machine(), init_eeprom_count);
+//  save_item(NAME(init_eeprom_count));
 }
 
 MACHINE_RESET_MEMBER(mitchell_state,mitchell)

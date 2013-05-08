@@ -68,7 +68,7 @@ void magmax_state::video_start()
 	UINT8 * prom14D = memregion("user2")->base();
 
 	/* Set up save state */
-	state_save_register_global(machine(), m_flipscreen);
+	save_item(NAME(m_flipscreen));
 
 	m_prom_tab = auto_alloc_array(machine(), UINT32, 256);
 

@@ -110,10 +110,10 @@ VIDEO_START_MEMBER(mcr3_state,spyhunt)
 	m_alpha_tilemap->set_transparent_pen(0);
 	m_alpha_tilemap->set_scrollx(0, 16);
 
-	state_save_register_global(machine(), m_spyhunt_sprite_color_mask);
-	state_save_register_global(machine(), m_spyhunt_scrollx);
-	state_save_register_global(machine(), m_spyhunt_scrolly);
-	state_save_register_global(machine(), m_spyhunt_scroll_offset);
+	save_item(NAME(m_spyhunt_sprite_color_mask));
+	save_item(NAME(m_spyhunt_scrollx));
+	save_item(NAME(m_spyhunt_scrolly));
+	save_item(NAME(m_spyhunt_scroll_offset));
 }
 
 

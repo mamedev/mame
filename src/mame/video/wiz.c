@@ -12,11 +12,11 @@
 
 void wiz_state::video_start()
 {
-	state_save_register_global_array(machine(), m_char_bank);
-	state_save_register_global_array(machine(), m_palbank);
-	state_save_register_global(machine(), m_flipx);
-	state_save_register_global(machine(), m_flipy);
-	state_save_register_global(machine(), m_bgpen);
+	save_item(NAME(m_char_bank));
+	save_item(NAME(m_palbank));
+	save_item(NAME(m_flipx));
+	save_item(NAME(m_flipy));
+	save_item(NAME(m_bgpen));
 }
 
 /***************************************************************************

@@ -249,9 +249,9 @@ void popeye_state::video_start()
 
 	m_lastflip = 0;
 
-	state_save_register_global(machine(), m_lastflip);
-	state_save_register_global_bitmap(machine(), m_tmpbitmap2);
-	state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
+	save_item(NAME(m_lastflip));
+	save_item(NAME(m_tmpbitmap2));
+	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
 }
 
 VIDEO_START_MEMBER(popeye_state,popeye)
@@ -266,9 +266,9 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 
 	m_lastflip = 0;
 
-	state_save_register_global(machine(), m_lastflip);
-	state_save_register_global_bitmap(machine(), m_tmpbitmap2);
-	state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
+	save_item(NAME(m_lastflip));
+	save_item(NAME(m_tmpbitmap2));
+	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
 }
 
 void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)

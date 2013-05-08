@@ -220,22 +220,22 @@ void segag80r_state::video_start()
 	}
 
 	/* register for save states */
-	state_save_register_global(machine(), m_video_control);
-	state_save_register_global(machine(), m_video_flip);
-	state_save_register_global(machine(), m_vblank_latch);
+	save_item(NAME(m_video_control));
+	save_item(NAME(m_video_flip));
+	save_item(NAME(m_vblank_latch));
 
-	state_save_register_global(machine(), m_spaceod_hcounter);
-	state_save_register_global(machine(), m_spaceod_vcounter);
-	state_save_register_global(machine(), m_spaceod_fixed_color);
-	state_save_register_global(machine(), m_spaceod_bg_control);
-	state_save_register_global(machine(), m_spaceod_bg_detect);
+	save_item(NAME(m_spaceod_hcounter));
+	save_item(NAME(m_spaceod_vcounter));
+	save_item(NAME(m_spaceod_fixed_color));
+	save_item(NAME(m_spaceod_bg_control));
+	save_item(NAME(m_spaceod_bg_detect));
 
-	state_save_register_global(machine(), m_bg_enable);
-	state_save_register_global(machine(), m_bg_char_bank);
-	state_save_register_global(machine(), m_bg_scrollx);
-	state_save_register_global(machine(), m_bg_scrolly);
+	save_item(NAME(m_bg_enable));
+	save_item(NAME(m_bg_char_bank));
+	save_item(NAME(m_bg_scrollx));
+	save_item(NAME(m_bg_scrolly));
 
-	state_save_register_global(machine(), m_pignewt_bg_color_offset);
+	save_item(NAME(m_pignewt_bg_color_offset));
 }
 
 

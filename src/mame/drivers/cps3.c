@@ -812,11 +812,11 @@ void cps3_state::video_start()
 {
 	m_ss_ram       = auto_alloc_array(machine(), UINT32, 0x10000/4);
 	memset(m_ss_ram, 0x00, 0x10000);
-	state_save_register_global_pointer(machine(), m_ss_ram, 0x10000/4);
+	save_pointer(NAME(m_ss_ram), 0x10000/4);
 
 	m_char_ram = auto_alloc_array(machine(), UINT32, 0x800000/4);
 	memset(m_char_ram, 0x00, 0x800000);
-	state_save_register_global_pointer(machine(), m_char_ram, 0x800000 /4);
+	save_pointer(NAME(m_char_ram), 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), cps3_tiles8x8_layout, (UINT8 *)m_ss_ram, machine().total_colors() / 16, 0));

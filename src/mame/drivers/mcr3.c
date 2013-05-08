@@ -1525,9 +1525,9 @@ ROM_END
 
 void mcr3_state::mcr_common_init()
 {
-	state_save_register_global(machine(), m_input_mux);
-	state_save_register_global(machine(), m_latched_input);
-	state_save_register_global(machine(), m_last_op4);
+	save_item(NAME(m_input_mux));
+	save_item(NAME(m_latched_input));
+	save_item(NAME(m_last_op4));
 }
 
 
@@ -1555,11 +1555,11 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 	m_maincpu->space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::maxrpm_op5_w),this));
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),this));
 
-	state_save_register_global(machine(), m_maxrpm_adc_control);
-	state_save_register_global(machine(), m_maxrpm_adc_select);
-	state_save_register_global(machine(), m_maxrpm_last_shift);
-	state_save_register_global(machine(), m_maxrpm_p1_shift);
-	state_save_register_global(machine(), m_maxrpm_p2_shift);
+	save_item(NAME(m_maxrpm_adc_control));
+	save_item(NAME(m_maxrpm_adc_select));
+	save_item(NAME(m_maxrpm_last_shift));
+	save_item(NAME(m_maxrpm_p1_shift));
+	save_item(NAME(m_maxrpm_p2_shift));
 }
 
 

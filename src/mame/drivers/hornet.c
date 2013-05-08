@@ -910,10 +910,10 @@ void hornet_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(m_maincpu, 0x00000000, 0x003fffff, FALSE, m_workram);
 
-	state_save_register_global(machine(), m_led_reg0);
-	state_save_register_global(machine(), m_led_reg1);
-	state_save_register_global_pointer(machine(), m_jvs_sdata, 1024);
-	state_save_register_global(machine(), m_jvs_sdata_ptr);
+	save_item(NAME(m_led_reg0));
+	save_item(NAME(m_led_reg1));
+	save_pointer(NAME(m_jvs_sdata), 1024);
+	save_item(NAME(m_jvs_sdata_ptr));
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hornet_state::irq_off),this));
 }

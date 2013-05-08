@@ -666,23 +666,23 @@ MACHINE_START_MEMBER(sat_console_state,saturn)
 	}
 
 	// save states
-	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine(), m_NMI_reset);
-	state_save_register_global(machine(), m_en_68k);
-	state_save_register_global(machine(), m_smpc.IOSEL1);
-	state_save_register_global(machine(), m_smpc.IOSEL2);
-	state_save_register_global(machine(), m_smpc.EXLE1);
-	state_save_register_global(machine(), m_smpc.EXLE2);
-	state_save_register_global(machine(), m_smpc.PDR1);
-	state_save_register_global(machine(), m_smpc.PDR2);
-//  state_save_register_global(machine(), m_port_sel);
-//  state_save_register_global(machine(), mux_data);
-	state_save_register_global(machine(), m_scsp_last_line);
-	state_save_register_global(machine(), m_smpc.intback_stage);
-	state_save_register_global(machine(), m_smpc.pmode);
-	state_save_register_global(machine(), m_smpc.SR);
-	state_save_register_global_array(machine(), m_smpc.SMEM);
+	save_pointer(NAME(m_scu_regs), 0x100/4);
+	save_pointer(NAME(m_scsp_regs), 0x1000/2);
+	save_item(NAME(m_NMI_reset));
+	save_item(NAME(m_en_68k));
+	save_item(NAME(m_smpc.IOSEL1));
+	save_item(NAME(m_smpc.IOSEL2));
+	save_item(NAME(m_smpc.EXLE1));
+	save_item(NAME(m_smpc.EXLE2));
+	save_item(NAME(m_smpc.PDR1));
+	save_item(NAME(m_smpc.PDR2));
+//  save_item(NAME(m_port_sel));
+//  save_item(NAME(mux_data));
+	save_item(NAME(m_scsp_last_line));
+	save_item(NAME(m_smpc.intback_stage));
+	save_item(NAME(m_smpc.pmode));
+	save_item(NAME(m_smpc.SR));
+	save_item(NAME(m_smpc.SMEM));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sat_console_state::stvcd_exit), this));
 

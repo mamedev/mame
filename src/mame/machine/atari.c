@@ -315,8 +315,8 @@ void atari_machine_start(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(_antic_reset), &machine));
 
 	/* save states */
-	state_save_register_global_pointer(machine, ((UINT8 *) &antic.r), sizeof(antic.r));
-	state_save_register_global_pointer(machine, ((UINT8 *) &antic.w), sizeof(antic.w));
+	machine.save().save_pointer(NAME((UINT8 *) &antic.r), sizeof(antic.r));
+	machine.save().save_pointer(NAME((UINT8 *) &antic.w), sizeof(antic.w));
 }
 
 

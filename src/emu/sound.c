@@ -832,7 +832,7 @@ sound_manager::sound_manager(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(sound_manager::reset), this));
 
 	// register global states
-	state_save_register_global(machine, m_last_update);
+	machine.save().save_item(NAME(m_last_update));
 
 	// set the starting attenuation
 	set_attenuation(machine.options().volume());

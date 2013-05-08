@@ -1539,7 +1539,7 @@ void mcr68_state::mcr68_common_init(int clip, int xoffset)
 	m_sprite_clip = clip;
 	m_sprite_xoffset = xoffset;
 
-	state_save_register_global(machine(), m_control_word);
+	save_item(NAME(m_control_word));
 }
 
 
@@ -1633,7 +1633,7 @@ DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
 	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * 115;
 
-	state_save_register_global_array(machine(), m_protection_data);
+	save_item(NAME(m_protection_data));
 }
 
 

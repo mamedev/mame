@@ -2793,8 +2793,8 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 	mcr12_sprite_xoffs = 0;
 	mcr12_sprite_xoffs_flip = 0;
 
-	state_save_register_global(machine(), input_mux);
-	state_save_register_global(machine(), last_op4);
+	save_item(NAME(input_mux));
+	save_item(NAME(last_op4));
 
 	midway_ssio_device *ssio = machine().device<midway_ssio_device>("ssio");
 	if (ssio != NULL)
@@ -2846,8 +2846,8 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 	dpoker_coin_status = 0;
 	dpoker_output = 0;
 
-	state_save_register_global(machine(), dpoker_coin_status);
-	state_save_register_global(machine(), dpoker_output);
+	save_item(NAME(dpoker_coin_status));
+	save_item(NAME(dpoker_output));
 }
 
 
@@ -2917,12 +2917,12 @@ DRIVER_INIT_MEMBER(mcr_state,nflfoot)
 	nflfoot_serial_out_active = FALSE;
 	nflfoot_serial_in_active = FALSE;
 
-	state_save_register_global(machine(), nflfoot_serial_out_active);
-	state_save_register_global(machine(), nflfoot_serial_out_bits);
-	state_save_register_global(machine(), nflfoot_serial_out_numbits);
-	state_save_register_global(machine(), nflfoot_serial_in_active);
-	state_save_register_global(machine(), nflfoot_serial_in_bits);
-	state_save_register_global(machine(), nflfoot_serial_in_numbits);
+	save_item(NAME(nflfoot_serial_out_active));
+	save_item(NAME(nflfoot_serial_out_bits));
+	save_item(NAME(nflfoot_serial_out_numbits));
+	save_item(NAME(nflfoot_serial_in_active));
+	save_item(NAME(nflfoot_serial_in_bits));
+	save_item(NAME(nflfoot_serial_in_numbits));
 }
 
 

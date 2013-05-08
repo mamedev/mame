@@ -81,7 +81,7 @@ void generic_machine_init(running_machine &machine)
 	/* for memory cards, request save state and an exit callback */
 	if (machine.config().m_memcard_handler != NULL)
 	{
-		state_save_register_global(machine, state->memcard_inserted);
+		machine.save().save_item(NAME(state->memcard_inserted));
 		machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(memcard_eject), &machine));
 	}
 }

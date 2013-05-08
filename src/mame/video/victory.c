@@ -48,7 +48,7 @@ void victory_state::video_start()
 	m_micro.timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
 	/* register for state saving */
-	state_save_register_global_array(machine(), m_paletteram);
+	save_item(NAME(m_paletteram));
 }
 
 

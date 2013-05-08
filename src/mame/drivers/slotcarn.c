@@ -547,7 +547,7 @@ GFXDECODE_END
 void slotcarn_state::machine_start()
 {
 	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
-	state_save_register_global_pointer(machine(), m_ram_palette, RAM_PALETTE_SIZE);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
 }
 
 

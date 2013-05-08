@@ -479,8 +479,8 @@ void smsmfg_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
-	state_save_register_global_array(machine(), m_vid_regs);
-	state_save_register_global_bitmap(machine(), &m_bitmap);
+	save_item(NAME(m_vid_regs));
+	save_item(NAME(m_bitmap));
 }
 
 UINT32 smsmfg_state::screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -544,14 +544,14 @@ void smsmfg_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("questions")->base(), 0x4000);
 
-	state_save_register_global(machine(), m_communication_port_status);
-	state_save_register_global_array(machine(), m_communication_port);
+	save_item(NAME(m_communication_port_status));
+	save_item(NAME(m_communication_port));
 }
 
 MACHINE_START_MEMBER(smsmfg_state,sureshot)
 {
-	state_save_register_global(machine(), m_communication_port_status);
-	state_save_register_global_array(machine(), m_communication_port);
+	save_item(NAME(m_communication_port_status));
+	save_item(NAME(m_communication_port));
 }
 
 void smsmfg_state::machine_reset()

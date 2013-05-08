@@ -976,11 +976,11 @@ void smc777_state::machine_start()
 	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
 	m_pcg = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
-	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
-	state_save_register_global_pointer(machine(), m_vram, 0x800);
-	state_save_register_global_pointer(machine(), m_attr, 0x800);
-	state_save_register_global_pointer(machine(), m_gvram, 0x8000);
-	state_save_register_global_pointer(machine(), m_pcg, 0x800);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_vram), 0x800);
+	save_pointer(NAME(m_attr), 0x800);
+	save_pointer(NAME(m_gvram), 0x8000);
+	save_pointer(NAME(m_pcg), 0x800);
 
 	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0));
 }

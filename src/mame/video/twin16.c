@@ -499,14 +499,14 @@ VIDEO_START_MEMBER(twin16_state,twin16)
 	m_sprite_timer->adjust(attotime::never);
 
 	/* register for savestates */
-	state_save_register_global_array(machine(), m_sprite_buffer);
-	state_save_register_global_array(machine(), m_scrollx);
-	state_save_register_global_array(machine(), m_scrolly);
+	save_item(NAME(m_sprite_buffer));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
 
-	state_save_register_global(machine(), m_need_process_spriteram);
-	state_save_register_global(machine(), m_gfx_bank);
-	state_save_register_global(machine(), m_video_register);
-	state_save_register_global(machine(), m_sprite_busy);
+	save_item(NAME(m_need_process_spriteram));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_video_register));
+	save_item(NAME(m_sprite_busy));
 }
 
 UINT32 twin16_state::screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

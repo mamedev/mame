@@ -172,12 +172,12 @@ static void generate_serial_data(running_machine &machine, int upper)
 
 static void serial_register_state(running_machine &machine)
 {
-	state_save_register_global_array(machine, serial.data);
-	state_save_register_global(machine, serial.buffer);
-	state_save_register_global(machine, serial.index);
-	state_save_register_global(machine, serial.status);
-	state_save_register_global(machine, serial.bits);
-	state_save_register_global(machine, serial.ormask);
+	machine.save().save_item(NAME(serial.data));
+	machine.save().save_item(NAME(serial.buffer));
+	machine.save().save_item(NAME(serial.index));
+	machine.save().save_item(NAME(serial.status));
+	machine.save().save_item(NAME(serial.bits));
+	machine.save().save_item(NAME(serial.ormask));
 }
 
 
@@ -257,19 +257,19 @@ static TIMER_CALLBACK( reset_timer )
 
 static void pic_register_state(running_machine &machine)
 {
-	state_save_register_global(machine, pic.latch);
-	state_save_register_global(machine, pic.latch_expire_time);
-	state_save_register_global(machine, pic.state);
-	state_save_register_global(machine, pic.index);
-	state_save_register_global(machine, pic.total);
-	state_save_register_global(machine, pic.nvram_addr);
-	state_save_register_global_array(machine, pic.buffer);
-	state_save_register_global_array(machine, pic.nvram);
-	state_save_register_global_array(machine, pic.default_nvram);
-	state_save_register_global_array(machine, pic.time_buf);
-	state_save_register_global(machine, pic.time_index);
-	state_save_register_global(machine, pic.time_just_written);
-	state_save_register_global(machine, pic.yearoffs);
+	machine.save().save_item(NAME(pic.latch));
+	machine.save().save_item(NAME(pic.latch_expire_time));
+	machine.save().save_item(NAME(pic.state));
+	machine.save().save_item(NAME(pic.index));
+	machine.save().save_item(NAME(pic.total));
+	machine.save().save_item(NAME(pic.nvram_addr));
+	machine.save().save_item(NAME(pic.buffer));
+	machine.save().save_item(NAME(pic.nvram));
+	machine.save().save_item(NAME(pic.default_nvram));
+	machine.save().save_item(NAME(pic.time_buf));
+	machine.save().save_item(NAME(pic.time_index));
+	machine.save().save_item(NAME(pic.time_just_written));
+	machine.save().save_item(NAME(pic.yearoffs));
 }
 
 
@@ -567,17 +567,17 @@ static void cage_irq_handler(running_machine &machine, int state);
 
 static void ioasic_register_state(running_machine &machine)
 {
-	state_save_register_global_array(machine, ioasic.reg);
-	state_save_register_global(machine, ioasic.shuffle_active);
-	state_save_register_global(machine, ioasic.irq_state);
-	state_save_register_global(machine, ioasic.sound_irq_state);
-	state_save_register_global(machine, ioasic.auto_ack);
-	state_save_register_global(machine, ioasic.force_fifo_full);
-	state_save_register_global_array(machine, ioasic.fifo);
-	state_save_register_global(machine, ioasic.fifo_in);
-	state_save_register_global(machine, ioasic.fifo_out);
-	state_save_register_global(machine, ioasic.fifo_bytes);
-	state_save_register_global(machine, ioasic.fifo_force_buffer_empty_pc);
+	machine.save().save_item(NAME(ioasic.reg));
+	machine.save().save_item(NAME(ioasic.shuffle_active));
+	machine.save().save_item(NAME(ioasic.irq_state));
+	machine.save().save_item(NAME(ioasic.sound_irq_state));
+	machine.save().save_item(NAME(ioasic.auto_ack));
+	machine.save().save_item(NAME(ioasic.force_fifo_full));
+	machine.save().save_item(NAME(ioasic.fifo));
+	machine.save().save_item(NAME(ioasic.fifo_in));
+	machine.save().save_item(NAME(ioasic.fifo_out));
+	machine.save().save_item(NAME(ioasic.fifo_bytes));
+	machine.save().save_item(NAME(ioasic.fifo_force_buffer_empty_pc));
 }
 
 

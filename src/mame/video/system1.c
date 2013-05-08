@@ -138,12 +138,12 @@ void system1_state::video_start_common(int pagecount)
 	m_sprite_bitmap = auto_bitmap_ind16_alloc(machine(), 512, 256);
 
 	/* register for save stats */
-	state_save_register_global(machine(), m_video_mode);
-	state_save_register_global(machine(), m_mix_collide_summary);
-	state_save_register_global(machine(), m_sprite_collide_summary);
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_mix_collide_summary));
+	save_item(NAME(m_sprite_collide_summary));
 	save_pointer(NAME(m_videoram), 0x800 * pagecount);
-	state_save_register_global_pointer(machine(), m_mix_collide, 64);
-	state_save_register_global_pointer(machine(), m_sprite_collide, 1024);
+	save_pointer(NAME(m_mix_collide), 64);
+	save_pointer(NAME(m_sprite_collide), 1024);
 }
 
 

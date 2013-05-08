@@ -468,9 +468,9 @@ void meritm_state::video_start()
 	m_layer0_enabled = m_layer1_enabled = 1;
 
 	m_vint = 0x18;
-	state_save_register_global(machine(), m_vint);
-	state_save_register_global(machine(), m_interrupt_vdp0_state);
-	state_save_register_global(machine(), m_interrupt_vdp1_state);
+	save_item(NAME(m_vint));
+	save_item(NAME(m_interrupt_vdp0_state));
+	save_item(NAME(m_interrupt_vdp1_state));
 }
 
 UINT32 meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1116,14 +1116,14 @@ void meritm_state::machine_start()
 	m_bank = 0xff;
 	meritm_crt250_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
-	state_save_register_global(machine(), m_bank);
+	save_item(NAME(m_bank));
 
 };
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt250_questions)
 {
 	meritm_state::machine_start();
-	state_save_register_global(machine(), m_questions_loword_address);
+	save_item(NAME(m_questions_loword_address));
 };
 
 MACHINE_START_MEMBER(meritm_state,meritm_crt250_crt252_crt258)
@@ -1145,9 +1145,9 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	meritm_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
 	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
-	state_save_register_global(machine(), m_bank);
-	state_save_register_global(machine(), m_psd_a15);
-	state_save_register_global_pointer(machine(), m_ram, 0x8000);
+	save_item(NAME(m_bank));
+	save_item(NAME(m_psd_a15));
+	save_pointer(NAME(m_ram), 0x8000);
 };
 
 // from MSX2 driver, may be not accurate for merit games

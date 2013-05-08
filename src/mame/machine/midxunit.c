@@ -26,12 +26,12 @@ static void midxunit_dcs_output_full(running_machine &machine, int state);
 
 void midxunit_state::register_state_saving()
 {
-	state_save_register_global(machine(), m_cmos_write_enable);
-	state_save_register_global_array(machine(), m_iodata);
-	state_save_register_global_array(machine(), m_ioshuffle);
-	state_save_register_global(machine(), m_analog_port);
-	state_save_register_global_array(machine(), m_uart);
-	state_save_register_global(machine(), m_security_bits);
+	save_item(NAME(m_cmos_write_enable));
+	save_item(NAME(m_iodata));
+	save_item(NAME(m_ioshuffle));
+	save_item(NAME(m_analog_port));
+	save_item(NAME(m_uart));
+	save_item(NAME(m_security_bits));
 }
 
 

@@ -289,12 +289,12 @@ void renegade_state::setbank()
 
 void renegade_state::machine_start()
 {
-	state_save_register_global_array(machine(), m_mcu_buffer);
-	state_save_register_global(machine(), m_mcu_input_size);
-	state_save_register_global(machine(), m_mcu_output_byte);
-	state_save_register_global(machine(), m_mcu_key);
+	save_item(NAME(m_mcu_buffer));
+	save_item(NAME(m_mcu_input_size));
+	save_item(NAME(m_mcu_output_byte));
+	save_item(NAME(m_mcu_key));
 
-	state_save_register_global(machine(), m_bank);
+	save_item(NAME(m_bank));
 	machine().save().register_postload(save_prepost_delegate(FUNC(renegade_state::setbank), this));
 }
 

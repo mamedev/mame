@@ -521,7 +521,7 @@ VIDEO_START( ygv608 )
 	ygv608.screen_resize = 1;
 	ygv608.tilemap_resize = 1;
 	namcond1_gfxbank = 0;
-	state_save_register_global(machine, namcond1_gfxbank);
+	machine.save().save_item(NAME(namcond1_gfxbank));
 
 	/* create tilemaps of all sizes and combinations */
 	tilemap_A_cache_8[0] = tilemap_create(machine, get_tile_info_A_8, get_tile_offset,  8,8, 32,32);

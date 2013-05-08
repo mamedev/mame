@@ -112,13 +112,13 @@ MACHINE_START_MEMBER(mcr68_state,mcr68)
 		state_save_register_item(machine(), "m6840", NULL, i, m6840->timer_active);
 	}
 
-	state_save_register_global(machine(), m_m6840_status);
-	state_save_register_global(machine(), m_m6840_status_read_since_int);
-	state_save_register_global(machine(), m_m6840_msb_buffer);
-	state_save_register_global(machine(), m_m6840_lsb_buffer);
-	state_save_register_global(machine(), m_m6840_irq_state);
-	state_save_register_global(machine(), m_v493_irq_state);
-	state_save_register_global(machine(), m_zwackery_sound_data);
+	save_item(NAME(m_m6840_status));
+	save_item(NAME(m_m6840_status_read_since_int));
+	save_item(NAME(m_m6840_msb_buffer));
+	save_item(NAME(m_m6840_lsb_buffer));
+	save_item(NAME(m_m6840_irq_state));
+	save_item(NAME(m_v493_irq_state));
+	save_item(NAME(m_zwackery_sound_data));
 }
 
 

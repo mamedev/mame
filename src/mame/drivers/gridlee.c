@@ -138,8 +138,8 @@ void gridlee_state::machine_start()
 	/* create the polynomial tables */
 	poly17_init();
 
-	state_save_register_global_array(machine(), m_last_analog_input);
-	state_save_register_global_array(machine(), m_last_analog_output);
+	save_item(NAME(m_last_analog_input));
+	save_item(NAME(m_last_analog_output));
 
 	m_irq_off = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::irq_off_tick),this));
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gridlee_state::irq_timer_tick),this));

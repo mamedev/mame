@@ -3389,8 +3389,8 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 
 	m_work_ram = auto_alloc_array(machine(), UINT8, 0xa0000);
 	m_ext_work_ram = auto_alloc_array(machine(), UINT8, 0x700000);
-	state_save_register_global_pointer(machine(), m_work_ram, 0xa0000);
-	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x700000);
+	save_pointer(NAME(m_work_ram), 0xa0000);
+	save_pointer(NAME(m_ext_work_ram), 0x700000);
 
 	m_ram_size = m_ram->size() - 0xa0000;
 
@@ -3410,9 +3410,9 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	m_ide_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
 
-	state_save_register_global_pointer(machine(), m_sdip, 24);
-	state_save_register_global_pointer(machine(), m_ide_ram, 0x2000);
-	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
+	save_pointer(NAME(m_sdip), 24);
+	save_pointer(NAME(m_ide_ram), 0x2000);
+	save_pointer(NAME(m_ext_gvram), 0xa0000);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)

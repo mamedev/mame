@@ -189,8 +189,8 @@ WRITE16_MEMBER(terracre_state::amazon_protection_w)
 MACHINE_START_MEMBER(terracre_state,amazon)
 {
 	/* set up for save */
-	state_save_register_global(machine(), m_mAmazonProtCmd);
-	state_save_register_global_array(machine(), m_mAmazonProtReg);
+	save_item(NAME(m_mAmazonProtCmd));
+	save_item(NAME(m_mAmazonProtReg));
 }
 
 static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )

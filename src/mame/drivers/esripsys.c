@@ -652,34 +652,34 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	membank("bank4")->set_base(&rom[0x8000]);
 
 	/* Register stuff for state saving */
-	state_save_register_global_pointer(machine(), m_fdt_a, FDT_RAM_SIZE);
-	state_save_register_global_pointer(machine(), m_fdt_b, FDT_RAM_SIZE);
-	state_save_register_global_pointer(machine(), m_cmos_ram, CMOS_RAM_SIZE);
+	save_pointer(NAME(m_fdt_a), FDT_RAM_SIZE);
+	save_pointer(NAME(m_fdt_b), FDT_RAM_SIZE);
+	save_pointer(NAME(m_cmos_ram), CMOS_RAM_SIZE);
 
-	state_save_register_global(machine(), m_g_iodata);
-	state_save_register_global(machine(), m_g_ioaddr);
-	state_save_register_global(machine(), m_coin_latch);
-	state_save_register_global(machine(), m_keypad_status);
-	state_save_register_global(machine(), m_g_status);
-	state_save_register_global(machine(), m_f_status);
-	state_save_register_global(machine(), m_io_firq_status);
-	state_save_register_global(machine(), m_cmos_ram_a2_0);
-	state_save_register_global(machine(), m_cmos_ram_a10_3);
+	save_item(NAME(m_g_iodata));
+	save_item(NAME(m_g_ioaddr));
+	save_item(NAME(m_coin_latch));
+	save_item(NAME(m_keypad_status));
+	save_item(NAME(m_g_status));
+	save_item(NAME(m_f_status));
+	save_item(NAME(m_io_firq_status));
+	save_item(NAME(m_cmos_ram_a2_0));
+	save_item(NAME(m_cmos_ram_a10_3));
 
-	state_save_register_global(machine(), m_u56a);
-	state_save_register_global(machine(), m_u56b);
-	state_save_register_global(machine(), m_g_to_s_latch1);
-	state_save_register_global(machine(), m_g_to_s_latch2);
-	state_save_register_global(machine(), m_s_to_g_latch1);
-	state_save_register_global(machine(), m_s_to_g_latch2);
-	state_save_register_global(machine(), m_dac_msb);
-	state_save_register_global(machine(), m_dac_vol);
-	state_save_register_global(machine(), m_tms_data);
+	save_item(NAME(m_u56a));
+	save_item(NAME(m_u56b));
+	save_item(NAME(m_g_to_s_latch1));
+	save_item(NAME(m_g_to_s_latch2));
+	save_item(NAME(m_s_to_g_latch1));
+	save_item(NAME(m_s_to_g_latch2));
+	save_item(NAME(m_dac_msb));
+	save_item(NAME(m_dac_vol));
+	save_item(NAME(m_tms_data));
 
 	m_fasel = 0;
 	m_fbsel = 1;
-	state_save_register_global(machine(), m_fasel);
-	state_save_register_global(machine(), m_fbsel);
+	save_item(NAME(m_fasel));
+	save_item(NAME(m_fbsel));
 }
 
 static const esrip_config rip_config =

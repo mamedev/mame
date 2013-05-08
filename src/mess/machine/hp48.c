@@ -1177,7 +1177,7 @@ void hp48_state::hp48_machine_start( hp48_models model )
 		state_save_register_item(machine(), "globals", NULL, i, m_modules[i].mask );
 	}
 	save_item(NAME(m_io) );
-	//state_save_register_global_pointer(machine,  machine.generic.nvram.u8, machine.generic.nvram_size );
+	//save_pointer(NAME(machine.generic.nvram.u8), machine.generic.nvram_size );
 
 	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_update_annunciators), state ));
 	machine().save().register_postload( save_prepost_delegate(FUNC(hp48_state::hp48_apply_modules), state ));

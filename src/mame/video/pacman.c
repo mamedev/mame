@@ -149,12 +149,12 @@ TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 
 void pacman_state::init_save_state()
 {
-	state_save_register_global(machine(), m_charbank);
-	state_save_register_global(machine(), m_spritebank);
-	state_save_register_global(machine(), m_palettebank);
-	state_save_register_global(machine(), m_colortablebank);
-	state_save_register_global(machine(), m_flipscreen);
-	state_save_register_global(machine(), m_bgpriority);
+	save_item(NAME(m_charbank));
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_palettebank));
+	save_item(NAME(m_colortablebank));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_bgpriority));
 }
 
 

@@ -132,9 +132,9 @@ VIDEO_START_MEMBER(jpmimpct_state,jpmimpct)
 {
 	memset(&m_bt477, 0, sizeof(m_bt477));
 
-	state_save_register_global(machine(), m_bt477.address);
-	state_save_register_global(machine(), m_bt477.addr_cnt);
-	state_save_register_global(machine(), m_bt477.pixmask);
-	state_save_register_global(machine(), m_bt477.command);
-	state_save_register_global(machine(), m_bt477.color);
+	save_item(NAME(m_bt477.address));
+	save_item(NAME(m_bt477.addr_cnt));
+	save_item(NAME(m_bt477.pixmask));
+	save_item(NAME(m_bt477.command));
+	save_item(NAME(m_bt477.color));
 }

@@ -54,9 +54,9 @@
 
 void cinemat_state::machine_start()
 {
-	state_save_register_global(machine(), m_coin_detected);
-	state_save_register_global(machine(), m_coin_last_reset);
-	state_save_register_global(machine(), m_mux_select);
+	save_item(NAME(m_coin_detected));
+	save_item(NAME(m_coin_last_reset));
+	save_item(NAME(m_mux_select));
 }
 
 

@@ -2430,10 +2430,10 @@ void pc8801_state::machine_start()
 	m_kanji_rom = memregion("kanji")->base();
 	m_cg_rom = memregion("cgrom")->base();
 
-	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
-	state_save_register_global_pointer(machine(), m_hi_work_ram, 0x1000);
-	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x8000*0x100);
-	state_save_register_global_pointer(machine(), m_gvram, 0xc000);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_pointer(NAME(m_hi_work_ram), 0x1000);
+	save_pointer(NAME(m_ext_work_ram), 0x8000*0x100);
+	save_pointer(NAME(m_gvram), 0xc000);
 }
 
 void pc8801_state::machine_reset()

@@ -76,12 +76,12 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
 	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
 
-	state_save_register_global(machine(), gun_control);
-	state_save_register_global(machine(), gun_irq_state);
-	state_save_register_global_array(machine(), gun_x);
-	state_save_register_global_array(machine(), gun_y);
-	state_save_register_global(machine(), crusnexo_leds_select);
-	state_save_register_global(machine(), keypad_select);
+	save_item(NAME(gun_control));
+	save_item(NAME(gun_irq_state));
+	save_item(NAME(gun_x));
+	save_item(NAME(gun_y));
+	save_item(NAME(crusnexo_leds_select));
+	save_item(NAME(keypad_select));
 }
 
 

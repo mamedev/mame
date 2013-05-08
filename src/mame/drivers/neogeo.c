@@ -1020,7 +1020,7 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_audio_cpu_rom_source));
 	save_item(NAME(m_audio_cpu_rom_source_last));
 	save_item(NAME(m_save_ram_unlocked));
-	state_save_register_global_pointer(machine(), memcard_data, 0x800);
+	save_pointer(NAME(memcard_data), 0x800);
 	save_item(NAME(m_output_data));
 	save_item(NAME(m_output_latch));
 	save_item(NAME(m_el_value));

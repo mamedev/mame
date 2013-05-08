@@ -126,7 +126,7 @@ static CPU_INIT( mb86233 )
 	cpustate->ARAM = &cpustate->RAM[0];
 	cpustate->BRAM = &cpustate->RAM[0x200];
 
-	state_save_register_global_pointer(device->machine(), cpustate->RAM,2 * 0x200 * sizeof(UINT32));
+	device->machine().save().save_pointer(NAME(cpustate->RAM),2 * 0x200 * sizeof(UINT32));
 }
 
 static CPU_RESET( mb86233 )

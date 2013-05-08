@@ -1460,9 +1460,9 @@ VIDEO_START_MEMBER(model1_state,model1)
 	m_quadpt = m_quaddb;
 	m_listctl[0] = m_listctl[1] = 0;
 
-	state_save_register_global_pointer(machine(), m_tgp_ram, 0x100000-0x40000);
-	state_save_register_global_pointer(machine(), m_poly_ram, 0x40000);
-	state_save_register_global_array(machine(), m_listctl);
+	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
+	save_pointer(NAME(m_poly_ram), 0x40000);
+	save_item(NAME(m_listctl));
 }
 
 UINT32 model1_state::screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

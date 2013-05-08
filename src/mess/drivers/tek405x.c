@@ -1158,7 +1158,6 @@ void tek4051_state::machine_start()
 	}
 
 	// register for state saving
-//  state_save_register_global(machine, );
 }
 
 

@@ -641,11 +641,11 @@ VIDEO_START_MEMBER(dooyong_state,lastday)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global(machine(), m_sprites_disabled);
-	state_save_register_global(machine(), m_interrupt_line_1);
-	state_save_register_global(machine(), m_interrupt_line_2);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_sprites_disabled));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
 }
 
 VIDEO_START_MEMBER(dooyong_state,gulfstrm)
@@ -680,10 +680,10 @@ VIDEO_START_MEMBER(dooyong_state,gulfstrm)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global(machine(), m_interrupt_line_1);
-	state_save_register_global(machine(), m_interrupt_line_2);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
 }
 
 VIDEO_START_MEMBER(dooyong_state,pollux)
@@ -715,10 +715,10 @@ VIDEO_START_MEMBER(dooyong_state,pollux)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global(machine(), m_interrupt_line_1);
-	state_save_register_global(machine(), m_interrupt_line_2);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_interrupt_line_1));
+	save_item(NAME(m_interrupt_line_2));
 }
 
 VIDEO_START_MEMBER(dooyong_state,bluehawk)
@@ -756,9 +756,9 @@ VIDEO_START_MEMBER(dooyong_state,bluehawk)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global_array(machine(), m_fg2scroll8);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_fg2scroll8));
 }
 
 VIDEO_START_MEMBER(dooyong_state,flytiger)
@@ -791,9 +791,9 @@ VIDEO_START_MEMBER(dooyong_state,flytiger)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global(machine(), m_flytiger_pri);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_flytiger_pri));
 }
 
 VIDEO_START_MEMBER(dooyong_state,primella)
@@ -825,9 +825,9 @@ VIDEO_START_MEMBER(dooyong_state,primella)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global(machine(), m_tx_pri);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_tx_pri));
 }
 
 VIDEO_START_MEMBER(dooyong_state,rshark)
@@ -867,11 +867,11 @@ VIDEO_START_MEMBER(dooyong_state,rshark)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_bg2scroll8);
-	state_save_register_global_array(machine(), m_fgscroll8);
-	state_save_register_global_array(machine(), m_fg2scroll8);
-	state_save_register_global(machine(), m_rshark_pri);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_bg2scroll8));
+	save_item(NAME(m_fgscroll8));
+	save_item(NAME(m_fg2scroll8));
+	save_item(NAME(m_rshark_pri));
 }
 
 VIDEO_START_MEMBER(dooyong_state,popbingo)
@@ -891,9 +891,9 @@ VIDEO_START_MEMBER(dooyong_state,popbingo)
 	memset(m_fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(machine(), m_bgscroll8);
-	state_save_register_global_array(machine(), m_bg2scroll8);  // Not used atm
-	state_save_register_global_array(machine(), m_fgscroll8);   // Not used atm
-	state_save_register_global_array(machine(), m_fg2scroll8);  // Not used atm
-	state_save_register_global(machine(), m_rshark_pri);
+	save_item(NAME(m_bgscroll8));
+	save_item(NAME(m_bg2scroll8));  // Not used atm
+	save_item(NAME(m_fgscroll8));   // Not used atm
+	save_item(NAME(m_fg2scroll8));  // Not used atm
+	save_item(NAME(m_rshark_pri));
 }

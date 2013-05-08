@@ -100,9 +100,9 @@ void m90_state::video_start()
 	m_pf1_layer->set_transparent_pen(0);
 	m_pf1_wide_layer->set_transparent_pen(0);
 
-	state_save_register_global_array(machine(), m_video_control_data);
-	state_save_register_global(machine(), m_last_pf1);
-	state_save_register_global(machine(), m_last_pf2);
+	save_item(NAME(m_video_control_data));
+	save_item(NAME(m_last_pf1));
+	save_item(NAME(m_last_pf2));
 }
 
 VIDEO_START_MEMBER(m90_state,bomblord)
@@ -117,7 +117,7 @@ VIDEO_START_MEMBER(m90_state,bomblord)
 	m_pf1_layer->set_transparent_pen(0);
 	m_pf1_wide_layer->set_transparent_pen(0);
 
-	state_save_register_global_array(machine(), m_video_control_data);
+	save_item(NAME(m_video_control_data));
 }
 
 VIDEO_START_MEMBER(m90_state,dynablsb)
@@ -130,7 +130,7 @@ VIDEO_START_MEMBER(m90_state,dynablsb)
 	m_pf2_layer->set_transparent_pen(0);
 	m_pf2_wide_layer->set_transparent_pen(0);
 
-	state_save_register_global_array(machine(), m_video_control_data);
+	save_item(NAME(m_video_control_data));
 }
 
 void m90_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)

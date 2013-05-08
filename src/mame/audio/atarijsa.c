@@ -107,11 +107,11 @@ ADDRESS_MAP_END
 
 static void init_save_state(running_machine &machine)
 {
-	state_save_register_global(machine, overall_volume);
-	state_save_register_global(machine, pokey_volume);
-	state_save_register_global(machine, ym2151_volume);
-	state_save_register_global(machine, tms5220_volume);
-	state_save_register_global(machine, oki6295_volume);
+	machine.save().save_item(NAME(overall_volume));
+	machine.save().save_item(NAME(pokey_volume));
+	machine.save().save_item(NAME(ym2151_volume));
+	machine.save().save_item(NAME(tms5220_volume));
+	machine.save().save_item(NAME(oki6295_volume));
 }
 
 

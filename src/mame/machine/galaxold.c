@@ -408,7 +408,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
-	state_save_register_global(machine(), m__4in1_bank);
+	save_item(NAME(m__4in1_bank));
 }
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)

@@ -43,10 +43,10 @@ void artmagic_state::video_start()
 	m_blitter_base = (UINT16 *)memregion("gfx1")->base();
 	m_blitter_mask = memregion("gfx1")->bytes()/2 - 1;
 
-	state_save_register_global_array(machine(), m_xor);
-	state_save_register_global(machine(), m_is_stoneball);
-	state_save_register_global_array(machine(), m_blitter_data);
-	state_save_register_global(machine(), m_blitter_page);
+	save_item(NAME(m_xor));
+	save_item(NAME(m_is_stoneball));
+	save_item(NAME(m_blitter_data));
+	save_item(NAME(m_blitter_page));
 }
 
 

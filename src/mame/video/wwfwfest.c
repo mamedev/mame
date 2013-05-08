@@ -220,11 +220,11 @@ void wwfwfest_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void wwfwfest_state::video_start()
 {
-	state_save_register_global(machine(), m_pri);
-	state_save_register_global(machine(), m_bg0_scrollx);
-	state_save_register_global(machine(), m_bg0_scrolly);
-	state_save_register_global(machine(), m_bg1_scrollx);
-	state_save_register_global(machine(), m_bg1_scrolly);
+	save_item(NAME(m_pri));
+	save_item(NAME(m_bg0_scrollx));
+	save_item(NAME(m_bg0_scrolly));
+	save_item(NAME(m_bg1_scrollx));
+	save_item(NAME(m_bg1_scrolly));
 
 	m_fg0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_fg0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wwfwfest_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);

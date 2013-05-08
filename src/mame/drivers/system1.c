@@ -367,10 +367,10 @@ void system1_state::machine_start()
 
 	m_mute_xor = 0x00;
 
-	state_save_register_global(machine(), m_dakkochn_mux_data);
-	state_save_register_global(machine(), m_videomode_prev);
-	state_save_register_global(machine(), m_mcu_control);
-	state_save_register_global(machine(), m_nob_maincpu_latch);
+	save_item(NAME(m_dakkochn_mux_data));
+	save_item(NAME(m_videomode_prev));
+	save_item(NAME(m_mcu_control));
+	save_item(NAME(m_nob_maincpu_latch));
 }
 
 

@@ -529,14 +529,14 @@ void dc_cons_state::dreamcast_atapi_init()
 
 	atapi_data = auto_alloc_array(machine(), UINT8,  ATAPI_DATA_SIZE );
 
-	state_save_register_global_pointer(machine(),  atapi_regs, ATAPI_REG_MAX );
-	state_save_register_global_pointer(machine(),  atapi_data, ATAPI_DATA_SIZE / 2 );
-	state_save_register_global(machine(),  atapi_data_ptr );
-	state_save_register_global(machine(),  atapi_data_len );
-	state_save_register_global(machine(),  atapi_xferlen );
-	state_save_register_global(machine(),  atapi_xferbase );
-	state_save_register_global(machine(),  atapi_cdata_wait );
-	state_save_register_global(machine(),  atapi_xfermod );
+	save_pointer(NAME(atapi_regs), ATAPI_REG_MAX );
+	save_pointer(NAME(atapi_data), ATAPI_DATA_SIZE / 2 );
+	save_item(NAME(atapi_data_ptr));
+	save_item(NAME(atapi_data_len));
+	save_item(NAME(atapi_xferlen));
+	save_item(NAME(atapi_xferbase));
+	save_item(NAME(atapi_cdata_wait));
+	save_item(NAME(atapi_xfermod));
 
 	gdrom = machine().device<gdrom_device>( "cdrom" );
 }

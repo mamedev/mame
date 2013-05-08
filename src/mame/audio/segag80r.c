@@ -258,8 +258,8 @@ MACHINE_CONFIG_END
 static SOUND_START( astrob )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state_save_register_global_array(machine, state->m_sound_state);
-	state_save_register_global(machine, state->m_sound_rate);
+	machine.save().save_item(NAME(state->m_sound_state));
+	machine.save().save_item(NAME(state->m_sound_rate));
 }
 
 
@@ -488,11 +488,11 @@ MACHINE_CONFIG_END
 static SOUND_START( sega005 )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state_save_register_global_array(machine, state->m_sound_state);
-	state_save_register_global(machine, state->m_sound_addr);
-	state_save_register_global(machine, state->m_sound_data);
-	state_save_register_global(machine, state->m_square_state);
-	state_save_register_global(machine, state->m_square_count);
+	state->save_item(NAME(state->m_sound_state));
+	state->save_item(NAME(state->m_sound_addr));
+	state->save_item(NAME(state->m_sound_data));
+	state->save_item(NAME(state->m_square_state));
+	state->save_item(NAME(state->m_square_count));
 }
 
 
@@ -709,7 +709,7 @@ MACHINE_CONFIG_END
 static SOUND_START( spaceod )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state_save_register_global_array(machine, state->m_sound_state);
+	state->save_item(NAME(state->m_sound_state));
 }
 
 
@@ -881,10 +881,10 @@ MACHINE_CONFIG_END
 static SOUND_START( monsterb )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	state_save_register_global_array(machine, state->m_sound_state);
-	state_save_register_global(machine, state->m_sound_addr);
-	state_save_register_global(machine, state->m_n7751_command);
-	state_save_register_global(machine, state->m_n7751_busy);
+	state->save_item(NAME(state->m_sound_state));
+	state->save_item(NAME(state->m_sound_addr));
+	state->save_item(NAME(state->m_n7751_command));
+	state->save_item(NAME(state->m_n7751_busy));
 }
 
 

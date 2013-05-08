@@ -406,21 +406,21 @@ void galaxian_state::video_start()
 
 void galaxian_state::state_save_register()
 {
-	state_save_register_global(machine(), m_flipscreen_x);
-	state_save_register_global(machine(), m_flipscreen_y);
-	state_save_register_global(machine(), m_background_enable);
-	state_save_register_global(machine(), m_background_red);
-	state_save_register_global(machine(), m_background_green);
-	state_save_register_global(machine(), m_background_blue);
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
+	save_item(NAME(m_background_enable));
+	save_item(NAME(m_background_red));
+	save_item(NAME(m_background_green));
+	save_item(NAME(m_background_blue));
 
-	state_save_register_global(machine(), m_sprites_base);
-	state_save_register_global(machine(), m_bullets_base);
-	state_save_register_global_array(machine(), m_gfxbank);
+	save_item(NAME(m_sprites_base));
+	save_item(NAME(m_bullets_base));
+	save_item(NAME(m_gfxbank));
 
-	state_save_register_global(machine(), m_stars_enabled);
-	state_save_register_global(machine(), m_star_rng_origin);
-	state_save_register_global(machine(), m_star_rng_origin_frame);
-	state_save_register_global(machine(), m_stars_blink_state);
+	save_item(NAME(m_stars_enabled));
+	save_item(NAME(m_star_rng_origin));
+	save_item(NAME(m_star_rng_origin_frame));
+	save_item(NAME(m_stars_blink_state));
 }
 
 

@@ -280,17 +280,17 @@ VIDEO_START_MEMBER(midzeus_state,midzeus2)
 	int_timer = machine().scheduler().timer_alloc(FUNC(int_timer_callback));
 
 	/* save states */
-	state_save_register_global_pointer(machine(), waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
-	state_save_register_global_pointer(machine(), waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
-	state_save_register_global_array(machine(), zeus_fifo);
-	state_save_register_global(machine(), zeus_fifo_words);
-	state_save_register_global(machine(), zeus_cliprect.min_x);
-	state_save_register_global(machine(), zeus_cliprect.max_x);
-	state_save_register_global(machine(), zeus_cliprect.min_y);
-	state_save_register_global(machine(), zeus_cliprect.max_y);
-	state_save_register_global_2d_array(machine(), zeus_matrix);
-	state_save_register_global_array(machine(), zeus_point);
-	state_save_register_global(machine(), zeus_texbase);
+	save_pointer(NAME(waveram[0]), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
+	save_pointer(NAME(waveram[1]), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 12 / sizeof(waveram[1][0]));
+	save_item(NAME(zeus_fifo));
+	save_item(NAME(zeus_fifo_words));
+	save_item(NAME(zeus_cliprect.min_x));
+	save_item(NAME(zeus_cliprect.max_x));
+	save_item(NAME(zeus_cliprect.min_y));
+	save_item(NAME(zeus_cliprect.max_y));
+	save_item(NAME(zeus_matrix));
+	save_item(NAME(zeus_point));
+	save_item(NAME(zeus_texbase));
 }
 
 

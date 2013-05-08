@@ -2193,7 +2193,7 @@ ROM_END
 
 void ms32_state::configure_banks()
 {
-	state_save_register_global(machine(), m_to_main);
+	save_item(NAME(m_to_main));
 	membank("bank4")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
 	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
 }

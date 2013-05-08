@@ -79,10 +79,10 @@ void magmax_state::machine_start()
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(magmax_state::scanline_callback),this));
 
 	/* Set up save state */
-	state_save_register_global(machine(), m_sound_latch);
-	state_save_register_global(machine(), m_LS74_clr);
-	state_save_register_global(machine(), m_LS74_q);
-	state_save_register_global(machine(), m_gain_control);
+	save_item(NAME(m_sound_latch));
+	save_item(NAME(m_LS74_clr));
+	save_item(NAME(m_LS74_q));
+	save_item(NAME(m_gain_control));
 }
 
 void magmax_state::machine_reset()

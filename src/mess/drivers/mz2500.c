@@ -1769,9 +1769,9 @@ void mz2500_state::machine_start()
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
 
-	state_save_register_global_pointer(machine(), m_main_ram, 0x80000);
-	state_save_register_global_pointer(machine(), m_pcg_ram, 0x2000);
-	state_save_register_global_pointer(machine(), m_emm_ram, 0x100000);
+	save_pointer(NAME(m_main_ram), 0x80000);
+	save_pointer(NAME(m_pcg_ram), 0x2000);
+	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
 	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0));

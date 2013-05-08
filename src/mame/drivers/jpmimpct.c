@@ -144,15 +144,15 @@ void jpmimpct_state::update_irqs()
 
 MACHINE_START_MEMBER(jpmimpct_state,jpmimpct)
 {
-	state_save_register_global(machine(), m_tms_irq);
-	state_save_register_global(machine(), m_duart_1_irq);
-	state_save_register_global(machine(), m_touch_cnt);
-	state_save_register_global_array(machine(), m_touch_data);
+	save_item(NAME(m_tms_irq));
+	save_item(NAME(m_duart_1_irq));
+	save_item(NAME(m_touch_cnt));
+	save_item(NAME(m_touch_data));
 
 	/* TODO! */
-	state_save_register_global(machine(), m_duart_1.ISR);
-	state_save_register_global(machine(), m_duart_1.IMR);
-	state_save_register_global(machine(), m_duart_1.CT);
+	save_item(NAME(m_duart_1.ISR));
+	save_item(NAME(m_duart_1.IMR));
+	save_item(NAME(m_duart_1.CT));
 }
 
 
@@ -1004,14 +1004,14 @@ static I8255_INTERFACE (ppi8255_intf)
 
 MACHINE_START_MEMBER(jpmimpct_state,impctawp)
 {
-	state_save_register_global(machine(), m_duart_1_irq);
-	state_save_register_global(machine(), m_touch_cnt);
-	state_save_register_global_array(machine(), m_touch_data);
+	save_item(NAME(m_duart_1_irq));
+	save_item(NAME(m_touch_cnt));
+	save_item(NAME(m_touch_data));
 
 	/* TODO! */
-	state_save_register_global(machine(), m_duart_1.ISR);
-	state_save_register_global(machine(), m_duart_1.IMR);
-	state_save_register_global(machine(), m_duart_1.CT);
+	save_item(NAME(m_duart_1.ISR));
+	save_item(NAME(m_duart_1.IMR));
+	save_item(NAME(m_duart_1.CT));
 
 	stepper_config(machine(), 0, &starpoint_interface_48step);
 	stepper_config(machine(), 1, &starpoint_interface_48step);

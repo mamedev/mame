@@ -210,9 +210,9 @@ void pacland_state::video_start()
 		m_fg_tilemap->set_transmask(color, mask, 0);
 	}
 
-	state_save_register_global(machine(), m_palette_bank);
-	state_save_register_global(machine(), m_scroll0);
-	state_save_register_global(machine(), m_scroll1);
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_scroll0));
+	save_item(NAME(m_scroll1));
 }
 
 

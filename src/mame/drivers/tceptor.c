@@ -338,9 +338,9 @@ static const namco_interface namco_config =
 
 void tceptor_state::machine_start()
 {
-	state_save_register_global(machine(), m_m6809_irq_enable);
-	state_save_register_global(machine(), m_m68k_irq_enable);
-	state_save_register_global(machine(), m_mcu_irq_enable);
+	save_item(NAME(m_m6809_irq_enable));
+	save_item(NAME(m_m68k_irq_enable));
+	save_item(NAME(m_mcu_irq_enable));
 }
 
 

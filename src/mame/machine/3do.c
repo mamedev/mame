@@ -1118,7 +1118,7 @@ void _3do_state::m_3do_clio_init( screen_device *screen )
 	memset(m_dspp.EI, 0, sizeof(UINT16) * 0x400);
 	memset(m_dspp.EO, 0, sizeof(UINT16) * 0x400);
 
-	state_save_register_global_pointer(machine(), m_dspp.N, 0x800);
-	state_save_register_global_pointer(machine(), m_dspp.EI, 0x400);
-	state_save_register_global_pointer(machine(), m_dspp.EO, 0x400);
+	save_pointer(NAME(m_dspp.N), 0x800);
+	save_pointer(NAME(m_dspp.EI), 0x400);
+	save_pointer(NAME(m_dspp.EO), 0x400);
 }

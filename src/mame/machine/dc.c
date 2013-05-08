@@ -759,31 +759,31 @@ void dc_state::machine_start()
 	rtc_initial_setup();
 
 	// save states
-	state_save_register_global_pointer(machine(), dc_rtcregister, 4);
-	state_save_register_global_pointer(machine(), dc_sysctrl_regs, 0x200/4);
-	state_save_register_global_pointer(machine(), g2bus_regs, 0x100/4);
-	state_save_register_global(machine(), m_wave_dma.aica_addr);
-	state_save_register_global(machine(), m_wave_dma.root_addr);
-	state_save_register_global(machine(), m_wave_dma.size);
-	state_save_register_global(machine(), m_wave_dma.dir);
-	state_save_register_global(machine(), m_wave_dma.flag);
-	state_save_register_global(machine(), m_wave_dma.indirect);
-	state_save_register_global(machine(), m_wave_dma.start);
-	state_save_register_global(machine(), m_wave_dma.sel);
-	state_save_register_global(machine(), m_pvr_dma.pvr_addr);
-	state_save_register_global(machine(), m_pvr_dma.sys_addr);
-	state_save_register_global(machine(), m_pvr_dma.size);
-	state_save_register_global(machine(), m_pvr_dma.sel);
-	state_save_register_global(machine(), m_pvr_dma.dir);
-	state_save_register_global(machine(), m_pvr_dma.flag);
-	state_save_register_global(machine(), m_pvr_dma.start);
-	state_save_register_global_pointer(machine(),pvrta_regs,0x2000/4);
-	state_save_register_global_pointer(machine(),pvrctrl_regs,0x100/4);
-	state_save_register_global(machine(), debug_dip_status);
-	state_save_register_global_pointer(machine(),tafifo_buff,32);
-	state_save_register_global(machine(), scanline);
-	state_save_register_global(machine(), next_y);
-	state_save_register_global_pointer(machine(),dc_sound_ram.target(),dc_sound_ram.bytes());
+	save_pointer(NAME(dc_rtcregister), 4);
+	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);
+	save_pointer(NAME(g2bus_regs), 0x100/4);
+	save_item(NAME(m_wave_dma.aica_addr));
+	save_item(NAME(m_wave_dma.root_addr));
+	save_item(NAME(m_wave_dma.size));
+	save_item(NAME(m_wave_dma.dir));
+	save_item(NAME(m_wave_dma.flag));
+	save_item(NAME(m_wave_dma.indirect));
+	save_item(NAME(m_wave_dma.start));
+	save_item(NAME(m_wave_dma.sel));
+	save_item(NAME(m_pvr_dma.pvr_addr));
+	save_item(NAME(m_pvr_dma.sys_addr));
+	save_item(NAME(m_pvr_dma.size));
+	save_item(NAME(m_pvr_dma.sel));
+	save_item(NAME(m_pvr_dma.dir));
+	save_item(NAME(m_pvr_dma.flag));
+	save_item(NAME(m_pvr_dma.start));
+	save_pointer(NAME(pvrta_regs),0x2000/4);
+	save_pointer(NAME(pvrctrl_regs),0x100/4);
+	save_item(NAME(debug_dip_status));
+	save_pointer(NAME(tafifo_buff),32);
+	save_item(NAME(scanline));
+	save_item(NAME(next_y));
+	save_pointer(NAME(dc_sound_ram.target()),dc_sound_ram.bytes());
 }
 
 void dc_state::machine_reset()

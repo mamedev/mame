@@ -134,10 +134,10 @@ void namcos1_state::video_start()
 	m_bg_tilemap[5]->set_scrolldy(0x10,0x110);
 
 	/* register videoram to the save state system (post-allocation) */
-	state_save_register_global_pointer(machine(), m_videoram, 0x8000);
-	state_save_register_global_array(machine(), m_cus116);
-	state_save_register_global_pointer(machine(), m_spriteram, 0x1000);
-	state_save_register_global_array(machine(), m_playfield_control);
+	save_pointer(NAME(m_videoram), 0x8000);
+	save_item(NAME(m_cus116));
+	save_pointer(NAME(m_spriteram), 0x1000);
+	save_item(NAME(m_playfield_control));
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)

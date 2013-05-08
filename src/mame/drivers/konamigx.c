@@ -3618,9 +3618,9 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
-	state_save_register_global(machine(), konamigx_wrport1_1);
-	state_save_register_global_array(machine(), sndto020);
-	state_save_register_global_array(machine(), sndto000);
+	save_item(NAME(konamigx_wrport1_1));
+	save_item(NAME(sndto020));
+	save_item(NAME(sndto000));
 }
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)

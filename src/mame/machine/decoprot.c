@@ -98,13 +98,13 @@ void decoprot_reset(running_machine &machine)
 	deco16_prot_ram = reinterpret_cast<UINT16 *>(machine.root_device().memshare("prot16ram")->ptr());
 	deco32_prot_ram = reinterpret_cast<UINT32 *>(machine.root_device().memshare("prot32ram")->ptr());
 
-	state_save_register_global(machine, deco16_xor);
-	state_save_register_global(machine, deco16_mask);
-	state_save_register_global(machine, decoprot_last_write);
-	state_save_register_global(machine, decoprot_last_write_val);
-	state_save_register_global(machine, decoprot_buffer_ram_selected);
-	state_save_register_global_array(machine, decoprot_buffer_ram);
-	state_save_register_global_array(machine, decoprot_buffer_ram2);
+	machine.save().save_item(NAME(deco16_xor));
+	machine.save().save_item(NAME(deco16_mask));
+	machine.save().save_item(NAME(decoprot_last_write));
+	machine.save().save_item(NAME(decoprot_last_write_val));
+	machine.save().save_item(NAME(decoprot_buffer_ram_selected));
+	machine.save().save_item(NAME(decoprot_buffer_ram));
+	machine.save().save_item(NAME(decoprot_buffer_ram2));
 }
 
 /***************************************************************************/

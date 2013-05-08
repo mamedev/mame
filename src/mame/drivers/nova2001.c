@@ -160,7 +160,7 @@ WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
 MACHINE_START_MEMBER(nova2001_state,ninjakun)
 {
 	/* Save State Stuff */
-	state_save_register_global(machine(), m_ninjakun_io_a002_ctrl);
+	save_item(NAME(m_ninjakun_io_a002_ctrl));
 }
 
 

@@ -1642,7 +1642,7 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 
 void aristmk4_state::machine_start()
 {
-	state_save_register_global_pointer(machine(), m_nvram, 0x1000); // m_nvram
+	save_pointer(NAME(m_nvram), 0x1000); // m_nvram
 }
 
 void aristmk4_state::machine_reset()

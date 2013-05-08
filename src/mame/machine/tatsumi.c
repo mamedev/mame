@@ -14,9 +14,9 @@ void tatsumi_reset(running_machine &machine)
 	state->m_apache3_adc = 0;
 	state->m_apache3_rot_idx = 0;
 
-	state_save_register_global(machine, state->m_last_control);
-	state_save_register_global(machine, state->m_control_word);
-	state_save_register_global(machine, state->m_apache3_adc);
+	state->save_item(NAME(state->m_last_control));
+	state->save_item(NAME(state->m_control_word));
+	state->save_item(NAME(state->m_apache3_adc));
 }
 
 /******************************************************************************/

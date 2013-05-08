@@ -116,9 +116,9 @@ void skykid_state::video_start()
 
 	m_tx_tilemap->set_transparent_pen(0);
 
-	state_save_register_global(machine(), m_priority);
-	state_save_register_global(machine(), m_scroll_x);
-	state_save_register_global(machine(), m_scroll_y);
+	save_item(NAME(m_priority));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
 }
 
 

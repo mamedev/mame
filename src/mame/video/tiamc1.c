@@ -134,7 +134,7 @@ void tiamc1_state::video_start()
 	m_spriteram_n = video_ram + 0x3020;
 	m_spriteram_a = video_ram + 0x3030;
 
-	state_save_register_global_pointer(machine(), video_ram, 0x3040);
+	save_pointer(NAME(video_ram), 0x3040);
 
 	m_bg_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
@@ -145,9 +145,9 @@ void tiamc1_state::video_start()
 	m_bg_vshift = 0;
 	m_bg_hshift = 0;
 
-	state_save_register_global(machine(), m_layers_ctrl);
-	state_save_register_global(machine(), m_bg_vshift);
-	state_save_register_global(machine(), m_bg_hshift);
+	save_item(NAME(m_layers_ctrl));
+	save_item(NAME(m_bg_vshift));
+	save_item(NAME(m_bg_hshift));
 
 	machine().gfx[0]->set_source(m_charram);
 }

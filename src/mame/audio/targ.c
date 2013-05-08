@@ -156,10 +156,10 @@ static void common_audio_start(running_machine &machine, int freq)
 	samples->set_volume(3, 0);
 	samples->start_raw(3, sine_wave, 32, 1000, true);
 
-	state_save_register_global(machine, port_1_last);
-	state_save_register_global(machine, port_2_last);
-	state_save_register_global(machine, tone_freq);
-	state_save_register_global(machine, tone_active);
+	machine.save().save_item(NAME(port_1_last));
+	machine.save().save_item(NAME(port_2_last));
+	machine.save().save_item(NAME(tone_freq));
+	machine.save().save_item(NAME(tone_active));
 }
 
 
@@ -176,7 +176,7 @@ static SAMPLES_START( targ_audio_start )
 
 	tone_pointer = 0;
 
-	state_save_register_global(machine, tone_pointer);
+	machine.save().save_item(NAME(tone_pointer));
 }
 
 

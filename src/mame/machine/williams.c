@@ -337,7 +337,7 @@ MACHINE_START_MEMBER(williams_state,williams_common)
 	membank("bank1")->configure_entry(0, m_videoram);
 	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + 0x10000);
 
-	state_save_register_global(machine(), m_vram_bank);
+	save_item(NAME(m_vram_bank));
 }
 
 
@@ -434,7 +434,7 @@ MACHINE_START_MEMBER(williams_state,williams2)
 	membank("bank1")->configure_entries(1, 4, memregion("maincpu")->base() + 0x10000, 0x10000);
 
 	/* register for save states */
-	state_save_register_global(machine(), m_vram_bank);
+	save_item(NAME(m_vram_bank));
 	machine().save().register_postload(save_prepost_delegate(FUNC(williams_state::williams2_postload), this));
 }
 
@@ -842,7 +842,7 @@ MACHINE_START_MEMBER(williams_state,blaster)
 	membank("bank2")->configure_entry(0, m_videoram + 0x4000);
 	membank("bank2")->configure_entries(1, 16, memregion("maincpu")->base() + 0x10000, 0x0000);
 
-	state_save_register_global(machine(), m_blaster_bank);
+	save_item(NAME(m_blaster_bank));
 }
 
 
@@ -943,7 +943,7 @@ WRITE8_MEMBER(williams_state::tshoot_lamp_w)
 MACHINE_START_MEMBER(joust2_state,joust2)
 {
 	MACHINE_START_CALL_MEMBER(williams2);
-	state_save_register_global(machine(), m_joust2_current_sound_data);
+	save_item(NAME(m_joust2_current_sound_data));
 }
 
 

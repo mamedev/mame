@@ -18,11 +18,11 @@
 
 void astrocde_state::machine_start()
 {
-	state_save_register_global(machine(), m_port_1_last);
-	state_save_register_global(machine(), m_port_2_last);
-	state_save_register_global(machine(), m_ram_write_enable);
-	state_save_register_global(machine(), m_input_select);
-	state_save_register_global(machine(), m_profpac_bank);
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_port_2_last));
+	save_item(NAME(m_ram_write_enable));
+	save_item(NAME(m_input_select));
+	save_item(NAME(m_profpac_bank));
 
 	m_port_1_last = m_port_2_last = 0xff;
 }
@@ -192,50 +192,50 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	init_savestate();
 
 	/* register our specific save state data */
-	state_save_register_global_pointer(machine(), m_profpac_videoram, 0x4000 * 4);
-	state_save_register_global_array(machine(), m_profpac_palette);
-	state_save_register_global_array(machine(), m_profpac_colormap);
-	state_save_register_global(machine(), m_profpac_intercept);
-	state_save_register_global(machine(), m_profpac_vispage);
-	state_save_register_global(machine(), m_profpac_readpage);
-	state_save_register_global(machine(), m_profpac_readshift);
-	state_save_register_global(machine(), m_profpac_writepage);
-	state_save_register_global(machine(), m_profpac_writemode);
-	state_save_register_global(machine(), m_profpac_writemask);
-	state_save_register_global(machine(), m_profpac_vw);
+	save_pointer(NAME(m_profpac_videoram), 0x4000 * 4);
+	save_item(NAME(m_profpac_palette));
+	save_item(NAME(m_profpac_colormap));
+	save_item(NAME(m_profpac_intercept));
+	save_item(NAME(m_profpac_vispage));
+	save_item(NAME(m_profpac_readpage));
+	save_item(NAME(m_profpac_readshift));
+	save_item(NAME(m_profpac_writepage));
+	save_item(NAME(m_profpac_writemode));
+	save_item(NAME(m_profpac_writemask));
+	save_item(NAME(m_profpac_vw));
 }
 
 
 void astrocde_state::init_savestate()
 {
-	state_save_register_global_array(machine(), m_sparkle);
+	save_item(NAME(m_sparkle));
 
-	state_save_register_global(machine(), m_interrupt_enabl);
-	state_save_register_global(machine(), m_interrupt_vector);
-	state_save_register_global(machine(), m_interrupt_scanline);
-	state_save_register_global(machine(), m_vertical_feedback);
-	state_save_register_global(machine(), m_horizontal_feedback);
+	save_item(NAME(m_interrupt_enabl));
+	save_item(NAME(m_interrupt_vector));
+	save_item(NAME(m_interrupt_scanline));
+	save_item(NAME(m_vertical_feedback));
+	save_item(NAME(m_horizontal_feedback));
 
-	state_save_register_global_array(machine(), m_colors);
-	state_save_register_global(machine(), m_colorsplit);
-	state_save_register_global(machine(), m_bgdata);
-	state_save_register_global(machine(), m_vblank);
-	state_save_register_global(machine(), m_video_mode);
+	save_item(NAME(m_colors));
+	save_item(NAME(m_colorsplit));
+	save_item(NAME(m_bgdata));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_video_mode));
 
-	state_save_register_global_array(machine(), m_funcgen_expand_color);
-	state_save_register_global(machine(), m_funcgen_control);
-	state_save_register_global(machine(), m_funcgen_expand_count);
-	state_save_register_global(machine(), m_funcgen_rotate_count);
-	state_save_register_global_array(machine(), m_funcgen_rotate_data);
-	state_save_register_global(machine(), m_funcgen_shift_prev_data);
-	state_save_register_global(machine(), m_funcgen_intercept);
+	save_item(NAME(m_funcgen_expand_color));
+	save_item(NAME(m_funcgen_control));
+	save_item(NAME(m_funcgen_expand_count));
+	save_item(NAME(m_funcgen_rotate_count));
+	save_item(NAME(m_funcgen_rotate_data));
+	save_item(NAME(m_funcgen_shift_prev_data));
+	save_item(NAME(m_funcgen_intercept));
 
-	state_save_register_global(machine(), m_pattern_source);
-	state_save_register_global(machine(), m_pattern_mode);
-	state_save_register_global(machine(), m_pattern_dest);
-	state_save_register_global(machine(), m_pattern_skip);
-	state_save_register_global(machine(), m_pattern_width);
-	state_save_register_global(machine(), m_pattern_height);
+	save_item(NAME(m_pattern_source));
+	save_item(NAME(m_pattern_mode));
+	save_item(NAME(m_pattern_dest));
+	save_item(NAME(m_pattern_skip));
+	save_item(NAME(m_pattern_width));
+	save_item(NAME(m_pattern_height));
 }
 
 

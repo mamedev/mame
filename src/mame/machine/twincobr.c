@@ -320,15 +320,15 @@ MACHINE_RESET_MEMBER(twincobr_state,wardner)
 
 void twincobr_state::twincobr_driver_savestate()
 {
-	state_save_register_global(machine(), m_toaplan_main_cpu);
-	state_save_register_global(machine(), m_intenable);
-	state_save_register_global(machine(), m_dsp_on);
-	state_save_register_global(machine(), m_dsp_addr_w);
-	state_save_register_global(machine(), m_main_ram_seg);
-	state_save_register_global(machine(), m_dsp_BIO);
-	state_save_register_global(machine(), m_dsp_execute);
-	state_save_register_global(machine(), m_fsharkbt_8741);
-	state_save_register_global(machine(), m_wardner_membank);
+	save_item(NAME(m_toaplan_main_cpu));
+	save_item(NAME(m_intenable));
+	save_item(NAME(m_dsp_on));
+	save_item(NAME(m_dsp_addr_w));
+	save_item(NAME(m_main_ram_seg));
+	save_item(NAME(m_dsp_BIO));
+	save_item(NAME(m_dsp_execute));
+	save_item(NAME(m_fsharkbt_8741));
+	save_item(NAME(m_wardner_membank));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(twincobr_state::twincobr_restore_dsp), this));
 }

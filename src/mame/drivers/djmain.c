@@ -1402,10 +1402,10 @@ void djmain_state::machine_start()
 	if (ide != NULL && m_ide_user_password != NULL)
 		ide->ide_set_user_password(m_ide_user_password);
 
-	state_save_register_global(machine(), m_sndram_bank);
-	state_save_register_global(machine(), m_pending_vb_int);
-	state_save_register_global(machine(), m_v_ctrl);
-	state_save_register_global_array(machine(), m_obj_regs);
+	save_item(NAME(m_sndram_bank));
+	save_item(NAME(m_pending_vb_int));
+	save_item(NAME(m_v_ctrl));
+	save_item(NAME(m_obj_regs));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(djmain_state::sndram_set_bank), this));
 }

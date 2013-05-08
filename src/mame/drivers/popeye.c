@@ -628,9 +628,9 @@ DRIVER_INIT_MEMBER(popeye_state,skyskipr)
 		auto_free(machine(), buffer);
 	}
 
-	state_save_register_global(machine(), m_prot0);
-	state_save_register_global(machine(), m_prot1);
-	state_save_register_global(machine(), m_prot_shift);
+	save_item(NAME(m_prot0));
+	save_item(NAME(m_prot1));
+	save_item(NAME(m_prot_shift));
 }
 
 DRIVER_INIT_MEMBER(popeye_state,popeye)
@@ -649,9 +649,9 @@ DRIVER_INIT_MEMBER(popeye_state,popeye)
 		auto_free(machine(), buffer);
 	}
 
-	state_save_register_global(machine(), m_prot0);
-	state_save_register_global(machine(), m_prot1);
-	state_save_register_global(machine(), m_prot_shift);
+	save_item(NAME(m_prot0));
+	save_item(NAME(m_prot1));
+	save_item(NAME(m_prot_shift));
 }
 
 

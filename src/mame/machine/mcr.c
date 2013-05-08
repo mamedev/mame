@@ -145,7 +145,7 @@ const z80sio_interface nflfoot_sio_intf =
 
 MACHINE_START_MEMBER(mcr_state,mcr)
 {
-	state_save_register_global(machine(), mcr_cocktail_flip);
+	save_item(NAME(mcr_cocktail_flip));
 }
 
 

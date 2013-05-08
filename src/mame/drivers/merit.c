@@ -134,11 +134,11 @@ void merit_state::machine_start()
 	m_question_address = 0;
 	m_ram_palette = auto_alloc_array(machine(), UINT8, RAM_PALETTE_SIZE);
 
-	state_save_register_global_pointer(machine(), m_ram_palette, RAM_PALETTE_SIZE);
-	state_save_register_global(machine(), m_lscnblk);
-	state_save_register_global(machine(), m_extra_video_bank_bit);
-	state_save_register_global(machine(), m_question_address);
-	state_save_register_global(machine(), m_decryption_key);
+	save_pointer(NAME(m_ram_palette), RAM_PALETTE_SIZE);
+	save_item(NAME(m_lscnblk));
+	save_item(NAME(m_extra_video_bank_bit));
+	save_item(NAME(m_question_address));
+	save_item(NAME(m_decryption_key));
 }
 
 

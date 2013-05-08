@@ -37,14 +37,14 @@ void exidy_state::video_start()
 	m_motion_object_2_vid.allocate(16, 16);
 	m_motion_object_2_clip.allocate(16, 16);
 
-	state_save_register_global(machine(), m_collision_mask);
-	state_save_register_global(machine(), m_collision_invert);
-	state_save_register_global(machine(), m_is_2bpp);
-	state_save_register_global(machine(), m_int_condition);
-	state_save_register_global_bitmap(machine(), &m_background_bitmap);
-	state_save_register_global_bitmap(machine(), &m_motion_object_1_vid);
-	state_save_register_global_bitmap(machine(), &m_motion_object_2_vid);
-	state_save_register_global_bitmap(machine(), &m_motion_object_2_clip);
+	save_item(NAME(m_collision_mask));
+	save_item(NAME(m_collision_invert));
+	save_item(NAME(m_is_2bpp));
+	save_item(NAME(m_int_condition));
+	save_item(NAME(m_background_bitmap));
+	save_item(NAME(m_motion_object_1_vid));
+	save_item(NAME(m_motion_object_2_vid));
+	save_item(NAME(m_motion_object_2_clip));
 }
 
 

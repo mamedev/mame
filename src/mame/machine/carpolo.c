@@ -488,15 +488,15 @@ void carpolo_state::machine_start()
 	m_ttl74148_3s = machine().device("74148_3s");
 	m_ttl74153_1k = machine().device("74153_1k");
 
-	state_save_register_global(machine(), m_ball_screen_collision_cause);
-	state_save_register_global(machine(), m_car_ball_collision_x);
-	state_save_register_global(machine(), m_car_ball_collision_y);
-	state_save_register_global(machine(), m_car_car_collision_cause);
-	state_save_register_global(machine(), m_car_goal_collision_cause);
-	state_save_register_global(machine(), m_car_ball_collision_cause);
-	state_save_register_global(machine(), m_car_border_collision_cause);
-	state_save_register_global(machine(), m_priority_0_extension);
-	state_save_register_global_array(machine(), m_last_wheel_value);
+	save_item(NAME(m_ball_screen_collision_cause));
+	save_item(NAME(m_car_ball_collision_x));
+	save_item(NAME(m_car_ball_collision_y));
+	save_item(NAME(m_car_car_collision_cause));
+	save_item(NAME(m_car_goal_collision_cause));
+	save_item(NAME(m_car_ball_collision_cause));
+	save_item(NAME(m_car_border_collision_cause));
+	save_item(NAME(m_priority_0_extension));
+	save_item(NAME(m_last_wheel_value));
 }
 
 void carpolo_state::machine_reset()

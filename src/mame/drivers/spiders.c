@@ -401,11 +401,11 @@ static const ttl74123_interface ic60_intf =
 void spiders_state::machine_start()
 {
 	/* setup for save states */
-	state_save_register_global(machine(), m_flipscreen);
-	state_save_register_global(machine(), m_gfx_rom_address);
-	state_save_register_global(machine(), m_gfx_rom_ctrl_mode);
-	state_save_register_global(machine(), m_gfx_rom_ctrl_latch);
-	state_save_register_global(machine(), m_gfx_rom_ctrl_data);
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_gfx_rom_address));
+	save_item(NAME(m_gfx_rom_ctrl_mode));
+	save_item(NAME(m_gfx_rom_ctrl_latch));
+	save_item(NAME(m_gfx_rom_ctrl_data));
 }
 
 

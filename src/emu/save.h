@@ -96,24 +96,6 @@ typedef delegate<void ()> save_prepost_delegate;
 
 
 
-// register global items
-#define state_save_register_global(_mach, _val) \
-	(_mach).save().save_item(_val, #_val)
-
-#define state_save_register_global_pointer(_mach, _val, _count) \
-	(_mach).save().save_pointer(_val, #_val, _count)
-
-#define state_save_register_global_array(_mach, _val) \
-	(_mach).save().save_item(_val, #_val)
-
-#define state_save_register_global_2d_array(_mach, _val) \
-	(_mach).save().save_item(_val, #_val)
-
-#define state_save_register_global_bitmap(_mach, _val) \
-	(_mach).save().save_item(*(_val), #_val)
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

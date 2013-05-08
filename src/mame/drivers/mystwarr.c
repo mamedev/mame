@@ -841,8 +841,8 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 	m_mw_irq_control = 0;
 
-	state_save_register_global(machine(), m_mw_irq_control);
-	state_save_register_global(machine(), m_cur_sound_region);
+	save_item(NAME(m_mw_irq_control));
+	save_item(NAME(m_cur_sound_region));
 	machine().save().register_postload(save_prepost_delegate(FUNC(mystwarr_state::reset_sound_region), this));
 }
 

@@ -289,8 +289,8 @@ static const ym2203_interface ym2203_config =
 
 void pkscram_state::machine_start()
 {
-	state_save_register_global(machine(), m_out);
-	state_save_register_global(machine(), m_interrupt_line_active);
+	save_item(NAME(m_out));
+	save_item(NAME(m_interrupt_line_active));
 }
 
 void pkscram_state::machine_reset()

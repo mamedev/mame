@@ -1273,11 +1273,11 @@ void tetrisp2_state::init_rockn_timer()
 	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
 	m_rockn_timer_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),this));
 
-	state_save_register_global_array(machine(), m_systemregs);
-	state_save_register_global_array(machine(), m_rocknms_sub_systemregs);
-	state_save_register_global(machine(), m_rockn_protectdata);
-	state_save_register_global(machine(), m_rockn_adpcmbank);
-	state_save_register_global(machine(), m_rockn_soundvolume);
+	save_item(NAME(m_systemregs));
+	save_item(NAME(m_rocknms_sub_systemregs));
+	save_item(NAME(m_rockn_protectdata));
+	save_item(NAME(m_rockn_adpcmbank));
+	save_item(NAME(m_rockn_soundvolume));
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn)

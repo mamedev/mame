@@ -1988,22 +1988,22 @@ MACHINE_START_MEMBER(model1_state,model1)
 {
 	m_ram_data = auto_alloc_array(machine(), UINT32, 0x10000);
 
-	state_save_register_global_pointer(machine(), m_ram_data, 0x10000);
-	state_save_register_global(machine(), m_ram_adr);
-	state_save_register_global(machine(), m_ram_scanadr);
-	state_save_register_global_array(machine(), m_ram_latch);
-	state_save_register_global(machine(), m_fifoout_rpos);
-	state_save_register_global(machine(), m_fifoout_wpos);
-	state_save_register_global_array(machine(), m_fifoout_data);
-	state_save_register_global(machine(), m_fifoin_rpos);
-	state_save_register_global(machine(), m_fifoin_wpos);
-	state_save_register_global_array(machine(), m_fifoin_data);
-	state_save_register_global_array(machine(), m_cmat);
-	state_save_register_global_2d_array(machine(), m_mat_stack);
-	state_save_register_global_2d_array(machine(), m_mat_vector);
-	state_save_register_global(machine(), m_mat_stack_pos);
-	state_save_register_global(machine(), m_acc);
-	state_save_register_global(machine(), m_list_length);
+	save_pointer(NAME(m_ram_data), 0x10000);
+	save_item(NAME(m_ram_adr));
+	save_item(NAME(m_ram_scanadr));
+	save_item(NAME(m_ram_latch));
+	save_item(NAME(m_fifoout_rpos));
+	save_item(NAME(m_fifoout_wpos));
+	save_item(NAME(m_fifoout_data));
+	save_item(NAME(m_fifoin_rpos));
+	save_item(NAME(m_fifoin_wpos));
+	save_item(NAME(m_fifoin_data));
+	save_item(NAME(m_cmat));
+	save_item(NAME(m_mat_stack));
+	save_item(NAME(m_mat_vector));
+	save_item(NAME(m_mat_stack_pos));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_list_length));
 }
 
 void model1_tgp_reset(running_machine &machine, int swa)

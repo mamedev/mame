@@ -255,9 +255,9 @@ void pengadvb_state::pengadvb_postload()
 
 void pengadvb_state::machine_start()
 {
-	state_save_register_global_pointer(machine(), m_main_mem, 0x4000);
-	state_save_register_global(machine(), m_mem_map);
-	state_save_register_global_array(machine(), m_mem_banks);
+	save_pointer(NAME(m_main_mem), 0x4000);
+	save_item(NAME(m_mem_map));
+	save_item(NAME(m_mem_banks));
 	machine().save().register_postload(save_prepost_delegate(FUNC(pengadvb_state::pengadvb_postload), this));
 }
 

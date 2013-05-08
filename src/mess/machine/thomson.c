@@ -1326,9 +1326,9 @@ void thomson_state::to7_midi_init(  )
 {
 	LOG (( "to7_midi_init\n" ));
 	to7_midi_chardev = chardev_open( &machine, "/dev/snd/midiC0D0", "/dev/snd/midiC0D1", &to7_midi_interface );
-	state_save_register_global(machine(), to7_midi_status );
-	state_save_register_global(machine(), to7_midi_overrun );
-	state_save_register_global(machine(), to7_midi_intr );
+	save_item(NAME(to7_midi_status );
+	save_item(NAME(to7_midi_overrun );
+	save_item(NAME(to7_midi_intr );
 }
 
 
@@ -1449,7 +1449,7 @@ MACHINE_START_MEMBER( thomson_state, to7 )
 	save_item(NAME(m_thom_cart_bank));
 	save_item(NAME(m_to7_lightpen));
 	save_item(NAME(m_to7_lightpen_step));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME((mem + 0x10000)), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to7_update_cart_bank_postload),this));
 }
 
@@ -1694,7 +1694,7 @@ MACHINE_START_MEMBER( thomson_state, to770 )
 	save_item(NAME(m_thom_cart_bank));
 	save_item(NAME(m_to7_lightpen));
 	save_item(NAME(m_to7_lightpen_step));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to770_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to7_update_cart_bank_postload), this));
 }
@@ -2106,7 +2106,7 @@ MACHINE_START_MEMBER( thomson_state, mo5 )
 	save_item(NAME(m_to7_lightpen));
 	save_item(NAME(m_to7_lightpen_step));
 	save_item(NAME(m_mo5_reg_cart));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::mo5_update_cart_bank_postload), this));
 }
 
@@ -2297,7 +2297,7 @@ void thomson_state::to9_palette_init()
 	m_to9_palette_idx = 0;
 	memset( m_to9_palette_data, 0, sizeof( m_to9_palette_data ) );
 	save_item(NAME(m_to9_palette_idx));
-	state_save_register_global_array(machine(), m_to9_palette_data);
+	save_item(NAME(m_to9_palette_data));
 }
 
 
@@ -3077,7 +3077,7 @@ MACHINE_START_MEMBER( thomson_state, to9 )
 	save_item(NAME(m_to7_lightpen));
 	save_item(NAME(m_to7_lightpen_step));
 	save_item(NAME(m_to9_soft_bank));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to9_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to9_update_cart_bank_postload), this));
 }
@@ -4140,7 +4140,7 @@ MACHINE_START_MEMBER( thomson_state, to8 )
 	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_cart_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_floppy_bank_postload), this));
@@ -4313,7 +4313,7 @@ MACHINE_START_MEMBER( thomson_state, to9p )
 	save_item(NAME(m_to8_lightpen_intr));
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_cart_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::to8_update_floppy_bank_postload), this));
@@ -5043,7 +5043,7 @@ MACHINE_START_MEMBER( thomson_state, mo6 )
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_item(NAME(m_mo5_reg_cart));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::mo6_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::mo6_update_cart_bank_postload), this));
 }
@@ -5303,7 +5303,7 @@ MACHINE_START_MEMBER( thomson_state, mo5nr )
 	save_item(NAME(m_to8_data_vpage));
 	save_item(NAME(m_to8_cart_vpage));
 	save_item(NAME(m_mo5_reg_cart));
-	state_save_register_global_pointer( machine(), (mem + 0x10000), 0x10000 );
+	save_pointer(NAME(mem + 0x10000), 0x10000 );
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::mo6_update_ram_bank_postload), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(thomson_state::mo6_update_cart_bank_postload), this));
 }

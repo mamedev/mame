@@ -200,9 +200,9 @@ void vertigo_state::machine_start()
 	m_custom = machine().device("custom");
 	m_ttl74148 = machine().device("74148");
 
-	state_save_register_global(machine(), m_irq_state);
-	state_save_register_global(machine(), m_adc_result);
-	state_save_register_global(machine(), m_irq4_time);
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_adc_result));
+	save_item(NAME(m_irq4_time));
 
 	vertigo_vproc_init();
 }

@@ -193,11 +193,11 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 	m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 	m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
 
-	state_save_register_global_pointer(machine(), m_videoram_pg[0], 0x1000);
-	state_save_register_global_pointer(machine(), m_videoram_pg[1], 0x1000);
-	state_save_register_global(machine(), m_videoram_pg_index);
-	state_save_register_global(machine(), m_palette_bank);
-	state_save_register_global(machine(), m_cocktail_mode);
+	save_pointer(NAME(m_videoram_pg[0]), 0x1000);
+	save_pointer(NAME(m_videoram_pg[1]), 0x1000);
+	save_item(NAME(m_videoram_pg_index));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_cocktail_mode));
 
 	/* some more candidates */
 	m_pleiads_protection_question = 0;
@@ -207,11 +207,11 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 	m_survival_input_latches[0] = 0;
 	m_survival_input_latches[1] = 0;
 
-	state_save_register_global(machine(), m_pleiads_protection_question);
-	state_save_register_global(machine(), m_survival_protection_value);
-	state_save_register_global(machine(), m_survival_sid_value);
-	state_save_register_global(machine(), m_survival_input_readc);
-	state_save_register_global_array(machine(), m_survival_input_latches);
+	save_item(NAME(m_pleiads_protection_question));
+	save_item(NAME(m_survival_protection_value));
+	save_item(NAME(m_survival_sid_value));
+	save_item(NAME(m_survival_input_readc));
+	save_item(NAME(m_survival_input_latches));
 
 }
 

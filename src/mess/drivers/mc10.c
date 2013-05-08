@@ -256,7 +256,7 @@ DRIVER_INIT_MEMBER(mc10_state,mc10)
 		prg.nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
-	state_save_register_global(machine(), m_keyboard_strobe);
+	save_item(NAME(m_keyboard_strobe));
 
 	//for alice32 force port4 DDR to 0xff at startup
 	if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))

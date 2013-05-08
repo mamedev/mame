@@ -420,15 +420,15 @@ void st0016_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void st0016_state::st0016_save_init()
 {
-	state_save_register_global(machine(), st0016_spr_bank);
-	state_save_register_global(machine(), st0016_spr2_bank);
-	state_save_register_global(machine(), st0016_pal_bank);
-	state_save_register_global(machine(), st0016_char_bank);
-	//state_save_register_global(machine(), st0016_rom_bank);
-	state_save_register_global_array(machine(), st0016_vregs);
-	state_save_register_global_pointer(machine(), st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	state_save_register_global_pointer(machine(), st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
-	state_save_register_global_pointer(machine(), st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	save_item(NAME(st0016_spr_bank));
+	save_item(NAME(st0016_spr2_bank));
+	save_item(NAME(st0016_pal_bank));
+	save_item(NAME(st0016_char_bank));
+	//save_item(NAME(st0016_rom_bank));
+	save_item(NAME(st0016_vregs));
+	save_pointer(NAME(st0016_charram), ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	save_pointer(NAME(st0016_paletteram), ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	save_pointer(NAME(st0016_spriteram), ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 }
 
 

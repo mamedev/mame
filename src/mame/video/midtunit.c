@@ -100,11 +100,11 @@ VIDEO_START_MEMBER(midtunit_state,midtunit)
 	dma_state.gfxrom = m_gfxrom->base();
 
 	/* register for state saving */
-	state_save_register_global(machine(), midtunit_control);
-	state_save_register_global_array(machine(), gfxbank_offset);
-	state_save_register_global_pointer(machine(), local_videoram, 0x100000/sizeof(local_videoram[0]));
-	state_save_register_global(machine(), videobank_select);
-	state_save_register_global_array(machine(), dma_register);
+	save_item(NAME(midtunit_control));
+	save_item(NAME(gfxbank_offset));
+	save_pointer(NAME(local_videoram), 0x100000/sizeof(local_videoram[0]));
+	save_item(NAME(videobank_select));
+	save_item(NAME(dma_register));
 }
 
 

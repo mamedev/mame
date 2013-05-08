@@ -525,7 +525,7 @@ VIDEO_START_MEMBER(dragngun_state,dragngun)
 
 	memset(m_dirty_palette,0,4096);
 
-	state_save_register_global(machine(), m_dragngun_sprite_ctrl);
+	save_item(NAME(m_dragngun_sprite_ctrl));
 	m_has_ace_ram=0;
 }
 
@@ -535,7 +535,7 @@ VIDEO_START_MEMBER(dragngun_state,lockload)
 
 	memset(m_dirty_palette,0,4096);
 
-	state_save_register_global(machine(), m_dragngun_sprite_ctrl);
+	save_item(NAME(m_dragngun_sprite_ctrl));
 	m_has_ace_ram=0;
 }
 
@@ -549,7 +549,7 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
 	memset(m_dirty_palette,0,4096);
-	state_save_register_global(machine(), m_pri);
+	save_item(NAME(m_pri));
 	m_has_ace_ram=1;
 }
 

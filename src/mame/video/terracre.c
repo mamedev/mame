@@ -189,8 +189,8 @@ void terracre_state::video_start()
 	m_foreground->set_transparent_pen(0xf);
 
 	/* register for saving */
-	state_save_register_global(machine(), m_xscroll);
-	state_save_register_global(machine(), m_yscroll);
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
 }
 
 UINT32 terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

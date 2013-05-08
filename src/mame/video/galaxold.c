@@ -380,20 +380,20 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 
 void galaxold_state::state_save_register()
 {
-	state_save_register_global_array(machine(), m_gfxbank);
-	state_save_register_global(machine(), m_flipscreen_x);
-	state_save_register_global(machine(), m_flipscreen_y);
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_flipscreen_x));
+	save_item(NAME(m_flipscreen_y));
 
-	state_save_register_global(machine(), m_stars_on);
-	state_save_register_global(machine(), m_stars_scrollpos);
-	state_save_register_global(machine(), m_stars_blink_state);
+	save_item(NAME(m_stars_on));
+	save_item(NAME(m_stars_scrollpos));
+	save_item(NAME(m_stars_blink_state));
 
-	state_save_register_global(machine(), m_darkplnt_bullet_color);
+	save_item(NAME(m_darkplnt_bullet_color));
 
-	state_save_register_global(machine(), m_background_enable);
-	state_save_register_global(machine(), m_background_red);
-	state_save_register_global(machine(), m_background_green);
-	state_save_register_global(machine(), m_background_blue);
+	save_item(NAME(m_background_enable));
+	save_item(NAME(m_background_red));
+	save_item(NAME(m_background_green));
+	save_item(NAME(m_background_blue));
 }
 
 void galaxold_state::video_start_common()
@@ -628,8 +628,8 @@ VIDEO_START_MEMBER(galaxold_state,rockclim)
 	m_modify_spritecode = &galaxold_state::rockclim_modify_spritecode;
 
 	m_rockclim_v = m_rockclim_h = 0;
-	state_save_register_global(machine(), m_rockclim_v);
-	state_save_register_global(machine(), m_rockclim_h);
+	save_item(NAME(m_rockclim_v));
+	save_item(NAME(m_rockclim_h));
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
