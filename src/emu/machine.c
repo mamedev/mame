@@ -235,7 +235,10 @@ const char *running_machine::describe_context()
 TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 {
 	if (strlen(options().autoboot_command())!=0) {
-		ioport().natkeyboard().post_utf8(options().autoboot_command());
+		astring val = astring(options().autoboot_command());
+		val.replace("\\n","\n");
+		val.replace("\\r","\r");
+		ioport().natkeyboard().post_utf8(val);
 		ioport().natkeyboard().post_utf8("\r");	
 	}
 }
