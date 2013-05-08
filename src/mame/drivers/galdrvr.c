@@ -1104,6 +1104,17 @@ static INPUT_PORTS_START( smooncrs )
 	/* Language is always non-Japanese due to code at 0x2f53 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mooncptc )
+	PORT_INCLUDE(mooncrst)
+
+	PORT_MODIFY("IN2") // no 1c/1c ?
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_5C ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( mooncrgx )
 	PORT_INCLUDE(mooncrst)
@@ -6730,7 +6741,7 @@ GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, RO
 GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
 GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
-GAME( 1980?,mooncptc, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980?,mooncptc, mooncrst, mooncrst, mooncptc, galaxian_state, mooncrsu, ROT90,  "bootleg (Petaco S.A.)", "Moon Cresta (Petaco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980?,sstarcrs, mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", GAME_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 198?, starfgmc, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
