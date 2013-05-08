@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0200, 0x0fff) AM_RAM
 	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3800) AM_ROM
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -260,12 +260,13 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 	/*
         A NE556 runs at either 1200 or 2400 Hz, depending on the state of bit 0.
         This output drives the speaker and the output signal to the cassette player.
-        Bit 6 enables the speaker.
+        Bit 6 enables the speaker. Also the speaker is silenced when cassette operations
+        are in progress (DMA/CB2 line low).
 	*/
 
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
-	m_beeper->set_state(BIT(data, 6));
+	m_beeper->set_state(BIT(data, 6) & m_screen_on);
 
 	m_portb = data;
 }
@@ -416,15 +417,19 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "c8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "c8,ch8", 1)
 MACHINE_CONFIG_END
 
 /* ROMs */
 
 ROM_START( d6800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877) )
+	ROM_SYSTEM_BIOS(0, "0", "Original")
+	ROMX_LOAD( "d6800.bin", 0xc000, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
+	ROMX_LOAD( "d6800.bin", 0xc400, 0x0400, CRC(3f97ca2e) SHA1(60f26e57a058262b30befceceab4363a5d65d877), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "1", "Dreamsoft")
+	ROMX_LOAD( "d6800.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT       INIT        COMPANY             FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,      0,   "Electronics Australia", "Dream 6800", GAME_NOT_WORKING )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS,          INIT      COMPANY        FULLNAME      FLAGS */
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", GAME_NOT_WORKING )
