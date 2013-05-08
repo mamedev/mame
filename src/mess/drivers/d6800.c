@@ -410,7 +410,10 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : exec=%04X",quick_length,quick_addr,quick_addr+quick_length,exec_addr);
 
 			// Start the quickload
-			m_maincpu->set_pc(exec_addr);
+			if (strcmp(image.filetype(), "bin") == 0)
+				m_maincpu->set_pc(quick_addr);
+			else
+				m_maincpu->set_pc(exec_addr);
 
 			result = IMAGE_INIT_PASS;
 		}
@@ -450,7 +453,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "c8,ch8", 1)
+	MCFG_QUICKLOAD_ADD("quickload", d6800_state, d6800, "bin,c8,ch8", 1)
 MACHINE_CONFIG_END
 
 /* ROMs */
