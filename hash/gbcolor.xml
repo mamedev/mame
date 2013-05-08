@@ -23696,6 +23696,22 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="fkdfw">
+		<description>Feng Kuang Da Fu Weng (Chi, Ripped from multicart)</description>
+		<year>200?</year>
+		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="疯狂大富翁"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="2097152">
+				<rom name="feng kuang da fu weng (unlicensed, chinese) (multicart rip) [raw dump].bin" size="2097152" crc="45b79edc" sha1="cc86e1247a352a7c7134db927cc41a1e9950fb96" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="onimush2">
 		<description>Gui Wu Zhe 2 (Chi)</description>
 		<year>200?</year>
