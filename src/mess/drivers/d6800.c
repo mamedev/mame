@@ -92,7 +92,11 @@ protected:
 	required_ioport m_io_shift;
 private:
 	UINT8 m_rtc;
-	bool m_screen_on;
+	bool m_ca1;
+	bool m_ca2;
+	bool m_cb1;
+	bool m_cb2;
+	UINT8 m_cass_data[3];
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -188,7 +192,7 @@ UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bit
 
 		for (x = 0; x < 8; x++)
 		{
-			if (m_screen_on)
+			if (m_cb2)
 				gfx = m_videoram[ x | (y<<3)];
 
 			*p++ = BIT(gfx, 7);
@@ -214,33 +218,45 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 		m_rtc = 0;
 
 	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
-	m_pia->ca1_w( (data == 255) ? 0 : 1);
-	data = m_io_shift->read();
-	m_pia->ca2_w( data );
-	m_pia->cb1_w((m_rtc) ? 1 : 0);
+	m_ca1 = (data == 255) ? 0 : 1;
+	m_ca2 = (bool)m_io_shift->read();
+	m_cb1 = (m_rtc) ? 1 : 0;
+
+	m_pia->ca1_w(m_ca1);
+	m_pia->ca2_w(m_ca2);
+	m_pia->cb1_w(m_cb1);
+
+	/* cassette - turn 1200/2400Hz to a bit */
+	m_cass_data[1]++;
+	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+
+	if (cass_ws != m_cass_data[0])
+	{
+		m_cass_data[0] = cass_ws;
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 0 : 128);
+		m_cass_data[1] = 0;
+	}
 }
 
 
 READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 {
-	return (m_rtc) ? 1 : 0;
+	return m_cb1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
-
-	return (data == 255) ? 0 : 1;
+	return m_ca1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 {
-	return m_io_shift->read();
+	return m_ca2;
 }
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
 {
-	m_screen_on = state;
+	m_cb2 = state;
 }
 
 READ8_MEMBER( d6800_state::d6800_cassette_r )
@@ -252,7 +268,7 @@ READ8_MEMBER( d6800_state::d6800_cassette_r )
 	knows if the tone is 1200 or 2400 Hz. Input to PIA is bit 7.
 	*/
 
-	return ((m_cass->input() > 0.03) ? 1 : 0) | m_portb;
+	return m_cass_data[2] | m_portb;
 }
 
 WRITE8_MEMBER( d6800_state::d6800_cassette_w )
@@ -266,9 +282,9 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
-	m_beeper->set_state(BIT(data, 6) & m_screen_on);
+	m_beeper->set_state(BIT(data, 6) & m_cb2);
 
-	m_portb = data;
+	m_portb = data & 0x7f;
 }
 
 READ8_MEMBER( d6800_state::d6800_keyboard_r )
@@ -329,6 +345,9 @@ void d6800_state::machine_reset()
 {
 	m_beeper->set_state(0);
 	m_rtc = 0;
+	m_cass_data[0] = 0;
+	m_cass_data[1] = 0;
+	m_cass_data[2] = 128;
 }
 
 /* Machine Drivers */
