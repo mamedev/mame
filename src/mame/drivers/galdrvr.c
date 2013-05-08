@@ -1105,7 +1105,7 @@ static INPUT_PORTS_START( smooncrs )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mooncptc )
-	PORT_INCLUDE(mooncrst)
+	PORT_INCLUDE(smooncrs)
 
 	PORT_MODIFY("IN2") // no 1c/1c ?
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
