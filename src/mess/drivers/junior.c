@@ -211,8 +211,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
 
 void junior_state::machine_start()
 {
-	state_save_register_item(machine(), "junior", NULL, 0, m_port_a );
-	state_save_register_item(machine(), "junior", NULL, 0, m_port_b );
+	save_item(NAME(m_port_a));
+	save_item(NAME(m_port_b));
 }
 
 

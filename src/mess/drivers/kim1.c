@@ -312,9 +312,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
 
 void kim1_state::machine_start()
 {
-	state_save_register_item(machine(), "kim1", NULL, 0, m_u2_port_b );
-	state_save_register_item(machine(), "kim1", NULL, 0, m_311_output );
-	state_save_register_item(machine(), "kim1", NULL, 0, m_cassette_high_count );
+	save_item(NAME(m_u2_port_b));
+	save_item(NAME(m_311_output));
+	save_item(NAME(m_cassette_high_count));
 }
 
 

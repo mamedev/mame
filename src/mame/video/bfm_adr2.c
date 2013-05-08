@@ -205,8 +205,8 @@ VIDEO_START( adder2 )
 	machine.save().save_item(NAME(adder2_data_from_sc2));
 	machine.save().save_item(NAME(adder2_data_to_sc2));
 
-	state_save_register_item_array(machine, "Adder", NULL, 0, adder_ram);
-	state_save_register_item_2d_array(machine, "Adder", NULL, 0, adder_screen_ram);
+	machine.save().save_item(NAME(adder_ram));
+	machine.save().save_item(NAME(adder_screen_ram));
 
 	tilemap0 = tilemap_create(machine, get_tile0_info, TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
