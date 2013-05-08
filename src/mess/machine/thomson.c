@@ -1326,9 +1326,9 @@ void thomson_state::to7_midi_init(  )
 {
 	LOG (( "to7_midi_init\n" ));
 	to7_midi_chardev = chardev_open( &machine, "/dev/snd/midiC0D0", "/dev/snd/midiC0D1", &to7_midi_interface );
-	state_save_register_global( machine, to7_midi_status );
-	state_save_register_global( machine, to7_midi_overrun );
-	state_save_register_global( machine, to7_midi_intr );
+	state_save_register_global(machine(), to7_midi_status );
+	state_save_register_global(machine(), to7_midi_overrun );
+	state_save_register_global(machine(), to7_midi_intr );
 }
 
 
@@ -2297,7 +2297,7 @@ void thomson_state::to9_palette_init()
 	m_to9_palette_idx = 0;
 	memset( m_to9_palette_data, 0, sizeof( m_to9_palette_data ) );
 	save_item(NAME(m_to9_palette_idx));
-	state_save_register_global_array( machine(), m_to9_palette_data );
+	state_save_register_global_array(machine(), m_to9_palette_data);
 }
 
 

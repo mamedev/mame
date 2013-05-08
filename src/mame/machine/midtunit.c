@@ -20,43 +20,22 @@
 #define SOUND_DCS                   3
 
 
-/* CMOS-related variables */
-static UINT8    cmos_write_enable;
-
-/* sound-related variables */
-static UINT8    chip_type;
-static UINT8    fake_sound_state;
-
-/* protection */
-static UINT8    mk_prot_index;
-static UINT16   mk2_prot_data;
-
-static const UINT32 *nbajam_prot_table;
-static UINT16   nbajam_prot_queue[5];
-static UINT8    nbajam_prot_index;
-
-static const UINT8 *jdredd_prot_table;
-static UINT8    jdredd_prot_index;
-static UINT8    jdredd_prot_max;
-
-
-
 /*************************************
  *
  *  State saving
  *
  *************************************/
 
-static void register_state_saving(running_machine &machine)
+void midtunit_state::register_state_saving()
 {
-	state_save_register_global(machine, cmos_write_enable);
-	state_save_register_global(machine, fake_sound_state);
-	state_save_register_global(machine, mk_prot_index);
-	state_save_register_global(machine, mk2_prot_data);
-	state_save_register_global_array(machine, nbajam_prot_queue);
-	state_save_register_global(machine, nbajam_prot_index);
-	state_save_register_global(machine, jdredd_prot_index);
-	state_save_register_global(machine, jdredd_prot_max);
+	state_save_register_global(machine(), cmos_write_enable);
+	state_save_register_global(machine(), fake_sound_state);
+	state_save_register_global(machine(), mk_prot_index);
+	state_save_register_global(machine(), mk2_prot_data);
+	state_save_register_global_array(machine(), nbajam_prot_queue);
+	state_save_register_global(machine(), nbajam_prot_index);
+	state_save_register_global(machine(), jdredd_prot_index);
+	state_save_register_global(machine(), jdredd_prot_max);
 }
 
 
@@ -407,10 +386,10 @@ READ16_MEMBER(midtunit_state::jdredd_hack_r)
  *
  *************************************/
 
-static void init_tunit_generic(running_machine &machine, int sound)
+void midtunit_state::init_tunit_generic(int sound)
 {
 	/* register for state saving */
-	register_state_saving(machine);
+	register_state_saving();
 
 	/* load sound ROMs and set up sound handlers */
 	chip_type = sound;
@@ -421,7 +400,7 @@ static void init_tunit_generic(running_machine &machine, int sound)
 			break;
 
 		case SOUND_DCS:
-			dcs_init(machine);
+			dcs_init(machine());
 			break;
 	}
 
@@ -442,7 +421,7 @@ static void init_tunit_generic(running_machine &machine, int sound)
 DRIVER_INIT_MEMBER(midtunit_state,mktunit)
 {
 	/* common init */
-	init_tunit_generic(machine(), SOUND_ADPCM);
+	init_tunit_generic(SOUND_ADPCM);
 
 	/* protection */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b00000, 0x1b6ffff, read16_delegate(FUNC(midtunit_state::mk_prot_r),this), write16_delegate(FUNC(midtunit_state::mk_prot_w),this));
@@ -460,45 +439,44 @@ DRIVER_INIT_MEMBER(midtunit_state,mkturbo)
 }
 
 
-static void init_nbajam_common(running_machine &machine, int te_protection)
+void midtunit_state::init_nbajam_common(int te_protection)
 {
 	/* common init */
-	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
-	midtunit_state *state = machine.driver_data<midtunit_state>();
+	init_tunit_generic(SOUND_ADPCM_LARGE);
 	/* protection */
 	if (!te_protection)
 	{
 		nbajam_prot_table = nbajam_prot_values;
-		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b14020, 0x1b2503f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
 	}
 	else
 	{
 		nbajam_prot_table = nbajamte_prot_values;
-		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
-		state->m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),state), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),state));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b15f40, 0x1b37f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1b95f40, 0x1bb7f5f, read16_delegate(FUNC(midtunit_state::nbajam_prot_r),this), write16_delegate(FUNC(midtunit_state::nbajam_prot_w),this));
 	}
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		machine.device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
+		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbaa, 0xfbd4);
 	else
-		machine.device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
+		machine().device("adpcm:cpu")->memory().space(AS_PROGRAM).install_ram(0xfbec, 0xfc16);
 }
 
 DRIVER_INIT_MEMBER(midtunit_state,nbajam)
 {
-	init_nbajam_common(machine(), 0);
+	init_nbajam_common(0);
 }
 
 DRIVER_INIT_MEMBER(midtunit_state,nbajamte)
 {
-	init_nbajam_common(machine(), 1);
+	init_nbajam_common(1);
 }
 
 DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 {
 	/* common init */
-	init_tunit_generic(machine(), SOUND_ADPCM_LARGE);
+	init_tunit_generic(SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
 	m_maincpu->space(AS_PROGRAM).nop_write(0x01d81060, 0x01d8107f);
@@ -530,7 +508,7 @@ DRIVER_INIT_MEMBER(midtunit_state,jdreddp)
 DRIVER_INIT_MEMBER(midtunit_state,mk2)
 {
 	/* common init */
-	init_tunit_generic(machine(), SOUND_DCS);
+	init_tunit_generic(SOUND_DCS);
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */

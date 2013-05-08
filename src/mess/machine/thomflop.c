@@ -340,7 +340,7 @@ void thomson_state::to7_5p14_reset()
 void thomson_state::to7_5p14_init()
 {
 	LOG(( "to7_5p14_init: CD 90-640 controller\n" ));
-	state_save_register_global( machine(), to7_5p14_select );
+	state_save_register_global(machine(), to7_5p14_select );
 }
 
 
@@ -447,7 +447,7 @@ const mc6843_interface to7_6843_itf = { NULL };
 void thomson_state::to7_5p14sd_init()
 {
 	LOG(( "to7_5p14sd_init: CD 90-015 controller\n" ));
-	state_save_register_global( machine(), to7_5p14sd_select );
+	state_save_register_global(machine(), to7_5p14sd_select );
 }
 
 
@@ -858,17 +858,17 @@ void thomson_state::to7_qdd_init()
 
 	to7qdd = auto_alloc(machine(), to7qdd_t);
 
-	state_save_register_global( machine(), to7qdd->status );
-	state_save_register_global( machine(), to7qdd->ctrl1 );
-	state_save_register_global( machine(), to7qdd->ctrl2 );
-	state_save_register_global( machine(), to7qdd->ctrl3 );
-	state_save_register_global( machine(), to7qdd->drive );
-	state_save_register_global( machine(), to7qdd->data_idx );
-	state_save_register_global( machine(), to7qdd->start_idx );
-	state_save_register_global( machine(), to7qdd->data_size );
-	state_save_register_global( machine(), to7qdd->data_crc );
-	state_save_register_global( machine(), to7qdd->index_pulse );
-	state_save_register_global_array( machine(), to7qdd->data );
+	state_save_register_global(machine(), to7qdd->status );
+	state_save_register_global(machine(), to7qdd->ctrl1 );
+	state_save_register_global(machine(), to7qdd->ctrl2 );
+	state_save_register_global(machine(), to7qdd->ctrl3 );
+	state_save_register_global(machine(), to7qdd->drive );
+	state_save_register_global(machine(), to7qdd->data_idx );
+	state_save_register_global(machine(), to7qdd->start_idx );
+	state_save_register_global(machine(), to7qdd->data_size );
+	state_save_register_global(machine(), to7qdd->data_crc );
+	state_save_register_global(machine(), to7qdd->index_pulse );
+	state_save_register_global_array(machine(), to7qdd->data );
 }
 
 
@@ -1554,24 +1554,24 @@ void thomson_state::thmfc_floppy_init()
 
 	thmfc_floppy_cmd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thmfc_floppy_cmd_complete_cb),this));
 
-	state_save_register_global( machine(), thmfc1->op );
-	state_save_register_global( machine(), thmfc1->sector );
-	state_save_register_global( machine(), thmfc1->sector_id );
-	state_save_register_global( machine(), thmfc1->track );
-	state_save_register_global( machine(), thmfc1->side );
-	state_save_register_global( machine(), thmfc1->drive );
-	state_save_register_global( machine(), thmfc1->sector_size );
-	state_save_register_global( machine(), thmfc1->formatting );
-	state_save_register_global( machine(), thmfc1->ipl );
-	state_save_register_global( machine(), thmfc1->data_idx );
-	state_save_register_global( machine(), thmfc1->data_size );
-	state_save_register_global( machine(), thmfc1->data_finish );
-	state_save_register_global( machine(), thmfc1->stat0 );
-	state_save_register_global( machine(), thmfc1->data_raw_idx );
-	state_save_register_global( machine(), thmfc1->data_raw_size );
-	state_save_register_global( machine(), thmfc1->data_crc );
-	state_save_register_global( machine(), thmfc1->wsync );
-	state_save_register_global_array( machine(), thmfc1->data );
+	state_save_register_global(machine(), thmfc1->op );
+	state_save_register_global(machine(), thmfc1->sector );
+	state_save_register_global(machine(), thmfc1->sector_id );
+	state_save_register_global(machine(), thmfc1->track );
+	state_save_register_global(machine(), thmfc1->side );
+	state_save_register_global(machine(), thmfc1->drive );
+	state_save_register_global(machine(), thmfc1->sector_size );
+	state_save_register_global(machine(), thmfc1->formatting );
+	state_save_register_global(machine(), thmfc1->ipl );
+	state_save_register_global(machine(), thmfc1->data_idx );
+	state_save_register_global(machine(), thmfc1->data_size );
+	state_save_register_global(machine(), thmfc1->data_finish );
+	state_save_register_global(machine(), thmfc1->stat0 );
+	state_save_register_global(machine(), thmfc1->data_raw_idx );
+	state_save_register_global(machine(), thmfc1->data_raw_size );
+	state_save_register_global(machine(), thmfc1->data_crc );
+	state_save_register_global(machine(), thmfc1->wsync );
+	state_save_register_global_array(machine(), thmfc1->data );
 }
 
 
@@ -1752,8 +1752,8 @@ UINT8 to7_floppy_bank;
 void thomson_state::to7_floppy_init( void* base )
 {
 	membank( THOM_FLOP_BANK )->configure_entries( 0, TO7_NB_FLOP_BANK, base, 0x800 );
-	state_save_register_global( machine(), to7_controller_type );
-	state_save_register_global( machine(), to7_floppy_bank );
+	state_save_register_global(machine(), to7_controller_type );
+	state_save_register_global(machine(), to7_floppy_bank );
 	to7_5p14sd_init();
 	to7_5p14_init();
 	to7_qdd_init();

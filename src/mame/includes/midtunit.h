@@ -68,6 +68,29 @@ public:
 	DECLARE_VIDEO_START(midtunit);
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	required_device<cpu_device> m_maincpu;
+	void register_state_saving();
+	void init_tunit_generic(int sound);
+	void init_nbajam_common(int te_protection);
+	
+	/* CMOS-related variables */
+	UINT8    cmos_write_enable;
+
+	/* sound-related variables */
+	UINT8    chip_type;
+	UINT8    fake_sound_state;
+
+	/* protection */
+	UINT8    mk_prot_index;
+	UINT16   mk2_prot_data;
+
+	const UINT32 *nbajam_prot_table;
+	UINT16   nbajam_prot_queue[5];
+	UINT8    nbajam_prot_index;
+
+	const UINT8 *jdredd_prot_table;
+	UINT8    jdredd_prot_index;
+	UINT8    jdredd_prot_max;
+	
 };
 /*----------- defined in video/midtunit.c -----------*/
 extern UINT8 midtunit_gfx_rom_large;
