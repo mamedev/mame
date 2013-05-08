@@ -134,7 +134,7 @@
 
 	<software name="ainvader">
 		<description>Model A Invaders</description>
-		<year>19??</year>
+		<year>1982</year>
 		<publisher>I.J.K.</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5509">
@@ -150,6 +150,50 @@
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="1650">
 				<rom name="munchyman(1981)(micropower).uef" size="1650" crc="1eb418a1" sha1="2da3a559253ac210dc75824e6dbdd34957680e84" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystad1">
+		<description>Mysterious Adventure 1 - The Golden Baton</description>
+		<year>1981</year>
+		<publisher>Adventure Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8932">
+				<rom name="mystadv1-goldenbaton(1981)(adventuresoft).uef" size="8932" crc="551fae00" sha1="59429ccd78a7135ba924496e7a540ae6472f0fe4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystad2">
+		<description>Mysterious Adventure 2 - The Time Machine</description>
+		<year>1981</year>
+		<publisher>Adventure Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="9067">
+				<rom name="mystadv2-timemachine(1981)(adventuresoft).uef" size="9067" crc="7a49561a" sha1="acb05f5713bb26312083d3052a27b56a79f17300" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystad3">
+		<description>Mysterious Adventure 3 - Arrow of Death pt.1</description>
+		<year>1981</year>
+		<publisher>Adventure Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8745">
+				<rom name="mystadv3-arrowofdeath(1981)(adventuresoft).uef" size="8745" crc="9420a55b" sha1="6b2dce306971de28955876eca709ab988abd6bd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mystad4">
+		<description>Mysterious Adventure 4 - Arrow of Death pt.2</description>
+		<year>1982</year>
+		<publisher>Adventure Soft</publisher>
+		<part name="cass" interface="bbc_cass">
+			<dataarea name="cass" size="8858">
+				<rom name="mystadv4-arrowofdeath2(1982)(adventuresoft).uef" size="8858" crc="f895c7e8" sha1="d3ec5ef7f4f744e069ab951b98a4a7dcaaa89f06" offset="0" />
 			</dataarea>
 		</part>
 	</software>
