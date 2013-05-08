@@ -258,8 +258,8 @@ MACHINE_CONFIG_END
 static SOUND_START( astrob )
 {
 	segag80r_state *state = machine.driver_data<segag80r_state>();
-	machine.save().save_item(NAME(state->m_sound_state));
-	machine.save().save_item(NAME(state->m_sound_rate));
+	state->save_item(NAME(state->m_sound_state));
+	state->save_item(NAME(state->m_sound_rate));
 }
 
 

@@ -75,16 +75,16 @@ static SOUND_START( generic )
 {
 	cinemat_state *state = machine.driver_data<cinemat_state>();
 	/* register for save states */
-	machine.save().save_item(NAME(state->m_sound_control));
-	machine.save().save_item(NAME(state->m_current_shift));
-	machine.save().save_item(NAME(state->m_last_shift));
-	machine.save().save_item(NAME(state->m_last_shift2));
-	machine.save().save_item(NAME(state->m_current_pitch));
-	machine.save().save_item(NAME(state->m_last_frame));
-	machine.save().save_item(NAME(state->m_sound_fifo));
-	machine.save().save_item(NAME(state->m_sound_fifo_in));
-	machine.save().save_item(NAME(state->m_sound_fifo_out));
-	machine.save().save_item(NAME(state->m_last_portb_write));
+	state->save_item(NAME(state->m_sound_control));
+	state->save_item(NAME(state->m_current_shift));
+	state->save_item(NAME(state->m_last_shift));
+	state->save_item(NAME(state->m_last_shift2));
+	state->save_item(NAME(state->m_current_pitch));
+	state->save_item(NAME(state->m_last_frame));
+	state->save_item(NAME(state->m_sound_fifo));
+	state->save_item(NAME(state->m_sound_fifo_in));
+	state->save_item(NAME(state->m_sound_fifo_out));
+	state->save_item(NAME(state->m_last_portb_write));
 }
 
 
