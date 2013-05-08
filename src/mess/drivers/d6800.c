@@ -11,12 +11,16 @@
     NOTE that the display only updates after each 4 digits is entered, and
     you can't see what you type as you change bytes. This is by design.
 
+    The cassette has no checksum, header or blocks. It is simply a stream
+    of pulses. The successful loading of a tape is therefore a matter of luck.
+
     Function keys:
     FN 0 - Modify memory - firstly enter a 4-digit address, then 2-digit data
                     the address will increment by itself, enter the next byte.
                     FN by itself will step to the next address.
 
-    FN 1 - Tape load
+    FN 1 - Tape load. You must have entered the start address at 0002, and
+           the end address+1 at 0004 (big-endian).
 
     FN 2 - Tape save. You must have entered the start address at 0002, and
            the end address+1 at 0004 (big-endian).
@@ -28,9 +32,6 @@
 
     Information and programs can be found at http://chip8.com/?page=78
 
-
-    TODO:
-    - Cassette
 
 */
 
@@ -73,6 +74,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( d6800_rtc_pulse );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
 	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
 protected:
@@ -96,7 +98,7 @@ private:
 	bool m_ca2;
 	bool m_cb1;
 	bool m_cb2;
-	UINT8 m_cass_data[3];
+	UINT8 m_cass_data[4];
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -208,8 +210,19 @@ UINT32 d6800_state::screen_update_d6800(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-/* PIA6821 Interface */
+/* NE556 */
 
+TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_c)
+{
+	m_cass_data[3]++;
+
+	if (BIT(m_portb, 0))
+		m_cass->output(BIT(m_cass_data[3], 0) ? -1.0 : +1.0); // 2400Hz
+	else
+		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
+}
+
+/* PIA6821 Interface */
 
 TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 {
@@ -233,7 +246,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(d6800_state::d6800_p)
 	if (cass_ws != m_cass_data[0])
 	{
 		m_cass_data[0] = cass_ws;
-		m_cass_data[2] = ((m_cass_data[1] < 12) ? 0 : 128);
+		m_cass_data[2] = ((m_cass_data[1] < 12) ? 128 : 0);
 		m_cass_data[1] = 0;
 	}
 }
@@ -280,7 +293,6 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
         are in progress (DMA/CB2 line low).
 	*/
 
-	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 	m_beeper->set_frequency(BIT(data, 0) ? 2400 : 1200);
 	m_beeper->set_state(BIT(data, 6) & m_cb2);
 
@@ -348,6 +360,7 @@ void d6800_state::machine_reset()
 	m_cass_data[0] = 0;
 	m_cass_data[1] = 0;
 	m_cass_data[2] = 128;
+	m_cass_data[3] = 0;
 }
 
 /* Machine Drivers */
@@ -433,6 +446,7 @@ static MACHINE_CONFIG_START( d6800, d6800_state )
 	/* devices */
 	MCFG_PIA6821_ADD("pia", d6800_mc6821_intf)
 	MCFG_CASSETTE_ADD("cassette", d6800_cassette_interface)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_c", d6800_state, d6800_c, attotime::from_hz(4800))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("d6800_p", d6800_state, d6800_p, attotime::from_hz(40000))
 
 	/* quickload */
@@ -451,4 +465,4 @@ ROM_START( d6800 )
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS,          INIT      COMPANY        FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", GAME_NOT_WORKING )
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", 0 )
