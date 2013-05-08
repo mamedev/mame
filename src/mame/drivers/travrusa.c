@@ -506,7 +506,7 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 
 GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,        ROT270, "Irem", "Traverse USA / Zippy Race", GAME_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,        ROT270, "Bootleg", "Traverse USA (I.P. - American Top Bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,        ROT270, "bootleg (I.P.)", "Traverse USA (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", GAME_SUPPORTS_SAVE )
 GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu", "Shot Rider", GAME_SUPPORTS_SAVE )
 GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", GAME_SUPPORTS_SAVE )
