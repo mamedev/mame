@@ -125,7 +125,7 @@ void MainWindow::setProcessor(device_t* processor)
 void MainWindow::closeEvent(QCloseEvent* event)
 {
 	debugActQuit();
-
+	
 	// Insure the window doesn't disappear before we get a chance to save its parameters
 	event->ignore();
 }

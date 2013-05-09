@@ -204,7 +204,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 	if (type == VIEW_NOTIFY_CURSOR_CHANGED)
 	{
 		// normalize the cursor
-		set_cursor_pos(get_cursor_pos());
+		set_cursor_pos(get_cursor_pos(m_cursor));
 	}
 	else if (type == VIEW_NOTIFY_SOURCE_CHANGED)
 	{
@@ -315,7 +315,7 @@ void debug_view_memory::view_update()
 void debug_view_memory::view_char(int chval)
 {
 	// get the position
-	cursor_pos pos = get_cursor_pos();
+	cursor_pos pos = get_cursor_pos(m_cursor);
 
 	// handle the incoming key
 	switch (chval)
@@ -437,7 +437,7 @@ void debug_view_memory::view_click(const int button, const debug_view_xy& pos)
 
 	/* cursor popup|toggle */
 	bool cursorVisible = true;
-	if (m_cursor.y == origcursor.y)
+	if (m_cursor.y == origcursor.y && m_cursor.x == origcursor.x)
 	{
 		cursorVisible = !m_cursor_visible;
 	}
@@ -461,7 +461,7 @@ void debug_view_memory::recompute()
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	// get the current cursor position
-	cursor_pos pos = get_cursor_pos();
+	cursor_pos pos = get_cursor_pos(m_cursor);
 
 	// determine the maximum address and address format string from the raw information
 	int addrchars;
@@ -565,15 +565,15 @@ bool debug_view_memory::needs_recompute()
 //  an address and a shift value
 //-------------------------------------------------
 
-debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos()
+debug_view_memory::cursor_pos debug_view_memory::get_cursor_pos(const debug_view_xy& cursor)
 {
 	// start with the base address for this row
 	cursor_pos pos;
-	pos.m_address = m_byte_offset + m_cursor.y * m_bytes_per_chunk * m_chunks_per_row;
+	pos.m_address = m_byte_offset + cursor.y * m_bytes_per_chunk * m_chunks_per_row;
 
 	// determine the X position within the middle section, clamping as necessary
 	const memory_view_pos &posdata = s_memory_pos_table[m_bytes_per_chunk];
-	int xposition = m_cursor.x - m_section[1].m_pos - 1;
+	int xposition = cursor.x - m_section[1].m_pos - 1;
 	if (xposition < 0)
 		xposition = 0;
 	else if (xposition >= posdata.m_spacing * m_chunks_per_row)

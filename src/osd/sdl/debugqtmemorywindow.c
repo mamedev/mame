@@ -35,9 +35,7 @@ MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	connect(m_memoryComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(memoryRegionChanged(int)));
 
 	// The main memory window
-	m_memTable = new DebuggerView(DVT_MEMORY,
-									m_machine,
-									this);
+	m_memTable = new DebuggerMemView(DVT_MEMORY, m_machine, this);
 
 	// Layout
 	QHBoxLayout* subLayout = new QHBoxLayout(topSubFrame);
@@ -261,6 +259,65 @@ QAction* MemoryWindow::chunkSizeMenuItem(const QString& itemName)
 		}
 	}
 	return NULL;
+}
+
+
+//=========================================================================
+//  DebuggerMemView
+//=========================================================================
+void DebuggerMemView::mousePressEvent(QMouseEvent* event)
+{
+	const bool leftClick = event->button() == Qt::LeftButton;
+	const bool rightClick = event->button() == Qt::RightButton;
+
+	if (leftClick || rightClick)
+	{
+		QFontMetrics actualFont = fontMetrics();
+		const int fontWidth = MAX(1, actualFont.width('_'));
+		const int fontHeight = MAX(1, actualFont.height());
+
+		debug_view_xy topLeft = view()->visible_position();
+		debug_view_xy clickViewPosition;
+		clickViewPosition.x = topLeft.x + (event->x() / fontWidth);
+		clickViewPosition.y = topLeft.y + (event->y() / fontHeight);
+		if (leftClick)
+		{
+			view()->process_click(DCK_LEFT_CLICK, clickViewPosition);
+		}
+		else if (rightClick)
+		{
+			// Display the last known PC to write to this memory location & copy it onto the clipboard
+			debug_view_memory* memView = downcast<debug_view_memory*>(view());
+			const offs_t address = memView->addressAtCursorPosition(clickViewPosition);
+			const debug_view_memory_source* source = downcast<const debug_view_memory_source*>(memView->source());
+			address_space* addressSpace = source->space();
+			const int nativeDataWidth = addressSpace->data_width() / 8;
+			const UINT64 memValue = debug_read_memory(*addressSpace,
+													  addressSpace->address_to_byte(address),
+													  nativeDataWidth,
+													  true);
+			const offs_t pc = source->device()->debug()->track_mem_pc_from_space_address_data(addressSpace->spacenum(), 
+																							  address, 
+																							  memValue);
+			if (pc != (offs_t)(-1))
+			{
+				// TODO: You can specify a box that the tooltip stays alive within - might be good?
+				const QString addressAndPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
+				QToolTip::showText(QCursor::pos(), addressAndPc, NULL);
+				
+				// Copy the PC into the clipboard as well
+				QClipboard *clipboard = QApplication::clipboard();
+				clipboard->setText(QString("%1").arg(pc, 2, 16));
+			}
+			else
+			{
+				QToolTip::showText(QCursor::pos(), "UNKNOWN PC", NULL);
+			}
+		}
+
+		viewport()->update();
+		update();
+	}
 }
 
 

@@ -88,7 +88,12 @@ static const help_item static_help_list[] =
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
 		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes.\n"
-		"  trackpc [<bool>,<cpu>,<bool>] -- toggle to visually track visited opcodes [for the given cpu [& clear]].\n"
+		"  trackpc [<bool>,<cpu>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear].\n"
+		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear].\n"
+		"  pcatmemp <address>[,<cpu>] -- query which PC wrote to a given program memory address for the current CPU.\n"
+		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU.\n"
+		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU.\n"
+		"                                (Note: you can also query this info by right clicking in a memory window.\n"
 		"  snap [<filename>] -- save a screen snapshot\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
 		"  quit -- exits MAME and the debugger\n"
@@ -391,8 +396,43 @@ static const help_item static_help_list[] =
 		"trackpc 1\n"
 		"  Begin tracking the current cpu's pc.\n"
 		"\n"
-		"trackpc 1, 0, 0\n"
+		"trackpc 1, 0, 1\n"
 		"  Continue tracking pc on cpu 0, but clear existing track info.\n"
+	},
+	{
+		"trackmem",
+		"\n"
+		"  trackmem [<bool>,<cpu>,<bool>]\n"
+		"\n"
+		"The trackmem command logs the PC at each time a memory address is written to.  "
+		"The first boolean argument toggles the process on and off.  The second argument is a cpu "
+		"selector; if no cpu is specified, the current cpu is automatically selected. The third argument "
+		" is a boolean denoting if the existing data should be cleared or not.  Please refer to the "
+		"pcatmem command for information on how to retrieve this data.  Also, right clicking in "
+		"a memory window will display the logged PC for the given address.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"trackmem\n"
+		"  Begin tracking the current CPU's pc.\n"
+		"\n"
+		"trackmem 1, 0, 1\n"
+		"  Continue tracking memory writes on cpu 0, but clear existing track info.\n"
+	},
+	{
+		"pcatmem",
+		"\n"
+		"  pcatmem(p/d/i) <address>[,<cpu>]\n"
+		"\n"
+		"The pcatmem command returns which PC wrote to a given memory address for the current CPU. "
+		"The first argument is the requested address.  The second argument is a cpu selector; if no "
+		"cpu is specified, the current cpu is automatically selected.  Right clicking in a memory window "
+		"will also display the logged PC for the given address.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"pcatmem 400000\n"
+		"  Print which PC wrote this CPU's memory location 0x400000.\n"
 	},
 	{
 		"snap",

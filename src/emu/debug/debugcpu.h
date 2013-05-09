@@ -156,7 +156,7 @@ public:
 		// internals
 		bool hit();
 
-		registerpoint *    m_next;                     // next in the list
+		registerpoint *     m_next;                     // next in the list
 		int                 m_index;                    // user reported index
 		UINT8               m_enabled;                  // enabled?
 		parsed_expression   m_condition;                // condition
@@ -258,6 +258,13 @@ public:
 	void set_track_pc_visited(const offs_t& pc);
 	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
+	// memory tracking
+	void set_track_mem(bool value) { m_track_mem = value; }
+	offs_t track_mem_pc_from_space_address_data(const address_spacenum& space,
+												const offs_t& address, 
+												const UINT64& data) const;
+	void track_mem_data_clear() { m_track_mem_set.clear(); }
+
 	// tracing
 	void trace(FILE *file, bool trace_over, const char *action);
 	void trace_printf(const char *fmt, ...);
@@ -298,8 +305,8 @@ private:
 	device_disasm_interface *  m_disasm;                // disasm interface, if present
 
 	// global state
-	UINT32                  m_flags;                    // debugging flags for this CPU
-	symbol_table            m_symtable;                 // symbol table for expression evaluation
+	UINT32                      m_flags;                // debugging flags for this CPU
+	symbol_table                m_symtable;             // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
 	// disassembly
@@ -377,11 +384,11 @@ private:
 		bool operator < (const dasm_pc_tag& rhs) const
 		{
 			if (m_address == rhs.m_address)
-					return m_crc < rhs.m_crc;
+				return m_crc < rhs.m_crc;
 			return (m_address < rhs.m_address);
 		}
 
-		offs_t m_address;
+		offs_t m_address;       // Stores [nothing] for a given address & crc32
 		UINT32 m_crc;
 	};
 	simple_set<dasm_pc_tag> m_track_pc_set;
@@ -393,11 +400,37 @@ private:
 	public:
 		dasm_comment(offs_t address, UINT32 crc, const char *text, rgb_t color);
 
-		astring  m_text;                     // comment text
-		rgb_t    m_color;                    // comment color
+		astring  m_text;        // Stores comment text & color for a given address & crc32
+		rgb_t    m_color;
 	};
 	simple_set<dasm_comment> m_comment_set;             // collection of comments
 	UINT32                   m_comment_change;          // change counter for comments
+
+	// memory tracking
+	class dasm_memory_access
+	{
+	public:
+		dasm_memory_access(const address_spacenum& address_space, 
+                           const offs_t& address, 
+                           const UINT64& data, 
+                           const offs_t& pc);
+
+		// required to be included in a simple_set
+		bool operator < (const dasm_memory_access& rhs) const
+		{
+			if ((m_address == rhs.m_address) && (m_address_space == rhs.m_address_space))
+				return m_data < rhs.m_data;
+			return (m_address < rhs.m_address) && (m_address_space == rhs.m_address_space);
+		}
+
+		// Stores the PC for a given address, memory region, and data value
+		address_spacenum m_address_space;
+		offs_t           m_address;
+		UINT64           m_data;
+		offs_t           m_pc;
+	};
+	simple_set<dasm_memory_access> m_track_mem_set;
+	bool m_track_mem;
 
 	// internal flag values
 	static const UINT32 DEBUG_FLAG_OBSERVING        = 0x00000001;       // observing this CPU

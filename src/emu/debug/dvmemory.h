@@ -87,6 +87,7 @@ public:
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
+	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
 	void set_expression(const char *expression);
@@ -117,9 +118,9 @@ private:
 	bool needs_recompute();
 
 	// cursor position management
-	cursor_pos get_cursor_pos();
+	cursor_pos get_cursor_pos(const debug_view_xy& cursor);
 	void set_cursor_pos(cursor_pos pos);
-	cursor_pos begin_update_and_get_cursor_pos() { begin_update(); return get_cursor_pos(); }
+	cursor_pos begin_update_and_get_cursor_pos() { begin_update(); return get_cursor_pos(m_cursor); }
 	void end_update_and_set_cursor_pos(cursor_pos pos) { set_cursor_pos(pos); end_update(); }
 
 	// memory access

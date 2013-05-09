@@ -6,6 +6,8 @@
 #include "debugqtview.h"
 #include "debugqtwindow.h"
 
+class DebuggerMemView;
+
 
 //============================================================
 //  The Memory Window.
@@ -39,7 +41,25 @@ private:
 	// Widgets
 	QLineEdit* m_inputEdit;
 	QComboBox* m_memoryComboBox;
-	DebuggerView* m_memTable;
+	DebuggerMemView* m_memTable;
+};
+
+
+//=========================================================================
+//  The mem window gets its own debugger view to handle right click pop-ups
+//=========================================================================
+class DebuggerMemView : public DebuggerView
+{
+public:
+	DebuggerMemView(const debug_view_type& type,
+					running_machine* machine,
+					QWidget* parent=NULL)
+		: DebuggerView(type, machine, parent) 
+	{}
+	virtual ~DebuggerMemView() {}
+    
+protected:
+	void mousePressEvent(QMouseEvent* event);
 };
 
 
@@ -59,13 +79,13 @@ public:
 	}
 
 	~MemoryWindowQtConfig() {}
-
+	
 	// Settings
 	int m_reverse;
 	int m_addressMode;
 	int m_chunkSize;
 	int m_memoryRegion;
-
+	
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
 	void addToXmlDataNode(xml_data_node* node) const;
