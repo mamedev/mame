@@ -1476,7 +1476,7 @@ READ8_MEMBER(nes_bmc_gb63_device::read_h)
 	//  m_dipsetting = ioport("CARTDIPS")->read();
 
 	if (m_latch == 1)
-		return (offset & 0xff00) >> 8;    // open bus
+		return m_open_bus;    // open bus
 	else
 		return hi_access_rom(offset);
 }
@@ -2458,7 +2458,7 @@ READ8_MEMBER(nes_bmc_gold150_device::read_h)
 	LOG_MMC(("bmc_gold150 read_h, offset: %04x\n", offset));
 
 	if (m_latch)    // open bus
-		return (offset & 0xff00) >> 8;
+		return m_open_bus;
 	else
 		return hi_access_rom(offset);
 }
@@ -2511,7 +2511,7 @@ READ8_MEMBER(nes_bmc_ch001_device::read_h)
 	LOG_MMC(("bmc_ch001 read_h, offset: %04x\n", offset));
 
 	if (m_latch && offset < 0x4000) // open bus
-		return (offset & 0xff00) >> 8;
+		return m_open_bus;
 	else
 		return hi_access_rom(offset);
 }

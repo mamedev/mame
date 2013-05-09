@@ -283,7 +283,7 @@ READ8_MEMBER(nes_jy_typea_device::read_l)
 		if ((offset & 3) == 3)
 			return m_latch;
 	}
-	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 WRITE8_MEMBER(nes_jy_typea_device::write_l)
@@ -310,7 +310,7 @@ READ8_MEMBER(nes_jy_typea_device::read_m)
 	if (m_reg[0] & 0x80)
 		return m_prg[(m_bank_6000 & m_prg_mask) * 0x2000 + (offset & 0x1fff)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 

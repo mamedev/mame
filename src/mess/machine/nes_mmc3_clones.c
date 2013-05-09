@@ -444,10 +444,10 @@ void nes_a9746_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	mmc3_common_initialize(0x7f, 0xff, 0);
 	m_reg[0] = 0;
 	m_reg[1] = 0;
 	m_reg[2] = 0;
+	mmc3_common_initialize(0x7f, 0xff, 0);
 }
 
 void nes_fk23c_device::device_start()
@@ -1797,7 +1797,7 @@ READ8_MEMBER( nes_sachen_shero_device::read_l )
 	{
 		// DSW read!
 	}
-	return (offset & 0xff00) >> 8;  // open bus
+	return m_open_bus;  // open bus
 }
 
 

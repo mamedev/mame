@@ -340,7 +340,7 @@ READ8_MEMBER(nes_txrom_device::read_m)
 			return m_prgram[offset & (m_prgram_size - 1)];
 	}
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 
@@ -376,10 +376,10 @@ READ8_MEMBER(nes_hkrom_device::read_m)
 	LOG_MMC(("hkrom read_m, offset: %04x\n", offset));
 
 	if (offset < 0x1000)
-		return 0xff;    // here it should be open bus
+		return m_open_bus;    // open bus
 
 	if (!(m_mmc6_reg & 0xa0))
-		return 0xff;    // here it should be open bus
+		return m_open_bus;    // open bus
 
 	if (BIT(offset, 9) && BIT(m_mmc6_reg, 7))   // access to upper half of 1k when upper read is enabled
 		return m_mmc6_ram[offset & 0x3ff];

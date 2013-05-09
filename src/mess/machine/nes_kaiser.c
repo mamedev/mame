@@ -476,7 +476,7 @@ READ8_MEMBER(nes_ks7017_device::read_ex)
 		return temp;
 	}
 
-	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 /*-------------------------------------------------

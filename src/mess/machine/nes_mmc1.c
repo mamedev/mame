@@ -293,7 +293,7 @@ READ8_MEMBER(nes_sxrom_device::read_m)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)];
 	}
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 // SOROM has two RAM banks, the first is not battery backed up, the second is.
@@ -324,7 +324,7 @@ READ8_MEMBER(nes_sorom_device::read_m)
 			return m_prgram[offset & (m_prgram_size - 1)];
 	}
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 // MMC1A boards have no wram enable/disable bit
@@ -349,7 +349,7 @@ READ8_MEMBER(nes_sxrom_a_device::read_m)
 	if (m_prgram)
 		return m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 WRITE8_MEMBER(nes_sorom_a_device::write_m)

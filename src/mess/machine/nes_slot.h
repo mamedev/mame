@@ -192,6 +192,7 @@ public:
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
+	void set_open_bus(UINT8 val) { m_open_bus = val; }
 
 	UINT8* get_prg_base() { return m_prg; }
 	UINT8* get_prgram_base() { return m_prgram; }
@@ -252,6 +253,7 @@ protected:
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
 	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
 	bool m_bus_conflict;
+	UINT8 m_open_bus;
 
 	// PRG
 	inline int prg_8k_bank_num(int bank);

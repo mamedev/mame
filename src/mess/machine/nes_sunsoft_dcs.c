@@ -231,7 +231,7 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_h)
 		if (m_timer_on)
 			return m_subslot->m_cart->read(space, offset, mem_mask);
 		else
-			return ((offset + 0x8000) & 0xff00) >> 8;   // after the timer is off, this returns open bus...
+			return m_open_bus;   // after the timer is off, this returns open bus...
 	}
 	else
 		return hi_access_rom(offset);
@@ -262,7 +262,7 @@ READ8_MEMBER(nes_sunsoft_dcs_device::read_m)
 	if (m_prgram && m_wram_enable)
 		return m_prgram[offset & (m_prgram_size - 1)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 //-------------------------------------------------

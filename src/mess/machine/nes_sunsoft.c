@@ -443,7 +443,7 @@ READ8_MEMBER(nes_sunsoft_4_device::read_m)
 	if (m_prgram && m_wram_enable)
 		return m_prgram[offset & (m_prgram_size - 1)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 /*-------------------------------------------------
@@ -564,7 +564,7 @@ READ8_MEMBER(nes_sunsoft_fme7_device::read_m)
 			return m_prgram[((bank * 0x2000) + offset) & (m_prgram_size - 1)];
 	}
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 

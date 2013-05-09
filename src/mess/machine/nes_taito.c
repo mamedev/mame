@@ -366,7 +366,7 @@ READ8_MEMBER(nes_x1_005_device::read_m)
 	if (offset >= 0x1f00 && m_latch == 0xa3)
 		return m_x1_005_ram[offset & 0x7f];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 /*-------------------------------------------------
@@ -469,5 +469,5 @@ READ8_MEMBER(nes_x1_017_device::read_m)
 	if (offset < 0x1400 && m_reg[2] == 0x84)
 		return m_x1_017_ram[0x1000 + (offset & 0x3ff)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }

@@ -1384,6 +1384,6 @@ READ8_MEMBER(nes_fujiya_device::read_m)
 	if (offset == 0x7001 || offset == 0x7777)
 		return m_latch | ((offset >> 8) & 0x7f);
 
-	return (offset & 0xff00) >> 8;  // open bus
+	return m_open_bus;  // open bus
 }
 #endif

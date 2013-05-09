@@ -969,7 +969,7 @@ READ8_MEMBER(nes_smb2j_device::read_l)
 	if (offset >= 0x1000)
 		return m_prg[0x10000 + (offset & 0x0fff)];
 
-	return ((offset + 0x4000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 READ8_MEMBER(nes_smb2j_device::read_m)

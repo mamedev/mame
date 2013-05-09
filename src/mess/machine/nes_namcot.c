@@ -520,7 +520,7 @@ READ8_MEMBER(nes_namcot175_device::read_m)
 	if (m_battery && offset < m_battery_size && m_wram_enable)
 		return m_battery[offset & (m_battery_size - 1)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 WRITE8_MEMBER(nes_namcot175_device::write_m)
@@ -602,7 +602,7 @@ READ8_MEMBER(nes_namcot163_device::read_m)
 	if (m_battery && offset < m_battery_size)
 		return m_battery[offset & (m_battery_size - 1)];
 
-	return ((offset + 0x6000) & 0xff00) >> 8;   // open bus
+	return m_open_bus;   // open bus
 }
 
 WRITE8_MEMBER(nes_namcot163_device::write_m)

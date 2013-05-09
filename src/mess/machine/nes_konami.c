@@ -295,7 +295,7 @@ READ8_MEMBER(nes_konami_vrc2_device::read_m)
 	else if (m_prgram)
 		return m_prgram[offset & (m_prgram_size - 1)];
 	else    // sort of protection? it returns open bus in $7000-$7fff and (open bus & 0xfe) | m_latch in $6000-$6fff
-		return (offset < 0x1000) ? ((((offset + 0x8000) & 0xfe00) >> 8) | (m_latch & 1)) : (((offset + 0x8000) & 0xff00) >> 8);
+		return (offset < 0x1000) ? ((m_open_bus & 0xfe) | (m_latch & 1)) : m_open_bus;
 }
 
 WRITE8_MEMBER(nes_konami_vrc2_device::write_m)
@@ -602,9 +602,7 @@ WRITE8_MEMBER(nes_konami_vrc6_device::write_h)
 				}
 			}
 			else    // saw
-			{
 				m_vrc6snd->write(space, (add_lines>>8) | 0x200, data);
-			}
 			break;
 		case 0x5000:
 		case 0x6000:
