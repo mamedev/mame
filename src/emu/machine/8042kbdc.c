@@ -245,6 +245,7 @@ void kbdc8042_device::device_start()
 	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(kbdc8042_device::kbdc8042_time),this));
 	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(1);
+	m_operation_write_state = 0; /* first write to 0x60 might occur before anything can set this */
 }
 
 /*-------------------------------------------------
