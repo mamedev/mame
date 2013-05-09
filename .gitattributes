@@ -4825,7 +4825,6 @@ src/mame/layout/slots.lay svneol=native#text/plain
 src/mame/layout/sltblgpo.lay svneol=native#text/plain
 src/mame/layout/sltblgtk.lay svneol=native#text/plain
 src/mame/layout/smoto.lay svneol=native#text/plain
-src/mame/layout/sms1.lay svneol=native#text/plain
 src/mame/layout/snookr10.lay svneol=native#text/plain
 src/mame/layout/solarq.lay svneol=native#text/plain
 src/mame/layout/sos.lay svneol=native#text/plain

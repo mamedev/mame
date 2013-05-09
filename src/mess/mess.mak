@@ -2252,7 +2252,6 @@ $(MESS_DRIVERS)/chesstrv.o: $(MESS_LAYOUT)/chesstrv.lh \
 							$(MESS_LAYOUT)/borisdpl.lh
 $(MESS_DRIVERS)/cp1.o:      $(MESS_LAYOUT)/cp1.lh
 $(MESS_DRIVERS)/cvicny.o:   $(MESS_LAYOUT)/cvicny.lh
-$(MESS_DRIVERS)/coco.o:     $(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/coco3.o:    $(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o: $(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:      $(MESS_LAYOUT)/c80.lh
@@ -2287,7 +2286,6 @@ $(MESS_DRIVERS)/megadriv.o: $(MAME_LAYOUT)/megacd.lh
 $(MESS_DRIVERS)/mekd2.o:    $(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o: $(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/merlin.o:   $(MESS_LAYOUT)/merlin.lh
-$(MESS_DRIVERS)/mikrolab.o: $(MESS_LAYOUT)/mikrolab.lh
 $(MESS_DRIVERS)/mirage.o:   $(MESS_LAYOUT)/mirage.lh
 $(MESS_DRIVERS)/mk1.o:      $(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:     $(MESS_LAYOUT)/mk14.lh
@@ -2316,7 +2314,7 @@ $(MESS_DRIVERS)/sdk86.o:    $(MESS_LAYOUT)/sdk86.lh
 $(MESS_DRIVERS)/selz80.o:   $(MESS_LAYOUT)/selz80.lh
 $(MESS_DRIVERS)/sitcom.o:   $(MESS_LAYOUT)/sitcom.lh
 $(MESS_DRIVERS)/slc1.o:     $(MESS_LAYOUT)/slc1.lh
-$(MESS_DRIVERS)/sms.o:      $(MAME_LAYOUT)/sms1.lh
+$(MESS_DRIVERS)/sms.o:      $(MESS_LAYOUT)/sms1.lh
 $(MESS_DRIVERS)/stopthie.o: $(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:  $(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o: $(MESS_LAYOUT)/supercon.lh

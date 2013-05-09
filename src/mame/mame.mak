@@ -2306,8 +2306,6 @@ $(DRIVERS)/segaorun.o:  $(LAYOUT)/outrun.lh
 
 $(DRIVERS)/segas32.o:   $(LAYOUT)/radr.lh
 
-$(DRIVERS)/segasms.o:   $(LAYOUT)/sms1.lh
-
 $(DRIVERS)/segaybd.o:   $(LAYOUT)/pdrift.lh
 
 $(DRIVERS)/skydiver.o:  $(LAYOUT)/skydiver.lh
@@ -2408,9 +2406,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 $(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neodrvr.c
-$(MACHINE)/nes_mmc.o:   $(MAMESRC)/machine/nes_ines.c \
-			$(MAMESRC)/machine/nes_pcb.c \
-			$(MAMESRC)/machine/nes_unif.c
 $(VIDEO)/jaguar.o:  $(MAMESRC)/video/jagobj.c \
 			$(MAMESRC)/video/jagblit.c
 $(DRIVERS)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
@@ -2424,4 +2419,3 @@ $(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
 $(DRIVERS)/namcos2.o: $(MAMESRC)/includes/namcos2.h
 $(MACHINE)/namcos2.o: $(MAMESRC)/includes/namcos2.h
 $(VIDEO)/namcos2.o: $(MAMESRC)/includes/namcos2.h
-
