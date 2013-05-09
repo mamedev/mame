@@ -239,11 +239,10 @@ TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 		m_lua_engine.execute(options().autoboot_script());
 	}
 	if (strlen(options().autoboot_command())!=0) {
-		astring val = astring(options().autoboot_command());
-		val.replace("\\n","\n");
-		val.replace("\\r","\r");
-		ioport().natkeyboard().post_utf8(val);
-		ioport().natkeyboard().post_utf8("\r");	
+		astring cmd = astring(options().autoboot_command());
+		cmd.replace("'","\\'");
+		astring val = astring("emu.keypost('",cmd,"')");
+		m_lua_engine.execute_string(val);
 	}
 }
 

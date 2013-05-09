@@ -62,12 +62,14 @@ public:
 	void lua_execute();
 	void report_errors(int status);
 	
-	void execute(const char *filename);
-	
+	void createvm();
+	void execute(const char *filename);	
+	void execute_string(const char *value);
 	void close();
 	
 	//static 
 	static int emu_gamename(lua_State *L);
+	static int emu_keypost(lua_State *L);
 private:	
 	// internal state
 	running_machine &   m_machine;                          // reference to our machine
