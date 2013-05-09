@@ -5333,7 +5333,6 @@ src/mame/video/gauntlet.c svneol=native#text/plain
 src/mame/video/gberet.c svneol=native#text/plain
 src/mame/video/gbusters.c svneol=native#text/plain
 src/mame/video/gcpinbal.c svneol=native#text/plain
-src/mame/video/genesis.c svneol=native#text/plain
 src/mame/video/gijoe.c svneol=native#text/plain
 src/mame/video/ginganin.c svneol=native#text/plain
 src/mame/video/gladiatr.c svneol=native#text/plain
