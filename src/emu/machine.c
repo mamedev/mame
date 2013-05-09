@@ -176,7 +176,8 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 		m_save(*this),
 		m_memory(*this),
 		m_ioport(*this),
-		m_scheduler(*this)
+		m_scheduler(*this),
+		m_lua_engine(*this)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&m_base_time, 0, sizeof(m_base_time));
@@ -234,6 +235,9 @@ const char *running_machine::describe_context()
 
 TIMER_CALLBACK_MEMBER(running_machine::autoboot_callback)
 {
+	if (strlen(options().autoboot_script())!=0) {
+		m_lua_engine.execute(options().autoboot_script());
+	}
 	if (strlen(options().autoboot_command())!=0) {
 		astring val = astring(options().autoboot_command());
 		val.replace("\\n","\n");
@@ -332,8 +336,11 @@ void running_machine::start()
 	// set up the cheat engine
 	m_cheat = auto_alloc(*this, cheat_manager(*this));
 
-	/* allocate a timer */
+	// allocate autoboot timer
 	m_autoboot_timer = scheduler().timer_alloc(timer_expired_delegate(FUNC(running_machine::autoboot_callback), this));
+
+	// initialize lua
+	m_lua_engine.initialize();
 
 	// disallow save state registrations starting here
 	m_save.allow_registration(false);

@@ -83,6 +83,7 @@ EMUOBJS = \
 	$(EMUOBJ)/info.o \
 	$(EMUOBJ)/input.o \
 	$(EMUOBJ)/ioport.o \
+	$(EMUOBJ)/luaengine.o \
 	$(EMUOBJ)/mame.o \
 	$(EMUOBJ)/machine.o \
 	$(EMUOBJ)/mconfig.o \

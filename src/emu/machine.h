@@ -418,6 +418,7 @@ private:
 	ioport_manager          m_ioport;               // I/O port manager
 	device_scheduler        m_scheduler;            // scheduler object
 	emu_timer           	*m_autoboot_timer;		// autoboot timer
+	lua_engine				m_lua_engine;			// LUA engine
 };
 
 

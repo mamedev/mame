@@ -201,6 +201,7 @@ enum
 
 #define OPTION_AUTOBOOT_COMMAND		"autoboot_command"
 #define OPTION_AUTOBOOT_DELAY		"autoboot_delay"
+#define OPTION_AUTOBOOT_SCRIPT		"autoboot_script"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -357,6 +358,7 @@ public:
 	
 	const char *autoboot_command() const { return value(OPTION_AUTOBOOT_COMMAND); }
 	int autoboot_delay() const { return int_value(OPTION_AUTOBOOT_DELAY); }
+	const char *autoboot_script() const { return value(OPTION_AUTOBOOT_SCRIPT); }
 
 	// device-specific options
 	const char *device_option(device_image_interface &image);

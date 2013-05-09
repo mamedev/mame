@@ -23,6 +23,7 @@ OBJDIRS += \
 	$(LIBOBJ)/libflac \
 	$(LIBOBJ)/lib7z \
 	$(LIBOBJ)/portmidi \
+	$(LIBOBJ)/lua \
 
 
 #-------------------------------------------------
@@ -427,3 +428,46 @@ $(LIBOBJ)/portmidi/%.o: $(LIBSRC)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/portmidi/ -c $< -o $@
 
+#-------------------------------------------------
+# LUA library objects
+#-------------------------------------------------
+
+LUAOBJS = \
+	$(LIBOBJ)/lua/lapi.o \
+	$(LIBOBJ)/lua/lcode.o \
+	$(LIBOBJ)/lua/lctype.o \
+	$(LIBOBJ)/lua/ldebug.o \
+	$(LIBOBJ)/lua/ldo.o \
+	$(LIBOBJ)/lua/ldump.o \
+	$(LIBOBJ)/lua/lfunc.o \
+	$(LIBOBJ)/lua/lgc.o \
+	$(LIBOBJ)/lua/llex.o \
+	$(LIBOBJ)/lua/lmem.o \
+	$(LIBOBJ)/lua/lobject.o \
+	$(LIBOBJ)/lua/lopcodes.o \
+	$(LIBOBJ)/lua/lparser.o \
+	$(LIBOBJ)/lua/lstate.o \
+	$(LIBOBJ)/lua/lstring.o \
+	$(LIBOBJ)/lua/ltable.o \
+	$(LIBOBJ)/lua/ltm.o \
+	$(LIBOBJ)/lua/lundump.o \
+	$(LIBOBJ)/lua/lvm.o \
+	$(LIBOBJ)/lua/lzio.o \
+	$(LIBOBJ)/lua/lauxlib.o \
+	$(LIBOBJ)/lua/lbaselib.o \
+	$(LIBOBJ)/lua/lbitlib.o \
+	$(LIBOBJ)/lua/lcorolib.o \
+	$(LIBOBJ)/lua/ldblib.o \
+	$(LIBOBJ)/lua/liolib.o \
+	$(LIBOBJ)/lua/lmathlib.o \
+	$(LIBOBJ)/lua/loslib.o \
+	$(LIBOBJ)/lua/lstrlib.o \
+	$(LIBOBJ)/lua/ltablib.o \
+	$(LIBOBJ)/lua/loadlib.o \
+	$(LIBOBJ)/lua/linit.o \
+
+$(OBJ)/liblua.a: $(LUAOBJS)
+
+$(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -c $< -o $@
