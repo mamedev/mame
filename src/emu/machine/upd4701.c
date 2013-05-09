@@ -11,301 +11,14 @@
 #include "emu.h"
 #include "upd4701.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct upd4701_state
-{
-	int cs;
-	int xy;
-	int ul;
-	int resetx;
-	int resety;
-	int latchx;
-	int latchy;
-	int startx;
-	int starty;
-	int x;
-	int y;
-	int switches;
-	int latchswitches;
-	int cf;
-};
-
-/* x,y increments can be 12bit (see MASK_COUNTER), hence we need a couple of
-16bit handlers in the following  */
-
 #define MASK_SWITCHES ( 7 )
 #define MASK_COUNTER ( 0xfff )
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE upd4701_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert((device->type() == UPD4701));
-	return (upd4701_state *)downcast<upd4701_device *>(device)->token();
-}
-
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    upd4701_ul_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_ul_w )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-	upd4701->ul = data;
-}
-
-/*-------------------------------------------------
-    upd4701_xy_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_xy_w )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-	upd4701->xy = data;
-}
-
-/*-------------------------------------------------
-    upd4701_cs_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_cs_w )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if (data != upd4701->cs)
-	{
-		upd4701->cs = data;
-
-		if (!upd4701->cs)
-		{
-			upd4701->latchx = (upd4701->x - upd4701->startx) & MASK_COUNTER;
-			upd4701->latchy = (upd4701->y - upd4701->starty) & MASK_COUNTER;
-
-			upd4701->latchswitches = (~upd4701->switches) & MASK_SWITCHES;
-			if (upd4701->latchswitches != 0)
-			{
-				upd4701->latchswitches |= 8;
-			}
-
-			upd4701->cf = 1;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_resetx_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_resetx_w )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if (upd4701->resetx != data)
-	{
-		upd4701->resetx = data;
-
-		if (upd4701->resetx)
-		{
-			upd4701->startx = upd4701->x;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_resety_w
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_resety_w )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if (upd4701->resety != data)
-	{
-		upd4701->resety = data;
-
-		if (upd4701->resety)
-		{
-			upd4701->starty = upd4701->y;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_x_add
--------------------------------------------------*/
-
-WRITE16_DEVICE_HANDLER( upd4701_x_add )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if (!upd4701->resetx && data != 0)
-	{
-		upd4701->x += data;
-
-		if (upd4701->cs)
-		{
-			upd4701->cf = 0;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_y_add
--------------------------------------------------*/
-
-WRITE16_DEVICE_HANDLER( upd4701_y_add )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if (!upd4701->resety && data != 0)
-	{
-		upd4701->y += data;
-
-		if (upd4701->cs)
-		{
-			upd4701->cf = 0;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_switches_set
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( upd4701_switches_set )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-	upd4701->switches = data;
-}
-
-/*-------------------------------------------------
-    upd4701_d_r
--------------------------------------------------*/
-
-READ16_DEVICE_HANDLER( upd4701_d_r )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-	int data;
-
-	if (upd4701->cs)
-	{
-		return 0xff;
-	}
-
-	if (upd4701->xy)
-	{
-		data = upd4701->latchy;
-	}
-	else
-	{
-		data = upd4701->latchx;
-	}
-
-	data |= upd4701->latchswitches << 12;
-
-	if (upd4701->ul)
-	{
-		return data >> 8;
-	}
-	else
-	{
-		return data & 0xff;
-	}
-}
-
-/*-------------------------------------------------
-    upd4701_sf_r
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( upd4701_sf_r )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	if ((upd4701->switches & MASK_SWITCHES) != MASK_SWITCHES)
-	{
-		return 0;
-	}
-
-	return 1;
-}
-
-/*-------------------------------------------------
-    upd4701_cf_r
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( upd4701_cf_r )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-	return upd4701->cf;
-}
-
-/*-------------------------------------------------
-    DEVICE_START( upd4701 )
--------------------------------------------------*/
-
-static DEVICE_START( upd4701 )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	/* register for state saving */
-	device->save_item(NAME(upd4701->cs));
-	device->save_item(NAME(upd4701->xy));
-	device->save_item(NAME(upd4701->ul));
-	device->save_item(NAME(upd4701->resetx));
-	device->save_item(NAME(upd4701->resety));
-	device->save_item(NAME(upd4701->latchx));
-	device->save_item(NAME(upd4701->latchy));
-	device->save_item(NAME(upd4701->startx));
-	device->save_item(NAME(upd4701->starty));
-	device->save_item(NAME(upd4701->x));
-	device->save_item(NAME(upd4701->y));
-	device->save_item(NAME(upd4701->switches));
-	device->save_item(NAME(upd4701->latchswitches));
-	device->save_item(NAME(upd4701->cf));
-}
-
-/*-------------------------------------------------
-    DEVICE_RESET( upd4701 )
--------------------------------------------------*/
-
-static DEVICE_RESET( upd4701 )
-{
-	upd4701_state *upd4701 = get_safe_token(device);
-
-	upd4701->cs = 1;
-	upd4701->xy = 0;
-	upd4701->ul = 0;
-	upd4701->resetx = 0;
-	upd4701->resety = 0;
-	upd4701->latchx = 0;
-	upd4701->latchy = 0;
-	upd4701->startx = 0;
-	upd4701->starty = 0;
-	upd4701->x = 0;
-	upd4701->y = 0;
-	upd4701->switches = 0;
-	upd4701->latchswitches = 0;
-	upd4701->cf = 1;
-}
 
 const device_type UPD4701 = &device_creator<upd4701_device>;
 
 upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, UPD4701, "NEC uPD4701 Encoder", tag, owner, clock)
 {
-	m_token = global_alloc_clear(upd4701_state);
 }
 
 //-------------------------------------------------
@@ -324,7 +37,20 @@ void upd4701_device::device_config_complete()
 
 void upd4701_device::device_start()
 {
-	DEVICE_START_NAME( upd4701 )(this);
+	save_item(NAME(m_cs));
+	save_item(NAME(m_xy));
+	save_item(NAME(m_ul));
+	save_item(NAME(m_resetx));
+	save_item(NAME(m_resety));
+	save_item(NAME(m_latchx));
+	save_item(NAME(m_latchy));
+	save_item(NAME(m_startx));
+	save_item(NAME(m_starty));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_switches));
+	save_item(NAME(m_latchswitches));
+	save_item(NAME(m_cf));
 }
 
 //-------------------------------------------------
@@ -333,5 +59,199 @@ void upd4701_device::device_start()
 
 void upd4701_device::device_reset()
 {
-	DEVICE_RESET_NAME( upd4701 )(this);
+	m_cs = 1;
+	m_xy = 0;
+	m_ul = 0;
+	m_resetx = 0;
+	m_resety = 0;
+	m_latchx = 0;
+	m_latchy = 0;
+	m_startx = 0;
+	m_starty = 0;
+	m_x = 0;
+	m_y = 0;
+	m_switches = 0;
+	m_latchswitches = 0;
+	m_cf = 1;
+}
+
+/* x,y increments can be 12bit (see MASK_COUNTER), hence we need a couple of
+16bit handlers in the following  */
+
+/*-------------------------------------------------
+    ul_w
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER( upd4701_device::ul_w )
+{
+	m_ul = state;
+}
+
+/*-------------------------------------------------
+    xy_w
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER( upd4701_device::xy_w )
+{
+	m_xy = state;
+}
+
+/*-------------------------------------------------
+    cs_w
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER( upd4701_device::cs_w )
+{
+	if (m_cs != state)
+	{
+		m_cs = state;
+
+		if (!m_cs)
+		{
+			m_latchx = (m_x - m_startx) & MASK_COUNTER;
+			m_latchy = (m_y - m_starty) & MASK_COUNTER;
+
+			m_latchswitches = (~m_switches) & MASK_SWITCHES;
+			if (m_latchswitches != 0)
+			{
+				m_latchswitches |= 8;
+			}
+
+			m_cf = 1;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    resetx_w
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER( upd4701_device::resetx_w )
+{
+	if (m_resetx != state)
+	{
+		m_resetx = state;
+
+		if (m_resetx)
+		{
+			m_startx = m_x;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    resety_w
+-------------------------------------------------*/
+
+WRITE_LINE_MEMBER( upd4701_device::resety_w )
+{
+	if (m_resety != state)
+	{
+		m_resety = state;
+
+		if (m_resety)
+		{
+			m_starty = m_y;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    x_add
+-------------------------------------------------*/
+
+void upd4701_device::x_add( INT16 data )
+{
+	if (!m_resetx && data != 0)
+	{
+		m_x += data;
+
+		if (m_cs)
+		{
+			m_cf = 0;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    y_add
+-------------------------------------------------*/
+
+void upd4701_device::y_add( INT16 data )
+{
+	if (!m_resety && data != 0)
+	{
+		m_y += data;
+
+		if (m_cs)
+		{
+			m_cf = 0;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    switches_set
+-------------------------------------------------*/
+
+void upd4701_device::switches_set( UINT8 data )
+{
+	m_switches = data;
+}
+
+/*-------------------------------------------------
+    d_r
+-------------------------------------------------*/
+
+READ16_MEMBER( upd4701_device::d_r )
+{
+	int data;
+
+	if (m_cs)
+	{
+		return 0xff;
+	}
+
+	if (m_xy)
+	{
+		data = m_latchy;
+	}
+	else
+	{
+		data = m_latchx;
+	}
+
+	data |= m_latchswitches << 12;
+
+	if (m_ul)
+	{
+		return data >> 8;
+	}
+	else
+	{
+		return data & 0xff;
+	}
+}
+
+/*-------------------------------------------------
+    sf_r
+-------------------------------------------------*/
+
+READ_LINE_MEMBER( upd4701_device::sf_r )
+{
+	if ((m_switches & MASK_SWITCHES) != MASK_SWITCHES)
+	{
+		return 0;
+	}
+
+	return 1;
+}
+
+/*-------------------------------------------------
+    cf_r
+-------------------------------------------------*/
+
+READ_LINE_MEMBER( upd4701_device::cf_r )
+{
+	return m_cf;
 }

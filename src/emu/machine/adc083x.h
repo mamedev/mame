@@ -9,8 +9,18 @@
 #ifndef __ADC083X_H__
 #define __ADC083X_H__
 
-#include "devlegcy.h"
+#include "emu.h"
 
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef double (*adc083x_input_convert_func)(device_t *device, UINT8 input);
+
+struct adc083x_interface
+{
+	adc083x_input_convert_func input_callback_r;
+};
 
 /***************************************************************************
     CONSTANTS
@@ -32,51 +42,71 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class adc0831_device : public device_t
+class adc083x_device : public device_t
 {
 public:
-	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	adc0831_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	~adc0831_device() { global_free(m_token); }
+	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_WRITE_LINE_MEMBER( cs_write );
+	DECLARE_WRITE_LINE_MEMBER( clk_write );
+	DECLARE_WRITE_LINE_MEMBER( di_write );
+	DECLARE_WRITE_LINE_MEMBER( se_write );
+	DECLARE_READ_LINE_MEMBER( sars_read );
+	DECLARE_READ_LINE_MEMBER( do_read );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	virtual void device_reset();
+
+	INT32 m_mux_bits;
+
 private:
+	UINT8 conversion();
+
+	void clear_sars();
+
 	// internal state
-	void *m_token;
+	INT32 m_cs;
+	INT32 m_clk;
+	INT32 m_di;
+	INT32 m_se;
+	INT32 m_sars;
+	INT32 m_do;
+	INT32 m_sgl;
+	INT32 m_odd;
+	INT32 m_sel1;
+	INT32 m_sel0;
+	INT32 m_state;
+	INT32 m_bit;
+	INT32 m_output;
+
+	adc083x_input_convert_func m_input_callback_r;
 };
 
-extern const device_type ADC0831;
+class adc0831_device : public adc083x_device
+{
+public:
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
-class adc0832_device : public adc0831_device
+class adc0832_device : public adc083x_device
 {
 public:
 	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type ADC0832;
-
-class adc0834_device : public adc0831_device
+class adc0834_device : public adc083x_device
 {
 public:
 	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
-extern const device_type ADC0834;
-
-class adc0838_device : public adc0831_device
+class adc0838_device : public adc083x_device
 {
 public:
 	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
-
-extern const device_type ADC0838;
-
 
 #define MCFG_ADC0831_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, ADC0831, 0) \
@@ -94,28 +124,9 @@ extern const device_type ADC0838;
 	MCFG_DEVICE_ADD(_tag, ADC0838, 0) \
 	MCFG_DEVICE_CONFIG(_config)
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef double (*adc083x_input_convert_func)(device_t *device, UINT8 input);
-
-struct adc083x_interface
-{
-	adc083x_input_convert_func input_callback_r;
-};
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-extern WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write );
-extern WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write );
-extern WRITE_LINE_DEVICE_HANDLER( adc083x_di_write );
-extern WRITE_LINE_DEVICE_HANDLER( adc083x_se_write );
-extern READ_LINE_DEVICE_HANDLER( adc083x_sars_read );
-extern READ_LINE_DEVICE_HANDLER( adc083x_do_read );
+extern const device_type ADC0831;
+extern const device_type ADC0832;
+extern const device_type ADC0834;
+extern const device_type ADC0838;
 
 #endif  /* __ADC083X_H__ */

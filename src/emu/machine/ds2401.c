@@ -62,28 +62,26 @@ void ds2401_device::device_reset()
 
 	if(m_region)
 	{
-		// Ensure the size is correct though
-		if(m_region->bytes() != SIZE_DATA)
-			logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n",
-						tag(),
-						SIZE_DATA,
-						m_region->bytes());
-		else {
-			UINT8 *rb = m_region->base();
-			memcpy(data, rb, SIZE_DATA);
+		if(m_region->bytes() == SIZE_DATA)
+		{
+			memcpy(data, m_region->base(), SIZE_DATA);
 			return;
 		}
+
+		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, m_region->bytes());
+	}
+	else
+	{
+		logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
 	}
 
-	// That chip is useless without an id, so bitch if there
-	// isn't one
-	logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
 	memset(data, 0, SIZE_DATA);
 }
 
 void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch(id) {
+	switch(id)
+	{
 	case TIMER_RESET:
 		verboselog(1, "timer_reset\n");
 		state = STATE_RESET;
@@ -91,7 +89,8 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	case TIMER_MAIN:
-		switch(state) {
+		switch(state)
+		{
 		case STATE_RESET1:
 			verboselog(2, "timer_main state_reset1 %d\n", rx);
 			tx = false;
@@ -109,18 +108,25 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		case STATE_COMMAND:
 			verboselog(2, "timer_main state_command %d\n", rx);
+
 			shift >>= 1;
 			if(rx)
+			{
 				shift |= 0x80;
+			}
+
 			bit++;
-			if(bit == 8) {
-				switch(shift) {
+			if(bit == 8)
+			{
+				switch(shift)
+				{
 				case COMMAND_READROM:
 					verboselog(1, "timer_main readrom\n");
 					bit = 0;
 					byte = 0;
 					state = STATE_READROM;
 					break;
+
 				default:
 					verboselog(0, "timer_main command not handled %02x\n", shift);
 					state = STATE_IDLE;
@@ -131,10 +137,14 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 		case STATE_READROM:
 			tx = true;
-			if(byte == SIZE_DATA) {
+
+			if(byte == SIZE_DATA)
+			{
 				verboselog(1, "timer_main readrom finished\n");
 				state = STATE_IDLE;
-			} else {
+			}
+			else
+			{
 				verboselog(2, "timer_main readrom window closed\n");
 			}
 			break;
@@ -145,51 +155,67 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-void ds2401_device::write(bool line)
+WRITE_LINE_MEMBER( ds2401_device::write )
 {
-	verboselog(1, "write(%d)\n", line);
+	verboselog(1, "write(%d)\n", state);
 
-	if(!line && rx) {
-		switch(state) {
+	if(!state && rx)
+	{
+		switch(state)
+		{
 		case STATE_IDLE:
 			break;
+
 		case STATE_COMMAND:
 			verboselog(2, "state_command\n");
 			timer_main->adjust(t_samp);
 			break;
+
 		case STATE_READROM:
-			if(!bit) {
+			if(!bit)
+			{
 				shift = data[7 - byte];
 				verboselog(1, "<- data %02x\n", shift);
 			}
+
 			tx = shift & 1;
 			shift >>= 1;
+
 			bit++;
-			if(bit == 8) {
+			if(bit == 8)
+			{
 				bit = 0;
 				byte++;
 			}
+
 			verboselog(2, "state_readrom %d\n", tx);
 			timer_main->adjust(t_rdv);
 			break;
+
 		default:
 			verboselog(0, "state not handled: %d\n", state );
 			break;
 		}
+
 		timer_reset->adjust(t_rstl);
-	} else if(line && !rx) {
-		switch(state) {
+	}
+	else if(state && !rx)
+	{
+		switch(state)
+		{
 		case STATE_RESET:
 			state = STATE_RESET1;
 			timer_main->adjust(t_pdh);
 			break;
 		}
+
 		timer_reset->adjust(attotime::never);
 	}
-	rx = line;
+
+	rx = state;
 }
 
-bool ds2401_device::read()
+READ_LINE_MEMBER( ds2401_device::read )
 {
 	verboselog(2, "read %d\n", tx && rx);
 	return tx && rx;

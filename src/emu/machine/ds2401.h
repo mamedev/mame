@@ -20,8 +20,8 @@ public:
 	// construction/destruction
 	ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	void write(bool line);
-	bool read();
+	DECLARE_WRITE_LINE_MEMBER( write );
+	DECLARE_READ_LINE_MEMBER( read );
 	UINT8 direct_read(int index);
 
 protected:

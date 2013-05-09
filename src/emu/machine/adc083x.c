@@ -47,126 +47,170 @@ enum
 struct adc0831_state
 {
 	adc083x_input_convert_func input_callback_r;
-
-	INT32 cs;
-	INT32 clk;
-	INT32 di;
-	INT32 se;
-	INT32 sars;
-	INT32 _do;
-	INT32 sgl;
-	INT32 odd;
-	INT32 sel1;
-	INT32 sel0;
-	INT32 state;
-	INT32 bit;
-	INT32 output;
-	INT32 mux_bits;
 };
 
+const device_type ADC0831 = &device_creator<adc0831_device>;
+const device_type ADC0832 = &device_creator<adc0832_device>;
+const device_type ADC0834 = &device_creator<adc0834_device>;
+const device_type ADC0838 = &device_creator<adc0838_device>;
 
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE adc0831_state *get_safe_token( device_t *device )
+adc083x_device::adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	m_cs(0),
+	m_clk(0),
+	m_di(0),
+	m_se(0),
+	m_do(1),
+	m_sgl(0),
+	m_odd(0),
+	m_sel1(0),
+	m_sel0(0),
+	m_state(STATE_IDLE),
+	m_bit(0),
+	m_output(0)
 {
-	assert( device != NULL );
-	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
-	return (adc0831_state *) downcast<adc0831_device *>(device)->token();
 }
 
-INLINE const adc083x_interface *get_interface( device_t *device )
+adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc083x_device(mconfig, ADC0831, "A/D Converters 0831", tag, owner, clock)
 {
-	assert( device != NULL );
-	assert( ( device->type() == ADC0831 ) || ( device->type() == ADC0832 ) || ( device->type() == ADC0834 ) || ( device->type() == ADC0838 ) );
-	return (const adc083x_interface *) device->static_config();
+	m_mux_bits = 0;
+}
+
+adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc083x_device(mconfig, ADC0832, "A/D Converters 0832", tag, owner, clock)
+{
+	m_mux_bits = 2;
+}
+
+adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc083x_device(mconfig, ADC0834, "A/D Converters 0834", tag, owner, clock)
+{
+	m_mux_bits = 3;
+}
+
+adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: adc083x_device(mconfig, ADC0838, "A/D Converters 0838", tag, owner, clock)
+{
+	m_mux_bits = 4;
+}
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void adc083x_device::device_config_complete()
+{
+	const adc083x_interface *intf = (const adc083x_interface *) static_config();
+
+	/* resolve callbacks */
+	m_input_callback_r = intf->input_callback_r;
 }
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
 /*-------------------------------------------------
-    adc083x_clear_sars
+    adc083x_device::device_start
 -------------------------------------------------*/
 
-static void adc083x_clear_sars( device_t *device, adc0831_state *adc083x )
+void adc083x_device::device_start()
 {
-	if( device->type() == ADC0834 ||device->type() == ADC0838 )
+	clear_sars();
+
+	/* register for state saving */
+	save_item( NAME(m_cs) );
+	save_item( NAME(m_clk) );
+	save_item( NAME(m_di) );
+	save_item( NAME(m_se) );
+	save_item( NAME(m_sars) );
+	save_item( NAME(m_do) );
+	save_item( NAME(m_sgl) );
+	save_item( NAME(m_odd) );
+	save_item( NAME(m_sel1) );
+	save_item( NAME(m_sel0) );
+	save_item( NAME(m_state) );
+	save_item( NAME(m_bit) );
+	save_item( NAME(m_output) );
+	save_item( NAME(m_mux_bits) );
+}
+
+/*-------------------------------------------------
+    adc083x_device::clear_sars
+-------------------------------------------------*/
+
+void adc083x_device::clear_sars()
+{
+	if( type() == ADC0834 || type() == ADC0838 )
 	{
-		adc083x->sars = 1;
+		m_sars = 1;
 	}
 	else
 	{
-		adc083x->sars = 0;
+		m_sars = 0;
 	}
 }
 
 /*-------------------------------------------------
-    adc083x_cs_write
+    adc083x_device::cs_write
 -------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( adc083x_cs_write )
+WRITE_LINE_MEMBER( adc083x_device::cs_write )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	if( adc083x->cs != state )
+	if( m_cs != state )
 	{
-		verboselog( 2, device->machine(), "adc083x_cs_write( %s, %d )\n", device->tag(), state );
+		verboselog( 2, machine(), "adc083x_cs_write( %s, %d )\n", tag(), state );
 	}
 
-	if( adc083x->cs == 0 && state != 0 )
+	if( m_cs == 0 && state != 0 )
 	{
-		adc083x->state = STATE_IDLE;
-		adc083x_clear_sars( device, adc083x );
-		adc083x->_do = 1;
+		m_state = STATE_IDLE;
+		clear_sars();
+		m_do = 1;
 	}
 
-	if( adc083x->cs != 0 && state == 0 )
+	if( m_cs != 0 && state == 0 )
 	{
-		if( device->type() == ADC0831 )
+		if( type() == ADC0831 )
 		{
-			adc083x->state = STATE_MUX_SETTLE;
+			m_state = STATE_MUX_SETTLE;
 		}
 		else
 		{
-			adc083x->state = STATE_WAIT_FOR_START;
+			m_state = STATE_WAIT_FOR_START;
 		}
 
-		adc083x_clear_sars( device, adc083x );
-		adc083x->_do = 1;
+		clear_sars();
+		m_do = 1;
 	}
 
-	adc083x->cs = state;
+	m_cs = state;
 }
 
 /*-------------------------------------------------
-    adc083x_conversion
+    adc083x_device::conversion
 -------------------------------------------------*/
 
-static UINT8 adc083x_conversion( device_t *device )
+UINT8 adc083x_device::conversion()
 {
-	adc0831_state *adc083x = get_safe_token( device );
 	int result;
 	int positive_channel = ADC083X_AGND;
 	int negative_channel = ADC083X_AGND;
 	double positive = 0;
 	double negative = 0;
-	double gnd = adc083x->input_callback_r( device, ADC083X_AGND );
-	double vref = adc083x->input_callback_r( device, ADC083X_VREF );
+	double gnd = m_input_callback_r( this, ADC083X_AGND );
+	double vref = m_input_callback_r( this, ADC083X_VREF );
 
-	if( device->type() == ADC0831 )
+	if( type() == ADC0831 )
 	{
 		positive_channel = ADC083X_CH0;
 		negative_channel = ADC083X_CH1;
 	}
-	else if( device->type() == ADC0832 )
+	else if( type() == ADC0832 )
 	{
-		positive_channel = ADC083X_CH0 + adc083x->odd;
-		if( adc083x->sgl == 0 )
+		positive_channel = ADC083X_CH0 + m_odd;
+		if( m_sgl == 0 )
 		{
 			negative_channel = positive_channel ^ 1;
 		}
@@ -175,10 +219,10 @@ static UINT8 adc083x_conversion( device_t *device )
 			negative_channel = ADC083X_AGND;
 		}
 	}
-	else if( device->type() == ADC0834 )
+	else if( type() == ADC0834 )
 	{
-		positive_channel = ADC083X_CH0 + adc083x->odd + ( adc083x->sel1 * 2 );
-		if( adc083x->sgl == 0 )
+		positive_channel = ADC083X_CH0 + m_odd + ( m_sel1 * 2 );
+		if( m_sgl == 0 )
 		{
 			negative_channel = positive_channel ^ 1;
 		}
@@ -187,10 +231,10 @@ static UINT8 adc083x_conversion( device_t *device )
 			negative_channel = ADC083X_AGND;
 		}
 	}
-	else if( device->type() == ADC0838 )
+	else if( type() == ADC0838 )
 	{
-		positive_channel = ADC083X_CH0 + adc083x->odd + ( adc083x->sel0 * 2 ) + ( adc083x->sel1 * 4 );
-		if( adc083x->sgl == 0 )
+		positive_channel = ADC083X_CH0 + m_odd + ( m_sel0 * 2 ) + ( m_sel1 * 4 );
+		if( m_sgl == 0 )
 		{
 			negative_channel = positive_channel ^ 1;
 		}
@@ -202,12 +246,12 @@ static UINT8 adc083x_conversion( device_t *device )
 
 	if( positive_channel != ADC083X_AGND )
 	{
-		positive = adc083x->input_callback_r( device, positive_channel ) - gnd;
+		positive = m_input_callback_r( this, positive_channel ) - gnd;
 	}
 
 	if( negative_channel != ADC083X_AGND )
 	{
-		negative = adc083x->input_callback_r( device, negative_channel ) - gnd;
+		negative = m_input_callback_r( this, negative_channel ) - gnd;
 	}
 
 	result = (int) ( ( ( positive - negative ) * 255 ) / vref );
@@ -224,347 +268,197 @@ static UINT8 adc083x_conversion( device_t *device )
 }
 
 /*-------------------------------------------------
-    adc083x_clk_write
+    adc083x_device::clk_write
 -------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( adc083x_clk_write )
+WRITE_LINE_MEMBER( adc083x_device::clk_write )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	if( adc083x->clk != state )
+	if( m_clk != state )
 	{
-		verboselog( 2, device->machine(), "adc083x_clk_write( %s, %d )\n", device->tag(), state );
+		verboselog( 2, machine(), "adc083x_clk_write( %s, %d )\n", tag(), state );
 	}
 
-	if( adc083x->cs == 0 )
+	if( m_cs == 0 )
 	{
-		if( adc083x->clk == 0 && state != 0 )
+		if( m_clk == 0 && state != 0 )
 		{
-			switch( adc083x->state )
+			switch( m_state )
 			{
 			case STATE_WAIT_FOR_START:
-				if( adc083x->di != 0 )
+				if( m_di != 0 )
 				{
-					verboselog( 1, device->machine(), "adc083x %s got start bit\n", device->tag() );
-					adc083x->state = STATE_SHIFT_MUX;
-					adc083x->sars = 0;
-					adc083x->sgl = 0;
-					adc083x->odd = 0;
-					adc083x->sel1 = 0;
-					adc083x->sel0 = 0;
-					adc083x->bit = 0;
+					verboselog( 1, machine(), "adc083x %s got start bit\n", tag() );
+					m_state = STATE_SHIFT_MUX;
+					m_sars = 0;
+					m_sgl = 0;
+					m_odd = 0;
+					m_sel1 = 0;
+					m_sel0 = 0;
+					m_bit = 0;
 				}
 				else
 				{
-					verboselog( 1, device->machine(), "adc083x %s not start bit\n", device->tag() );
+					verboselog( 1, machine(), "adc083x %s not start bit\n", tag() );
 				}
 				break;
 
 			case STATE_SHIFT_MUX:
-				switch( adc083x->bit )
+				switch( m_bit )
 				{
 				case 0:
-					if( adc083x->di != 0 )
+					if( m_di != 0 )
 					{
-						adc083x->sgl = 1;
+						m_sgl = 1;
 					}
-					verboselog( 1, device->machine(), "adc083x %s sgl <- %d\n", device->tag(), adc083x->sgl );
+					verboselog( 1, machine(), "adc083x %s sgl <- %d\n", tag(), m_sgl );
 					break;
 
 				case 1:
-					if( adc083x->di != 0 )
+					if( m_di != 0 )
 					{
-						adc083x->odd = 1;
+						m_odd = 1;
 					}
-					verboselog( 1, device->machine(), "adc083x %s odd <- %d\n", device->tag(), adc083x->odd );
+					verboselog( 1, machine(), "adc083x %s odd <- %d\n", tag(), m_odd );
 					break;
 
 				case 2:
-					if( adc083x->di != 0 )
+					if( m_di != 0 )
 					{
-						adc083x->sel1 = 1;
+						m_sel1 = 1;
 					}
-					verboselog( 1, device->machine(), "adc083x %s sel1 <- %d\n", device->tag(), adc083x->sel1 );
+					verboselog( 1, machine(), "adc083x %s sel1 <- %d\n", tag(), m_sel1 );
 					break;
 
 				case 3:
-					if( adc083x->di != 0 )
+					if( m_di != 0 )
 					{
-						adc083x->sel0 = 1;
+						m_sel0 = 1;
 					}
-					verboselog( 1, device->machine(), "adc083x %s sel0 <- %d\n", device->tag(), adc083x->sel0 );
+					verboselog( 1, machine(), "adc083x %s sel0 <- %d\n", tag(), m_sel0 );
 					break;
 				}
 
-				adc083x->bit++;
-				if( adc083x->bit == adc083x->mux_bits )
+				m_bit++;
+				if( m_bit == m_mux_bits )
 				{
-					adc083x->state = STATE_MUX_SETTLE;
+					m_state = STATE_MUX_SETTLE;
 				}
 
 				break;
 
 			case STATE_WAIT_FOR_SE:
-				adc083x->sars = 0;
-				if( device->type() == ADC0838 && adc083x->se != 0 )
+				m_sars = 0;
+				if( type() == ADC0838 && m_se != 0 )
 				{
-					verboselog( 1, device->machine(), "adc083x %s not se\n", device->tag() );
+					verboselog( 1, machine(), "adc083x %s not se\n", tag() );
 				}
 				else
 				{
-					verboselog( 1, device->machine(), "adc083x %s got se\n", device->tag() );
-					adc083x->state = STATE_OUTPUT_LSB_FIRST;
-					adc083x->bit = 1;
+					verboselog( 1, machine(), "adc083x %s got se\n", tag() );
+					m_state = STATE_OUTPUT_LSB_FIRST;
+					m_bit = 1;
 				}
 				break;
 			}
 		}
 
-		if( adc083x->clk != 0 && state == 0 )
+		if( m_clk != 0 && state == 0 )
 		{
-			switch( adc083x->state )
+			switch( m_state )
 			{
 			case STATE_MUX_SETTLE:
-				verboselog( 1, device->machine(), "adc083x %s mux settle\n", device->tag() );
-				adc083x->output = adc083x_conversion( device );
-				adc083x->state = STATE_OUTPUT_MSB_FIRST;
-				adc083x->bit = 7;
-				adc083x_clear_sars( device, adc083x );
-				adc083x->_do = 0;
+				verboselog( 1, machine(), "adc083x %s mux settle\n", tag() );
+				m_output = conversion();
+				m_state = STATE_OUTPUT_MSB_FIRST;
+				m_bit = 7;
+				clear_sars();
+				m_do = 0;
 				break;
 
 			case STATE_OUTPUT_MSB_FIRST:
-				adc083x->_do = ( adc083x->output >> adc083x->bit ) & 1;
-				verboselog( 1, device->machine(), "adc083x %s msb %d -> %d\n", device->tag(), adc083x->bit, adc083x->_do );
+				m_do = ( m_output >> m_bit ) & 1;
+				verboselog( 1, machine(), "adc083x %s msb %d -> %d\n", tag(), m_bit, m_do );
 
-				adc083x->bit--;
-				if( adc083x->bit < 0 )
+				m_bit--;
+				if( m_bit < 0 )
 				{
-					if( device->type() == ADC0831 )
+					if( type() == ADC0831 )
 					{
-						adc083x->state = STATE_FINISHED;
+						m_state = STATE_FINISHED;
 					}
 					else
 					{
-						adc083x->state = STATE_WAIT_FOR_SE;
+						m_state = STATE_WAIT_FOR_SE;
 					}
 				}
 				break;
 
 			case STATE_OUTPUT_LSB_FIRST:
-				adc083x->_do = ( adc083x->output >> adc083x->bit ) & 1;
-				verboselog( 1, device->machine(), "adc083x %s lsb %d -> %d\n", device->tag(), adc083x->bit, adc083x->_do );
+				m_do = ( m_output >> m_bit ) & 1;
+				verboselog( 1, machine(), "adc083x %s lsb %d -> %d\n", tag(), m_bit, m_do );
 
-				adc083x->bit++;
-				if( adc083x->bit == 8 )
+				m_bit++;
+				if( m_bit == 8 )
 				{
-					adc083x->state = STATE_FINISHED;
+					m_state = STATE_FINISHED;
 				}
 				break;
 
 			case STATE_FINISHED:
-				adc083x->state = STATE_IDLE;
-				adc083x->_do = 0;
+				m_state = STATE_IDLE;
+				m_do = 0;
 				break;
 			}
 		}
 	}
 
-	adc083x->clk = state;
+	m_clk = state;
 }
 
 /*-------------------------------------------------
-    adc083x_di_write
+    adc083x_device::di_write
 -------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( adc083x_di_write )
+WRITE_LINE_MEMBER( adc083x_device::di_write )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	if( adc083x->di != state )
+	if( m_di != state )
 	{
-		verboselog( 2, device->machine(), "adc083x_di_write( %s, %d )\n", device->tag(), state );
+		verboselog( 2, machine(), "adc083x_di_write( %s, %d )\n", tag(), state );
 	}
 
-	adc083x->di = state;
+	m_di = state;
 }
 
 /*-------------------------------------------------
-    adc083x_se_write
+    adc083x_device::se_write
 -------------------------------------------------*/
 
-WRITE_LINE_DEVICE_HANDLER( adc083x_se_write )
+WRITE_LINE_MEMBER( adc083x_device::se_write )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	if( adc083x->se != state )
+	if( m_se != state )
 	{
-		verboselog( 2, device->machine(), "adc083x_se_write( %s, %d )\n", device->tag(), state );
+		verboselog( 2, machine(), "adc083x_se_write( %s, %d )\n", tag(), state );
 	}
 
-	adc083x->se = state;
+	m_se = state;
 }
 
 /*-------------------------------------------------
-    adc083x_sars_read
+    adc083x_device::sars_read
 -------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( adc083x_sars_read )
+READ_LINE_MEMBER( adc083x_device::sars_read )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	verboselog( 1, device->machine(), "adc083x_sars_read( %s ) %d\n", device->tag(), adc083x->sars );
-	return adc083x->sars;
+	verboselog( 1, machine(), "adc083x_sars_read( %s ) %d\n", tag(), m_sars );
+	return m_sars;
 }
 
 /*-------------------------------------------------
-    adc083x_do_read
+    adc083x_device::do_read
 -------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( adc083x_do_read )
+READ_LINE_MEMBER( adc083x_device::do_read )
 {
-	adc0831_state *adc083x = get_safe_token( device );
-
-	verboselog( 1, device->machine(), "adc083x_do_read( %s ) %d\n", device->tag(), adc083x->_do );
-	return adc083x->_do;
-}
-
-
-/*-------------------------------------------------
-    DEVICE_START( adc083x )
--------------------------------------------------*/
-
-static DEVICE_START( adc0831 )
-{
-	adc0831_state *adc083x = get_safe_token( device );
-	const adc083x_interface *intf = get_interface( device );
-
-	adc083x->cs = 0;
-	adc083x->clk = 0;
-	adc083x->di = 0;
-	adc083x->se = 0;
-	adc083x_clear_sars( device, adc083x );
-	adc083x->_do = 1;
-	adc083x->sgl = 0;
-	adc083x->odd = 0;
-	adc083x->sel1 = 0;
-	adc083x->sel0 = 0;
-	adc083x->state = STATE_IDLE;
-	adc083x->bit = 0;
-	adc083x->output = 0;
-
-	if( device->type() == ADC0831 )
-	{
-		adc083x->mux_bits = 0;
-	}
-	else if( device->type() == ADC0832 )
-	{
-		adc083x->mux_bits = 2;
-	}
-	else if( device->type() == ADC0834 )
-	{
-		adc083x->mux_bits = 3;
-	}
-	else if( device->type() == ADC0838 )
-	{
-		adc083x->mux_bits = 4;
-	}
-
-	/* resolve callbacks */
-	adc083x->input_callback_r = intf->input_callback_r;
-
-	/* register for state saving */
-	device->save_item( NAME(adc083x->cs) );
-	device->save_item( NAME(adc083x->clk) );
-	device->save_item( NAME(adc083x->di) );
-	device->save_item( NAME(adc083x->se) );
-	device->save_item( NAME(adc083x->sars) );
-	device->save_item( NAME(adc083x->_do) );
-	device->save_item( NAME(adc083x->sgl) );
-	device->save_item( NAME(adc083x->odd) );
-	device->save_item( NAME(adc083x->sel1) );
-	device->save_item( NAME(adc083x->sel0) );
-	device->save_item( NAME(adc083x->state) );
-	device->save_item( NAME(adc083x->bit) );
-	device->save_item( NAME(adc083x->output) );
-	device->save_item( NAME(adc083x->mux_bits) );
-}
-
-
-/*-------------------------------------------------
-    DEVICE_RESET( adc083x )
--------------------------------------------------*/
-
-static DEVICE_RESET( adc0831 )
-{
-	adc0831_state *adc083x = get_safe_token( device );
-
-	adc083x_clear_sars( device, adc083x );
-	adc083x->_do = 1;
-	adc083x->state = STATE_IDLE;
-}
-
-const device_type ADC0831 = &device_creator<adc0831_device>;
-
-adc0831_device::adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ADC0831, "A/D Converters 0831", tag, owner, clock)
-{
-	m_token = global_alloc_clear(adc0831_state);
-}
-adc0831_device::adc0831_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
-{
-	m_token = global_alloc_clear(adc0831_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void adc0831_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void adc0831_device::device_start()
-{
-	DEVICE_START_NAME( adc0831 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void adc0831_device::device_reset()
-{
-	DEVICE_RESET_NAME( adc0831 )(this);
-}
-
-
-const device_type ADC0832 = &device_creator<adc0832_device>;
-
-adc0832_device::adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: adc0831_device(mconfig, ADC0832, "A/D Converters 0832", tag, owner, clock)
-{
-}
-
-
-const device_type ADC0834 = &device_creator<adc0834_device>;
-
-adc0834_device::adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: adc0831_device(mconfig, ADC0834, "A/D Converters 0834", tag, owner, clock)
-{
-}
-
-
-const device_type ADC0838 = &device_creator<adc0838_device>;
-
-adc0838_device::adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: adc0831_device(mconfig, ADC0838, "A/D Converters 0838", tag, owner, clock)
-{
+	verboselog( 1, machine(), "adc083x_do_read( %s ) %d\n", tag(), m_do );
+	return m_do;
 }
