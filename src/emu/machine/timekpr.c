@@ -352,7 +352,7 @@ void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	}
 }
 
-void timekeeper_device::write(UINT16 offset, UINT8 data)
+WRITE8_MEMBER( timekeeper_device::write )
 {
 	if( offset == m_offset_control )
 	{
@@ -375,7 +375,7 @@ void timekeeper_device::write(UINT16 offset, UINT8 data)
 	m_data[ offset ] = data;
 }
 
-UINT8 timekeeper_device::read(UINT16 offset)
+READ8_MEMBER( timekeeper_device::read )
 {
 	UINT8 result = m_data[ offset ];
 	if( offset == m_offset_date && type() == M48T58 )
@@ -433,12 +433,3 @@ void timekeeper_device::nvram_write(emu_file &file)
 {
 	file.write( m_data, m_size );
 }
-
-
-
-/***************************************************************************
-    TRAMPOLINES
-***************************************************************************/
-
-WRITE8_DEVICE_HANDLER( timekeeper_w ) { downcast<timekeeper_device *>(device)->write(offset, data); }
-READ8_DEVICE_HANDLER( timekeeper_r ) { return downcast<timekeeper_device*>(device)->read(offset); }

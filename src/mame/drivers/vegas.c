@@ -618,13 +618,13 @@ static WRITE32_HANDLER( timekeeper_w )
 	if (state->m_cmos_unlocked)
 	{
 		if ((mem_mask & 0x000000ff) != 0)
-			state->m_timekeeper->write(offset * 4 + 0, data >> 0);
+			state->m_timekeeper->write(space, offset * 4 + 0, data >> 0, 0xff);
 		if ((mem_mask & 0x0000ff00) != 0)
-			state->m_timekeeper->write(offset * 4 + 1, data >> 8);
+			state->m_timekeeper->write(space, offset * 4 + 1, data >> 8, 0xff);
 		if ((mem_mask & 0x00ff0000) != 0)
-			state->m_timekeeper->write(offset * 4 + 2, data >> 16);
+			state->m_timekeeper->write(space, offset * 4 + 2, data >> 16, 0xff);
 		if ((mem_mask & 0xff000000) != 0)
-			state->m_timekeeper->write(offset * 4 + 3, data >> 24);
+			state->m_timekeeper->write(space, offset * 4 + 3, data >> 24, 0xff);
 		if (offset*4 >= 0x7ff0)
 			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, mem_mask, data);
 		state->m_cmos_unlocked = 0;
@@ -639,13 +639,13 @@ static READ32_HANDLER( timekeeper_r )
 	vegas_state *state = space.machine().driver_data<vegas_state>();
 	UINT32 result = 0xffffffff;
 	if ((mem_mask & 0x000000ff) != 0)
-		result = (result & ~0x000000ff) | (state->m_timekeeper->read(offset * 4 + 0) << 0);
+		result = (result & ~0x000000ff) | (state->m_timekeeper->read(space, offset * 4 + 0, 0xff) << 0);
 	if ((mem_mask & 0x0000ff00) != 0)
-		result = (result & ~0x0000ff00) | (state->m_timekeeper->read(offset * 4 + 1) << 8);
+		result = (result & ~0x0000ff00) | (state->m_timekeeper->read(space, offset * 4 + 1, 0xff) << 8);
 	if ((mem_mask & 0x00ff0000) != 0)
-		result = (result & ~0x00ff0000) | (state->m_timekeeper->read(offset * 4 + 2) << 16);
+		result = (result & ~0x00ff0000) | (state->m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
 	if ((mem_mask & 0xff000000) != 0)
-		result = (result & ~0xff000000) | (state->m_timekeeper->read(offset * 4 + 3) << 24);
+		result = (result & ~0xff000000) | (state->m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
 	if (offset*4 >= 0x7ff0)
 		if (LOG_TIMEKEEPER) logerror("timekeeper_r(%04X & %08X) = %08X\n", offset*4, mem_mask, result);
 	return result;

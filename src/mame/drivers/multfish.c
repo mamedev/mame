@@ -185,7 +185,10 @@ class multfish_state : public driver_device
 public:
 	multfish_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_m48t35(*this, "m48t35" )
+	{
+	}
 
 	/* Video related */
 
@@ -248,9 +251,9 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	DECLARE_MACHINE_RESET(island2a);
 	UINT32 screen_update_multfish(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device<timekeeper_device> m_m48t35;
 };
 
 TILE_GET_INFO_MEMBER(multfish_state::get_multfish_tile_info)
@@ -377,21 +380,19 @@ WRITE8_MEMBER(multfish_state::multfish_bank_w)
 
 READ8_MEMBER(multfish_state::multfish_timekeeper_r)
 {
-	device_t *device = machine().device("m48t35");
-	return timekeeper_r(device, space, offset + 0x6000);
+	return m_m48t35->read(space, offset + 0x6000, 0xff);
 }
 
 WRITE8_MEMBER(multfish_state::multfish_timekeeper_w)
 {
-	device_t *device = machine().device("m48t35");
-	timekeeper_w(device, space, offset + 0x6000, data);
+	m_m48t35->write(space, offset + 0x6000, data, 0xff);
 }
 
 READ8_MEMBER(multfish_state::bankedram_r)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		return timekeeper_r(machine().device("m48t35"), space, offset + 0x2000*(m_rambk & 0x03));
+		return m_m48t35->read(space, offset + 0x2000*(m_rambk & 0x03), 0xff);
 	}
 	else
 	{
@@ -404,7 +405,7 @@ WRITE8_MEMBER(multfish_state::bankedram_w)
 {
 	if ((m_rambk & 0x80) == 0x00)
 	{
-		timekeeper_w(machine().device("m48t35"), space, offset + 0x2000*(m_rambk & 0x03), data);
+		m_m48t35->write(space, offset + 0x2000*(m_rambk & 0x03), data, 0xff);
 	}
 	else
 	{
@@ -1153,20 +1154,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( rollfr, multfish )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(rollfr_portmap)
-MACHINE_CONFIG_END
-
-MACHINE_RESET_MEMBER(multfish_state,island2a)
-{
-	multfish_state::machine_reset();
-
-	// this set needs preprogrammed data in timekeeper
-	timekeeper_w(machine().device("m48t35"), generic_space(), 0x2003 , 0x01);
-	timekeeper_w(machine().device("m48t35"), generic_space(), 0x4003 , 0x02);
-}
-static MACHINE_CONFIG_DERIVED( island2a, multfish )
-
-	/* basic machine hardware */
-	MCFG_MACHINE_RESET_OVERRIDE(multfish_state, island2a )
 MACHINE_CONFIG_END
 
 
@@ -4552,6 +4539,9 @@ ROM_START( island2a ) // 060529 bank F9
 	ROM_LOAD( "island2.006", 0x180000, 0x80000, CRC(55e285d9) SHA1(ba58963441c65220700cd8057e6afe3f5f8faa4f) )
 	ROM_LOAD( "island2.007", 0x280000, 0x80000, CRC(edd72be6) SHA1(fb1e63f59e8565c23ae43630fa572fbc022c878f) )
 	ROM_LOAD( "island2.008", 0x380000, 0x80000, CRC(c336d608) SHA1(55391183c6d95ecea81354efa70641350860d1f5) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 )
+	ROM_LOAD( "m48t35",      0x000000, 0x08000, CRC(c8ec9973) SHA1(7973189d9b380ca2591d3ef3b80446410f7a8ed8) )
 ROM_END
 
 ROM_START( island2b ) // 060529 bank F9, changed version text to 070205, skip some start tests
@@ -5277,7 +5267,7 @@ GAME( 2005, islanda,     island_parent,   multfish, multfish, driver_device,  0,
 GAME( 2005, islandb,     island_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, VIDEO GAME-1 OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 OS01"
 GAME( 2005, islandc,     island_parent,   multfish, multfish, multfish_state,  customl,       ROT0,  "bootleg", "Island (bootleg, 050713, LOTOS OS01)", GAME_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS OS01"
 
-GAME( 2006, island2a,    island2_parent,  island2a, multfish, driver_device,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9 (not standart, game not work)
+GAME( 2006, island2a,    island2_parent,  multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack)", GAME_SUPPORTS_SAVE ) // bank F9 (not standart, game not work)
 GAME( 2006, island2b,    island2_parent,  multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, banking address hack, changed version text)", GAME_SUPPORTS_SAVE ) // bank F9, changed version text to 070205, skip some start tests
 GAME( 2006, island2c,    island2_parent,  multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 060529, LOTTOGAME (I))", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 GAME( 2006, island2_3a,  island2_parent,  multfish, multfish, driver_device,  0,             ROT0,  "bootleg", "Island 2 (bootleg, 061218, VIDEO GAME-1 OS2-01)", GAME_SUPPORTS_SAVE ) // bank F9, modified graphics, changed version text to "VIDEO GAME-1 OS2-01"

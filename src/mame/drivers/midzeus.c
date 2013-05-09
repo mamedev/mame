@@ -31,7 +31,6 @@ The Grid         v1.2   10/18/2000
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/midzeus.h"
 #include "machine/midwayic.h"
-#include "machine/timekpr.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
 
@@ -153,16 +152,13 @@ WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 
 READ32_MEMBER(midzeus_state::zeus2_timekeeper_r)
 {
-	device_t *device = machine().device("m48t35");
-	return timekeeper_r(device, space, offset) | 0xffffff00;
+	return m_m48t35->read(space, offset, 0xff) | 0xffffff00;
 }
-
 
 WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 {
-	device_t *device = machine().device("m48t35");
 	if (bitlatch[2] && !cmos_protected)
-		timekeeper_w(device, space, offset, data);
+		m_m48t35->write(space, offset, data, 0xff);
 	else
 		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;

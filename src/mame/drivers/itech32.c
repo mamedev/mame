@@ -4258,8 +4258,8 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowln)
 
 void itech32_state::install_timekeeper()
 {
-	device_t *device = machine().device("m48t02");
-	m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_r), FUNC(timekeeper_w), 0xffffffff);
+	timekeeper_device *m48t02 = machine().device<timekeeper_device>("m48t02");
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8_delegate(FUNC(timekeeper_device::read), m48t02), write8_delegate(FUNC(timekeeper_device::write), m48t02), 0xffffffff);
 }
 
 DRIVER_INIT_MEMBER(itech32_state,wcbowlt)

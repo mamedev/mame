@@ -4,6 +4,7 @@
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
+#include "machine/timekpr.h"
 
 struct gfx_range
 {
@@ -77,7 +78,8 @@ public:
 		m_output(*this, "output"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_m48t35(*this,"m48t35")
 	{ }
 
 	/* memory pointers */
@@ -167,6 +169,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<m48t35_device> m_m48t35;
 	msm5205_device *m_msm_1;    // fcrash
 	msm5205_device *m_msm_2;    // fcrash
 	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);

@@ -64,8 +64,8 @@ protected:
 	timekeeper_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 public:
-	void write(UINT16 offset, UINT8 data);
-	UINT8 read(UINT16 offset);
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
 
 protected:
 	// device-level overrides
@@ -146,14 +146,5 @@ extern const device_type M48T35;
 extern const device_type M48T37;
 extern const device_type M48T58;
 extern const device_type MK48T08;
-
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-DECLARE_WRITE8_DEVICE_HANDLER( timekeeper_w );
-DECLARE_READ8_DEVICE_HANDLER( timekeeper_r );
 
 #endif // __TIMEKPR_H__
