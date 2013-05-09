@@ -45,6 +45,23 @@ static INPUT_PORTS_START( galaxian )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( galaxrf )
+	PORT_INCLUDE(galaxian)
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x03, 0x01, "Bonus Life / Enemy Bullet Speed" ) // not verified this
+	PORT_DIPSETTING(    0x00, "None, Slow" )
+	PORT_DIPSETTING(    0x01, "12000, Medium" )
+	PORT_DIPSETTING(    0x02, "20000, Fast" )
+	PORT_DIPSETTING(    0x03, "30000, Fastest" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPNAME( 0x08, 0x00, "Player Bullet Speed" )
+	PORT_DIPSETTING(    0x00, "Slow" )
+	PORT_DIPSETTING(    0x08, "Fast" ) 
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( superg )
 	PORT_INCLUDE(galaxian)
 
@@ -3059,6 +3076,22 @@ ROM_START( galaxiant )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",    0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
+ROM_END
+
+ROM_START( galaxrf )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "princip1.u",   0x0000, 0x0800, CRC(3d5d9bae) SHA1(36ef85b42c361e70cd6f31351d6f4b0ef3f3492f) )
+	ROM_LOAD( "princip2.v",   0x0800, 0x0800, CRC(a433067e) SHA1(1aed1a2153c4a32a9996fc709e544f2063885599) )
+	ROM_LOAD( "princip3.w",   0x1000, 0x0800, CRC(aaf038d4) SHA1(2d070fe7c4e9b26092f0f12a9db3392f7d8a65f1) )
+	ROM_LOAD( "princip4.y",   0x1800, 0x0800, CRC(d74bdd2a) SHA1(68917489b90e7fc3dd1fe9f18d7ef25e12c8d823) )
+	ROM_LOAD( "princip5.z",   0x2000, 0x0800, CRC(7eeb9e63) SHA1(c05da0f8a3c06aff441f3f9bda891f3e173dc7b7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "graphhj.j1",  0x0000, 0x0800, CRC(39fb43a4) SHA1(4755609bd974976f04855d51e08ec0d62ab4bc07) )
+	ROM_LOAD( "graphkl.l1",  0x0800, 0x0800, CRC(7e3f56a2) SHA1(a9795d8b7388f404f3b0e2c6ce15d713a4c5bafa) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // assumed to be the same
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )
 ROM_END
 
 ROM_START( astrians )
@@ -6653,6 +6686,7 @@ GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, RO
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, supergx,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu", "Super GX", GAME_NOT_WORKING | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 19??, tst_galx, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "<unknown>", "Galaxian Test ROM", GAME_SUPPORTS_SAVE )
+GAME( 1980, galaxrf,  galaxian, galaxian, galaxrf, galaxian_state,  galaxian, ROT90,  "bootleg (Recreativos Franco S.A.)", "Galaxian (Recreativos Franco S.A. Spanish bootleg)", GAME_SUPPORTS_SAVE )
 
 /* other games on basic galaxian hardware */
 GAME( 1981, blkhole,  0,        galaxian, blkhole, galaxian_state,  galaxian, ROT90,  "TDS & MINTS", "Black Hole", GAME_SUPPORTS_SAVE )
