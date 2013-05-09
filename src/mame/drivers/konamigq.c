@@ -62,7 +62,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
 		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu") { }
+		m_soundcpu(*this, "soundcpu")
+	{
+	}
 
 	required_device<am53cf96_device> m_am53cf96;
 
@@ -70,13 +72,13 @@ public:
 	UINT8 m_sndtor3k[ 16 ];
 	UINT8 *m_p_n_pcmram;
 	UINT8 m_sector_buffer[ 512 ];
-	DECLARE_WRITE32_MEMBER(soundr3k_w);
-	DECLARE_READ32_MEMBER(soundr3k_r);
-	DECLARE_WRITE32_MEMBER(mb89371_w);
-	DECLARE_READ32_MEMBER(mb89371_r);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
-	DECLARE_WRITE32_MEMBER(pcmram_w);
-	DECLARE_READ32_MEMBER(pcmram_r);
+	DECLARE_WRITE16_MEMBER(soundr3k_w);
+	DECLARE_READ16_MEMBER(soundr3k_r);
+	DECLARE_WRITE16_MEMBER(mb89371_w);
+	DECLARE_READ16_MEMBER(mb89371_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(pcmram_w);
+	DECLARE_READ16_MEMBER(pcmram_r);
 	DECLARE_READ16_MEMBER(sndcomm68k_r);
 	DECLARE_WRITE16_MEMBER(sndcomm68k_w);
 	DECLARE_READ16_MEMBER(tms57002_data_word_r);
@@ -94,46 +96,35 @@ public:
 
 /* Sound */
 
-WRITE32_MEMBER(konamigq_state::soundr3k_w)
+WRITE16_MEMBER(konamigq_state::soundr3k_w)
 {
-	if( ACCESSING_BITS_16_31 )
+	m_sndto000[ offset ] = data;
+	if( offset == 7 )
 	{
-		m_sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
-		if( offset == 3 )
-		{
-			m_soundcpu->set_input_line(1, HOLD_LINE );
-		}
-	}
-	if( ACCESSING_BITS_0_15 )
-	{
-		m_sndto000[ offset << 1 ] = data;
+		m_soundcpu->set_input_line(1, HOLD_LINE );
 	}
 }
 
-READ32_MEMBER(konamigq_state::soundr3k_r)
+READ16_MEMBER(konamigq_state::soundr3k_r)
 {
-	UINT32 data;
-
-	data = ( m_sndtor3k[ ( offset << 1 ) + 1 ] << 16 ) | m_sndtor3k[ offset << 1 ];
-
 	/* hack to help the main program start up */
-	if( offset == 1 )
+	if( offset == 2 || offset == 3 )
 	{
-		data = 0;
+		return 0;
 	}
 
-	return data;
+	return m_sndtor3k[ offset ];
 }
 
 /* UART */
 
-WRITE32_MEMBER(konamigq_state::mb89371_w)
+WRITE16_MEMBER(konamigq_state::mb89371_w)
 {
 }
 
-READ32_MEMBER(konamigq_state::mb89371_r)
+READ16_MEMBER(konamigq_state::mb89371_r)
 {
-	return 0xffffffff;
+	return 0xffff;
 }
 
 /* EEPROM */
@@ -150,7 +141,7 @@ static const UINT16 konamigq_def_eeprom[64] =
 	0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa,
 };
 
-WRITE32_MEMBER(konamigq_state::eeprom_w)
+WRITE16_MEMBER(konamigq_state::eeprom_w)
 {
 	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
@@ -159,30 +150,23 @@ WRITE32_MEMBER(konamigq_state::eeprom_w)
 
 /* PCM RAM */
 
-WRITE32_MEMBER(konamigq_state::pcmram_w)
+WRITE16_MEMBER(konamigq_state::pcmram_w)
 {
-	if( ACCESSING_BITS_0_7 )
-	{
-		m_p_n_pcmram[ offset << 1 ] = data;
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		m_p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
-	}
+	m_p_n_pcmram[ offset ] = data;
 }
 
-READ32_MEMBER(konamigq_state::pcmram_r)
+READ16_MEMBER(konamigq_state::pcmram_r)
 {
-	return ( m_p_n_pcmram[ ( offset << 1 ) + 1 ] << 16 ) | m_p_n_pcmram[ offset << 1 ];
+	return m_p_n_pcmram[ offset ];
 }
 
 /* Video */
 
 static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
-	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ(soundr3k_r)
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
+	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE16(soundr3k_w, 0xffffffff)
+	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ16(soundr3k_r, 0xffffffff)
+	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE16(eeprom_w, 0x0000ffff)
 	AM_RANGE(0x1f198000, 0x1f198003) AM_WRITENOP            /* cabinet lamps? */
 	AM_RANGE(0x1f1a0000, 0x1f1a0003) AM_WRITENOP            /* indicates gun trigger */
 	AM_RANGE(0x1f200000, 0x1f200003) AM_READ_PORT("GUNX1")
@@ -194,8 +178,8 @@ static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x1f230000, 0x1f230003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1f230004, 0x1f230007) AM_READ_PORT("P3_SERVICE")
 	AM_RANGE(0x1f238000, 0x1f238003) AM_READ_PORT("DSW")
-	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE(pcmram_r, pcmram_w)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
+	AM_RANGE(0x1f300000, 0x1f5fffff) AM_READWRITE16(pcmram_r, pcmram_w, 0xffffffff)
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
 ADDRESS_MAP_END
 

@@ -137,36 +137,35 @@ public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"),
-		m_maincpu(*this, "maincpu"),
-		m_eeprom(*this, "eeprom") { }
+		m_maincpu(*this, "maincpu")
+	{
+	}
 
 	required_device<am53cf96_device> m_am53cf96;
 
 	UINT32 m_flash_address;
 
 	UINT16 m_trackball_prev[ 2 ];
-	UINT32 m_trackball_data[ 2 ];
+	UINT16 m_trackball_data[ 2 ];
 	UINT16 m_btc_trackball_prev[ 4 ];
-	UINT32 m_btc_trackball_data[ 4 ];
+	UINT16 m_btc_trackball_data[ 4 ];
 
 	fujitsu_29f016a_device *m_flash8[4];
-	sharp_lh28f400_device *m_flash16[4];
+	sharp_lh28f400_device *m_flash16[1];
 
 	UINT8 m_sector_buffer[ 4096 ];
-	DECLARE_WRITE32_MEMBER(mb89371_w);
-	DECLARE_READ32_MEMBER(mb89371_r);
-	DECLARE_READ32_MEMBER(flash_r);
-	DECLARE_WRITE32_MEMBER(flash_w);
-	DECLARE_READ32_MEMBER(trackball_r);
-	DECLARE_READ32_MEMBER(unknown_r);
-	DECLARE_READ32_MEMBER(btcflash_r);
-	DECLARE_WRITE32_MEMBER(btcflash_w);
-	DECLARE_READ32_MEMBER(btc_trackball_r);
-	DECLARE_WRITE32_MEMBER(btc_trackball_w);
-	DECLARE_READ32_MEMBER(tokimeki_serial_r);
-	DECLARE_WRITE32_MEMBER(tokimeki_serial_w);
-	DECLARE_WRITE32_MEMBER(kdeadeye_0_w);
-	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(mb89371_w);
+	DECLARE_READ16_MEMBER(mb89371_r);
+	DECLARE_READ16_MEMBER(flash_r);
+	DECLARE_WRITE16_MEMBER(flash_w);
+	DECLARE_READ16_MEMBER(trackball_r);
+	DECLARE_READ16_MEMBER(unknown_r);
+	DECLARE_READ16_MEMBER(btcflash_r);
+	DECLARE_WRITE16_MEMBER(btcflash_w);
+	DECLARE_READ16_MEMBER(btc_trackball_r);
+	DECLARE_WRITE16_MEMBER(btc_trackball_w);
+	DECLARE_READ16_MEMBER(tokimeki_serial_r);
+	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
 	DECLARE_DRIVER_INIT(simpbowl);
 	DECLARE_DRIVER_INIT(tokimosh);
 	DECLARE_DRIVER_INIT(kdeadeye);
@@ -176,25 +175,15 @@ public:
 	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 	required_device<cpu_device> m_maincpu;
-	required_device<eeprom_device> m_eeprom;
 };
 
-/* EEPROM handlers */
-
-WRITE32_MEMBER(konamigv_state::eeprom_w)
-{
-	m_eeprom->write_bit((data&0x01) ? 1 : 0);
-	m_eeprom->set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-	m_eeprom->set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE32_MEMBER(konamigv_state::mb89371_w)
+WRITE16_MEMBER(konamigv_state::mb89371_w)
 {
 }
 
-READ32_MEMBER(konamigv_state::mb89371_r)
+READ16_MEMBER(konamigv_state::mb89371_r)
 {
-	return 0xffffffff;
+	return 0xffff;
 }
 
 static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
@@ -202,9 +191,45 @@ static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
 	AM_RANGE(0x1f100008, 0x1f10000b) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
-	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
+	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE_PORT("EEPROMOUT")
+	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE16(mb89371_r, mb89371_w, 0xffffffff)
 	AM_RANGE(0x1f780000, 0x1f780003) AM_WRITENOP /* watchdog? */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( simpbowl_map, AS_PROGRAM, 32, konamigv_state )
+	AM_IMPORT_FROM( konamigv_map )
+
+	AM_RANGE(0x1f680080, 0x1f68008f) AM_READWRITE16(flash_r, flash_w, 0xffffffff)
+	AM_RANGE(0x1f6800c0, 0x1f6800c7) AM_READ16(trackball_r, 0xffffffff)
+	AM_RANGE(0x1f6800c8, 0x1f6800cb) AM_READ16(unknown_r, 0x0000ffff) /* ?? */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( btchamp_map, AS_PROGRAM, 32, konamigv_state )
+	AM_IMPORT_FROM( konamigv_map )
+
+	AM_RANGE(0x1f380000, 0x1f3fffff) AM_READWRITE16(btcflash_r, btcflash_w, 0xffffffff)
+	AM_RANGE(0x1f680080, 0x1f680087) AM_READ16(btc_trackball_r, 0xffffffff)
+	AM_RANGE(0x1f680088, 0x1f68008b) AM_WRITE16(btc_trackball_w, 0xffffffff)
+	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kdeadeye_map, AS_PROGRAM, 32, konamigv_state )
+	AM_IMPORT_FROM( konamigv_map )
+
+	AM_RANGE(0x1f380000, 0x1f3fffff) AM_READWRITE16(btcflash_r, btcflash_w, 0xffffffff)
+	AM_RANGE(0x1f680080, 0x1f680083) AM_READ_PORT("GUNX1")
+	AM_RANGE(0x1f680090, 0x1f680093) AM_READ_PORT("GUNY1")
+	AM_RANGE(0x1f6800a0, 0x1f6800a3) AM_READ_PORT("GUNX2")
+	AM_RANGE(0x1f6800b0, 0x1f6800b3) AM_READ_PORT("GUNY2")
+	AM_RANGE(0x1f6800c0, 0x1f6800c3) AM_READ_PORT("BUTTONS")
+	AM_RANGE(0x1f6800e0, 0x1f6800e3) AM_WRITENOP
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tokimosh_map, AS_PROGRAM, 32, konamigv_state )
+	AM_IMPORT_FROM( konamigv_map )
+
+	AM_RANGE(0x1f680080, 0x1f680083) AM_READ16(tokimeki_serial_r, 0x0000ffff)
+	AM_RANGE(0x1f680090, 0x1f680093) AM_WRITE16(tokimeki_serial_w, 0x0000ffff)
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -394,52 +419,42 @@ static INPUT_PORTS_START( konamigv )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START4 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-READ32_MEMBER(konamigv_state::flash_r)
+READ16_MEMBER(konamigv_state::flash_r)
 {
-	int reg = offset*2;
-	//int shift = 0;
-
-	if (mem_mask == 0xffff0000)
-	{
-		reg++;
-		//shift = 16;
-	}
-
-	if (reg == 4)   // set odd address
+	if (offset == 4)   // set odd address
 	{
 		m_flash_address |= 1;
 	}
 
-	if (reg == 0)
+	if (offset == 0)
 	{
 		int chip = (m_flash_address >= 0x200000) ? 2 : 0;
-		int ret;
 
-		ret = m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff;
-		ret |= m_flash8[chip+1]->read(m_flash_address & 0x1fffff)<<8;
+		int ret = ( m_flash8[chip]->read(m_flash_address & 0x1fffff) & 0xff ) |
+			( m_flash8[chip+1]->read(m_flash_address & 0x1fffff) << 8 );
+
 		m_flash_address++;
 
 		return ret;
 	}
+
 	return 0;
 }
 
-WRITE32_MEMBER(konamigv_state::flash_w)
+WRITE16_MEMBER(konamigv_state::flash_w)
 {
-	int reg = offset*2;
 	int chip;
 
-	if (mem_mask == 0xffff0000)
-	{
-		reg++;
-		data>>= 16;
-	}
-
-	switch (reg)
+	switch (offset)
 	{
 		case 0:
 			chip = (m_flash_address >= 0x200000) ? 2 : 0;
@@ -451,10 +466,12 @@ WRITE32_MEMBER(konamigv_state::flash_w)
 			m_flash_address = 0;
 			m_flash_address |= (data<<1);
 			break;
+
 		case 2:
 			m_flash_address &= 0xff00ff;
 			m_flash_address |= (data<<8);
 			break;
+
 		case 3:
 			m_flash_address &= 0x00ffff;
 			m_flash_address |= (data<<15);
@@ -462,29 +479,31 @@ WRITE32_MEMBER(konamigv_state::flash_w)
 	}
 }
 
-READ32_MEMBER(konamigv_state::trackball_r)
+READ16_MEMBER(konamigv_state::trackball_r)
 {
-	if( offset == 0 && mem_mask == 0x0000ffff )
+	if( offset == 0 )
 	{
-		int axis;
-		UINT16 diff;
-		UINT16 value;
 		static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y" };
 
-		for( axis = 0; axis < 2; axis++ )
+		for( int axis = 0; axis < 2; axis++ )
 		{
-			value = ioport(axisnames[axis])->read();
-			diff = value - m_trackball_prev[ axis ];
+			UINT16 value = ioport(axisnames[axis])->read();
+			m_trackball_data[ axis ] = value - m_trackball_prev[ axis ];
 			m_trackball_prev[ axis ] = value;
-			m_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
 		}
 	}
-	return m_trackball_data[ offset ];
+
+	if( ( offset & 1 ) == 0 )
+	{
+		return m_trackball_data[ offset >> 1 ] << 8;
+	}
+
+	return m_trackball_data[ offset >> 1 ] & 0xf00;
 }
 
-READ32_MEMBER(konamigv_state::unknown_r)
+READ16_MEMBER(konamigv_state::unknown_r)
 {
-	return 0xffffffff;
+	return 0xffff;
 }
 
 DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
@@ -494,14 +513,13 @@ DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 	m_flash8[2] = machine().device<fujitsu_29f016a_device>("flash2");
 	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1f680080, 0x1f68008f, read32_delegate(FUNC(konamigv_state::flash_r),this), write32_delegate(FUNC(konamigv_state::flash_w),this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler     ( 0x1f6800c0, 0x1f6800c7, read32_delegate(FUNC(konamigv_state::trackball_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler     ( 0x1f6800c8, 0x1f6800cb, read32_delegate(FUNC(konamigv_state::unknown_r),this)); /* ?? */
-
 	DRIVER_INIT_CALL(konamigv);
 }
 
 static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
+
 	MCFG_FUJITSU_29F016A_ADD("flash0")
 	MCFG_FUJITSU_29F016A_ADD("flash1")
 	MCFG_FUJITSU_29F016A_ADD("flash2")
@@ -521,56 +539,41 @@ INPUT_PORTS_END
 
 /* Beat the Champ */
 
-READ32_MEMBER(konamigv_state::btcflash_r)
+READ16_MEMBER(konamigv_state::btcflash_r)
 {
-	if (mem_mask == 0x0000ffff)
-	{
-		return m_flash16[0]->read(offset*2);
-	}
-	else if (mem_mask == 0xffff0000)
-	{
-		return m_flash16[0]->read((offset*2)+1)<<16;
-	}
-
-	return 0;
+	return m_flash16[0]->read(offset);
 }
 
-WRITE32_MEMBER(konamigv_state::btcflash_w)
+WRITE16_MEMBER(konamigv_state::btcflash_w)
 {
-	if (mem_mask == 0x0000ffff)
-	{
-		m_flash16[0]->write(offset*2, data&0xffff);
-	}
-	else if (mem_mask == 0xffff0000)
-	{
-		m_flash16[0]->write((offset*2)+1, (data>>16)&0xffff);
-	}
+	m_flash16[0]->write(offset, data);
 }
 
-READ32_MEMBER(konamigv_state::btc_trackball_r)
+READ16_MEMBER(konamigv_state::btc_trackball_r)
 {
 //  mame_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
 
-	if( offset == 1 && mem_mask == 0xffff0000 )
+	if( offset == 3 )
 	{
-		int axis;
-		UINT16 diff;
-		UINT16 value;
 		static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
-		for( axis = 0; axis < 4; axis++ )
+		for( int axis = 0; axis < 4; axis++ )
 		{
-			value = ioport(axisnames[axis])->read();
-			diff = value - m_btc_trackball_prev[ axis ];
+			UINT16 value = ioport(axisnames[axis])->read();
+			m_btc_trackball_data[ axis ] = value - m_btc_trackball_prev[ axis ];
 			m_btc_trackball_prev[ axis ] = value;
-			m_btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
 		}
 	}
 
-	return m_btc_trackball_data[ offset ] | ( m_btc_trackball_data[ offset + 2 ] >> 8 );
+	if( ( offset & 1 ) == 0 )
+	{
+		return ( m_btc_trackball_data[ offset >> 1 ] << 8 ) | ( m_btc_trackball_data[ ( offset >> 1 ) + 2 ] & 0xff );
+	}
+
+	return ( m_btc_trackball_data[ offset >> 1 ] & 0xf00 ) | ( m_btc_trackball_data[ ( offset >> 1 ) + 2 ] >> 8 );
 }
 
-WRITE32_MEMBER(konamigv_state::btc_trackball_w)
+WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
 //  mame_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
 }
@@ -579,14 +582,13 @@ DRIVER_INIT_MEMBER(konamigv_state,btchamp)
 {
 	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1f680080, 0x1f68008f, read32_delegate(FUNC(konamigv_state::btc_trackball_r),this), write32_delegate(FUNC(konamigv_state::btc_trackball_w),this));
-	m_maincpu->space(AS_PROGRAM).nop_write                  ( 0x1f6800e0, 0x1f6800e3);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1f380000, 0x1f3fffff, read32_delegate(FUNC(konamigv_state::btcflash_r),this), write32_delegate(FUNC(konamigv_state::btcflash_w),this) );
-
 	DRIVER_INIT_CALL(konamigv);
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( btchamp_map )
+
 	MCFG_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
@@ -608,15 +610,15 @@ INPUT_PORTS_END
 
 /* Tokimeki Memorial games - have a mouse and printer and who knows what else */
 
-READ32_MEMBER(konamigv_state::tokimeki_serial_r)
+READ16_MEMBER(konamigv_state::tokimeki_serial_r)
 {
 	// bits checked: 0x80 and 0x20 for periodic status (800b6968 and 800b69e0 in tokimosh)
 	// 0x08 for reading the serial device (8005e624)
 
-	return 0xffffffff;
+	return 0xffff;
 }
 
-WRITE32_MEMBER(konamigv_state::tokimeki_serial_w)
+WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 {
 	/*
 	    serial EEPROM-like device here: when mem_mask == 0x000000ff only,
@@ -634,11 +636,13 @@ WRITE32_MEMBER(konamigv_state::tokimeki_serial_w)
 
 DRIVER_INIT_MEMBER(konamigv_state,tokimosh)
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler ( 0x1f680080, 0x1f680083, read32_delegate(FUNC(konamigv_state::tokimeki_serial_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler( 0x1f680090, 0x1f680093, write32_delegate(FUNC(konamigv_state::tokimeki_serial_w),this));
-
 	DRIVER_INIT_CALL(konamigv);
 }
+
+static MACHINE_CONFIG_DERIVED( tokimosh, konamigv )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( tokimosh_map )
+MACHINE_CONFIG_END
 
 /*
 Dead Eye
@@ -650,26 +654,17 @@ CD:
     A01
 */
 
-WRITE32_MEMBER(konamigv_state::kdeadeye_0_w)
-{
-}
-
 DRIVER_INIT_MEMBER(konamigv_state,kdeadeye)
 {
 	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
-
-	m_maincpu->space(AS_PROGRAM).install_read_port  ( 0x1f680080, 0x1f680083, "GUNX1" );
-	m_maincpu->space(AS_PROGRAM).install_read_port  ( 0x1f680090, 0x1f680093, "GUNY1" );
-	m_maincpu->space(AS_PROGRAM).install_read_port  ( 0x1f6800a0, 0x1f6800a3, "GUNX2" );
-	m_maincpu->space(AS_PROGRAM).install_read_port  ( 0x1f6800b0, 0x1f6800b3, "GUNY2" );
-	m_maincpu->space(AS_PROGRAM).install_read_port  ( 0x1f6800c0, 0x1f6800c3, "BUTTONS" );
-	m_maincpu->space(AS_PROGRAM).install_write_handler    ( 0x1f6800e0, 0x1f6800e3, write32_delegate(FUNC(konamigv_state::kdeadeye_0_w),this) );
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x1f380000, 0x1f3fffff, read32_delegate(FUNC(konamigv_state::btcflash_r),this), write32_delegate(FUNC(konamigv_state::btcflash_w),this));
 
 	DRIVER_INIT_CALL(konamigv);
 }
 
 static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
+
 	MCFG_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
@@ -852,11 +847,11 @@ GAME( 1996, pbball96, konamigv, konamigv, konamigv, konamigv_state, konamigv, RO
 GAME( 1996, hyperath, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Athlete (GV021 Japan 1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Let's Attack Crazy Cross (GV027 Asia 1.10)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, susume,   lacrazyc, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, btchamp,  konamigv, btchamp,  btchamp, konamigv_state,  btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  konamigv_state, btchamp,  ROT0, "Konami", "Beat the Champ (GV053 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, konamigv_state, kdeadeye, ROT0, "Konami", "Dead Eye (GV054 UAA01)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, weddingr, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, tokimosh, konamigv, konamigv, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1997, tokimosp, konamigv, konamigv, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1997, tokimosh, konamigv, tokimosh, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GE755 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1997, tokimosp, konamigv, tokimosh, konamigv, konamigv_state, tokimosh, ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal version PLUS (GE756 JAB)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1998, nagano98, konamigv, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Nagano Winter Olympics '98 (GX720 EAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 1998, naganoj,  nagano98, konamigv, konamigv, konamigv_state, konamigv, ROT0, "Konami", "Hyper Olympic in Nagano (GX720 JAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
 GAME( 2000, simpbowl, konamigv, simpbowl, simpbowl, konamigv_state, simpbowl, ROT0, "Konami", "Simpsons Bowling (GQ829 UAA)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE)
