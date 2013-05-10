@@ -383,7 +383,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8, bbusters_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
@@ -638,14 +638,11 @@ WRITE_LINE_MEMBER(bbusters_state::sound_irq)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2608_interface ym2608_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	},
-	DEVCB_DRIVER_LINE_MEMBER(bbusters_state,sound_irq)
+	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 /******************************************************************************/
@@ -726,7 +723,8 @@ static MACHINE_CONFIG_START( mechatt, bbusters_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
-	MCFG_SOUND_CONFIG(ym2608_config)
+	MCFG_YM2608_IRQ_HANDLER(WRITELINE(bbusters_state, sound_irq))
+	MCFG_YM2608_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

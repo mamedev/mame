@@ -936,7 +936,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1649,17 +1649,14 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static const ym2608_interface ym2608b_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
-	},
-	DEVCB_DRIVER_LINE_MEMBER(itech8_state,generate_sound_irq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(itech8_state,ym2203_portb_out),
 };
 
 
@@ -1741,7 +1738,8 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
-	MCFG_SOUND_CONFIG(ym2608b_config)
+	MCFG_YM2608_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
+	MCFG_YM2608_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

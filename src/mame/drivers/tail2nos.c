@@ -57,9 +57,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_byte_r) AM_WRITENOP /* the write is a clear pending command */
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE_LEGACY("ymsnd", ym2608_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_device, write)
 #if 0
-	AM_RANGE(0x18, 0x1b) AM_DEVREAD_LEGACY("ymsnd", ym2608_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_device, read)
 #endif
 ADDRESS_MAP_END
 
@@ -181,17 +181,14 @@ WRITE_LINE_MEMBER(tail2nos_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2608_interface ym2608_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(tail2nos_state,sound_bankswitch_w)
-	},
-	DEVCB_DRIVER_LINE_MEMBER(tail2nos_state,irqhandler)
+	AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(tail2nos_state,sound_bankswitch_w)
 };
 
 
@@ -256,7 +253,8 @@ static MACHINE_CONFIG_START( tail2nos, tail2nos_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2608_config)
+	MCFG_YM2608_IRQ_HANDLER(WRITELINE(tail2nos_state, irqhandler))
+	MCFG_YM2608_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

@@ -41,23 +41,21 @@ WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 	pic8259_ir4_w(machine().device("pic8259_slave"), state);
 }
 
-static const ym2608_interface pc98_ym2608_intf =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_porta_r),
-		DEVCB_NULL,//(pc9801_state,opn_portb_r),
-		DEVCB_NULL,//(pc9801_state,opn_porta_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_portb_w),
-	},
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,pc9801_sound_irq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_porta_r),
+	DEVCB_NULL,//(pc9801_state,opn_portb_r),
+	DEVCB_NULL,//(pc9801_state,opn_porta_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_portb_w),
 };
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X1*4) // actually YMF288, unknown clock / divider
-	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
+	MCFG_YM2608_IRQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, pc9801_118_device, pc9801_sound_irq))
+	MCFG_YM2608_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -192,7 +190,7 @@ void pc9801_118_device::device_reset()
 READ8_MEMBER(pc9801_118_device::pc9801_118_r)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
-		return ym2608_r(m_opn3, space, offset >> 1);
+		return m_opn3->read(space, offset >> 1);
 	else // odd
 	{
 		//printf("PC9801-118: Read to undefined port [%02x]\n",offset+0x188);
@@ -204,7 +202,7 @@ READ8_MEMBER(pc9801_118_device::pc9801_118_r)
 WRITE8_MEMBER(pc9801_118_device::pc9801_118_w)
 {
 	if(((offset & 5) == 0) || m_ext_reg)
-		ym2608_w(m_opn3,space, offset >> 1,data);
+		m_opn3->write(space, offset >> 1,data);
 	//else // odd
 	//  printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
