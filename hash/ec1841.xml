@@ -14,7 +14,8 @@
 	XXX
 -->
 <softwarelist name="ec1841" description="EC 1841 disk images">
-	<software name="alpha-dos-01.05">
+
+	<software name="ados0105">
 		<description>Alpha-DOS 01.05 (modified MS-DOS 3.20)</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -24,7 +25,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="alpha-dos-02.01">
+
+	<software name="ados0201">
 		<description>Alpha-DOS 02.01 (modified PC-DOS 3.30)</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -34,7 +36,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="basic-alpha-dos-2.0">
+
+	<software name="basic20a">
 		<description>BASIC 2.0 for Alpha-DOS</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -44,7 +47,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="basic-m86-2.0">
+
+	<software name="basic20m">
 		<description>BASIC 2.0 for M86</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -54,6 +58,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="demo">
 		<description>Demo disk</description>
 		<year>1988</year>
@@ -64,7 +69,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="tps-2.2.14">
+
+	<software name="tps2214">
 		<description>TPS release 2.2 changeset 14</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -74,7 +80,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="teletext-m86">
+
+	<software name="teletext">
 		<description>TELETEXT for M86</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -84,7 +91,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="textm86-alpha-dos-1.1.0">
+
+	<software name="textm86a">
 		<description>TEXTM86 1.1.0 for Alpha-DOS</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -94,7 +102,8 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="textm86-m86-1.1.0">
+
+	<software name="textm86m">
 		<description>TEXTM86 1.1.0 for M86</description>
 		<year>1988</year>
 		<publisher>MPO VT</publisher>
@@ -104,4 +113,5 @@
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>
