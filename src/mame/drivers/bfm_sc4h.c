@@ -189,10 +189,10 @@ READ16_MEMBER(sc4_state::sc4_mem_r)
 							return 0x0000;//space.machine().rand();;
 
 						case 0x1244:
-							return ymz280b_r(m_ymz,space,0);
+							return m_ymz->read(space,0);
 
 						case 0x1246:
-							return ymz280b_r(m_ymz,space,1);
+							return m_ymz->read(space,1);
 
 						default:
 							logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d (LAMPS etc.)\n", pc, offset*2, mem_mask, cs);
@@ -332,11 +332,11 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 							break;
 
 						case 0x1248:
-							ymz280b_w(m_ymz,space,0, data & 0xff);
+							m_ymz->write(space,0, data & 0xff);
 							break;
 
 						case 0x124a:
-							ymz280b_w(m_ymz,space,1, data & 0xff);
+							m_ymz->write(space,1, data & 0xff);
 							break;
 
 						case 0x1330:
@@ -625,11 +625,6 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_irqhandler)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static const ymz280b_interface ymz280b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(sc4_state,bfm_sc4_irqhandler)
-};
-
 
 
 void bfm_sc4_duart_irq_handler(device_t *device, int state, UINT8 vector)
@@ -760,7 +755,7 @@ MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_DEFAULT_LAYOUT(layout_bfm_sc4)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(sc4_state, bfm_sc4_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

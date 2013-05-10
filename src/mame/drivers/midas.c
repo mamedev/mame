@@ -288,7 +288,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
 	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
 	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
@@ -694,11 +694,6 @@ WRITE_LINE_MEMBER(midas_state::livequiz_irqhandler)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static const ymz280b_interface ymz280b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(midas_state,livequiz_irqhandler)
-};
-
 static MACHINE_CONFIG_START( livequiz, midas_state )
 
 	/* basic machine hardware */
@@ -723,7 +718,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(midas_state, livequiz_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -756,7 +751,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(midas_state, livequiz_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END

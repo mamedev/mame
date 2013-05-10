@@ -685,7 +685,7 @@ static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32, skns_state )
 	/* In between is write only */
 	AM_RANGE(0x0040000c, 0x0040000f) AM_READ_PORT("40000c")
 	AM_RANGE(0x00800000, 0x00801fff) AM_RAM AM_SHARE("nvram") /* 'backup' RAM */
-	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff0000) /* ymz280_w (sound) */
+	AM_RANGE(0x00c00000, 0x00c00003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff0000) /* ymz280_w (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0xffffffff)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
 	AM_RANGE(0x02000000, 0x02003fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
@@ -741,12 +741,6 @@ GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_NULL   // irq ?
-};
-
-
 static MSM6242_INTERFACE( rtc_intf )
 {
 	DEVCB_NULL
@@ -788,7 +782,6 @@ static MACHINE_CONFIG_START( skns, skns_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 33333333 / 2)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

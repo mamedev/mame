@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(ramdac_bg_w)
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(ramdac_fg_w)
-	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
+	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
 	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
 
 	AM_RANGE(0x700000, 0x7fffff) AM_ROM AM_REGION("maincpu", 0) // ?
@@ -655,11 +655,6 @@ GFXDECODE_END
 *    Sound Interface     *
 *************************/
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_NULL   // irq ?
-};
-
 INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
 {
 	//printf("1\n");
@@ -698,7 +693,6 @@ static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

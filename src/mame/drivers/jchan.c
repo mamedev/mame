@@ -468,7 +468,7 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(jchan_suprnova_sprite32_2_w) AM_SHARE("spriteram_2")
 	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_2_w) AM_SHARE("sprregs_2")
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff) // sound
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
 
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
 ADDRESS_MAP_END
@@ -577,14 +577,6 @@ static INPUT_PORTS_START( jchan2 )
 INPUT_PORTS_END
 
 
-/* sound stuff */
-
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_NULL   // irq ?
-};
-
-
 /* machine driver */
 
 static MACHINE_CONFIG_START( jchan, jchan_state )
@@ -626,7 +618,6 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

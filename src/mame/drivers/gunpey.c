@@ -1292,7 +1292,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
 
 	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(gunpey_output_w,0x00ff)
-	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
+	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff)
 
 	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
@@ -1315,11 +1315,6 @@ WRITE_LINE_MEMBER(gunpey_state::sound_irq_gen)
 {
 	logerror("sound irq\n");
 }
-
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(gunpey_state,sound_irq_gen)
-};
 
 
 /***************************************************************************************/
@@ -1474,7 +1469,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(gunpey_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END

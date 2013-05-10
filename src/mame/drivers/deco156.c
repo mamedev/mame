@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
+	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
 
 
@@ -314,11 +314,6 @@ WRITE_LINE_MEMBER(deco156_state::sound_irq_gen)
 	logerror("sound irq\n");
 }
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(deco156_state,sound_irq_gen)
-};
-
 INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
@@ -421,7 +416,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(deco156_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

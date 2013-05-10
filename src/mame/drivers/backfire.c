@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 //  AM_RANGE(0x1e8000, 0x1e8003) AM_READ(backfire_wheel1_r)
 //  AM_RANGE(0x1e8004, 0x1e8007) AM_READ(backfire_wheel2_r)
 
-	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
+	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
 
 
@@ -438,11 +438,6 @@ WRITE_LINE_MEMBER(backfire_state::sound_irq_gen)
 	logerror("sound irq\n");
 }
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(backfire_state,sound_irq_gen)
-};
-
 INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
@@ -545,7 +540,7 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 28000000 / 2)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(backfire_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

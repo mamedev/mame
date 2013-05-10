@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)    // VSCCS
 	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)  // CLTC
 	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE_LEGACY("k055555", k055555_word_w)  // PCU2
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff00)
+	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)  // Graphic planes
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram_xbgr_word_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
@@ -363,11 +363,6 @@ WRITE_LINE_MEMBER(bishi_state::sound_irq_gen)
 	m_maincpu->set_input_line(M68K_IRQ_1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bishi_state,sound_irq_gen)
-};
-
 
 static const k056832_interface bishi_k056832_intf =
 {
@@ -426,7 +421,7 @@ static MACHINE_CONFIG_START( bishi, bishi_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, SOUND_CLOCK) /* 16.9344MHz */
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(bishi_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

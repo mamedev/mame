@@ -2511,7 +2511,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w )
+	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE("ymz", ymz280b_device, read, write )
 	AM_RANGE( 0x90, 0x90 ) AM_READWRITE(cbaj_z80_latch_r, cbaj_z80_latch_w )
 	AM_RANGE( 0x91, 0x91 ) AM_READ(cbaj_z80_ready_r )
 ADDRESS_MAP_END

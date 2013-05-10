@@ -1852,7 +1852,7 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
 	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
 	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
+	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xffff0000)
 	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
 	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
 	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
@@ -1896,12 +1896,6 @@ READ8_MEMBER(firebeat_state::soundram_r)
 WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
 {
 }
-
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(firebeat_state,sound_irq_callback),         // irq
-	DEVCB_DRIVER_MEMBER(firebeat_state,soundram_r)
-};
 
 static INPUT_PORTS_START(ppp)
 	PORT_START("IN0")
@@ -2095,7 +2089,8 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
+	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -2148,7 +2143,8 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(firebeat_state, sound_irq_callback))
+	MCFG_YMZ280B_EXT_READ_HANDLER(READ8(firebeat_state, soundram_r))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

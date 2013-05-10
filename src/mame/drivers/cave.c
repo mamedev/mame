@@ -423,7 +423,7 @@ static const eeprom_interface eeprom_interface_93C46_pacslot =
 static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -448,7 +448,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -524,7 +524,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
 	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprite bank 1
 	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprite bank 2
 	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -586,7 +586,7 @@ static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
 /**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")         // Layer 1
 /**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")         // Layer 2
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)           // YMZ280
 /**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")                             // Layer 0 Control
 /**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")                             // Layer 1 Control
 /**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")                             // Layer 2 Control
@@ -700,8 +700,8 @@ static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)                                                  // IRQ Cause
 	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_SHARE("videoregs")                         // Video Regs
 	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8_LEGACY("ymz", ymz280b_r, 0x00ff)                                     // YMZ280
-	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)                                  // YMZ280
+//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8("ymz", ymz280b_device, read, 0x00ff)                           // YMZ280
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)                         // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")                                                        // Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")                                                        // Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)                                                  // Leds
@@ -716,7 +716,7 @@ static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")                           // Layer 0 Control
 	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram") // Sprites
 	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)                                  // YMZ280
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)                         // YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")                                                        // Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")                                                        // Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)                                                  // Leds
@@ -991,7 +991,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                                 // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM                                                                 // RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)                   // YMZ280
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)                   // YMZ280
 /**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")       // Sprites
 /**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")                         // Sprites?
 /**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")         // Layer 0
@@ -1797,11 +1797,6 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 	m_agallet_vblank_irq = 0;
 }
 
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(cave_state,sound_irq_gen)
-};
-
 WRITE_LINE_MEMBER(cave_state::irqhandler)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1852,7 +1847,7 @@ static MACHINE_CONFIG_START( dfeveron, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1894,7 +1889,7 @@ static MACHINE_CONFIG_START( ddonpach, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1986,7 +1981,7 @@ static MACHINE_CONFIG_START( esprade, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2026,7 +2021,7 @@ static MACHINE_CONFIG_START( gaia, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2067,7 +2062,7 @@ static MACHINE_CONFIG_START( guwange, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2163,7 +2158,7 @@ static MACHINE_CONFIG_START( korokoro, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2544,7 +2539,7 @@ static MACHINE_CONFIG_START( uopoko, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(cave_state, sound_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

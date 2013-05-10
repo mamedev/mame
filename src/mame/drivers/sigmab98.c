@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gegege_io_map, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE_LEGACY("ymz", ymz280b_w )
+	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE("ymz", ymz280b_device, write )
 
 	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE(regs_r,  regs_w )
 //  AM_RANGE( 0xa2, 0xa3 )

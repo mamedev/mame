@@ -493,16 +493,11 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xf00012, 0xf00013) AM_READ_PORT("P2")
 	AM_RANGE(0xf00014, 0xf00015) AM_READ_PORT("COIN")
 	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
-	AM_RANGE(0xf00020, 0xf00023) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)  // sound
+	AM_RANGE(0xf00020, 0xf00023) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)     // sound
 	AM_RANGE(0xf00040, 0xf00041) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
 	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
 ADDRESS_MAP_END
 
-
-static const ymz280b_interface ymz280b_intf =
-{
-	DEVCB_NULL   // irq ?
-};
 
 static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2) // Confirmed from PCB
@@ -540,7 +535,6 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_33_333MHz / 2)  // Confirmed from PCB
-	MCFG_SOUND_CONFIG(ymz280b_intf)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

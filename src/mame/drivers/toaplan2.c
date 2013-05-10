@@ -1431,7 +1431,7 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -2984,11 +2984,6 @@ WRITE_LINE_MEMBER(toaplan2_state::bbakraid_irqhandler)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static const ymz280b_interface ymz280b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(toaplan2_state,bbakraid_irqhandler)
-};
-
 
 static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
@@ -3845,7 +3840,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(toaplan2_state, bbakraid_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

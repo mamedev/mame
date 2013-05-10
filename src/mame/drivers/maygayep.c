@@ -105,11 +105,6 @@ WRITE_LINE_MEMBER(maygayep_state::irqhandler)
 {
 }
 
-static const ymz280b_interface ymz280b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(maygayep_state,irqhandler)
-};
-
 
 static MACHINE_CONFIG_START( maygayep, maygayep_state )
 	MCFG_CPU_ADD("maincpu", H83002, 16000000 )
@@ -118,7 +113,7 @@ static MACHINE_CONFIG_START( maygayep, maygayep_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 10000000 )
-	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_YMZ280B_IRQ_HANDLER(WRITELINE(maygayep_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

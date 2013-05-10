@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(realbrk_vram_2_w) AM_SHARE("vram_2")  // Text         (2)
 	AM_RANGE(0x606000, 0x60600f) AM_RAM_WRITE(realbrk_vregs_w) AM_SHARE("vregs")    // Scroll + Video Regs
 	AM_RANGE(0x605000, 0x61ffff) AM_RAM                                         //
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff00)   // YMZ280
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)   // YMZ280
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                                         // RAM
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)  // TMP68301 Registers
 ADDRESS_MAP_END
