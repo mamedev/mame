@@ -2327,15 +2327,16 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="mgear2ssd" cloneof="mgear2ss">
-		<description>Metal Gear 2 - Solid Snake (Demo) (Jpn)</description>
-		<year>1990</year>
+	<software name="mgearjvc" cloneof="mgear">
+		<description>Metal Gear (Jpn, Virtual Console)</description>
+		<year>2010</year>
 		<publisher>Konami</publisher>
-		<info name="alt_title" value="ソリッドスネークメタルギア2" />
+		<info name="alt_title" value="メタルギア" />
+		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="KONAMI-SCC" />
-			<dataarea name="rom" size="131072">
-				<rom name="metal gear 2 - solid snake (japan) (demo).rom" size="131072" crc="dcee5080" sha1="21ac0ae7da47abf30986b479489134c79405f95d" status="baddump" offset="0" />
+			<feature name="mapper" value="KONAMI" />
+			<dataarea name="rom" size="262144">
+				<rom name="megarom.rom" size="262144" crc="ed46831f" sha1="6228aef9c26276b9ed4157d1c5b3912d27ee6ce5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2349,6 +2350,32 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="KONAMI-SCC" />
 			<dataarea name="rom" size="524288">
 				<rom name="metal gear 2 - solid snake (japan).rom" size="524288" crc="18b1f34b" sha1="af567ea6e27912d6d5bf1c8e9bc18e9b393fd1ab" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgear2ssd" cloneof="mgear2ss">
+		<description>Metal Gear 2 - Solid Snake (Demo) (Jpn)</description>
+		<year>1990</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ソリッドスネークメタルギア2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="131072">
+				<rom name="metal gear 2 - solid snake (japan) (demo).rom" size="131072" crc="dcee5080" sha1="21ac0ae7da47abf30986b479489134c79405f95d" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgear2ssvc" cloneof="mgear2ss">
+		<description>Metal Gear 2 - Solid Snake (Jpn, Virtual Console)</description>
+		<year>2010</year>
+		<publisher>Konami</publisher>
+		<info name="alt_title" value="ソリッドスネークメタルギア2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="KONAMI-SCC" />
+			<dataarea name="rom" size="524288">
+				<rom name="megarom.rom" size="524288" crc="a02a1669" sha1="d8cd8c87d720cf0bf52a7f432999979de5438bd5" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
