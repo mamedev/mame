@@ -1257,7 +1257,7 @@ WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)          /* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram") /* shared ram?? */
-	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
+	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE(dmaoffset_w)  /* dma */
 	AM_RANGE(0x1fa00000, 0x1fbfffff) AM_ROMBANK("bank1") /* banked roms */

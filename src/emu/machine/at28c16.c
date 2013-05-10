@@ -87,7 +87,7 @@ const address_space_config *at28c16_device::memory_space_config( address_spacenu
 
 void at28c16_device::device_start()
 {
-	m_write_timer = machine().scheduler().timer_alloc( FUNC(write_finished), this );
+	m_write_timer = timer_alloc(0);
 
 	save_item( NAME(m_a9_12v) );
 	save_item( NAME(m_oe_12v) );
@@ -182,12 +182,7 @@ void at28c16_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE8_DEVICE_HANDLER( at28c16_w )
-{
-	downcast<at28c16_device *>( device )->write( offset, data );
-}
-
-void at28c16_device::write( offs_t offset, UINT8 data )
+WRITE8_MEMBER( at28c16_device::write )
 {
 	if( m_last_write >= 0 )
 	{
@@ -225,12 +220,7 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 }
 
 
-READ8_DEVICE_HANDLER( at28c16_r )
-{
-	return downcast<at28c16_device *>( device )->read( offset );
-}
-
-UINT8 at28c16_device::read( offs_t offset )
+READ8_MEMBER( at28c16_device::read )
 {
 	if( m_last_write >= 0 )
 	{
@@ -252,12 +242,7 @@ UINT8 at28c16_device::read( offs_t offset )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( at28c16_a9_12v )
-{
-	downcast<at28c16_device *>( device )->set_a9_12v( state );
-}
-
-void at28c16_device::set_a9_12v( int state )
+WRITE_LINE_MEMBER( at28c16_device::set_a9_12v )
 {
 	state &= 1;
 	if( m_a9_12v != state )
@@ -268,12 +253,7 @@ void at28c16_device::set_a9_12v( int state )
 }
 
 
-WRITE_LINE_DEVICE_HANDLER( at28c16_oe_12v )
-{
-	downcast<at28c16_device *>( device )->set_oe_12v( state );
-}
-
-void at28c16_device::set_oe_12v( int state )
+WRITE_LINE_MEMBER( at28c16_device::set_oe_12v )
 {
 	state &= 1;
 	if( m_oe_12v != state )
@@ -284,11 +264,12 @@ void at28c16_device::set_oe_12v( int state )
 }
 
 
-//**************************************************************************
-//  INTERNAL HELPERS
-//**************************************************************************
-
-TIMER_CALLBACK( at28c16_device::write_finished )
+void at28c16_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	reinterpret_cast<at28c16_device *>(ptr)->m_last_write = -1;
+	switch( id )
+	{
+	case 0:
+		m_last_write = -1;
+		break;
+	}
 }

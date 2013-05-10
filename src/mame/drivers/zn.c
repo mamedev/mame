@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x1fa30000, 0x1fa30003) AM_NOP /* ?? */
 	AM_RANGE(0x1fa40000, 0x1fa40003) AM_READNOP /* ?? */
 	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READNOP /* ?? */
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
+	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb20000, 0x1fb20007) AM_READ(unknown_r)
 ADDRESS_MAP_END
 

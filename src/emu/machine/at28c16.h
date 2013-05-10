@@ -44,10 +44,10 @@ public:
 	at28c16_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
 
 	// I/O operations
-	void write( offs_t offset, UINT8 data );
-	UINT8 read( offs_t offset );
-	void set_a9_12v( int state );
-	void set_oe_12v( int state );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
+	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
 
 protected:
 	// device-level overrides
@@ -55,6 +55,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
@@ -63,9 +64,6 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read( emu_file &file );
 	virtual void nvram_write( emu_file &file );
-
-	// internal helpers
-	static TIMER_CALLBACK( write_finished );
 
 	// internal state
 	address_space_config m_space_config;
@@ -78,15 +76,5 @@ protected:
 
 // device type definition
 extern const device_type AT28C16;
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-DECLARE_WRITE8_DEVICE_HANDLER( at28c16_w );
-DECLARE_READ8_DEVICE_HANDLER( at28c16_r );
-WRITE_LINE_DEVICE_HANDLER( at28c16_a9_12v );
-WRITE_LINE_DEVICE_HANDLER( at28c16_oe_12v );
 
 #endif

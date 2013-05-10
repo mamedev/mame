@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_SHARE("shared_ram")
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE_LEGACY(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY(ygv608_debug_trigger)
 #endif

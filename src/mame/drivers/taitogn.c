@@ -818,7 +818,7 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE(control3_r, control3_w)
 	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READNOP // systematic read at spu_address + 250000, result dropped, maybe other accesses
 	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ(hack1_r)
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
+	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0xffffffff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE(rf5c296_io_r, rf5c296_io_w)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE(control_r, control_w)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE(control2_w)
