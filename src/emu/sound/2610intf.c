@@ -18,25 +18,25 @@
 
 static void psg_set_clock(void *param, int clock)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ay8910_set_clock_ym(ym2610->_psg(), clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ay8910_write_ym(ym2610->_psg(), address, data);
 }
 
 static int psg_read(void *param)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	return ay8910_read_ym(ym2610->_psg());
 }
 
 static void psg_reset(void *param)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ay8910_reset_ym(ym2610->_psg());
 }
 
@@ -57,7 +57,7 @@ void *ym2610_device::_psg()
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ym2610->_IRQHandler(irq);
 }
 
@@ -84,7 +84,7 @@ void ym2610_device::device_timer(emu_timer &timer, device_timer_id id, int param
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ym2610->_timer_handler(c, count, clock);
 }
 
@@ -106,7 +106,7 @@ void ym2610_device::_timer_handler(int c,int count,int clock)
 /* update request from fm.c */
 void ym2610_update_request(void *param)
 {
-	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610_device *ym2610 = (ym2610_device *) param;
 	ym2610->_ym2610_update_request();
 }
 
