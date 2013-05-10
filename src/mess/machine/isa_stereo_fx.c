@@ -123,7 +123,7 @@ static MACHINE_CONFIG_FRAGMENT( stereo_fx )
 	MCFG_SOUND_ADD("dacr", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_PC_JOY_ADD("joy")
+	MCFG_PC_JOY_ADD("pc_joy")
 MACHINE_CONFIG_END
 
 const rom_entry *stereo_fx_device::device_rom_region() const
@@ -195,7 +195,7 @@ stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *ta
 	device_isa8_card_interface(mconfig, *this),
 	m_dacl(*this, "dacl"),
 	m_dacr(*this, "dacr"),
-	m_joy(*this, "joy"),
+	m_joy(*this, "pc_joy"),
 	m_cpu(*this, "stereo_fx_cpu")
 {
 	m_t1 = 0;
@@ -204,7 +204,7 @@ stereo_fx_device::stereo_fx_device(const machine_config &mconfig, const char *ta
 void stereo_fx_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
+	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
 	m_isa->install_device(0x0226, 0x0227, 0, 0, read8_delegate(FUNC(stereo_fx_device::invalid_r), this), write8_delegate(FUNC(stereo_fx_device::dsp_reset_w), this));
 	m_isa->install_device(0x022a, 0x022b, 0, 0, read8_delegate(FUNC(stereo_fx_device::dsp_data_r), this), write8_delegate(FUNC(stereo_fx_device::invalid_w), this) );
 	m_isa->install_device(0x022c, 0x022d, 0, 0, read8_delegate(FUNC(stereo_fx_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(stereo_fx_device::dsp_cmd_w), this) );

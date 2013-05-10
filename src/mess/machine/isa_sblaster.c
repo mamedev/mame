@@ -107,7 +107,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_PC_JOY_ADD("joy")
+	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_PC_JOY_ADD("joy")
+	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
@@ -143,7 +143,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ADD("sbdacr", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
-	MCFG_PC_JOY_ADD("joy")
+	MCFG_PC_JOY_ADD("pc_joy")
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
@@ -1122,7 +1122,7 @@ sb_device::sb_device(const machine_config &mconfig, device_type type, const char
 	device_serial_interface(mconfig, *this),
 	m_dacl(*this, "sbdacl"),
 	m_dacr(*this, "sbdacr"),
-	m_joy(*this, "joy"),
+	m_joy(*this, "pc_joy"),
 	m_mdout(*this, "mdout")
 {
 }
@@ -1164,7 +1164,7 @@ isa16_sblaster16_device::isa16_sblaster16_device(const machine_config &mconfig, 
 
 void sb8_device::device_start()
 {
-	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
+	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
 	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
@@ -1222,7 +1222,7 @@ void isa8_sblaster1_5_device::device_start()
 
 void sb16_device::device_start()
 {
-	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
+	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
 	m_isa->install_device(                   0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );

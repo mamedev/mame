@@ -141,6 +141,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
 	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	DECLARE_WRITE8_MEMBER(asst128_fdc_dor_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	void fdc_interrupt(bool state);

@@ -1322,6 +1322,13 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
 	return data;
 }
 
+WRITE8_MEMBER(pc_state::asst128_fdc_dor_w)
+{
+	pc_fdc_xt_device *fdc = machine().device<pc_fdc_xt_device>("fdc");
+
+	fdc->tc_w((data & 0x80) == 0x80);
+	fdc->dor_w(space, offset, data, mem_mask);
+}
 
 /**********************************************************
  *
