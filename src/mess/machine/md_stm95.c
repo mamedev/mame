@@ -16,6 +16,21 @@
 #include "machine/md_stm95.h"
 
 
+stm95_eeprom_device::stm95_eeprom_device(running_machine &machine, UINT8 *eeprom) :
+			stm_state(IDLE),
+			stream_pos(0),
+			m_machine(machine)
+{
+	eeprom_data = eeprom;
+	state_save_register_item(machine, "STM95", NULL, 0, latch);
+	state_save_register_item(machine, "STM95", NULL, 0, reset_line);
+	state_save_register_item(machine, "STM95", NULL, 0, sck_line);
+	state_save_register_item(machine, "STM95", NULL, 0, WEL);
+	state_save_register_item(machine, "STM95", NULL, 0, stream_pos);
+	state_save_register_item(machine, "STM95", NULL, 0, stream_data);
+	state_save_register_item(machine, "STM95", NULL, 0, eeprom_addr);
+}
+
 void stm95_eeprom_device::set_cs_line(int state)
 {
 	reset_line = state;
@@ -177,11 +192,10 @@ md_eeprom_stm95_device::md_eeprom_stm95_device(const machine_config &mconfig, co
 void md_eeprom_stm95_device::device_start()
 {
 	nvram_alloc(machine(), M95320_SIZE);
-	m_stm95.eeprom_data = (UINT8*)get_nvram_base();
+	m_stm95 = auto_alloc(machine(), stm95_eeprom_device(machine(), (UINT8*)get_nvram_base()));
 
 	save_item(NAME(m_rdcnt));
 	save_item(NAME(m_bank));
-	//TODO: save and restore the m_stm95...
 }
 
 void md_eeprom_stm95_device::device_reset()
@@ -227,7 +241,7 @@ READ16_MEMBER(md_eeprom_stm95_device::read_a13)
 {
 	if (offset == 0x0a/2)
 	{
-		return m_stm95.get_so_line() & 1;
+		return m_stm95->get_so_line() & 1;
 	}
 	return 0xffff;
 }
@@ -244,9 +258,9 @@ WRITE16_MEMBER(md_eeprom_stm95_device::write_a13)
 	}
 	else if (offset < 0x0a/2)
 	{
-		m_stm95.set_si_line(BIT(data, 0));
-		m_stm95.set_sck_line(BIT(data, 1));
-		m_stm95.set_halt_line(BIT(data, 2));
-		m_stm95.set_cs_line(BIT(data, 3));
+		m_stm95->set_si_line(BIT(data, 0));
+		m_stm95->set_sck_line(BIT(data, 1));
+		m_stm95->set_halt_line(BIT(data, 2));
+		m_stm95->set_cs_line(BIT(data, 3));
 	}
 }

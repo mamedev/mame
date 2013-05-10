@@ -103,6 +103,7 @@ void device_md_cart_interface::nvram_alloc(running_machine &machine, size_t size
 	{
 		m_nvram = auto_alloc_array_clear(machine, UINT16, size/sizeof(UINT16));
 		m_nvram_size = size;
+		state_save_register_item_pointer(machine, "MD_CART", NULL, 0, m_nvram, m_nvram_size);
 	}
 }
 

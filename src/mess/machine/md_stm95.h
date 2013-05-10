@@ -26,10 +26,8 @@ enum STMSTATE
 class stm95_eeprom_device
 {
 public:
-	stm95_eeprom_device() :
-	stm_state(IDLE),
-	stream_pos(0)
-	{};
+	stm95_eeprom_device(running_machine &machine, UINT8 *eeprom);
+	running_machine &machine() const { return m_machine; }
 
 	UINT8   *eeprom_data;
 	void    set_cs_line(int);
@@ -48,6 +46,8 @@ protected:
 	int     stream_pos;
 	int     stream_data;
 	int     eeprom_addr;
+	
+	running_machine& m_machine;
 };
 
 
@@ -74,7 +74,7 @@ private:
 	UINT8 m_bank[3];
 	int m_rdcnt;
 
-	stm95_eeprom_device m_stm95;
+	stm95_eeprom_device *m_stm95;
 };
 
 

@@ -27,7 +27,7 @@ const device_type GB_CART_SLOT = &device_creator<gb_cart_slot_device>;
 const device_type MEGADUCK_CART_SLOT = &device_creator<megaduck_cart_slot_device>;
 
 //**************************************************************************
-//    MD cartridges Interface
+//    GB cartridges Interface
 //**************************************************************************
 
 //-------------------------------------------------
@@ -76,6 +76,7 @@ void device_gb_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
 	{
 		m_ram = auto_alloc_array_clear(machine, UINT8, size);
 		m_ram_size = size;
+		state_save_register_item_pointer(machine, "GB_CART", NULL, 0, m_ram, m_ram_size);
 	}
 }
 

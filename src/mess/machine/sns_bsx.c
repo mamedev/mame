@@ -73,7 +73,6 @@ void sns_rom_bsx_device::device_start()
 	save_item(NAME(access_60_6f));
 	save_item(NAME(rom_access));
 	save_item(NAME(m_pram));
-	// TODO: save unit-related items and fix their restore...
 }
 
 void sns_rom_bsx_device::device_reset()
@@ -117,6 +116,10 @@ void sns_rom_bsmempak_device::device_reset()
 BSX_base::BSX_base(running_machine &machine)
 			: m_machine(machine)
 {
+	state_save_register_item(machine, "SNES_BSX", NULL, 0, regs);
+	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_counter);
+	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_hour);
+	state_save_register_item(machine, "SNES_BSX", NULL, 0, r2192_second);
 }
 
 void BSX_base::init()
