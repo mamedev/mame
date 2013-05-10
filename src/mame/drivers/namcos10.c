@@ -387,7 +387,7 @@ READ16_MEMBER(namcos10_state::range_r)
 }
 
 static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000fffff)
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
 	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
 
