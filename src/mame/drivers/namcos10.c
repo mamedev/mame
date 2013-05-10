@@ -277,20 +277,19 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	// memm variant interface
-	DECLARE_WRITE32_MEMBER(key_w);
-	DECLARE_READ32_MEMBER(range_r);
-	DECLARE_WRITE32_MEMBER(bank_w);
+	DECLARE_WRITE16_MEMBER(key_w);
+	DECLARE_READ16_MEMBER(range_r);
+	DECLARE_WRITE16_MEMBER(bank_w);
 
 	// memn variant interface
-	DECLARE_READ32_MEMBER (nand_status_r);
-	DECLARE_WRITE32_MEMBER(nand_address1_w);
-	DECLARE_WRITE32_MEMBER(nand_address2_w);
-	DECLARE_WRITE32_MEMBER(nand_address3_w);
-	DECLARE_WRITE32_MEMBER(nand_address4_w);
-	DECLARE_READ32_MEMBER (nand_data_r);
-	DECLARE_WRITE32_MEMBER(watchdog_w);
-	DECLARE_WRITE32_MEMBER(nand_block_w);
-	DECLARE_READ32_MEMBER (nand_block_r);
+	DECLARE_READ16_MEMBER (nand_status_r);
+	DECLARE_WRITE8_MEMBER(nand_address1_w);
+	DECLARE_WRITE8_MEMBER(nand_address2_w);
+	DECLARE_WRITE8_MEMBER(nand_address3_w);
+	DECLARE_WRITE8_MEMBER(nand_address4_w);
+	DECLARE_READ16_MEMBER(nand_data_r);
+	DECLARE_WRITE16_MEMBER(nand_block_w);
+	DECLARE_READ16_MEMBER(nand_block_r);
 
 	UINT8 *nand_base;
 	void nand_copy( UINT32 *dst, UINT32 address, int len );
@@ -300,7 +299,7 @@ private:
 	UINT8  cnt;
 	UINT32 bank_base;
 	UINT32 nand_address;
-	UINT32 block[0x1ff];
+	UINT16 block[0x1ff];
 
 	UINT16 nand_read( UINT32 address );
 	UINT16 nand_read2( UINT32 address );
@@ -338,27 +337,21 @@ ADDRESS_MAP_END
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
 // decryption in range_r then jumps there (and dies horribly, of course)
 
-WRITE32_MEMBER(namcos10_state::key_w )
+WRITE16_MEMBER(namcos10_state::key_w )
 {
 	key = (data >> 15) | (data << 1);
 	logerror("key_w %04x\n", key);
 	cnt = 0;
 }
 
-WRITE32_MEMBER(namcos10_state::bank_w)
+WRITE16_MEMBER(namcos10_state::bank_w)
 {
-	bank_base = 0x80000*(offset*2 + (ACCESSING_BITS_16_31 ? 1 : 0));
+	bank_base = 0x80000 * offset;
 }
 
-READ32_MEMBER(namcos10_state::range_r)
+READ16_MEMBER(namcos10_state::range_r)
 {
-	UINT32 data32 = ((const UINT32 *)(memregion("maincpu:rom")->base()))[offset+bank_base];
-
-	UINT16 d16;
-	if(ACCESSING_BITS_16_31)
-		d16 = data32 >> 16;
-	else
-		d16 = data32;
+	UINT32 d16 = ((const UINT16 *)(memregion("maincpu:rom")->base()))[offset+bank_base];
 
 	/* This is not entirely correct, but not entirely incorrect either...
 	   It's also specific to mrdriller2, it seems.
@@ -390,16 +383,13 @@ READ32_MEMBER(namcos10_state::range_r)
 
 	cnt++;
 
-	if(ACCESSING_BITS_16_31)
-		return dd16 << 16;
-	else
-		return dd16;
+	return dd16;
 }
 
 static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE(key_w)
-	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ (range_r)
-	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE(bank_w)
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000fffff)
+	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
+	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
 
 	AM_IMPORT_FROM(namcos10_map)
 ADDRESS_MAP_END
@@ -410,32 +400,32 @@ ADDRESS_MAP_END
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
 
-READ32_MEMBER(namcos10_state::nand_status_r )
+READ16_MEMBER(namcos10_state::nand_status_r )
 {
 	return 0;
 }
 
-WRITE32_MEMBER(namcos10_state::nand_address1_w )
+WRITE8_MEMBER(namcos10_state::nand_address1_w )
 {
 	logerror("nand_a1_w %08x (%08x)\n", data, space.device().safe_pc());
-	//  nand_address = ( nand_address & 0x00ffffff ) | ( ( data & 0xff ) << 24 );
+	//  nand_address = ( nand_address & 0x00ffffff ) | ( data << 24 );
 }
 
-WRITE32_MEMBER(namcos10_state::nand_address2_w )
+WRITE8_MEMBER( namcos10_state::nand_address2_w )
 {
 	logerror("nand_a2_w %08x (%08x)\n", data, space.device().safe_pc());
-	nand_address = ( nand_address & 0xffffff00 ) | ( ( data & 0xff ) <<  0 );
+	nand_address = ( nand_address & 0xffffff00 ) | ( data << 0 );
 }
 
-WRITE32_MEMBER(namcos10_state::nand_address3_w )
+WRITE8_MEMBER( namcos10_state::nand_address3_w )
 {
 	logerror("nand_a3_w %08x (%08x)\n", data, space.device().safe_pc());
-	nand_address = ( nand_address & 0xffff00ff ) | ( ( data & 0xff ) <<  8 );
+	nand_address = ( nand_address & 0xffff00ff ) | ( data <<  8 );
 }
 
-WRITE32_MEMBER(namcos10_state::nand_address4_w )
+WRITE8_MEMBER( namcos10_state::nand_address4_w )
 {
-	nand_address = ( nand_address & 0xff00ffff ) | ( ( data & 0xff ) << 16 );
+	nand_address = ( nand_address & 0xff00ffff ) | ( data << 16 );
 	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, space.device().safe_pc(), nand_address*2);
 }
 
@@ -451,9 +441,9 @@ UINT16 namcos10_state::nand_read2( UINT32 address )
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
 }
 
-READ32_MEMBER(namcos10_state::nand_data_r )
+READ16_MEMBER( namcos10_state::nand_data_r )
 {
-	UINT32 data = nand_read2( nand_address * 2 );
+	UINT16 data = nand_read2( nand_address * 2 );
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
 
@@ -473,30 +463,26 @@ void namcos10_state::nand_copy( UINT32 *dst, UINT32 address, int len )
 	}
 }
 
-WRITE32_MEMBER(namcos10_state::nand_block_w)
+WRITE16_MEMBER(namcos10_state::nand_block_w)
 {
 	COMBINE_DATA( &block[offset] );
 }
 
-READ32_MEMBER(namcos10_state::nand_block_r)
+READ16_MEMBER(namcos10_state::nand_block_r)
 {
 	return block[ offset ];
 }
 
-WRITE32_MEMBER(namcos10_state::watchdog_w)
-{
-}
-
 static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE(key_w)
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000ffff)
 
-	AM_RANGE(0x1f400000, 0x1f400003) AM_READ (nand_status_r)
-	AM_RANGE(0x1f410000, 0x1f410003) AM_WRITE(nand_address1_w)
-	AM_RANGE(0x1f420000, 0x1f420003) AM_WRITE(nand_address2_w)
-	AM_RANGE(0x1f430000, 0x1f430003) AM_WRITE(nand_address3_w)
-	AM_RANGE(0x1f440000, 0x1f440003) AM_WRITE(nand_address4_w)
-	AM_RANGE(0x1f450000, 0x1f450003) AM_READ (nand_data_r)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_READWRITE(nand_block_r, nand_block_w)
+	AM_RANGE(0x1f400000, 0x1f400003) AM_READ16(nand_status_r, 0x0000ffff)
+	AM_RANGE(0x1f410000, 0x1f410003) AM_WRITE8(nand_address1_w, 0x000000ff)
+	AM_RANGE(0x1f420000, 0x1f420003) AM_WRITE8(nand_address2_w, 0x000000ff)
+	AM_RANGE(0x1f430000, 0x1f430003) AM_WRITE8(nand_address3_w, 0x000000ff)
+	AM_RANGE(0x1f440000, 0x1f440003) AM_WRITE8(nand_address4_w, 0x000000ff)
+	AM_RANGE(0x1f450000, 0x1f450003) AM_READ16(nand_data_r, 0x0000ffff)
+	AM_RANGE(0x1fb60000, 0x1fb60003) AM_READWRITE16(nand_block_r, nand_block_w, 0x0000ffff)
 
 	AM_IMPORT_FROM(namcos10_map)
 ADDRESS_MAP_END
