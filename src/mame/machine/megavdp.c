@@ -153,7 +153,6 @@ void sega_genesis_vdp_device::device_start()
 	save_item(NAME(m_visible_scanlines));
 	save_item(NAME(m_irq6_scanline));
 	save_item(NAME(m_z80irq_scanline));
-//  save_item(NAME(m_total_scanlines));
 	save_item(NAME(m_scanline_counter));
 
 	m_sprite_renderline = auto_alloc_array(machine(), UINT8, 1024);
@@ -174,15 +173,24 @@ void sega_genesis_vdp_device::device_start()
 
 
 	if (!m_use_alt_timing)
-	{
 		m_render_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
-	}
 	else
-	{
 		m_render_line = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
-	}
 
 	m_render_line_raw = auto_alloc_array(machine(), UINT16, machine().primary_screen->width());
+
+	// FIXME: are these all needed? I'm pretty sure some of these (most?) are just helpers which don't need to be saved, 
+	// but better safe than sorry...
+	save_pointer(NAME(m_sprite_renderline), 1024);
+	save_pointer(NAME(m_highpri_renderline), 320);
+	save_pointer(NAME(m_video_renderline), 320/4);
+	save_pointer(NAME(megadrive_vdp_palette_lookup), 0x40/2);
+	save_pointer(NAME(megadrive_vdp_palette_lookup_sprite), 0x40/2);
+	save_pointer(NAME(megadrive_vdp_palette_lookup_shadow), 0x40/2);
+	save_pointer(NAME(megadrive_vdp_palette_lookup_highlight), 0x40/2);
+	save_pointer(NAME(m_render_line_raw), machine().primary_screen->width()/2);
+	if (m_use_alt_timing)
+		save_pointer(NAME(m_render_line), machine().primary_screen->width()/2);
 
 	irq6_on_timer = machine().scheduler().timer_alloc(FUNC(irq6_on_timer_callback), (void*)this);
 	irq4_on_timer = machine().scheduler().timer_alloc(FUNC(irq4_on_timer_callback), (void*)this);

@@ -861,6 +861,11 @@ MACHINE_START_MEMBER(md_base_state,megadriv)
 	m_io_pad_3b[1] = ioport("PAD2");
 	m_io_pad_3b[2] = ioport("IN0");
 	m_io_pad_3b[3] = ioport("UNK");
+
+	save_item(NAME(m_io_stage));
+	save_item(NAME(m_megadrive_io_data_regs));
+	save_item(NAME(m_megadrive_io_ctrl_regs));
+	save_item(NAME(m_megadrive_io_tx_regs));
 }
 
 MACHINE_RESET_MEMBER(md_base_state,megadriv)
