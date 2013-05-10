@@ -613,6 +613,17 @@ $(CPUOBJ)/e132xs/e132xs.o:  $(CPUSRC)/e132xs/e132xs.c \
 
 
 #-------------------------------------------------
+# 15IE-00-013 CPU ("Microprogrammed Control Device")
+#-------------------------------------------------
+
+ifneq ($(filter IE15,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ie15
+CPUOBJS += $(CPUOBJ)/ie15/ie15.o
+DASMOBJS += $(CPUOBJ)/ie15/ie15dasm.o
+endif
+
+
+#-------------------------------------------------
 # Intel 4004
 #-------------------------------------------------
 
@@ -2095,4 +2106,11 @@ endif
 
 $(CPUOBJ)/scudsp/scudspdasm.o: CPUOBJS += $(CPUOBJ)/scudsp/scudspdasm.c
 
+#-------------------------------------------------
+# Electronika 15IE-00-013
+#-------------------------------------------------
 
+ifneq ($(filter IE15,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ie15
+DASMOBJS += $(CPUOBJ)/ie15/ie15dasm.o
+endif

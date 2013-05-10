@@ -173,6 +173,7 @@ enum
 	XTAL_28_63636MHz    = 28636363,     /* Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier)*/
 	XTAL_30MHz          = 30000000,     /* Impera Magic Card */
 	XTAL_30_4761MHz     = 30476100,     /* Taito JC */
+	XTAL_30_8MHz        = 30800000,     /* 15IE-00-013 */
 	XTAL_32MHz          = 32000000,
 	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs */
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
