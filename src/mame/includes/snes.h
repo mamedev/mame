@@ -644,8 +644,7 @@ public:
 	read8_delegate      m_oldjoy2_read;
 
 	/* cart related */
-	UINT8 m_has_addon_chip;
-	snes_cart_info m_cart[2];   // the second one is used by MESS for Sufami Turbo and, eventually, BS-X
+	snes_cart_info m_cart;   // used by NSS/SFCBox only! to be moved in a derived class!
 	void rom_map_setup(UINT32 size);
 
 	snes_ppu_class        m_ppu;
