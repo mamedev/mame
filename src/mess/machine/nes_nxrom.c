@@ -136,6 +136,9 @@ void nes_nrom_device::common_start()
 	save_item(NAME(m_nt_src));
 	save_item(NAME(m_nt_orig));
 	save_item(NAME(m_nt_writable));
+
+	// open bus
+	save_item(NAME(m_open_bus));
 }
 
 void nes_nrom_device::pcb_reset()
