@@ -41,7 +41,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	virtual void post_load();
+	virtual void device_post_load();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 

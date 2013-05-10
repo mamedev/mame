@@ -127,7 +127,7 @@ void ymz280b_device::update_volumes(struct YMZ280BVoice *voice)
 }
 
 
-void ymz280b_device::post_load()
+void ymz280b_device::device_post_load()
 {
 	for (int j = 0; j < 8; j++)
 	{
