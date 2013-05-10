@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( mcatadv_sound_map, AS_PROGRAM, 8, mcatadv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     // ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")                // ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
@@ -231,8 +231,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2610_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREAD_LEGACY("ymsnd", ym2610_r)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ymsnd", ym2610_device, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREAD("ymsnd", ym2610_device, read)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w)
 ADDRESS_MAP_END
@@ -417,11 +417,6 @@ WRITE_LINE_MEMBER(mcatadv_state::sound_irq)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2610_interface mcatadv_ym2610_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(mcatadv_state,sound_irq)   /* irq */
-};
-
 
 void mcatadv_state::machine_start()
 {
@@ -466,7 +461,7 @@ static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-	MCFG_SOUND_CONFIG(mcatadv_ym2610_interface)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(mcatadv_state, sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)

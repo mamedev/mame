@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, bbusters_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
@@ -648,11 +648,6 @@ static const ym2608_interface ym2608_config =
 	DEVCB_DRIVER_LINE_MEMBER(bbusters_state,sound_irq)
 };
 
-static const ym2610_interface ym2610_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bbusters_state,sound_irq)
-};
-
 /******************************************************************************/
 
 void bbusters_state::screen_eof_bbuster(screen_device &screen, bool state)
@@ -694,7 +689,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(bbusters_state, sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

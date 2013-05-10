@@ -16,48 +16,28 @@
 #include "2610intf.h"
 #include "fm.h"
 
-struct ym2610_state
-{
-	sound_stream *  stream;
-	emu_timer *     timer[2];
-	void *          chip;
-	void *          psg;
-	const ym2610_interface *intf;
-	device_t *device;
-	devcb_resolved_write_line irqhandler;
-};
-
-
-INLINE ym2610_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == YM2610 || device->type() == YM2610B);
-	return (ym2610_state *)downcast<ym2610_device *>(device)->token();
-}
-
-
 static void psg_set_clock(void *param, int clock)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	ay8910_set_clock_ym(info->psg, clock);
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ay8910_set_clock_ym(ym2610->_psg(), clock);
 }
 
 static void psg_write(void *param, int address, int data)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	ay8910_write_ym(info->psg, address, data);
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ay8910_write_ym(ym2610->_psg(), address, data);
 }
 
 static int psg_read(void *param)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	return ay8910_read_ym(info->psg);
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	return ay8910_read_ym(ym2610->_psg());
 }
 
 static void psg_reset(void *param)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	ay8910_reset_ym(info->psg);
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ay8910_reset_ym(ym2610->_psg());
 }
 
 static const ssg_callbacks psgintf =
@@ -68,106 +48,132 @@ static const ssg_callbacks psgintf =
 	psg_reset
 };
 
+void *ym2610_device::_psg()
+{
+	return m_psg;
+}
+
 /*------------------------- TM2610 -------------------------------*/
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	if (!info->irqhandler.isnull())
-		info->irqhandler(irq);
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610->_IRQHandler(irq);
+}
+
+void ym2610_device::_IRQHandler(int irq)
+{
+	if (!m_irq_handler.isnull())
+		m_irq_handler(irq);
 }
 
 /* Timer overflow callback from timer.c */
-static TIMER_CALLBACK( timer_callback_0 )
+void ym2610_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	ym2610_state *info = (ym2610_state *)ptr;
-	ym2610_timer_over(info->chip,0);
-}
+	switch(id)
+	{
+	case 0:
+		ym2610_timer_over(m_chip,0);
+		break;
 
-static TIMER_CALLBACK( timer_callback_1 )
-{
-	ym2610_state *info = (ym2610_state *)ptr;
-	ym2610_timer_over(info->chip,1);
+	case 1:
+		ym2610_timer_over(m_chip,1);
+		break;
+	}
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
 {
-	ym2610_state *info = (ym2610_state *)param;
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610->_timer_handler(c, count, clock);
+}
+
+void ym2610_device::_timer_handler(int c,int count,int clock)
+{
 	if( count == 0 )
 	{   /* Reset FM Timer */
-		info->timer[c]->enable(false);
+		m_timer[c]->enable(false);
 	}
 	else
 	{   /* Start FM Timer */
 		attotime period = attotime::from_hz(clock) * count;
 
-		if (!info->timer[c]->enable(true))
-			info->timer[c]->adjust(period);
+		if (!m_timer[c]->enable(true))
+			m_timer[c]->adjust(period);
 	}
 }
 
 /* update request from fm.c */
 void ym2610_update_request(void *param)
 {
-	ym2610_state *info = (ym2610_state *)param;
-	info->stream->update();
+	ym2610_device *ym2610 = downcast<ym2610_device *>(param);
+	ym2610->_ym2610_update_request();
+}
+
+void ym2610_device::_ym2610_update_request()
+{
+	m_stream->update();
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	ym2610_update_one(m_chip, outputs, samples);
+}
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ym2610b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	ym2610b_update_one(m_chip, outputs, samples);
 }
 
 
-static STREAM_UPDATE( ym2610_stream_update )
+void ym2610_device::device_post_load()
 {
-	ym2610_state *info = (ym2610_state *)param;
-	ym2610_update_one(info->chip, outputs, samples);
-}
-
-static STREAM_UPDATE( ym2610b_stream_update )
-{
-	ym2610_state *info = (ym2610_state *)param;
-	ym2610b_update_one(info->chip, outputs, samples);
+	ym2610_postload(m_chip);
 }
 
 
-static void ym2610_intf_postload(ym2610_state *info)
-{
-	ym2610_postload(info->chip);
-}
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-
-static DEVICE_START( ym2610 )
+void ym2610_device::device_start()
 {
-	static const ym2610_interface generic_2610 = { DEVCB_NULL };
 	static const ay8910_interface generic_ay8910 =
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ym2610_interface *intf = device->static_config() ? (const ym2610_interface *)device->static_config() : &generic_2610;
-	int rate = device->clock()/72;
+	
+	int rate = clock()/72;
 	void *pcmbufa,*pcmbufb;
 	int  pcmsizea,pcmsizeb;
-	ym2610_state *info = get_safe_token(device);
 	astring name;
-	device_type type = device->type();
 
-	info->intf = intf;
-	info->device = device;
-	info->irqhandler.resolve(intf->irqhandler, *device);
-	info->psg = ay8910_start_ym(NULL, device->type(), device, device->clock(), &generic_ay8910);
-	assert_always(info->psg != NULL, "Error creating YM2610/AY8910 chip");
+	m_irq_handler.resolve();
+	m_psg = ay8910_start_ym(NULL, type(), this, clock(), &generic_ay8910);
+	assert_always(m_psg != NULL, "Error creating YM2610/AY8910 chip");
 
 	/* Timer Handler set */
-	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_0), info);
-	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_1), info);
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	info->stream = device->machine().sound().stream_alloc(*device,0,2,rate,info,(type == YM2610) ? ym2610_stream_update : ym2610b_stream_update);
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate);
 	/* setup adpcm buffers */
-	pcmbufa  = *device->region();
-	pcmsizea = device->region()->bytes();
-	name.printf("%s.deltat", device->tag());
-	pcmbufb  = (void *)(device->machine().root_device().memregion(name)->base());
-	pcmsizeb = device->machine().root_device().memregion(name)->bytes();
+	pcmbufa  = *region();
+	pcmsizea = region()->bytes();
+	name.printf("%s.deltat", tag());
+	pcmbufb  = (void *)(machine().root_device().memregion(name)->base());
+	pcmsizeb = machine().root_device().memregion(name)->bytes();
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
 		pcmbufb = pcmbufa;
@@ -175,63 +181,57 @@ static DEVICE_START( ym2610 )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,device,device->clock(),rate,
+	m_chip = ym2610_init(this,this,clock(),rate,
 					pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 					timer_handler,IRQHandler,&psgintf);
-	assert_always(info->chip != NULL, "Error creating YM2610 chip");
-
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(ym2610_intf_postload), info));
+	assert_always(m_chip != NULL, "Error creating YM2610 chip");
 }
 
-static DEVICE_STOP( ym2610 )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ym2610_device::device_stop()
 {
-	ym2610_state *info = get_safe_token(device);
-	ym2610_shutdown(info->chip);
-	ay8910_stop_ym(info->psg);
+	ym2610_shutdown(m_chip);
+	ay8910_stop_ym(m_psg);
 }
 
-static DEVICE_RESET( ym2610 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ym2610_device::device_reset()
 {
-	ym2610_state *info = get_safe_token(device);
-	ym2610_reset_chip(info->chip);
+	ym2610_reset_chip(m_chip);
 }
 
 
-READ8_DEVICE_HANDLER( ym2610_r )
+READ8_MEMBER( ym2610_device::read )
 {
-	ym2610_state *info = get_safe_token(device);
-	return ym2610_read(info->chip, offset & 3);
+	return ym2610_read(m_chip, offset & 3);
 }
 
-WRITE8_DEVICE_HANDLER( ym2610_w )
+WRITE8_MEMBER( ym2610_device::write )
 {
-	ym2610_state *info = get_safe_token(device);
-	ym2610_write(info->chip, offset & 3, data);
+	ym2610_write(m_chip, offset & 3, data);
 }
 
-
-READ8_DEVICE_HANDLER( ym2610_status_port_a_r ) { return ym2610_r(device, space, 0); }
-READ8_DEVICE_HANDLER( ym2610_status_port_b_r ) { return ym2610_r(device, space, 2); }
-READ8_DEVICE_HANDLER( ym2610_read_port_r ) { return ym2610_r(device, space, 1); }
-
-WRITE8_DEVICE_HANDLER( ym2610_control_port_a_w ) { ym2610_w(device, space, 0, data); }
-WRITE8_DEVICE_HANDLER( ym2610_control_port_b_w ) { ym2610_w(device, space, 2, data); }
-WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w ) { ym2610_w(device, space, 1, data); }
-WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w ) { ym2610_w(device, space, 3, data); }
 
 const device_type YM2610 = &device_creator<ym2610_device>;
 
 ym2610_device::ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM2610, "YM2610", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_irq_handler(*this)
 {
-	m_token = global_alloc_clear(ym2610_state);
 }
+
 ym2610_device::ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_irq_handler(*this)
 {
-	m_token = global_alloc_clear(ym2610_state);
 }
 
 //-------------------------------------------------
@@ -244,57 +244,9 @@ void ym2610_device::device_config_complete()
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ym2610_device::device_start()
-{
-	DEVICE_START_NAME( ym2610 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ym2610_device::device_reset()
-{
-	DEVICE_RESET_NAME( ym2610 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void ym2610_device::device_stop()
-{
-	DEVICE_STOP_NAME( ym2610 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ym2610_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-
 const device_type YM2610B = &device_creator<ym2610b_device>;
 
 ym2610b_device::ym2610b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ym2610_device(mconfig, YM2610B, "YM2610B", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ym2610b_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

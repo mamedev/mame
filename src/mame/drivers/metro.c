@@ -1609,11 +1609,6 @@ WRITE_LINE_MEMBER(metro_state::blzntrnd_irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2610_interface blzntrnd_ym2610_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(metro_state,blzntrnd_irqhandler)
-};
-
 static ADDRESS_MAP_START( blzntrnd_sound_map, AS_PROGRAM, 8, metro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -1624,7 +1619,7 @@ static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8, metro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r) AM_WRITENOP
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
@@ -4438,7 +4433,7 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
-	MCFG_SOUND_CONFIG(blzntrnd_ym2610_interface)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(metro_state, blzntrnd_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -4485,7 +4480,7 @@ static MACHINE_CONFIG_START( gstrik2, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
-	MCFG_SOUND_CONFIG(blzntrnd_ym2610_interface)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(metro_state, blzntrnd_irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

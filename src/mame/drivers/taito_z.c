@@ -1588,7 +1588,7 @@ static ADDRESS_MAP_START( bshark_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
 //  AM_RANGE(0x40000a, 0x40000b) AM_READ(taitoz_unknown_r)  // ???
-	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_NOP // interrupt controller?
 	AM_RANGE(0x60000e, 0x60000f) AM_NOP
 	AM_RANGE(0x800000, 0x801fff) AM_DEVREADWRITE_LEGACY("tc0150rod", tc0150rod_word_r, tc0150rod_word_w)
@@ -1681,7 +1681,7 @@ static ADDRESS_MAP_START( spacegun_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(spacegun_input_bypass_r, spacegun_output_bypass_w)
-	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
+	AM_RANGE(0xc00000, 0xc00007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_NOP // interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_NOP
 	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
@@ -1745,7 +1745,7 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, taitoz_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
@@ -2911,16 +2911,6 @@ WRITE_LINE_MEMBER(taitoz_state::irqhandlerb)
 //  m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2610_interface ym2610_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(taitoz_state,irqhandler)
-};
-
-static const ym2610_interface ym2610_interfaceb =
-{
-	DEVCB_DRIVER_LINE_MEMBER(taitoz_state,irqhandlerb)
-};
-
 
 /***********************************************************
                       MACHINE DRIVERS
@@ -3101,7 +3091,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3163,7 +3153,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
@@ -3225,7 +3215,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 20.0)
@@ -3284,7 +3274,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_interfaceb)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 28.0)
@@ -3355,7 +3345,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3420,7 +3410,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3482,7 +3472,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3541,7 +3531,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_interfaceb)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3603,7 +3593,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3665,7 +3655,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)

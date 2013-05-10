@@ -3,29 +3,13 @@
 #ifndef __2610INTF_H__
 #define __2610INTF_H__
 
-#include "devlegcy.h"
+#include "emu.h"
 #include "fm.h"
-
 
 void ym2610_update_request(void *param);
 
-struct ym2610_interface
-{
-	devcb_write_line irqhandler; /* IRQ handler for the YM2610 */
-};
-
-DECLARE_READ8_DEVICE_HANDLER( ym2610_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2610_w );
-
-DECLARE_READ8_DEVICE_HANDLER( ym2610_status_port_a_r );
-DECLARE_READ8_DEVICE_HANDLER( ym2610_status_port_b_r );
-DECLARE_READ8_DEVICE_HANDLER( ym2610_read_port_r );
-
-DECLARE_WRITE8_DEVICE_HANDLER( ym2610_control_port_a_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2610_control_port_b_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2610_data_port_a_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ym2610_data_port_b_w );
-
+#define MCFG_YM2610_IRQ_HANDLER(_devcb) \
+	devcb = &ym2610_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 class ym2610_device : public device_t,
 									public device_sound_interface
@@ -33,22 +17,39 @@ class ym2610_device : public device_t,
 public:
 	ym2610_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ym2610_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	~ym2610_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2610_device &>(device).m_irq_handler.set_callback(object); }
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	void *_psg();
+	void _IRQHandler(int irq);
+	void _timer_handler(int c,int count,int clock);
+	void _ym2610_update_request();
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_post_load();
 	virtual void device_stop();
 	virtual void device_reset();
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+	void *          m_chip;
+
 private:
 	// internal state
-	void *m_token;
+	sound_stream *  m_stream;
+	emu_timer *     m_timer[2];
+	void *          m_psg;
+	devcb2_write_line m_irq_handler;
 };
 
 extern const device_type YM2610;

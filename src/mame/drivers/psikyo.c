@@ -409,7 +409,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
@@ -434,7 +434,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
@@ -1030,11 +1030,6 @@ void psikyo_state::machine_reset()
 ***************************************************************************/
 
 
-static const ym2610_interface sngkace_ym2610_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(psikyo_state,sound_irq)
-};
-
 static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	/* basic machine hardware */
@@ -1065,7 +1060,7 @@ static MACHINE_CONFIG_START( sngkace, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(sngkace_ym2610_interface)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -1078,11 +1073,6 @@ MACHINE_CONFIG_END
         Gun Bird / Battle K-Road / Strikers 1945 (Japan, unprotected)
 ***************************************************************************/
 
-
-static const ym2610_interface gunbird_ym2610_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(psikyo_state,sound_irq)   /* irq */
-};
 
 static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
@@ -1114,7 +1104,7 @@ static MACHINE_CONFIG_START( gunbird, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_SOUND_CONFIG(gunbird_ym2610_interface)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(psikyo_state, sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

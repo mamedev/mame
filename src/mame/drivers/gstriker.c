@@ -267,11 +267,6 @@ WRITE_LINE_MEMBER(gstriker_state::gs_ym2610_irq)
 		m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-static const ym2610_interface ym2610_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(gstriker_state,gs_ym2610_irq)
-};
-
 /*** MEMORY LAYOUTS **********************************************************/
 
 
@@ -306,7 +301,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
@@ -571,7 +566,7 @@ static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(gstriker_state, gs_ym2610_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -617,7 +612,7 @@ static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(gstriker_state, gs_ym2610_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

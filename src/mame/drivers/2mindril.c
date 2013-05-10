@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x460010, 0x46001f) AM_WRITE(f3_control_1_w)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
-	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
 	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_SHARE("iodata") // i/o
@@ -415,11 +415,6 @@ WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2610_interface ym2610_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(_2mindril_state,irqhandler)
-};
-
 
 MACHINE_START_MEMBER(_2mindril_state,drill)
 {
@@ -460,7 +455,7 @@ static MACHINE_CONFIG_START( drill, _2mindril_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(_2mindril_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

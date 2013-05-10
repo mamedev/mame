@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, pipedrm_state )
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
 	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -592,12 +592,6 @@ static const ym2608_interface ym2608_config =
 };
 
 
-static const ym2610_interface ym2610_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pipedrm_state,irqhandler)
-};
-
-
 
 /*************************************
  *
@@ -683,7 +677,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_YM2610_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
