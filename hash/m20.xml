@@ -130,6 +130,18 @@
 		</part>
 	</software>
 
+	<software name="cpm8k">
+		<description>CP/M 8000</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="286720">
+				<rom name="cpm8k.img" size="286720" crc="e0f8dfe3" sha1="9d6a17af5ef2775ad985bface454926ae3f2a322" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos20" supported="no">
 	<!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
 	<!-- MESS complains about "Unable to identify the image format" -->
