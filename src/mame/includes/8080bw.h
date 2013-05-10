@@ -71,6 +71,9 @@ public:
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(indianbtbr_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(indianbtbr_sh_port_2_w);
+	DECLARE_READ8_MEMBER(indianbtbr_01_r);
 	DECLARE_WRITE8_MEMBER(schaser_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(schaser_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(rollingc_sh_port_w);

@@ -336,8 +336,6 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_1_w)
 
 	machine().sound().system_enable(data & 0x20);
 
-	m_screen_red = data & 0x01;
-
 	m_port_1_last_extra = data;
 }
 
@@ -358,6 +356,31 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
 	discrete_sound_w(m_discrete, space, INDIANBT_MUSIC_DATA, data);
+}
+
+WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
+{
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
+
+	if (rising_bits & 0x01) m_samples->start(4, 7);     /* Lasso */
+	if (rising_bits & 0x04) m_samples->start(0, 1);     /* Shot Sound */
+	if (rising_bits & 0x08) m_samples->start(3, 2);     /* Hit */
+
+	machine().sound().system_enable(data & 0x20);
+
+	m_port_1_last_extra = data;
+}
+
+WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_2_w)
+{
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
+
+	if (rising_bits & 0x08) m_samples->start(2, 3);     /* Move */
+	if (rising_bits & 0x10) m_samples->start(3, 7);     /* Death */
+
+	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
+
+	m_port_2_last_extra = data;
 }
 
 
