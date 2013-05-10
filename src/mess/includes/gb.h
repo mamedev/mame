@@ -92,16 +92,16 @@ struct gb_lcd_t {
 	emu_timer *lcd_timer;
 	int gbc_mode;
 
-	memory_region *gb_vram;     /* Pointer to VRAM */
-	memory_region *gb_oam;      /* Pointer to OAM memory */
-	UINT8   *gb_vram_ptr;
-	UINT8   *gb_chrgen;     /* Character generator */
-	UINT8   *gb_bgdtab;     /* Background character table */
-	UINT8   *gb_wndtab;     /* Window character table */
+	UINT8   *gb_vram;     // Pointer to VRAM
+	UINT8   *gb_oam;      // Pointer to OAM memory
 	UINT8   gb_tile_no_mod;
-	UINT8   *gbc_chrgen;    /* CGB Character generator */
-	UINT8   *gbc_bgdtab;    /* CGB Background character table */
-	UINT8   *gbc_wndtab;    /* CGB Window character table */
+	UINT32  gb_chrgen_offs;		// GB Character generator
+	UINT32  gb_bgdtab_offs;		// GB Background character table
+	UINT32  gb_wndtab_offs;		// GB Window character table
+	UINT32  gbc_chrgen_offs;	// CGB Character generator
+	UINT32  gbc_bgdtab_offs;	// CGB Background character table
+	UINT32  gbc_wndtab_offs;	// CGB Window character table
+	int     gb_vram_bank;
 };
 
 
@@ -138,7 +138,7 @@ public:
 	UINT8       m_reloading;
 
 	/* Serial I/O related */
-	UINT32      m_SIOCount;             /* Serial I/O counter */
+	UINT32      m_sio_count;             /* Serial I/O counter */
 	emu_timer   *m_gb_serial_timer;
 
 	/* SGB variables */
@@ -154,13 +154,13 @@ public:
 	UINT32 m_sgb_atf;
 
 	/* CGB variables */
-	UINT8       *m_GBC_RAMMap[8];           /* (CGB) Addresses of internal RAM banks */
-	UINT8       m_GBC_RAMBank;          /* (CGB) Current CGB RAM bank */
+	UINT8       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
+	UINT8       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
 
 
 	gb_lcd_t m_lcd;
 	void (gb_state::*update_scanline) ();
-	bool m_bios_disable;
+	int m_bios_disable;
 
 	bitmap_ind16 m_bitmap;
 	DECLARE_WRITE8_MEMBER(gb_io_w);
@@ -185,13 +185,12 @@ public:
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
 	DECLARE_PALETTE_INIT(sgb);
+	DECLARE_MACHINE_START(gbpocket);
 	DECLARE_MACHINE_RESET(gbpocket);
 	DECLARE_PALETTE_INIT(gbp);
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	DECLARE_PALETTE_INIT(gbc);
-	DECLARE_MACHINE_START(gb_video);
-	DECLARE_MACHINE_START(gbc_video);
 	INTERRUPT_GEN_MEMBER(gb_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(gb_serial_timer_proc);
 	TIMER_CALLBACK_MEMBER(gb_video_init_vbl);
@@ -228,11 +227,19 @@ protected:
 	void sgb_update_scanline();
 	void cgb_update_sprites();
 	void cgb_update_scanline();
-	void gb_video_reset( int mode );
+	void gb_video_reset(int mode);
+	void gb_video_start(int mode);
 	void gbc_hdma(UINT16 length);
 	void gb_increment_scanline();
 	void gb_lcd_switch_on();
 	inline void gb_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	
+	void save_gb_base();
+	void save_gb_video();
+	void save_gbc_only();
+	void save_sgb_only();
+	void gb_videoptr_restore();
+	void gbc_videoptr_restore();
 };
 
 

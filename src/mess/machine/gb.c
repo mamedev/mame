@@ -87,28 +87,6 @@ TODO:
 #include "audio/gb.h"
 #include "includes/gb.h"
 
-/* Memory bank controller types */
-enum {
-	MBC_NONE=0,     /*  32KB ROM - No memory bank controller         */
-	MBC_MBC1,       /*  ~2MB ROM,   8KB RAM -or- 512KB ROM, 32KB RAM */
-	MBC_MBC2,       /* 256KB ROM,  32KB RAM                          */
-	MBC_MMM01,      /*    ?? ROM,    ?? RAM                          */
-	MBC_MBC3,       /*   2MB ROM,  32KB RAM, RTC                     */
-	MBC_MBC4,       /*    ?? ROM,    ?? RAM                          */
-	MBC_MBC5,       /*   8MB ROM, 128KB RAM (32KB w/ Rumble)         */
-	MBC_TAMA5,      /*    ?? ROM     ?? RAM - What is this?          */
-	MBC_HUC1,       /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
-	MBC_HUC3,       /*    ?? ROM,    ?? RAM - Hudson Soft Controller */
-	MBC_MBC6,       /*    ?? ROM,  32KB SRAM                         */
-	MBC_MBC7,       /*    ?? ROM,    ?? RAM                          */
-	MBC_WISDOM,     /*    ?? ROM,    ?? RAM - Wisdom tree controller */
-	MBC_MBC1_KOR,   /*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
-	MBC_YONGYONG,   /*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
-	MBC_LASAMA,     /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
-	MBC_ATVRACIN,
-	MBC_MEGADUCK,   /* MEGADUCK style banking                        */
-	MBC_UNKNOWN,    /* Unknown mapper                                */
-};
 
 /* RAM layout defines */
 #define CGB_START_VRAM_BANKS    0x0000
@@ -133,6 +111,51 @@ enum {
 /* #define V_GENERAL*/      /* Display general debug information */
 /* #define V_BANK*/         /* Display bank switching debug information */
 #endif
+
+//-------------------------
+// handle save state
+//-------------------------
+
+void gb_state::save_gb_base()
+{
+	save_item(NAME(m_gb_io));
+	save_item(NAME(m_divcount));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_shift_cycles));
+	save_item(NAME(m_triggering_irq));
+	save_item(NAME(m_reloading));
+	save_item(NAME(m_sio_count));
+	save_item(NAME(m_bios_disable));
+}
+
+void gb_state::save_gbc_only()
+{
+	save_item(NAME(m_gbc_rambank));
+}
+
+void gb_state::save_sgb_only()
+{	
+	save_item(NAME(m_sgb_pal_data));
+	save_item(NAME(m_sgb_pal));
+	save_item(NAME(m_sgb_tile_map));
+	save_item(NAME(m_sgb_window_mask));
+	save_item(NAME(m_sgb_pal_data));
+	save_item(NAME(m_sgb_atf_data));
+	save_item(NAME(m_sgb_packets));
+	save_item(NAME(m_sgb_bitcount));
+	save_item(NAME(m_sgb_bytecount));
+	save_item(NAME(m_sgb_start));
+	save_item(NAME(m_sgb_rest));
+	save_item(NAME(m_sgb_controller_no));
+	save_item(NAME(m_sgb_controller_mode));
+	save_item(NAME(m_sgb_data));
+	save_item(NAME(m_sgb_atf));
+
+	save_pointer(NAME(m_sgb_tile_data), 0x2000);
+	for (int i = 0; i < 20; i++)
+		save_item(NAME(m_sgb_pal_map[i]));
+}
+
 
 void gb_state::gb_init_regs()
 {
@@ -163,7 +186,18 @@ MACHINE_START_MEMBER(gb_state,gb)
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL_MEMBER( gb_video );
+	save_gb_base();
+	gb_video_start(GB_VIDEO_DMG);
+}
+
+MACHINE_START_MEMBER(gb_state,gbpocket)
+{
+	/* Allocate the serial timer, and disable it */
+	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
+	m_gb_serial_timer->enable( 0 );
+	
+	save_gb_base();
+	gb_video_start(GB_VIDEO_MGB);
 }
 
 MACHINE_START_MEMBER(gb_state,gbc)
@@ -172,52 +206,38 @@ MACHINE_START_MEMBER(gb_state,gbc)
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL_MEMBER( gbc_video );
-}
+	for (int i = 0; i < 8; i++)
+		m_gbc_rammap[i] = m_ram->pointer() + CGB_START_RAM_BANKS + i * 0x1000;
 
-MACHINE_RESET_MEMBER(gb_state,gb)
-{
-	gb_init();
-
-	gb_video_reset(GB_VIDEO_DMG);
-
-	/* Enable BIOS rom */
-	m_bios_disable = FALSE;
-
-	m_divcount = 0x0004;
+	save_gb_base();
+	save_gbc_only();
+	gb_video_start(GB_VIDEO_CGB);
 }
 
 
 MACHINE_START_MEMBER(gb_state,sgb)
 {
 	m_sgb_packets = -1;
-	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000 );
+	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
 
-	MACHINE_START_CALL_MEMBER( gb_video );
+	save_gb_base();
+	save_sgb_only();
+	gb_video_start(GB_VIDEO_SGB);
 }
 
-MACHINE_RESET_MEMBER(gb_state,sgb)
+MACHINE_RESET_MEMBER(gb_state,gb)
 {
 	gb_init();
-
-	gb_video_reset(GB_VIDEO_SGB);
-
-	gb_init_regs();
-
-
+	
+	gb_video_reset(GB_VIDEO_DMG);
+	
 	/* Enable BIOS rom */
-	m_bios_disable = FALSE;
-
-	memset(m_sgb_tile_data, 0, 0x2000);
-
-	m_sgb_window_mask = 0;
-	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
-	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
-
+	m_bios_disable = 0;
+	
 	m_divcount = 0x0004;
 }
 
@@ -229,7 +249,7 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 
 	gb_init_regs();
 
-	m_bios_disable = TRUE;
+	m_bios_disable = 0;
 
 	/* Initialize the Sound registers */
 	gb_sound_w(m_custom, generic_space(), 0x16,0x80);
@@ -241,8 +261,6 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 
 MACHINE_RESET_MEMBER(gb_state,gbc)
 {
-	int ii;
-
 	gb_init();
 
 	gb_video_reset( GB_VIDEO_CGB );
@@ -250,15 +268,33 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 	gb_init_regs();
 
 	/* Enable BIOS rom */
-	m_bios_disable = FALSE;
+	m_bios_disable = 0;
 
-	/* Allocate memory for internal ram */
-	for (ii = 0; ii < 8; ii++)
-	{
-		m_GBC_RAMMap[ii] = m_ram->pointer() + CGB_START_RAM_BANKS + ii * 0x1000;
-		memset(m_GBC_RAMMap[ii], 0, 0x1000);
-	}
+	for (int i = 0; i < 8; i++)
+		memset(m_gbc_rammap[i], 0, 0x1000);
 }
+
+MACHINE_RESET_MEMBER(gb_state,sgb)
+{
+	gb_init();
+	
+	gb_video_reset(GB_VIDEO_SGB);
+	
+	gb_init_regs();
+	
+	
+	/* Enable BIOS rom */
+	m_bios_disable = 0;
+	
+	memset(m_sgb_tile_data, 0, 0x2000);
+	
+	m_sgb_window_mask = 0;
+	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
+	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
+	
+	m_divcount = 0x0004;
+}
+
 
 WRITE8_MEMBER(gb_state::gb_io_w)
 {
@@ -281,11 +317,11 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 		case 0x00:
 		case 0x01:
 		case 0x80:              /* enabled & external clock */
-			m_SIOCount = 0;
+			m_sio_count = 0;
 			break;
 		case 0x81:              /* enabled & internal clock */
 			SIODATA = 0xFF;
-			m_SIOCount = 8;
+			m_sio_count = 8;
 			m_gb_serial_timer->adjust(m_maincpu->cycles_to_attotime(512), 0, m_maincpu->cycles_to_attotime(512));
 			m_gb_serial_timer->enable( 1 );
 			break;
@@ -339,7 +375,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 	if (offset == 0x10)
 	{
 		/* disable BIOS ROM */
-		m_bios_disable = TRUE;
+		m_bios_disable = 1;
 		//printf("here again?\n");
 	}
 	else
@@ -731,7 +767,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 
 									for( I = 0; I < 2048; I++ )
 									{
-										col = ( m_lcd.gb_vram_ptr[ 0x0800 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x0800 + (I*2) ];
+										col = (m_lcd.gb_vram[0x0800 + (I*2) + 1] << 8) | m_lcd.gb_vram[0x0800 + (I*2)];
 										m_sgb_pal_data[I] = col;
 									}
 								}
@@ -761,10 +797,10 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								/* Not Implemented */
 								break;
 							case 0x13:  /* CHR_TRN */
-								if( sgb_data[1] & 0x1 )
-									memcpy( m_sgb_tile_data + 4096, m_lcd.gb_vram_ptr + 0x0800, 4096 );
+								if (sgb_data[1] & 0x1)
+									memcpy(m_sgb_tile_data + 4096, m_lcd.gb_vram + 0x0800, 4096);
 								else
-									memcpy( m_sgb_tile_data, m_lcd.gb_vram_ptr + 0x0800, 4096 );
+									memcpy(m_sgb_tile_data, m_lcd.gb_vram + 0x0800, 4096);
 								break;
 							case 0x14:  /* PCT_TRN */
 								{
@@ -772,26 +808,26 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 									UINT16 col;
 									if (m_cartslot && m_cartslot->get_sgb_hack())
 									{
-										memcpy( m_sgb_tile_map, m_lcd.gb_vram_ptr + 0x1000, 2048 );
+										memcpy(m_sgb_tile_map, m_lcd.gb_vram + 0x1000, 2048);
 										for( I = 0; I < 64; I++ )
 										{
-											col = ( m_lcd.gb_vram_ptr[ 0x0800 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x0800 + (I*2) ];
+											col = (m_lcd.gb_vram[0x0800 + (I*2) + 1 ] << 8) | m_lcd.gb_vram[0x0800 + (I*2)];
 											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 									else /* Do things normally */
 									{
-										memcpy( m_sgb_tile_map, m_lcd.gb_vram_ptr + 0x0800, 2048 );
+										memcpy(m_sgb_tile_map, m_lcd.gb_vram + 0x0800, 2048);
 										for( I = 0; I < 64; I++ )
 										{
-											col = ( m_lcd.gb_vram_ptr[ 0x1000 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x1000 + (I*2) ];
+											col = (m_lcd.gb_vram[0x1000 + (I*2) + 1] << 8) | m_lcd.gb_vram[0x1000 + (I*2)];
 											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 								}
 								break;
 							case 0x15:  /* ATTR_TRN */
-								memcpy( m_sgb_atf_data, m_lcd.gb_vram_ptr + 0x0800, 4050 );
+								memcpy( m_sgb_atf_data, m_lcd.gb_vram + 0x0800, 4050 );
 								break;
 							case 0x16:  /* ATTR_SET */
 								{
@@ -923,9 +959,9 @@ TIMER_CALLBACK_MEMBER(gb_state::gb_serial_timer_proc)
 	/* Shift in a received bit */
 	SIODATA = (SIODATA << 1) | 0x01;
 	/* Decrement number of handled bits */
-	m_SIOCount--;
+	m_sio_count--;
 	/* If all bits done, stop timer and trigger interrupt */
-	if ( ! m_SIOCount )
+	if ( ! m_sio_count )
 	{
 		SIOCONT &= 0x7F;
 		m_gb_serial_timer->enable( 0 );
@@ -994,15 +1030,15 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 			m_maincpu->set_speed(data);
 			return;
 		case 0x10:  /* BFF - Bios disable */
-			m_bios_disable = TRUE;
+			m_bios_disable = 1;
 			return;
 		case 0x16:  /* RP - Infrared port */
 			break;
 		case 0x30:  /* SVBK - RAM bank select */
-			m_GBC_RAMBank = data & 0x7;
-			if (!m_GBC_RAMBank)
-				m_GBC_RAMBank = 1;
-			m_rambank->set_base(m_GBC_RAMMap[m_GBC_RAMBank]);
+			m_gbc_rambank = data & 0x7;
+			if (!m_gbc_rambank)
+				m_gbc_rambank = 1;
+			m_rambank->set_base(m_gbc_rammap[m_gbc_rambank]);
 			break;
 		default:
 			break;
@@ -1019,7 +1055,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	case 0x16:  /* RP - Infrared port */
 		break;
 	case 0x30:  /* SVBK - RAM bank select */
-		return m_GBC_RAMBank;
+		return m_gbc_rambank;
 	default:
 		break;
 	}
@@ -1037,8 +1073,9 @@ MACHINE_START_MEMBER(megaduck_state,megaduck)
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
-
-	MACHINE_START_CALL_MEMBER( gb_video );
+	
+	save_gb_base();
+	gb_video_start(GB_VIDEO_DMG);
 }
 
 MACHINE_RESET_MEMBER(megaduck_state,megaduck)
@@ -1046,7 +1083,7 @@ MACHINE_RESET_MEMBER(megaduck_state,megaduck)
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
 	gb_init();
 
-	m_bios_disable = TRUE;
+	m_bios_disable = 1;
 
 	gb_video_reset( GB_VIDEO_DMG );
 }
