@@ -468,6 +468,15 @@ LUAOBJS = \
 
 $(OBJ)/liblua.a: $(LUAOBJS)
 
+LUA_FLAGS =
+ifeq ($(TARGETOS),linux)
+LUA_FLAGS += -DLUA_USE_POSIX
+endif
+
+ifeq ($(TARGETOS),macosx)
+LUA_FLAGS += -DLUA_USE_POSIX
+endif
+
 $(LIBOBJ)/lua/%.o: $(LIBSRC)/lua/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL -c $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -DLUA_COMPAT_ALL $(LUA_FLAGS) -c $< -o $@
