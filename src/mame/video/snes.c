@@ -1687,6 +1687,17 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	/* Init oam RAM */
 	memset((UINT8 *)m_oam_ram, 0xff, SNES_OAM_SIZE);
 
+	
+	for (int i = 0; i < 2; i++)
+	{
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].enable);
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].clip);
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].buffer);
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].priority);
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].layer);
+		state_save_register_item(machine, "snes_ppu", NULL, i, m_scanlines[i].blend_exception);
+	}
+
 	for (int i = 0; i < 6; i++)
 	{
 		state_save_register_item(machine, "snes_ppu", NULL, i, m_layer[i].window1_enabled);
