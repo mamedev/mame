@@ -1056,7 +1056,7 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP            /* Unknown */
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)       /* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("ymf", ymf271_r, ymf271_w)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
@@ -1101,13 +1101,6 @@ WRITE32_MEMBER(seibuspi_state::sys386f2_eeprom_w)
 	m_eeprom->set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 }
-
-static const ymf271_interface ymf271_config =
-{
-	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_read),
-	DEVCB_DRIVER_MEMBER(seibuspi_state,flashrom_write),
-	DEVCB_DRIVER_LINE_MEMBER(seibuspi_state,irqhandler)
-};
 
 /********************************************************************/
 
@@ -1870,7 +1863,10 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
-	MCFG_SOUND_CONFIG(ymf271_config)
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
+	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state,flashrom_write))
+
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1947,7 +1943,9 @@ static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measur
 	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
 
 	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz)
-	MCFG_SOUND_CONFIG(ymf271_config)
+	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, irqhandler))
+	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
+	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state,flashrom_write))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

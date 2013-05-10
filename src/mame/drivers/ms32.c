@@ -1359,7 +1359,7 @@ WRITE8_MEMBER(ms32_state::to_main_w)
 
 static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE_LEGACY("ymf", ymf271_r,ymf271_w)
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_device, read, write)
 	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
 	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
