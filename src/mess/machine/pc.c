@@ -56,10 +56,10 @@
 
 #define DBG_LOG(N,M,A) \
 	do { \
-		if(VERBOSE_DBG>=N) \
+  	if(VERBOSE_DBG>=N) \
 		{ \
 			if( M ) \
-				logerror("%11.6f: %-24s",machine.time().as_double(),(char*)M ); \
+				logerror("%11.6f at %s: %-24s",machine().time().as_double(),machine().describe_context(),(char*)M ); \
 			logerror A; \
 		} \
 	} while (0)
@@ -93,10 +93,9 @@ WRITE8_MEMBER(pc_state::ec1841_memboard_w)
 {
 	pc_state *st = space.machine().driver_data<pc_state>();
 	address_space &program = st->m_maincpu->space(AS_PROGRAM);
-	running_machine &machine = space.machine();
 	UINT8 current;
 
-	DBG_LOG(1,"ec1841_memboard_w",("(%d) <- %02X at %s\n", offset, data, machine.describe_context()));
+	DBG_LOG(1,"ec1841_memboard_w",("(%d) <- %02X\n", offset, data));
 
 	// for now, handle only board 0
 	if (offset > 0) {

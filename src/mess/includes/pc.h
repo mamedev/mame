@@ -193,7 +193,6 @@ extern const struct pic8259_interface ibm5150_pic8259_config;
 extern const struct pic8259_interface pcjr_pic8259_config;
 extern const ins8250_interface ibm5150_com_interface[4];
 extern const rs232_port_interface ibm5150_serport_config[4];
-extern const i8255_interface ibm5150_ppi8255_interface;
 extern const i8255_interface ibm5160_ppi8255_interface;
 extern const i8255_interface pc_ppi8255_interface;
 extern const i8255_interface pcjr_ppi8255_interface;

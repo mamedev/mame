@@ -1383,7 +1383,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )    // has no motor control
 
-	MCFG_FD1793x_ADD("vg93", XTAL_8MHz / 8) // clock?
+	MCFG_FD1793x_ADD("vg93", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fd0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
 
@@ -1431,6 +1431,8 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","ec1841")
 
 	/* keyboard -- needs dump */
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
@@ -2070,6 +2072,7 @@ ROM_START( ec1840 )
 ROM_END
 
 ROM_START( ec1841 )
+	ROM_DEFAULT_BIOS("v2")
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "EC-1841.01")
 	ROMX_LOAD( "012-01-3107.bin", 0xfc000, 0x0800, CRC(77957396) SHA1(785f1dceb6e2b4618f5c5f0af15eb74a8c951448), ROM_SKIP(1) | ROM_BIOS(1))
@@ -2114,9 +2117,18 @@ ROM_START( ec1845 )
 	ROMX_LOAD( "184505.bin", 0xfe001, 0x0800, CRC(c807e3f5) SHA1(08117e449f0d04f96041cff8d34893f500f3760d), ROM_SKIP(1))
 	ROMX_LOAD( "184506.bin", 0xff000, 0x0800, CRC(24f5c27c) SHA1(7822dd7f715ef00ccf6d8408be8bbfe01c2eba20), ROM_SKIP(1))
 	ROMX_LOAD( "184507.bin", 0xff001, 0x0800, CRC(75122203) SHA1(7b0fbdf1315230633e39574ac7360163bc7361e1), ROM_SKIP(1))
-	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
+  ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( asst128 )
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
+	/* BASIC ROM taken from IBM 5150 and needs dumping */
+	ROM_LOAD( "basic-1.10.rom",    0xf6000, 0x8000, CRC(ebacb791) SHA1(07449ebca18f979b9ab748582b736e402f2bf940))
+	ROM_LOAD( "asf400-f600.bin",   0xf4000, 0x2000, CRC(e3bf22de) SHA1(d4319edc82c0015ca0adc6c8771e887659717e62))
+	ROM_LOAD( "asfc00-ff00.bin",   0xfc000, 0x4000, CRC(0cb6401c) SHA1(70c4da47700f9925fd04049f16d54610c743ed8b))
+	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
+	// Here CGA rom with cyrillic support should be added
+ROM_END
 
 ROM_START( mk88 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
@@ -2354,6 +2366,7 @@ COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t, pc_state,  
 COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1031", GAME_NOT_WORKING)
 COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
 COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pcega, pc_state,      pccga,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
+COMP( 198?, asst128,    ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Assistent 128", GAME_NOT_WORKING)
 COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
 COMP( 1987, ec1841,     ibm5150,    0,          ec1841,     pccga, pc_state,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
 COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
