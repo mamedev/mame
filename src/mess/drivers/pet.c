@@ -144,6 +144,7 @@ ROM sockets:  UA3   2K or 4K character
     - 8296
         - PLA dumps
         - high resolution graphics
+        - Malvern Particle Sizer OEM variant
 
 */
 
