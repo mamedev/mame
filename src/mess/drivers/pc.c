@@ -92,6 +92,7 @@ video HW too.
 #include "imagedev/cartslot.h"
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
+#include "formats/asst128_dsk.h"
 
 #include "machine/am9517a.h"
 #include "sound/sn76496.h"
@@ -882,9 +883,17 @@ FLOPPY_FORMATS_MEMBER( pc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
+FLOPPY_FORMATS_MEMBER( pc_state::asst128_formats )
+	FLOPPY_ASST128_FORMAT
+FLOPPY_FORMATS_END
+
 static SLOT_INTERFACE_START( ibmpc_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 		SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( asst128_floppies )
+		SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(ibm5150_com)
@@ -1522,6 +1531,18 @@ static MACHINE_CONFIG_DERIVED( asst128, iskr1031 )
 	MCFG_CPU_REPLACE("maincpu", I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
 	MCFG_CPU_IO_MAP(asst128_io)
+
+	MCFG_DEVICE_REMOVE("fdc:0");
+	MCFG_DEVICE_REMOVE("fdc:1");
+
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
+
+	MCFG_DEVICE_REMOVE(CGA_SCREEN_NAME)
+	MCFG_DEVICE_REMOVE(CGA_MC6845_NAME)
+
+	MCFG_FRAGMENT_ADD( pcvideo_mc1502 )
+	MCFG_GFXDECODE(ibmpcjr)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( iskr3104, pc_state )
@@ -2151,7 +2172,8 @@ ROM_START( asst128 )
 	ROM_LOAD( "asf400-f600.bin",   0xf4000, 0x2000, CRC(e3bf22de) SHA1(d4319edc82c0015ca0adc6c8771e887659717e62))
 	ROM_LOAD( "asfc00-ff00.bin",   0xfc000, 0x4000, CRC(0cb6401c) SHA1(70c4da47700f9925fd04049f16d54610c743ed8b))
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-	// Here CGA rom with cyrillic support should be added
+	ROM_COPY( "maincpu", 0xffa6e, 0x0800, 0x0400 )
+	ROM_COPY( "maincpu", 0xfc000, 0x0c00, 0x0400 )
 ROM_END
 
 ROM_START( mk88 )

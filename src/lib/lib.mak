@@ -104,6 +104,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/apridisk.o    \
 	$(LIBOBJ)/formats/apollo_dsk.o  \
 	$(LIBOBJ)/formats/ap_dsk35.o    \
+	$(LIBOBJ)/formats/asst128_dsk.o \
 	$(LIBOBJ)/formats/atari_dsk.o   \
 	$(LIBOBJ)/formats/atarist_dsk.o \
 	$(LIBOBJ)/formats/atom_tap.o    \
