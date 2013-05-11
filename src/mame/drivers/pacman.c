@@ -6266,7 +6266,7 @@ GAME( 1981, hangly,   puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Popeye-Man", GAME_SUPPORTS_SAVE )
-GAME( 1980, pacuman,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg", "Pacuman (Spanish bootleg of Puck Man)", GAME_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets, Pacuman is used on the cabinet art, manufactured by Recreativos Franco S.A.?
+GAME( 1980, pacuman,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacuman (Spanish bootleg of Puck Man)", GAME_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
 GAME( 1980, crockman, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, driver_device, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE )
