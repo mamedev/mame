@@ -140,6 +140,7 @@ CPUS += HD61700
 CPUS += LC8670
 CPUS += ES5510
 CPUS += SCUDSP
+CPUS += IE15
 
 #-------------------------------------------------
 # specify available sound cores
