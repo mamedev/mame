@@ -93,15 +93,21 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFSETTING(0x00, "Service" )
 		PORT_CONFSETTING(APOLLO_CONF_SERVICE_MODE, "Normal " )
 
+		PORT_CONFNAME(APOLLO_CONF_DISPLAY, APOLLO_CONF_8_PLANES, "Graphics Controller")
+		PORT_CONFSETTING(APOLLO_CONF_8_PLANES, "8-Plane Color")
+		PORT_CONFSETTING(APOLLO_CONF_4_PLANES, "4-Plane Color")
+		PORT_CONFSETTING(APOLLO_CONF_MONO_15I, "15\" Monochrome")
+//		PORT_CONFSETTING(APOLLO_CONF_MONO_19I, "19\" Monochrome")
+
 		PORT_CONFNAME(APOLLO_CONF_GERMAN_KBD, 0x00, "German Keyboard")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_GERMAN_KBD, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_DATE_1990, 0x00, "20 Years Ago ...")
+		PORT_CONFNAME(APOLLO_CONF_DATE_1990, APOLLO_CONF_DATE_1990, "20 Years Ago ...")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_DATE_1990, DEF_STR ( On ) )
 
-		PORT_CONFNAME(APOLLO_CONF_NODE_ID, 0x00, "Node ID from Disk")
+		PORT_CONFNAME(APOLLO_CONF_NODE_ID, APOLLO_CONF_NODE_ID, "Node ID from Disk")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_NODE_ID, DEF_STR ( On ) )
 
@@ -124,27 +130,8 @@ INPUT_PORTS_START( apollo_config )
 		PORT_CONFNAME(APOLLO_CONF_NET_TRACE, 0x00, "Network Trace")
 		PORT_CONFSETTING(0x00, DEF_STR ( Off ) )
 		PORT_CONFSETTING(APOLLO_CONF_NET_TRACE, DEF_STR ( On ) )
+
 INPUT_PORTS_END
-
-/*-------------------------------------------------
- device start callback
- -------------------------------------------------*/
-
-static DEVICE_START(apollo_config)
-{
-	DLOG1(("start apollo_config"));
-}
-
-/*-------------------------------------------------
- device reset callback
- -------------------------------------------------*/
-
-static DEVICE_RESET(apollo_config)
-{
-	DLOG1(("reset apollo_config"));
-	// load configuration
-	config = device->machine().root_device().ioport("apollo_config")->read();
-}
 
 class apollo_config_device : public device_t
 {
@@ -160,7 +147,6 @@ private:
 };
 
 extern const device_type APOLLO_CONF;
-
 
 const device_type APOLLO_CONF = &device_creator<apollo_config_device>;
 
@@ -185,7 +171,7 @@ void apollo_config_device::device_config_complete()
 
 void apollo_config_device::device_start()
 {
-	DEVICE_START_NAME( apollo_config )(this);
+	MLOG1(("start apollo_config"));
 }
 
 //-------------------------------------------------
@@ -194,7 +180,9 @@ void apollo_config_device::device_start()
 
 void apollo_config_device::device_reset()
 {
-	DEVICE_RESET_NAME( apollo_config )(this);
+	MLOG1(("reset apollo_config"));
+	// load configuration
+	config = machine().root_device().ioport("apollo_config")->read();
 }
 
 

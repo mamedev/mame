@@ -46,7 +46,7 @@
 		</rect>
 	</element>
 
-	<view name="Apollo 15&quot; Monochrome">
+	<view name="Apollo (1024x800)">
 
 		<bezel element="background">     <bounds left="0" right="253" top="800" bottom="844" /> </bezel>
 		<bezel name="f1s" element="f1s"> <bounds left="0" right="60" top="806" bottom="822" /> </bezel>

@@ -406,15 +406,15 @@ nc150    // 1992 NC150
 nc200    // 1993 NC200
 
 // Apollo
-dn3500     // Apollo Workstation DN3500 19" monochrome (1989)
-dsp3500    // Apollo Server DSP3500 (1989)
-dn3000     // Apollo Workstation DN3000 19" monochrome (1987)
-dsp3000    // Apollo Server DSP3000 (1987)
-dn3500_15i // Apollo Workstation DN3500 15" monochrome (1989)
-dn3000_15i // Apollo Workstation DN3000 15" monochrome (1988)
-dn5500     // Apollo Workstation DN5500 19" monochrome (1991)
-dsp5500    // Apollo Server DSP5500 (1991)
-dn5500_15i // Apollo Workstation DN5500 15" monochrome (1991)
+dn3500      // Apollo Workstation DN3500 15" Color (1989)
+dn3500_19i  // Apollo Workstation DN3500 19" Monochrome (1989)
+dsp3500     // Apollo Server DSP3500 (1989)
+dn3000      // Apollo Workstation DN3000 15" Color (1988)
+dn3000_19i  // Apollo Workstation DN3000 19" Monochrome (1987)
+dsp3000     // Apollo Server DSP3000 (1987)
+dn5500      // Apollo Workstation DN5500 15" Color (1991)
+dn5500_19i  // Apollo Workstation DN5500 19" Monochrome (1991)
+dsp5500     // Apollo Server DSP5500 (1991)
 
 // Apple
 apple1  // Jul 1976 Apple 1

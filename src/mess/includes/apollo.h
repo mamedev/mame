@@ -210,22 +210,24 @@ public:
 
 MACHINE_CONFIG_EXTERN( apollo );
 
-
-
-
 /*----------- machine/apollo_config.c -----------*/
 
 // configuration bit definitions
 
-#define APOLLO_CONF_SERVICE_MODE 0x001
-#define APOLLO_CONF_GERMAN_KBD   0x002
-#define APOLLO_CONF_DATE_1990    0x004
-#define APOLLO_CONF_NODE_ID      0x008
-#define APOLLO_CONF_IDLE_SLEEP   0x010
-#define APOLLO_CONF_TRAP_TRACE   0x020
-#define APOLLO_CONF_FPU_TRACE    0x040
-#define APOLLO_CONF_DISK_TRACE   0x080
-#define APOLLO_CONF_NET_TRACE    0x100
+#define APOLLO_CONF_SERVICE_MODE 0x0001
+#define APOLLO_CONF_DISPLAY      0x001e
+#define APOLLO_CONF_8_PLANES     0x0002
+#define APOLLO_CONF_4_PLANES     0x0004
+#define APOLLO_CONF_MONO_15I     0x0008
+#define APOLLO_CONF_MONO_19I     0x0010
+#define APOLLO_CONF_GERMAN_KBD   0x0020
+#define APOLLO_CONF_DATE_1990    0x0040
+#define APOLLO_CONF_NODE_ID      0x0080
+#define APOLLO_CONF_IDLE_SLEEP   0x0100
+#define APOLLO_CONF_TRAP_TRACE   0x0200
+#define APOLLO_CONF_FPU_TRACE    0x0400
+#define APOLLO_CONF_DISK_TRACE   0x0800
+#define APOLLO_CONF_NET_TRACE    0x1000
 
 // check configuration setting
 int apollo_config(int mask);
@@ -320,26 +322,40 @@ typedef int (*apollo_netserver_transmit)(device_t *, const UINT8 *, int);
 void apollo_netserver_init(const char *root_path,  apollo_netserver_transmit tx_data);
 
 /*----------- video/apollo.c -----------*/
-class apollo_mono_device : public device_t
+
+#define APOLLO_SCREEN_TAG "apollo_screen"
+
+class apollo_graphics_15i : public device_t
 {
 public:
-	apollo_mono_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	~apollo_mono_device() { global_free(m_token); }
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
+	~apollo_graphics_15i() { global_free(m_token); }
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+protected:
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
+	virtual void device_reset();
 private:
 	// internal state
 	void *m_token;
 };
 
+extern const device_type APOLLO_GRAPHICS;
 
-#define APOLLO_SCREEN_TAG "apollo_screen"
+#define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
+	MCFG_FRAGMENT_ADD(apollo_graphics) \
+	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
 
-class apollo_mono19i_device : public apollo_mono_device
+MACHINE_CONFIG_EXTERN( apollo_graphics );
+
+class apollo_graphics_19i : public apollo_graphics_15i
 {
 public:
-	apollo_mono19i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -351,39 +367,22 @@ private:
 
 extern const device_type APOLLO_MONO19I;
 
-
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono19i) \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
 
 MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
-class apollo_mono15i_device : public apollo_mono_device
-{
-public:
-	apollo_mono15i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-private:
-	// internal state
-};
-
-extern const device_type APOLLO_MONO15I;
-
-
-#define MCFG_APOLLO_MONO15I_ADD( _tag) \
-	MCFG_FRAGMENT_ADD(apollo_mono15i) \
-	MCFG_DEVICE_ADD(_tag, APOLLO_MONO15I, 0)
-
-MACHINE_CONFIG_EXTERN( apollo_mono15i );
-
-DECLARE_READ16_DEVICE_HANDLER( apollo_mcr_r ) ;
-DECLARE_WRITE16_DEVICE_HANDLER(apollo_mcr_w );
+DECLARE_READ8_DEVICE_HANDLER( apollo_mcr_r ) ;
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_mcr_w );
 
 DECLARE_READ16_DEVICE_HANDLER( apollo_mgm_r );
 DECLARE_WRITE16_DEVICE_HANDLER( apollo_mgm_w );
+
+DECLARE_READ8_DEVICE_HANDLER( apollo_ccr_r ) ;
+DECLARE_WRITE8_DEVICE_HANDLER(apollo_ccr_w );
+
+DECLARE_READ16_DEVICE_HANDLER( apollo_cgm_r );
+DECLARE_WRITE16_DEVICE_HANDLER( apollo_cgm_w );
 
 #endif /* APOLLO_H_ */

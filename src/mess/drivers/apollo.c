@@ -41,7 +41,7 @@
 
 // we use this to prevent excessive logging (if emulation runs amok)
 // error.log will be 10 MB for 100000 lines
-#define APOLLO_MAX_NO_OF_LOG_LINES 500000
+#define APOLLO_MAX_NO_OF_LOG_LINES 1000000
 
 #define ATBUS_IO_BASE       0x040000
 #define ATBUS_IO_END        0x05ffff
@@ -754,8 +754,11 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+
+		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -802,8 +805,11 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//
+//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -841,8 +847,11 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+
+		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -879,8 +888,11 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//
+//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -925,8 +937,11 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+		AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 		AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+
+		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -946,7 +961,6 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 //      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
 		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
@@ -977,8 +991,11 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(0x058000, 0x058007) AM_DEVREADWRITE8_LEGACY(APOLLO_ETH_TAG, threecom3c505_r, threecom3c505_w, 0xffffffff)
 		AM_RANGE(0x05f800, 0x05f807) AM_DEVICE8(APOLLO_FDC_TAG, pc_fdc_at_device, map, 0xffffffff)
 
-//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
+//      AM_RANGE(0x05d800, 0x05dc07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_mcr_r, apollo_mcr_w, 0xffffffff)
 //      AM_RANGE(0xfa0000, 0xfdffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_mgm_r, apollo_mgm_w, 0xffffffff)
+//
+//		AM_RANGE(0x05e800, 0x05ec07) AM_DEVREADWRITE8_LEGACY(APOLLO_SCREEN_TAG, apollo_ccr_r, apollo_ccr_w, 0xffffffff)
+//		AM_RANGE(0x0a0000, 0x0bffff) AM_DEVREADWRITE16_LEGACY(APOLLO_SCREEN_TAG, apollo_cgm_r, apollo_cgm_w, 0xffffffff)
 
 		AM_RANGE(ATBUS_IO_BASE, ATBUS_IO_END) AM_READWRITE16(apollo_atbus_io_r, apollo_atbus_io_w, 0xffffffff)
 
@@ -1236,8 +1253,8 @@ static MACHINE_CONFIG_DERIVED( dn3500_19i, dn3500 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3500_15i, dn3500 )
-	/* video hardware 15" monochrome */
-	MCFG_APOLLO_MONO15I_ADD(APOLLO_SCREEN_TAG)
+	/* video hardware is 15" monochrome or color */
+	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
 MACHINE_CONFIG_END
 
@@ -1245,8 +1262,6 @@ static MACHINE_CONFIG_DERIVED( dn3000, dn3500 )
 	MCFG_CPU_REPLACE(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(dn3000_map)
 	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
-
-
 	MCFG_RAM_MODIFY("messram")
 	MCFG_RAM_DEFAULT_SIZE("8M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")
@@ -1270,7 +1285,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn3000_15i, dn3000 )
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_MONO15I_ADD(APOLLO_SCREEN_TAG)
+	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
 MACHINE_CONFIG_END
 
@@ -1298,7 +1313,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dn5500_15i, dn5500 )
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_MONO15I_ADD(APOLLO_SCREEN_TAG)
+	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
 	MCFG_APOLLO_KBD_ADD( APOLLO_KBD_TAG, apollo_kbd_config )
 MACHINE_CONFIG_END
 
@@ -1343,7 +1358,7 @@ ROM_END
 #define rom_dn3500_19i rom_dn3500
 
 #define rom_dsp3000    rom_dn3000
-#define rom_dn3000_15i rom_dn3000
+#define rom_dn3000_19i rom_dn3000
 
 #define rom_dsp5500    rom_dn5500
 #define rom_dn5500_15i rom_dn5500
@@ -1358,14 +1373,14 @@ ROM_END
 //#define DSP_FLAGS GAME_NO_SOUND
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME                         FLAGS */
-COMP( 1989, dn3500,     0,      0,      dn3500_19i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
+COMP( 1989, dn3500,          0, 0,      dn3500_15i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500", DN_FLAGS )
 COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state,dsp3500,"Apollo",   "Apollo DSP3500",                DSP_FLAGS )
-COMP( 1989, dn3500_15i, dn3500, 0,      dn3500_15i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 15\" Monochrome", DN_FLAGS )
+COMP( 1989, dn3500_19i, dn3500, 0,      dn3500_19i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
 
-COMP( 1988, dn3000,     dn3500, 0,      dn3000_19i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
+COMP( 1988, dn3000,     dn3500, 0,      dn3000_15i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000", DN_FLAGS )
 COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state,dsp3000,"Apollo",   "Apollo DSP3000",                DSP_FLAGS )
-COMP( 1988, dn3000_15i, dn3500, 0,      dn3000_15i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 15\" Monochrome", DN_FLAGS )
+COMP( 1988, dn3000_19i, dn3500, 0,      dn3000_19i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
 
-COMP( 1991, dn5500,     dn3500, 0,      dn5500_19i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 19\" Monochrome", GAME_NOT_WORKING )
+COMP( 1991, dn5500,     dn3500, 0,      dn5500_15i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500", GAME_NOT_WORKING )
 COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state,dsp5500,"Apollo",   "Apollo DSP5500",                GAME_NOT_WORKING )
-COMP( 1991, dn5500_15i, dn3500, 0,      dn5500_15i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 15\" Monochrome", GAME_NOT_WORKING )
+COMP( 1991, dn5500_19i, dn3500, 0,      dn5500_19i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 19\" Monochrome", GAME_NOT_WORKING )
