@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sandscrp_soundport, AS_IO, 8, sandscrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)    // ROM Bank
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)        // PORTA/B read
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)        // PORTA/B read
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)     // OKIM6295
 	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)    //
 	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)     //
@@ -468,17 +468,14 @@ WRITE_LINE_MEMBER(sandscrp_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2203_interface ym2203_intf_sandscrp =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"), /* Port A Read */
-		DEVCB_INPUT_PORT("DSW2"), /* Port B Read */
-		DEVCB_NULL, /* Port A Write */
-		DEVCB_NULL, /* Port B Write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(sandscrp_state,irqhandler) /* IRQ handler */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"), /* Port A Read */
+	DEVCB_INPUT_PORT("DSW2"), /* Port B Read */
+	DEVCB_NULL, /* Port A Write */
+	DEVCB_NULL, /* Port B Write */
 };
 
 
@@ -532,7 +529,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_SOUND_CONFIG(ym2203_intf_sandscrp)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sandscrp_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END

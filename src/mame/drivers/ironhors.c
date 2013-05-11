@@ -91,7 +91,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, ironhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -340,16 +340,13 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 	DEVCB_NULL
 };
 
@@ -396,7 +393,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 18432000/6)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 
 	MCFG_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
 	MCFG_SOUND_ROUTE_EX(1, "disc_ih", 1.0, 1)
@@ -430,16 +427,13 @@ READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 	return soundlatch_byte_r(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
-static const ym2203_interface farwest_ym2203_config =
+static const ay8910_interface farwest_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(ironhors_state,farwest_soundlatch_r),
-		DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ironhors_state,farwest_soundlatch_r),
+	DEVCB_DRIVER_MEMBER(ironhors_state,ironhors_filter_w),
 	DEVCB_NULL
 };
 
@@ -462,7 +456,7 @@ static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 	MCFG_SCREEN_UPDATE_DRIVER(ironhors_state, screen_update_farwest)
 
 	MCFG_SOUND_MODIFY("ym2203")
-	MCFG_SOUND_CONFIG(farwest_ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&farwest_ay8910_config)
 MACHINE_CONFIG_END
 
 

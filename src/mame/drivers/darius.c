@@ -464,8 +464,8 @@ WRITE8_MEMBER(darius_state::darius_write_portB1)
 static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
@@ -767,30 +767,24 @@ WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2203_interface ym2203_interface_1 =
+static const ay8910_interface ay8910_config_1 =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,                 /* portA read */
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA0),  /* portA write */
-		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB0),  /* portB write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(darius_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,                 /* portA read */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA0),  /* portA write */
+	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB0),  /* portB write */
 };
 
-static const ym2203_interface ym2203_interface_2 =
+static const ay8910_interface ay8910_config_2 =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,                 /* portA read */
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA1),  /* portA write */
-		DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB1)       /* portB write */
-	},
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,                 /* portA read */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portA1),  /* portA write */
+	DEVCB_DRIVER_MEMBER(darius_state,darius_write_portB1)       /* portB write */
 };
 
 
@@ -913,7 +907,8 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-	MCFG_SOUND_CONFIG(ym2203_interface_1)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(darius_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config_1)
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter0.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter0.1l", 0.08)
@@ -924,7 +919,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
-	MCFG_SOUND_CONFIG(ym2203_interface_2)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config_2)
 	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
 	MCFG_SOUND_ROUTE(0, "filter1.0r", 0.08)
 	MCFG_SOUND_ROUTE(1, "filter1.1l", 0.08)

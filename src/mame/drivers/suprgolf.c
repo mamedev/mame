@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, suprgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
 	ADDRESS_MAP_END
 
@@ -424,17 +424,14 @@ WRITE_LINE_MEMBER(suprgolf_state::irqhandler)
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW0"),
-		DEVCB_INPUT_PORT("DSW1"),
-		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
-		DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
-	},
-	DEVCB_DRIVER_LINE_MEMBER(suprgolf_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW0"),
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeA),
+	DEVCB_DRIVER_MEMBER(suprgolf_state,suprgolf_writeB),
 };
 
 WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
@@ -529,7 +526,8 @@ static MACHINE_CONFIG_START( suprgolf, suprgolf_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/4) /* guess */
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(suprgolf_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* guess */

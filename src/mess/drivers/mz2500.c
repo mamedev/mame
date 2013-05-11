@@ -1532,7 +1532,7 @@ static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
 	AM_RANGE(0xbf, 0xbf) AM_READ(mz2500_iplane_latch_r)
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
-	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE_LEGACY("ym", ym2203_r, ym2203_w)
+	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_device, read, write)
 //  AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 	AM_RANGE(0xcc, 0xcc) AM_READWRITE(rp5c15_8_r, rp5c15_8_w)
 	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
@@ -2018,17 +2018,14 @@ WRITE8_MEMBER(mz2500_state::opn_porta_w)
 	m_ym_porta = data;
 }
 
-static const ym2203_interface ym2203_interface_1 =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_r),  // read A
-		DEVCB_INPUT_PORT("DSW1"),   // read B
-		DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_w),  // write A
-		DEVCB_NULL                  // write B
-	},
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_r),  // read A
+	DEVCB_INPUT_PORT("DSW1"),   // read B
+	DEVCB_DRIVER_MEMBER(mz2500_state,opn_porta_w),  // write A
+	DEVCB_NULL                  // write B
 };
 
 void mz2500_state::palette_init()
@@ -2153,7 +2150,7 @@ static MACHINE_CONFIG_START( mz2500, mz2500_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym", YM2203, 2000000) //unknown clock / divider
-	MCFG_SOUND_CONFIG(ym2203_interface_1)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

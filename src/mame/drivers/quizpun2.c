@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP  // IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP  // NMI end
 	AM_RANGE( 0x40, 0x40 ) AM_READ(soundlatch_byte_r )
-	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w )
+	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write )
 ADDRESS_MAP_END
 
 

@@ -147,17 +147,14 @@ WRITE8_MEMBER(chinsan_state::ym_port_w2)
 }
 
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"),
-		DEVCB_INPUT_PORT("DSW2"),
-		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w1),
-		DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w2)
-	},
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w1),
+	DEVCB_DRIVER_MEMBER(chinsan_state,ym_port_w2)
 };
 
 WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
@@ -261,7 +258,7 @@ static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(chin_adpcm_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)   // ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
@@ -621,7 +618,7 @@ static MACHINE_CONFIG_START( chinsan, chinsan_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000) /* ? Mhz */
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

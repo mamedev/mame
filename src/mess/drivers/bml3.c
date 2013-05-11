@@ -46,16 +46,19 @@ class bml3_state : public driver_device
 public:
 	bml3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "crtc"),
-	//m_cass(*this, "cassette"),
-	m_beep(*this, "beeper")
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "crtc"),
+		//m_cass(*this, "cassette"),
+		m_beep(*this, "beeper"),
+		m_ym2203(*this, "ym2203")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	//required_device<cassette_image_device> m_cass;
 	required_device<beep_device> m_beep;
+	required_device<ym2203_device> m_ym2203;
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);
@@ -333,18 +336,16 @@ WRITE8_MEMBER( bml3_state::bml3_psg_latch_w)
 
 READ8_MEMBER(bml3_state::bml3_ym2203_r)
 {
-	device_t *device = machine().device("ym2203");
 	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	return ym2203_r(device,space, dev_offs);
+	return m_ym2203->read(space, dev_offs);
 }
 
 WRITE8_MEMBER(bml3_state::bml3_ym2203_w)
 {
-	device_t *device = machine().device("ym2203");
 	UINT8 dev_offs = ((m_psg_latch & 3) != 3);
 
-	ym2203_w(device,space, dev_offs,data);
+	m_ym2203->write(space, dev_offs, data);
 }
 
 READ8_MEMBER( bml3_state::bml3_vram_attr_r)
@@ -861,17 +862,14 @@ static ACIA6850_INTERFACE( bml3_acia_if )
 	DEVCB_DRIVER_LINE_MEMBER(bml3_state, bml3_acia_irq_w)
 };
 
-static const ym2203_interface ym2203_interface_1 =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, // read A
-		DEVCB_NULL, // read B
-		DEVCB_NULL, // write A
-		DEVCB_NULL  // write B
-	},
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, // read A
+	DEVCB_NULL, // read B
+	DEVCB_NULL, // write A
+	DEVCB_NULL  // write B
 };
 
 /* TODO */
@@ -922,7 +920,7 @@ static MACHINE_CONFIG_START( bml3, bml3_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 
 	MCFG_SOUND_ADD("ym2203", YM2203, 2000000) //unknown clock / divider
-	MCFG_SOUND_CONFIG(ym2203_interface_1)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

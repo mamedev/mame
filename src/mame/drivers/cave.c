@@ -1057,7 +1057,7 @@ static ADDRESS_MAP_START( hotdogst_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w)                   // ROM bank
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)                       // From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)                       //
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)    //
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   //
 	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w)                   // Samples bank
 ADDRESS_MAP_END
@@ -1087,8 +1087,8 @@ static ADDRESS_MAP_START( mazinger_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w)   // ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)     // To Main CPU
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)       // From Main CPU
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)  // YM2203
-	AM_RANGE(0x52, 0x53) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)   // YM2203
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym2203_device, write) // YM2203
+	AM_RANGE(0x52, 0x53) AM_DEVREAD("ymsnd", ym2203_device, read)   // YM2203
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", okim6295_device, write) // M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w)   // Samples bank
 ADDRESS_MAP_END
@@ -1165,7 +1165,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8, cave_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_device, read, write)  // M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_device, read, write)  //
 	AM_RANGE(0x10, 0x17) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)         // Samples bank
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)        //
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   //
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)                         // To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITENOP                                         // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w)                       // ROM bank
@@ -1802,14 +1802,11 @@ WRITE_LINE_MEMBER(cave_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	},
-	DEVCB_DRIVER_LINE_MEMBER(cave_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 /***************************************************************************
@@ -2106,7 +2103,8 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.20)
@@ -2212,7 +2210,8 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_4MHz)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.20)
@@ -2381,7 +2380,8 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz / 4)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cave_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.40)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.40)

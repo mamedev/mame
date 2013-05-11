@@ -357,10 +357,10 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	coin_counter_w(machine(), 0, ~data & 0x80);
 
 	if (BIT(m_upd7807_portc, 5) && !BIT(data, 5))   /* write clock 1->0 */
-		ym2203_w(m_ym, space, BIT(data, 3), m_upd7807_porta);
+		m_ymsnd->write(space, BIT(data, 3), m_upd7807_porta);
 
 	if (BIT(m_upd7807_portc, 4) && !BIT(data, 4))   /* read clock 1->0 */
-		m_upd7807_porta = ym2203_r(m_ym, space, BIT(data, 3));
+		m_upd7807_porta = m_ymsnd->read(space, BIT(data, 3));
 
 	m_upd7807_portc = data;
 }
@@ -1140,7 +1140,6 @@ static const sn76496_config psg_intf =
 
 MACHINE_START_MEMBER(homedata_state,homedata)
 {
-	m_ym = machine().device("ymsnd");
 	m_sn = machine().device<sn76489a_device>("snsnd");
 
 	save_item(NAME(m_visible_page));
@@ -1279,16 +1278,13 @@ MACHINE_CONFIG_END
 /**************************************************************************/
 
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"),
-		DEVCB_INPUT_PORT("DSW2"),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1337,7 +1333,7 @@ static MACHINE_CONFIG_START( reikaids, homedata_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

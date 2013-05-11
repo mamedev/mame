@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

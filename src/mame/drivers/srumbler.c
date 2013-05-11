@@ -99,8 +99,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_device, write)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END

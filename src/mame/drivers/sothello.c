@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sothello_state )
 	AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
 	AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
-	AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
 	AM_RANGE( 0x70, 0x73) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 ADDRESS_MAP_END
@@ -351,17 +351,14 @@ void sothello_state::machine_reset()
 {
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSWA"),
-		DEVCB_INPUT_PORT("DSWB"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-	},
-	DEVCB_DRIVER_LINE_MEMBER(sothello_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSWA"),
+	DEVCB_INPUT_PORT("DSWB"),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 static MACHINE_CONFIG_START( sothello, sothello_state )
@@ -398,7 +395,8 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(sothello_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

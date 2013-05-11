@@ -1201,7 +1201,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 //  AM_RANGE(0x0034, 0x0034) GVRAM Control Port 1
 //  AM_RANGE(0x0035, 0x0035) GVRAM Control Port 2
 	AM_RANGE(0x0040, 0x0041) AM_READ(sys_port4_r) // (R) System Port 4 (W) System port 3 (strobe port)
-	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x0002) AM_DEVREADWRITE8_LEGACY("ym", ym2203_r,ym2203_w,0xffff)
+	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x0002) AM_DEVREADWRITE8("ym", ym2203_device, read, write, 0xffff)
 //  AM_RANGE(0x005c, 0x005c) (R) GVRAM status
 //  AM_RANGE(0x005c, 0x005f) (W) GVRAM selection
 //  AM_RANGE(0x0070, 0x0070) ? (*)
@@ -1765,16 +1765,13 @@ void pc88va_state::fdc_irq(bool state)
 }
 
 
-static const ym2203_interface pc88va_ym2203_intf =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1873,7 +1870,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym", YM2203, 3993600) //unknown clock / divider
-	MCFG_SOUND_CONFIG(pc88va_ym2203_intf)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

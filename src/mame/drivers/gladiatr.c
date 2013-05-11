@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
 	AM_RANGE(0x60, 0x61) AM_READWRITE(qx2_r,qx2_w)
@@ -443,7 +443,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_1_r, TAITO8741_1_w)
 	AM_RANGE(0x40, 0x40) AM_NOP // WRITE(sub_irq_ack_w)
 	AM_RANGE(0x60, 0x61) AM_READWRITE_LEGACY(TAITO8741_2_r, TAITO8741_2_w)
@@ -625,30 +625,24 @@ READ8_MEMBER(gladiatr_state::f1_r)
 	return machine().rand();
 }
 
-static const ym2203_interface ppking_ym2203_interface =
+static const ay8910_interface ppking_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
-		DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
+	DEVCB_DRIVER_MEMBER(gladiatr_state,f1_r),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-static const ym2203_interface gladiatr_ym2203_interface =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_INPUT_PORT("DSW3"),               /* port B read */
-		DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
-		DEVCB_NULL,
-	},
-	DEVCB_DRIVER_LINE_MEMBER(gladiatr_state,gladiator_ym_irq)          /* NMI request for 2nd cpu */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW3"),               /* port B read */
+	DEVCB_DRIVER_MEMBER(gladiatr_state,gladiator_int_control_w), /* port A write */
+	DEVCB_NULL,
 };
 
 static const msm5205_interface msm5205_config =
@@ -697,7 +691,7 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ppking_ym2203_interface)
+	MCFG_YM2203_AY8910_INTF(&ppking_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
@@ -745,7 +739,8 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_SOUND_CONFIG(gladiatr_ym2203_interface)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state, gladiator_ym_irq))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)

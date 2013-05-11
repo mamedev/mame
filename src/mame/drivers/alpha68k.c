@@ -792,17 +792,17 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE_LEGACY("ym2", ym2413_w)
-	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kyros_sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ym2", ym2203_write_port_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE_LEGACY("ym2", ym2203_control_port_w)
-	AM_RANGE(0x90, 0x90) AM_DEVWRITE_LEGACY("ym3", ym2203_write_port_w)
-	AM_RANGE(0x91, 0x91) AM_DEVWRITE_LEGACY("ym3", ym2203_control_port_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ym1", ym2203_device, write)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ym2", ym2203_device, write_port_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ym2", ym2203_device, control_port_w)
+	AM_RANGE(0x90, 0x90) AM_DEVWRITE("ym3", ym2203_device, write_port_w)
+	AM_RANGE(0x91, 0x91) AM_DEVWRITE("ym3", ym2203_device, control_port_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jongbou_sound_portmap, AS_IO, 8, alpha68k_state )
@@ -1833,16 +1833,13 @@ WRITE8_MEMBER(alpha68k_state::porta_w)
 	m_sound_pa_latch = data & 1;
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ym2203_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(alpha68k_state, porta_w),
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(alpha68k_state, porta_w),
 	DEVCB_NULL
 };
 
@@ -2146,7 +2143,7 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ym2203_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
@@ -2195,7 +2192,7 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ym2203_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
@@ -2238,7 +2235,7 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ym2203_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
@@ -2280,7 +2277,7 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ym2203_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)

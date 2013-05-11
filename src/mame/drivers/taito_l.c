@@ -470,9 +470,8 @@ READ8_MEMBER(taitol_state::portB_r)
 
 READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
 {
-	device_t *device = machine().device("ymsnd");
 	m_extport = (offset >> 1) & 1;
-	return ym2203_r(device, space, offset & 1);
+	return m_ymsnd->read(space, offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_data_w)
@@ -645,7 +644,7 @@ READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
 #define COMMON_SINGLE_MAP \
-	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w) \
+	AM_RANGE(0xa000, 0xa003) AM_READ(extport_select_and_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write) \
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 
@@ -678,7 +677,7 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -748,7 +747,7 @@ static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
@@ -771,7 +770,7 @@ static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 #if 0
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
@@ -870,7 +869,7 @@ static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 
@@ -1751,30 +1750,24 @@ WRITE8_MEMBER(taitol_state::portA_w)
 	}
 }
 
-static const ym2203_interface ym2203_interface_triple =
+static const ay8910_interface triple_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
-		DEVCB_NULL,
-	},
-	DEVCB_DRIVER_LINE_MEMBER(taitol_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
+	DEVCB_NULL,
 };
 
-static const ym2203_interface ym2203_interface_champwr =
+static const ay8910_interface champwr_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
-		DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
-	},
-	DEVCB_DRIVER_LINE_MEMBER(taitol_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(taitol_state,portA_w),
+	DEVCB_DRIVER_MEMBER(taitol_state,champwr_msm5205_volume_w),
 };
 
 
@@ -1784,16 +1777,13 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B      /* 8 kHz */
 };
 
-static const ym2203_interface ym2203_interface_single =
+static const ay8910_interface single_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(taitol_state,portA_r),
-		DEVCB_DRIVER_MEMBER(taitol_state,portB_r),
-		DEVCB_NULL,
-		DEVCB_NULL
-	},
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(taitol_state,portA_r),
+	DEVCB_DRIVER_MEMBER(taitol_state,portB_r),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -1841,7 +1831,8 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2203_interface_triple)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_AY8910_INTF(&triple_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1867,7 +1858,8 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_SOUND_CONFIG(ym2203_interface_champwr)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_AY8910_INTF(&champwr_ay8910_config)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_SOUND_CONFIG(msm5205_config)
@@ -1979,7 +1971,7 @@ static MACHINE_CONFIG_START( plotting, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym2203_interface_single)
+	MCFG_YM2203_AY8910_INTF(&single_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)

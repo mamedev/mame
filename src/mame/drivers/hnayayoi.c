@@ -96,8 +96,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnayayoi_io_map, AS_IO, 8, hnayayoi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym2203_device, write)
+	AM_RANGE(0x02, 0x03) AM_DEVREAD("ymsnd", ym2203_device, read)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW3")
 	AM_RANGE(0x06, 0x06) AM_WRITE(adpcm_data_w)
 //  AM_RANGE(0x08, 0x08) AM_WRITENOP // CRT Controller
@@ -118,8 +118,8 @@ static ADDRESS_MAP_START( hnfubuki_map, AS_PROGRAM, 8, hnayayoi_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xfeff) AM_ROM
-	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)
-	AM_RANGE(0xff02, 0xff03) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)
+	AM_RANGE(0xff00, 0xff01) AM_DEVWRITE("ymsnd", ym2203_device, write)
+	AM_RANGE(0xff02, 0xff03) AM_DEVREAD("ymsnd", ym2203_device, read)
 	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW3")
 	AM_RANGE(0xff06, 0xff06) AM_WRITE(adpcm_data_w)
 //  AM_RANGE(0xff08, 0xff08) AM_WRITENOP // CRT Controller
@@ -144,8 +144,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_io_map, AS_IO, 8, hnayayoi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ymsnd", ym2203_control_port_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ymsnd", ym2203_status_port_r)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ymsnd", ym2203_device, control_port_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD("ymsnd", ym2203_device, status_port_r)
 //  AM_RANGE(0x12, 0x12) AM_WRITENOP // CRT Controller
 	AM_RANGE(0x13, 0x13) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("COIN")
@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( untoucha_io_map, AS_IO, 8, hnayayoi_state )
 	AM_RANGE(0x28, 0x28) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(adpcm_vclk_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(adpcm_reset_inv_w)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE_LEGACY("ymsnd", ym2203_write_port_w)
-	AM_RANGE(0x51, 0x51) AM_DEVREAD_LEGACY("ymsnd", ym2203_read_port_r)
+	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ymsnd", ym2203_device, write_port_w)
+	AM_RANGE(0x51, 0x51) AM_DEVREAD("ymsnd", ym2203_device, read_port_r)
 //  AM_RANGE(0x52, 0x52) AM_WRITENOP // CRT Controller
 ADDRESS_MAP_END
 
@@ -505,17 +505,14 @@ WRITE_LINE_MEMBER(hnayayoi_state::irqhandler)
 }
 
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"),
-		DEVCB_INPUT_PORT("DSW2"),
-		DEVCB_NULL,
-		DEVCB_NULL,
-	},
-	DEVCB_DRIVER_LINE_MEMBER(hnayayoi_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_NULL,
 };
 
 static const msm5205_interface msm5205_config =
@@ -576,7 +573,8 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 20000000/8)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(hnayayoi_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

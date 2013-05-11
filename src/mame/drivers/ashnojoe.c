@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
 	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
@@ -289,17 +289,14 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 	membank("bank4")->set_entry(data & 0x0f);
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
-		DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
-	},
-	DEVCB_DRIVER_LINE_MEMBER(ashnojoe_state,ym2203_irq_handler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_a),
+	DEVCB_DRIVER_MEMBER(ashnojoe_state,ym2203_write_b),
 };
 
 WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
@@ -367,7 +364,8 @@ static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(ashnojoe_state, ym2203_irq_handler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)

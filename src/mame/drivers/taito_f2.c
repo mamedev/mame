@@ -1170,7 +1170,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // I can't see a bank control, but there ARE some bytes past 0x8000
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
@@ -2813,17 +2813,14 @@ WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
 	// Implement //
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,             /* portA read */
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),   /* portA write - not implemented */
-		DEVCB_NULL,             /* portB write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(taitof2_state,irqhandler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,             /* portA read */
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(taitof2_state,cameltrya_porta_w),   /* portA write - not implemented */
+	DEVCB_NULL,             /* portB write */
 };
 
 
@@ -3607,7 +3604,8 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 24000000/8) /* verified on pcb  */
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitof2_state, irqhandler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)

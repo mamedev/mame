@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8, chanbara_state )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P1")
-	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -369,17 +369,14 @@ WRITE_LINE_MEMBER(chanbara_state::sound_irq)
 }
 
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-			AY8910_LEGACY_OUTPUT,
-			AY8910_DEFAULT_LOADS,
-			DEVCB_NULL,
-			DEVCB_NULL,
-			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_0_w),
-			DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_1_w),
-	},
-	DEVCB_DRIVER_LINE_MEMBER(chanbara_state,sound_irq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_0_w),
+	DEVCB_DRIVER_MEMBER(chanbara_state,chanbara_ay_out_1_w),
 };
 
 
@@ -416,7 +413,8 @@ static MACHINE_CONFIG_START( chanbara, chanbara_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000/8)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chanbara_state, sound_irq))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

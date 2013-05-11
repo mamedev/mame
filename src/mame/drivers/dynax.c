@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x74, 0x74 ) AM_WRITE(dynax_blitter_ack_w)        // Blitter IRQ Ack
 	AM_RANGE( 0x76, 0x76 ) AM_WRITE(dynax_blit_palbank_w)       // Layers Palettes (High Bit)
 	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hanamai_layer_half_w)       // half of the interleaved layer to write to
-	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)  // 2 x DSW
+	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write) // 2 x DSW
 	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)   // AY8910
 //  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP   //
@@ -845,7 +845,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)       // Blitter
-	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)  // 2 x DSW
+	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)  // 2 x DSW
 //  AM_RANGE( 0x12, 0x12 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x13, 0x13 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x20, 0x20 ) AM_READ_PORT("P1")               // P1
@@ -1022,7 +1022,7 @@ static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)    // VBlank IRQ Ack
 	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)         // AY8910
 	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)   //
-	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)  //
+	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write) //
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)      // MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)               // MSM5205 data
 	AM_RANGE( 0x50, 0x50 ) AM_READ(jantouki_soundlatch_status_r)    // Soundlatch status
@@ -4065,17 +4065,14 @@ MACHINE_START_MEMBER(dynax_state,hnoridur)
                                 Hana no Mai
 ***************************************************************************/
 
-static const ym2203_interface hanamai_ym2203_interface =
+static const ay8910_interface hanamai_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW1"),           /* Port A Read: DSW */
-		DEVCB_INPUT_PORT("DSW0"),           /* Port B Read: DSW */
-		DEVCB_NULL,                         /* Port A Write */
-		DEVCB_NULL,                         /* Port B Write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,sprtmtch_sound_callback)     /* IRQ handler */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW1"),           /* Port A Read: DSW */
+	DEVCB_INPUT_PORT("DSW0"),           /* Port B Read: DSW */
+	DEVCB_NULL,                         /* Port A Write */
+	DEVCB_NULL,                         /* Port B Write */
 };
 
 static const msm5205_interface hanamai_msm5205_interface =
@@ -4119,7 +4116,8 @@ static MACHINE_CONFIG_START( hanamai, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MCFG_SOUND_CONFIG(hanamai_ym2203_interface)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_YM2203_AY8910_INTF(&hanamai_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4233,17 +4231,14 @@ MACHINE_CONFIG_END
                                 Sports Match
 ***************************************************************************/
 
-static const ym2203_interface sprtmtch_ym2203_interface =
+static const ay8910_interface sprtmtch_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("DSW0"),   /* Port A Read: DSW */
-		DEVCB_INPUT_PORT("DSW1"),   /* Port B Read: DSW */
-		DEVCB_NULL,                 /* Port A Write */
-		DEVCB_NULL,                 /* Port B Write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,sprtmtch_sound_callback),    /* IRQ handler */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("DSW0"),   /* Port A Read: DSW */
+	DEVCB_INPUT_PORT("DSW1"),   /* Port B Read: DSW */
+	DEVCB_NULL,                 /* Port A Write */
+	DEVCB_NULL,                 /* Port B Write */
 };
 
 static MACHINE_CONFIG_START( sprtmtch, dynax_state )
@@ -4276,7 +4271,8 @@ static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MCFG_SOUND_CONFIG(sprtmtch_ym2203_interface)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, sprtmtch_sound_callback))
+	MCFG_YM2203_AY8910_INTF(&sprtmtch_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -4407,14 +4403,11 @@ MACHINE_CONFIG_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-static const ym2203_interface jantouki_ym2203_interface =
+static const ay8910_interface jantouki_ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	},
-	DEVCB_DRIVER_LINE_MEMBER(dynax_state,jantouki_sound_callback)     /* IRQ handler */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 static const msm5205_interface jantouki_msm5205_interface =
@@ -4489,7 +4482,8 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MCFG_SOUND_CONFIG(jantouki_ym2203_interface)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(dynax_state, jantouki_sound_callback))
+	MCFG_YM2203_AY8910_INTF(&jantouki_ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)

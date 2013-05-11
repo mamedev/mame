@@ -363,10 +363,10 @@ static ADDRESS_MAP_START( ym2203c_sound_map, AS_PROGRAM, 8, chinagat_state )
 // 8804 and/or 8805 make a gong sound when the coin goes in
 // but only on the title screen....
 
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 //  AM_RANGE(0x8802, 0x8802) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 //  AM_RANGE(0x8803, 0x8803) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8804, 0x8805) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITEONLY
 //  AM_RANGE(0x8805, 0x8805) AM_WRITEONLY
 
@@ -518,14 +518,11 @@ static const msm5205_interface msm5205_config =
 };
 
 /* This is only on the second bootleg board */
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	},
-	DEVCB_DRIVER_LINE_MEMBER(chinagat_state,chinagat_irq_handler)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
 
@@ -684,7 +681,8 @@ static MACHINE_CONFIG_START( saiyugoub2, chinagat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3579545)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(chinagat_state, chinagat_irq_handler))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)

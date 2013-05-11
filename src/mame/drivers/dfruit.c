@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dfruit_map, AS_PROGRAM, 8, dfruit_state )
 	AM_IMPORT_FROM(tc0091lvc_map)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE_LEGACY("opn",ym2203_r,ym2203_w)
+	AM_RANGE(0xa004, 0xa005) AM_DEVREADWRITE("opn", ym2203_device, read, write)
 	AM_RANGE(0xa008, 0xa008) AM_READNOP //watchdog
 ADDRESS_MAP_END
 
@@ -368,14 +368,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 	}
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_INPUT_PORT("IN4"), DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
-	},
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("IN4"), DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
 };
 
 
@@ -410,7 +407,7 @@ static MACHINE_CONFIG_START( dfruit, dfruit_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

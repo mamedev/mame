@@ -347,8 +347,8 @@ static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("2203a", ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("2203b", ym2203_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("2203a", ym2203_device, write)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("2203b", ym2203_device, write)
 	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
 	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_SHARE("soundlatch2")
 ADDRESS_MAP_END

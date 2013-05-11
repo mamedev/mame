@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)             // nmi ack
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w) AM_SHARE("paletteram")
 /**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
-	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 /**/AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(metlclsh_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym2", ym3526_w )
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_SHARE("spriteram")

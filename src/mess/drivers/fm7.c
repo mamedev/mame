@@ -845,21 +845,21 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = ym2203_r(space.machine().device("ym"),space, 1);
+				m_psg_data = m_ym->read(space, 1);
 				break;
 			case 0x02:
 				// Data write
-				ym2203_w(space.machine().device("ym"),space, 1,m_psg_data);
+				m_ym->write(space, 1,m_psg_data);
 				logerror("YM: data write 0x%02x\n",m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ym2203_w(space.machine().device("ym"),space, 0,m_psg_data);
+				m_ym->write(space, 0,m_psg_data);
 				logerror("YM: address latch 0x%02x\n",m_psg_data);
 				break;
 			case 0x04:
 				// Status register
-				m_psg_data = ym2203_r(space.machine().device("ym"),space, 0);
+				m_psg_data = m_ym->read(space, 0);
 				break;
 			case 0x09:
 				// Joystick port read
@@ -1973,17 +1973,14 @@ static const ay8910_interface fm7_psg_intf =
 	DEVCB_NULL                  /* portB write */
 };
 
-static const ym2203_interface fm7_ym_intf =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_1_r),
-		DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_2_r),
-		DEVCB_NULL,                 /* portA write */
-		DEVCB_NULL                  /* portB write */
-	},
-	DEVCB_DRIVER_LINE_MEMBER(fm7_state,fm77av_fmirq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_1_r),
+	DEVCB_DRIVER_MEMBER(fm7_state,fm77av_joy_2_r),
+	DEVCB_NULL,                 /* portA write */
+	DEVCB_NULL                  /* portB write */
 };
 
 static const cassette_interface fm7_cassette_interface =
@@ -2105,7 +2102,8 @@ static MACHINE_CONFIG_START( fm77av, fm7_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym", YM2203, XTAL_4_9152MHz / 4)
-	MCFG_SOUND_CONFIG(fm7_ym_intf)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(fm7_state, fm77av_fmirq))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)

@@ -1,5 +1,6 @@
 #include "sound/dac.h"
 #include "sound/sn76496.h"
+#include "sound/2203intf.h"
 
 class homedata_state : public driver_device
 {
@@ -10,7 +11,10 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dac(*this, "dac") {}
+		m_dac(*this, "dac"),
+		m_ymsnd(*this, "ymsnd")
+	{
+	}
 
 	/* memory pointers */
 	optional_shared_ptr<UINT8> m_vreg;
@@ -42,7 +46,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<dac_device> m_dac;
-	device_t *m_ym;
+	optional_device<ym2203_device> m_ymsnd;
 	sn76489a_device *m_sn;
 	UINT8 m_prot_data;
 	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);

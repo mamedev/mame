@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 /* same as Tryout */
 static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // unknown, NOT irq/nmi mask
@@ -239,27 +239,21 @@ WRITE_LINE_MEMBER(shootout_state::shootout_snd2_irq)
 	m_maincpu->set_input_line(0, state);
 }
 
-static const ym2203_interface ym2203_config =
+static const ay8910_interface ay8910_config =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
-	},
-	DEVCB_DRIVER_LINE_MEMBER(shootout_state,shootout_snd_irq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 };
 
-static const ym2203_interface ym2203_interface2 =
+static const ay8910_interface ay8910_config2 =
 {
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,
-		DEVCB_NULL,
-		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
-		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
-	},
-	DEVCB_DRIVER_LINE_MEMBER(shootout_state,shootout_snd2_irq)
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
+	DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 };
 
 static MACHINE_CONFIG_START( shootout, shootout_state )
@@ -287,7 +281,8 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd_irq))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -314,7 +309,8 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MCFG_SOUND_CONFIG(ym2203_interface2)
+	MCFG_YM2203_IRQ_HANDLER(WRITELINE(shootout_state, shootout_snd2_irq))
+	MCFG_YM2203_AY8910_INTF(&ay8910_config2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
