@@ -539,7 +539,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( studio2, studio2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, 1760000) /* the real clock is derived from an oscillator circuit */
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 1760000) /* the real clock is derived from an oscillator circuit */
 	MCFG_CPU_PROGRAM_MAP(studio2_map)
 	MCFG_CPU_IO_MAP(studio2_io_map)
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
@@ -558,7 +558,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( visicom, visicom_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_579545MHz/2)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(visicom_map)
 	MCFG_CPU_IO_MAP(visicom_io_map)
 	MCFG_CPU_CONFIG(studio2_cosmac_intf)
@@ -577,7 +577,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mpt02, mpt02_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1864_CLOCK)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1864_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mpt02_map)
 	MCFG_CPU_IO_MAP(mpt02_io_map)
 	MCFG_CPU_CONFIG(mpt02_cosmac_intf)

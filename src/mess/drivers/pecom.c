@@ -177,7 +177,7 @@ static const cassette_interface pecom_cassette_interface =
 static MACHINE_CONFIG_START( pecom64, pecom_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, CDP1869_DOT_CLK_PAL/3)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, CDP1869_DOT_CLK_PAL/3)
 	MCFG_CPU_PROGRAM_MAP(pecom64_mem)
 	MCFG_CPU_IO_MAP(pecom64_io)
 	MCFG_CPU_CONFIG(pecom64_cdp1802_config)

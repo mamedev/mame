@@ -562,7 +562,7 @@ static DM9368_INTERFACE( led_intf )
 
 static MACHINE_CONFIG_START( cosmicos, cosmicos_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
 	MCFG_CPU_IO_MAP(cosmicos_io)
 	MCFG_CPU_CONFIG(cosmicos_config)

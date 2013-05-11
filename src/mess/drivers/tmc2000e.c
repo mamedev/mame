@@ -324,7 +324,7 @@ static const cassette_interface tmc2000_cassette_interface =
 
 static MACHINE_CONFIG_START( tmc2000e, tmc2000e_state )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
 	MCFG_CPU_PROGRAM_MAP(tmc2000e_map)
 	MCFG_CPU_IO_MAP(tmc2000e_io_map)
 	MCFG_CPU_CONFIG(tmc2000e_config)

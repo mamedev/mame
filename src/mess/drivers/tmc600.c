@@ -290,7 +290,7 @@ static const floppy_interface tmc600_floppy_interface =
 
 static MACHINE_CONFIG_START( tmc600, tmc600_state )
 	// basic system hardware
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, 3579545)  // ???
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, 3579545)  // ???
 	MCFG_CPU_PROGRAM_MAP(tmc600_map)
 	MCFG_CPU_IO_MAP(tmc600_io_map)
 	MCFG_CPU_CONFIG(cosmac_intf)

@@ -1,11 +1,49 @@
 /**********************************************************************
 
-    RCA "COSMAC" CPU emulation
+    RCA COSMAC CPU emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************
+                            _____   _____
+                   Vcc   1 |*    \_/     | 40  Vdd
+                _BUS 3   2 |             | 39  _BUS 4
+                _BUS 2   3 |             | 38  _BUS 5
+                _BUS 1   4 |             | 37  _BUS 6
+                _BUS 0   5 |             | 36  _BUS 7
+                   _N0   6 |             | 35  Vss
+                   _N1   7 |             | 34  _EF1
+                   _N2   8 |             | 33  _EF2
+                   _N3   9 |             | 32  _EF3
+                     *  10 |   CDP1801U  | 31  _EF4
+                     *  11 |             | 30  _DMA OUT
+                     *  12 |             | 29  _INTERRUPT
+                     *  13 |             | 28  _DMA IN
+                     *  14 |             | 27  _CLEAR
+                _CLOCK  15 |             | 26  _LOAD
+                  _TPB  16 |             | 25  _SC2
+                  _TPA  17 |             | 24  _SC1
+                     *  18 |             | 23  _SC0
+                   MWR  19 |             | 22  _M READ
+                   Vss  20 |_____________| 21  *
+
+                            _____   _____
+                   Vcc   1 |*    \_/     | 28  Vdd
+                _BUS 4   2 |             | 27  _BUS 3
+                _BUS 5   3 |             | 26  _BUS 2
+                _BUS 6   4 |             | 25  _BUS 1
+                _BUS 7   5 |             | 24  _BUS 0
+                  _MA0   6 |             | 23  *
+                  _MA1   7 |   CDP1801C  | 22  _TPB
+                  _MA2   8 |             | 21  *
+                  _MA3   9 |             | 20  *
+                  _MA4  10 |             | 19  *
+                  _MA5  11 |             | 18  *
+                  _MA6  12 |             | 17  *
+                  _MA7  13 |             | 16  *
+                   Vss  14 |_____________| 15  _CLEAR
+
                             _____   _____
                  CLOCK   1 |*    \_/     | 40  Vdd
                  _WAIT   2 |             | 39  _XTAL
@@ -144,7 +182,7 @@ class cosmac_device : public cpu_device,
 {
 public:
 	// construction/destruction
-	cosmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// public interfaces
 	offs_t get_memory_address();
@@ -173,7 +211,6 @@ protected:
 	// device_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const;
 	virtual UINT32 disasm_max_opcode_bytes() const;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// helpers
 	inline UINT8 read_opcode(offs_t pc);
@@ -290,6 +327,7 @@ protected:
 	// control instructions opcode handlers
 	void idl();
 	void nop();
+	void und();
 	void sep();
 	void sex();
 	void seq();
@@ -373,13 +411,49 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
+	virtual cosmac_device::ophandler get_ophandler(UINT8 opcode) = 0;
+};
+
+
+// ======================> cdp1801_device
+
+class cdp1801_device : public cosmac_device
+{
+public:
+	// construction/destruction
+	cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual cosmac_device::ophandler get_ophandler(UINT8 opcode);
+
+	static const ophandler s_opcodetable[256];
+};
+
+
+// ======================> cdp1802_device
+
+class cdp1802_device : public cosmac_device
+{
+public:
+	// construction/destruction
+	cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+	virtual cosmac_device::ophandler get_ophandler(UINT8 opcode);
 
 	static const ophandler s_opcodetable[256];
 };
 
 
 // device type definition
-extern const device_type COSMAC;
+extern const device_type CDP1801;
+extern const device_type CDP1802;
 
 
 #endif /* __COSMAC_H__ */

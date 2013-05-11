@@ -1616,6 +1616,7 @@ $(MESSOBJ)/radio.a:             \
 	$(MESS_DRIVERS)/mikrosha.o  \
 
 $(MESSOBJ)/rca.a:               \
+	$(MESS_DRIVERS)/microkit.o  \
 	$(MESS_DRIVERS)/studio2.o   \
 	$(MESS_DRIVERS)/vip.o       \
 	$(MESS_MACHINE)/vip_byteio.o\

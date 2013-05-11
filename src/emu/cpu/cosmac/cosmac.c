@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    RCA "COSMAC" CPU emulation
+    RCA COSMAC CPU emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,16 +11,6 @@
 #include "debugger.h"
 #include "cosmac.h"
 #include "coreutil.h"
-
-
-/*
-
-    TODO:
-
-    - divide clock by 8
-    - min cycles -> 2 and 3
-
-*/
 
 // permit our enums to be saved
 ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);
@@ -88,88 +78,181 @@ const cosmac_state_code COSMAC_STATE_CODE[] =
 //  STATIC OPCODE TABLES
 //**************************************************************************
 
-const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
+const cosmac_device::ophandler cdp1801_device::s_opcodetable[256] =
 {
-	&cosmac_device::idl,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
-	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
-	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
-	&cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,    &cosmac_device::ldn,
+	&cdp1801_device::idl,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
+	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
+	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
+	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
 
-	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
-	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
-	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
-	&cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,    &cosmac_device::inc,
+	&cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,
+	&cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,
+	&cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,
+	&cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,    &cdp1801_device::inc,
 
-	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
-	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
-	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
-	&cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,    &cosmac_device::dec,
+	&cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,
+	&cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,
+	&cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,
+	&cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,    &cdp1801_device::dec,
 
-	&cosmac_device::br,     &cosmac_device::bq,     &cosmac_device::bz,     &cosmac_device::bdf,
-	&cosmac_device::b,      &cosmac_device::b,      &cosmac_device::b,      &cosmac_device::b,
-	&cosmac_device::nbr,    &cosmac_device::bnq,    &cosmac_device::bnz,    &cosmac_device::bnf,
-	&cosmac_device::bn,     &cosmac_device::bn,     &cosmac_device::bn,     &cosmac_device::bn,
+	&cdp1801_device::br,     &cdp1801_device::und,    &cdp1801_device::bz,     &cdp1801_device::bdf,
+	&cdp1801_device::b,      &cdp1801_device::b,      &cdp1801_device::b,      &cdp1801_device::b,
+	&cdp1801_device::nbr,    &cdp1801_device::und,    &cdp1801_device::bnz,    &cdp1801_device::bnf,
+	&cdp1801_device::bn,     &cdp1801_device::bn,     &cdp1801_device::bn,     &cdp1801_device::bn,
 
-	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
-	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
-	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
-	&cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,    &cosmac_device::lda,
+	&cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,
+	&cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,
+	&cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,
+	&cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,    &cdp1801_device::lda,
 
-	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
-	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
-	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
-	&cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,    &cosmac_device::str,
+	&cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,
+	&cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,
+	&cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,
+	&cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,    &cdp1801_device::str,
 
-	&cosmac_device::irx,    &cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,
-	&cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,    &cosmac_device::out,
-	&cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,
-	&cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,    &cosmac_device::inp,
+	&cdp1801_device::und,    &cdp1801_device::out,    &cdp1801_device::out,    &cdp1801_device::out,
+	&cdp1801_device::out,    &cdp1801_device::out,    &cdp1801_device::out,    &cdp1801_device::out,
+	&cdp1801_device::und,    &cdp1801_device::inp,    &cdp1801_device::inp,    &cdp1801_device::inp,
+	&cdp1801_device::inp,    &cdp1801_device::inp,    &cdp1801_device::inp,    &cdp1801_device::inp,
 
-	&cosmac_device::ret,    &cosmac_device::dis,    &cosmac_device::ldxa,   &cosmac_device::stxd,
-	&cosmac_device::adc,    &cosmac_device::sdb,    &cosmac_device::shrc,   &cosmac_device::smb,
-	&cosmac_device::sav,    &cosmac_device::mark,   &cosmac_device::req,    &cosmac_device::seq,
-	&cosmac_device::adci,   &cosmac_device::sdbi,   &cosmac_device::shlc,   &cosmac_device::smbi,
+	&cdp1801_device::ret,    &cdp1801_device::dis,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::sav,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
 
-	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
-	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
-	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
-	&cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,    &cosmac_device::glo,
+	&cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,
+	&cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,
+	&cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,
+	&cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,    &cdp1801_device::glo,
 
-	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
-	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
-	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
-	&cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,    &cosmac_device::ghi,
+	&cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,
+	&cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,
+	&cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,
+	&cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,    &cdp1801_device::ghi,
 
-	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
-	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
-	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
-	&cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,    &cosmac_device::plo,
+	&cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,
+	&cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,
+	&cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,
+	&cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,    &cdp1801_device::plo,
 
-	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
-	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
-	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
-	&cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,    &cosmac_device::phi,
+	&cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,
+	&cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,
+	&cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,
+	&cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,    &cdp1801_device::phi,
 
-	&cosmac_device::lbr,    &cosmac_device::lbq,    &cosmac_device::lbz,    &cosmac_device::lbdf,
-	&cosmac_device::nop,    &cosmac_device::lsnq,   &cosmac_device::lsnz,   &cosmac_device::lsnf,
-	&cosmac_device::nlbr,   &cosmac_device::lbnq,   &cosmac_device::lbnz,   &cosmac_device::lbnf,
-	&cosmac_device::lsie,   &cosmac_device::lsq,    &cosmac_device::lsz,    &cosmac_device::lsdf,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
+	&cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,    &cdp1801_device::und,
 
-	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
-	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
-	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
-	&cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,    &cosmac_device::sep,
+	&cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,
+	&cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,
+	&cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,
+	&cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,    &cdp1801_device::sep,
 
-	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
-	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
-	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
-	&cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,    &cosmac_device::sex,
+	&cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,
+	&cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,
+	&cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,
+	&cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,    &cdp1801_device::sex,
 
-	&cosmac_device::ldx,    &cosmac_device::_or,    &cosmac_device::_and,   &cosmac_device::_xor,
-	&cosmac_device::add,    &cosmac_device::sd,     &cosmac_device::shr,    &cosmac_device::sm,
-	&cosmac_device::ldi,    &cosmac_device::ori,    &cosmac_device::ani,    &cosmac_device::xri,
-	&cosmac_device::adi,    &cosmac_device::sdi,    &cosmac_device::shl,    &cosmac_device::smi
+	&cdp1801_device::ldx,    &cdp1801_device::_or,    &cdp1801_device::_and,   &cdp1801_device::_xor,
+	&cdp1801_device::add,    &cdp1801_device::sd,     &cdp1801_device::shr,    &cdp1801_device::sm,
+	&cdp1801_device::ldi,    &cdp1801_device::ori,    &cdp1801_device::ani,    &cdp1801_device::xri,
+	&cdp1801_device::adi,    &cdp1801_device::sdi,    &cdp1801_device::und,    &cdp1801_device::smi
 };
+
+cosmac_device::ophandler cdp1801_device::get_ophandler(UINT8 opcode)
+{
+	return s_opcodetable[opcode];
+}
+
+const cosmac_device::ophandler cdp1802_device::s_opcodetable[256] =
+{
+	&cdp1802_device::idl,    &cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,
+	&cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,
+	&cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,
+	&cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,    &cdp1802_device::ldn,
+
+	&cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,
+	&cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,
+	&cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,
+	&cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,    &cdp1802_device::inc,
+
+	&cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,
+	&cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,
+	&cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,
+	&cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,    &cdp1802_device::dec,
+
+	&cdp1802_device::br,     &cdp1802_device::bq,     &cdp1802_device::bz,     &cdp1802_device::bdf,
+	&cdp1802_device::b,      &cdp1802_device::b,      &cdp1802_device::b,      &cdp1802_device::b,
+	&cdp1802_device::nbr,    &cdp1802_device::bnq,    &cdp1802_device::bnz,    &cdp1802_device::bnf,
+	&cdp1802_device::bn,     &cdp1802_device::bn,     &cdp1802_device::bn,     &cdp1802_device::bn,
+
+	&cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,
+	&cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,
+	&cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,
+	&cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,    &cdp1802_device::lda,
+
+	&cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,
+	&cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,
+	&cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,
+	&cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,    &cdp1802_device::str,
+
+	&cdp1802_device::irx,    &cdp1802_device::out,    &cdp1802_device::out,    &cdp1802_device::out,
+	&cdp1802_device::out,    &cdp1802_device::out,    &cdp1802_device::out,    &cdp1802_device::out,
+	&cdp1802_device::inp,    &cdp1802_device::inp,    &cdp1802_device::inp,    &cdp1802_device::inp,
+	&cdp1802_device::inp,    &cdp1802_device::inp,    &cdp1802_device::inp,    &cdp1802_device::inp,
+
+	&cdp1802_device::ret,    &cdp1802_device::dis,    &cdp1802_device::ldxa,   &cdp1802_device::stxd,
+	&cdp1802_device::adc,    &cdp1802_device::sdb,    &cdp1802_device::shrc,   &cdp1802_device::smb,
+	&cdp1802_device::sav,    &cdp1802_device::mark,   &cdp1802_device::req,    &cdp1802_device::seq,
+	&cdp1802_device::adci,   &cdp1802_device::sdbi,   &cdp1802_device::shlc,   &cdp1802_device::smbi,
+
+	&cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,
+	&cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,
+	&cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,
+	&cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,    &cdp1802_device::glo,
+
+	&cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,
+	&cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,
+	&cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,
+	&cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,    &cdp1802_device::ghi,
+
+	&cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,
+	&cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,
+	&cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,
+	&cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,    &cdp1802_device::plo,
+
+	&cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,
+	&cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,
+	&cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,
+	&cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,    &cdp1802_device::phi,
+
+	&cdp1802_device::lbr,    &cdp1802_device::lbq,    &cdp1802_device::lbz,    &cdp1802_device::lbdf,
+	&cdp1802_device::nop,    &cdp1802_device::lsnq,   &cdp1802_device::lsnz,   &cdp1802_device::lsnf,
+	&cdp1802_device::nlbr,   &cdp1802_device::lbnq,   &cdp1802_device::lbnz,   &cdp1802_device::lbnf,
+	&cdp1802_device::lsie,   &cdp1802_device::lsq,    &cdp1802_device::lsz,    &cdp1802_device::lsdf,
+
+	&cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,
+	&cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,
+	&cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,
+	&cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,    &cdp1802_device::sep,
+
+	&cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,
+	&cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,
+	&cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,
+	&cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,    &cdp1802_device::sex,
+
+	&cdp1802_device::ldx,    &cdp1802_device::_or,    &cdp1802_device::_and,   &cdp1802_device::_xor,
+	&cdp1802_device::add,    &cdp1802_device::sd,     &cdp1802_device::shr,    &cdp1802_device::sm,
+	&cdp1802_device::ldi,    &cdp1802_device::ori,    &cdp1802_device::ani,    &cdp1802_device::xri,
+	&cdp1802_device::adi,    &cdp1802_device::sdi,    &cdp1802_device::shl,    &cdp1802_device::smi
+};
+
+cosmac_device::ophandler cdp1802_device::get_ophandler(UINT8 opcode)
+{
+	return s_opcodetable[opcode];
+}
 
 
 
@@ -178,29 +261,50 @@ const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
 //**************************************************************************
 
 // device type definition
-const device_type COSMAC = &device_creator<cosmac_device>;
+const device_type CDP1801 = &device_creator<cdp1801_device>;
+const device_type CDP1802 = &device_creator<cdp1802_device>;
 
 
 //-------------------------------------------------
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, COSMAC, "COSMAC", tag, owner, clock),
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, type, name, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 		m_op(0),
 		m_state(COSMAC_STATE_1_RESET),
 		m_mode(COSMAC_MODE_RESET),
-		m_irq(0),
-		m_dmain(0),
-		m_dmaout(0),
+		m_irq(CLEAR_LINE),
+		m_dmain(CLEAR_LINE),
+		m_dmaout(CLEAR_LINE),
 		m_program(NULL),
 		m_io(NULL),
 		m_direct(NULL)
 {
 	for (int i = 0; i < 4; i++)
 		EF[i] = CLEAR_LINE;
+}
+
+
+//-------------------------------------------------
+//  cdp1801_device - constructor
+//-------------------------------------------------
+
+cdp1801_device::cdp1801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cosmac_device(mconfig, CDP1801, "CDP1801", tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  cdp1802_device - constructor
+//-------------------------------------------------
+
+cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cosmac_device(mconfig, CDP1802, "CDP1802", tag, owner, clock)
+{
 }
 
 
@@ -420,12 +524,17 @@ UINT32 cosmac_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t cosmac_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cdp1801_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern CPU_DISASSEMBLE( cosmac );
-	return CPU_DISASSEMBLE_NAME(cosmac)(this, buffer, pc, oprom, opram, options);
+	extern CPU_DISASSEMBLE( cdp1801 );
+	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, buffer, pc, oprom, opram, options);
 }
 
+offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( cdp1802 );
+	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, buffer, pc, oprom, opram, options);
+}
 
 
 //**************************************************************************
@@ -821,7 +930,7 @@ inline void cosmac_device::initialize()
 inline void cosmac_device::execute_instruction()
 {
 	// parse the instruction
-	(this->*s_opcodetable[m_op])();
+	(this->*this->get_ophandler(m_op))();
 
 	m_icount -= CLOCKS_EXECUTE;
 
@@ -1107,6 +1216,7 @@ void cosmac_device::lsie()  { long_skip(IE); }
 // control instructions opcode handlers
 void cosmac_device::idl()   { /* idle */ }
 void cosmac_device::nop()   { m_icount -= CLOCKS_EXECUTE; }
+void cosmac_device::und()   { /* undefined opcode in CDP1801 */ m_icount -= CLOCKS_EXECUTE; }
 void cosmac_device::sep()   { P = N; }
 void cosmac_device::sex()   { X = N; }
 void cosmac_device::seq()   { set_q_flag(1); }

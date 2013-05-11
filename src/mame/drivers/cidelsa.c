@@ -460,7 +460,7 @@ void cidelsa_state::machine_reset()
 
 static MACHINE_CONFIG_START( destryer, cidelsa_state )
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryer_map)
 	MCFG_CPU_IO_MAP(destryer_io_map)
 	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -472,7 +472,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( destryera, cidelsa_state )
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
 	MCFG_CPU_PROGRAM_MAP(destryera_map)
 	MCFG_CPU_IO_MAP(destryer_io_map)
 	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -484,7 +484,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( altair, cidelsa_state )
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, ALTAIR_CHR1)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
 	MCFG_CPU_PROGRAM_MAP(altair_map)
 	MCFG_CPU_IO_MAP(altair_io_map)
 	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -502,7 +502,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( draco, draco_state )
 	/* basic system hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DRACO_CHR1)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
 	MCFG_CPU_PROGRAM_MAP(draco_map)
 	MCFG_CPU_IO_MAP(draco_io_map)
 	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)

@@ -764,7 +764,7 @@ QUICKLOAD_LOAD_MEMBER( vip_state, vip )
 
 static MACHINE_CONFIG_START( vip, vip_state )
 	// basic machine hardware
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_3_52128MHz/2)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_3_52128MHz/2)
 	MCFG_CPU_PROGRAM_MAP(vip_mem)
 	MCFG_CPU_IO_MAP(vip_io)
 	MCFG_CPU_CONFIG(cosmac_intf)

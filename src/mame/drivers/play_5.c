@@ -59,7 +59,7 @@ static COSMAC_INTERFACE( cdp1802_config )
 
 static MACHINE_CONFIG_START( play_5, play_5_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COSMAC, 2950000)
+	MCFG_CPU_ADD("maincpu", CDP1802, 2950000)
 	MCFG_CPU_PROGRAM_MAP(play_5_map)
 	MCFG_CPU_CONFIG(cdp1802_config)
 MACHINE_CONFIG_END

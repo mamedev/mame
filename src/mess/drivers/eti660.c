@@ -251,7 +251,7 @@ static const cassette_interface eti660_cassette_interface =
 
 static MACHINE_CONFIG_START( eti660, eti660_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, XTAL_8_867238MHz/5)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
 	MCFG_CPU_PROGRAM_MAP(eti660_map)
 	MCFG_CPU_IO_MAP(eti660_io_map)
 	MCFG_CPU_CONFIG(eti660_config)
