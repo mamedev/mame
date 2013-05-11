@@ -250,7 +250,7 @@ void popeye_state::video_start()
 	m_lastflip = 0;
 
 	save_item(NAME(m_lastflip));
-	save_item(NAME(m_tmpbitmap2));
+	save_item(NAME(*m_tmpbitmap2));
 	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
 }
 
@@ -267,7 +267,7 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 	m_lastflip = 0;
 
 	save_item(NAME(m_lastflip));
-	save_item(NAME(m_tmpbitmap2));
+	save_item(NAME(*m_tmpbitmap2));
 	save_pointer(NAME(m_bitmapram), popeye_bitmapram_size);
 }
 

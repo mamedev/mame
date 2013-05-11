@@ -151,11 +151,11 @@ void carpolo_state::video_start()
 
 	m_sprite_border_collision_bitmap = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH, SPRITE_HEIGHT);
 
-	save_item(NAME(m_sprite_sprite_collision_bitmap1));
-	save_item(NAME(m_sprite_sprite_collision_bitmap2));
-	save_item(NAME(m_sprite_goal_collision_bitmap1));
-	save_item(NAME(m_sprite_goal_collision_bitmap2));
-	save_item(NAME(m_sprite_border_collision_bitmap));
+	save_item(NAME(*m_sprite_sprite_collision_bitmap1));
+	save_item(NAME(*m_sprite_sprite_collision_bitmap2));
+	save_item(NAME(*m_sprite_goal_collision_bitmap1));
+	save_item(NAME(*m_sprite_goal_collision_bitmap2));
+	save_item(NAME(*m_sprite_border_collision_bitmap));
 }
 
 
