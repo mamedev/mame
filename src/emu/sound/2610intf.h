@@ -4,7 +4,7 @@
 #define __2610INTF_H__
 
 #include "emu.h"
-#include "fm.h"
+#include "ay8910.h"
 
 void ym2610_update_request(void *param);
 

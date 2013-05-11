@@ -4,7 +4,6 @@
 #define __2608INTF_H__
 
 #include "emu.h"
-#include "fm.h"
 #include "ay8910.h"
 
 void ym2608_update_request(void *param);
