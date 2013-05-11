@@ -12,7 +12,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ay8910.h"
 #include "2608intf.h"
 #include "fm.h"
 
@@ -136,7 +135,7 @@ void ym2608_device::device_post_load()
 
 void ym2608_device::device_start()
 {
-	static const ay8910_interface generic_ay8910 =
+	static const ay8910_interface default_ay8910_config =
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
@@ -147,11 +146,11 @@ void ym2608_device::device_start()
 	void *pcmbufa;
 	int  pcmsizea;
 
-	const ay8910_interface *ay8910_intf = m_ay8910_intf != NULL ? m_ay8910_intf : &generic_ay8910;
+	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
 	m_irq_handler.resolve();
 	/* FIXME: Force to use simgle output */
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_intf);
+	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
 	assert_always(m_psg != NULL, "Error creating YM2608/AY8910 chip");
 
 	/* Timer Handler set */

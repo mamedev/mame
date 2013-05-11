@@ -11,8 +11,8 @@ void ym2608_update_request(void *param);
 #define MCFG_YM2608_IRQ_HANDLER(_devcb) \
 	devcb = &ym2608_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-#define MCFG_YM2608_AY8910_INTF(_ay8910_intf) \
-	ym2608_device::set_ay8910_intf(*device, _ay8910_intf);
+#define MCFG_YM2608_AY8910_INTF(_ay8910_config) \
+	ym2608_device::set_ay8910_config(*device, _ay8910_config);
 
 class ym2608_device : public device_t,
 									public device_sound_interface
@@ -22,7 +22,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2608_device &>(device).m_irq_handler.set_callback(object); }
-	static void set_ay8910_intf(device_t &device, const ay8910_interface *ay8910_intf) { downcast<ym2608_device &>(device).m_ay8910_intf = ay8910_intf; }
+	static void set_ay8910_config(device_t &device, const ay8910_interface *ay8910_config) { downcast<ym2608_device &>(device).m_ay8910_config = ay8910_config; }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -52,7 +52,7 @@ private:
 	void *          m_chip;
 	void *          m_psg;
 	devcb2_write_line m_irq_handler;
-	const ay8910_interface *m_ay8910_intf;
+	const ay8910_interface *m_ay8910_config;
 };
 
 extern const device_type YM2608;
