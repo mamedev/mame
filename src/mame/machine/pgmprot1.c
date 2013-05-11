@@ -1509,7 +1509,6 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,oldsplus)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_r),this), write16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_w),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16_delegate(FUNC(pgm_arm_type1_state::pgm_arm7_type1_sim_protram_r),this));
 	save_item(NAME(m_extra_ram));
-	save_item(NAME(m_slots));
 }
 
 INPUT_PORTS_START( photoy2k )
