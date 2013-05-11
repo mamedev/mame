@@ -5443,6 +5443,33 @@ ROM_START( newpuc2b )
 	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
 ROM_END
 
+ROM_START( pacuman )
+	ROM_REGION( 0x10000, "maincpu",0 )
+	ROM_LOAD( "pacuman01.bin", 0x0000, 0x0800, CRC(ec8c1ed8) SHA1(8c8e1c60b8f4735d736d7ef94f2967cb84a078b1) )
+	ROM_LOAD( "pacuman02.bin", 0x0800, 0x0800, CRC(40edaf56) SHA1(a53cdf0f2809e2de99507f22d2c4d0600416d6ea) )
+	ROM_LOAD( "pacuman03.bin", 0x1000, 0x0800, CRC(db4f702b) SHA1(a7a22c3ee91ca28ffb20d1f8b54fc6caf48e8d0f) )
+	ROM_LOAD( "pacuman04.bin", 0x1800, 0x0800, CRC(28f7257d) SHA1(fc8cbb74c18578b6245e987645327e50c7dd3012) )
+	ROM_LOAD( "pacuman05.bin", 0x2000, 0x0800, CRC(212acb41) SHA1(6d784e139dfc7c772a970f3b65718a876a109660) )
+	ROM_LOAD( "pacuman06.bin", 0x2800, 0x0800, CRC(e73dd1b9) SHA1(6fe69e96acc0dd638c1d51d32d7ea1e01cc21cb6) )
+	ROM_LOAD( "pacuman07.bin", 0x3000, 0x0800, CRC(908a2cb2) SHA1(ea2a0f50878aaf27c46df11644180d224af3bd83) )
+	ROM_LOAD( "pacuman08.bin", 0x3800, 0x0800, CRC(cf4ba26c) SHA1(b36b682cfb920b3247d80fe7c4e5fed845bf0272) )
+
+	ROM_REGION( 0x2000, "gfx1" , 0)
+	ROM_LOAD( "chg1", 0x0000, 0x0800, CRC(2066a0b7) SHA1(6d4ccc27d6be185589e08aa9f18702b679e49a4a) )
+	ROM_LOAD( "chg2", 0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "chg3", 0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "chg4", 0x1800, 0x0800, CRC(7dc75a81) SHA1(d3fe1cad3b594052d8367685febb2335b0ad62f4) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f", 0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) /* sound PROMs */
+	ROM_LOAD( "82s126.1m", 0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )   /*timing - not used */
+ROM_END
+
+
 ROM_START( nmouse )
 	ROM_REGION( 0x10000, "maincpu",0 )
 	ROM_LOAD( "naumouse.d7", 0x0000, 0x0800, CRC(e447ecfa) SHA1(45bce93f4a4e1c9994fb6b0c81691a14cae43ae5) )
@@ -6239,6 +6266,7 @@ GAME( 1981, hangly,   puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Popeye-Man", GAME_SUPPORTS_SAVE )
+GAME( 1980, pacuman,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg", "Pacuman (Spanish bootleg of Puck Man)", GAME_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets, Pacuman is used on the cabinet art, manufactured by Recreativos Franco S.A.?
 GAME( 1980, crockman, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, driver_device, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE )
