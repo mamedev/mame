@@ -87,7 +87,6 @@
 
 #define MOS6560_VRETRACERATE 60
 #define MOS6561_VRETRACERATE 50
-#define MOS656X_HRETRACERATE 15625
 
 #define MOS6560_MAME_XPOS  4           /* xleft not displayed */
 #define MOS6560_MAME_YPOS  10          /* y up not displayed */
