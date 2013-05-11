@@ -25,6 +25,7 @@ const device_type FLOPPY_525_SSSD = &device_creator<floppy_525_sssd>;
 const device_type FLOPPY_525_SD = &device_creator<floppy_525_sd>;
 const device_type FLOPPY_525_SSDD = &device_creator<floppy_525_ssdd>;
 const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
+const device_type FLOPPY_525_SSQD = &device_creator<floppy_525_ssqd>;
 const device_type FLOPPY_525_QD = &device_creator<floppy_525_qd>;
 const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
 const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
@@ -1184,6 +1185,31 @@ void floppy_525_dd::handled_variants(UINT32 *variants, int &var_count) const
 	variants[var_count++] = floppy_image::DSDD;
 }
 
+floppy_525_ssqd::floppy_525_ssqd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" single-sided quad density floppy drive", tag, owner, clock, "floppy_525_ssqd", __FILE__)
+{
+}
+
+floppy_525_ssqd::~floppy_525_ssqd()
+{
+}
+
+void floppy_525_ssqd::setup_characteristics()
+{
+	form_factor = floppy_image::FF_525;
+	tracks = 84;
+	sides = 1;
+	set_rpm(300);
+}
+
+void floppy_525_ssqd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::SSDD;
+	variants[var_count++] = floppy_image::SSQD;
+}
+
 floppy_525_qd::floppy_525_qd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	floppy_image_device(mconfig, FLOPPY_525_QD, "5.25\" quad density floppy drive", tag, owner, clock, "floppy_525_qd", __FILE__)
 {
@@ -1207,6 +1233,7 @@ void floppy_525_qd::handled_variants(UINT32 *variants, int &var_count) const
 	variants[var_count++] = floppy_image::SSSD;
 	variants[var_count++] = floppy_image::SSDD;
 	variants[var_count++] = floppy_image::SSQD;
+	variants[var_count++] = floppy_image::DSSD;
 	variants[var_count++] = floppy_image::DSDD;
 	variants[var_count++] = floppy_image::DSQD;
 }
