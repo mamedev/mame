@@ -3872,6 +3872,21 @@ ROM_START( lrescuem )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+ROM_START( lrescuem2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "0.bin",    0x0000, 0x0800, CRC(27d37ad6) SHA1(18b2de9f9c022a31187b2a4049573e7f204e84c9) )
+	ROM_LOAD( "1.bin",    0x0800, 0x0800, CRC(d8ed56f0) SHA1(d3f02d43f59d8ee83b4ed94f58f1bd25dca1a8de) )
+	ROM_LOAD( "2.bin",    0x1000, 0x0800, CRC(3aed9788) SHA1(1be3c2f9f3a0f7d187a6faa2b020979027fa60e9) )
+	ROM_LOAD( "3.bin",    0x1800, 0x0800, CRC(fa121b92) SHA1(2753b8b93d69d49e85075765630958038aa21ce3) )
+	ROM_LOAD( "4.bin",    0x4000, 0x0800, CRC(535b4a78) SHA1(dd5613f47a3c7e15701c5d1dbac4a2228b9c28f2) )
+	ROM_LOAD( "5.bin",    0x4800, 0x0800, CRC(0613a977) SHA1(47b85efdc436b39f8fb12355f9b87cb791f2d3b1) )
+	ROM_LOAD( "6.bin",    0x5000, 0x0800, CRC(8fe51cc0) SHA1(1a98044ab95a1559362813a3961c1436267dcf63) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 - these don't really fit this game, but were on the PCB */
+	ROM_LOAD( "cv01-7643.2c",   0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
 
 /*
 Cosmo
@@ -4504,7 +4519,8 @@ GAME( 1979, spcewarl,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270
 GAME( 1979, lrescue,    0,        lrescue,   lrescue,   driver_device, 0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, grescue,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "Taito (Universal license?)", "Galaxy Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, mlander,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
-GAME( 1978, lrescuem,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, lrescuem,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg) set 1", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1979, lrescuem2,  lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg) set 2", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, desterth,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,    0,        schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, schasera,   schaser,  schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 2)", GAME_SUPPORTS_SAVE )
