@@ -18,7 +18,7 @@ K11T0976B
 |      |M9810B|                 +-------------+                  |
 |      |      |                 |             |                  |
 |      +------+   LM1085        |   XILINX    | 44.8MHz          |
-|                               |   Spartan   |     +---------+  |
+|      4.096MHz                 |   Spartan   |     +---------+  |
 |                               |   XC2S50    |     |CY7C1021B|  |
 | +---+                         |             |     +---------+  |
 | | T |          +-------+      |             |       "WORK"     |
@@ -39,7 +39,7 @@ Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
    Sound: OKI MSM9810B 8-channel ADPCM audio
    Video: Sigma Xilinx Spartan XC2S50 FPGA
           TI THS8134 Triple 8-Bit, 80 MSPS Video D/A Converter
-     OSC: 20MHz & 44.8MHz
+     OSC: 44.8MHz, 20MHz & 4.096MHz
   EEPROM: AT93C46 @ IC6
      RAM: Cypress CY7C1021B 64K x 16 Static RAM (44-pin TSOP) x 3 (silkscreened WORK, FRAM0 & FRAM1)
    Other: Renesas M5296FP Watchdog Timer IC with +5v constant-voltage power supply
@@ -50,10 +50,21 @@ Main CPU: Renesas HD6412394TE20 H8S/2394 (ROMless microcontroller @ 20MHz)
           TA8200AH - Dual Audio Power Amplifier (13Watts per channel)
           TDP1030 - 2-In-1 Low-Side Switch for Motor, Solenoid and Lamp Drive
 
-ROMS: F34-01 (IC13 M27C160 silkscreened PCM)
-      F34-02 (IC2  M27C160 silkscreened PRG)
+Label    ROM Type       PCB silkscreened info   Notes
+--------------------------------------------------------------------------
+F34-01   ST 27C160      IC13 MSM27C1602 PCM     PCM Sound samples
+F34-02   ST 27C160      IC2 M27C160 PRG         H8S/2394 program code
+F34-03   OKI 27C1602B   IC13 MSM27C1602 PCM     Replaces F34-01 (See NOTE)
 
-There are two known types of PCB.
+NOTE: There are known to exist PCBs labeled as K11T0976C vs the K11T0976B as listed above. This PCB
+      has the OKI PCM rom labeled as F34-03 instead of F34-01 even though the data has NOT changed.
+      F34-01 is the EEPROM ST 27C160 version
+      F34-03 is OKI R27C1602B OTP-ROM version
+
+R27C1602B is a 16Mbit electrically one time programmable ROM that can electrically switch between
+           1,048,576-word x 16-bit and 2,097,152-word x 8-bit by the state of the BYTE# pin.
+
+There are two known types of serial number labels.
 
 One has the secondary label 351100195 with a serial number labeled:
  S/N: SICABN/Cxxxx (xxxx=number of PCB)
@@ -62,10 +73,6 @@ One has the secondary label 351100195 with a serial number labeled:
 The other has the secondary label 351100210 with a serial number labeled:
  S/N: SIURxxxx (xxxx=number of PCB)
  SPACE INVADERS U/R
-
-NOTE: There is known to exist a PCB labeled as K11T0976C vs the K11T0976B as listed above. This PCB
-      has the OKI PCM rom labeled as F34-03 which is different to the current set which is F34-01.
-      It's unknown if the F34-03 sample rom is an updated or corrected sample set.
 
 Both boards have the same program code and either can be set to Coin or Free Play
 as well as Up Right, Cocktail or Flip Screen from the service menu.
@@ -311,7 +318,7 @@ static INPUT_PORTS_START( invqix )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right 1 player start")   // start B-1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Right 1 player start")   // start B-1 ("Right start" - picks Qix)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -346,7 +353,7 @@ ROM_START( invqix )
 	ROM_LOAD( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) )
 
 	ROM_REGION(0x1000000, "oki", 0)
-	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) )
+	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) /* Can also be labeled F34-03 based on ROM chip type */
 
 	ROM_REGION(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
