@@ -16,170 +16,201 @@
 * NOTES
 *
 ******************************************************************************/
-#include "emu.h"
 #include "8950intf.h"
 #include "fm.h"
-#include "sound/fmopl.h"
-
-
-struct y8950_state
-{
-	sound_stream *  stream;
-	emu_timer *     timer[2];
-	void *          chip;
-	const y8950_interface *intf;
-	y8950_device *device;
-};
-
-
-INLINE y8950_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == Y8950);
-	return (y8950_state *)downcast<y8950_device *>(device)->token();
-}
+#include "fmopl.h"
 
 
 static void IRQHandler(void *param,int irq)
 {
-	y8950_state *info = (y8950_state *)param;
-	if (!info->device->m_handler.isnull()) info->device->m_handler(irq ? ASSERT_LINE : CLEAR_LINE);
+	y8950_device *y8950 = (y8950_device *) param;
+	y8950->_IRQHandler(irq);
 }
-static TIMER_CALLBACK( timer_callback_0 )
+
+void y8950_device::_IRQHandler(int irq)
 {
-	y8950_state *info = (y8950_state *)ptr;
-	y8950_timer_over(info->chip,0);
+	m_irq_handler(irq);
 }
-static TIMER_CALLBACK( timer_callback_1 )
+
+void y8950_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	y8950_state *info = (y8950_state *)ptr;
-	y8950_timer_over(info->chip,1);
+	switch(id)
+	{
+	case 0:
+		y8950_timer_over(m_chip,0);
+		break;
+		
+	case 1:
+		y8950_timer_over(m_chip,1);
+		break;
+	}
 }
-static void TimerHandler(void *param,int c,attotime period)
+
+static void timer_handler(void *param, int c, attotime period)
 {
-	y8950_state *info = (y8950_state *)param;
+	y8950_device *y8950 = (y8950_device *) param;
+	y8950->_timer_handler(c, period);
+}
+
+void y8950_device::_timer_handler(int c, attotime period)
+{
 	if( period == attotime::zero )
 	{   /* Reset FM Timer */
-		info->timer[c]->enable(false);
+		m_timer[c]->enable(false);
 	}
 	else
 	{   /* Start FM Timer */
-		info->timer[c]->adjust(period);
+		m_timer[c]->adjust(period);
 	}
 }
 
 
 static unsigned char Y8950PortHandler_r(void *param)
 {
-	y8950_state *info = (y8950_state *)param;
-	if (!info->device->m_portread.isnull())
-		return info->device->m_portread(0);
-	return 0;
+	y8950_device *y8950 = (y8950_device *) param;
+	return y8950->_Y8950PortHandler_r();
+}
+
+unsigned char y8950_device::_Y8950PortHandler_r()
+{
+	return m_io_read_handler(0);
 }
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
-	y8950_state *info = (y8950_state *)param;
-	if (!info->device->m_portwrite.isnull())
-		info->device->m_portwrite(0,data);
+	y8950_device *y8950 = (y8950_device *) param;
+	y8950->_Y8950PortHandler_w(data);
+}
+
+void y8950_device::_Y8950PortHandler_w(unsigned char data)
+{
+	m_io_write_handler((offs_t)0,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
-	y8950_state *info = (y8950_state *)param;
-	if (!info->device->m_keyboardread.isnull())
-		return info->device->m_keyboardread(0);
-	return 0;
+	y8950_device *y8950 = (y8950_device *) param;
+	return y8950->_Y8950KeyboardHandler_r();
+}
+
+unsigned char y8950_device::_Y8950KeyboardHandler_r()
+{
+	return m_keyboard_read_handler(0);
 }
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
-	y8950_state *info = (y8950_state *)param;
-	if (!info->device->m_keyboardwrite.isnull())
-		info->device->m_keyboardwrite(0,data);
+	y8950_device *y8950 = (y8950_device *) param;
+	y8950->_Y8950KeyboardHandler_w(data);
 }
 
-static STREAM_UPDATE( y8950_stream_update )
+void y8950_device::_Y8950KeyboardHandler_w(unsigned char data)
 {
-	y8950_state *info = (y8950_state *)param;
-	y8950_update_one(info->chip, outputs[0], samples);
+	m_keyboard_write_handler((offs_t)0,data);
 }
 
-static void _stream_update(void *param, int interval)
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void y8950_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	y8950_state *info = (y8950_state *)param;
-	info->stream->update();
+	y8950_update_one(m_chip, outputs[0], samples);
+}
+
+static void y8950_update_request(void *param, int interval)
+{
+	y8950_device *y8950 = (y8950_device *) param;
+	y8950->_y8950_update_request();
+}
+
+void y8950_device::_y8950_update_request()
+{
+	m_stream->update();
 }
 
 
-static DEVICE_START( y8950 )
-{
-	static const y8950_interface dummy = { DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL };
-	y8950_state *info = get_safe_token(device);
-	int rate = device->clock()/72;
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-	info->intf = device->static_config() ? (const y8950_interface *)device->static_config() : &dummy;
-	info->device = downcast<y8950_device *>(device);
+void y8950_device::device_start()
+{
+	int rate = clock()/72;
+
+	m_irq_handler.resolve_safe();
+	m_keyboard_read_handler.resolve_safe(0);
+	m_keyboard_write_handler.resolve_safe();
+	m_io_read_handler.resolve_safe(0);
+	m_io_write_handler.resolve_safe();
 
 	/* stream system initialize */
-	info->chip = y8950_init(device,device->clock(),rate);
-	assert_always(info->chip != NULL, "Error creating Y8950 chip");
+	m_chip = y8950_init(this,clock(),rate);
+	assert_always(m_chip != NULL, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip, *device->region(), device->region()->bytes());
+	y8950_set_delta_t_memory(m_chip, *region(), region()->bytes());
 
-	info->stream = device->machine().sound().stream_alloc(*device,0,1,rate,info,y8950_stream_update);
+	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* port and keyboard handler */
-	y8950_set_port_handler(info->chip, Y8950PortHandler_w, Y8950PortHandler_r, info);
-	y8950_set_keyboard_handler(info->chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, info);
+	y8950_set_port_handler(m_chip, Y8950PortHandler_w, Y8950PortHandler_r, this);
+	y8950_set_keyboard_handler(m_chip, Y8950KeyboardHandler_w, Y8950KeyboardHandler_r, this);
 
 	/* Y8950 setup */
-	y8950_set_timer_handler (info->chip, TimerHandler, info);
-	y8950_set_irq_handler   (info->chip, IRQHandler, info);
-	y8950_set_update_handler(info->chip, _stream_update, info);
+	y8950_set_timer_handler (m_chip, timer_handler, this);
+	y8950_set_irq_handler   (m_chip, IRQHandler, this);
+	y8950_set_update_handler(m_chip, y8950_update_request, this);
 
-	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_0), info);
-	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_1), info);
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 }
 
-static DEVICE_STOP( y8950 )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void y8950_device::device_stop()
 {
-	y8950_state *info = get_safe_token(device);
-	y8950_shutdown(info->chip);
+	y8950_shutdown(m_chip);
 }
 
-static DEVICE_RESET( y8950 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void y8950_device::device_reset()
 {
-	y8950_state *info = get_safe_token(device);
-	y8950_reset_chip(info->chip);
+	y8950_reset_chip(m_chip);
 }
 
 
-READ8_DEVICE_HANDLER( y8950_r )
+READ8_MEMBER( y8950_device::read )
 {
-	y8950_state *info = get_safe_token(device);
-	return y8950_read(info->chip, offset & 1);
+	return y8950_read(m_chip, offset & 1);
 }
 
-WRITE8_DEVICE_HANDLER( y8950_w )
+WRITE8_MEMBER( y8950_device::write )
 {
-	y8950_state *info = get_safe_token(device);
-	y8950_write(info->chip, offset & 1, data);
+	y8950_write(m_chip, offset & 1, data);
 }
 
-READ8_DEVICE_HANDLER( y8950_status_port_r ) { return y8950_r(device, space, 0); }
-READ8_DEVICE_HANDLER( y8950_read_port_r ) { return y8950_r(device, space, 1); }
-WRITE8_DEVICE_HANDLER( y8950_control_port_w ) { y8950_w(device, space, 0, data); }
-WRITE8_DEVICE_HANDLER( y8950_write_port_w ) { y8950_w(device, space, 1, data); }
+READ8_MEMBER( y8950_device::status_port_r ) { return read(space, 0); }
+READ8_MEMBER( y8950_device::read_port_r ) { return read(space, 1); }
+WRITE8_MEMBER( y8950_device::control_port_w ) { write(space, 0, data); }
+WRITE8_MEMBER( y8950_device::write_port_w ) { write(space, 1, data); }
 
 
 const device_type Y8950 = &device_creator<y8950_device>;
 
 y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_irq_handler(*this),
+		m_keyboard_read_handler(*this),
+		m_keyboard_write_handler(*this),
+		m_io_read_handler(*this),
+		m_io_write_handler(*this)
 {
-	m_token = global_alloc_clear(y8950_state);
 }
 
 //-------------------------------------------------
@@ -190,61 +221,4 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 
 void y8950_device::device_config_complete()
 {
-	// inherit a copy of the static data
-	const y8950_interface *intf = reinterpret_cast<const y8950_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<y8950_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_handler_cb, 0, sizeof(m_handler_cb));
-		memset(&m_keyboardread_cb, 0, sizeof(m_keyboardread_cb));
-		memset(&m_keyboardwrite_cb, 0, sizeof(m_keyboardwrite_cb));
-		memset(&m_portread_cb, 0, sizeof(m_portread_cb));
-		memset(&m_portwrite_cb, 0, sizeof(m_portwrite_cb));
-	}
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void y8950_device::device_start()
-{
-	m_handler.resolve(m_handler_cb, *this);
-	m_keyboardread.resolve(m_keyboardread_cb, *this);
-	m_keyboardwrite.resolve(m_keyboardwrite_cb, *this);
-	m_portread.resolve(m_portread_cb, *this);
-	m_portwrite.resolve(m_portwrite_cb, *this);
-
-	DEVICE_START_NAME( y8950 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void y8950_device::device_reset()
-{
-	DEVICE_RESET_NAME( y8950 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void y8950_device::device_stop()
-{
-	DEVICE_STOP_NAME( y8950 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void y8950_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
