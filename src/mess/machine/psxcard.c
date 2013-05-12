@@ -54,13 +54,18 @@ void psxcard_device::device_start()
 	m_disabled = false;
 
 	// save state registrations
-/*  save_item(NAME(pkt));
+    save_item(NAME(pkt));
     save_item(NAME(pkt_ptr));
     save_item(NAME(pkt_sz));
-    save_item(NAME(pkt));
-    save_item(NAME(cache));
+    save_item(NAME(cmd));
     save_item(NAME(addr));
-    save_item(NAME(state));*/
+    save_item(NAME(state));
+    save_item(NAME(m_disabled));
+    save_item(NAME(m_odata));
+    save_item(NAME(m_idata));
+    save_item(NAME(m_bit));
+    save_item(NAME(m_count));
+    save_item(NAME(m_pad));
 }
 
 void psxcard_device::device_reset()

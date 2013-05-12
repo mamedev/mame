@@ -463,6 +463,7 @@ struct spu_device::voiceinfo
 
 class stream_buffer
 {
+public:
 	struct stream_marker
 	{
 	public:
@@ -482,7 +483,6 @@ class stream_buffer
 	stream_marker *marker_head,
 								*marker_tail;
 
-public:
 	stream_buffer(const unsigned int _sector_size,
 								const unsigned int _num_sectors)
 		:   head(0),
@@ -986,42 +986,32 @@ void spu_device::device_start()
 	memset(cache,0,(spu_ram_size>>4)*sizeof(sample_cache *));
 
 	// register save state stuff
-	// per-voice variables
-	for (int v = 0; v < 24; v++)
-	{
-		save_item(NAME(spureg.voice[v].vol_l), v);
-		save_item(NAME(spureg.voice[v].vol_r), v);
-		save_item(NAME(spureg.voice[v].pitch), v);
-		save_item(NAME(spureg.voice[v].addr), v);
-		save_item(NAME(spureg.voice[v].adsl), v);
-		save_item(NAME(spureg.voice[v].srrr), v);
-		save_item(NAME(spureg.voice[v].curvol), v);
-		save_item(NAME(spureg.voice[v].repaddr), v);
-	}
-
-	// SPU globals
-	save_item(NAME(spureg.mvol_l));
-	save_item(NAME(spureg.mvol_r));
-	save_item(NAME(spureg.rvol_l));
-	save_item(NAME(spureg.rvol_r));
-	save_item(NAME(spureg.keyon));
-	save_item(NAME(spureg.keyoff));
-	save_item(NAME(spureg.fm));
-	save_item(NAME(spureg.noise));
-	save_item(NAME(spureg.reverb));
-	save_item(NAME(spureg.chon));
-	save_item(NAME(spureg._unknown));
-	save_item(NAME(spureg.reverb_addr));
-	save_item(NAME(spureg.irq_addr));
-	save_item(NAME(spureg.trans_addr));
-	save_item(NAME(spureg.data));
-	save_item(NAME(spureg.ctrl));
-	save_item(NAME(spureg.status));
-	save_item(NAME(spureg.cdvol_l));
-	save_item(NAME(spureg.cdvol_r));
-	save_item(NAME(spureg.exvol_l));
-	save_item(NAME(spureg.exvol_r));
+	save_item(NAME(reg));			// this covers all spureg.* plus the reverb parameter block
+	save_item(NAME(xa_cnt));
+	save_item(NAME(cdda_cnt));
+	save_item(NAME(xa_freq));
+	save_item(NAME(cdda_freq));
+	save_item(NAME(xa_channels));
+	save_item(NAME(xa_spf));
+	save_item(NAME(cur_frame_sample));
+	save_item(NAME(cur_generate_sample));
 	save_pointer(NAME(spu_ram), spu_ram_size);
+
+	save_item(NAME(xa_buffer->head));
+	save_item(NAME(xa_buffer->tail));
+	save_item(NAME(xa_buffer->in));
+	save_item(NAME(xa_buffer->sector_size));
+	save_item(NAME(xa_buffer->num_sectors));
+	save_item(NAME(xa_buffer->buffer_size));
+	save_pointer(NAME(xa_buffer->buffer), xa_sector_size*xa_buffer_sectors);
+
+	save_item(NAME(cdda_buffer->head));
+	save_item(NAME(cdda_buffer->tail));
+	save_item(NAME(cdda_buffer->in));
+	save_item(NAME(cdda_buffer->sector_size));
+	save_item(NAME(cdda_buffer->num_sectors));
+	save_item(NAME(cdda_buffer->buffer_size));
+	save_pointer(NAME(cdda_buffer->buffer), cdda_sector_size*cdda_buffer_sectors);
 }
 
 void spu_device::device_reset()

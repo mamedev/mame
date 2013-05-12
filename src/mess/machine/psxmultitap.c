@@ -33,6 +33,13 @@ void psx_multitap_device::device_start()
 	m_portc->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psx_multitap_device::ack), this));
 	m_portd->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psx_multitap_device::ack), this));
 	m_nextmode = false;
+
+	save_item(NAME(m_activeport));
+	save_item(NAME(m_cack));
+	save_item(NAME(m_singlemode));
+	save_item(NAME(m_nextmode));
+	save_item(NAME(m_tapmc));
+	save_item(NAME(m_data));
 }
 
 void psx_multitap_device::interface_pre_reset()
