@@ -319,7 +319,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
-	const UINT32 *sprrom = (UINT32*)screen.memregion("spr_gfx")->base();
+	const UINT32 *sprrom = (UINT32*)screen.memregion(":spr_gfx")->base();
 	const pen_t *paldata = screen.machine().pens;
 
 	int miny = cliprect.min_y;
