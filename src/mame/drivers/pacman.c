@@ -1505,13 +1505,30 @@ static INPUT_PORTS_START( mspacman )
 	PORT_DIPSETTING(    0x10, "15000" )
 	PORT_DIPSETTING(    0x20, "20000" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pacmansp )
+	PORT_INCLUDE( pacman )
+
+	PORT_MODIFY("DSW1") 
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:7") 
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Hard (Invalid)" ) // breaks the attract screen on this version
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pacuman )
+	PORT_INCLUDE( pacman )
+
+	PORT_MODIFY("DSW1") 
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x03, "2C/1C, 1C/1C" )
+	PORT_DIPSETTING(    0x01, "1C/2C, 1C/3C" )
+	PORT_DIPSETTING(    0x02, "1C/2C, 1C/4C" )
+	PORT_DIPSETTING(    0x00, "1C/1C, 1C/2C" )
 INPUT_PORTS_END
 
 
@@ -3730,6 +3747,28 @@ ROM_START( pacmod )
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "pacmanh.5e",   0x0000, 0x1000, CRC(299fb17a) SHA1(ad97adc2122482a9018bacd137df9d8f409ddf85) )
 	ROM_LOAD( "pacman.5f",    0x1000, 0x1000, CRC(958fedf9) SHA1(4a937ac02216ea8c96477d4a15522070507fb599) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
+
+
+// more recent bootleg board running a Spanish version of the game with larger ROMs and 'MADE IN GREECE' marking
+// game has a high score name entry feature, with the name displayed next to 'El Super' on the title screen
+ROM_START( pacmansp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x8000, CRC(f2404b4d) SHA1(c9707ace0632e745fb7f1bf58cd606be5c7ee000) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "2.bin",    0x0000, 0x0800, CRC(7a75b696) SHA1(d25179f3ce20277a20d7159ff47d8b364bf4a8a3) )
+	ROM_CONTINUE(0x1000,0x800)
+	ROM_CONTINUE(0x0800,0x800)
+	ROM_CONTINUE(0x1800,0x800)
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
@@ -6266,7 +6305,8 @@ GAME( 1981, hangly,   puckman,  pacman,   pacman,   driver_device, 0,        ROT
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, popeyeman,puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "hack", "Popeye-Man", GAME_SUPPORTS_SAVE )
-GAME( 1980, pacuman,  puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacuman (Spanish bootleg of Puck Man)", GAME_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
+GAME( 198?, pacmansp, puckman,  pacman,   pacmansp, driver_device, 0,        ROT90,  "bootleg", "Puck Man (Spanish, 'Made in Greece' bootleg)", GAME_SUPPORTS_SAVE ) // likely produced late 80s / early 90s, these bootlegs have very visible 'MADE IN GREECE' text etched onto the board
+GAME( 1980, pacuman,  puckman,  pacman,   pacuman,  driver_device, 0,        ROT90,  "bootleg (Recreativos Franco S.A.)", "Pacu-Man (Spanish bootleg of Puck Man)", GAME_SUPPORTS_SAVE ) // common bootleg in Spain, code is shifted a bit compared to the Puck Man sets. Title & Manufacturer info from cabinet/PCB, not displayed ingame
 GAME( 1980, crockman, puckman,  pacman,   pacman,   driver_device, 0,        ROT90,  "bootleg (Rene Pierre)", "Crock-Man", GAME_SUPPORTS_SAVE )
 GAME( 1981, piranhah, puckman,  pacman,   mspacman, driver_device, 0,        ROT90,  "hack", "Piranha (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, crush,    0,        pacman,   maketrax, pacman_state,  maketrax, ROT90,  "Alpha Denshi Co. / Kural Samno Electric, Ltd.", "Crush Roller (set 1)", GAME_SUPPORTS_SAVE )
