@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_device, read, write)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -439,11 +439,6 @@ WRITE_LINE_MEMBER(exprraid_state::irqhandler)
 	m_slave->set_input_line_and_vector(0, state, 0xff);
 }
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(exprraid_state,irqhandler)
-};
-
 #if 0
 INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 {
@@ -509,7 +504,7 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3600000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(exprraid_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

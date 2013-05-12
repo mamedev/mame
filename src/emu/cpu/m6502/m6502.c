@@ -721,4 +721,9 @@ UINT8 m6502_device::mi_default_nd::read_decrypted(UINT16 adr)
 	return read(adr);
 }
 
+WRITE_LINE_MEMBER( m6502_device::irq_line )
+{
+	set_input_line( M6502_IRQ_LINE, state );
+}
+
 #include "cpu/m6502/m6502.inc"

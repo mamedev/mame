@@ -394,7 +394,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)    /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)

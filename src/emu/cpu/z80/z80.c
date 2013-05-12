@@ -3926,5 +3926,26 @@ CPU_GET_INFO( nsc800 )
 	}
 }
 
-DEFINE_LEGACY_CPU_DEVICE(Z80, z80);
-DEFINE_LEGACY_CPU_DEVICE(NSC800, nsc800);
+z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info)
+	: legacy_cpu_device(mconfig, type, tag, owner, clock, info)
+{
+}
+
+z80_device::z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: legacy_cpu_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(z80))
+{
+}
+
+const device_type Z80 = &legacy_device_creator<z80_device>;
+
+nsc800_device::nsc800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock)
+	: z80_device(mconfig, type, tag, owner, clock, CPU_GET_INFO_NAME(nsc800))
+{
+}
+
+const device_type NSC800 = &legacy_device_creator<nsc800_device>;
+
+WRITE_LINE_MEMBER( z80_device::irq_line )
+{
+	set_input_line( INPUT_LINE_IRQ0, state );
+}

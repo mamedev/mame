@@ -246,7 +246,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -378,12 +378,6 @@ static GFXDECODE_START( sidepckt )
 GFXDECODE_END
 
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6502_IRQ_LINE)
-};
-
-
 
 static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 
@@ -415,7 +409,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

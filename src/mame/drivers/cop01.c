@@ -173,7 +173,7 @@ READ8_MEMBER(cop01_state::kludge)
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP    /* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_READ(kludge)    /* 1412M2? */

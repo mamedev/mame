@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -745,11 +745,6 @@ INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 	device.execute().set_input_line(7, HOLD_LINE);  /* VBL */
 }
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6502_IRQ_LINE)
-};
-
 /*************************************
  *
  *  Machine driver
@@ -823,7 +818,7 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -864,7 +859,7 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

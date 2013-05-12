@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_device, write_unsigned8)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_device, write_unsigned8)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)

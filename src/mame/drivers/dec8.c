@@ -855,7 +855,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -864,7 +864,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -873,7 +873,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
@@ -1908,11 +1908,6 @@ WRITE_LINE_MEMBER(dec8_state::irqhandler)
 	m_audiocpu->set_input_line(0, state); /* M6502_IRQ_LINE */
 }
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6502_IRQ_LINE)
-};
-
 static const ym3812_interface ym3812_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(dec8_state,irqhandler)
@@ -2045,7 +2040,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2094,7 +2089,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2143,7 +2138,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2192,7 +2187,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2294,7 +2289,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
@@ -2350,7 +2345,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

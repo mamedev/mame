@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r) AM_WRITENOP // message for main cpu
 	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE(bublbobl_sh_nmi_enable_w)  // bit 0: message pending for main cpu, bit 1: message pending for sound cpu
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
@@ -422,11 +422,6 @@ WRITE_LINE_MEMBER(missb2_state::irqhandler)
 //  m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(missb2_state,irqhandler)
-};
-
 /* Interrupt Generator */
 
 INTERRUPT_GEN_MEMBER(missb2_state::missb2_interrupt)
@@ -487,7 +482,7 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

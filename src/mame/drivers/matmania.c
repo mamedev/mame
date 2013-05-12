@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_device, write_signed8)
 	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -341,12 +341,6 @@ static MACHINE_CONFIG_START( matmania, matmania_state )
 MACHINE_CONFIG_END
 
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6809_FIRQ_LINE)
-};
-
-
 MACHINE_START_MEMBER(matmania_state,maniach)
 {
 	MACHINE_START_CALL_MEMBER(matmania);
@@ -418,7 +412,7 @@ static MACHINE_CONFIG_START( maniach, matmania_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DAC_ADD("dac")

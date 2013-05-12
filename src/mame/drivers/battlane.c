@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( battlane_map, AS_PROGRAM, 8, battlane_state )
 	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P2") AM_WRITE(battlane_scrollx_w)
 	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("DSW1") AM_WRITE(battlane_scrolly_w)
 	AM_RANGE(0x1c03, 0x1c03) AM_READ_PORT("DSW2") AM_WRITE(battlane_cpu_command_w)
-	AM_RANGE(0x1c04, 0x1c05) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w)
+	AM_RANGE(0x1c04, 0x1c05) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
 	AM_RANGE(0x1e00, 0x1e3f) AM_WRITE(battlane_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(battlane_bitmap_w) AM_SHARE("share4")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -248,18 +248,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
-};
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -305,7 +293,7 @@ static MACHINE_CONFIG_START( battlane, battlane_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, firq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -577,3 +577,13 @@ m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, dev
 		: m6809_base_device(mconfig, "M6809E", tag, owner, clock, M6809E, 4)
 {
 }
+
+WRITE_LINE_MEMBER( m6809_base_device::irq_line )
+{
+	set_input_line( M6809_IRQ_LINE, state );
+}
+
+WRITE_LINE_MEMBER( m6809_base_device::firq_line )
+{
+	set_input_line( M6809_FIRQ_LINE, state );
+}

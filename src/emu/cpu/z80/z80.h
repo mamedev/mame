@@ -26,9 +26,29 @@ enum
 	Z80_GENPCBASE = STATE_GENPCBASE
 };
 
-DECLARE_LEGACY_CPU_DEVICE(Z80, z80);
-DECLARE_LEGACY_CPU_DEVICE(NSC800, nsc800);
+class z80_device : public legacy_cpu_device
+{
+public:
+	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_WRITE_LINE_MEMBER( irq_line );
+
+protected:
+	z80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, cpu_get_info_func info);
+};
+
+extern const device_type Z80;
+
+class nsc800_device : public z80_device
+{
+public:
+	nsc800_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock);
+};
+
+extern const device_type NSC800;
+
+CPU_GET_INFO( z80 );
+CPU_GET_INFO( nsc800 );
 CPU_DISASSEMBLE( z80 );
 
 void z80_set_cycle_tables(device_t *device, const UINT8 *op, const UINT8 *cb, const UINT8 *ed, const UINT8 *xy, const UINT8 *xycb, const UINT8 *ex);

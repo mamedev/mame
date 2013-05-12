@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wheelrun_sound_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w )
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP    // ""
@@ -1015,11 +1015,6 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 MACHINE_CONFIG_END
 
 
-static const ym3526_interface wheelrun_ym3526_interface =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)
-};
-
 static MACHINE_CONFIG_START( wheelrun, fantland_state )
 
 	/* basic machine hardware */
@@ -1049,7 +1044,7 @@ static MACHINE_CONFIG_START( wheelrun, fantland_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
-	MCFG_SOUND_CONFIG(wheelrun_ym3526_interface)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", z80_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

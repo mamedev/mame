@@ -51,6 +51,9 @@ public:
 	// inline configuration helpers
 	static void static_set_config(device_t &device, const m6809_config &config);
 
+	DECLARE_WRITE_LINE_MEMBER( irq_line );
+	DECLARE_WRITE_LINE_MEMBER( firq_line );
+
 protected:
 	// device-level overrides
 	virtual void device_start();

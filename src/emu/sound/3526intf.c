@@ -22,135 +22,143 @@
 #include "sound/fmopl.h"
 
 
-struct ym3526_state
-{
-	sound_stream *  stream;
-	emu_timer *     timer[2];
-	void *          chip;
-	const ym3526_interface *intf;
-	device_t *device;
-
-	devcb_resolved_write_line out_int_func;
-};
-
-
-INLINE ym3526_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == YM3526);
-	return (ym3526_state *)downcast<ym3526_device *>(device)->token();
-}
-
-
 /* IRQ Handler */
 static void IRQHandler(void *param,int irq)
 {
-	ym3526_state *info = (ym3526_state *)param;
-	info->out_int_func(irq ? ASSERT_LINE : CLEAR_LINE);
+	ym3526_device *ym3526 = (ym3526_device *) param;
+	ym3526->_IRQHandler(irq);
 }
+
+void ym3526_device::_IRQHandler(int irq)
+{
+	if (!m_irq_handler.isnull())
+		m_irq_handler(irq);
+}
+
 /* Timer overflow callback from timer.c */
-static TIMER_CALLBACK( timer_callback_0 )
+void ym3526_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	ym3526_state *info = (ym3526_state *)ptr;
-	ym3526_timer_over(info->chip,0);
+	switch(id)
+	{
+	case 0:
+		ym3526_timer_over(m_chip,0);
+		break;
+
+	case 1:
+		ym3526_timer_over(m_chip,1);
+		break;
+	}
 }
-static TIMER_CALLBACK( timer_callback_1 )
+
+static void timer_handler(void *param,int c,attotime period)
 {
-	ym3526_state *info = (ym3526_state *)ptr;
-	ym3526_timer_over(info->chip,1);
+	ym3526_device *ym3526 = (ym3526_device *) param;
+	ym3526->_timer_handler(c, period);
 }
-/* TimerHandler from fm.c */
-static void TimerHandler(void *param,int c,attotime period)
+
+void ym3526_device::_timer_handler(int c,attotime period)
 {
-	ym3526_state *info = (ym3526_state *)param;
 	if( period == attotime::zero )
 	{   /* Reset FM Timer */
-		info->timer[c]->enable(false);
+		m_timer[c]->enable(false);
 	}
 	else
 	{   /* Start FM Timer */
-		info->timer[c]->adjust(period);
+		m_timer[c]->adjust(period);
 	}
 }
 
-
-static STREAM_UPDATE( ym3526_stream_update )
+/* update request from fm.c */
+void ym3526_update_request(void *param, int interval)
 {
-	ym3526_state *info = (ym3526_state *)param;
-	ym3526_update_one(info->chip, outputs[0], samples);
+	ym3526_device *ym3526 = (ym3526_device *) param;
+	ym3526->_ym3526_update_request();
 }
 
-static void _stream_update(void *param, int interval)
+void ym3526_device::_ym3526_update_request()
 {
-	ym3526_state *info = (ym3526_state *)param;
-	info->stream->update();
+	m_stream->update();
 }
 
 
-static DEVICE_START( ym3526 )
-{
-	static const ym3526_interface dummy = { DEVCB_NULL };
-	ym3526_state *info = get_safe_token(device);
-	int rate = device->clock()/72;
 
-	info->intf = device->static_config() ? (const ym3526_interface *)device->static_config() : &dummy;
-	info->device = device;
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	ym3526_update_one(m_chip, outputs[0], samples);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ym3526_device::device_start()
+{
+	int rate = clock()/72;
 
 	// resolve callbacks
-	info->out_int_func.resolve(info->intf->out_int_func, *device);
+	m_irq_handler.resolve();
 
 	/* stream system initialize */
-	info->chip = ym3526_init(device,device->clock(),rate);
-	assert_always(info->chip != NULL, "Error creating YM3526 chip");
+	m_chip = ym3526_init(this,clock(),rate);
+	assert_always(m_chip != NULL, "Error creating YM3526 chip");
 
-	info->stream = device->machine().sound().stream_alloc(*device,0,1,rate,info,ym3526_stream_update);
+	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* YM3526 setup */
-	ym3526_set_timer_handler (info->chip, TimerHandler, info);
-	ym3526_set_irq_handler   (info->chip, IRQHandler, info);
-	ym3526_set_update_handler(info->chip, _stream_update, info);
+	ym3526_set_timer_handler (m_chip, timer_handler, this);
+	ym3526_set_irq_handler   (m_chip, IRQHandler, this);
+	ym3526_set_update_handler(m_chip, ym3526_update_request, this);
 
-	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_0), info);
-	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_1), info);
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 }
 
-static DEVICE_STOP( ym3526 )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ym3526_device::device_stop()
 {
-	ym3526_state *info = get_safe_token(device);
-	ym3526_shutdown(info->chip);
+	ym3526_shutdown(m_chip);
 }
 
-static DEVICE_RESET( ym3526 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ym3526_device::device_reset()
 {
-	ym3526_state *info = get_safe_token(device);
-	ym3526_reset_chip(info->chip);
+	ym3526_reset_chip(m_chip);
 }
 
 
-READ8_DEVICE_HANDLER( ym3526_r )
+READ8_MEMBER( ym3526_device::read )
 {
-	ym3526_state *info = get_safe_token(device);
-	return ym3526_read(info->chip, offset & 1);
+	return ym3526_read(m_chip, offset & 1);
 }
 
-WRITE8_DEVICE_HANDLER( ym3526_w )
+WRITE8_MEMBER( ym3526_device::write )
 {
-	ym3526_state *info = get_safe_token(device);
-	ym3526_write(info->chip, offset & 1, data);
+	ym3526_write(m_chip, offset & 1, data);
 }
 
-READ8_DEVICE_HANDLER( ym3526_status_port_r ) { return ym3526_r(device, space, 0); }
-READ8_DEVICE_HANDLER( ym3526_read_port_r ) { return ym3526_r(device, space, 1); }
-WRITE8_DEVICE_HANDLER( ym3526_control_port_w ) { ym3526_w(device, space, 0, data); }
-WRITE8_DEVICE_HANDLER( ym3526_write_port_w ) { ym3526_w(device, space, 1, data); }
+READ8_MEMBER( ym3526_device::status_port_r ) { return read(space, 0); }
+READ8_MEMBER( ym3526_device::read_port_r ) { return read(space, 1); }
+WRITE8_MEMBER( ym3526_device::control_port_w ) { write(space, 0, data); }
+WRITE8_MEMBER( ym3526_device::write_port_w ) { write(space, 1, data); }
 
 
 const device_type YM3526 = &device_creator<ym3526_device>;
 
 ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YM3526, "YM3526", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_irq_handler(*this)
 {
-	m_token = global_alloc_clear(ym3526_state);
 }
 
 //-------------------------------------------------
@@ -161,41 +169,4 @@ ym3526_device::ym3526_device(const machine_config &mconfig, const char *tag, dev
 
 void ym3526_device::device_config_complete()
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ym3526_device::device_start()
-{
-	DEVICE_START_NAME( ym3526 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ym3526_device::device_reset()
-{
-	DEVICE_RESET_NAME( ym3526 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void ym3526_device::device_stop()
-{
-	DEVICE_STOP_NAME( ym3526 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ym3526_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

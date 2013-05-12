@@ -705,7 +705,7 @@ static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r,ym3526_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -915,12 +915,6 @@ static GFXDECODE_START( renegade )
 GFXDECODE_END
 
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", M6809_FIRQ_LINE)
-};
-
-
 void renegade_state::machine_reset()
 {
 	m_bank = 0;
@@ -958,7 +952,7 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("adpcm", RENEGADE_ADPCM, 8000)

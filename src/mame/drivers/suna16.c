@@ -267,7 +267,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM                                   // ROM
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)    //
+	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)   // AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM                                   // RAM
 	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE(soundlatch2_byte_w              )   // To PCM Z80
@@ -948,11 +948,6 @@ MACHINE_CONFIG_END
                             Best Of Best
 ***************************************************************************/
 
-static const ym3526_interface bestbest_ym3526_interface =
-{
-	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0)
-};
-
 WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 {
 	// ?
@@ -1005,7 +1000,7 @@ static MACHINE_CONFIG_START( bestbest, suna16_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/8)   /* 3MHz */
-	MCFG_SOUND_CONFIG(bestbest_ym3526_interface)
+	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", z80_device, irq_line))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
