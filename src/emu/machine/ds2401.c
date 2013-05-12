@@ -40,31 +40,31 @@ void ds2401_device::device_start()
 	t_pdh  = attotime::from_usec( 30);
 	t_pdl  = attotime::from_usec(120);
 
-	save_item(NAME(state));
-	save_item(NAME(bit));
-	save_item(NAME(byte));
-	save_item(NAME(shift));
-	save_item(NAME(rx));
-	save_item(NAME(tx));
+	save_item(NAME(m_state));
+	save_item(NAME(m_bit));
+	save_item(NAME(m_byte));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_rx));
+	save_item(NAME(m_tx));
 
-	timer_main  = timer_alloc(TIMER_MAIN);
-	timer_reset = timer_alloc(TIMER_RESET);
+	m_timer_main  = timer_alloc(TIMER_MAIN);
+	m_timer_reset = timer_alloc(TIMER_RESET);
 }
 
 void ds2401_device::device_reset()
 {
-	state = STATE_IDLE;
-	bit = 0;
-	byte = 0;
-	shift = 0;
-	rx = true;
-	tx = true;
+	m_state = STATE_IDLE;
+	m_bit = 0;
+	m_byte = 0;
+	m_shift = 0;
+	m_rx = true;
+	m_tx = true;
 
 	if(m_region)
 	{
 		if(m_region->bytes() == SIZE_DATA)
 		{
-			memcpy(data, m_region->base(), SIZE_DATA);
+			memcpy(m_data, m_region->base(), SIZE_DATA);
 			return;
 		}
 
@@ -75,7 +75,7 @@ void ds2401_device::device_reset()
 		logerror("ds2401 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
 	}
 
-	memset(data, 0, SIZE_DATA);
+	memset(m_data, 0, SIZE_DATA);
 }
 
 void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -84,64 +84,64 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	{
 	case TIMER_RESET:
 		verboselog(1, "timer_reset\n");
-		state = STATE_RESET;
-		timer_reset->adjust(attotime::never);
+		m_state = STATE_RESET;
+		m_timer_reset->adjust(attotime::never);
 		break;
 
 	case TIMER_MAIN:
-		switch(state)
+		switch(m_state)
 		{
 		case STATE_RESET1:
-			verboselog(2, "timer_main state_reset1 %d\n", rx);
-			tx = false;
-			state = STATE_RESET2;
-			timer_main->adjust(t_pdl);
+			verboselog(2, "timer_main state_reset1 %d\n", m_rx);
+			m_tx = false;
+			m_state = STATE_RESET2;
+			m_timer_main->adjust(t_pdl);
 			break;
 
 		case STATE_RESET2:
-			verboselog(2, "timer_main state_reset2 %d\n", rx);
-			tx = true;
-			bit = 0;
-			shift = 0;
-			state = STATE_COMMAND;
+			verboselog(2, "timer_main state_reset2 %d\n", m_rx);
+			m_tx = true;
+			m_bit = 0;
+			m_shift = 0;
+			m_state = STATE_COMMAND;
 			break;
 
 		case STATE_COMMAND:
-			verboselog(2, "timer_main state_command %d\n", rx);
+			verboselog(2, "timer_main state_command %d\n", m_rx);
 
-			shift >>= 1;
-			if(rx)
+			m_shift >>= 1;
+			if(m_rx)
 			{
-				shift |= 0x80;
+				m_shift |= 0x80;
 			}
 
-			bit++;
-			if(bit == 8)
+			m_bit++;
+			if(m_bit == 8)
 			{
-				switch(shift)
+				switch(m_shift)
 				{
 				case COMMAND_READROM:
 					verboselog(1, "timer_main readrom\n");
-					bit = 0;
-					byte = 0;
-					state = STATE_READROM;
+					m_bit = 0;
+					m_byte = 0;
+					m_state = STATE_READROM;
 					break;
 
 				default:
-					verboselog(0, "timer_main command not handled %02x\n", shift);
-					state = STATE_IDLE;
+					verboselog(0, "timer_main command not handled %02x\n", m_shift);
+					m_state = STATE_IDLE;
 					break;
 				}
 			}
 			break;
 
 		case STATE_READROM:
-			tx = true;
+			m_tx = true;
 
-			if(byte == SIZE_DATA)
+			if( m_byte == SIZE_DATA )
 			{
 				verboselog(1, "timer_main readrom finished\n");
-				state = STATE_IDLE;
+				m_state = STATE_IDLE;
 			}
 			else
 			{
@@ -149,7 +149,7 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 			break;
 		default:
-			verboselog(0, "timer_main state not handled: %d\n", state);
+			verboselog(0, "timer_main state not handled: %d\n", m_state);
 			break;
 		}
 	}
@@ -159,71 +159,71 @@ WRITE_LINE_MEMBER( ds2401_device::write )
 {
 	verboselog(1, "write(%d)\n", state);
 
-	if(!state && rx)
+	if(!state && m_rx)
 	{
-		switch(state)
+		switch(m_state)
 		{
 		case STATE_IDLE:
 			break;
 
 		case STATE_COMMAND:
 			verboselog(2, "state_command\n");
-			timer_main->adjust(t_samp);
+			m_timer_main->adjust(t_samp);
 			break;
 
 		case STATE_READROM:
-			if(!bit)
+			if(!m_bit)
 			{
-				shift = data[7 - byte];
-				verboselog(1, "<- data %02x\n", shift);
+				m_shift = m_data[7 - m_byte];
+				verboselog(1, "<- data %02x\n", m_shift);
 			}
 
-			tx = shift & 1;
-			shift >>= 1;
+			m_tx = m_shift & 1;
+			m_shift >>= 1;
 
-			bit++;
-			if(bit == 8)
+			m_bit++;
+			if(m_bit == 8)
 			{
-				bit = 0;
-				byte++;
+				m_bit = 0;
+				m_byte++;
 			}
 
-			verboselog(2, "state_readrom %d\n", tx);
-			timer_main->adjust(t_rdv);
+			verboselog(2, "state_readrom %d\n", m_tx);
+			m_timer_main->adjust(t_rdv);
 			break;
 
 		default:
-			verboselog(0, "state not handled: %d\n", state );
+			verboselog(0, "state not handled: %d\n", m_state );
 			break;
 		}
 
-		timer_reset->adjust(t_rstl);
+		m_timer_reset->adjust(t_rstl);
 	}
-	else if(state && !rx)
+	else if(state && !m_rx)
 	{
-		switch(state)
+		switch(m_state)
 		{
 		case STATE_RESET:
-			state = STATE_RESET1;
-			timer_main->adjust(t_pdh);
+			m_state = STATE_RESET1;
+			m_timer_main->adjust(t_pdh);
 			break;
 		}
 
-		timer_reset->adjust(attotime::never);
+		m_timer_reset->adjust(attotime::never);
 	}
 
-	rx = state;
+	m_rx = state;
 }
 
 READ_LINE_MEMBER( ds2401_device::read )
 {
-	verboselog(2, "read %d\n", tx && rx);
-	return tx && rx;
+	verboselog(2, "read %d\n", m_tx && m_rx);
+	return m_tx && m_rx;
 }
 
 UINT8 ds2401_device::direct_read(int index)
 {
-	return data[index];
+	return m_data[index];
 }
 
 /*
