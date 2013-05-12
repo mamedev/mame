@@ -16,7 +16,6 @@
 * NOTES
 *
 ******************************************************************************/
-#include "emu.h"
 #include "3526intf.h"
 #include "fm.h"
 #include "fmopl.h"

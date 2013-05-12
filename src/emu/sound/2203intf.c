@@ -1,4 +1,3 @@
-#include "emu.h"
 #include "2203intf.h"
 #include "fm.h"
 
