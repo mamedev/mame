@@ -459,13 +459,15 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_ay8910(*this, "ay8910")
+	{
+	}
 
 	UINT8 m_main_latch_d800;
 	UINT8 m_snd_latch_0800;
 	UINT8 m_snd_latch_0a02;
 	UINT8 m_ay8910_addr;
-	device_t *m_ay8910;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
@@ -491,6 +493,7 @@ public:
 	UINT32 screen_update_fclown(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<ay8910_device> m_ay8910;
 };
 
 
@@ -689,8 +692,8 @@ WRITE8_MEMBER(_5clown_state::cpu_d800_w)
 
 WRITE8_MEMBER(_5clown_state::fclown_ay8910_w)
 {
-	ay8910_address_w(m_ay8910, space, 0, offset);
-	ay8910_data_w(m_ay8910, space, 0, data);
+	m_ay8910->address_w(space, 0, offset);
+	m_ay8910->data_w(space, 0, data);
 }
 
 
@@ -1258,11 +1261,6 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 			samples_src[x] = samples_src[x] ^ 0x12;     /* Otherwise bit 1 & 5 XOR'ed */
 		}
 	}
-
-
-	/* Assigning AY-3-8910 sound device */
-
-	m_ay8910 = machine().device("ay8910");
 }
 
 

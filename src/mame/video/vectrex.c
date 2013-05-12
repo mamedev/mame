@@ -3,7 +3,6 @@
 #include "includes/vectrex.h"
 #include "video/vector.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/ay8910.h"
 
 
 #define ANALOG_DELAY 7800
@@ -365,12 +364,10 @@ WRITE8_MEMBER(vectrex_state::v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		device_t *ay8912 = machine().device("ay8912");
-
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
-			ay8910_address_w(ay8912, space, 0, m_via_out[PORTA]);
+			m_ay8912->address_w(space, 0, m_via_out[PORTA]);
 		else
-			ay8910_data_w(ay8912, space, 0, m_via_out[PORTA]);
+			m_ay8912->data_w(space, 0, m_via_out[PORTA]);
 	}
 
 	if (!(data & 0x1) && (m_via_out[PORTB] & 0x1))

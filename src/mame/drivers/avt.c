@@ -632,8 +632,8 @@ static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )
 //  AM_RANGE(0x08, 0x0b) unk, maybe IO
 //  AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
 //  AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)     /* AY8910 data */
-	AM_RANGE(0x23, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)      /* AY8910 control */
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_device, data_w)     /* AY8910 data */
+	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_device, address_w)      /* AY8910 control */
 	AM_RANGE(0x28, 0x28) AM_WRITE(avt_6845_address_w)
 	AM_RANGE(0x29, 0x29) AM_READWRITE(avt_6845_data_r,avt_6845_data_w)
 ADDRESS_MAP_END

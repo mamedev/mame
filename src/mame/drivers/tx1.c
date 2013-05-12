@@ -541,7 +541,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_sound_io, AS_IO, 8, tx1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 
@@ -616,10 +616,10 @@ ADDRESS_MAP_END
 /* Common */
 static ADDRESS_MAP_START( buggyboy_sound_io, AS_IO, 8, tx1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("ym1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ym1", ay8910_data_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("ym2", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ym2", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("ym1", ay8910_device, data_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ay8910_device, data_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("ym2", ay8910_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

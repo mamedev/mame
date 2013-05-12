@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8, supertnk_state )
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
 	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
 	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW")
 	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w)

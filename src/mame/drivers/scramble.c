@@ -76,10 +76,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("8910.1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("8910.2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8910.2", ay8910_device, address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -340,18 +340,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("8910.1", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("8910.1", ay8910_device, data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("8910.1", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("8910.1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("8910.2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("8910.2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 
@@ -414,13 +414,13 @@ static ADDRESS_MAP_START( harem_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// ports->speech?:
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY    ("8910.3", ay8910_address_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_LEGACY("8910.3", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("8910.3", ay8910_device, address_w)
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("8910.3", ay8910_device, data_r, data_w)
 	// same as scramble:
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY    ("8910.1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("8910.1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY    ("8910.2", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("8910.2", ay8910_r, ay8910_data_w)  // read soundlatch
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_device, address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("8910.2", ay8910_device, address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_device, data_r, data_w)  // read soundlatch
 ADDRESS_MAP_END
 
 

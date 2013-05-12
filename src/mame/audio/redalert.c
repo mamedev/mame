@@ -76,7 +76,7 @@ WRITE8_MEMBER(redalert_state::redalert_audio_command_w)
 
 WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 {
-	device_t *device = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	/* BC2 is connected to a pull-up resistor, so BC2=1 always */
 	switch (data & 0x03)
 	{
@@ -86,7 +86,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 
 		/* BC1=1, BDIR=0 : read from PSG */
 		case 0x01:
-			m_ay8910_latch_1 = ay8910_r(device, space, 0);
+			m_ay8910_latch_1 = ay8910->data_r(space, 0);
 			break;
 
 		/* BC1=0, BDIR=1 : write to PSG */
@@ -94,7 +94,7 @@ WRITE8_MEMBER(redalert_state::redalert_AY8910_w)
 		case 0x02:
 		case 0x03:
 		default:
-			ay8910_data_address_w(device, space, data, m_ay8910_latch_2);
+			ay8910->data_address_w(space, data, m_ay8910_latch_2);
 			break;
 	}
 }
@@ -300,35 +300,35 @@ READ8_MEMBER(redalert_state::demoneye_ay8910_latch_2_r)
 
 WRITE8_MEMBER(redalert_state::demoneye_ay8910_data_w)
 {
-	device_t *ay1 = machine().device("ay1");
-	device_t *ay2 = machine().device("ay2");
+	ay8910_device *ay1 = machine().device<ay8910_device>("ay1");
+	ay8910_device *ay2 = machine().device<ay8910_device>("ay2");
 
 	switch (m_ay8910_latch_1 & 0x03)
 	{
 		case 0x00:
 			if (m_ay8910_latch_1 & 0x10)
-				ay8910_data_w(ay1, space, 0, data);
+				ay1->data_w(space, 0, data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				ay8910_data_w(ay2, space, 0, data);
+				ay2->data_w(space, 0, data);
 
 			break;
 
 		case 0x01:
 			if (m_ay8910_latch_1 & 0x10)
-				m_ay8910_latch_2 = ay8910_r(ay1, space, 0);
+				m_ay8910_latch_2 = ay1->data_r(space, 0);
 
 			if (m_ay8910_latch_1 & 0x20)
-				m_ay8910_latch_2 = ay8910_r(ay2, space, 0);
+				m_ay8910_latch_2 = ay2->data_r(space, 0);
 
 			break;
 
 		case 0x03:
 			if (m_ay8910_latch_1 & 0x10)
-				ay8910_address_w(ay1, space, 0, data);
+				ay1->address_w(space, 0, data);
 
 			if (m_ay8910_latch_1 & 0x20)
-				ay8910_address_w(ay2, space, 0, data);
+				ay2->address_w(space, 0, data);
 
 			break;
 

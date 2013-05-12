@@ -262,8 +262,8 @@ static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
 ADDRESS_MAP_END
 
@@ -285,8 +285,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, route16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 

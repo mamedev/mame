@@ -470,8 +470,8 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -491,8 +491,8 @@ static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 
@@ -512,8 +512,8 @@ static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, AS_IO, 8, merit_state )
-	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 

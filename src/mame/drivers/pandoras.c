@@ -158,9 +158,9 @@ static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM                                                         /* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM                                                         /* RAM */
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)                                         /* soundlatch_byte_r */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)                          /* AY-8910 */
-	AM_RANGE(0x6001, 0x6001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)                                   /* AY-8910 */
-	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)                         /* AY-8910 */
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)                          /* AY-8910 */
+	AM_RANGE(0x6001, 0x6001) AM_DEVREAD("aysnd", ay8910_device, data_r)                                   /* AY-8910 */
+	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE("aysnd", ay8910_device, data_w)                         /* AY-8910 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)                          /* cause INT on the 8039 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_byte_w)                                       /* sound command to the 8039 */
 ADDRESS_MAP_END

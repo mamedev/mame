@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP // ?
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( carrera )

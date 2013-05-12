@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW2")
 	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
-	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

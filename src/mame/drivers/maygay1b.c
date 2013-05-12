@@ -813,7 +813,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 
 	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE_LEGACY("duart68681", duart68681_r, duart68681_w )
 
-	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x20B0, 0x20B0) AM_READ(m1_meter_r)
 
 	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)

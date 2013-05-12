@@ -98,8 +98,8 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
+	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -114,8 +114,8 @@ static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, scregg_state )
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w) AM_READ(scregg_irqack_r)
-	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_device, address_data_w) AM_READ(scregg_irqack_r)
+	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
 ADDRESS_MAP_END

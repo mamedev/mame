@@ -267,8 +267,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM                                   // ROM
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w )   //
-	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w    )   // AY8910
+	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)    //
+	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)   // AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM                                   // RAM
 	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE(soundlatch2_byte_w              )   // To PCM Z80
 	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_byte_r              )   // From Main CPU

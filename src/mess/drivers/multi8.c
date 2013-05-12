@@ -327,8 +327,8 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-READ8_MEMBER(multi8_state::ay8912_0_r){ return ay8910_r(machine().device("aysnd"),space, 0); }
-READ8_MEMBER(multi8_state::ay8912_1_r){ return ay8910_r(machine().device("aysnd"),space, 1); }
+READ8_MEMBER(multi8_state::ay8912_0_r){ return machine().device<ay8910_device>("aysnd")->data_r(space, 0); }
+READ8_MEMBER(multi8_state::ay8912_1_r){ return machine().device<ay8910_device>("aysnd")->data_r(space, 1); }
 
 READ8_MEMBER( multi8_state::multi8_kanji_r )
 {
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START(multi8_io, AS_IO, 8, multi8_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
-	AM_RANGE(0x18, 0x19) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
 	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)

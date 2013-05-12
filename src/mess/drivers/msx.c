@@ -345,9 +345,9 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(msx_state::msx_ay8910_w)
 {
 	if ( offset & 1 )
-		ay8910_data_w( m_ay8910, space, offset, data );
+		m_ay8910->data_w( space, offset, data );
 	else
-		ay8910_address_w( m_ay8910, space, offset, data );
+		m_ay8910->address_w( space, offset, data );
 }
 
 
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START ( msx_io_map, AS_IO, 8, msx_state )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE(msx_fmpac_w)
 	AM_RANGE( 0x90, 0x90) AM_READWRITE(msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_WRITE(msx_printer_data_w)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD_LEGACY("ay8910", ay8910_r) AM_WRITE(msx_ay8910_w)
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_device, data_r) AM_WRITE(msx_ay8910_w)
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x98, 0x98) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE( 0x99, 0x99) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START ( msx2_io_map, AS_IO, 8, msx_state )
 	AM_RANGE( 0x7c, 0x7d) AM_WRITE(msx_fmpac_w)
 	AM_RANGE( 0x90, 0x90) AM_READWRITE(msx_printer_status_r, msx_printer_strobe_w)
 	AM_RANGE( 0x91, 0x91) AM_WRITE(msx_printer_data_w)
-	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD_LEGACY("ay8910", ay8910_r) AM_WRITE(msx_ay8910_w)
+	AM_RANGE( 0xa0, 0xa7) AM_DEVREAD("ay8910", ay8910_device, data_r) AM_WRITE(msx_ay8910_w)
 	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
 	AM_RANGE( 0xb4, 0xb4) AM_WRITE(msx_rtc_latch_w)

@@ -646,7 +646,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 /*  Winners Circle 1982
@@ -700,7 +700,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP    /* socket for another ay, inited but never played */
 ADDRESS_MAP_END
 
@@ -761,7 +761,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( re800_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -821,7 +821,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 

@@ -129,10 +129,10 @@ static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM //only bking3
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4400, 0x4401) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4401, 0x4401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x4402, 0x4403) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x4403, 0x4403) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x4400, 0x4401) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x4401, 0x4401) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x4402, 0x4403) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x4403, 0x4403) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x4800, 0x4800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */

@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( gluck2_map, AS_PROGRAM, 8, gluck2_state )
 	AM_RANGE(0x3500, 0x3500) AM_READ_PORT("IN1")
 	AM_RANGE(0x3600, 0x3600) AM_READ_PORT("IN2")
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(counters_w )
-	AM_RANGE(0x3d00, 0x3d01) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x3d00, 0x3d01) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

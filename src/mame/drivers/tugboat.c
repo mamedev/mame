@@ -219,7 +219,7 @@ void tugboat_state::machine_reset()
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)  /* scrolling is performed changing the start_addr register (0C/0D) */
 	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
 	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)

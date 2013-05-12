@@ -63,8 +63,8 @@ static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
 	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
-	AM_RANGE(0xf401, 0xf401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
 ADDRESS_MAP_END

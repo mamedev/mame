@@ -20,7 +20,6 @@ TODO:
 #include "cpu/m6800/m6800.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
-#include "sound/ay8910.h"
 #include "sound/sn76477.h"
 #include "sound/tms3615.h"
 #include "video/s2636.h"
@@ -578,8 +577,8 @@ WRITE_LINE_MEMBER(laserbat_state::zaccaria_irq0b)
 
 READ8_MEMBER(laserbat_state::zaccaria_port0a_r)
 {
-	device_t *ay = (m_active_8910 == 0) ? m_ay1 : m_ay2;
-	return ay8910_r(ay, space, 0);
+	ay8910_device *ay8910 = (m_active_8910 == 0) ? m_ay1 : m_ay2;
+	return ay8910->data_r(space, 0);
 }
 
 WRITE8_MEMBER(laserbat_state::zaccaria_port0a_w)
@@ -593,7 +592,7 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(m_ay1, space, m_last_port0b >> 0, m_port0a);
+		m_ay1->data_address_w(space, m_last_port0b >> 0, m_port0a);
 	}
 	else if ((m_last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -605,7 +604,7 @@ WRITE8_MEMBER(laserbat_state::zaccaria_port0b_w)
 	if ((m_last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(m_ay2, space, m_last_port0b >> 2, m_port0a);
+		m_ay2->data_address_w(space, m_last_port0b >> 2, m_port0a);
 	}
 	else if ((m_last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -689,8 +688,6 @@ void laserbat_state::machine_start()
 	m_sn = machine().device("snsnd");
 	m_tms1 = machine().device<tms3615_device>("tms1");
 	m_tms2 = machine().device<tms3615_device>("tms2");
-	m_ay1 = machine().device("ay1");
-	m_ay2 = machine().device("ay2");
 
 	save_item(NAME(m_video_page));
 	save_item(NAME(m_input_mux));

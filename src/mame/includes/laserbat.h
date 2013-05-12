@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/6821pia.h"
+#include "sound/ay8910.h"
 
 class laserbat_state : public driver_device
 {
@@ -13,12 +14,17 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_fo_state(*this, "fo_state")
-	{ }
+		m_fo_state(*this, "fo_state"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_shared_ptr<UINT8> m_fo_state;
+	optional_device<ay8910_device> m_ay1;
+	optional_device<ay8910_device> m_ay2;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -57,8 +63,6 @@ public:
 	device_t *m_sn;
 	tms3615_device *m_tms1;
 	tms3615_device *m_tms2;
-	device_t *m_ay1;
-	device_t *m_ay2;
 
 	// memory
 	UINT8      m_videoram[0x400];

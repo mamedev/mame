@@ -1021,9 +1021,9 @@ static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
 	AM_RANGE(0x35, 0x35) AM_WRITE(multfish_lamps3_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x3a, 0x3a) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("aysnd", ay8910_device, data_r)
 
 	AM_RANGE(0x60, 0x60) AM_WRITE(multfish_dispenable_w) // display enable mirror for lottery sets
 

@@ -2354,15 +2354,15 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 
 		if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine.system().name,"ts2068")))
 		{
-			device_t *ay8912 = machine.device("ay8912");
+			ay8910_device *ay8912 = machine.device<ay8910_device>("ay8912");
 
 			/* Only set up sound registers for 128K machine or TS2068! */
 			for (i = 0; i < 16; i++)
 			{
-				ay8910_address_w(ay8912, state->generic_space(), 0, i);
-				ay8910_data_w(ay8912, state->generic_space(), 0, snapdata[39 + i]);
+				ay8912->address_w(state->generic_space(), 0, i);
+				ay8912->data_w(state->generic_space(), 0, snapdata[39 + i]);
 			}
-			ay8910_address_w(ay8912, state->generic_space(), 0, snapdata[38]);
+			ay8912->address_w(state->generic_space(), 0, snapdata[38]);
 		}
 
 		pSource = snapdata + header_size;

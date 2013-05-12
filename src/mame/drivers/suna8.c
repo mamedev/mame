@@ -1177,7 +1177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w      )
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM // RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD_LEGACY("ymsnd", ym3812_status_port_r)   // ? unsure
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_byte_w                )   //
@@ -1212,7 +1212,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM // ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w   )
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w      )
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM // RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_byte_w                )   // To PCM CPU
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r                  )   // From Main CPU

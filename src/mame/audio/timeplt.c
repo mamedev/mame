@@ -167,10 +167,10 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE_LEGACY("timeplt_audio", timeplt_filter_w)
 ADDRESS_MAP_END
 
@@ -179,10 +179,10 @@ static ADDRESS_MAP_START( locomotn_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_DEVWRITE_LEGACY("timeplt_audio", timeplt_filter_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 

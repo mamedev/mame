@@ -931,9 +931,9 @@ static ADDRESS_MAP_START( pc6001_io , AS_IO, 8, pc6001_state )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, nec_ppi8255_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_WRITENOP
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001_system_latch_w)
 	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_NOP // disk device
@@ -1467,9 +1467,9 @@ static ADDRESS_MAP_START( pc6001m2_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_WRITE(pc6001m2_system_latch_w)
@@ -1510,9 +1510,9 @@ static ADDRESS_MAP_START( pc6601_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necmk2_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001m2_system_latch_w)
@@ -1711,9 +1711,9 @@ static ADDRESS_MAP_START( pc6001sr_io , AS_IO, 8, pc6001_state )
 
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_READWRITE(nec_ppi8255_r, necsr_ppi8255_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x0c) AM_DEVWRITE("ay8910", ay8910_device, data_w)
+	AM_RANGE(0xa2, 0xa2) AM_MIRROR(0x0c) AM_DEVREAD("ay8910", ay8910_device, data_r)
 	AM_RANGE(0xa3, 0xa3) AM_MIRROR(0x0c) AM_NOP
 
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(pc6001sr_system_latch_w)

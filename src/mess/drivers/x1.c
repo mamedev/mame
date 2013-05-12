@@ -1596,7 +1596,7 @@ READ8_MEMBER( x1_state::x1_io_r )
 	else if(offset >= 0x1400 && offset <= 0x17ff)   { return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return ay8910_r(machine().device("ay"), space, 0); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), 0); }
 //  else if(offset >= 0x1f90 && offset <= 0x1f91)   { return z80sio_c_r(machine().device("sio"), (offset-0x1f90) & 1); }
 //  else if(offset >= 0x1f92 && offset <= 0x1f93)   { return z80sio_d_r(machine().device("sio"), (offset-0x1f92) & 1); }
@@ -1632,8 +1632,8 @@ WRITE8_MEMBER( x1_state::x1_io_w )
 	else if(offset == 0x1800 || offset == 0x1801)   { x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { ay8910_data_w(machine().device("ay"), space, 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)   { ay8910_address_w(machine().device("ay"), space, 0,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)   { machine().device<ay8910_device>("ay")->data_w(space, 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
 //  else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), 0,data); }
@@ -1680,7 +1680,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset >= 0x1400 && offset <= 0x17ff)   { return x1_pcg_r(space, offset-0x1400); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { return x1_sub_io_r(space, 0); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { return machine().device<i8255_device>("ppi8255_0")->read(space, (offset-0x1a00) & 3); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return ay8910_r(machine().device("ay"), space, 0); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)   { return machine().device<ay8910_device>("ay")->data_r(space, 0); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { return z80dma_r(machine().device("dma"), space, 0); }
 	else if(offset >= 0x1f90 && offset <= 0x1f93)   { return z80dart_ba_cd_r(machine().device("sio"), space, (offset-0x1f90) & 3); }
 	else if(offset >= 0x1f98 && offset <= 0x1f9f)   { printf("Extended SIO/CTC read %04x\n",offset); return 0xff; }
@@ -1730,8 +1730,8 @@ WRITE8_MEMBER( x1_state::x1turbo_io_w )
 	else if(offset == 0x1800 || offset == 0x1801)   { x1_6845_w(space, offset-0x1800, data); }
 	else if(offset >= 0x1900 && offset <= 0x19ff)   { x1_sub_io_w(space, 0,data); }
 	else if(offset >= 0x1a00 && offset <= 0x1aff)   { machine().device<i8255_device>("ppi8255_0")->write(space, (offset-0x1a00) & 3,data); }
-	else if(offset >= 0x1b00 && offset <= 0x1bff)   { ay8910_data_w(machine().device("ay"), space, 0,data); }
-	else if(offset >= 0x1c00 && offset <= 0x1cff)   { ay8910_address_w(machine().device("ay"), space, 0,data); }
+	else if(offset >= 0x1b00 && offset <= 0x1bff)   { machine().device<ay8910_device>("ay")->data_w(space, 0,data); }
+	else if(offset >= 0x1c00 && offset <= 0x1cff)   { machine().device<ay8910_device>("ay")->address_w(space, 0,data); }
 	else if(offset >= 0x1d00 && offset <= 0x1dff)   { x1_rom_bank_1_w(space,0,data); }
 	else if(offset >= 0x1e00 && offset <= 0x1eff)   { x1_rom_bank_0_w(space,0,data); }
 	else if(offset >= 0x1f80 && offset <= 0x1f8f)   { z80dma_w(machine().device("dma"), space, 0,data); }

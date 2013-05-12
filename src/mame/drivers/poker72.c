@@ -117,8 +117,8 @@ static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
 	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
 	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
-	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE_LEGACY("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
+	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
+	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE("ay", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 

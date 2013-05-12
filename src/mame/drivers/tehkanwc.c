@@ -259,10 +259,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

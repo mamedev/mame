@@ -91,10 +91,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x9002, 0x9002) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x9002, 0x9002) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

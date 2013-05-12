@@ -131,12 +131,12 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ay3", ay8910_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

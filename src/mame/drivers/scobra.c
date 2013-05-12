@@ -251,10 +251,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8, scobra_state )
@@ -265,8 +265,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 
@@ -278,8 +278,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 

@@ -225,9 +225,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM
 ADDRESS_MAP_END
 
@@ -236,9 +236,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
 	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 

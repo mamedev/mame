@@ -1688,12 +1688,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x4801, 0x4801) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_DEVREAD_LEGACY("ay3", ay8910_r)
-	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x4801, 0x4801) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
+	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END

@@ -1313,11 +1313,11 @@ WRITE8_MEMBER(goldnpkr_state::wcfalcon_snd_w)
 {
 	if (wcfalcon_flag == 0)
 	{
-		ay8910_data_address_w(machine().device("ay8910"), space, 0, data);
+		machine().device<ay8910_device>("ay8910")->data_address_w(space, 0, data);
 	}
 	else
 	{
-		ay8910_data_address_w(machine().device("ay8910"), space, 1, data);
+		machine().device<ay8910_device>("ay8910")->data_address_w(space, 1, data);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;

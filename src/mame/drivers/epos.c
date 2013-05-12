@@ -79,18 +79,18 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(epos_port_1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
-	AM_RANGE(0x34, 0x34) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
-	AM_RANGE(0x3C, 0x3C) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x3C, 0x3C) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 

@@ -1051,8 +1051,8 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_SHARE("s3000_ram")
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_device, data_w)
 
 	// Superboard Data
 	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_SHARE("s5000_ram")

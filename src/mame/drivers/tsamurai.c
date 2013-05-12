@@ -175,7 +175,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, tsamurai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_m660_io_map, AS_IO, 8, tsamurai_state )
@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vsgongf_audio_io_map, AS_IO, 8, tsamurai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(tsamurai_state::sound_command1_r)
@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound3_m660_io_map, AS_IO, 8, tsamurai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 /*******************************************************************************/

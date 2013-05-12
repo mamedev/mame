@@ -133,7 +133,11 @@ public:
 		m_colorram(*this, "colorram"),
 		m_soundcpu(*this, "soundcpu"),
 		m_samples(*this, "samples"),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2")
+	{
+	}
 
 	required_shared_ptr<UINT8> m_spriteram;
 	required_shared_ptr<UINT8> m_scrollram;
@@ -159,8 +163,6 @@ public:
 
 	/* sound devices */
 	required_device<cpu_device> m_soundcpu;
-	device_t *m_ay1;
-	device_t *m_ay2;
 	optional_device<samples_device> m_samples;
 	DECLARE_WRITE8_MEMBER(m63_videoram_w);
 	DECLARE_WRITE8_MEMBER(m63_colorram_w);
@@ -191,6 +193,8 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_ay1;
+	optional_device<ay8910_device> m_ay2;
 };
 
 
@@ -386,13 +390,13 @@ WRITE8_MEMBER(m63_state::snd_irq_w)
 WRITE8_MEMBER(m63_state::snddata_w)
 {
 	if ((m_p2 & 0xf0) == 0xe0)
-		ay8910_address_w(m_ay1, space, 0, offset);
+		m_ay1->address_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0xa0)
-		ay8910_data_w(m_ay1, space, 0, offset);
+		m_ay1->data_w(space, 0, offset);
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x60)
-		ay8910_address_w(m_ay2, space, 0, offset);
+		m_ay2->address_w(space, 0, offset);
 	else if (m_ay2 != NULL && (m_p1 & 0xe0) == 0x40)
-			ay8910_data_w(m_ay2, space, 0, offset);
+			m_ay2->data_w(space, 0, offset);
 	else if ((m_p2 & 0xf0) == 0x70 )
 		m_sound_status = offset;
 }
@@ -717,9 +721,6 @@ INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 
 MACHINE_START_MEMBER(m63_state,m63)
 {
-	m_ay1 = machine().device("ay1");
-	m_ay2 = machine().device("ay2");
-
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_fg_flag));
 	save_item(NAME(m_sy_offset));

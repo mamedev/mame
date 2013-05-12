@@ -714,7 +714,7 @@ static ADDRESS_MAP_START(intv_mem, AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE_LEGACY("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8_LEGACY("ay8914.1", ay8914_r, ay8914_w, 0x00ff )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */
@@ -731,7 +731,7 @@ static ADDRESS_MAP_START( intv2_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE_LEGACY("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8_LEGACY("ay8914.1", ay8914_r, ay8914_w, 0x00ff )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x0400, 0x04ff) AM_ROM AM_REGION("maincpu", 0x400<<1)  /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
@@ -749,9 +749,9 @@ static ADDRESS_MAP_START( intvecs_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE_LEGACY("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
 	// AM_RANGE(0x00E0, 0x00E3) AM_READWRITE( intv_ecs_uart_r, intv_ecs_uart_w )
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE8_LEGACY("ay8914.2", ay8914_r, ay8914_w, 0x00ff ) /* ecs psg */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE8("ay8914.2", ay8914_device, read, write, 0x00ff ) /* ecs psg */
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8_LEGACY("ay8914.1", ay8914_r, ay8914_w, 0x00ff )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x2000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE( ecs_bank1_page_select );
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( intvkbd_mem , AS_PROGRAM, 16, intv_state)
 	AM_RANGE(0x0000, 0x003f) AM_READWRITE( intv_stic_r, intv_stic_w )
 	AM_RANGE(0x0080, 0x0081) AM_DEVREADWRITE_LEGACY("sp0256_speech", spb640_r, spb640_w ) /* Intellivoice */
 	AM_RANGE(0x0100, 0x01ef) AM_READWRITE( intv_ram8_r, intv_ram8_w )
-	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8_LEGACY("ay8914.1", ay8914_r, ay8914_w, 0x00ff )
+	AM_RANGE(0x01f0, 0x01ff) AM_DEVREADWRITE8("ay8914.1", ay8914_device, read, write, 0x00ff )
 	AM_RANGE(0x0200, 0x035f) AM_READWRITE( intv_ram16_r, intv_ram16_w )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("maincpu", 0x1000<<1) /* Exec ROM, 10-bits wide */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM AM_REGION("maincpu", 0x3000<<1) /* GROM,     8-bits wide */

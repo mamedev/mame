@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP

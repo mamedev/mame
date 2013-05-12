@@ -3,7 +3,7 @@
 #ifndef __AY8910_H__
 #define __AY8910_H__
 
-#include "devlegcy.h"
+#include "emu.h"
 
 /*
 AY-3-8910A: 2 I/O ports
@@ -74,9 +74,6 @@ YMZ294: 0 I/O port
 #define YM2149_PIN26_LOW            (0x10)
 
 
-#define AY8910_INTERFACE(name) \
-	const ay8910_interface (name) =
-
 struct ay8910_interface
 {
 	int                 flags;          /* Flags */
@@ -87,27 +84,6 @@ struct ay8910_interface
 	devcb_write8        portBwrite;
 };
 
-
-void ay8910_set_volume(device_t *device,int channel,int volume);
-
-DECLARE_READ8_DEVICE_HANDLER( ay8910_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ay8910_address_w );
-DECLARE_WRITE8_DEVICE_HANDLER( ay8910_data_w );
-
-/* /RES */
-DECLARE_WRITE8_DEVICE_HANDLER( ay8910_reset_w );
-
-/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
-DECLARE_WRITE8_DEVICE_HANDLER( ay8910_data_address_w );
-
-/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
-DECLARE_WRITE8_DEVICE_HANDLER( ay8910_address_data_w );
-
-/* AY8914 handlers needed due to different register map */
-DECLARE_READ8_DEVICE_HANDLER( ay8914_r );
-DECLARE_WRITE8_DEVICE_HANDLER( ay8914_w );
-
-
 /*********** An interface for SSG of YM2203 ***********/
 
 void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, int clock, const ay8910_interface *intf);
@@ -115,6 +91,7 @@ void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, in
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);
 void ay8910_set_clock_ym(void *chip, int clock);
+void ay8910_set_volume(void *chip ,int channel, int volume);
 void ay8910_write_ym(void *chip, int addr, int data);
 int ay8910_read_ym(void *chip);
 
@@ -124,10 +101,22 @@ class ay8910_device : public device_t,
 public:
 	ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	~ay8910_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( address_w );
+	DECLARE_WRITE8_MEMBER( data_w );
+
+	/* /RES */
+	DECLARE_WRITE8_MEMBER( reset_w );
+
+	/* use this when BC1 == A0; here, BC1=0 selects 'data' and BC1=1 selects 'latch address' */
+	DECLARE_WRITE8_MEMBER( data_address_w );
+
+	/* use this when BC1 == !A0; here, BC1=0 selects 'latch address' and BC1=1 selects 'data' */
+	DECLARE_WRITE8_MEMBER( address_data_w );
+
+	void set_volume(int channel,int volume);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -137,9 +126,10 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-private:
+
 	// internal state
-	void *m_token;
+	const ay8910_interface *m_ay8910_config;
+	void *m_psg;
 };
 
 extern const device_type AY8910;
@@ -148,9 +138,6 @@ class ay8912_device : public ay8910_device
 {
 public:
 	ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type AY8912;
@@ -159,9 +146,6 @@ class ay8913_device : public ay8910_device
 {
 public:
 	ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type AY8913;
@@ -171,8 +155,9 @@ class ay8914_device : public ay8910_device
 public:
 	ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	/* AY8914 handlers needed due to different register map */
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 };
 
 extern const device_type AY8914;
@@ -181,9 +166,6 @@ class ay8930_device : public ay8910_device
 {
 public:
 	ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type AY8930;
@@ -196,9 +178,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start();
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YM2149;
@@ -207,9 +186,6 @@ class ym3439_device : public ym2149_device
 {
 public:
 	ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YM3439;
@@ -218,9 +194,6 @@ class ymz284_device : public ym2149_device
 {
 public:
 	ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YMZ284;
@@ -229,9 +202,6 @@ class ymz294_device : public ym2149_device
 {
 public:
 	ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 };
 
 extern const device_type YMZ294;

@@ -156,14 +156,14 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP    /* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, bagman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITENOP
 ADDRESS_MAP_END
 

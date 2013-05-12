@@ -273,9 +273,9 @@ static ADDRESS_MAP_START( cgc7900_mem, AS_PROGRAM, 16, cgc7900_state )
 //  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
 //  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
 	AM_RANGE(0xff824a, 0xff824b) AM_READ(sync_r)
-	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8_LEGACY(AY8910_TAG, ay8910_address_w, 0xff00)
-	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8_LEGACY(AY8910_TAG, ay8910_r, 0xff00)
-	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8_LEGACY(AY8910_TAG, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_device, address_w, 0xff00)
+	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_device, data_r, 0xff00)
+	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_device, data_w, 0xff00)
 //  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
 //  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
 //  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register

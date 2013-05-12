@@ -814,9 +814,9 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 			// bit 3 selects which of the two 8913 to enable
 			// bit 4 goes to the 8913 BC1 pin
 			if ((data & 0x08) != 0)
-				ay8910_data_address_w(m_ay1, space, data >> 4, m_psg_latch);
+				m_ay1->data_address_w(space, data >> 4, m_psg_latch);
 			else
-				ay8910_data_address_w(m_ay2, space, data >> 4, m_psg_latch);
+				m_ay2->data_address_w(space, data >> 4, m_psg_latch);
 		}
 	}
 	else
@@ -828,8 +828,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 		else
 		{
 			ay8913_device *ay = (data & 0x08) ? m_ay1 : m_ay2;
-			ay8910_address_w(ay, space, 0, m_psg_latch);
-			ay8910_data_w(ay, space, 0, m_psg_data_latch);
+			ay->address_w(space, 0, m_psg_latch);
+			ay->data_w(space, 0, m_psg_data_latch);
 		}
 	}
 

@@ -309,8 +309,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
@@ -318,8 +318,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( statusbj_io, AS_IO, 8, statriv2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 #endif

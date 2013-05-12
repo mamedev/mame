@@ -217,8 +217,8 @@ static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??
@@ -240,8 +240,8 @@ static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP    // ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)    // ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP    // ??

@@ -307,8 +307,8 @@ static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
 	AM_RANGE(0x40000c, 0x40000d) AM_READ(unk_r)
 	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")   // not sure...
-	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff) //wrong
+	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
+	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff) //wrong
 
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x500200, 0x50020f) AM_RAM //?

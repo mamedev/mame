@@ -225,8 +225,8 @@ static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x48, 0x4b) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_READNOP
 	AM_RANGE(0x50, 0x53) AM_WRITENOP
@@ -243,8 +243,8 @@ static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8, coinmstr_state )
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x48, 0x49) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x49, 0x49) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x48, 0x49) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x49, 0x49) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("pia0", pia6821_device, read, write) //?
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x70, 0x73) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
@@ -267,8 +267,8 @@ static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8, coinmstr_state )
 	AM_RANGE(0x68, 0x69) AM_READNOP
 	AM_RANGE(0x68, 0x6b) AM_WRITENOP
 	AM_RANGE(0x6b, 0x6b) AM_READNOP
-	AM_RANGE(0x78, 0x79) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x79, 0x79) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x78, 0x79) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x79, 0x79) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xc0, 0xc1) AM_READNOP
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -277,8 +277,8 @@ static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x48, 0x49) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x49, 0x49) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x48, 0x49) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x49, 0x49) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("pia0", pia6821_device, read, write) /* confirmed */
 	AM_RANGE(0x68, 0x6b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) /* confirmed */
 	AM_RANGE(0x78, 0x7b) AM_DEVREADWRITE("pia2", pia6821_device, read, write) /* confirmed */

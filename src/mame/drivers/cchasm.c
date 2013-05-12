@@ -51,11 +51,11 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xf9e) AM_READ(cchasm_coin_sound_r)
-	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_byte_r, soundlatch3_byte_w)
 	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(cchasm_soundlatch2_r, cchasm_soundlatch4_w)
 	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE(cchasm_reset_coin_flag_w)

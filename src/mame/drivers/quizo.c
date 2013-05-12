@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, quizo_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN1")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN2")
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
 ADDRESS_MAP_END

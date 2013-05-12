@@ -406,8 +406,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -477,8 +477,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
@@ -501,8 +501,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")         /* DSW + blitter busy flag */
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)

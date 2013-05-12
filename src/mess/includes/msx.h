@@ -140,7 +140,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_ay8910;
+	required_device<ay8910_device> m_ay8910;
 	required_device<ym2413_device> m_ym;
 	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;

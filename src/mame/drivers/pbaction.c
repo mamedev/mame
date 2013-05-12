@@ -110,9 +110,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbaction_sound_io_map, AS_IO, 8, pbaction_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 

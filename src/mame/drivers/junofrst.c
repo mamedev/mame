@@ -309,9 +309,9 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(junofrst_i8039_irq_w)
 ADDRESS_MAP_END

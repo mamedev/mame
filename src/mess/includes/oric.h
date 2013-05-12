@@ -154,7 +154,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ay8912;
+	required_device<ay8910_device> m_ay8912;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
 	required_device<via6522_device> m_via6522_0;

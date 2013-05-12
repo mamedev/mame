@@ -91,8 +91,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 /* Ring King */
@@ -136,8 +136,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ringking_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_device, write_unsigned8)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

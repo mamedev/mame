@@ -37,8 +37,8 @@ public:
 
 	optional_device<roc10937_t> m_vfd;
 
-	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, space, 0, data); }
-	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, space, 1, data); }
+	DECLARE_WRITE8_MEMBER( ay_w0 ) { m_ay->address_data_w(space, 0, data); }
+	DECLARE_WRITE8_MEMBER( ay_w1 ) { m_ay->address_data_w(space, 1, data); }
 
 	DECLARE_WRITE8_MEMBER( ctc_w0 ) { m_z80ctc->write(space, 0, data); }
 	DECLARE_WRITE8_MEMBER( ctc_w1 ) { m_z80ctc->write(space, 1, data); }
@@ -75,7 +75,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio5_w2 ) { m_z80pio_5->write(space, 2, data); }
 	DECLARE_WRITE8_MEMBER( pio5_w3 ) { m_z80pio_5->write(space, 3, data); }
 
-	DECLARE_READ8_MEMBER( ay_r0 ) { return ay8910_r(m_ay, space, 0); }
+	DECLARE_READ8_MEMBER( ay_r0 ) { return m_ay->data_r(space, 0); }
 
 	DECLARE_READ8_MEMBER( ctc_r0 ) { return m_z80ctc->read(space, 0); }
 	DECLARE_READ8_MEMBER( ctc_r1 ) { return m_z80ctc->read(space, 1); }

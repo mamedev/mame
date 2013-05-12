@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP

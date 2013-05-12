@@ -905,7 +905,7 @@ READ8_MEMBER(videopkr_state::baby_sound_p3_r)
 
 WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 {
-	device_t *device = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 	UINT8 lmp_ports, ay_intf;
 	m_sbp3 = data;
 	lmp_ports = m_sbp3 >> 1 & 0x07;
@@ -927,11 +927,11 @@ WRITE8_MEMBER(videopkr_state::baby_sound_p3_w)
 		case 0x00:  break;
 		case 0x01:  break;
 		case 0x02:  break;
-		case 0x03:  ay8910_data_w(device, space, 1, m_sbp0); break;
+		case 0x03:  ay8910->data_w(space, 1, m_sbp0); break;
 		case 0x04:  break;
-		case 0x05:  m_sbp0 = ay8910_r(device, space, m_sbp0); break;
+		case 0x05:  m_sbp0 = ay8910->data_r(space, m_sbp0); break;
 		case 0x06:  break;
-		case 0x07:  ay8910_address_w(device, space, 0, m_sbp0); break;
+		case 0x07:  ay8910->address_w(space, 0, m_sbp0); break;
 	}
 }
 

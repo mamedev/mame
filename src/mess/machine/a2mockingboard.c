@@ -331,10 +331,10 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 {
 	if (!(data & 4))
 	{
-		ay8910_reset_w(m_ay1, space, 0, 0);
+		m_ay1->reset_w(space, 0, 0);
 		if (m_isPhasor && m_PhasorNative)
 		{
-			ay8910_reset_w(m_ay2, space, 0, 0);
+			m_ay2->reset_w(space, 0, 0);
 		}
 	}
 	else
@@ -347,15 +347,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta1 = ay8910_r(m_ay1, space, 0);
+					m_porta1 = m_ay1->data_r(space, 0);
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					ay8910_data_w(m_ay1, space, 0, m_porta1);
+					m_ay1->data_w(space, 0, m_porta1);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					ay8910_address_w(m_ay1, space, 0, m_porta1);
+					m_ay1->address_w(space, 0, m_porta1);
 					break;
 			}
 		}
@@ -381,33 +381,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via1_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta1 = ay8910_r(m_ay1, space, 0);
+						m_porta1 = m_ay1->data_r(space, 0);
 					}
 					if (chipSel & 2)
 					{
-						m_porta1 = ay8910_r(m_ay2, space, 0);
+						m_porta1 = m_ay2->data_r(space, 0);
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						ay8910_data_w(m_ay1, space, 0, m_porta1);
+						m_ay1->data_w(space, 0, m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						ay8910_data_w(m_ay2, space, 0, m_porta1);
+						m_ay2->data_w(space, 0, m_porta1);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						ay8910_address_w(m_ay1, space, 0, m_porta1);
+						m_ay1->address_w(space, 0, m_porta1);
 					}
 					if (chipSel & 2)
 					{
-						ay8910_address_w(m_ay2, space, 0, m_porta1);
+						m_ay2->address_w(space, 0, m_porta1);
 					}
 					break;
 			}
@@ -436,12 +436,12 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 	{
 		if (m_isPhasor && m_PhasorNative)
 		{
-			ay8910_reset_w(m_ay3, space, 0, 0);
-			ay8910_reset_w(m_ay4, space, 0, 0);
+			m_ay3->reset_w(space, 0, 0);
+			m_ay4->reset_w(space, 0, 0);
 		}
 		else
 		{
-			ay8910_reset_w(m_ay2, space, 0, 0);
+			m_ay2->reset_w(space, 0, 0);
 		}
 	}
 	else
@@ -454,15 +454,15 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 					break;
 
 				case 1: // BDIR=0, BC1=1 (read PSG)
-					m_porta2 = ay8910_r(m_ay2, space, 0);
+					m_porta2 = m_ay2->data_r(space, 0);
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
-					ay8910_data_w(m_ay2, space, 0, m_porta2);
+					m_ay2->data_w(space, 0, m_porta2);
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
-					ay8910_address_w(m_ay2, space, 0, m_porta2);
+					m_ay2->address_w(space, 0, m_porta2);
 					break;
 			}
 		}
@@ -488,33 +488,33 @@ WRITE8_MEMBER( a2bus_ayboard_device::via2_out_b )
 				case 1: // BDIR=0, BC1=1 (read PSG)
 					if (chipSel & 1)
 					{
-						m_porta2 = ay8910_r(m_ay3, space, 0);
+						m_porta2 = m_ay3->data_r(space, 0);
 					}
 					if (chipSel & 2)
 					{
-						m_porta2 = ay8910_r(m_ay4, space, 0);
+						m_porta2 = m_ay4->data_r(space, 0);
 					}
 					break;
 
 				case 2: // BDIR=1, BC1=0 (write PSG)
 					if (chipSel & 1)
 					{
-						ay8910_data_w(m_ay3, space, 0, m_porta2);
+						m_ay3->data_w(space, 0, m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						ay8910_data_w(m_ay4, space, 0, m_porta2);
+						m_ay4->data_w(space, 0, m_porta2);
 					}
 					break;
 
 				case 3: // BDIR=1, BC1=1 (latch)
 					if (chipSel & 1)
 					{
-						ay8910_address_w(m_ay3, space, 0, m_porta2);
+						m_ay3->address_w(space, 0, m_porta2);
 					}
 					if (chipSel & 2)
 					{
-						ay8910_address_w(m_ay4, space, 0, m_porta2);
+						m_ay4->address_w(space, 0, m_porta2);
 					}
 					break;
 			}

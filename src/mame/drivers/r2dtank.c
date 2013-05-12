@@ -180,10 +180,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 	UINT8 ret = 0;
 
 	if (m_AY8910_selected & 0x08)
-		ret = ay8910_r(machine().device("ay1"), space, 0);
+		ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);
 
 	if (m_AY8910_selected & 0x10)
-		ret = ay8910_r(machine().device("ay2"), space, 0);
+		ret = machine().device<ay8910_device>("ay2")->data_r(space, 0);
 
 	return ret;
 }
@@ -192,10 +192,10 @@ READ8_MEMBER(r2dtank_state::AY8910_port_r)
 WRITE8_MEMBER(r2dtank_state::AY8910_port_w)
 {
 	if (m_AY8910_selected & 0x08)
-		ay8910_data_address_w(machine().device("ay1"), space, m_AY8910_selected >> 2, data);
+		machine().device<ay8910_device>("ay1")->data_address_w(space, m_AY8910_selected >> 2, data);
 
 	if (m_AY8910_selected & 0x10)
-		ay8910_data_address_w(machine().device("ay2"), space, m_AY8910_selected >> 2, data);
+		machine().device<ay8910_device>("ay2")->data_address_w(space, m_AY8910_selected >> 2, data);
 }
 
 

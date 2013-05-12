@@ -700,8 +700,8 @@ static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x4000) AM_READ_PORT("IN1")      /* IN1 */
 	AM_RANGE(0x0c02, 0x0c02) AM_MIRROR(0x4000) AM_READ(centiped_IN2_r)  /* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_MIRROR(0x4000) AM_READ_PORT("IN3")      /* IN3 */
-	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x4000) AM_DEVWRITE_LEGACY("pokey", ay8910_data_address_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_DEVREAD_LEGACY("pokey", ay8910_r)
+	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x4000) AM_DEVWRITE("pokey", ay8910_device, data_address_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_DEVREAD("pokey", ay8910_device, data_r)
 	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x4000) AM_WRITE(centiped_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1600, 0x163f) AM_MIRROR(0x4000) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x4000) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
@@ -718,8 +718,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magworm_map, AS_PROGRAM, 8, centiped_state )
 	AM_IMPORT_FROM(centiped_base_map)
-	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE_LEGACY("pokey", ay8910_address_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE_LEGACY("pokey", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x1001, 0x1001) AM_DEVWRITE("pokey", ay8910_device, address_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREADWRITE("pokey", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 
@@ -731,16 +731,16 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(centiped_state::caterplr_AY8910_w)
 {
-	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, space, 0, offset);
-	ay8910_data_w(device, space, 0, data);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("pokey");
+	ay8910->address_w(space, 0, offset);
+	ay8910->data_w(space, 0, data);
 }
 
 READ8_MEMBER(centiped_state::caterplr_AY8910_r)
 {
-	device_t *device = machine().device("pokey");
-	ay8910_address_w(device, space, 0, offset);
-	return ay8910_r(device, space, 0);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("pokey");
+	ay8910->address_w(space, 0, offset);
+	return ay8910->data_r(space, 0);
 }
 
 

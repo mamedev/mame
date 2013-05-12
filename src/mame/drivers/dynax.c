@@ -532,7 +532,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x76, 0x76 ) AM_WRITE(dynax_blit_palbank_w)       // Layers Palettes (High Bit)
 	AM_RANGE( 0x77, 0x77 ) AM_WRITE(hanamai_layer_half_w)       // half of the interleaved layer to write to
 	AM_RANGE( 0x78, 0x79 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write) // 2 x DSW
-	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)   // AY8910
+	AM_RANGE( 0x7a, 0x7b ) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)   // AY8910
 //  AM_RANGE( 0x7c, 0x7c ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x7d, 0x7d ) AM_WRITENOP   //
 	AM_RANGE( 0x7e, 0x7e ) AM_WRITE(dynax_blit_romregion_w) // Blitter ROM bank
@@ -554,9 +554,9 @@ static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)     // AY8910, DSW1
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW1
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
@@ -640,9 +640,9 @@ static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
 
-	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)     // AY8910, DSW1
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x36, 0x36 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     // AY8910, DSW1
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
@@ -779,8 +779,8 @@ static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x22, 0x22 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x24, 0x25 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x28, 0x28 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x2a, 0x2a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(dynax_extra_scrollx_w)  // screen scroll X
 	AM_RANGE( 0x49, 0x49 ) AM_WRITE(dynax_extra_scrolly_w)  // screen scroll Y
 	AM_RANGE( 0x4a, 0x4a ) AM_WRITE(yarunara_rombank_w)     // BANK ROM Select
@@ -818,8 +818,8 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x32, 0x32 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x34, 0x35 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x38, 0x38 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(dynax_blit_pen_w)       // Destination Pen
 	AM_RANGE( 0x41, 0x41 ) AM_WRITE(dynax_blit_dest_w)      // Destination Layer
 	AM_RANGE( 0x42, 0x42 ) AM_WRITE(dynax_blit_palette01_w) // Layers Palettes
@@ -901,8 +901,8 @@ static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(hanamai_keyboard_w)     // keyboard row select
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("COINS")            // Coins
 	AM_RANGE( 0x12, 0x12 ) AM_READ(hanamai_keyboard_1_r)        // P2
@@ -1020,8 +1020,8 @@ static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)       // BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)    // VBlank IRQ Ack
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)         // AY8910
-	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)   //
+	AM_RANGE( 0x21, 0x21 ) AM_DEVREAD("aysnd", ay8910_device, data_r)         // AY8910
+	AM_RANGE( 0x22, 0x23 ) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)   //
 	AM_RANGE( 0x28, 0x29 ) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write) //
 	AM_RANGE( 0x30, 0x30 ) AM_WRITE(adpcm_reset_w)      // MSM5205 reset
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE(adpcm_data_w)               // MSM5205 data
@@ -1059,8 +1059,8 @@ static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(adpcm_reset_w)  // MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)           // MSM5205 data
 	AM_RANGE( 0x04, 0x05 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
-	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   // AY8910
-	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    //
+	AM_RANGE( 0x08, 0x08 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   // AY8910
+	AM_RANGE( 0x0a, 0x0a ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    //
 	AM_RANGE( 0x11, 0x12 ) AM_WRITE(mjelctrn_blitter_ack_w) //?
 //  AM_RANGE( 0x20, 0x20 ) AM_WRITENOP   // CRT Controller
 //  AM_RANGE( 0x21, 0x21 ) AM_WRITENOP   // CRT Controller
@@ -1339,9 +1339,9 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(tenkai_8000_r, tenkai_8000_w)
-	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)       // AY8910
-	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w) //
-	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)  //
+	AM_RANGE( 0x10000, 0x10000 ) AM_DEVREAD("aysnd", ay8910_device, data_r)       // AY8910
+	AM_RANGE( 0x10008, 0x10008 ) AM_DEVWRITE("aysnd", ay8910_device, data_w) //
+	AM_RANGE( 0x10010, 0x10010 ) AM_DEVWRITE("aysnd", ay8910_device, address_w)  //
 	AM_RANGE( 0x10020, 0x10021 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)      //
 	AM_RANGE( 0x10040, 0x10040 ) AM_WRITE(dynax_blit_pen_w)     // Destination Pen
 	AM_RANGE( 0x10044, 0x10044 ) AM_WRITE(tenkai_blit_dest_w)       // Destination Layer

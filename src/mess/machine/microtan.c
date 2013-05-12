@@ -774,7 +774,7 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-	device_t *ay8910 = machine().device("ay8910.1");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay8910.1");
 
 	/* check for .DMP file format */
 	if (snapshot_size == 8263)
@@ -850,15 +850,15 @@ void microtan_state::microtan_snapshot_copy(UINT8 *snapshot_buff, int snapshot_s
 		/* first set of AY8910 registers */
 		for (i = 0; i < 16; i++ )
 		{
-			ay8910_address_w(ay8910, generic_space(), 0, i);
-			ay8910_data_w(ay8910, generic_space(), 0, snapshot_buff[base++]);
+			ay8910->address_w(generic_space(), 0, i);
+			ay8910->data_w(generic_space(), 0, snapshot_buff[base++]);
 		}
 
 		/* second set of AY8910 registers */
 		for (i = 0; i < 16; i++ )
 		{
-			ay8910_address_w(ay8910, generic_space(), 0, i);
-			ay8910_data_w(ay8910, generic_space(), 0, snapshot_buff[base++]);
+			ay8910->address_w(generic_space(), 0, i);
+			ay8910->data_w(generic_space(), 0, snapshot_buff[base++]);
 		}
 
 		for (i = 0; i < 32*16; i++)

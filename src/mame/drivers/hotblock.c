@@ -135,8 +135,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
 	AM_RANGE(0x0004, 0x0004) AM_READWRITE(hotblock_port4_r, hotblock_port4_w)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 

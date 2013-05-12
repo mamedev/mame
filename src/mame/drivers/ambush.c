@@ -81,10 +81,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 

@@ -396,8 +396,8 @@ static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)         /* irq ack lv 2 */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)         /* irq ack lv 4 */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP                        /* watchdog */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
+	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
 READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
@@ -428,8 +428,8 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_adpcm_code_w)           /* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP                    /* ??? */
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16) /* Sprites Y */
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
 	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)                                  /* ADPCM voice status */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)                 /* key matrix | I/O */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xe2, 0xe2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8, srmp2_state )

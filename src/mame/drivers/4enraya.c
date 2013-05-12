@@ -69,7 +69,7 @@ WRITE8_MEMBER(_4enraya_state::sound_data_w)
 WRITE8_MEMBER(_4enraya_state::sound_control_w)
 {
 	if ((m_last_snd_ctrl & m_snd_latch_bit ) == m_snd_latch_bit && (data & m_snd_latch_bit) == 0x00)
-		ay8910_data_address_w(m_ay, space, m_last_snd_ctrl, m_soundlatch);
+		m_ay->data_address_w(space, m_last_snd_ctrl, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }

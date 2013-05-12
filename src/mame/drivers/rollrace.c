@@ -63,9 +63,9 @@ static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 

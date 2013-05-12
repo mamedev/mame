@@ -61,7 +61,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (cgenie_io, AS_IO, 8, cgenie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(cgenie_sh_control_port_r, cgenie_sh_control_port_w )
-	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w )
+	AM_RANGE(0xf9, 0xf9) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 	AM_RANGE(0xfa, 0xfa) AM_READWRITE(cgenie_index_r, cgenie_index_w )
 	AM_RANGE(0xfb, 0xfb) AM_READWRITE(cgenie_register_r, cgenie_register_w )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(cgenie_port_ff_r, cgenie_port_ff_w )

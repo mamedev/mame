@@ -65,8 +65,8 @@ static ADDRESS_MAP_START( survival_memory_map, AS_PROGRAM, 8, phoenix_state )
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w) /* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x6800, 0x68ff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x6900, 0x69ff) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)               /* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")                           /* DSW */
 ADDRESS_MAP_END

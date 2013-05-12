@@ -82,8 +82,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
-	AM_RANGE(0x10, 0x10) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )

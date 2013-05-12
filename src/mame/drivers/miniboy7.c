@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_address_data_w)  // FIXME
+	AM_RANGE(0x3000, 0x3001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, address_data_w)  // FIXME
 	AM_RANGE(0x3080, 0x3083) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x3800, 0x3800) AM_READNOP // R (right after each read, another value is loaded to the ACCU, so it lacks of sense)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

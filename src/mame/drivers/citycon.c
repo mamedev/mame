@@ -43,8 +43,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD_LEGACY("aysnd", ay8910_r)  /* ?? */
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_device, data_r)  /* ?? */
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

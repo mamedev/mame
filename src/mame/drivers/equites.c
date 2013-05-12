@@ -741,7 +741,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
-	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)  // followed by 1 (and usually 0) on 8155 port B

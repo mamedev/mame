@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( spc1000_io , AS_IO, 8, spc1000_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(spc1000_gmode_r, spc1000_gmode_w)
 	AM_RANGE(0x8000, 0x8009) AM_READ(spc1000_keyboard_r)
 	AM_RANGE(0xA000, 0xA000) AM_READWRITE(spc1000_iplk_r, spc1000_iplk_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay8910", ay8910_device, address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */

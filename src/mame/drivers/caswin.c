@@ -193,8 +193,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vvillage_io, AS_IO, 8, caswin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11,0x11) AM_READ_PORT("IN1")
 	AM_RANGE(0x10,0x10) AM_WRITE(vvillage_scroll_w)

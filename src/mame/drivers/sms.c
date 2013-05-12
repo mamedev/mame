@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ(z80_8088_r)
 	AM_RANGE(0x3500, 0x3501) AM_READWRITE(p03_r, p03_w)
 ADDRESS_MAP_END

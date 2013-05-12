@@ -13,14 +13,13 @@
 #include "machine/wd17xx.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 #define AYWriteReg(chip,port,value) \
-	ay8910_address_w(ay8910, space, 0,port);  \
-	ay8910_data_w(ay8910, space, 0,value)
+	m_ay8910->address_w(space, 0,port);  \
+	m_ay8910->data_w(space, 0,value)
 
 #define TAPE_HEADER "Colour Genie - Virtual Tape File"
 
@@ -47,7 +46,6 @@ TIMER_CALLBACK_MEMBER(cgenie_state::handle_cassette_input)
 void cgenie_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	device_t *ay8910 = machine().device("ay8910");
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* reset the AY8910 to be quiet, since the cgenie BIOS doesn't */
@@ -594,5 +592,5 @@ READ8_MEMBER(cgenie_state::cgenie_sh_control_port_r)
 WRITE8_MEMBER(cgenie_state::cgenie_sh_control_port_w)
 {
 	m_control_port = data;
-	ay8910_address_w(machine().device("ay8910"), space, offset, data);
+	m_ay8910->address_w(space, offset, data);
 }

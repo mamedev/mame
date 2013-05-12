@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(mole_tileram_w) AM_READNOP
 	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
-	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
 	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
 	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???

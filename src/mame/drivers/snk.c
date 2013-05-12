@@ -1380,9 +1380,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( marvins_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ(marvins_soundlatch_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x8002, 0x8007) AM_DEVWRITE("wave", snkwave_device, snkwave_w)
-	AM_RANGE(0x8008, 0x8009) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(marvins_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -1398,9 +1398,9 @@ static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP    // ? always FFFF, snkwave leftover?
-	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jcross_sound_portmap, AS_IO, 8, snk_state )
@@ -1414,9 +1414,9 @@ static ADDRESS_MAP_START( hal21_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 //  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
-	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_sound_portmap, AS_IO, 8, snk_state )

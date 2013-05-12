@@ -575,8 +575,8 @@ static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)  // pc=444
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", i8255_device, read, write)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("rtc", v3021_device, read, write)

@@ -63,8 +63,8 @@ WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 /* Same as Syusse Oozumou */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)

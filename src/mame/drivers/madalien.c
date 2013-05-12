@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, madalien_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_RAM /* unknown device in an epoxy block, might be tilt detection */
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1ffc) AM_READ(madalien_sound_command_r)
-	AM_RANGE(0x8000, 0x8001) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_MIRROR(0x1ffc) AM_WRITE(soundlatch2_byte_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -928,9 +928,9 @@ static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)        /* Input Ports 2 & 4 */
 	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)                  /* YM2149 control */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("aysnd", ay8910_device, address_w)                  /* YM2149 control */
 	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)       /* YM2149 (Input Port 1) */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)       /* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)                       /* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)                   /* SM7831 Co-Processor */
 ADDRESS_MAP_END

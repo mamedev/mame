@@ -247,16 +247,16 @@ WRITE8_MEMBER(mirax_state::audio_w)
 
 WRITE8_MEMBER(mirax_state::ay1_sel)
 {
-	device_t *device = machine().device("ay1");
-	ay8910_address_w(device,space,0,m_nAyCtrl);
-	ay8910_data_w(device,space,0,data);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
+	ay8910->address_w(space,0,m_nAyCtrl);
+	ay8910->data_w(space,0,data);
 }
 
 WRITE8_MEMBER(mirax_state::ay2_sel)
 {
-	device_t *device = machine().device("ay2");
-	ay8910_address_w(device,space,0,m_nAyCtrl);
-	ay8910_data_w(device,space,0,data);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
+	ay8910->address_w(space,0,m_nAyCtrl);
+	ay8910->data_w(space,0,data);
 }
 
 WRITE8_MEMBER(mirax_state::nmi_mask_w)

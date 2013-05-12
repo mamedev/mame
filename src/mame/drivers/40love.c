@@ -738,7 +738,7 @@ WRITE8_MEMBER(fortyl_state::sound_control_3_w)/* unknown */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)

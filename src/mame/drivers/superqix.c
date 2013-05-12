@@ -562,8 +562,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(pbillian_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -575,8 +575,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hotsmash_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(pbillian_0410_w)
@@ -588,10 +588,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_byte_w) AM_SHARE("paletteram")
-	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0x0405, 0x0405) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(mcu_acknowledge_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)  /* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)

@@ -490,8 +490,8 @@ static ADDRESS_MAP_START( engima2_audio_cpu_map, AS_PROGRAM, 8, enigma2_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ffc) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END

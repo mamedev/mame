@@ -1334,7 +1334,7 @@ DRIVER_INIT_MEMBER(segag80v_state,spacfury)
 DRIVER_INIT_MEMBER(segag80v_state,zektor)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	device_t *ay = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 
 	/* configure security */
 	m_decrypt = segag80_security(82);
@@ -1343,7 +1343,7 @@ DRIVER_INIT_MEMBER(segag80v_state,zektor)
 	m_usb = NULL;
 	iospace.install_legacy_write_handler(*machine().device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace.install_legacy_write_handler(*machine().device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
-	iospace.install_legacy_write_handler(*ay, 0x3c, 0x3d, FUNC(ay8910_address_data_w));
+	iospace.install_write_handler(0x3c, 0x3d, write8_delegate(FUNC(ay8910_device::address_data_w), ay8910));
 	iospace.install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),this));
 	iospace.install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),this));
 

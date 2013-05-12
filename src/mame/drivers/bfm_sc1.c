@@ -715,8 +715,8 @@ static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)            // irq latch
 
 	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 
 	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
 	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register

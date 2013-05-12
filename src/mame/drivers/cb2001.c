@@ -570,8 +570,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", i8255_device, read, write, 0xffff)   /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0xffff)   /* DIP switches */
-	AM_RANGE(0x20, 0x21) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xffff)
+	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
 
 	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)

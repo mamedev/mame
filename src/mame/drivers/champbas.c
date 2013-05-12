@@ -221,7 +221,7 @@ READ8_MEMBER(champbas_state::champbja_alt_protection_r)
 static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
@@ -248,7 +248,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("spriteram_2") /* ??? */
@@ -351,10 +351,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay4", ay8910_data_address_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay4", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

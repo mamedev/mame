@@ -4,6 +4,7 @@
 
 *************************************************************************/
 #include "sound/msm5205.h"
+#include "sound/ay8910.h"
 
 class mermaid_state : public driver_device
 {
@@ -18,7 +19,11 @@ public:
 		m_colorram(*this, "colorram"),
 		m_ay8910_enable(*this, "ay8910_enable"),
 		m_maincpu(*this, "maincpu"),
-		m_adpcm(*this, "adpcm"){ }
+		m_adpcm(*this, "adpcm"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram2;
@@ -54,8 +59,8 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_adpcm;
-	device_t *m_ay1;
-	device_t *m_ay2;
+	required_device<ay8910_device> m_ay1;
+	required_device<ay8910_device> m_ay2;
 
 	UINT8    m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);

@@ -807,8 +807,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jongbou_sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_byte_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END

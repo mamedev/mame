@@ -116,7 +116,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "includes/mermaid.h"
 
@@ -124,14 +123,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	if (m_ay8910_enable[0]) ay8910_data_w(m_ay1, space, offset, data);
-	if (m_ay8910_enable[1]) ay8910_data_w(m_ay2, space, offset, data);
+	if (m_ay8910_enable[0]) m_ay1->data_w(space, offset, data);
+	if (m_ay8910_enable[1]) m_ay2->data_w(space, offset, data);
 }
 
 WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	if (m_ay8910_enable[0]) ay8910_address_w(m_ay1, space, offset, data);
-	if (m_ay8910_enable[1]) ay8910_address_w(m_ay2, space, offset, data);
+	if (m_ay8910_enable[0]) m_ay1->address_w(space, offset, data);
+	if (m_ay8910_enable[1]) m_ay2->address_w(space, offset, data);
 }
 
 
@@ -360,9 +359,6 @@ GFXDECODE_END
 
 void mermaid_state::machine_start()
 {
-	m_ay1 = machine().device("ay1");
-	m_ay2 = machine().device("ay2");
-
 	save_item(NAME(m_coll_bit0));
 	save_item(NAME(m_coll_bit1));
 	save_item(NAME(m_coll_bit2));

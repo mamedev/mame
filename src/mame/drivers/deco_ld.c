@@ -305,10 +305,10 @@ INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
 
 static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(soundlatch_byte_r,soundlatch2_byte_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

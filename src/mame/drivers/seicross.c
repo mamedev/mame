@@ -123,8 +123,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, seicross_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x08) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x08) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x08) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 

@@ -340,8 +340,8 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x092000, 0x09201f) AM_DEVREADWRITE8("via6522_0", via6522_device, read, write, 0x00ff)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITENOP  // related to music
-	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xff00)
-	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
+	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xff00)
+	AM_RANGE(0x092802, 0x092803) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
 	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_SHARE("nvram") /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READNOP

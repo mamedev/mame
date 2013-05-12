@@ -170,8 +170,8 @@ static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP    // ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM         // main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM         // ???
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)

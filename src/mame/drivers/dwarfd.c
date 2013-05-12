@@ -614,8 +614,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 
 	AM_RANGE(0x20, 0x20) AM_READWRITE(i8275_preg_r, i8275_preg_w)
 	AM_RANGE(0x21, 0x21) AM_READWRITE(i8275_sreg_r, i8275_creg_w)

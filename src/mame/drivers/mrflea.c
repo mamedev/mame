@@ -190,14 +190,14 @@ static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8, mrflea_state )
 	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
 	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
 	AM_RANGE(0x23, 0x23) AM_WRITENOP /* 0xb4,0x09,0x05 */
-	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)
 	AM_RANGE(0x43, 0x43) AM_WRITE(mrflea_select1_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x44, 0x45) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREAD_LEGACY("ay3", ay8910_r)
-	AM_RANGE(0x46, 0x47) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x44, 0x45) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x46, 0x47) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 /*************************************

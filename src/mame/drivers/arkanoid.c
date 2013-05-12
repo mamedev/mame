@@ -557,8 +557,8 @@ DIP locations verified for:
 static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")     /* 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
@@ -572,8 +572,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
@@ -588,8 +588,8 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(hexa_d008_w)
 	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w) /* or IRQ acknowledge, or both */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
@@ -598,8 +598,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram")
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(brixian_d008_w)  /* gfx bank, flip screen etc. */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("spriteram")

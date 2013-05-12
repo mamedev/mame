@@ -324,10 +324,10 @@ static ADDRESS_MAP_START( imolagp_master_map, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
-	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 //  AM_RANGE(0x37f7, 0x37f7) AM_NOP
 	AM_RANGE(0x3800, 0x3800) AM_READWRITE(vreg_data_r, vreg_data_w)
-	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")
 	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
 	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_led_board_w)

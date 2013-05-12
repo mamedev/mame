@@ -68,7 +68,6 @@ chdman createhd -o ST125N.chd -chs 407,4,26 -ss 512
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
 #include "machine/scsibus.h"
-#include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
 #include "includes/rmnimbus.h"
@@ -2719,11 +2718,10 @@ void rmnimbus_state::rmni_sound_reset()
 
 READ8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_r)
 {
-	device_t *ay8910 = machine().device(AY8910_TAG);
 	UINT8   result=0;
 
 	if ((offset*2)==0)
-		result=ay8910_r(ay8910,space, 0);
+		result = m_ay8910->data_r(space, 0);
 
 	return result;
 }
@@ -2731,15 +2729,14 @@ READ8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_r)
 WRITE8_MEMBER(rmnimbus_state::nimbus_sound_ay8910_w)
 {
 	int pc=space.device().safe_pc();
-	device_t *ay8910 = machine().device(AY8910_TAG);
 
 	if(LOG_SOUND)
 		logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
 
 	switch (offset*2)
 	{
-		case 0x00   : ay8910_data_address_w(ay8910, space, 1, data); break;
-		case 0x02   : ay8910_data_address_w(ay8910, space, 0, data); break;
+		case 0x00   : m_ay8910->data_address_w(space, 1, data); break;
+		case 0x02   : m_ay8910->data_address_w(space, 0, data); break;
 	}
 
 }

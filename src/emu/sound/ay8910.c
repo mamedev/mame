@@ -194,21 +194,6 @@ struct ay8910_context
 	devcb_resolved_write8 portBwrite;
 };
 
-INLINE ay8910_context *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == AY8910 ||
-			device->type() == AY8912 ||
-			device->type() == AY8913 ||
-			device->type() == AY8914 ||
-			device->type() == AY8930 ||
-			device->type() == YM2149 ||
-			device->type() == YM3439 ||
-			device->type() == YMZ284 ||
-			device->type() == YMZ294);
-	return (ay8910_context *)downcast<ay8910_device *>(device)->token();
-}
-
 
 /*************************************
  *
@@ -843,9 +828,9 @@ void ay8910_reset_ym(void *chip)
 #endif
 }
 
-void ay8910_set_volume(device_t *device,int channel,int volume)
+void ay8910_set_volume(void *chip,int channel,int volume)
 {
-	ay8910_context *psg = get_safe_token(device);
+	ay8910_context *psg = (ay8910_context *)chip;
 	int ch;
 
 	for (ch = 0; ch < psg->streams; ch++)
@@ -939,38 +924,67 @@ int ay8910_read_ym(void *chip)
  *
  *************************************/
 
-static DEVICE_START( ay8910 )
+void ay8910_device::set_volume(int channel,int volume)
 {
-	static const ay8910_interface generic_ay8910 =
+	ay8910_set_volume(m_psg, channel, volume);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ay8910_device::device_start()
+{
+	m_ay8910_config = (const ay8910_interface *) static_config();
+
+	static const ay8910_interface default_ay8910_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config() ? (const ay8910_interface *)device->static_config() : &generic_ay8910);
-	ay8910_start_ym(get_safe_token(device), AY8910, device, device->clock(), intf);
+
+	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
+
+	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
 }
 
-static DEVICE_START( ym2149 )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ym2149_device::device_start()
 {
-	static const ay8910_interface generic_ay8910 =
+	m_ay8910_config = (const ay8910_interface *) static_config();
+
+	static const ay8910_interface default_ay8910_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	};
-	const ay8910_interface *intf = (device->static_config() ? (const ay8910_interface *)device->static_config() : &generic_ay8910);
-	ay8910_start_ym(get_safe_token(device), YM2149, device, device->clock(), intf);
+
+	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
+
+	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
 }
 
-static DEVICE_STOP( ay8910 )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ay8910_device::device_stop()
 {
-	ay8910_stop_ym(get_safe_token(device));
+	ay8910_stop_ym(m_psg);
 }
 
-static DEVICE_RESET( ay8910 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ay8910_device::device_reset()
 {
-	ay8910_reset_ym(get_safe_token(device));
+	ay8910_reset_ym(m_psg);
 }
 
 /*************************************
@@ -979,59 +993,59 @@ static DEVICE_RESET( ay8910 )
  *
  *************************************/
 
-READ8_DEVICE_HANDLER( ay8910_r )
+READ8_MEMBER( ay8910_device::data_r )
 {
-	return ay8910_read_ym(get_safe_token(device));
+	return ay8910_read_ym(m_psg);
 }
 
-WRITE8_DEVICE_HANDLER( ay8910_data_address_w )
+WRITE8_MEMBER( ay8910_device::data_address_w )
 {
 	/* note that directly connecting BC1 to A0 puts data on 0 and address on 1 */
-	ay8910_write_ym(get_safe_token(device), ~offset & 1, data);
+	ay8910_write_ym(m_psg, ~offset & 1, data);
 }
 
-WRITE8_DEVICE_HANDLER( ay8910_address_data_w )
+WRITE8_MEMBER( ay8910_device::address_data_w )
 {
-	ay8910_write_ym(get_safe_token(device), offset & 1, data);
+	ay8910_write_ym(m_psg, offset & 1, data);
 }
 
-WRITE8_DEVICE_HANDLER( ay8910_address_w )
-{
-#if ENABLE_REGISTER_TEST
-	return;
-#else
-	ay8910_data_address_w(device, space, 1, data);
-#endif
-}
-
-WRITE8_DEVICE_HANDLER( ay8910_data_w )
+WRITE8_MEMBER( ay8910_device::address_w )
 {
 #if ENABLE_REGISTER_TEST
 	return;
 #else
-	ay8910_data_address_w(device, space, 0, data);
+	data_address_w(space, 1, data);
 #endif
 }
 
-WRITE8_DEVICE_HANDLER( ay8910_reset_w )
+WRITE8_MEMBER( ay8910_device::data_w )
 {
-	ay8910_reset_ym(get_safe_token(device));
+#if ENABLE_REGISTER_TEST
+	return;
+#else
+	data_address_w(space, 0, data);
+#endif
+}
+
+WRITE8_MEMBER( ay8910_device::reset_w )
+{
+	ay8910_reset_ym(m_psg);
 }
 
 static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8, 9, 10, 14, 15 };
 
-READ8_DEVICE_HANDLER( ay8914_r )
+READ8_MEMBER( ay8914_device::read )
 {
 	UINT16 rv;
-	ay8910_address_w(device, space, 0, mapping8914to8910[offset & 0xff]);
-	rv = (UINT16)ay8910_r(device, space, 0);
+	address_w(space, 0, mapping8914to8910[offset & 0xf]);
+	rv = (UINT16) data_r(space, 0);
 	return rv;
 }
 
-WRITE8_DEVICE_HANDLER( ay8914_w )
+WRITE8_MEMBER( ay8914_device::write )
 {
-	ay8910_address_w(device, space, 0, mapping8914to8910[offset & 0xff]);
-	ay8910_data_w(device, space, 0, data & 0xff);
+	address_w(space, 0, mapping8914to8910[offset & 0xf]);
+	data_w(space, 0, data & 0xff);
 }
 
 
@@ -1042,13 +1056,11 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(ay8910_context);
 }
 ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
-	m_token = global_alloc_clear(ay8910_context);
 }
 
 //-------------------------------------------------
@@ -1061,32 +1073,6 @@ void ay8910_device::device_config_complete()
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ay8910_device::device_start()
-{
-	DEVICE_START_NAME( ay8910 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ay8910_device::device_reset()
-{
-	DEVICE_RESET_NAME( ay8910 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void ay8910_device::device_stop()
-{
-	DEVICE_STOP_NAME( ay8910 )(this);
-}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -1106,32 +1092,12 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ay8912_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type AY8913 = &device_creator<ay8913_device>;
 
 ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8913, "AY-3-8913A", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ay8913_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1142,32 +1108,12 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ay8914_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type AY8930 = &device_creator<ay8930_device>;
 
 ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ay8910_device(mconfig, AY8930, "AY8930", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ay8930_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1182,41 +1128,12 @@ ym2149_device::ym2149_device(const machine_config &mconfig, device_type type, co
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ym2149_device::device_start()
-{
-	DEVICE_START_NAME( ym2149 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ym2149_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type YM3439 = &device_creator<ym3439_device>;
 
 ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ym2149_device(mconfig, YM3439, "YM3439", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ym3439_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
 
 
@@ -1227,30 +1144,10 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ymz284_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
 
 const device_type YMZ294 = &device_creator<ymz294_device>;
 
 ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: ym2149_device(mconfig, YMZ294, "YMZ294", tag, owner, clock)
 {
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ymz294_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

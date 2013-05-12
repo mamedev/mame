@@ -68,24 +68,24 @@ WRITE8_MEMBER(kncljoe_state::m6803_port1_w)
 
 WRITE8_MEMBER(kncljoe_state::m6803_port2_w)
 {
-	device_t *device = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 
 	/* write latch */
 	if ((m_port2 & 0x01) && !(data & 0x01))
 	{
 		/* control or data port? */
 		if (m_port2 & 0x08)
-			ay8910_data_address_w(device, space, m_port2 >> 2, m_port1);
+			ay8910->data_address_w(space, m_port2 >> 2, m_port1);
 	}
 	m_port2 = data;
 }
 
 READ8_MEMBER(kncljoe_state::m6803_port1_r)
 {
-	device_t *device = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 
 	if (m_port2 & 0x08)
-		return ay8910_r(device, space, 0);
+		return ay8910->data_r(space, 0);
 	return 0xff;
 }
 

@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, battlex_state )
 	AM_RANGE(0x10, 0x10) AM_WRITE(battlex_flipscreen_w)
 
 	/* verify all of these */
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(battlex_scroll_starfield_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(battlex_scroll_x_lsb_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)

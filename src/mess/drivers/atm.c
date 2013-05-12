@@ -127,8 +127,8 @@ static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(atm_state,atm)

@@ -175,8 +175,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xd001, 0xd001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(dominob_d008_w)
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("IN0")
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITENOP

@@ -160,38 +160,38 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 
 READ16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_r)
 {
-	device_t *device = machine().device("ay1");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	/* Each 2149 register is mapped to a different address */
-	ay8910_address_w(device,space,0,offset);
-	return ay8910_r(device,space,0);
+	ay8910->address_w(space,0,offset);
+	return ay8910->data_r(space,0);
 }
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
 {
-	device_t *device = machine().device("ay1");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
 	/* Each 2149 register is mapped to a different address */
-	ay8910_address_w(device,space,0,offset);
+	ay8910->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) ay8910_data_w(device,space,0, data       & 0xff);
-	else                ay8910_data_w(device,space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) ay8910->data_w(space,0, data       & 0xff);
+	else                ay8910->data_w(space,0,(data >> 8) & 0xff);
 }
 
 READ16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_r)
 {
-	device_t *device = machine().device("ay2");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	/* Each 2149 register is mapped to a different address */
-	ay8910_address_w(device,space,0,offset);
-	return ay8910_r(device,space,0);
+	ay8910->address_w(space,0,offset);
+	return ay8910->data_r(space,0);
 }
 
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
 {
-	device_t *device = machine().device("ay2");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
 	/* Each 2149 register is mapped to a different address */
-	ay8910_address_w(device,space,0,offset);
+	ay8910->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) ay8910_data_w(device,space,0, data       & 0xff);
-	else                ay8910_data_w(device,space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) ay8910->data_w(space,0, data       & 0xff);
+	else                ay8910->data_w(space,0,(data >> 8) & 0xff);
 }
 
 

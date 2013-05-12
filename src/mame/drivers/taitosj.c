@@ -217,8 +217,8 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)   /* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_device, data_r)   /* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -257,8 +257,8 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD_LEGACY("ay1", ay8910_r)   /* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40f) AM_MIRROR(0x00f0) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_DEVREAD("ay1", ay8910_device, data_r)   /* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("colorbank")
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -322,8 +322,8 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")          /* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40f) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD_LEGACY("ay1", ay8910_r) /* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD("ay1", ay8910_device, data_r) /* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_SHARE("gfxpointer")
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
@@ -338,12 +338,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x4801, 0x4801) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
-	AM_RANGE(0x4803, 0x4803) AM_DEVREAD_LEGACY("ay3", ay8910_r)
-	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
-	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
+	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x4801, 0x4801) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0x4802, 0x4803) AM_DEVWRITE("ay3", ay8910_device, address_data_w)
+	AM_RANGE(0x4803, 0x4803) AM_DEVREAD("ay3", ay8910_device, data_r)
+	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE("ay4", ay8910_device, address_data_w)
+	AM_RANGE(0x4805, 0x4805) AM_DEVREAD("ay4", ay8910_device, data_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostic ROM */
 ADDRESS_MAP_END

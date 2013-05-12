@@ -9,6 +9,7 @@
 
 #include "machine/6522via.h"
 #include "sound/dac.h"
+#include "sound/ay8910.h"
 
 
 #define NVECT 10000
@@ -107,7 +108,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via6522_0;
 	required_device<dac_device> m_dac;
-	required_device<device_t> m_ay8912;
+	required_device<ay8910_device> m_ay8912;
 	optional_ioport m_io_contr1x;
 	optional_ioport m_io_contr1y;
 	optional_ioport m_io_contr2x;

@@ -13,6 +13,7 @@
 #include "machine/ram.h"
 #include "machine/mc146818.h"
 #include "sound/speaker.h"
+#include "sound/ay8910.h"
 
 
 class orion_state : public radio86_state
@@ -102,7 +103,7 @@ protected:
 	required_device<floppy_connector> m_fd3;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<device_t> m_speaker;
-	optional_device<device_t> m_ay8912;
+	optional_device<ay8910_device> m_ay8912;
 	required_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;

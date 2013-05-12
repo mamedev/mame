@@ -16,8 +16,8 @@ struct irem_audio_state
 	UINT8                m_port1;
 	UINT8                m_port2;
 
-	device_t *m_ay1;
-	device_t *m_ay2;
+	ay8910_device *m_ay1;
+	ay8910_device *m_ay2;
 	device_t *m_adpcm1;
 	device_t *m_adpcm2;
 };
@@ -45,8 +45,8 @@ static DEVICE_START( irem_audio )
 
 	state->m_adpcm1 = machine.device("msm1");
 	state->m_adpcm2 = machine.device("msm2");
-	state->m_ay1 = machine.device("ay1");
-	state->m_ay2 = machine.device("ay2");
+	state->m_ay1 = machine.device<ay8910_device>("ay1");
+	state->m_ay2 = machine.device<ay8910_device>("ay2");
 
 	device->save_item(NAME(state->m_port1));
 	device->save_item(NAME(state->m_port2));
@@ -98,17 +98,17 @@ static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 		{
 			/* PSG 0 or 1? */
 			if (state->m_port2 & 0x08)
-				ay8910_address_w(state->m_ay1, space, 0, state->m_port1);
+				state->m_ay1->address_w(space, 0, state->m_port1);
 			if (state->m_port2 & 0x10)
-				ay8910_address_w(state->m_ay2, space, 0, state->m_port1);
+				state->m_ay2->address_w(space, 0, state->m_port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (state->m_port2 & 0x08)
-				ay8910_data_w(state->m_ay1, space, 0, state->m_port1);
+				state->m_ay1->data_w(space, 0, state->m_port1);
 			if (state->m_port2 & 0x10)
-				ay8910_data_w(state->m_ay2, space, 0, state->m_port1);
+				state->m_ay2->data_w(space, 0, state->m_port1);
 		}
 	}
 	state->m_port2 = data;
@@ -128,9 +128,9 @@ static READ8_DEVICE_HANDLER( m6803_port1_r )
 
 	/* PSG 0 or 1? */
 	if (state->m_port2 & 0x08)
-		return ay8910_r(state->m_ay1, space, 0);
+		return state->m_ay1->data_r(space, 0);
 	if (state->m_port2 & 0x10)
-		return ay8910_r(state->m_ay2, space, 0);
+		return state->m_ay2->data_r(space, 0);
 	return 0xff;
 }
 

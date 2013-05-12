@@ -1918,8 +1918,8 @@ static ADDRESS_MAP_START( quiz365_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x3002c0, 0x3002c1) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
 	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0x3003c2, 0x3003c3) AM_WRITE(quiz365_oki_bank1_w)
 	AM_RANGE(0x3003ca, 0x3003cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)                   // Blitter irq acknowledge
 	AM_RANGE(0x3003cc, 0x3003cd) AM_WRITE(quiz365_oki_bank2_w)
@@ -1970,7 +1970,7 @@ static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)                             // Video Chip
 	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
@@ -2037,8 +2037,8 @@ static ADDRESS_MAP_START( ddenlovrk_map, AS_PROGRAM, 16, ddenlovr_state )
 
 	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                     // RAM
 ADDRESS_MAP_END
@@ -2075,8 +2075,8 @@ static ADDRESS_MAP_START( ddenlovr_map, AS_PROGRAM, 16, ddenlovr_state )
 
 	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                     // RAM
 ADDRESS_MAP_END
@@ -2149,7 +2149,7 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, ddenlovr_state )
 	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)                                 // Video Chip
 	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
@@ -2212,8 +2212,8 @@ static ADDRESS_MAP_START( ultrchmp_map, AS_PROGRAM, 16, ddenlovr_state )
 
 	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")                                       // RAM (Battey-backed)
 ADDRESS_MAP_END
@@ -2458,8 +2458,8 @@ static ADDRESS_MAP_START( mmpanic_sound_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x04, 0x04) AM_NOP                 // read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP    // almost always 1, sometimes 0
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 
@@ -2971,7 +2971,7 @@ static ADDRESS_MAP_START( mjchuuka_portmap, AS_IO, 8, ddenlovr_state )     // 16
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -3079,9 +3079,9 @@ static ADDRESS_MAP_START( mjmyster_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x42, 0x43) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -3244,9 +3244,9 @@ static ADDRESS_MAP_START( hginga_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x26, 0x26) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(hginga_input_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(hginga_coins_w)
 	AM_RANGE(0x42, 0x42) AM_READ(hginga_coins_r)
@@ -3367,9 +3367,9 @@ static ADDRESS_MAP_START( hgokou_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x62, 0x62) AM_READ(hgokou_input_r)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x86, 0x86) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x88, 0x88) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x86, 0x86) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x88, 0x88) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ(hanakanz_rand_r)
 ADDRESS_MAP_END
 
@@ -3410,9 +3410,9 @@ static ADDRESS_MAP_START( hgokbang_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x26, 0x26) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(hgokou_dsw_sel_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(hgokou_input_w)
 	AM_RANGE(0x42, 0x42) AM_READ(hgokou_input_r)
@@ -3547,9 +3547,9 @@ static ADDRESS_MAP_START( mjmywrld_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x42, 0x43) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
 	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
@@ -3648,8 +3648,8 @@ static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, ddenlovr_state )
 
 	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM                                                     // RAM
 ADDRESS_MAP_END
@@ -3739,7 +3739,7 @@ static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, ddenlovr_state )  // 16 bit
 	AM_RANGE(0x0184, 0x0184) AM_WRITE(mjflove_coincounter_w)
 	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x0280, 0x028f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
-	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x0380, 0x0380) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -3842,7 +3842,7 @@ static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, ddenlovr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(sryudens_rambank_w)    // ? ack on RTC int
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(mjflove_rombank_w)
 	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w)
@@ -3929,7 +3929,7 @@ static ADDRESS_MAP_START( janshinp_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x80, 0x80) AM_RAM
 	AM_RANGE(0x90, 0x90) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x92, 0x93) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x94, 0x95) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x94, 0x95) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 
@@ -4002,8 +4002,8 @@ static ADDRESS_MAP_START( seljan2_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x43, 0x43) AM_READ(rongrong_gfxrom_r)
 	AM_RANGE(0x50, 0x51) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x54, 0x54) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x58, 0x58) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x5c, 0x5c) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)   // dsw
+	AM_RANGE(0x58, 0x58) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x5c, 0x5c) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)   // dsw
 	AM_RANGE(0x60, 0x60) AM_READNOP AM_WRITE(sryudens_rambank_w)    // ? ack on RTC int
 	AM_RANGE(0x70, 0x70) AM_WRITE(seljan2_rombank_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM") AM_WRITE(seljan2_palette_enab_w)    // writes: 1 = palette RAM at b000, 0 = ROM
@@ -4151,9 +4151,9 @@ static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, ddenlovr_state )
 	AM_RANGE( 0x21, 0x21 ) AM_WRITE(htengoku_coin_w)        //
 	AM_RANGE( 0x22, 0x22 ) AM_READ(htengoku_coin_r)         //
 	AM_RANGE( 0x23, 0x23 ) AM_READ(htengoku_input_r)        //
-	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)    // AY8910
-	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD_LEGACY("aysnd", ay8910_r)     //
-	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)   //
+	AM_RANGE( 0x40, 0x40 ) AM_DEVWRITE("aysnd", ay8910_device, address_w)    // AY8910
+	AM_RANGE( 0x42, 0x42 ) AM_DEVREAD("aysnd", ay8910_device, data_r)     //
+	AM_RANGE( 0x44, 0x44 ) AM_DEVWRITE("aysnd", ay8910_device, data_w)   //
 	AM_RANGE( 0x46, 0x47 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)        //
 	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE(ddenlovr_palette_base_w)    // ddenlovr mixer chip

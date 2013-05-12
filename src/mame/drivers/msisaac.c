@@ -257,8 +257,8 @@ WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)

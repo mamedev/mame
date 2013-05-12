@@ -274,8 +274,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w) // to/from main CPU
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
 
 

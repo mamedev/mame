@@ -1143,8 +1143,8 @@ static void update_ay(device_t *device, address_space &space)
 			case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
 				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
-				device_t *ay = device->machine().device("ay8913");
-				ay8910_data_w(ay, space, 0, pia_ic6->a_output());
+				ay8910_device *ay8910 = device->machine().device<ay8910_device>("ay8913");
+				ay8910->data_w(space, 0, pia_ic6->a_output());
 				LOG(("AY Chip Write \n"));
 				break;
 			}
@@ -1152,8 +1152,8 @@ static void update_ay(device_t *device, address_space &space)
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
 				pia6821_device *pia_ic6 = device->machine().device<pia6821_device>("pia_ic6");
-				device_t *ay = device->machine().device("ay8913");
-				ay8910_address_w(ay, space, 0, pia_ic6->a_output());
+				ay8910_device *ay8910 = device->machine().device<ay8910_device>("ay8913");
+				ay8910->address_w(space, 0, pia_ic6->a_output());
 				LOG(("AY Chip Select \n"));
 				break;
 			}

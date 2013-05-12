@@ -89,8 +89,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cchance_state )
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_1_r) AM_WRITE(output_0_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0") AM_WRITE(output_1_w)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 

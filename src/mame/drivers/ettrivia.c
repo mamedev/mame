@@ -120,20 +120,20 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0: break;
-		case 0xc4: m_b000_ret = ay8910_r(machine().device("ay1"), space, 0);    break;
-		case 0x94: m_b000_ret = ay8910_r(machine().device("ay2"), space, 0);    break;
-		case 0x86: m_b000_ret = ay8910_r(machine().device("ay3"), space, 0);    break;
+		case 0xc4: m_b000_ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);    break;
+		case 0x94: m_b000_ret = machine().device<ay8910_device>("ay2")->data_r(space, 0);    break;
+		case 0x86: m_b000_ret = machine().device<ay8910_device>("ay3")->data_r(space, 0);    break;
 
 		case 0x80:
 			switch(m_b800_prev)
 			{
-				case 0xe0: ay8910_address_w(machine().device("ay1"),space,0,m_b000_val);    break;
-				case 0x98: ay8910_address_w(machine().device("ay2"),space,0,m_b000_val);    break;
-				case 0x83: ay8910_address_w(machine().device("ay3"),space,0,m_b000_val);    break;
+				case 0xe0: machine().device<ay8910_device>("ay1")->address_w(space,0,m_b000_val);    break;
+				case 0x98: machine().device<ay8910_device>("ay2")->address_w(space,0,m_b000_val);    break;
+				case 0x83: machine().device<ay8910_device>("ay3")->address_w(space,0,m_b000_val);    break;
 
-				case 0xa0: ay8910_data_w(machine().device("ay1"),space,0,m_b000_val);   break;
-				case 0x88: ay8910_data_w(machine().device("ay2"),space,0,m_b000_val);   break;
-				case 0x81: ay8910_data_w(machine().device("ay3"),space,0,m_b000_val);   break;
+				case 0xa0: machine().device<ay8910_device>("ay1")->data_w(space,0,m_b000_val);   break;
+				case 0x88: machine().device<ay8910_device>("ay2")->data_w(space,0,m_b000_val);   break;
+				case 0x81: machine().device<ay8910_device>("ay3")->data_w(space,0,m_b000_val);   break;
 
 			}
 		break;

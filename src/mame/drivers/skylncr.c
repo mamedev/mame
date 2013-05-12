@@ -426,8 +426,8 @@ static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE(skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w )
-	AM_RANGE(0x31, 0x31) AM_DEVREAD_LEGACY("aysnd", ay8910_r )
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREAD("aysnd", ay8910_device, data_r)
 
 	AM_RANGE(0x40, 0x41) AM_WRITE(skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE(skylncr_paletteram2_w )

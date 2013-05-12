@@ -602,8 +602,8 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 
 	// Reel Optics, EEPROM
 	AM_RANGE(0x5000, 0x5000) AM_READ(splus_reel_optics_r) AM_WRITE(i2c_nvram_w)

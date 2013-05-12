@@ -53,7 +53,11 @@ public:
 	othello_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"){ }
+		m_maincpu(*this, "maincpu"),
+		m_ay1(*this, "ay1"),
+		m_ay2(*this, "ay2")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
@@ -71,10 +75,10 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_ay1;
+	required_device<ay8910_device> m_ay2;
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
-	device_t *m_ay1;
-	device_t *m_ay2;
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
 	DECLARE_WRITE8_MEMBER(unk_8c_w);
@@ -226,14 +230,14 @@ WRITE8_MEMBER(othello_state::ack_w)
 
 WRITE8_MEMBER(othello_state::ay_address_w)
 {
-	if (m_ay_select & 1) ay8910_address_w(m_ay1, space, 0, data);
-	if (m_ay_select & 2) ay8910_address_w(m_ay2, space, 0, data);
+	if (m_ay_select & 1) m_ay1->address_w(space, 0, data);
+	if (m_ay_select & 2) m_ay2->address_w(space, 0, data);
 }
 
 WRITE8_MEMBER(othello_state::ay_data_w)
 {
-	if (m_ay_select & 1) ay8910_data_w(m_ay1, space, 0, data);
-	if (m_ay_select & 2) ay8910_data_w(m_ay2, space, 0, data);
+	if (m_ay_select & 1) m_ay1->data_w(space, 0, data);
+	if (m_ay_select & 2) m_ay2->data_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
@@ -385,8 +389,6 @@ void othello_state::machine_start()
 {
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 	m_n7751 = machine().device("n7751");
-	m_ay1 = machine().device("ay1");
-	m_ay2 = machine().device("ay2");
 
 	save_item(NAME(m_tile_bank));
 	save_item(NAME(m_ay_select));

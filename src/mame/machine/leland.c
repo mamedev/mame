@@ -1090,7 +1090,7 @@ READ8_MEMBER(leland_state::leland_master_input_r)
 
 		case 0x03:  /* /IGID */
 		case 0x13:
-			result = ay8910_r(machine().device("ay8910.1"), space, offset);
+			result = machine().device<ay8910_device>("ay8910.1")->data_r(space, offset);
 			break;
 
 		case 0x10:  /* /GIN0 */
@@ -1129,7 +1129,7 @@ WRITE8_MEMBER(leland_state::leland_master_output_w)
 
 		case 0x0a:  /* /OGIA */
 		case 0x0b:  /* /OGID */
-			ay8910_address_data_w(machine().device("ay8910.1"), space, offset, data);
+			machine().device<ay8910_device>("ay8910.1")->address_data_w(space, offset, data);
 			break;
 
 		case 0x0c:  /* /BKXL */

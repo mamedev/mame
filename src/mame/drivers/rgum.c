@@ -70,8 +70,8 @@ static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_device, data_w)
+	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_w)
 
 	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
 	AM_RANGE(0x2803, 0x2803) AM_READNOP

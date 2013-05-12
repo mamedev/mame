@@ -290,14 +290,14 @@ WRITE8_MEMBER(gsword_state::gsword_nmi_set_w)
 
 WRITE8_MEMBER(gsword_state::gsword_AY8910_control_port_0_w)
 {
-	device_t *device = machine().device("ay1");
-	ay8910_address_w(device,space,offset,data);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay1");
+	ay8910->address_w(space,offset,data);
 	m_fake8910_0 = data;
 }
 WRITE8_MEMBER(gsword_state::gsword_AY8910_control_port_1_w)
 {
-	device_t *device = machine().device("ay2");
-	ay8910_address_w(device,space,offset,data);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("ay2");
+	ay8910->address_w(space,offset,data);
 	m_fake8910_1 = data;
 }
 
@@ -360,9 +360,9 @@ static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_3_r,TAITO8741_3_w)
 	AM_RANGE(0x40, 0x41) AM_READWRITE_LEGACY(TAITO8741_1_r,TAITO8741_1_w)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 //
 	AM_RANGE(0xe0, 0xe0) AM_READNOP /* ?? */
 	AM_RANGE(0xa0, 0xa0) AM_WRITENOP /* ?? */
@@ -394,9 +394,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 
 	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(josvolly_nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear

@@ -347,8 +347,8 @@ static ADDRESS_MAP_START( ace_io, AS_IO, 8, ace_state )
 	AM_RANGE(0x83, 0x83) AM_MIRROR(0xff38) AM_READWRITE(pio_bd_r, pio_bd_w)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0xff38) AM_READWRITE(pio_ac_r, pio_ac_w)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0xff38) AM_READWRITE(pio_bc_r, pio_bc_w)
-	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY(AY8910_TAG, ay8910_address_w)
-	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(AY8910_TAG, ay8910_r, ay8910_data_w)
+	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_DEVWRITE(AY8910_TAG, ay8910_device, address_w)
+	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_DEVREADWRITE(AY8910_TAG, ay8910_device, data_r, data_w)
 ADDRESS_MAP_END
 
 

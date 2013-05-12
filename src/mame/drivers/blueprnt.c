@@ -117,10 +117,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6002, 0x6002) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
+	AM_RANGE(0x8002, 0x8002) AM_DEVREAD("ay2", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, blueprnt_state )

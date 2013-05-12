@@ -628,8 +628,8 @@ static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
 	AM_RANGE(0x35, 0x35) AM_WRITE(ampoker2_port35_w)    /* see write handlers */
 	AM_RANGE(0x36, 0x36) AM_WRITE(ampoker2_port36_w)    /* see write handlers */
 	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x3A, 0x3A) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x38, 0x39) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 /*

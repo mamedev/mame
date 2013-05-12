@@ -255,6 +255,7 @@ static WRITE8_HANDLER( carnival_music_port_1_w )
 
 static WRITE8_DEVICE_HANDLER( carnival_music_port_2_w )
 {
+	ay8910_device *ay8910 = (ay8910_device *) device;
 	static int psgSelect = 0;
 	int newSelect;
 
@@ -274,11 +275,11 @@ static WRITE8_DEVICE_HANDLER( carnival_music_port_2_w )
 			break;
 
 		case PSG_BC_WRITE:
-			ay8910_data_w( device, space, 0, psgData );
+			ay8910->data_w(space, 0, psgData);
 			break;
 
 		case PSG_BC_LATCH_ADDRESS:
-			ay8910_address_w( device, space, 0, psgData );
+			ay8910->address_w(space, 0, psgData);
 			break;
 		}
 	}

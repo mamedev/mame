@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
 	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_WRITE(paletteram_BBGGGRRR_byte_w) AM_SHARE("paletteram")
@@ -196,8 +196,8 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf822, 0xf822) AM_WRITE(goldstar_fa00_w) // hack (connected to ppi output port?, needed for colour banking)
 	AM_RANGE(0xf820, 0xf823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
 
-	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xf830, 0xf830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xf840, 0xf840) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 //  AM_RANGE(0xf850, 0xf850) AM_WRITE(ncb3_p1_flip_w)   // need flip?
 //  AM_RANGE(0xf860, 0xf860) AM_WRITE(ncb3_p2_flip_w)   // need flip?
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* guess... device is initialized, but doesn't seems to be used.*/
@@ -298,8 +298,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Inputs */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)    /* output port */
@@ -314,15 +314,15 @@ static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
-	AM_RANGE(0x21, 0x21) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x21, 0x21) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)    /* output port */
@@ -334,8 +334,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE(cm_outport0_w)    /* output port */
@@ -373,8 +373,8 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)  /* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -417,8 +417,8 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)  /* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w) //lamps
 	AM_RANGE(0xb860, 0xb860) AM_WRITE(magodds_outb860_w) //watchdog
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
@@ -478,8 +478,8 @@ static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
 
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* DSW bank */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)  /* no sound... only use ports */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use ports */
 	AM_RANGE(0xb850, 0xb850) AM_WRITENOP    /* just turn off the lamps, if exist */
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -500,8 +500,8 @@ static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)    /* Input Ports */
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)    /* Input/Output Ports */
-	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)  /* no sound... only use both ports for DSWs */
+	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
+	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("aysnd", ay8910_device, address_w)  /* no sound... only use both ports for DSWs */
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write) /* Other PPI initialized? */
@@ -572,7 +572,7 @@ WRITE8_MEMBER(goldstar_state::unkcm_0x12_w)
 
 static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+//  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(unkcm_0x11_w)
@@ -631,10 +631,10 @@ static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("sn1", sn76489_device, write)                      /* SN76489 #1 */
 	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("sn2", sn76489_device, write)                      /* SN76489 #2 */
 	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("sn3", sn76489_device, write)                      /* SN76489 #3 */
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)                  /* AY8910 control? */
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)       /* AY8910 Input? */
-//  AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-//  AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("aysnd", ay8910_device, address_w)                  /* AY8910 control? */
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)       /* AY8910 Input? */
+//  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_device, data_r)
+//  AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 

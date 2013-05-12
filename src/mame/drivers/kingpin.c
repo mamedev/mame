@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	//AM_RANGE(0x8400, 0x8400) AM_READNOP // ?
 	//AM_RANGE(0x8401, 0x8401) AM_WRITENOP // ?
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
@@ -154,7 +154,7 @@ static TMS9928A_INTERFACE(kingpin_tms9928a_interface)
 	DEVCB_DRIVER_LINE_MEMBER(kingpin_state, vdp_interrupt)
 };
 
-static AY8910_INTERFACE( ay8912_interface )
+static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

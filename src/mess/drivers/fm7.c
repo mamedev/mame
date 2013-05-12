@@ -824,15 +824,15 @@ void fm7_state::fm7_update_psg()
 				break;
 			case 0x01:
 				// Data read
-				m_psg_data = ay8910_r(space.machine().device("psg"),space, 0);
+				m_psg_data = m_psg->data_r(space, 0);
 				break;
 			case 0x02:
 				// Data write
-				ay8910_data_w(space.machine().device("psg"),space, 0,m_psg_data);
+				m_psg->data_w(space, 0,m_psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ay8910_address_w(space.machine().device("psg"),space, 0,m_psg_data);
+				m_psg->address_w(space, 0,m_psg_data);
 				break;
 		}
 	}

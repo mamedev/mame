@@ -368,8 +368,8 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE_LEGACY("ym2149", ay8910_r, ay8910_address_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE("ym2149", ay8910_device, data_r, address_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE("ym2149", ay8910_device, data_w)
 ADDRESS_MAP_END
 
 

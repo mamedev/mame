@@ -49,8 +49,8 @@ static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf0fb) AM_READ_LEGACY(tms9995_internal1_r)
-	AM_RANGE(0xffec, 0xffed) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0xffee, 0xffef) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xffec, 0xffed) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0xffee, 0xffef) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0xfffc, 0xffff) AM_READ_LEGACY(tms9995_internal2_r)
 ADDRESS_MAP_END
 

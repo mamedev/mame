@@ -74,8 +74,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/

@@ -1061,9 +1061,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
 ADDRESS_MAP_END

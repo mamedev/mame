@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 

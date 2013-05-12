@@ -104,11 +104,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8, popeye_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_device, data_r)
 ADDRESS_MAP_END
 
 

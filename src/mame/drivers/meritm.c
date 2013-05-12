@@ -686,8 +686,8 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -699,8 +699,8 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
@@ -720,8 +720,8 @@ static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("aysnd", ay8910_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 

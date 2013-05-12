@@ -12,7 +12,6 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
-#include "sound/ay8910.h"
 #include "includes/orion.h"
 
 #define SCREEN_WIDTH_384 48
@@ -363,7 +362,7 @@ READ8_MEMBER(orion_state::orionz80_io_r)
 {
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r(m_ay8912, space, 0);
+		return m_ay8912->data_r(space, 0);
 	}
 	return 0xff;
 }
@@ -381,10 +380,10 @@ WRITE8_MEMBER(orion_state::orionz80_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(m_ay8912, space, 0, data);
+		case 0xfffd : m_ay8912->address_w(space, 0, data);
 						break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(m_ay8912, space, 0, data);
+		case 0xbefd : m_ay8912->data_w(space, 0, data);
 						break;
 	}
 }
@@ -554,7 +553,7 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 	}
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r(m_ay8912, space, 0);
+		return m_ay8912->data_r(space, 0);
 	}
 	return 0xff;
 }
@@ -592,10 +591,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(m_ay8912, space, 0, data);
+		case 0xfffd : m_ay8912->address_w(space, 0, data);
 						break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(m_ay8912, space, 0, data);
+		case 0xbefd : m_ay8912->data_w(space, 0, data);
 						break;
 	}
 }

@@ -1337,7 +1337,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("namco", ay8910_data_address_w)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE("namco", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8, pacman_state )
@@ -1396,7 +1396,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("namco", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("namco", ay8910_device, data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END

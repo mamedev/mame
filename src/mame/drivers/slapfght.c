@@ -392,24 +392,24 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")

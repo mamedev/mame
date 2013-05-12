@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0xe7, 0xe7) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xea) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
@@ -288,7 +288,7 @@ static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )

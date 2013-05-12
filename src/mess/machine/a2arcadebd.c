@@ -108,7 +108,7 @@ void a2bus_arcboard_device::device_reset()
     6 - AY data
 */
 
-	UINT8 a2bus_arcboard_device::read_c0nx(address_space &space, UINT8 offset)
+UINT8 a2bus_arcboard_device::read_c0nx(address_space &space, UINT8 offset)
 {
 	switch (offset)
 	{
@@ -119,7 +119,7 @@ void a2bus_arcboard_device::device_reset()
 			return m_tms->register_read(space, 0);
 
 		case 6:
-			return ay8910_r(m_ay, space, 0);
+			return m_ay->data_r(space, 0);
 	}
 
 	return 0xff;
@@ -138,11 +138,11 @@ void a2bus_arcboard_device::write_c0nx(address_space &space, UINT8 offset, UINT8
 			break;
 
 		case 5:
-			ay8910_address_w(m_ay, space, 0, data);
+			m_ay->address_w(space, 0, data);
 			break;
 
 		case 6:
-			ay8910_data_w(m_ay, space, 0, data);
+			m_ay->data_w(space, 0, data);
 			break;
 	}
 }

@@ -183,7 +183,7 @@ void aces1_state::machine_reset()
 static ADDRESS_MAP_START( aces1_map, AS_PROGRAM, 8, aces1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xadf0, 0xadf3) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w) //  Dips, Sound
+	AM_RANGE(0xadf0, 0xadf3) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, address_data_w) //  Dips, Sound
 	AM_RANGE(0xafb0, 0xafb3) AM_DEVREADWRITE("ppi8255_ic24", i8255_device, read, write) // IC24 - lamps, 7segs
 	AM_RANGE(0xafd0, 0xafd3) AM_DEVREADWRITE("ppi8255_ic25", i8255_device, read, write) // IC25 - lamps, meters, reel comms (writes)
 	AM_RANGE(0xafe0, 0xafe3) AM_DEVREADWRITE("ppi8255_ic37", i8255_device, read, write)//  IC37 - doors, coins, reel optics (reads)

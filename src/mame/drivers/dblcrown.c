@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )
 	AM_RANGE(0x10, 0x10) AM_READWRITE(lamps_r,lamps_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(bank_r,bank_w)
 	AM_RANGE(0x12, 0x12) AM_READWRITE(mux_r,mux_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 //  AM_RANGE(0x30, 0x30) always 1?
 	AM_RANGE(0x40, 0x40) AM_WRITE(output_w)
 ADDRESS_MAP_END

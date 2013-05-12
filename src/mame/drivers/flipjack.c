@@ -315,10 +315,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flipjack_sound_map, AS_PROGRAM, 8, flipjack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flipjack_sound_io_map, AS_IO, 8, flipjack_state )
@@ -407,7 +407,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 };
 
 
-static AY8910_INTERFACE( ay8910_config_1 )
+static const ay8910_interface ay8910_config_1 =
 {
 	AY8910_LEGACY_OUTPUT,                   /* Flags */
 	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */
@@ -417,7 +417,7 @@ static AY8910_INTERFACE( ay8910_config_1 )
 	DEVCB_NULL                              /* Port B write */
 };
 
-static AY8910_INTERFACE( ay8910_config_2 )
+static const ay8910_interface ay8910_config_2 =
 {
 	AY8910_LEGACY_OUTPUT,                   /* Flags */
 	AY8910_DEFAULT_LOADS,                   /* Load on channel in ohms */

@@ -76,14 +76,14 @@ WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
 	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(machine().device("ay1"), space, *m_ay8910_select >> 4, *m_ay8910_data);
+		machine().device<ay8910_device>("ay1")->data_address_w(space, *m_ay8910_select >> 4, *m_ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
 	if (((*m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(machine().device("ay2"), space, *m_ay8910_select >> 6, *m_ay8910_data);
+		machine().device<ay8910_device>("ay2")->data_address_w(space, *m_ay8910_select >> 6, *m_ay8910_data);
 	}
 
 	*m_ay8910_select = data;

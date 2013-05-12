@@ -208,8 +208,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquarius_io, AS_IO, 8, aquarius_state )
 //  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
-	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_DEVREADWRITE("ay8910", ay8910_device, data_r, data_w)
+	AM_RANGE(0xf7, 0xf7) AM_MIRROR(0xff00) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_READWRITE(cassette_r, cassette_w)
 	AM_RANGE(0xfd, 0xfd) AM_MIRROR(0xff00) AM_READWRITE(vsync_r, mapper_w)
 	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_READWRITE(printer_r, printer_w)

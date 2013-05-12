@@ -157,7 +157,7 @@ READ8_MEMBER(oric_state::oric_via_in_a_func)
 		/* if psg is in read register state return reg data */
 		if (m_psg_control==0x01)
 		{
-			return ay8910_r(m_ay8912, space, 0);
+			return m_ay8912->data_r(space, 0);
 		}
 
 		/* return high-impedance */
@@ -199,12 +199,12 @@ void oric_state::oric_psg_connection_refresh(address_space &space)
 
 			/* write register data */
 			case 2:
-				ay8910_data_w(m_ay8912, space, 0, m_via_port_a_data);
+				m_ay8912->data_w(space, 0, m_via_port_a_data);
 				break;
 
 			/* write register index */
 			case 3:
-				ay8910_address_w(m_ay8912, space, 0, m_via_port_a_data);
+				m_ay8912->address_w(space, 0, m_via_port_a_data);
 				break;
 
 			default:

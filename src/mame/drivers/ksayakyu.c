@@ -122,9 +122,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
+	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?

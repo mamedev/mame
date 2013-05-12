@@ -138,35 +138,35 @@ WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
 
 static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
-	AM_RANGE(0x82, 0x82) AM_DEVREAD_LEGACY("ay1", ay8910_r)
-	AM_RANGE(0x84, 0x85) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
+	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_device, data_r)
+	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 

@@ -412,11 +412,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
@@ -427,11 +427,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")

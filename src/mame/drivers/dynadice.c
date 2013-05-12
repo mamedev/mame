@@ -85,7 +85,7 @@ WRITE8_MEMBER(dynadice_state::sound_data_w)
 
 WRITE8_MEMBER(dynadice_state::sound_control_w)
 {
-	device_t *device = machine().device("aysnd");
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
 /*
     AY 3-8910 :
 
@@ -96,10 +96,10 @@ WRITE8_MEMBER(dynadice_state::sound_control_w)
 
 */
 	if ((data & 7) == 7)
-		ay8910_address_w(device, space, 0, m_ay_data);
+		ay8910->address_w(space, 0, m_ay_data);
 
 	if ((data & 7) == 6)
-		ay8910_data_w(device, space, 0, m_ay_data);
+		ay8910->data_w(space, 0, m_ay_data);
 }
 
 
