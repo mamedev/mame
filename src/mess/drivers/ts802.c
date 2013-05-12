@@ -7,14 +7,20 @@
 
     TODO:
     - Everything - this is just a skeleton
-
+ 
+    Technical manual at:
+    http://bitsavers.org/pdf/televideo/TS800A_TS802_TS802H_Maintenance_Manual_1982.pdf
+ 
+    includes in-depth discussion of the inner workings of the WD1000 HDD controller.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
-
+#include "machine/z80dma.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
 
 class ts802_state : public driver_device
 {
@@ -43,10 +49,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(ts802_io, AS_IO, 8, ts802_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	AM_RANGE(0x00, 0x00) AM_READ(port00_r)	// DIP switches
+	// 04 - written once after OS boot to bank in RAM from 0000-3FFF instead of ROM.  4000-FFFF is always RAM.
+	// 08-0B: Z80 CTC
+	// 0C-0F: Z80 SIO #1
 	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
 	AM_RANGE(0x0f, 0x0f) AM_READ(port0f_r)
+	// 10: Z80 DMA
+	// 14-17: WD 1793
+	// 18: floppy misc.
+	// 20-23: Z80 SIO #2
 	AM_RANGE(0x20, 0x20) AM_WRITENOP
+	// 48-4F: WD1000 harddisk controller
+	// 80: LEDs
 ADDRESS_MAP_END
 
 
