@@ -67,7 +67,7 @@ void gomoku_sound_device::device_start()
 	m_num_voices = GOMOKU_MAX_VOICES;
 	m_last_channel = m_channel_list + m_num_voices;
 
-	m_sound_rom = memregion("gomoku")->base();
+	m_sound_rom = memregion(":gomoku")->base();
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	m_sound_enable = 1;
