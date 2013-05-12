@@ -159,7 +159,7 @@ void ym2610_device::device_start()
 	astring name;
 
 	m_irq_handler.resolve();
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), &generic_ay8910);
+	m_psg = ay8910_start_ym(this, &generic_ay8910);
 	assert_always(m_psg != NULL, "Error creating YM2610/AY8910 chip");
 
 	/* Timer Handler set */

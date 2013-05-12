@@ -136,7 +136,7 @@ void ym2203_device::device_start()
 	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
 	m_irq_handler.resolve();
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
+	m_psg = ay8910_start_ym(this, ay8910_config);
 	assert_always(m_psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */

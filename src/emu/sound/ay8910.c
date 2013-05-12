@@ -730,13 +730,12 @@ static void ay8910_statesave(ay8910_context *psg, device_t *device)
  *
  *************************************/
 
-void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(device_t *device, const ay8910_interface *intf)
 {
-	ay8910_context *info = (ay8910_context *)infoptr;
-	int master_clock = clock;
+	device_type chip_type = device->type();
+	int master_clock = device->clock();
 
-	if (info == NULL)
-		info = auto_alloc_clear(device->machine(), ay8910_context);
+	ay8910_context *info = auto_alloc_clear(device->machine(), ay8910_context);
 
 	info->device = device;
 	info->intf = intf;
@@ -946,7 +945,7 @@ void ay8910_device::device_start()
 
 	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
+	m_psg = ay8910_start_ym(this, ay8910_config);
 }
 
 //-------------------------------------------------
@@ -966,7 +965,7 @@ void ym2149_device::device_start()
 
 	const ay8910_interface *ay8910_config = m_ay8910_config != NULL ? m_ay8910_config : &default_ay8910_config;
 
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
+	m_psg = ay8910_start_ym(this, ay8910_config);
 }
 
 //-------------------------------------------------

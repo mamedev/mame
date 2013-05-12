@@ -86,7 +86,7 @@ struct ay8910_interface
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(void *infoptr, device_type chip_type, device_t *device, int clock, const ay8910_interface *intf);
+void *ay8910_start_ym(device_t *device, const ay8910_interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

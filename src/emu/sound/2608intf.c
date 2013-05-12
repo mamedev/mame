@@ -150,7 +150,7 @@ void ym2608_device::device_start()
 
 	m_irq_handler.resolve();
 	/* FIXME: Force to use simgle output */
-	m_psg = ay8910_start_ym(NULL, type(), this, clock(), ay8910_config);
+	m_psg = ay8910_start_ym(this, ay8910_config);
 	assert_always(m_psg != NULL, "Error creating YM2608/AY8910 chip");
 
 	/* Timer Handler set */
