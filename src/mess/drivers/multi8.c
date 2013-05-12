@@ -677,7 +677,7 @@ static MACHINE_CONFIG_START( multi8, multi8_state )
 	/* Audio */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, 1500000) //unknown clock / divider
-	MCFG_SOUND_CONFIG(&ay8910_config)
+	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_ADD("beeper", BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
