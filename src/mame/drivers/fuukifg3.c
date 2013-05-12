@@ -286,7 +286,7 @@ WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 
 	// also write to ymf262
 	if (offset < 4)
-		ymf262_w(machine().device("ymf2"), space, offset, data);
+		machine().device<ymf262_device>("ymf2")->write(space, offset, data);
 }
 
 static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8, fuuki32_state )
@@ -576,11 +576,6 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 	DEVCB_DRIVER_LINE_MEMBER(fuuki32_state,irqhandler)      /* irq */
 };
 
-static const ymf262_interface fuuki32_ymf262_interface =
-{
-	DEVCB_NULL            /* irq, already hooked up via ymf278b */
-};
-
 static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	/* basic machine hardware */
@@ -613,7 +608,6 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("ymf2", YMF262, YMF278B_STD_CLOCK / (19/8.0))
-	MCFG_SOUND_CONFIG(fuuki32_ymf262_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 0.40)

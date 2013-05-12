@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymf", ymf262_r, ymf262_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
@@ -438,11 +438,6 @@ WRITE_LINE_MEMBER(tecmosys_state::sound_irq)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf262_interface tecmosys_ymf262_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tecmosys_state,sound_irq)       /* irq */
-};
-
 void tecmosys_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base(), 0x4000);
@@ -479,7 +474,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
-	MCFG_SOUND_CONFIG(tecmosys_ymf262_interface)
+	MCFG_YMF262_IRQ_HANDLER(WRITELINE(tecmosys_state, sound_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)

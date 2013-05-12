@@ -10,136 +10,136 @@
 #include "ymf262.h"
 
 
-struct ymf262_state
+/* IRQ Handler */
+static void IRQHandler(void *param,int irq)
 {
-	sound_stream *  stream;
-	emu_timer *     timer[2];
-	void *          chip;
-	const ymf262_interface *intf;
-	device_t *device;
-	devcb_resolved_write_line irqhandler;
-};
+	ymf262_device *ymf262 = (ymf262_device *) param;
+	ymf262->_IRQHandler(irq);
+}
 
-
-INLINE ymf262_state *get_safe_token(device_t *device)
+void ymf262_device::_IRQHandler(int irq)
 {
-	assert(device != NULL);
-	assert(device->type() == YMF262);
-	return (ymf262_state *)downcast<ymf262_device *>(device)->token();
+	if (!m_irq_handler.isnull())
+		m_irq_handler(irq);
+}
+
+/* Timer overflow callback from timer.c */
+void ymf262_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case 0:
+		ymf262_timer_over(m_chip,0);
+		break;
+
+	case 1:
+		ymf262_timer_over(m_chip,1);
+		break;
+	}
 }
 
 
-
-
-static void IRQHandler_262(void *param,int irq)
+static void timer_handler(void *param, int c, attotime period)
 {
-	ymf262_state *info = (ymf262_state *)param;
-	if (!info->irqhandler.isnull())
-		info->irqhandler(irq);
+	ymf262_device *ymf262 = (ymf262_device *) param;
+	ymf262->_timer_handler(c, period);
 }
 
-static TIMER_CALLBACK( timer_callback_262_0 )
+void ymf262_device::_timer_handler(int c, attotime period)
 {
-	ymf262_state *info = (ymf262_state *)ptr;
-	ymf262_timer_over(info->chip, 0);
-}
-
-static TIMER_CALLBACK( timer_callback_262_1 )
-{
-	ymf262_state *info = (ymf262_state *)ptr;
-	ymf262_timer_over(info->chip, 1);
-}
-
-static void timer_handler_262(void *param,int timer, attotime period)
-{
-	ymf262_state *info = (ymf262_state *)param;
 	if( period == attotime::zero )
 	{   /* Reset FM Timer */
-		info->timer[timer]->enable(false);
+		m_timer[c]->enable(false);
 	}
 	else
 	{   /* Start FM Timer */
-		info->timer[timer]->adjust(period);
+		m_timer[c]->adjust(period);
 	}
 }
 
-static STREAM_UPDATE( ymf262_stream_update )
+void ymf262_update_request(void *param, int interval)
 {
-	ymf262_state *info = (ymf262_state *)param;
-	ymf262_update_one(info->chip, outputs, samples);
+	ymf262_device *ymf262 = (ymf262_device *) param;
+	ymf262->_ymf262_update_request();
 }
 
-static void _stream_update(void *param, int interval)
+void ymf262_device::_ymf262_update_request()
 {
-	ymf262_state *info = (ymf262_state *)param;
-	info->stream->update();
+	m_stream->update();
 }
 
 
-static DEVICE_START( ymf262 )
-{
-	static const ymf262_interface dummy = { DEVCB_NULL };
-	ymf262_state *info = get_safe_token(device);
-	int rate = device->clock()/288;
 
-	info->intf = device->static_config() ? (const ymf262_interface *)device->static_config() : &dummy;
-	info->device = device;
-	info->irqhandler.resolve(info->intf->irqhandler, *device);
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	ymf262_update_one(m_chip, outputs, samples);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ymf262_device::device_start()
+{
+	int rate = clock()/288;
+
+	m_irq_handler.resolve();
 
 	/* stream system initialize */
-	info->chip = ymf262_init(device,device->clock(),rate);
-	assert_always(info->chip != NULL, "Error creating YMF262 chip");
+	m_chip = ymf262_init(this,clock(),rate);
+	assert_always(m_chip != NULL, "Error creating YMF262 chip");
 
-	info->stream = device->machine().sound().stream_alloc(*device,0,4,rate,info,ymf262_stream_update);
+	m_stream = machine().sound().stream_alloc(*this,0,4,rate);
 
 	/* YMF262 setup */
-	ymf262_set_timer_handler (info->chip, timer_handler_262, info);
-	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
-	ymf262_set_update_handler(info->chip, _stream_update, info);
+	ymf262_set_timer_handler (m_chip, timer_handler, this);
+	ymf262_set_irq_handler   (m_chip, IRQHandler, this);
+	ymf262_set_update_handler(m_chip, ymf262_update_request, this);
 
-	info->timer[0] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_262_0), info);
-	info->timer[1] = device->machine().scheduler().timer_alloc(FUNC(timer_callback_262_1), info);
+	m_timer[0] = timer_alloc(0);
+	m_timer[1] = timer_alloc(1);
 }
 
-static DEVICE_STOP( ymf262 )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void ymf262_device::device_stop()
 {
-	ymf262_state *info = get_safe_token(device);
-	ymf262_shutdown(info->chip);
+	ymf262_shutdown(m_chip);
 }
 
-/* reset */
-static DEVICE_RESET( ymf262 )
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ymf262_device::device_reset()
 {
-	ymf262_state *info = get_safe_token(device);
-	ymf262_reset_chip(info->chip);
+	ymf262_reset_chip(m_chip);
 }
 
 
-READ8_DEVICE_HANDLER( ymf262_r )
+READ8_MEMBER( ymf262_device::read )
 {
-	ymf262_state *info = get_safe_token(device);
-	return ymf262_read(info->chip, offset & 3);
+	return ymf262_read(m_chip, offset & 3);
 }
 
-WRITE8_DEVICE_HANDLER( ymf262_w )
+WRITE8_MEMBER( ymf262_device::write )
 {
-	ymf262_state *info = get_safe_token(device);
-	ymf262_write(info->chip, offset & 3, data);
+	ymf262_write(m_chip, offset & 3, data);
 }
-
-READ8_DEVICE_HANDLER ( ymf262_status_r ) { return ymf262_r(device, space, 0); }
-WRITE8_DEVICE_HANDLER( ymf262_register_a_w ) { ymf262_w(device, space, 0, data); }
-WRITE8_DEVICE_HANDLER( ymf262_register_b_w ) { ymf262_w(device, space, 2, data); }
-WRITE8_DEVICE_HANDLER( ymf262_data_a_w ) { ymf262_w(device, space, 1, data); }
-WRITE8_DEVICE_HANDLER( ymf262_data_b_w ) { ymf262_w(device, space, 3, data); }
 
 const device_type YMF262 = &device_creator<ymf262_device>;
 
 ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF262, "YMF262", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+		device_sound_interface(mconfig, *this),
+		m_irq_handler(*this)
 {
-	m_token = global_alloc_clear(ymf262_state);
 }
 
 //-------------------------------------------------
@@ -150,41 +150,4 @@ ymf262_device::ymf262_device(const machine_config &mconfig, const char *tag, dev
 
 void ymf262_device::device_config_complete()
 {
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ymf262_device::device_start()
-{
-	DEVICE_START_NAME( ymf262 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void ymf262_device::device_reset()
-{
-	DEVICE_RESET_NAME( ymf262 )(this);
-}
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void ymf262_device::device_stop()
-{
-	DEVICE_STOP_NAME( ymf262 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void ymf262_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }
