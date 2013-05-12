@@ -470,8 +470,9 @@ READ8_MEMBER(taitol_state::portB_r)
 
 READ8_MEMBER(taitol_state::extport_select_and_ym2203_r)
 {
+	ym2203_device *ym2203 = machine().device<ym2203_device>("ymsnd");
 	m_extport = (offset >> 1) & 1;
-	return m_ymsnd->read(space, offset & 1);
+	return ym2203->read(space, offset & 1);
 }
 
 WRITE8_MEMBER(taitol_state::mcu_data_w)
