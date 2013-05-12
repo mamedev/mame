@@ -648,10 +648,8 @@ void ymz280b_device::device_start()
 
 void ymz280b_device::device_reset()
 {
-	int i;
-
 	/* initial clear registers */
-	for (i = 0xff; i >= 0; i--)
+	for (int i = 0xff; i >= 0; i--)
 	{
 		m_current_register = i;
 		write_to_register(0);
@@ -662,7 +660,7 @@ void ymz280b_device::device_reset()
 	m_rom_readback_addr = 0;
 
 	/* clear other voice parameters */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		struct YMZ280BVoice *voice = &m_voice[i];
 
@@ -935,10 +933,21 @@ const device_type YMZ280B = &device_creator<ymz280b_device>;
 ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_current_register(0),
+		m_status_register(0),
+		m_irq_state(0),
+		m_irq_mask(0),
+		m_irq_enable(0),
+		m_keyon_enable(0),
+		m_ext_mem_enable(0),
+		m_rom_addr_hi(0),
+		m_rom_addr_mid(0),
+		m_rom_readback_addr(0),
 		m_irq_handler(*this),
 		m_ext_read_handler(*this),
 		m_ext_write_handler(*this)
 {
+	memset(m_voice, 0, sizeof(m_voice));
 }
 
 //-------------------------------------------------

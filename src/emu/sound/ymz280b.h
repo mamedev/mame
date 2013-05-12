@@ -97,9 +97,7 @@ private:
 	int compute_status();
 
 	// internal state
-	sound_stream * m_stream;          /* which stream are we using */
-	UINT8 *m_region_base;             /* pointer to the base of the region */
-	UINT32 m_region_size;
+	struct YMZ280BVoice m_voice[8];   /* the 8 voices */
 	UINT8 m_current_register;         /* currently accessible register */
 	UINT8 m_status_register;          /* current status register */
 	UINT8 m_irq_state;                /* current IRQ state */
@@ -107,20 +105,22 @@ private:
 	UINT8 m_irq_enable;               /* current IRQ enable */
 	UINT8 m_keyon_enable;             /* key on enable */
 	UINT8 m_ext_mem_enable;           /* external memory enable */
-	double m_master_clock;            /* master clock frequency */
-	devcb2_write_line m_irq_handler;  /* IRQ callback */
-	struct YMZ280BVoice m_voice[8];   /* the 8 voices */
 	UINT32 m_rom_addr_hi;
 	UINT32 m_rom_addr_mid;
 	UINT32 m_rom_readback_addr;       /* where the CPU can read the ROM */
+
+	devcb2_write_line m_irq_handler;  /* IRQ callback */
 	devcb2_read8 m_ext_read_handler;  /* external RAM read handler */
 	devcb2_write8 m_ext_write_handler;/* external RAM write handler */
 
-#if MAKE_WAVS
-	void * m_wavresample;             /* resampled waveform */
-#endif
-
+	double m_master_clock;            /* master clock frequency */
+	UINT8 *m_region_base;             /* pointer to the base of the region */
+	UINT32 m_region_size;
+	sound_stream *m_stream;           /* which stream are we using */
 	INT16 *m_scratch;
+#if MAKE_WAVS
+	void *m_wavresample;              /* resampled waveform */
+#endif
 };
 
 extern const device_type YMZ280B;

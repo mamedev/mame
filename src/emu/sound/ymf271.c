@@ -1711,9 +1711,7 @@ void ymf271_device::device_start()
 
 void ymf271_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 48; i++)
+	for (int i = 0; i < 48; i++)
 	{
 		m_slots[i].active = 0;
 		m_slots[i].volume = 0;
@@ -1725,10 +1723,27 @@ const device_type YMF271 = &device_creator<ymf271_device>;
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		m_timerA(0),
+		m_timerB(0),
+		m_timerAVal(0),
+		m_timerBVal(0),
+		m_irqstate(0),
+		m_status(0),
+		m_enable(0),
+		m_reg0(0),
+		m_reg1(0),
+		m_reg2(0),
+		m_reg3(0),
+		m_pcmreg(0),
+		m_timerreg(0),
+		m_ext_address(0),
+		m_ext_read(0),
 		m_irq_handler(*this),
 		m_ext_read_handler(*this),
 		m_ext_write_handler(*this)
 {
+	memset(m_slots, 0, sizeof(&m_slots));
+	memset(m_groups, 0, sizeof(&m_groups));
 }
 
 //-------------------------------------------------

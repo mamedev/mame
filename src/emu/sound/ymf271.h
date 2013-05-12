@@ -115,25 +115,32 @@ private:
 	YMF271Slot m_slots[48];
 	YMF271Group m_groups[12];
 
-	INT32 m_timerA, m_timerB;
-	INT32 m_timerAVal, m_timerBVal;
+	INT32 m_timerA;
+	INT32 m_timerB;
+	INT32 m_timerAVal;
+	INT32 m_timerBVal;
 	INT32 m_irqstate;
 	INT8  m_status;
 	INT8  m_enable;
 
-	emu_timer *m_timA, *m_timB;
-
-	INT8  m_reg0, m_reg1, m_reg2, m_reg3, m_pcmreg, m_timerreg;
+	INT8  m_reg0;
+	INT8  m_reg1;
+	INT8  m_reg2;
+	INT8  m_reg3;
+	INT8  m_pcmreg;
+	INT8  m_timerreg;
 	UINT32 m_ext_address;
 	UINT8 m_ext_read;
 
 	const UINT8 *m_rom;
+	UINT32 m_clock;
+
+	emu_timer *m_timA, *m_timB;
+	sound_stream *m_stream;
+
 	devcb2_write_line m_irq_handler;
 	devcb2_read8 m_ext_read_handler;
 	devcb2_write8 m_ext_write_handler;
-
-	UINT32 m_clock;
-	sound_stream * m_stream;
 };
 
 extern const device_type YMF271;
