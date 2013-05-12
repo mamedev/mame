@@ -132,7 +132,7 @@ static ADDRESS_MAP_START(votrpss_io, AS_IO, 8, votrpss_state)
 	//AM_RANGE(0x00, 0x03) AM_READWRITE(8255ppi_r, 8255ppi_w) AM_MIRROR (0x3c)
 	//AM_RANGE(0x40, 0x41) AM_READWRITE(i8251_r, i8251_w) AM_MIRROR (0x3e)
 	//AM_RANGE(0x80, 0x83) AM_READWRITE(pit8253_r, pit8253_w) AM_MIRROR (0x3c)
-	//AM_RANGE(0xc0, 0xc3) AM_READWRITE(ay8910_r, ay8910_W) AM_MIRROR (0x3c)
+	//AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w) AM_MIRROR (0x3c)
 ADDRESS_MAP_END
 
 
