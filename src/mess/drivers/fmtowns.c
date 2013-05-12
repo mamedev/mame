@@ -2242,7 +2242,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x04d0,0x04d3) AM_READ8(towns_padport_r, 0x00ff00ff)
 	AM_RANGE(0x04d4,0x04d7) AM_WRITE8(towns_pad_mask_w, 0x00ff0000)
 	// Sound (YM3438 [FM], RF5c68 [PCM])
-	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8_LEGACY("fm",ym3438_r,ym3438_w,0x00ff00ff)
+	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm", ym3438_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
 	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
 	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffffffff)
@@ -2294,7 +2294,7 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	AM_RANGE(0x04d0,0x04d3) AM_READ8(towns_padport_r, 0x00ff)
 	AM_RANGE(0x04d6,0x04d7) AM_WRITE8(towns_pad_mask_w, 0x00ff)
 	// Sound (YM3438 [FM], RF5c68 [PCM])
-	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8_LEGACY("fm",ym3438_r,ym3438_w,0x00ff)
+	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8("fm", ym3438_device, read, write, 0x00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffff)  // R/W  -- volume ports
 	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffff)
 	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffff)
@@ -2748,11 +2748,6 @@ static const upd71071_intf towns_dma_config =
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
-static const ym3438_interface ym3438_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_fm_irq)
-};
-
 static const rf5c68_interface rf5c68_intf =
 {
 	towns_pcm_irq
@@ -2813,7 +2808,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
-	MCFG_SOUND_CONFIG(ym3438_intf)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(towns_state, towns_fm_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_RF5C68_ADD("pcm", 53693100 / 7)  // actual clock speed unknown
 	MCFG_SOUND_CONFIG(rf5c68_intf)

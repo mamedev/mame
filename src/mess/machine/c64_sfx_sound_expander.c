@@ -35,11 +35,6 @@ WRITE_LINE_MEMBER( c64_sfx_sound_expander_cartridge_device::opl_irq_w )
 	m_slot->irq_w(state);
 }
 
-static const ym3526_interface ym3526_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_sfx_sound_expander_cartridge_device, opl_irq_w)
-};
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_sfx_sound_expander )
@@ -48,7 +43,7 @@ static const ym3526_interface ym3526_config =
 static MACHINE_CONFIG_FRAGMENT( c64_sfx_sound_expander )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(YM3526_TAG, YM3526, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_YM3526_IRQ_HANDLER(WRITELINE(c64_sfx_sound_expander_cartridge_device, opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
@@ -250,7 +245,7 @@ UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, of
 		}
 		else if (BIT(offset, 5))
 		{
-			data = ym3526_r(m_opl, space, BIT(offset, 4));
+			data = m_opl->read(space, BIT(offset, 4));
 		}
 	}
 
@@ -266,7 +261,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, off
 {
 	if (!io2 && BIT(offset, 5))
 	{
-		ym3526_w(m_opl, space, BIT(offset, 4), data);
+		m_opl->write(space, BIT(offset, 4), data);
 	}
 
 	m_exp->cd_w(space, get_offset(offset, 0), data, sphi2, ba, roml, romh, io1, io2);
