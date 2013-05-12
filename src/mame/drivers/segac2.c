@@ -599,7 +599,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segac2_state )
 	AM_RANGE(0x800000, 0x800001) AM_MIRROR(0x13fdfe) AM_READWRITE(prot_r, prot_w)
 	AM_RANGE(0x800200, 0x800201) AM_MIRROR(0x13fdfe) AM_WRITE(control_w)
 	AM_RANGE(0x840000, 0x84001f) AM_MIRROR(0x13fee0) AM_READWRITE(io_chip_r, io_chip_w)
-	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3438_r, ym3438_w, 0x00ff)
+	AM_RANGE(0x840100, 0x840107) AM_MIRROR(0x13fef8) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
@@ -1225,10 +1225,6 @@ WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
 	//printf("sound irq %d\n", state);
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
-static const ym3438_interface ym3438_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segac2_state,segac2_irq2_interrupt)      /* IRQ handler */
-};
 
 
 /******************************************************************************
@@ -1387,7 +1383,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XL2_CLOCK/7)
-	MCFG_SOUND_CONFIG(ym3438_intf)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segac2_state, segac2_irq2_interrupt))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	/* right channel not connected */
 

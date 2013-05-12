@@ -70,7 +70,7 @@ public:
 	{ }
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_z80snd;
-	optional_device<device_t> m_ymsnd;
+	optional_device<ym2612_device> m_ymsnd;
 	required_device<sega_genesis_vdp_device> m_vdp;
 	optional_device<sega_32x_device> m_32x;
 	optional_device<sega_segacd_device> m_segacd;

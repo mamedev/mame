@@ -1230,8 +1230,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_portmap, AS_IO, 8, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym1", ym3438_r, ym3438_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym2", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(sound_bank_hi_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -1250,7 +1250,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -2130,19 +2130,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interfaces
- *
- *************************************/
-
-static const ym3438_interface ym3438_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(segas32_state,ym3438_irq_handler)
-};
-
-
-
-/*************************************
- *
  *  Dual PCB shared memory comms
  *
  *************************************/
@@ -2212,7 +2199,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
@@ -2278,7 +2265,7 @@ static MACHINE_CONFIG_START( multi32, segas32_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(segas32_state, ym3438_irq_handler))
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 

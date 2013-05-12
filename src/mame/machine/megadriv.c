@@ -66,7 +66,7 @@ READ8_MEMBER(md_base_state::megadriv_68k_YM2612_read)
 	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		return ym2612_r(m_ymsnd, space, offset);
+		return m_ymsnd->read(space, offset);
 	}
 	else
 	{
@@ -83,7 +83,7 @@ WRITE8_MEMBER(md_base_state::megadriv_68k_YM2612_write)
 	//mame_printf_debug("megadriv_68k_YM2612_write %02x %04x %04x\n",offset,data,mem_mask);
 	if ((m_genz80.z80_has_bus == 0) && (m_genz80.z80_is_reset == 0))
 	{
-		ym2612_w(m_ymsnd, space, offset, data);
+		m_ymsnd->write(space, offset, data);
 	}
 	else
 	{
@@ -774,7 +774,7 @@ READ8_MEMBER(md_base_state::megadriv_z80_unmapped_read )
 
 static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, md_base_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2612_r,ym2612_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_device, read, write)
 
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
 	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
@@ -1288,7 +1288,7 @@ WRITE8_MEMBER(md_base_state::z80_unmapped_w )
 /* sets the megadrive z80 to it's normal ports / map */
 void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
 {
-	device_t *ym = machine().device("ymsnd");
+	ym2612_device *ym2612 = machine().device<ym2612_device>("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
 	machine().device(tag)->memory().space(AS_IO).install_readwrite_handler(0x0000, 0xffff, read8_delegate(FUNC(mtech_state::z80_unmapped_port_r),this), write8_delegate(FUNC(mtech_state::z80_unmapped_port_w),this));
@@ -1303,7 +1303,7 @@ void mtech_state::megatech_set_megadrive_z80_as_megadrive_z80(const char* tag)
 	machine().device(tag)->memory().space(AS_PROGRAM).install_ram(0x0000, 0x1fff, m_genz80.z80_prgram);
 
 
-	machine().device(tag)->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
+	machine().device(tag)->memory().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read),ym2612), write8_delegate(FUNC(ym2612_device::write),ym2612));
 	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	machine().device(tag)->memory().space(AS_PROGRAM).install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	machine().device(tag)->memory().space(AS_PROGRAM).install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));

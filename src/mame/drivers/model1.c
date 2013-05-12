@@ -1038,7 +1038,7 @@ static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xc50000, 0xc50001) AM_WRITE(m1_snd_mpcm_bnk1_w )
 	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY("sega2", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc70000, 0xc70001) AM_WRITE(m1_snd_mpcm_bnk2_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3438_r, ym3438_w, 0x00ff )
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8("ymsnd", ym3438_device, read, write, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 

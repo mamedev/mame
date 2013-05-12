@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_sound_io_map, AS_IO, 8, shangha3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -470,11 +470,6 @@ WRITE_LINE_MEMBER(shangha3_state::irqhandler)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-static const ym3438_interface ym3438_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(shangha3_state,irqhandler)
-};
-
 
 static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
@@ -542,7 +537,7 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/6) /* 8 MHz? */
-	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
@@ -582,7 +577,7 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/6) /* 8 MHz? */
-	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(shangha3_state,irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 

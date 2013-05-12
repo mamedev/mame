@@ -1492,11 +1492,6 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-static const ym3438_interface utoukond_ym3438_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(seta_state,utoukond_ym3438_interrupt)   // IRQ handler
-};
-
 /***************************************************************************
 
 
@@ -3217,7 +3212,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8, seta_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -8909,7 +8904,7 @@ static MACHINE_CONFIG_START( utoukond, seta_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, 16000000/4) /* 4 MHz */
-	MCFG_SOUND_CONFIG(utoukond_ym3438_intf)
+	MCFG_YM2612_IRQ_HANDLER(WRITELINE(seta_state, utoukond_ym3438_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
