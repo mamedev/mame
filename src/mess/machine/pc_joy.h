@@ -23,10 +23,10 @@ public:
 	device_pc_joy_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_pc_joy_interface();
 
-	virtual bool x1(int delta) { return false; }
-	virtual bool x2(int delta) { return false; }
-	virtual bool y1(int delta) { return false; }
-	virtual bool y2(int delta) { return false; }
+	virtual UINT8 x1(int delta) { return 0; }
+	virtual UINT8 x2(int delta) { return 0; }
+	virtual UINT8 y1(int delta) { return 0; }
+	virtual UINT8 y2(int delta) { return 0; }
 	virtual UINT8 btn() { return 0xf; }
 	virtual void port_write() { }
 };
@@ -56,10 +56,10 @@ public:
 	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ioport_constructor device_input_ports() const;
 
-	virtual bool x1(int delta) { return (m_x1->read() > delta); }
-	virtual bool x2(int delta) { return (m_x2->read() > delta); }
-	virtual bool y1(int delta) { return (m_y1->read() > delta); }
-	virtual bool y2(int delta) { return (m_y2->read() > delta); }
+	virtual UINT8 x1(int delta) { return (m_x1->read() > delta); }
+	virtual UINT8 x2(int delta) { return (m_x2->read() > delta); }
+	virtual UINT8 y1(int delta) { return (m_y1->read() > delta); }
+	virtual UINT8 y2(int delta) { return (m_y2->read() > delta); }
 	virtual UINT8 btn() { return m_btn->read(); }
 
 protected:
