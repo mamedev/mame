@@ -12813,7 +12813,7 @@ GAME( 200?, sc5corstc   ,sc5corst,  bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, 
 
 // PR3417 AWP CRAZYFRUIT AND NUTCASE SCORP5         PR3417 CF NUTCASE SOUNDS11        CF& NUTCASE S.SITE
 GAME( 200?, sc5cfnc     ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Crazy Fruit & Nutcase (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5cfnca    ,sc5cfnc,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Crazy Fruit & Nutcase (Bellfruit) (Scorpion 5) (set 2", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc5cfnca    ,sc5cfnc,   bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Crazy Fruit & Nutcase (Bellfruit) (Scorpion 5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR3436 CRAZY FRUITS COMMUNITY PARTY         CRAZY FRUITS CP ARCADE  PR3436 CF COMMUNITY P SOUNDS11
 GAME( 200?, sc5cfcp     ,0,         bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Crazy Fruits Community Party (Bellfruit) (Scorpion 5) (set 1)", GAME_IS_SKELETON_MECHANICAL )

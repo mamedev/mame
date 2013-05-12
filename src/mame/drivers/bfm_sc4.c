@@ -29883,7 +29883,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4corotb)
 GAME( 200?, sc4coroc    ,0,         sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Arcade Version 012) (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4coroh    ,sc4coroc,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Arcade Version 012) (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 // P_2_4_ _O_O_A_I_N_S_ _i_g_ _e_s_o_ _1_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _O_O_T_T_I_L_ _O_N_S_ _ _ _ _ _ _ _C_R_N_T_O_ _S_ _ _ _
-GAME( 200?, sc4coron    ,sc4coroc,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Bingo Version ?1) (PR2?4?) (Mazooma) (Scorpion 4) ", GAME_NOT_WORKING ) // incomplete pair, was in 'show me the money' set 'Bingo Version' is a guess
+GAME( 200?, sc4coron    ,sc4coroc,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Bingo Version ?1) (PR2?4?) (Mazooma) (Scorpion 4)", GAME_NOT_WORKING ) // incomplete pair, was in 'show me the money' set 'Bingo Version' is a guess
 // PR2249 CORONATION STREET         CORS  MAZ COROST_TRIPLE SOUNDS
 GAME( 200?, sc4corod    ,sc4coroc,  sc4, sc4, sc4_state, sc4corod, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4coroi    ,sc4coroc,  sc4, sc4, sc4_state, sc4corod, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
