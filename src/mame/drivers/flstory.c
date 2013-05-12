@@ -686,67 +686,67 @@ static INPUT_PORTS_START( victnine )
 	PORT_START("DSW0")      /* D800 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME(0x04, 0x04, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x40, 0x40, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0xa0, 0x20, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(   0x20, DEF_STR( Upright ) )
-	PORT_DIPSETTING(   0xa0, DEF_STR( Cocktail ) )
-	PORT_DIPSETTING(   0x00, "MA / MB" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xa0, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, "MA / MB" )
 
 	PORT_START("DSW1")      /* D801 */
-	PORT_DIPNAME(0x0f, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(   0x0f, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(   0x0e, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(   0x0d, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(   0x0c, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(   0x0b, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(   0x0a, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(   0x09, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(   0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(   0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(   0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(   0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(   0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(   0x06, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(   0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME(0xf0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(   0xf0, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(   0xe0, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(   0xd0, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(   0xc0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(   0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(   0xa0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(   0x90, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(   0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(   0x20, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(   0x30, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(   0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(   0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(   0x60, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(   0x70, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW2")      /* D802 */
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME(0x10, 0x10, "Coinage Display" )
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Show Year" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME(0x40, 0x40, "No hit" )
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x80, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(   0x80, "A and B" )
-	PORT_DIPSETTING(   0x00, "A only" )
+	PORT_DIPNAME( 0x40, 0x40, "No hit" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x80, "A and B" )
+	PORT_DIPSETTING(    0x00, "A only" )
 
 	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -802,7 +802,6 @@ static INPUT_PORTS_START( victnine )
 INPUT_PORTS_END
 
 
-
 static INPUT_PORTS_START( rumba )
 	PORT_START("DSW0")      /* D800 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
@@ -810,86 +809,85 @@ static INPUT_PORTS_START( rumba )
 	PORT_DIPSETTING(    0x01, "10000 60000" )
 	PORT_DIPSETTING(    0x02, "10000 40000" )
 	PORT_DIPSETTING(    0x03, "10000 20000" )
-	PORT_DIPNAME(0x04, 0x04, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(    0x00, "6")
-	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x80, 0x80, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(   0x80, DEF_STR( Cocktail ) )
-
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")      /* D801 */
-	PORT_DIPNAME(0x0f, 0x00, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(   0x0f, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(   0x0e, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(   0x0d, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(   0x0c, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(   0x0b, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(   0x0a, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(   0x09, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(   0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(   0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(   0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(   0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(   0x05, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(   0x06, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(   0x07, DEF_STR( 1C_8C ) )
-	PORT_DIPNAME(0xf0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(   0xf0, DEF_STR( 9C_1C ) )
-	PORT_DIPSETTING(   0xe0, DEF_STR( 8C_1C ) )
-	PORT_DIPSETTING(   0xd0, DEF_STR( 7C_1C ) )
-	PORT_DIPSETTING(   0xc0, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(   0xb0, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(   0xa0, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(   0x90, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(   0x10, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(   0x20, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(   0x30, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(   0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(   0x50, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(   0x60, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(   0x70, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW2")      /* D802 */
-	PORT_DIPNAME( 0x01,   0x01, "Training Stage" )
-	PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04,   0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(      0x04, DEF_STR( Japanese ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( English ) )
-	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,   0x20, "Copyright String" )
-	PORT_DIPSETTING(      0x20, "Taito Corp. MCMLXXXIV" )
-	PORT_DIPSETTING(      0x00, "Taito Corporation" )
-	PORT_DIPNAME( 0x40,   0x40, "Infinite Lives" ) //???
-	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Training Stage" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPNAME( 0x08, 0x00, "Attract Sound" )	/* At title sequence only - NOT Demo Sounds */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Coinage Display" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Copyright String" )
+	PORT_DIPSETTING(    0x20, "Taito Corp. MCMLXXXIV" )
+	PORT_DIPSETTING(    0x00, "Taito Corporation" )
+	PORT_DIPNAME( 0x40, 0x40, "Infinite Lives" ) //???
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")      /* D803 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -1064,16 +1062,16 @@ MACHINE_RESET_MEMBER(flstory_state,flstory)
 static MACHINE_CONFIG_START( flstory, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_10_733MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_733MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(flstory_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_8MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)    /* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705, XTAL_18_432MHz/6)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(flstory_m68705_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1121,16 +1119,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( onna34ro, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,10733000/2)     /* ??? */
+	MCFG_CPU_ADD("maincpu", Z80, 10733000/2)     /* ??? */
 	MCFG_CPU_PROGRAM_MAP(onna34ro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-//  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
+//  MCFG_CPU_ADD("mcu", M68705, XTAL_18_432MHz/6)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1157,7 +1155,7 @@ static MACHINE_CONFIG_START( onna34ro, flstory_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MCFG_SOUND_CONFIG(msm5232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -1178,16 +1176,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( victnine, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, 8000000/2)      /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(victnine_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000/2)     /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-//  MCFG_CPU_ADD("mcu", M68705,4000000)  /* ??? */
+//  MCFG_CPU_ADD("mcu", M68705, XTAL_18_432MHz/6)  /* ??? */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1214,7 +1212,7 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_ADD("msm", MSM5232, 8000000/4)
 	MCFG_SOUND_CONFIG(msm5232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -1241,16 +1239,16 @@ MACHINE_RESET_MEMBER(flstory_state,rumba)
 static MACHINE_CONFIG_START( rumba, flstory_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)      /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rumba_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", flstory_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)     /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(flstory_state, irq0_line_hold, 2*60)   /* IRQ generated by ??? */
 						/* NMI generated by the main CPU */
 
-//  MCFG_CPU_ADD("mcu", M68705,18432000/6)  /* ??? */
+//  MCFG_CPU_ADD("mcu", M68705, XTAL_18_432MHz/6) /* verified on pcb */
 //  MCFG_CPU_PROGRAM_MAP(m68705_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - an high value to ensure proper */
@@ -1273,11 +1271,11 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4) /* verified on pcb */
 	MCFG_SOUND_CONFIG(msm5232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
