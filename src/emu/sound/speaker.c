@@ -420,7 +420,7 @@ static double get_filtered_volume(speaker_state *sp)
 const device_type SPEAKER_SOUND = &device_creator<speaker_sound_device>;
 
 speaker_sound_device::speaker_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SPEAKER_SOUND, "Speaker", tag, owner, clock),
+	: device_t(mconfig, SPEAKER_SOUND, "Filtered 1-bit DAC", tag, owner, clock),
 		device_sound_interface(mconfig, *this)
 {
 	m_token = global_alloc_clear(speaker_state);
