@@ -23696,6 +23696,38 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 
 <!-- Other Asian Pirate dumps to sort -->
 
+<!-- TODO: study the menu and writes of this cart! -->
+	<software name="m_digi10" supported="no">
+		<description>Shu Ma Bao Long Zhuan Ji 10 in 1 (Chi)</description>
+		<year>200?</year>
+		<publisher>SKOB?</publisher>
+		<info name="alt_title" value="數碼暴龍專集 10 in 1"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="4194304">
+				<rom name="shu ma bao long zhuan ji 10 in 1 (unlicensed).bin" size="4194304" crc="37603b3a" sha1="37366ff0b3a722da867327c62cae6ad0e51d4a12" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This got ripped by m_digi10 -->
+	<software name="digid3">
+		<description>Chao Jin Hua - Shu Ma Bao Bei D-3 (Chi, Ripped from 10 in 1 multicart)</description>
+		<year>200?</year>
+		<publisher>SKOB?</publisher>
+		<info name="alt_title" value="超進化 數碼寶貝D-3"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<!-- cartridge ram -->
+			<dataarea name="rom" size="1048576">
+				<rom name="chao jin hua - shu ma bao bei d-3 (unlicensed, chinese) (multicart rip).bin" size="1048576" crc="1517d27e" sha1="0d14f2e2ab630b6f99a8125e5c0120c2d7967270" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="fkdfw">
 		<description>Feng Kuang Da Fu Weng (Chi, Ripped from multicart)</description>
 		<year>200?</year>
@@ -23950,7 +23982,7 @@ These were produced between 2000 and 2001 by Rocket Games, run by Datel Design
 		<description>Shu Ma Bao Long - Shui Jing Ban II (Chi)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
-		<info name="alt_title" value="數碼暴龍 - 水晶板II"/>
+		<info name="alt_title" value="數碼暴龍 - 水晶版II"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_sintax" />
 			<!-- cartridge ram -->
