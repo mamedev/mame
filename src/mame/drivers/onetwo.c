@@ -195,8 +195,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_byte_w)
 ADDRESS_MAP_END
@@ -337,11 +337,6 @@ WRITE_LINE_MEMBER(onetwo_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(onetwo_state,irqhandler)  /* IRQ Line */
-};
-
 /*************************************
  *
  *  Machine driver
@@ -385,7 +380,7 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(onetwo_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified

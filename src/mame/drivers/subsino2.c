@@ -1232,7 +1232,7 @@ static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(ss9601_scrollctrl_w )
 
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
+	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE("ymsnd", ym3812_device, write)
 
 	AM_RANGE(0x0060, 0x0063) AM_WRITE(hm86171_colorram_w )
 

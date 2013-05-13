@@ -406,7 +406,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -980,11 +980,6 @@ WRITE_LINE_MEMBER(nmg5_state::soundirq)
 	m_soundcpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nmg5_state,soundirq)    /* IRQ Line */
-};
-
 void nmg5_state::machine_start()
 {
 	save_item(NAME(m_gfx_bank));
@@ -1036,7 +1031,7 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000) /* 4MHz */
-	MCFG_SOUND_CONFIG(ym3812_intf)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nmg5_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)

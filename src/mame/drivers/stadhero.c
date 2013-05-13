@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, stadhero_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -217,11 +217,6 @@ WRITE_LINE_MEMBER(stadhero_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(stadhero_state,irqhandler)
-};
-
 /******************************************************************************/
 
 static MACHINE_CONFIG_START( stadhero, stadhero_state )
@@ -262,7 +257,7 @@ static MACHINE_CONFIG_START( stadhero, stadhero_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_24MHz/8)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(stadhero_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)

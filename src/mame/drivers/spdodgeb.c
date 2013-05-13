@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -387,11 +387,6 @@ WRITE_LINE_MEMBER(spdodgeb_state::irqhandler)
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,irqhandler)
-};
-
 static const msm5205_interface msm5205_config_1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(spdodgeb_state,spd_adpcm_int_1),  /* interrupt function */
@@ -442,7 +437,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spdodgeb_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

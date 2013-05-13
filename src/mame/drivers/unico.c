@@ -67,8 +67,8 @@ static ADDRESS_MAP_START( burglarx_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x800030, 0x800031) AM_WRITENOP                                                // ? 0
 	AM_RANGE(0x80010c, 0x800121) AM_WRITEONLY AM_SHARE("scroll")                // Scroll
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_write_port_w, 0xff00           )   //
-	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00       )   //
+	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8("ymsnd", ym3812_device, write_port_w, 0xff00)
+	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8("ymsnd", ym3812_device, status_port_r, control_port_w, 0xff00)
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(burglarx_sound_bank_w)                    //
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP                                                // IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_SHARE("vram")        // Layers 1, 2, 0
@@ -155,8 +155,8 @@ static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x800178, 0x800179) AM_READ(unico_guny_1_msb_r         )   //
 	AM_RANGE(0x80017c, 0x80017d) AM_READ(unico_gunx_1_msb_r         )   //
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff               )   // Sound
-	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_write_port_w, 0xff00           )   //
-	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00       )   //
+	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8("ymsnd", ym3812_device, write_port_w, 0xff00)
+	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8("ymsnd", ym3812_device, status_port_r, control_port_w, 0xff00)
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(zeropnt_sound_bank_w              )   //
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITEONLY   // ? IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_SHARE("vram")    // Layers 1, 2, 0

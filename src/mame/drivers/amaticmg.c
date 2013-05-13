@@ -644,7 +644,7 @@ static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(unk80_w)
@@ -660,7 +660,7 @@ static ADDRESS_MAP_START( amaticmg2_portmap, AS_IO, 8, amaticmg_state )
 //  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE("crtc", mc6845_device, address_w)                  // 0e for mg_iii_vger_3.64_v_8309
 	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w) // 0f for mg_iii_vger_3.64_v_8309
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(rombank_w)
@@ -788,15 +788,6 @@ static GFXDECODE_START( amaticmg2 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
-/************************************
-*          Sound Interface          *
-************************************/
-
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_NULL
-};
-
 
 /************************************
 *          CRTC Interface           *
@@ -898,7 +889,6 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, SND_CLOCK)
-	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 //  MCFG_DAC_ADD("dac")   /* Y3014B */

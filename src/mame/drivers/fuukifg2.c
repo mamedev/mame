@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(fuuki16_oki_banking_w)    // Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP    // ? In the NMI routine
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_device, read)   // M6295
 	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_device, write) // M6295
 ADDRESS_MAP_END
@@ -394,11 +394,6 @@ WRITE_LINE_MEMBER(fuuki16_state::soundirq)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface fuuki16_ym3812_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fuuki16_state,soundirq)    /* IRQ Line */
-};
-
 /*
     - Interrupts (pbancho) -
 
@@ -484,7 +479,7 @@ static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(fuuki16_ym3812_intf)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(fuuki16_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 

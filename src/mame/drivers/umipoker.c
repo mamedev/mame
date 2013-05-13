@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_device, read, write)
 ADDRESS_MAP_END
 
 

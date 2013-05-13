@@ -547,7 +547,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -556,7 +556,7 @@ ADDRESS_MAP_END
 /* Physical memory map (21 bits) */
 static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
 	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -567,7 +567,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_byte_r)
@@ -1304,16 +1304,6 @@ WRITE_LINE_MEMBER(dec0_state::sound_irq2)
 	m_audiocpu->set_input_line(1, state); /* IRQ2 */
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dec0_state,sound_irq)
-};
-
-static const ym3812_interface ym3812b_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dec0_state,sound_irq2)
-};
-
 /******************************************************************************/
 
 
@@ -1347,7 +1337,7 @@ static MACHINE_CONFIG_DERIVED( dec0_base_sound, dec0_base )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
@@ -1365,7 +1355,7 @@ static MACHINE_CONFIG_DERIVED( dec0_base_sound_alt, dec0_base )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3812b_interface)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
@@ -1733,7 +1723,7 @@ static MACHINE_CONFIG_DERIVED( midresb, midres )
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	MCFG_SOUND_MODIFY("ym2")
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec0_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

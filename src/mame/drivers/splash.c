@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)              /* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)                     /* Sound latch */
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w) /* YM3812 */
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write) /* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                     /* RAM */
 ADDRESS_MAP_END
 

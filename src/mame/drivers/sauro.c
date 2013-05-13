@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */

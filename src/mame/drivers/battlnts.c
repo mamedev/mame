@@ -78,8 +78,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                         /* ROM 777c01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym3812_r, ym3812_w)      /* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)      /* YM3812 (chip 2) */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_device, read, write)      /* YM3812 (chip 1) */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym3812_device, read, write)      /* YM3812 (chip 2) */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
 ADDRESS_MAP_END
 

@@ -743,7 +743,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0, 0x1) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_device, write_signed8)
 	AM_RANGE(0x3, 0x3) AM_DEVWRITE("dac2", dac_device, write_signed8)
 	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)

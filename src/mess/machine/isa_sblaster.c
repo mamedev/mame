@@ -61,11 +61,6 @@ static const int m_cmd_fifo_length[256] =
 
 static const int protection_magic[4] = { 0x96, 0xa5, 0x69, 0x5a };
 
-static const ym3812_interface pc_ym3812_interface =
-{
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START(midiin_slot)
 	SLOT_INTERFACE("midiin", MIDIIN_PORT)
 SLOT_INTERFACE_END
@@ -87,7 +82,6 @@ static const serial_port_interface midiout_intf =
 static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 3.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 3.00)
 	MCFG_SAA1099_ADD("saa1099.1", 4772720)
@@ -110,7 +104,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 	/* no CM/S support (empty sockets) */
@@ -144,20 +137,24 @@ MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
 {
+	ym3812_device *ym3812 = (ym3812_device *) device;
+
 	UINT8 retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = ym3812_status_port_r( device, space, offset ); break;
+		case 0 : retVal = ym3812->status_port_r( space, offset ); break;
 	}
 	return retVal;
 }
 
 static WRITE8_DEVICE_HANDLER( ym3812_16_w )
 {
+	ym3812_device *ym3812 = (ym3812_device *) device;
+
 	switch(offset)
 	{
-		case 0 : ym3812_control_port_w( device, space, offset, data ); break;
-		case 1 : ym3812_write_port_w( device, space, offset, data ); break;
+		case 0 : ym3812->control_port_w( space, offset, data ); break;
+		case 1 : ym3812->write_port_w( space, offset, data ); break;
 	}
 }
 

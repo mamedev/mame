@@ -11,34 +11,32 @@
 
 #define ym3812_StdClock 3579545
 
-static const ym3812_interface pc_ym3812_interface =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( adlib_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
-	MCFG_SOUND_CONFIG(pc_ym3812_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.00)
 MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
 {
+	ym3812_device *ym3812 = (ym3812_device *) device;
+
 	UINT8 retVal = 0xff;
 	switch(offset)
 	{
-		case 0 : retVal = ym3812_status_port_r( device, space, offset ); break;
+		case 0 : retVal = ym3812->status_port_r( space, offset ); break;
 	}
 	return retVal;
 }
 
 static WRITE8_DEVICE_HANDLER( ym3812_16_w )
 {
+	ym3812_device *ym3812 = (ym3812_device *) device;
+
 	switch(offset)
 	{
-		case 0 : ym3812_control_port_w( device, space, offset, data ); break;
-		case 1 : ym3812_write_port_w( device, space, offset, data ); break;
+		case 0 : ym3812->control_port_w( space, offset, data ); break;
+		case 1 : ym3812->write_port_w( space, offset, data ); break;
 	}
 }
 

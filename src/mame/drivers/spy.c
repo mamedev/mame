@@ -393,7 +393,7 @@ static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
@@ -474,11 +474,6 @@ WRITE_LINE_MEMBER(spy_state::irqhandler)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(spy_state,irqhandler)
-};
-
 
 static const k052109_interface spy_k052109_intf =
 {
@@ -552,7 +547,7 @@ static MACHINE_CONFIG_START( spy, spy_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(spy_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)

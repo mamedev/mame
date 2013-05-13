@@ -774,8 +774,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alpha68k_I_s_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfc00, 0xfc00) AM_RAM // unknown port
 ADDRESS_MAP_END
@@ -815,8 +815,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnextspc_sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0x3b, 0x3b) AM_READNOP // unknown read port
 	AM_RANGE(0x3d, 0x3d) AM_READNOP // unknown read port
 	AM_RANGE(0x7b, 0x7b) AM_READNOP // unknown read port
@@ -1848,11 +1848,6 @@ WRITE_LINE_MEMBER(alpha68k_state::ym3812_irq)
 	m_audiocpu->set_input_line(0, (state) ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(alpha68k_state,ym3812_irq)
-};
-
 
 /******************************************************************************/
 
@@ -2101,7 +2096,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(alpha68k_state, ym3812_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2318,7 +2313,7 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(alpha68k_state, ym3812_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

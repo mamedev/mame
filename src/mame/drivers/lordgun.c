@@ -354,7 +354,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_byte_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r )
@@ -665,11 +665,6 @@ WRITE_LINE_MEMBER(lordgun_state::soundirq)
 	m_soundcpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-static const ym3812_interface lordgun_ym3812_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(lordgun_state,soundirq)
-};
-
 static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
@@ -698,7 +693,7 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MCFG_SOUND_CONFIG(lordgun_ym3812_interface)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(lordgun_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right!

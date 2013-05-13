@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("k051649", k051649_device, k051649_volume_w)
 	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("k051649", k051649_device, k051649_keyonoff_w)
 	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("k051649", k051649_device, k051649_test_r, k051649_test_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(city_sound_bank_w) /* 7232 bankswitch */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
@@ -1486,11 +1486,6 @@ WRITE_LINE_MEMBER(nemesis_state::sound_irq)
 // driver_state->audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(nemesis_state,sound_irq)
-};
-
 WRITE8_MEMBER(nemesis_state::volume_callback)
 {
 	k007232_set_volume(m_k007232, 0, (data >> 4) * 0x11, 0);
@@ -1828,7 +1823,7 @@ static MACHINE_CONFIG_START( citybomb, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nemesis_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -1874,7 +1869,7 @@ static MACHINE_CONFIG_START( nyanpani, nemesis_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(nemesis_state, sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 

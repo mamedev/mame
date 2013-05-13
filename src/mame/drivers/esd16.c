@@ -253,7 +253,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)          // YM3812
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_device, write)          // YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)   // M6295
 	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r)             // From Main CPU
 	AM_RANGE(0x04, 0x04) AM_WRITENOP                        // ? $00, $30

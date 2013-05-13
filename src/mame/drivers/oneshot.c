@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_byte_r,soundlatch_byte_w)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
@@ -331,11 +331,6 @@ WRITE_LINE_MEMBER(oneshot_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(oneshot_state,irqhandler)
-};
-
 void oneshot_state::machine_start()
 {
 	save_item(NAME(m_gun_x_p1));
@@ -384,7 +379,7 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(oneshot_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified

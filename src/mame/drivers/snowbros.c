@@ -215,7 +215,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) /* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -316,7 +316,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( honeydol_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)                                // not connected?
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)                                // not connected?
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_byte_r, soundlatch_byte_w) /* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
@@ -1492,14 +1492,6 @@ WRITE_LINE_MEMBER(snowbros_state::irqhandler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-/* SnowBros Sound */
-
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(snowbros_state,irqhandler)
-};
-
-
 MACHINE_RESET_MEMBER(snowbros_state,semiprot)
 {
 	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
@@ -1554,7 +1546,7 @@ static MACHINE_CONFIG_START( snowbros, snowbros_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1663,7 +1655,7 @@ static MACHINE_CONFIG_START( honeydol, snowbros_state )
 	/* sound hardware */
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snowbros_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 

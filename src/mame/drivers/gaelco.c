@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                         /* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_device, read, write)   /* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
-	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)        /* YM3812 */
+	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)        /* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_byte_r)                         /* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_ROM                                         /* ROM */
 ADDRESS_MAP_END

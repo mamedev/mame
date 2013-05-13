@@ -193,8 +193,8 @@ WRITE_LINE_MEMBER(tbowl_state::tbowl_adpcm_int_2)
 static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("ym1", ym3812_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_device, write)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
@@ -432,11 +432,6 @@ WRITE_LINE_MEMBER(tbowl_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tbowl_state,irqhandler)
-};
-
 static const msm5205_interface msm5205_config_1 =
 {
 	DEVCB_DRIVER_LINE_MEMBER(tbowl_state,tbowl_adpcm_int_1),    /* interrupt function */
@@ -511,7 +506,7 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tbowl_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 4000000)

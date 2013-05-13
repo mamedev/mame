@@ -846,7 +846,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1908,11 +1908,6 @@ WRITE_LINE_MEMBER(dec8_state::irqhandler)
 	m_audiocpu->set_input_line(0, state); /* M6502_IRQ_LINE */
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(dec8_state,irqhandler)
-};
-
 static const msm5205_interface msm5205_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(dec8_state,csilver_adpcm_int),  /* interrupt function */
@@ -2240,7 +2235,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2387,7 +2382,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2438,7 +2433,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(dec8_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 

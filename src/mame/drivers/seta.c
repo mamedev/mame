@@ -2904,7 +2904,7 @@ static ADDRESS_MAP_START( crazyfgt_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x620000, 0x620003) AM_WRITENOP    // protection
 	AM_RANGE(0x630000, 0x630003) AM_READ(seta_dsw_r)
 	AM_RANGE(0x640400, 0x640fff) AM_WRITEONLY AM_SHARE("paletteram")    // Palette
-	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0x00ff)
+	AM_RANGE(0x650000, 0x650003) AM_DEVWRITE8("ymsnd", ym3812_device, write, 0x00ff)
 	AM_RANGE(0x658000, 0x658001) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x670000, 0x670001) AM_READNOP     // watchdog?
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_2_w) AM_SHARE("vram_2") // VRAM 2
@@ -3087,7 +3087,7 @@ static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x3000, 0x3001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("sharedram")       // Shared RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM                             // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                        // Banked ROM

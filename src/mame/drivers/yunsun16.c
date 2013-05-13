@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w )
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r )                        // From Main CPU
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
 ADDRESS_MAP_END
@@ -575,11 +575,6 @@ WRITE_LINE_MEMBER(yunsun16_state::soundirq)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface magicbub_ym3812_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(yunsun16_state,soundirq)    /* IRQ Line */
-};
-
 static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 
 	/* basic machine hardware */
@@ -608,7 +603,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(magicbub_ym3812_intf)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(yunsun16_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 

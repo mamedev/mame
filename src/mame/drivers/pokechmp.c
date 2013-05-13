@@ -105,7 +105,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_device, write)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP    /* MSM5205 chip on Pocket Gal, not connected here? */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w) /* sound rom bank seems to be replaced with OKI bank */
 	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_device, read, write) // extra

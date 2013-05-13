@@ -946,7 +946,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -958,7 +958,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
@@ -1646,12 +1646,6 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(itech8_state,generate_sound_irq)
-};
-
-
 
 /*************************************
  *
@@ -1741,7 +1735,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
@@ -1757,7 +1751,7 @@ static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("ymsnd", YM3812, CLOCK_8MHz/2)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(itech8_state, generate_sound_irq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MCFG_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified

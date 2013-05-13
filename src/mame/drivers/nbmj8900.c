@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8900_romsel_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8900_scrolly_w)
 
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 
 	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 

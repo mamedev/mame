@@ -2318,7 +2318,7 @@ static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
 	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_SHARE("paletteram")
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0x00ff )
+	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8("ymsnd", ym3812_device, write, 0x00ff)
 
 	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(drgnwrld_igs003_w )
 	AM_RANGE( 0x800002, 0x800003 ) AM_READ(drgnwrld_igs003_r )

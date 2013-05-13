@@ -229,7 +229,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tecmo_adpcm_vol_w)
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 												/* writes code to this area */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(tecmo_adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(tecmo_adpcm_vol_w)
@@ -606,11 +606,6 @@ WRITE_LINE_MEMBER(tecmo_state::irqhandler)
 	m_soundcpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tecmo_state,irqhandler)
-};
-
 static const msm5205_interface msm5205_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(tecmo_state,tecmo_adpcm_int),    /* interrupt function */
@@ -654,7 +649,7 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tecmo_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
@@ -713,7 +708,7 @@ static MACHINE_CONFIG_START( backfirt, tecmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(tecmo_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* no MSM on this PCB */

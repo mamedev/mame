@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")         /* Twin Cobra - Coin/Start */
 	AM_RANGE(0x20, 0x20) AM_WRITE(twincobr_coin_w)      /* Twin Cobra coin count-lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
@@ -552,11 +552,6 @@ WRITE_LINE_MEMBER(twincobr_state::irqhandler)
 	m_audiocpu->set_input_line(0, state);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(twincobr_state,irqhandler)
-};
-
 
 
 static MACHINE_CONFIG_START( twincobr, twincobr_state )
@@ -599,7 +594,7 @@ static MACHINE_CONFIG_START( twincobr, twincobr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(twincobr_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

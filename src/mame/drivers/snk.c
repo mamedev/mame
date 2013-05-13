@@ -468,12 +468,6 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 }
 
 
-static const ym3812_interface ym3812_config_1 =
-{
-	DEVCB_DRIVER_LINE_MEMBER(snk_state,ymirq_callback_1)
-};
-
-
 
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
@@ -1446,8 +1440,8 @@ static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE_LEGACY("ym1", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3812_write_port_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
@@ -1466,8 +1460,8 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE_LEGACY("ym1", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3812_write_port_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("ym2", y8950_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
@@ -3837,7 +3831,7 @@ static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ym1", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_SOUND_CONFIG(ym3812_config_1)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -3989,7 +3983,7 @@ static MACHINE_CONFIG_DERIVED( chopper1, bermudat )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ym1", YM3812, 4000000)
-	MCFG_SOUND_CONFIG(ym3812_config_1)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

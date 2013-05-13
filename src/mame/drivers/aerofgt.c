@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
@@ -1276,11 +1276,6 @@ WRITE_LINE_MEMBER(aerofgt_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ym3812_interface ym3812_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(aerofgt_state,irqhandler)  /* IRQ Line */
-};
-
 
 MACHINE_START_MEMBER(aerofgt_state,common)
 {
@@ -1779,7 +1774,7 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(aerofgt_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
