@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 // rom mapping
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
 // sound chip
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_device, read, write, 0xffffffff)
 // inputs/eeprom
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x05800004, 0x05800007) AM_READWRITE(psh_eeprom_r, psh_eeprom_w)
@@ -538,7 +538,7 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x03000004, 0x03000007) AM_READWRITE(psh_eeprom_r, psh_eeprom_w)
 // sound chip
-	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8("ymf", ymf278b_device, read, write, 0xffffffff)
 // video chip
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_SHARE("bgram") // video banks 7-0x1f (backgrounds and other effects)
@@ -785,11 +785,6 @@ WRITE_LINE_MEMBER(psikyosh_state::irqhandler)
 	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf278b_interface ymf278b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(psikyosh_state,irqhandler)
-};
-
 
 void psikyosh_state::machine_start()
 {
@@ -827,7 +822,7 @@ static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyosh_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

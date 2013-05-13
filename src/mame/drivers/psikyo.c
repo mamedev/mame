@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP
-	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE_LEGACY("ymf", ymf278b_r, ymf278b_w)
+	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE("ymf", ymf278b_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
@@ -1153,11 +1153,6 @@ WRITE_LINE_MEMBER(psikyo_state::irqhandler)
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf278b_interface ymf278b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(psikyo_state,irqhandler)
-};
-
 static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
@@ -1190,7 +1185,7 @@ static MACHINE_CONFIG_START( s1945, psikyo_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyo_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

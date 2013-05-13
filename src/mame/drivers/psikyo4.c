@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_SHARE("bgpen_2") // screen 2 clear colour
 	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_SHARE("paletteram") // palette
 	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_device, read, write, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x05800004, 0x05800007) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x05800008, 0x0580000b) AM_WRITEONLY AM_SHARE("io_select") // Used by Mahjong games to choose input (also maps normal loderndf inputs to offsets)
@@ -648,11 +648,6 @@ WRITE_LINE_MEMBER(psikyo4_state::irqhandler)
 	m_maincpu->set_input_line(12, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf278b_interface ymf278b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(psikyo4_state,irqhandler)
-};
-
 
 void psikyo4_state::machine_start()
 {
@@ -701,7 +696,7 @@ static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(psikyo4_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

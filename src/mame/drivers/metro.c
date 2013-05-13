@@ -437,11 +437,6 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 	m_portb = data;
 }
 
-static const ymf278b_interface ymf278b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(metro_state,ymf278b_interrupt)
-};
-
 
 /***************************************************************************
 
@@ -770,8 +765,8 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 
 static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8_LEGACY("ymf", ymf278b_r, 0x00ff)       // Sound
-	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8_LEGACY("ymf", ymf278b_w, 0x00ff)      // Sound
+	AM_RANGE(0x300000, 0x300001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
+	AM_RANGE(0x300000, 0x30000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
 	AM_RANGE(0x400000, 0x41ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")                                // Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")                                //
@@ -829,8 +824,8 @@ static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
-	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8_LEGACY("ymf", ymf278b_r, 0x00ff)       // Sound
-	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8_LEGACY("ymf", ymf278b_w, 0x00ff)      // Sound
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -841,8 +836,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8_LEGACY("ymf", ymf278b_r, 0x00ff)       // Sound
-	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8_LEGACY("ymf", ymf278b_w, 0x00ff)      // Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
+	AM_RANGE(0xb00000, 0xb0000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) // Sound
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")                                // Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")                                //
@@ -900,8 +895,8 @@ static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // read but ignored?
-	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8_LEGACY("ymf", ymf278b_r, 0x00ff)       // Sound
-	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8_LEGACY("ymf", ymf278b_w, 0x00ff)      //
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) //
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -935,8 +930,8 @@ static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
 	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // 3 x DSW
-	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8_LEGACY("ymf", ymf278b_r, 0x00ff)       // Sound
-	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8_LEGACY("ymf", ymf278b_w, 0x00ff)      //
+	AM_RANGE(0x400000, 0x400001) AM_DEVREAD8("ymf", ymf278b_device, read, 0x00ff)   // Sound
+	AM_RANGE(0x400000, 0x40000b) AM_DEVWRITE8("ymf", ymf278b_device, write, 0x00ff) //
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -3593,7 +3588,7 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3626,7 +3621,7 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3659,7 +3654,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3692,7 +3687,7 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -3725,7 +3720,7 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(metro_state, ymf278b_interrupt))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

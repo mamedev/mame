@@ -282,7 +282,7 @@ WRITE8_MEMBER(fuuki32_state::snd_z80_w)
 
 WRITE8_MEMBER(fuuki32_state::snd_ymf278b_w)
 {
-	ymf278b_w(machine().device("ymf1"), space, offset, data);
+	machine().device<ymf278b_device>("ymf1")->write(space, offset, data);
 
 	// also write to ymf262
 	if (offset < 4)
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8, fuuki32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related
-	AM_RANGE(0x40, 0x45) AM_DEVREAD_LEGACY("ymf1", ymf278b_r) AM_WRITE(snd_ymf278b_w)
+	AM_RANGE(0x40, 0x45) AM_DEVREAD("ymf1", ymf278b_device, read) AM_WRITE(snd_ymf278b_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -571,11 +571,6 @@ WRITE_LINE_MEMBER(fuuki32_state::irqhandler)
 	m_soundcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const ymf278b_interface fuuki32_ymf278b_interface =
-{
-	DEVCB_DRIVER_LINE_MEMBER(fuuki32_state,irqhandler)      /* irq */
-};
-
 static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	/* basic machine hardware */
@@ -603,7 +598,7 @@ static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymf1", YMF278B, YMF278B_STD_CLOCK) // 33.8688MHz
-	MCFG_SOUND_CONFIG(fuuki32_ymf278b_interface)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(fuuki32_state, irqhandler))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 

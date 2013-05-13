@@ -367,8 +367,8 @@ static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8, lordgun_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch2_byte_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r )
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP    // writes 03 then 07 at end of NMI
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD_LEGACY("ymf", ymf278b_r)
-	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE_LEGACY("ymf", ymf278b_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("ymf", ymf278b_device, read)
+	AM_RANGE(0x7000, 0x7005) AM_DEVWRITE("ymf", ymf278b_device, write)
 	AM_RANGE(0x7400, 0x7400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x7800, 0x7800) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -701,11 +701,6 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 MACHINE_CONFIG_END
 
 
-static const ymf278b_interface ymf278b_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(lordgun_state,soundirq)
-};
-
 static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
@@ -734,7 +729,7 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
-	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_YMF278B_IRQ_HANDLER(WRITELINE(lordgun_state, soundirq))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right
