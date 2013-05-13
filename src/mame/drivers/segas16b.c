@@ -1170,7 +1170,7 @@ WRITE16_MEMBER( segas16b_state::standard_io_w )
 
 WRITE16_MEMBER( segas16b_state::atomicp_sound_w )
 {
-	ym2413_w(m_ym2413, space, offset, data >> 8);
+	m_ym2413->write(space, offset, data >> 8);
 }
 
 

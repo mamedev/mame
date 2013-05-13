@@ -831,7 +831,7 @@ READ8_MEMBER(sms_state::sms_input_port_1_r)
 WRITE8_MEMBER(sms_state::sms_ym2413_register_port_0_w)
 {
 	if (m_has_fm)
-		ym2413_w(m_ym, space, 0, (data & 0x3f));
+		m_ym->write(space, 0, (data & 0x3f));
 }
 
 
@@ -840,7 +840,7 @@ WRITE8_MEMBER(sms_state::sms_ym2413_data_port_0_w)
 	if (m_has_fm)
 	{
 		logerror("data_port_0_w %x %x\n", offset, data);
-		ym2413_w(m_ym, space, 1, data);
+		m_ym->write(space, 1, data);
 	}
 }
 
@@ -1906,7 +1906,6 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_lphaser_1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_1_callback),this));
 	m_lphaser_2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::lphaser_2_callback),this));
 
-	m_ym = machine().device("ym2413");
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
 	m_space = &m_main_cpu->space(AS_PROGRAM);

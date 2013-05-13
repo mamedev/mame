@@ -508,8 +508,8 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 
 	AM_RANGE( 0x001b, 0x001b ) AM_WRITE(dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w   )
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w       )
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
 
 //  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE(dunhuang_82_w )
 

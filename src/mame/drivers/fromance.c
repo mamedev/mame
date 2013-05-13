@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ymsnd", ym2413_device, write)
 ADDRESS_MAP_END
 
 

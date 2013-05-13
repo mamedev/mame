@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("sharedram1")                      /* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("sharedram3")     /* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP
-	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800003) AM_READNOP AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x800004, 0x800005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_SHARE("sharedram1")
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM AM_SHARE("sharedram2")

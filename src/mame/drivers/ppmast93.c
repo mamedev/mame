@@ -222,7 +222,7 @@ WRITE8_MEMBER(ppmast93_state::ppmast_sound_w)
 	switch(offset&0xff)
 	{
 		case 0:
-		case 1: ym2413_w(machine().device("ymsnd"),space,offset,data); break;
+		case 1: machine().device<ym2413_device>("ymsnd")->write(space,offset,data); break;
 		case 2: m_dac->write_unsigned8(data);break;
 		default: logerror("%x %x - %x\n",offset,data,space.device().safe_pcbase());
 	}

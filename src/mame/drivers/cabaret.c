@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")         /* DSW2 */
 	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")         /* DSW3 */
 
-	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
+	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
 
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")

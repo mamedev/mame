@@ -2282,14 +2282,14 @@ READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 
 WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	device_t *ym = machine().device("ym2413");
-	if (ym) ym2413_w(ym,space,offset,data);
+	ym2413_device *ym2413 = machine().device<ym2413_device>("ym2413");
+	if (ym2413) ym2413->write(space,offset,data);
 }
 
 READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  device_t *ym = machine().device("ym2413");
-//  return ym2413_read(ym,offset);
+//  ym2413_device *ym2413 = machine().device<ym2413_device>("ym2413");
+//  if (ym2413) return ym2413->read(space,offset);
 	return 0xff;
 }
 

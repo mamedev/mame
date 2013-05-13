@@ -321,7 +321,7 @@ READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
 
 static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	JPM_SYS5_COMMON_MAP
-	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8_LEGACY("ym2413", ym2413_w, 0x00ff)
+	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w)
 ADDRESS_MAP_END
 
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16, jpmsys5_state )
 	JPM_SYS5_COMMON_MAP
 	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w) // extra on video system (rom board?) (although regular games do write here?)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1") // extra on video system (rom board?)
-	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8_LEGACY("ym2413", ym2413_w, 0x00ff)
+	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x0460e0, 0x0460e5) AM_WRITE(ramdac_w)  // extra on video system (rom board?)
 	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w)
 	AM_RANGE(0x800000, 0xcfffff) AM_READWRITE(sys5_tms34061_r, sys5_tms34061_w) // extra on video system (rom board?)

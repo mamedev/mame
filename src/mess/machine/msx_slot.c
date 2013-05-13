@@ -1704,13 +1704,13 @@ MSX_SLOT_WRITE(fmpac)
 	case 0x7ff4:
 		if (state->m_cart.fmpac.opll_active)
 		{
-			ym2413_w (drvstate->m_ym, space, 0, val);
+			drvstate->m_ym->write(space, 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->m_cart.fmpac.opll_active)
 		{
-			ym2413_w (drvstate->m_ym, space, 1, val);
+			drvstate->m_ym->write(space, 1, val);
 		}
 		break;
 	case 0x7ff6:

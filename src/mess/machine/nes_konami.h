@@ -3,6 +3,7 @@
 
 #include "machine/nes_nxrom.h"
 #include "audio/vrc6.h"
+#include "sound/2413intf.h"
 
 
 // ======================> nes_konami_vrc1_device
@@ -136,7 +137,7 @@ public:
 	virtual void pcb_reset();
 
 private:
-	device_t *m_ym2413;
+	required_device<ym2413_device> m_ym2413;
 };
 
 

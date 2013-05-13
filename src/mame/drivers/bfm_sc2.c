@@ -1463,7 +1463,7 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
 	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)                     /* custom chip unlock */
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
 	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)                /* vfd2 data (not usually connected!)*/
 

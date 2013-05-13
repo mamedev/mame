@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( gluck2_map, AS_PROGRAM, 8, gluck2_state )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(gluck2_videoram_w) AM_SHARE("videoram") /* 6116 #1 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(gluck2_colorram_w) AM_SHARE("colorram") /* 6116 #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW1")
-	AM_RANGE(0x2d00, 0x2d01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
+	AM_RANGE(0x2d00, 0x2d01) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x3400, 0x3400) AM_READ_PORT("IN0")
 	AM_RANGE(0x3500, 0x3500) AM_READ_PORT("IN1")
 	AM_RANGE(0x3600, 0x3600) AM_READ_PORT("IN2")

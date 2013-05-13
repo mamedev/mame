@@ -791,7 +791,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_device, write_signed8)
-	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE_LEGACY("ym2", ym2413_w)
+	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE("ym2", ym2413_device, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
 ADDRESS_MAP_END

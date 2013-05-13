@@ -1347,7 +1347,7 @@ static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
 ADDRESS_MAP_END
 
 
@@ -1772,7 +1772,7 @@ static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE("ymsnd", ym2413_device, write)
 ADDRESS_MAP_END
 
 
