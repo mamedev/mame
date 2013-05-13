@@ -1557,7 +1557,7 @@ INVESTIGATE
 		</part>
 	</software>
 
-	<software name="advenlnd" supported="no">
+	<software name="advland" supported="no">
 		<description>Adventureland</description>
 		<year>1984</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
@@ -2807,7 +2807,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 	</software>
 
 	<software name="genchohi">
-		<description>Aoki Ookami to Shiroki Mejika - Gencho Hisshi</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi</description>
 		<year>1992</year>
 		<publisher>光栄 (Koei)</publisher>
 		<!-- PC8801mk2SR -->
@@ -5488,7 +5488,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cancanb">
-		<description>CanCan Bunny</description>
+		<description>Can Can Bunny</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -5512,7 +5512,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cancanba" cloneof="cancanb">
-		<description>CanCan Bunny (Alt?)</description>
+		<description>Can Can Bunny (Alt?)</description>
 		<year>1989</year>
 		<publisher>カクテルソフト (Cocktail Soft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -5537,7 +5537,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cancanbs">
-		<description>CanCan Bunny Superior</description>
+		<description>Can Can Bunny Superior</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -5576,7 +5576,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cancanbsa" cloneof="cancanbs">
-		<description>CanCan Bunny Superior (Alt?)</description>
+		<description>Can Can Bunny Superior (Alt?)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -5615,7 +5615,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 	</software>
 
 	<software name="cancanbsb" cloneof="cancanbs">
-		<description>CanCan Bunny Superior (Alt 2)</description>
+		<description>Can Can Bunny Superior (Alt 2)</description>
 		<year>1990</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<!-- PC8801mk2SR -->
@@ -7455,12 +7455,12 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="4thunit">
-		<description>Dai4 no Unit - The 4th Unit</description>
+		<description>The 4th Unit</description>
 		<year>1987</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198712xx"/>
-		<info name="alt_title" value="第4のユニット"/>
+		<info name="alt_title" value="第4のユニット ~ Dai 4 no Unit"/>
 		<!--combined image-->
 		<!--rom name="dai4 no unit 1.d88" size="697664" crc="5262d5d7" sha1="d1ec3328234ef453b07b4872d72fdbf237c4e256" offset="0" /-->
 
@@ -7480,12 +7480,12 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="4thunit2">
-		<description>Dai4 no Unit 2 - The 4th Unit 2</description>
+		<description>The 4th Unit 2</description>
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198807xx"/>
-		<info name="alt_title" value="第4のユニット2"/>
+		<info name="alt_title" value="第4のユニット2 ~ Dai 4 no Unit Act. 2"/>
 		<!--combined image-->
 		<!--rom name="dai4 no unit 2.d88" size="1046496" crc="46dcecc9" sha1="1abcd75036d91b759e693ddb0efde854006ac951" offset="0" /-->
 
@@ -7512,12 +7512,12 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="dualtarg">
-		<description>Dai4 no Unit 3 - Dual Targets - The 4th Unit Act. 3</description>
+		<description>Dual Targets - The 4th Unit Act. 3</description>
 		<year>1989</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198904xx"/>
-		<info name="alt_title" value="デュアルターゲット 第4のユニット3"/>
+		<info name="alt_title" value="デュアルターゲット 第4のユニット3 ~ Dai 4 no Unit Act. 3 - Dual Targets"/>
 		<!--combined image-->
 		<!--rom name="dual targets.d88" size="1098448" crc="a9c071ce" sha1="6f857ec5d1dd8f90c6739cf1a98f5f4a20cdad84" offset="0" /-->
 
@@ -7544,12 +7544,12 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="zero">
-		<description>Dai4 no Unit 4 - Zero - The 4th Unit Act. 4</description>
+		<description>Zero - The 4th Unit Act. 4</description>
 		<year>1990</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900705"/>
-		<info name="alt_title" value="Zero 第4のユニット4"/>
+		<info name="alt_title" value="Zero 第4のユニット4 ~ Dai 4 no Unit Act. 4 - Zero"/>
 		<!--combined image-->
 		<!--rom name="dai4 no unit 4.d88" size="832496" crc="33936ee3" sha1="503d5f89a58a50f82d496f640895ef16e03256bf" offset="0" /-->
 
@@ -7909,8 +7909,8 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		</part>
 	</software>
 
-	<software name="datenshi">
-		<description>Datenshi Kyoko</description>
+	<software name="kyoko">
+		<description>Datenshi Kyouko - Part I</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10061,7 +10061,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 	</software>
 
 	<software name="dslayed">
-		<description>Dragon Slayer - Eiyu Densetsu</description>
+		<description>Dragon Slayer - Eiyuu Densetsu</description>
 		<year>1989</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10117,7 +10117,7 @@ ExtractDisk  [06]"SCENARIO DISK 2 " -> "dragon slayer eiyu densetsu 2_06.d88"
 ExtractDisk  [07]"SCENARIO DISK 3 " -> "dragon slayer eiyu densetsu 2_07.d88"
 ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 -->
-		<description>Dragon Slayer - Eiyu Densetsu 2</description>
+		<description>Dragon Slayer - Eiyuu Densetsu 2</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10185,7 +10185,7 @@ ExtractDisk  [08]"SCENARIO DISK 4 " -> "dragon slayer eiyu densetsu 2_08.d88"
 	</software>
 
 	<software name="dslayed2a" cloneof="dslayed2">
-		<description>Dragon Slayer - Eiyu Densetsu 2 (Alt Program Disk)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu 2 (Alt Program Disk)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10264,7 +10264,7 @@ ExtractDisk  [08]"START DISK      " -> "eiyu densetsu ii_08.d88"
 all but the program disks are the same as in the above sets (up to the d88 header)
 but in different order
 -->
-		<description>Dragon Slayer - Eiyu Densetsu 2 (Alt Program Disk 2)</description>
+		<description>Dragon Slayer - Eiyuu Densetsu 2 (Alt Program Disk 2)</description>
 		<year>1992</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- PC8801mk2SR -->
@@ -10808,7 +10808,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="eiyudena" cloneof="eiyuden">
-		<description>Eiyu Densetsu Saga (Alt)</description>
+		<description>Eiyuu Densetsu Saga (Alt)</description>
 		<year>1984</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<!-- PC8801 -->
@@ -10840,7 +10840,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 	</software>
 
 	<software name="eiyuyama">
-		<description>Eiyu Yamato Takeru</description>
+		<description>Eiyuu Yamato Takeru</description>
 		<year>1985</year>
 		<publisher>ログインソフト (Login Soft)</publisher>
 		<!-- PC8801 -->
@@ -11374,7 +11374,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		</part>
 	</software>
 
-	<software name="exterln">
+	<software name="exterlin">
 		<description>Exterlien</description>
 		<year>1990</year>
 		<publisher>ディーオー (D.O.)</publisher>
@@ -13202,7 +13202,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 	</software>
 
 	<software name="gaudia" cloneof="gaudi">
-		<description>Gaudi (Alt)</description>
+		<description>Gaudi - Barcelona no Kaze (Alt)</description>
 		<year>1989</year>
 		<publisher>ウルフチーム (WolfTeam)</publisher>
 		<!-- PC8801mk2SR -->
@@ -18357,7 +18357,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="noriko">
-		<description>Kobishojo Noriko</description>
+		<description>Kobishojo Noriko - Part I</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
 		<!-- PC8801mk2SR -->
@@ -18407,7 +18407,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ          " -> "gundam tactical operation_03.d88"
 	</software>
 
 	<software name="kohakuir">
-		<description>Kohakuiro no Yuigon</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<!-- PC8801mk2SR -->
@@ -18454,7 +18454,7 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 
 -->
 	<software name="kohakuira" cloneof="kohakuir">
-		<description>Kohakuiro no Yuigon (Alt)</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (Alt)</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<!-- PC8801mk2SR -->
@@ -18934,7 +18934,7 @@ ExtractDisk  [04]"D_USER          " -> "kon'yamo asamade powerful mahjong 2_04.d
 	</software>
 
 	<software name="kudokik2">
-		<description>Kudokikata Oshiemasu II - Kind Gals</description>
+		<description>Kudokikata Oshiemasu II - Kind Gal's</description>
 		<year>1988</year>
 		<publisher>ハード (Hard)</publisher>
 		<!-- PC8801mk2SR -->
@@ -20822,7 +20822,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mahjongc">
+	<software name="mjclinic">
 		<description>Mahjong Clinic Zoukan-gou</description>
 		<year>1991</year>
 		<publisher>ホームデータ (Home Data)</publisher>
@@ -20875,7 +20875,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mahjongk">
+	<software name="mjkyojs">
 		<description>Mahjong Kyo Jidai Special</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -20900,7 +20900,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mahjngk2">
+	<software name="mjkyojs2">
 		<description>Mahjong Kyo Jidai Special II</description>
 		<year>1989</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -21465,7 +21465,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="makenshi">
+	<software name="kumiko">
 		<description>Makenshi Kumiko</description>
 		<year>1988</year>
 		<publisher>システムハウスオウ (System House Oh!)</publisher>
@@ -21676,7 +21676,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		</part>
 	</software>
 
-	<software name="mastrmon">
+	<software name="mastmons">
 		<description>Master of Monsters</description>
 		<year>1988</year>
 		<publisher>システムソフト (System Soft)</publisher>
@@ -22382,7 +22382,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mightmag">
-		<description>Might &amp; Magic</description>
+		<description>Might and Magic</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -22421,7 +22421,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mightmg2">
-		<description>Might &amp; Magic Book 2</description>
+		<description>Might and Magic Book 2</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -22467,7 +22467,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="mightmg2a" cloneof="mightmg2">
-		<description>Might &amp; Magic Book 2 (Alt)</description>
+		<description>Might and Magic Book 2 (Alt)</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<!-- PC8801mk2SR -->
@@ -24292,7 +24292,7 @@ ExtractDisk  [05]"ｺｹﾞﾝﾀ          " -> "Nukenin Densetsu 05.d88"
 	</software>
 
 	<software name="kaguya">
-		<description>Ohi! Kaguya Hime - Koromo Koromo no Waka re</description>
+		<description>Ohi! Kaguya Hime - Kinuginu no Wakare</description>
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<!-- PC8801 -->
@@ -27893,7 +27893,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 		</part>
 	</software>
 
-	<software name="royalblo">
+	<software name="royalbld">
 		<description>Royal Blood</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
@@ -28108,7 +28108,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="ryukyu">
-		<description>Ryu Kyu</description>
+		<description>Ryuukyuu</description>
 		<year>1989</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801mk2SR -->
@@ -28347,7 +28347,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 	</software>
 
 	<software name="tomathim">
-		<description>Salad no Kuni no Tomato-hime</description>
+		<description>Salad no Kuni no Tomato Hime</description>
 		<year>1984</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
@@ -28859,7 +28859,7 @@ ExtractDisk  [02]"MUSIC2          " -> "scheme music disk_02.d88"
 	</software>
 
 	<software name="schwarzs">
-		<description>Schwarzschild</description>
+		<description>Schwarzschild - Kyouran no Ginga</description>
 		<year>1989</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<!-- PC8801mk2SR -->
@@ -33355,8 +33355,8 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 		</part>
 	</software>
 
-	<software name="tenkyuha">
-		<description>Tenkyuhai</description>
+	<software name="tenkyuh">
+		<description>Tenkyuuhai</description>
 		<year>1989</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
 		<!-- PC8801mk2SR -->
@@ -33381,7 +33381,7 @@ ExtractDisk  [02]"DISK B          " -> "telenet music box (b)_02.d88"
 	</software>
 
 	<software name="tenkyuhs">
-		<description>Tenkyuhai Special - Tougen no Utage 2</description>
+		<description>Tenkyuuhai Special - Tougen no Utage</description>
 		<year>1990</year>
 		<publisher>タケル (Takeru)</publisher>
 		<!-- PC8801mk2SR -->
@@ -39048,8 +39048,8 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		</part>
 	</software>
 
-	<software name="yaritaih">
-		<description>Yaritai Hodai</description>
+	<software name="yaritai1">
+		<description>Yaritai Houdai</description>
 		<year>1988</year>
 		<publisher>全流通 (Zenryutsu)</publisher>
 		<!-- PC8801mk2SR -->
@@ -43307,7 +43307,7 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		</part>
 	</software>
 
-	<software name="mahorobo">
+	<software name="mahoroba">
 		<description>Mahoroba</description>
 		<year>1989?</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -44260,6 +44260,18 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="443264">
 				<rom name="powerful engine (a).d88" size="443264" crc="dd643091" sha1="4a2d35952594826bc551916d960e6c8929cf9072" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prodigy">
+		<description>Prodigy</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Yoichi Hayashi" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="prodigy.d88" size="348848" crc="a7027b3f" sha1="84d214cc43b380163884d15740b2c4d38e0fe648" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -45803,6 +45815,54 @@ ExtractDisk  [02]"              " -> "sound on-ten vol.1(a)_02.d88"
 		</part>
 	</software>
 
+	<software name="uchuboku">
+		<description>Uchuu Bokushi</description>
+		<year>19??</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Onion Soft" />
+		<!--combined image-->
+		<!--rom name="uchu_bokushi.d88" size="697696" crc="bc87eab3" sha1="a28d0d7600c3425e64fa4fcc1fdf4fd03105abe8" offset="0" /-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="348848">
+				<rom name="uchuu bokushi (disk 1).d88" size="348848" crc="5e1fb9c0" sha1="61cebb48ce96289410b6d48c1ac018209d7efc61" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="uchuu bokushi (disk 2).d88" size="348848" crc="76942e82" sha1="b9385464a95f357437bb01b4f72f127daaf7bca7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uchubokua" cloneof="uchuboku">
+		<description>Uchuu Bokushi (Alt Disk A)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="developer" value="Onion Soft" />
+		<!--combined image-->
+		<!--rom name="uchu bokushi.d88" size="697696" crc="a6f1bd50" sha1="66f96918e5f2f488d15e2288e6fd14c36ecd3f0e" offset="0" /-->
+
+		<!-- Disk A,B -->
+		<part name="flop1" interface="floppy_5_25" >
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="348848">
+				<rom name="uchu bokushi (disk a).d88" size="348848" crc="4bd64692" sha1="5fc15c5220aa5b61d64b595b02d0516e80b46569" offset="0" />
+			</dataarea>
+		</part>
+		<!-- Same other -->
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="348848">
+				<rom name="uchuu bokushi (disk 2).d88" size="348848" crc="76942e82" sha1="b9385464a95f357437bb01b4f72f127daaf7bca7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="uedajun1">
 		<description>Ueda Jun'ichi Ongaku-Shu Vol.1</description>
 		<year>1990</year>
@@ -46725,7 +46785,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="doubleea">
+	<software name="dbleagle">
 		<description>Double Eagle</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -48188,7 +48248,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="fightnow">
-		<description>Mai-chan Teba Fighting Now</description>
+		<description>Mai-chan Teba Fighting Now!!</description>
 		<year>19??</year>
 		<publisher>L.C.S.</publisher>
 		<info name="alt_title" value="舞ちゃんてばFightingNow"/>
@@ -48836,17 +48896,6 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">
 				<rom name="powerful janken exe.d88" size="422160" crc="72bdd2d0" sha1="4b65a3ed92c2868628763430784ef4c77055efe9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="prodigy">
-		<description>Prodigy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348848">
-				<rom name="prodigy.d88" size="348848" crc="a7027b3f" sha1="84d214cc43b380163884d15740b2c4d38e0fe648" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -49797,52 +49846,6 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="uchuboku">
-		<description>Uchuu Bokushi</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="uchu_bokushi.d88" size="697696" crc="bc87eab3" sha1="a28d0d7600c3425e64fa4fcc1fdf4fd03105abe8" offset="0" /-->
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1" />
-			<dataarea name="flop" size="348848">
-				<rom name="uchuu bokushi (disk 1).d88" size="348848" crc="5e1fb9c0" sha1="61cebb48ce96289410b6d48c1ac018209d7efc61" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="uchuu bokushi (disk 2).d88" size="348848" crc="76942e82" sha1="b9385464a95f357437bb01b4f72f127daaf7bca7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="uchubokua" cloneof="uchuboku">
-		<description>Uchuu Bokushi (Alt Disk A)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="uchu bokushi.d88" size="697696" crc="a6f1bd50" sha1="66f96918e5f2f488d15e2288e6fd14c36ecd3f0e" offset="0" /-->
-
-		<!-- Disk A,B -->
-		<part name="flop1" interface="floppy_5_25" >
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="348848">
-				<rom name="uchu bokushi (disk a).d88" size="348848" crc="4bd64692" sha1="5fc15c5220aa5b61d64b595b02d0516e80b46569" offset="0" />
-			</dataarea>
-		</part>
-		<!-- Same other -->
-
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2" />
-			<dataarea name="flop" size="348848">
-				<rom name="uchuu bokushi (disk 2).d88" size="348848" crc="76942e82" sha1="b9385464a95f357437bb01b4f72f127daaf7bca7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="uniform">
 		<description>Uniform</description>
 		<year>19??</year>
@@ -49982,7 +49985,7 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 	</software>
 
 	<software name="xna">
-		<description>X'na</description>
+		<description>X・na</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -50408,8 +50411,8 @@ loderuna - pc8801       Device Floppy Disk load failed: Invalid image
 		</part>
 	</software>
 
-	<software name="bikankur">
-		<description>Bikan Kurabu</description>
+	<software name="mikanclb">
+		<description>Mikan Club</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -51728,6 +51731,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		</part>
 	</software>
 
+<!-- Mazekko = mixed (var types of software is contained) -->
 	<software name="mazekko">
 		<description>Mazekko Disk</description>
 		<year>19??</year>
@@ -51740,7 +51744,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 	</software>
 
 	<software name="mekumeku">
-		<description>Mekumeku Hasedon</description>
+		<description>Mekurumeku Hasedon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -52496,7 +52500,7 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 	</software>
 
 	<software name="seiferre">
-		<description>Sei Ferret Gakuen Tantei Kurabu</description>
+		<description>Sei Ferret Gakuen Tantei Club</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="ばにっくinセントフーレ"/>
@@ -56382,7 +56386,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefilea">
+	<software name="filemst">
 		<description>The File Master 88 v1.1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56393,7 +56397,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefilem">
+	<software name="filemdata" cloneof="filemst">
 		<description>The File Master 88 - Data Disk 880105</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56404,8 +56408,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile1">
-		<description>The File Master diskA</description>
+	<software name="filemda"  cloneof="filemst">
+		<description>The File Master - diskA</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56415,8 +56419,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile2">
-		<description>The File Master diskB</description>
+	<software name="filemdb"  cloneof="filemst">
+		<description>The File Master - diskB</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56426,8 +56430,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile3">
-		<description>The File Master diskC</description>
+	<software name="filemdc"  cloneof="filemst">
+		<description>The File Master - diskC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56437,8 +56441,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile4">
-		<description>The File Master diskD</description>
+	<software name="filemdd"  cloneof="filemst">
+		<description>The File Master - diskD</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56448,8 +56452,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile5">
-		<description>The File Master diskE</description>
+	<software name="filemde"  cloneof="filemst">
+		<description>The File Master - diskE</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56459,8 +56463,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile6">
-		<description>The File Master diskF</description>
+	<software name="filemdf"  cloneof="filemst">
+		<description>The File Master - diskF</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56470,8 +56474,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile7">
-		<description>The File Master diskG</description>
+	<software name="filemdg"  cloneof="filemst">
+		<description>The File Master - diskG</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56481,8 +56485,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile8">
-		<description>The File Master diskH</description>
+	<software name="filemdh"  cloneof="filemst">
+		<description>The File Master - diskH</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56492,8 +56496,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefile9">
-		<description>The File Master diskI</description>
+	<software name="filemdi"  cloneof="filemst">
+		<description>The File Master - diskI</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56503,8 +56507,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil10">
-		<description>The File Master diskJ</description>
+	<software name="filemdj"  cloneof="filemst">
+		<description>The File Master - diskJ</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56514,8 +56518,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil11">
-		<description>The File Master diskK</description>
+	<software name="filemdk"  cloneof="filemst">
+		<description>The File Master - diskK</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56525,8 +56529,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil12">
-		<description>The File Master diskL</description>
+	<software name="filemdl"  cloneof="filemst">
+		<description>The File Master - diskL</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56536,8 +56540,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil13">
-		<description>The File Master diskM</description>
+	<software name="filemdm"  cloneof="filemst">
+		<description>The File Master - diskM</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -56547,7 +56551,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil14">
+	<software name="filemnice"  cloneof="filemst">
 		<description>The File Master NICE</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56558,7 +56562,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil15">
+	<software name="filemp8b"  cloneof="filemst">
 		<description>The File Master P8B</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56569,7 +56573,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil16">
+	<software name="filemp8n"  cloneof="filemst">
 		<description>The File Master P8N</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56580,7 +56584,7 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
-	<software name="thefil17">
+	<software name="filemsys"  cloneof="filemst">
 		<description>The File Master System</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56591,6 +56595,8 @@ ExtractDisk  [03]"文章ﾃﾞｨｽｸ    " -> "super shunbo ii_03.d88"
 		</part>
 	</software>
 
+<!--combined image-->
+<!--rom name="the file master (ver1.1) &amp; hot file express.d88" size="4883872" crc="a3c56a8b" sha1="3308c7575f2872f65f5ae5dc54fdae2732c68aa6" offset="0" /-->
 <!--
 ExtractDisk  [01]"TFM-88          " -> "the file master (ver1.1) & hot file express_01.d88"
 ExtractDisk  [02]"TFM_ｵﾄｸﾖｳ      " -> "the file master (ver1.1) & hot file express_02.d88"
@@ -56607,46 +56613,66 @@ ExtractDisk  [12]"TFM_Parameter_7 " -> "the file master (ver1.1) & hot file expr
 ExtractDisk  [13]"TFM_Param_8_NEW " -> "the file master (ver1.1) & hot file express_13.d88" b3f914c5
 ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file express_14.d88"
 -->
-	<software name="thefil18">
-		<description>The File Master (ver1.1) &amp; Hot File Express</description>
+	<software name="filemsta"  cloneof="filemst">
+		<description>The File Master v1.1 (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!--combined image-->
-		<!--rom name="the file master (ver1.1) &amp; hot file express.d88" size="4883872" crc="a3c56a8b" sha1="3308c7575f2872f65f5ae5dc54fdae2732c68aa6" offset="0" /-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 57100 -->
 				<rom name="the file master (ver1.1) &amp; hot file express_01.d88" size="348848" crc="141ade9a" sha1="61dae17d14219534d34595a2cd73eed9e615fbe0" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop2" interface="floppy_5_25">
+	<software name="filemstoto"  cloneof="filemst">
+		<description>The File Master - Otokuyou</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 60962 -->
 				<rom name="the file master (ver1.1) &amp; hot file express_02.d88" size="348848" crc="c4291708" sha1="3eb5317e3310d637ecf2e8ba13c52b87a64c7fd0" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop11" interface="floppy_5_25">
+	<software name="filemstp3"  cloneof="filemst">
+		<description>The File Master - Parameter 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 55008 -->
 				<rom name="the file master (ver1.1) &amp; hot file express_11.d88" size="348848" crc="5d3e078b" sha1="9cbff18b2a074b42d457bb2967d58fb8e1d3ae16" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop12" interface="floppy_5_25">
+	<software name="filemstp7"  cloneof="filemst">
+		<description>The File Master - Parameter 7</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 64257 -->
 				<rom name="the file master (ver1.1) &amp; hot file express_12.d88" size="348848" crc="0f271e8e" sha1="f94470efc724f7e28b388f7e0d8bf5dfff66f6e2" offset="0" />
 			</dataarea>
 		</part>
+	</software>
 
-		<part name="flop14" interface="floppy_5_25">
+<!-- Alt version of P8N?? -->
+	<software name="filemstp8"  cloneof="filemst">
+		<description>The File Master - Parameter 8 New</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 16510 -->
 				<rom name="the file master (ver1.1) &amp; hot file express_14.d88" size="348848" crc="84f9606b" sha1="1ecc9473b134a4b7244fd94fd681a90c173ed71c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="thefil19">
-		<description>The File Master 88 v1.1 (Alt)</description>
+	<software name="filemstb" cloneof="filemst">
+		<description>The File Master 88 v1.1 (Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
@@ -56656,7 +56682,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="thefil20">
+	<software name="filemstf01"  cloneof="filemst">
 		<description>The File Master 88 Filer 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56667,7 +56693,95 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="thefil21">
+	<software name="filemstf02"  cloneof="filemst">
+		<description>The File Master 88 Filer 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7297 -->
+				<rom name="the file master 88 filer 2.d88" size="348832" crc="9edeaded" sha1="74c7e70da1df786fc5f02494dec4162dac3f0fa7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf03"  cloneof="filemst">
+		<description>The File Master 88 Filer 3</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 32108 -->
+				<rom name="the file master 88 filer 3.d88" size="348832" crc="4eba4a40" sha1="170e6b7cace9f26e898e8480b23cc798225696a9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf04"  cloneof="filemst">
+		<description>The File Master 88 Filer 4</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 53590 -->
+				<rom name="the file master 88 filer 4.d88" size="348832" crc="486511d3" sha1="8e6380949d7af11fbd29f692edd828334659ab47" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf05"  cloneof="filemst">
+		<description>The File Master 88 Filer 5</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 16173 -->
+				<rom name="the file master 88 filer 5.d88" size="348832" crc="e15e8501" sha1="05b196fa628a9c19b1903fa351ef11677185ec5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf06"  cloneof="filemst">
+		<description>The File Master 88 Filer 6</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 25652 -->
+				<rom name="the file master 88 filer 6.d88" size="348832" crc="295c4b09" sha1="e54ae35b2dc0921b1c851e484ce97dbfb6b2342e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf07"  cloneof="filemst">
+		<description>The File Master 88 Filer 7</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 23836 -->
+				<rom name="the file master 88 filer 7.d88" size="348832" crc="2a9dd41a" sha1="5f870b6e379b465496f9c42b324c76ebf63280ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf08"  cloneof="filemst">
+		<description>The File Master 88 Filer 8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7009 -->
+				<rom name="the file master 88 filer 8.d88" size="348832" crc="d2c283c4" sha1="aeb973e875ea162bfb52484869027c3b19d44a77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf09"  cloneof="filemst">
+		<description>The File Master 88 Filer 9</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk" interface="floppy_5_25">
+			<dataarea name="flop" size="348832">    <!-- Data CRC16: 3292 -->
+				<rom name="the file master 88 filer 9.d88" size="348832" crc="76619253" sha1="f51eebdfd9913c2130e2b15e7b7966e8ffa90324" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="filemstf10"  cloneof="filemst">
 		<description>The File Master 88 Filer 10</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56678,7 +56792,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="thefil22">
+	<software name="filemstf11"  cloneof="filemst">
 		<description>The File Master 88 Filer 11</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56689,7 +56803,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 		</part>
 	</software>
 
-	<software name="thefil23">
+	<software name="filemstf12"  cloneof="filemst">
 		<description>The File Master 88 Filer 12</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -56701,7 +56815,7 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
 	</software>
 
 <!-- INVALID D88 Image!
-    <software name="thefil24">
+    <software name="filemstf13"  cloneof="filemst">
         <description>The File Master 88 Filer 13</description>
         <year>19??</year>
         <publisher>&lt;unknown&gt;</publisher>
@@ -56713,101 +56827,13 @@ ExtractDisk  [14]"TFM_NEW        " -> "the file master (ver1.1) & hot file expre
     </software>
  -->
 
-	<software name="thefil25">
+	<software name="filemstf14"  cloneof="filemst">
 		<description>The File Master 88 Filer 14</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">    <!-- Data CRC16: 20467 -->
 				<rom name="the file master 88 filer 14.d88" size="348832" crc="93f493f7" sha1="3fe93a20002e7aa4101c8b77cd102b6e7d9828dc" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil26">
-		<description>The File Master 88 Filer 2</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7297 -->
-				<rom name="the file master 88 filer 2.d88" size="348832" crc="9edeaded" sha1="74c7e70da1df786fc5f02494dec4162dac3f0fa7" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil27">
-		<description>The File Master 88 Filer 3</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 32108 -->
-				<rom name="the file master 88 filer 3.d88" size="348832" crc="4eba4a40" sha1="170e6b7cace9f26e898e8480b23cc798225696a9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil28">
-		<description>The File Master 88 Filer 4</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 53590 -->
-				<rom name="the file master 88 filer 4.d88" size="348832" crc="486511d3" sha1="8e6380949d7af11fbd29f692edd828334659ab47" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil29">
-		<description>The File Master 88 Filer 5</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 16173 -->
-				<rom name="the file master 88 filer 5.d88" size="348832" crc="e15e8501" sha1="05b196fa628a9c19b1903fa351ef11677185ec5d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil30">
-		<description>The File Master 88 Filer 6</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 25652 -->
-				<rom name="the file master 88 filer 6.d88" size="348832" crc="295c4b09" sha1="e54ae35b2dc0921b1c851e484ce97dbfb6b2342e" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil31">
-		<description>The File Master 88 Filer 7</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 23836 -->
-				<rom name="the file master 88 filer 7.d88" size="348832" crc="2a9dd41a" sha1="5f870b6e379b465496f9c42b324c76ebf63280ba" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil32">
-		<description>The File Master 88 Filer 8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 7009 -->
-				<rom name="the file master 88 filer 8.d88" size="348832" crc="d2c283c4" sha1="aeb973e875ea162bfb52484869027c3b19d44a77" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thefil33">
-		<description>The File Master 88 Filer 9</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk" interface="floppy_5_25">
-			<dataarea name="flop" size="348832">    <!-- Data CRC16: 3292 -->
-				<rom name="the file master 88 filer 9.d88" size="348832" crc="76619253" sha1="f51eebdfd9913c2130e2b15e7b7966e8ffa90324" offset="0" />
 			</dataarea>
 		</part>
 	</software>

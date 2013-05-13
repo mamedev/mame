@@ -16587,7 +16587,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="masterm">
+	<software name="mastmons">
 		<description>Master of Monsters (USA)</description>
 		<year>1991</year>
 		<publisher>Renovation</publisher>
@@ -16601,7 +16601,7 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
-	<software name="mastermj" cloneof="masterm">
+	<software name="mastmonsj" cloneof="mastmons">
 		<description>Master of Monsters (Jpn)</description>
 		<year>1991</year>
 		<publisher>Toshiba EMI</publisher>
@@ -18354,7 +18354,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<software name="n3dgaugu">
 		<description>New 3D Golf Simulation - Harukanaru Augusta (Jpn)</description>
 		<year>1993</year>
-		<publisher>T &amp; E Soft</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<info name="serial" value="T-114033"/>
 		<info name="release" value="19931217"/>
 		<info name="alt_title" value="遥かなるオーガスタ"/>

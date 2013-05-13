@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="basilgrt" supported="no">
+	<software name="basil" supported="no">
 		<description>Basil: The Great Mouse Detective</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>

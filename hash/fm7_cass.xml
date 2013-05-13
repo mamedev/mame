@@ -942,7 +942,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kaguya">
-		<description>Ooi! Kaguya Hime - Kinuginu no Wakare</description>
+		<description>Ohi! Kaguya Hime - Kinuginu no Wakare</description>
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="serial" value="K40M5047"/>
@@ -2123,7 +2123,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="wldgolf">
+	<software name="worldglf">
 		<description>World Golf</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>

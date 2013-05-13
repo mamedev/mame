@@ -96,7 +96,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<year>1988</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="release" value="198802xx"/>
-		<info name="alt_title" value="第4のユニット"/>
+		<info name="alt_title" value="第4のユニット ~ Dai 4 no Unit" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="4th unit, the (19xx)(data west)(jp)(disk 1 of 2).2d" size="327680" crc="885edcf7" sha1="d6a536bd4fb8553dbe9c0467cbfe1d70e2fff342" offset="0" />
@@ -288,7 +288,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="bcity">
+	<software name="batlcity">
 		<description>Battle City</description>
 		<year>1986</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1544,7 +1544,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="mahjongk">
+	<software name="mjkyojs">
 		<description>Mahjong Kyo Jidai Special</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -1769,7 +1769,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="mightmag" supported="partial">
-		<description>Might &amp; Magic</description>
+		<description>Might and Magic</description>
 		<year>1988</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198801xx"/>
@@ -4786,7 +4786,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="kohakuir" supported="partial">
-		<description>Kohakuiro no Yuigon</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<!-- Turbo only -->

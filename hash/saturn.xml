@@ -1099,12 +1099,12 @@
 	  Sonic R (Japan) [GS-9170]                                                             | (sonicrj)
 	  Sonic Wings Special (Japan) [T-26402G]                                                | (sonicwin)
 	  Sorvice (Japan) [T-16609G]                                                            | (sorvice)
-	  Sotsugyou II: Neo Generation (Japan) [T-5301G]                                        | (sots2)
-	  Sotsugyou III: Wedding Bell (Japan) [T-10505G]                                        | (sots3)
+	  Sotsugyou II: Neo Generation (Japan) [T-5301G]                                        | (sotsugy2)
+	  Sotsugyou III: Wedding Bell (Japan) [T-10505G]                                        | (sotsugy3)
 	  Sotsugyou III: Wedding Bell (Japan) (Shokai Gentei!) [T-10506G]                       |  ??
-	  Sotsugyou: Album (Japan) [T-10504G]                                                   | (sotsalb)
-	  Sotsugyou: Crossworld (Japan) [T-10503G]                                              | (sotscros)
-	  Sotsugyou: Graduation S (Japan) [T-20103G]                                            | (sotsgrs)
+	  Sotsugyou: Album (Japan) [T-10504G]                                                   | (sotsualb)
+	  Sotsugyou: Crossworld (Japan) [T-10503G]                                              | (sotsuxw)
+	  Sotsugyou: Graduation S (Japan) [T-20103G]                                            | (sotsugys)
 	  Soukuu no Tsubasa: Gotha World (Japan) [T-2205G]                                      | (gothawld)
 	  Soukyuu Gurentai (Japan) [T-10616G]                                                   | (soukyuug)
 	  Soukyuu Gurentai Otokuyou (Japan) [T-10626G]                                          | (soukygo)
@@ -1192,8 +1192,8 @@
 	  Tantei Jinguuji Saburou: Yume no Owarini (Japan) [T-1316G]                            | (tanteiyo)
 	  Techno Motor (Japan) [T-37601G]                                                       | (technomo)
 	  Techno Motor (Japan) (Satakore) [T-37602G]                                            |  @@
-	  Teitoku no Ketsudan II (Japan) [T-7607G]                                              | (teitoku2)
-	  Teitoku no Ketsudan III (Japan) [T-7640G]                                             | (teitoku3)
+	  Teitoku no Ketsudan II (Japan) [T-7607G]                                              | (teikets2)
+	  Teitoku no Ketsudan III (Japan) [T-7640G]                                             | (teikets3)
 	  Teitoku no Ketsudan III (Japan) (Premium Pack) [T-7654G]                              |  ??
 	  Teitoku no Ketsudan III with Power Up Kit (Japan) [T-7661G]                           |  ??
 	  Tekkyuu: True Pinball (Japan) [T-18505G]                                              | (truepinj)
@@ -7998,7 +7998,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou Album (Japan)... -->
-	<software name="sotsalb" supported="no">
+	<software name="sotsualb" supported="no">
 		<description>Sotsugyou Album (Jpn)</description>
 		<year>1998</year>
 		<publisher>Shogakukan</publisher>
@@ -8014,7 +8014,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou Crossworld (Japan)... -->
-	<software name="sotscros" supported="no">
+	<software name="sotsuxw" supported="no">
 		<description>Sotsugyou Crossworld (Jpn)</description>
 		<year>1997</year>
 		<publisher>Shogakukan</publisher>
@@ -8030,7 +8030,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou II - Neo Generation (Japan) (1M)... -->
-	<software name="sots2" supported="no">
+	<software name="sotsugy2" supported="no">
 		<description>Sotsugyou II - Neo Generation (Jpn) (1M)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
@@ -8046,7 +8046,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou II - Neo Generation (Japan) (2M)... -->
-	<software name="sots2a" cloneof="sots2" supported="no">
+	<software name="sotsugy2a" cloneof="sotsugy2" supported="no">
 		<description>Sotsugyou II - Neo Generation (Jpn) (2M)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
@@ -8062,7 +8062,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou III - Wedding Bell (Japan)... -->
-	<software name="sots3" supported="no">
+	<software name="sotsugy3" supported="no">
 		<description>Sotsugyou III - Wedding Bell (Jpn)</description>
 		<year>1998</year>
 		<publisher>Shogakukan</publisher>
@@ -13191,7 +13191,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou II Neo Generation ~ Graduation II (JAP) (DW0416)... -->
-	<software name="sots2b" cloneof="sots2" supported="no">
+	<software name="sotsugy2b" cloneof="sotsugy2" supported="no">
 		<description>Sotsugyou II - Neo Generation (Jpn, Alt)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
@@ -13692,7 +13692,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Teitoku no ketsudan WWIII (JAP) (DW0473)... -->
-	<software name="teitoku3" supported="no">
+	<software name="teikets3" supported="no">
 		<description>Teitoku no Ketsudan III (Jpn)</description>
 		<year>1997</year>
 		<publisher>Koei</publisher>
@@ -20365,7 +20365,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou Crossworld (T-10503G)... -->
-	<software name="sotscrosa" cloneof="sotscros" supported="no">
+	<software name="sotsuxwa" cloneof="sotsuxw" supported="no">
 		<description>Sotsugyou Crossworld (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Shogakukan</publisher>
@@ -25854,7 +25854,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou 2 Neo Generation (J) (T-5301G)... -->
-	<software name="sots2c" cloneof="sots2" supported="no">
+	<software name="sotsugy2c" cloneof="sotsugy2" supported="no">
 		<description>Sotsugyou II - Neo Generation (Jpn, Alt 2)</description>
 		<year>1995</year>
 		<publisher>Riverhill Software</publisher>
@@ -26212,7 +26212,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Teitoku no Ketsudan 2 (J) (T-7607G)... -->
-	<software name="teitoku2" cloneof="pto2" supported="no">
+	<software name="teikets2" cloneof="pto2" supported="no">
 		<description>Teitoku no Ketsudan II (Jpn)</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
@@ -29567,7 +29567,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Sotsugyou Graduation S (Japan) [T-20103G]... -->
-	<software name="sotsgrs" supported="no">
+	<software name="sotsugys" supported="no">
 		<description>Sotsugyou Graduation S (Jpn)</description>
 		<year>1997</year>
 		<publisher>NEC Interchannel</publisher>

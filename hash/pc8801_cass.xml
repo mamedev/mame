@@ -870,7 +870,6 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="パックマン"/>
-		<info name="alt_title" value="パッグマン"/>
 		<part name="cass" interface="pc8801_cass">
 			<dataarea name="cass" size="25430">
 				<rom name="pacman.cmt" size="25430" crc="458ef928" sha1="4ca27b63d2dde02942f9b74dbee25a28469a99cf" offset="0" />

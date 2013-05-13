@@ -254,7 +254,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kohakuir">
-		<description>Kohakuiro no Yuigon</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<info name="release" value="198811xx"/>
@@ -282,7 +282,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="kohakuira" cloneof="kohakuir">
-		<description>Kohakuiro no Yuigon (original?)</description>
+		<description>Kohakuiro no Yuigon - Seiyou Karuta Renzoku Satsujin Jiken (original?)</description>
 		<year>1988</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<info name="release" value="198811xx"/>
@@ -387,7 +387,7 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
-	<software name="mahjongk">
+	<software name="mjkyojs">
 		<description>Mahjong Kyo Jidai Special</description>
 		<year>1988</year>
 		<publisher>マイクロネット (Micronet)</publisher>
@@ -436,7 +436,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mightmag">
-		<description>Might &amp; Magic</description>
+		<description>Might and Magic</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198712xx"/>
@@ -464,7 +464,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mightmaga" cloneof="mightmag">
-		<description>Might &amp; Magic (Alt Disk 1)</description>
+		<description>Might and Magic (Alt Disk 1)</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198712xx"/>
@@ -492,7 +492,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mightmagb" cloneof="mightmag">
-		<description>Might &amp; Magic (Alt 2)</description>
+		<description>Might and Magic (Alt 2)</description>
 		<year>1987</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="release" value="198712xx"/>
@@ -542,7 +542,7 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="nobuzenk">
-		<description>Nobunaga no Yabou - Zenkoku Ban</description>
+		<description>Nobunaga no Yabou - Zenkokuban</description>
 		<year>1987?</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="FUKN19002"/>
