@@ -126,6 +126,7 @@ static const unif unif_list[] =
 	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNL_AC08},
 	{ "UNL-BB",                     0,    0, CHRRAM_0,  UNL_BB},
 	{ "UNL-LH32",                   0,    0, CHRRAM_0,  UNL_LH32},
+	{ "UNL-LH53",                   0,    0, CHRRAM_0,  UNL_LH53},
 	{ "BMC-G-146",                  0,    0, CHRRAM_0,  BMC_G146},
 	{ "BMC-11160",                  0,    0, CHRRAM_0,  BMC_11160},
 	{ "UNL-MALISB",                 0,    0, CHRRAM_0,  UNL_MALISB},

@@ -250,7 +250,7 @@ static const nes_mmc mmc_list[] =
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_GOLDENCARD_6IN1 },
 	// 218 Unused
-	{ 216, UNL_A9746 },
+	// 219 UNL-A9746 (according to Cah4e3's code, no dump available (yet)
 	// 220 Unused
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },

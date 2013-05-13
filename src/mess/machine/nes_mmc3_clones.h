@@ -383,7 +383,7 @@ private:
 	UINT8 m_reg;
 };
 
-
+#ifdef UNUSED_FUNCTION
 // ======================> nes_a9746_device
 
 class nes_a9746_device : public nes_txrom_device
@@ -402,6 +402,7 @@ private:
 	void update_banks(UINT8 value);
 	UINT8 m_reg[3];
 };
+#endif
 
 
 // ======================> nes_fk23c_device

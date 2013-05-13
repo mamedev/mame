@@ -3409,7 +3409,7 @@
 		</part>
 	</software>
 
-	<software name="bchess">
+	<software name="btlchess">
 		<description>Battle Chess (USA)</description>
 		<year>1990</year>
 		<publisher>Data East</publisher>
@@ -59001,8 +59001,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Hwang Shinwei</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="a9746" />
-			<feature name="pcb" value="UNL-A9746" />
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="32768">
 				<rom name="block force (unl) (hwang shinwei).prg" size="32768" crc="b655c53a" sha1="5de850b4e28c49ff9ed53def2a335d29b09387c2" offset="00000" status="baddump" />
@@ -63276,6 +63276,26 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nazomfds" supported="no">
+		<description>Nazo no Murasamejou (Asia, FDS conversion)</description>
+		<year>19??</year>
+		<publisher>Whirlwind Manu?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unl_lh53" />
+			<feature name="pcb" value="UNL-LH53" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="nazo no murasamejou (fds conversion)(unl)[u][!].prg" size="131072" crc="11783125" sha1="cb3202693901124fcaf52c3e4d8fbf4949c326da" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM (battery backed) on cartridge -->
+			<dataarea name="bwram" size="8192">
 			</dataarea>
 		</part>
 	</software>

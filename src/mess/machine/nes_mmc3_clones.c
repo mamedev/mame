@@ -49,7 +49,7 @@ const device_type NES_SF3 = &device_creator<nes_sf3_device>;
 const device_type NES_GOUDER = &device_creator<nes_gouder_device>;
 const device_type NES_SA9602B = &device_creator<nes_sa9602b_device>;
 const device_type NES_SACHEN_SHERO = &device_creator<nes_sachen_shero_device>;
-const device_type NES_A9746 = &device_creator<nes_a9746_device>;
+//const device_type NES_A9746 = &device_creator<nes_a9746_device>;
 
 const device_type NES_FK23C = &device_creator<nes_fk23c_device>;
 const device_type NES_FK23CA = &device_creator<nes_fk23ca_device>;
@@ -166,10 +166,10 @@ nes_sachen_shero_device::nes_sachen_shero_device(const machine_config &mconfig, 
 {
 }
 
-nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: nes_txrom_device(mconfig, NES_A9746, "NES Cart A-9746 PCB", tag, owner, clock, "nes_bmc_a9746", __FILE__)
-{
-}
+//nes_a9746_device::nes_a9746_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+//					: nes_txrom_device(mconfig, NES_A9746, "NES Cart A-9746 PCB", tag, owner, clock, "nes_bmc_a9746", __FILE__)
+//{
+//}
 
 nes_fk23c_device::nes_fk23c_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
 					: nes_txrom_device(mconfig, type, name, tag, owner, clock, shortname, source)
@@ -432,22 +432,6 @@ void nes_sachen_shero_device::pcb_reset()
 
 	m_reg = 0;
 	mmc3_common_initialize(0xff, 0x1ff, 0);
-}
-
-void nes_a9746_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_reg));
-}
-
-void nes_a9746_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg[0] = 0;
-	m_reg[1] = 0;
-	m_reg[2] = 0;
-	mmc3_common_initialize(0x7f, 0xff, 0);
 }
 
 void nes_fk23c_device::device_start()
@@ -1801,79 +1785,6 @@ READ8_MEMBER( nes_sachen_shero_device::read_l )
 }
 
 
-/*-------------------------------------------------
-
- UNL-A9746
-
-
- MMC3 clone
-
-
- In MESS: Very Preliminary Support
-
- -------------------------------------------------*/
-
-void nes_a9746_device::update_banks(UINT8 value)
-{
-	UINT8 bank = BITSWAP8(value & 0x3c,7,6,0,1,2,3,4,5);
-
-	switch (m_reg[0])
-	{
-		case 0x26: prg8_89(bank); break;
-		case 0x25: prg8_ab(bank); break;
-		case 0x24: prg8_cd(bank); break;
-		case 0x23: prg8_ef(bank); break;
-	}
-
-	switch (m_reg[1])
-	{
-		case 0x08: case 0x0a: case 0x0c: case 0x0e:
-		case 0x10: case 0x12: case 0x14: case 0x16:
-		case 0x18: case 0x1a: case 0x1c: case 0x1e:
-			m_reg[2] = (value << 4);
-			break;
-		case 0x09: chr1_0(m_reg[2] | (value >> 1), m_chr_source); break;
-		case 0x0b: chr1_1(m_reg[2] | (value >> 1) | 1, m_chr_source);  break;
-		case 0x0d: chr1_2(m_reg[2] | (value >> 1), m_chr_source);  break;
-		case 0x0f: chr1_3(m_reg[2] | (value >> 1) | 1, m_chr_source);  break;
-		case 0x11: chr1_4(m_reg[2] | (value >> 1), m_chr_source); break;
-		case 0x15: chr1_5(m_reg[2] | (value >> 1), m_chr_source);  break;
-		case 0x19: chr1_6(m_reg[2] | (value >> 1), m_chr_source);  break;
-		case 0x1d: chr1_7(m_reg[2] | (value >> 1), m_chr_source);  break;
-	}
-}
-
-WRITE8_MEMBER(nes_a9746_device::write_h)
-{
-	LOG_MMC(("unl_a9746 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x6003)
-	{
-		case 0x0000:
-			m_reg[1] = data;
-			m_reg[0] = 0;
-			break;
-		case 0x0001:
-			update_banks(data);
-			break;
-		case 0x0002:
-			m_reg[0] = data;
-			m_reg[1] = 0;
-			break;
-
-		case 0x0003:
-		case 0x2000:
-		case 0x2001:
-		case 0x2002:
-		case 0x2003:
-			break;
-
-		default:
-			txrom_write(space, offset, data, mem_mask);
-			break;
-	}
-}
-
 
 /*-------------------------------------------------
 
@@ -2584,3 +2495,96 @@ WRITE8_MEMBER(nes_pjoy84_device::write_m)
 			break;
 	}
 }
+
+#ifdef UNUSED_FUNCTION
+/*-------------------------------------------------
+ 
+ UNL-A9746
+ 
+ 
+ MMC3 clone
+ 
+ 
+ Preliminary emulation based on Cah4e3's code
+ No dump is available (yet) for this.
+ 
+ -------------------------------------------------*/
+
+void nes_a9746_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_a9746_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	
+	m_reg[0] = 0;
+	m_reg[1] = 0;
+	m_reg[2] = 0;
+	mmc3_common_initialize(0x7f, 0xff, 0);
+}
+
+void nes_a9746_device::update_banks(UINT8 value)
+{
+	UINT8 bank = BITSWAP8(value & 0x3c,7,6,0,1,2,3,4,5);
+	
+	switch (m_reg[0])
+	{
+		case 0x26: prg8_89(bank); break;
+		case 0x25: prg8_ab(bank); break;
+		case 0x24: prg8_cd(bank); break;
+		case 0x23: prg8_ef(bank); break;
+	}
+	
+	switch (m_reg[1])
+	{
+		case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		case 0x10: case 0x12: case 0x14: case 0x16:
+		case 0x18: case 0x1a: case 0x1c: case 0x1e:
+			m_reg[2] = (value << 4);
+			break;
+		case 0x09: chr1_0(m_reg[2] | (value >> 1), m_chr_source); break;
+		case 0x0b: chr1_1(m_reg[2] | (value >> 1) | 1, m_chr_source);  break;
+		case 0x0d: chr1_2(m_reg[2] | (value >> 1), m_chr_source);  break;
+		case 0x0f: chr1_3(m_reg[2] | (value >> 1) | 1, m_chr_source);  break;
+		case 0x11: chr1_4(m_reg[2] | (value >> 1), m_chr_source); break;
+		case 0x15: chr1_5(m_reg[2] | (value >> 1), m_chr_source);  break;
+		case 0x19: chr1_6(m_reg[2] | (value >> 1), m_chr_source);  break;
+		case 0x1d: chr1_7(m_reg[2] | (value >> 1), m_chr_source);  break;
+	}
+}
+
+WRITE8_MEMBER(nes_a9746_device::write_h)
+{
+	LOG_MMC(("unl_a9746 write_h, offset: %04x, data: %02x\n", offset, data));
+	
+	switch (offset & 0x6003)
+	{
+		case 0x0000:
+			m_reg[1] = data;
+			m_reg[0] = 0;
+			break;
+		case 0x0001:
+			update_banks(data);
+			break;
+		case 0x0002:
+			m_reg[0] = data;
+			m_reg[1] = 0;
+			break;
+			
+		case 0x0003:
+		case 0x2000:
+		case 0x2001:
+		case 0x2002:
+		case 0x2003:
+			break;
+			
+		default:
+			txrom_write(space, offset, data, mem_mask);
+			break;
+	}
+}
+#endif
+

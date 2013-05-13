@@ -288,9 +288,9 @@ static const nes_pcb pcb_list[] =
 	{ "ks7013b",          KAISER_KS7013B },
 	{ "mmalee2",          UNL_MMALEE },
 	{ "unl_2708",         UNL_2708 },
-	{ "a9746",            UNL_A9746 },
 	{ "unl_lh10",         UNL_LH10 },
 	{ "unl_lh32",         UNL_LH32 },
+	{ "unl_lh53",         UNL_LH53 },
 	{ "unl_ac08",         UNL_AC08 },
 	{ "unl_bb",           UNL_BB },
 	{ "unl_malisb",       UNL_MALISB },
@@ -307,6 +307,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
+	{ "a9746",            UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };

@@ -285,6 +285,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_2708",         NES_2708)    // mapper 103
 	SLOT_INTERFACE_INTERNAL("unl_lh32",         NES_LH32)   // used by Monty no Doki Doki Daidassou FDS conversion
 	SLOT_INTERFACE_INTERNAL("unl_lh10",         NES_LH10)    // used in Fuuun Shaolin Kyo (FDS Conversion)
+	SLOT_INTERFACE_INTERNAL("unl_lh53",         NES_LH53)    // used in Nazo no Murasamejou (FDS Conversion)
 	SLOT_INTERFACE_INTERNAL("unl_ac08",         NES_AC08) //  used by Green Beret FDS conversion
 	SLOT_INTERFACE_INTERNAL("unl_bb",           NES_UNL_BB) //  used by a few FDS conversions
 	SLOT_INTERFACE_INTERNAL("sgpipe",           NES_SHUIGUAN)    // mapper 183
@@ -313,7 +314,6 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("gouder",           NES_GOUDER)
 	SLOT_INTERFACE_INTERNAL("sa9602b",          NES_SA9602B)
 	SLOT_INTERFACE_INTERNAL("unl_shero",        NES_SACHEN_SHERO)
-	SLOT_INTERFACE_INTERNAL("a9746",            NES_A9746)    // mapper 219
 // misc multigame cart boards
 	SLOT_INTERFACE_INTERNAL("benshieng",        NES_BENSHIENG)
 	SLOT_INTERFACE_INTERNAL("action52",         NES_ACTION52)
@@ -392,6 +392,7 @@ static SLOT_INTERFACE_START(nes_cart)
 	SLOT_INTERFACE_INTERNAL("unl_3d_block",     NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_c_n22m",       NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
 	SLOT_INTERFACE_INTERNAL("unl_pec_586",      NES_NROM) //  [mentioned in FCEUMM source - we need more info] - UNSUPPORTED
+	SLOT_INTERFACE_INTERNAL("a9746",            NES_NROM) // mapper 219 - UNSUPPORTED (no dump available)
 // legacy boards for FFE copier mappers (are there images available to fix/improve emulation?)
 	SLOT_INTERFACE_INTERNAL("ffe3",             NES_FFE3)
 	SLOT_INTERFACE_INTERNAL("ffe4",             NES_FFE4)

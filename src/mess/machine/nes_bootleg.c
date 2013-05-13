@@ -53,6 +53,7 @@ const device_type NES_09034A = &device_creator<nes_09034a_device>;
 const device_type NES_TOBIDASE = &device_creator<nes_tobidase_device>;
 const device_type NES_LH32 = &device_creator<nes_lh32_device>;
 const device_type NES_LH10 = &device_creator<nes_lh10_device>;
+const device_type NES_LH53 = &device_creator<nes_lh53_device>;
 const device_type NES_2708 = &device_creator<nes_2708_device>;
 const device_type NES_AC08 = &device_creator<nes_ac08_device>;
 const device_type NES_UNL_BB = &device_creator<nes_unl_bb_device>;
@@ -127,6 +128,11 @@ nes_lh32_device::nes_lh32_device(const machine_config &mconfig, const char *tag,
 
 nes_lh10_device::nes_lh10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: nes_nrom_device(mconfig, NES_LH10, "NES Cart LH-10 Pirate PCB", tag, owner, clock, "nes_lh10", __FILE__)
+{
+}
+
+nes_lh53_device::nes_lh53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: nes_nrom_device(mconfig, NES_LH53, "NES Cart LH-53 Pirate PCB", tag, owner, clock, "nes_lh53", __FILE__)
 {
 }
 
@@ -417,6 +423,30 @@ void nes_lh10_device::pcb_reset()
 	prg8_ef(0xff);
 	memset(m_reg, 0, sizeof(m_reg));
 	m_latch = 0;
+}
+
+void nes_lh53_device::device_start()
+{
+	common_start();
+	irq_timer = timer_alloc(TIMER_IRQ);
+	irq_timer->adjust(attotime::zero, 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(1));
+	
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_reg));
+}
+
+void nes_lh53_device::pcb_reset()
+{
+	chr8(0, CHRRAM);
+	
+	prg8_89(0xc);
+	prg8_ab(0xd);	// last 2K are overlayed by WRAM
+	prg8_cd(0xe);	// first 6K are overlayed by WRAM
+	prg8_ef(0xf);
+	m_reg = 0;
+	m_irq_count = 0;
+	m_irq_enable = 0;
 }
 
 void nes_2708_device::device_start()
@@ -1269,6 +1299,77 @@ WRITE8_MEMBER(nes_lh10_device::write_h)
 			case 0x0001:
 				m_reg[m_latch] = data;
 				update_prg();
+				break;
+		}
+	}
+}
+
+/*-------------------------------------------------
+ 
+ UNL-LH53
+ 
+ Games: Nazo no Murasamejou (FDS conversion)
+ 
+ This PCB maps WRAM (w/battery) in 0xb800-0xd7ff and 
+ PRG in 0x6000-0x7fff
+
+ iNES:
+ 
+ In MESS: Preliminar Support only.
+ 
+ -------------------------------------------------*/
+
+void nes_lh53_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_IRQ)
+	{
+		if (m_irq_enable)
+		{
+			m_irq_count++;
+			if (m_irq_count > 7560)//value from FCEUMM...
+			{
+				m_irq_count = 0;
+				machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+			}
+		}
+	}
+}
+
+READ8_MEMBER(nes_lh53_device::read_m)
+{
+	LOG_MMC(("lh53 read_m, offset: %04x\n", offset));
+	return m_prg[(m_reg * 0x2000) + (offset & 0x1fff)];
+}
+
+READ8_MEMBER(nes_lh53_device::read_h)
+{
+	LOG_MMC(("lh53 read_h, offset: %04x\n", offset));
+	
+	if (offset >= 0x3800 && offset < 0x5800)
+		return m_battery[offset & 0x1fff];
+	
+	return hi_access_rom(offset);
+}
+
+WRITE8_MEMBER(nes_lh53_device::write_h)
+{
+	LOG_MMC(("lh53 write_h, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset >= 0x3800 && offset < 0x5800)
+		m_battery[offset & 0x1fff] = data;
+	
+	else
+	{
+		switch (offset & 0x7000)
+		{
+			case 0x6000:
+				m_irq_enable = BIT(data, 1);
+				m_irq_count = 0;
+				if (!m_irq_enable)
+					machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+				break;
+			case 0x7000:
+				m_reg = data & 0x0f;
 				break;
 		}
 	}
