@@ -138,7 +138,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\
 	MCFG_SOUND_ADD("ymsnd", YM3812, freq1)                              \
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym3812_irqhandler>)) \
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym3812_irqhandler>)) \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)                      \
 																	\
 	MCFG_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_LOW)              \
@@ -147,7 +147,7 @@ extern const seibu_adpcm_interface seibu_adpcm2_intf;
 	MCFG_SPEAKER_STANDARD_MONO("mono")                              \
 																	\
 	MCFG_SOUND_ADD("ymsnd", YM3812, freq1)                              \
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym3812_irqhandler>)) \
+	MCFG_YM3812_IRQ_HANDLER(WRITELINE(driver_device, member_wrapper_line<seibu_ym3812_irqhandler>)) \
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)                      \
 																	\
 	MCFG_OKIM6295_ADD("oki", freq2, OKIM6295_PIN7_HIGH)             \
