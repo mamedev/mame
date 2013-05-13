@@ -51,7 +51,7 @@ struct matsucd
 	void (*stch_cb)( running_machine &machine, int level ); /* Status changed callback */
 	void (*scor_cb)( running_machine &machine, int level ); /* Subcode ready callback */
 	cdrom_file *cdrom;
-	device_t *cdda;
+	cdda_device *cdda;
 	emu_timer *frame_timer;
 };
 
@@ -67,7 +67,7 @@ void matsucd_init( cdrom_image_device *cdrom_device, const char *cdda_tag )
 	memset(&cd, 0, sizeof( matsucd ) );
 
 	cd.cdrom = cdrom_device->get_cdrom_file();
-	cd.cdda = cdrom_device->machine().device(cdda_tag);
+	cd.cdda = cdrom_device->machine().device<cdda_device>(cdda_tag);
 
 	cd.frame_timer = cdrom_device->machine().scheduler().timer_alloc(FUNC(matsu_subcode_proc));
 
@@ -137,31 +137,27 @@ int matsucd_get_next_byte( UINT8 *data )
 
 static void matsucd_cdda_stop( running_machine &machine )
 {
-	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
-
-	if (cdda != NULL)
+	if (cd.cdda != NULL)
 	{
-		cdda_stop_audio(cdda);
+		cd.cdda->stop_audio();
 		cd.frame_timer->reset(  );
 	}
 }
 
 static void matsucd_cdda_play( running_machine &machine, UINT32 lba, UINT32 num_blocks )
 {
-	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
-	if (cdda != NULL)
+	if (cd.cdda != NULL)
 	{
-		cdda_start_audio(cdda, lba, num_blocks);
+		cd.cdda->start_audio(lba, num_blocks);
 		cd.frame_timer->adjust(attotime::from_hz( 75 ));
 	}
 }
 
 static void matsucd_cdda_pause( running_machine &machine, int pause )
 {
-	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
-	if (cdda != NULL)
+	if (cd.cdda != NULL)
 	{
-		cdda_pause_audio(cdda, pause);
+		cd.cdda->pause_audio(pause);
 
 		if ( pause )
 		{
@@ -176,17 +172,15 @@ static void matsucd_cdda_pause( running_machine &machine, int pause )
 
 static UINT8 matsucd_cdda_getstatus( running_machine &machine, UINT32 *lba )
 {
-	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
-
 	if ( lba ) *lba = 0;
 
-	if (cdda != NULL)
+	if (cd.cdda != NULL)
 	{
-		if (cdda_audio_active(cdda))
+		if (cd.cdda->audio_active())
 		{
-			if ( lba ) *lba = cdda_get_audio_lba(cdda);
+			if ( lba ) *lba = cd.cdda->get_audio_lba();
 
-			if (cdda_audio_paused(cdda))
+			if (cd.cdda->audio_paused())
 			{
 				return 0x12;    /* audio paused */
 			}
@@ -195,7 +189,7 @@ static UINT8 matsucd_cdda_getstatus( running_machine &machine, UINT32 *lba )
 				return 0x11;    /* audio in progress */
 			}
 		}
-		else if (cdda_audio_ended(cdda))
+		else if (cd.cdda->audio_ended())
 		{
 			return 0x13;    /* audio ended */
 		}
@@ -280,11 +274,9 @@ static void matsucd_set_status( running_machine &machine, UINT8 status )
 
 static TIMER_CALLBACK(matsu_subcode_proc)
 {
-	device_t *cdda = cdda_from_cdrom(machine, cd.cdrom);
-
 	(void)param;
 
-	if (cdda != NULL)
+	if (cd.cdda != NULL)
 	{
 		UINT8   s = matsucd_cdda_getstatus(machine, NULL);
 		UINT8   newstatus = cd.status;
@@ -364,11 +356,8 @@ void matsucd_command_w( running_machine &machine, UINT8 data )
 
 	if ( cd.cdda_set == 0 )
 	{
-		// 2009-10, FP: for some reason, cdda_from_cdrom was not returning the correct
-		// CDDA device. Hence, as a temp workaround, I added the cdda to the struct
-		// and its tag is configured in matsucd_init
 		if ( cd.cdrom )
-			cdda_set_cdrom( cd.cdda, cd.cdrom);
+			cd.cdda->set_cdrom(cd.cdrom);
 
 		cd.cdda_set = 1;
 	}

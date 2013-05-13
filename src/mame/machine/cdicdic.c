@@ -813,7 +813,7 @@ void cdicdic_device::process_delayed_command()
 //              next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
 				verboselog(machine(), 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
 
-				cdda_start_audio(state->m_cdda, lba, rounded_next_msf);
+				state->m_cdda->start_audio(lba, rounded_next_msf);
 			}
 
 			m_ram[(m_data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;                      //  CTRL
@@ -1115,7 +1115,7 @@ WRITE16_MEMBER( cdicdic_device::regs_w )
 						break;
 					}
 					case 0x2b: // Stop CDDA
-						cdda_stop_audio(state->m_cdda);
+						state->m_cdda->stop_audio();
 						m_interrupt_timer->adjust(attotime::never);
 						break;
 					case 0x23: // Reset Mode 1
@@ -1226,13 +1226,13 @@ void cdicdic_device::device_reset()
 	{
 		// MESS case (has CDROM device)
 		m_cd = cdrom_dev->get_cdrom_file();
-		cdda_set_cdrom(state->m_cdda, m_cd);
+		state->m_cdda->set_cdrom(m_cd);
 	}
 	else
 	{
 		// MAME case
 		m_cd = cdrom_open(get_disk_handle(machine(), ":cdrom"));
-		cdda_set_cdrom(state->m_cdda, m_cd);
+		state->m_cdda->set_cdrom(m_cd);
 	}
 }
 

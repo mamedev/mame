@@ -201,7 +201,7 @@ void lc89510_temp_device::CDD_Stop(running_machine &machine)
 	SCD_STATUS = CDD_STOPPED;
 	CDD_STATUS = 0x0000;
 	SET_CDD_DATA_MODE
-	cdda_stop_audio( m_cdda ); //stop any pending CD-DA
+	m_cdda->stop_audio(); //stop any pending CD-DA
 
 	//neocd
 	NeoCD_StatusHack = 0x0E;
@@ -366,7 +366,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	printf("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
 	if(!(CURRENT_TRACK_IS_DATA))
-		cdda_start_audio( m_cdda, SCD_CURLBA, end_msf - SCD_CURLBA );
+		m_cdda->start_audio(SCD_CURLBA, end_msf - SCD_CURLBA);
 	SET_CDC_READ
 
 
@@ -399,7 +399,7 @@ void lc89510_temp_device::CDD_Pause(running_machine &machine)
 
 	//segacd.current_frame = cdda_get_audio_lba( machine.device( "cdda" ) );
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( m_cdda, 1 );
+	m_cdda->pause_audio(1);
 
 
 	NeoCD_StatusHack = 4;
@@ -418,7 +418,7 @@ void lc89510_temp_device::CDD_Resume(running_machine &machine)
 	CDD_MIN = to_bcd (SCD_CURTRK, false);
 	SET_CDC_READ
 	//if(!(CURRENT_TRACK_IS_DATA))
-	cdda_pause_audio( m_cdda, 0 );
+	m_cdda->pause_audio(0);
 
 	NeoCD_StatusHack = 1;
 }
@@ -993,7 +993,7 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_cdfader_w )
 
 	//printf("%f\n",cdfader_vol);
 
-	cdda_set_volume( m_cdda, cdfader_vol);
+	m_cdda->set_volume(cdfader_vol);
 }
 
 void lc89510_temp_device::reset_cd(void)
@@ -1010,8 +1010,8 @@ void lc89510_temp_device::reset_cd(void)
 			if ( segacd.cd )
 			{
 				segacd.toc = cdrom_get_toc( segacd.cd );
-				cdda_set_cdrom( m_cdda, segacd.cd );
-				cdda_stop_audio(m_cdda ); //stop any pending CD-DA
+				m_cdda->set_cdrom(segacd.cd);
+				m_cdda->stop_audio(); //stop any pending CD-DA
 			}
 		}
 	}

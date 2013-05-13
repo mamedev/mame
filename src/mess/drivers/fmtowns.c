@@ -1381,8 +1381,7 @@ void towns_state::towns_cd_set_status(UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3
 UINT8 towns_state::towns_cd_get_track()
 {
 	cdrom_image_device* cdrom = m_cdrom;
-	device_t* cdda = m_cdda;
-	UINT32 lba = cdda_get_audio_lba(cdda);
+	UINT32 lba = m_cdda->get_audio_lba();
 	UINT8 track;
 
 	for(track=1;track<99;track++)
@@ -1566,8 +1565,8 @@ void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
 	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current;
 
-	cdda_set_cdrom(m_cdda,device->get_cdrom_file());
-	cdda_start_audio(m_cdda,m_towns_cd.cdda_current,m_towns_cd.cdda_length);
+	m_cdda->set_cdrom(device->get_cdrom_file());
+	m_cdda->start_audio(m_towns_cd.cdda_current,m_towns_cd.cdda_length);
 	logerror("CD: CD-DA start from LBA:%i length:%i\n",m_towns_cd.cdda_current,m_towns_cd.cdda_length);
 	if(m_towns_cd.command & 0x20)
 	{
@@ -1636,7 +1635,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 				if(m_towns_cd.command & 0x20)
 				{
 					m_towns_cd.extra_status = 0;
-					if(cdda_audio_active(m_cdda) && !cdda_audio_paused(m_cdda))
+					if(m_cdda->audio_active() && !m_cdda->audio_paused())
 						towns_cd_set_status(0x00,0x03,0x00,0x00);
 					else
 						towns_cd_set_status(0x00,0x01,0x00,0x00);
@@ -1657,7 +1656,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 1;
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				cdda_pause_audio(m_cdda,1);
+				m_cdda->pause_audio(1);
 				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			case 0x85:   // Stop CD audio track (difference from 0x84?)
@@ -1666,7 +1665,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 1;
 					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				cdda_pause_audio(m_cdda,1);
+				m_cdda->pause_audio(1);
 				logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			case 0x87:  // Resume CD-DA playback
@@ -1675,7 +1674,7 @@ void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 					m_towns_cd.extra_status = 1;
 					towns_cd_set_status(0x00,0x03,0x00,0x00);
 				}
-				cdda_pause_audio(m_cdda,0);
+				m_cdda->pause_audio(0);
 				logerror("CD: Command 0x87: RESUME CD-DA\n");
 				break;
 			default:
@@ -1792,21 +1791,21 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 									m_towns_cd.extra_status++;
 									break;
 								case 2:  // st0/1/2 = MSF from beginning of current track
-									addr = cdda_get_audio_lba(m_cdda);
+									addr = m_cdda->get_audio_lba();
 									addr = lba_to_msf(addr - m_towns_cd.cdda_current);
 									towns_cd_set_status(0x19,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
 									m_towns_cd.extra_status++;
 									break;
 								case 3:  // st1/2 = current MSF
-									addr = cdda_get_audio_lba(m_cdda);
+									addr = m_cdda->get_audio_lba();
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
 									towns_cd_set_status(0x19,
 										0x00,(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8);
 									m_towns_cd.extra_status++;
 									break;
 								case 4:
-									addr = cdda_get_audio_lba(m_cdda);
+									addr = m_cdda->get_audio_lba();
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
 									towns_cd_set_status(0x20,
 										addr & 0x0000ff,0x00,0x00);
@@ -2030,9 +2029,9 @@ WRITE8_MEMBER(towns_state::towns_volume_w)
 	case 2:
 		m_towns_volume[m_towns_volume_select] = data;
 		if(m_towns_volume_select == 4)
-			cdda_set_channel_volume(m_cdda,0,100.0 * (data / 64.0f));
+			m_cdda->set_channel_volume(0,100.0 * (data / 64.0f));
 		if(m_towns_volume_select == 5)
-			cdda_set_channel_volume(m_cdda,1,100.0 * (data / 64.0f));
+			m_cdda->set_channel_volume(1,100.0 * (data / 64.0f));
 		break;
 	case 3:  // select channel
 		if(data < 8)
@@ -2616,7 +2615,7 @@ void towns_state::machine_reset()
 	m_pit = machine().device("pit");
 	m_messram = m_ram;
 	m_cdrom = machine().device<cdrom_image_device>("cdrom");
-	m_cdda = machine().device("cdda");
+	m_cdda = machine().device<cdda_device>("cdda");
 	m_scsi = machine().device<fmscsi_device>("scsi:fm");
 	m_ftimer = 0x00;
 	m_freerun_timer = 0x00;

@@ -8,6 +8,7 @@
 #define _GDROM_H_
 
 #include "machine/scsihle.h"
+#include "sound/cdda.h"
 
 // Sega GD-ROM handler
 class gdrom_device : public scsihle_device
@@ -43,6 +44,7 @@ private:
 	UINT32 read_type;   // for command 0x30 only
 	UINT32 data_select; // for command 0x30 only
 	cdrom_file *cdrom;
+	optional_device<cdda_device> m_cdda;
 	bool is_file;
 };
 

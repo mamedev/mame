@@ -8,6 +8,7 @@
 #define _SCSICD_H_
 
 #include "machine/scsihle.h"
+#include "sound/cdda.h"
 #include "cdrom.h"
 
 class scsicd_device : public scsihle_device
@@ -33,6 +34,7 @@ protected:
 	virtual void device_reset();
 
 private:
+	required_device<cdda_device> m_cdda;
 	UINT32 lba;
 	UINT32 blocks;
 	UINT32 last_lba;

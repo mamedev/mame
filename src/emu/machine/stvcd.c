@@ -364,7 +364,7 @@ void saturn_state::cd_exec_command( void )
 						cur_track = (start_pos)>>8;
 						cd_fad_seek = cdrom_get_track_start(cdrom, cur_track-1);
 						cd_stat = CD_STAT_SEEK;
-						cdda_pause_audio( machine().device( "cdda" ), 0 );
+						machine().device<cdda_device>("cdda")->pause_audio(0);
 					}
 					else
 					{
@@ -437,8 +437,8 @@ void saturn_state::cd_exec_command( void )
 			// cdda
 			if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 			{
-				cdda_pause_audio( machine().device( "cdda" ), 0 );
-				//cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
+				machine().device<cdda_device>("cdda")->pause_audio(0);
+				//machine().device<cdda_device>("cdda")->start_audio(cd_curfad, fadstoplay);
 				//cdda_repeat_count = 0;
 			}
 
@@ -464,7 +464,7 @@ void saturn_state::cd_exec_command( void )
 				if (temp == 0xffffff)
 				{
 					cd_stat = CD_STAT_PAUSE;
-					cdda_pause_audio( machine().device( "cdda" ), 1 );
+					machine().device<cdda_device>("cdda")->pause_audio(1);
 				}
 				else
 				{
@@ -480,7 +480,7 @@ void saturn_state::cd_exec_command( void )
 					cd_stat = CD_STAT_PAUSE;
 					cur_track = cr2>>8;;
 					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-					cdda_pause_audio( machine().device( "cdda" ), 1 );
+					machine().device<cdda_device>("cdda")->pause_audio(1);
 					// (index is cr2 low byte)
 				}
 				else // error!
@@ -488,7 +488,7 @@ void saturn_state::cd_exec_command( void )
 					cd_stat = CD_STAT_STANDBY;
 					cd_curfad = 0xffffffff;
 					cur_track = 0xff;
-					cdda_stop_audio( machine().device( "cdda" ) ); //stop any pending CD-DA
+					machine().device<cdda_device>("cdda")->stop_audio(); //stop any pending CD-DA
 				}
 			}
 
@@ -1477,7 +1477,7 @@ void saturn_state::stvcd_reset( void )
 		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
 	}
 
-	cdda_set_cdrom( machine().device("cdda"), cdrom );
+	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);
 
 	if (cdrom)
 	{
@@ -2593,12 +2593,12 @@ void saturn_state::cd_playdata( void )
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 				{
 					cd_read_filtered_sector(cd_curfad,&p_ok);
-					cdda_stop_audio( machine().device( "cdda" ) ); //stop any pending CD-DA
+					machine().device<cdda_device>("cdda")->stop_audio(); //stop any pending CD-DA
 				}
 				else
 				{
 					p_ok = 1; // TODO
-					cdda_start_audio( machine().device( "cdda" ), cd_curfad, 1  );
+					machine().device<cdda_device>("cdda")->start_audio(cd_curfad, 1);
 				}
 
 				if(p_ok)
@@ -2681,7 +2681,7 @@ void saturn_state::stvcd_set_tray_close( void )
 		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
 	}
 
-	cdda_set_cdrom( machine().device("cdda"), cdrom );
+	machine().device<cdda_device>("cdda")->set_cdrom(cdrom);
 
 	if (cdrom)
 	{

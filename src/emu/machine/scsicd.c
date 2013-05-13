@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "machine/scsihle.h"
 #include "cdrom.h"
-#include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
 #include "scsicd.h"
 
@@ -23,12 +22,14 @@ static void phys_frame_to_msf(int phys_frame, int *m, int *s, int *f)
 const device_type SCSICD = &device_creator<scsicd_device>;
 
 scsicd_device::scsicd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: scsihle_device(mconfig, SCSICD, "SCSICD", tag, owner, clock, "scsicd", __FILE__)
+	: scsihle_device(mconfig, SCSICD, "SCSICD", tag, owner, clock, "scsicd", __FILE__),
+	m_cdda(*this, "cdda")
 {
 }
 
 scsicd_device::scsicd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	scsihle_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_cdda(*this, "cdda")
 {
 }
 
@@ -82,7 +83,6 @@ machine_config_constructor scsicd_device::device_mconfig_additions() const
 
 void scsicd_device::ExecCommand( int *transferLength )
 {
-	device_t *cdda;
 	int trk;
 
 	switch ( command[0] )
@@ -110,11 +110,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 			break;
 
 		case 0x1b: // START STOP UNIT
-			cdda = cdda_from_cdrom(machine(), cdrom);
-			if (cdda != NULL)
-			{
-				cdda_stop_audio(cdda);
-			}
+			m_cdda->stop_audio();
 			SetPhase( SCSI_PHASE_STATUS );
 			*transferLength = 0;
 			break;
@@ -146,11 +142,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 				cur_subblock = 0;
 			}
 
-			cdda = cdda_from_cdrom(machine(), cdrom);
-			if (cdda != NULL)
-			{
-				cdda_stop_audio(cdda);
-			}
+			m_cdda->stop_audio();
 
 			SetPhase( SCSI_PHASE_DATAIN );
 			*transferLength = blocks * bytes_per_sector;
@@ -188,11 +180,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 				length = 4;
 			}
 
-			cdda = cdda_from_cdrom(machine(), cdrom);
-			if (cdda != NULL)
-			{
-				cdda_stop_audio(cdda);
-			}
+			m_cdda->stop_audio();
 
 			SetPhase( SCSI_PHASE_DATAIN );
 			*transferLength = length;
@@ -219,9 +207,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
 				play_err_flag = 0;
-				cdda = cdda_from_cdrom(machine(), cdrom);
-				if (cdda != NULL)
-					cdda_start_audio(cdda, lba, blocks);
+				m_cdda->start_audio(lba, blocks);
 			}
 			else
 			{
@@ -250,9 +236,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 
 			if (blocks && cdrom)
 			{
-				cdda = cdda_from_cdrom(machine(), cdrom);
-				if (cdda != NULL)
-					cdda_start_audio(cdda, lba, blocks);
+				m_cdda->start_audio(lba, blocks);
 			}
 
 			logerror("SCSICD: PLAY AUDIO T/I: strk %d idx %d etrk %d idx %d frames %d\n", command[4], command[5], command[7], command[8], blocks);
@@ -263,9 +247,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 		case 0x4b: // PAUSE/RESUME
 			if (cdrom)
 			{
-				cdda = cdda_from_cdrom(machine(), cdrom);
-				if (cdda != NULL)
-					cdda_pause_audio(cdda, (command[8] & 0x01) ^ 0x01);
+				m_cdda->pause_audio((command[8] & 0x01) ^ 0x01);
 			}
 
 			logerror("SCSICD: PAUSE/RESUME: %s\n", command[8]&1 ? "RESUME" : "PAUSE");
@@ -276,9 +258,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 		case 0x4e: // STOP
 			if (cdrom)
 			{
-				cdda = cdda_from_cdrom(machine(), cdrom);
-				if (cdda != NULL)
-					cdda_stop_audio(cdda);
+				m_cdda->stop_audio();
 			}
 
 			logerror("SCSICD: STOP_PLAY_SCAN\n");
@@ -318,9 +298,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 			if (cdrom_get_track_type(cdrom, trk) == CD_TRACK_AUDIO)
 			{
 				play_err_flag = 0;
-				cdda = cdda_from_cdrom(machine(), cdrom);
-				if (cdda != NULL)
-					cdda_start_audio(cdda, lba, blocks);
+				m_cdda->start_audio(lba, blocks);
 			}
 			else
 			{
@@ -347,11 +325,7 @@ void scsicd_device::ExecCommand( int *transferLength )
 				cur_subblock = 0;
 			}
 
-			cdda = cdda_from_cdrom(machine(), cdrom);
-			if (cdda != NULL)
-			{
-				cdda_stop_audio(cdda);
-			}
+			m_cdda->stop_audio();
 
 			SetPhase( SCSI_PHASE_DATAIN );
 			*transferLength = blocks * bytes_per_sector;
@@ -378,7 +352,6 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 	UINT32 last_phys_frame;
 	UINT32 temp;
 	UINT8 tmp_buffer[2048];
-	device_t *cdda;
 
 	switch ( command[0] )
 	{
@@ -389,8 +362,7 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 
 			data[0] = 0x71; // deferred error
 
-			cdda = cdda_from_cdrom(machine(), cdrom);
-			if (cdda != NULL && cdda_audio_active(cdda))
+			if (m_cdda->audio_active())
 			{
 				data[12] = 0x00;
 				data[13] = 0x11;    // AUDIO PLAY OPERATION IN PROGRESS
@@ -470,7 +442,6 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 			{
 				case 1: // return current position
 				{
-					int audio_active;
 					int msf;
 
 					if (!cdrom)
@@ -482,11 +453,12 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 
 					msf = command[1] & 0x2;
 
-					cdda = cdda_from_cdrom(machine(), cdrom);
-					audio_active = cdda != NULL && cdda_audio_active(cdda);
+					int audio_active = m_cdda->audio_active();
 					if (audio_active)
 					{
-						if (cdda_audio_paused(cdda))
+						// if audio is playing, get the latest LBA from the CDROM layer
+						last_lba = m_cdda->get_audio_lba();
+						if (m_cdda->audio_paused())
 						{
 							data[1] = 0x12;     // audio is paused
 						}
@@ -497,7 +469,8 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 					}
 					else
 					{
-						if (cdda != NULL && cdda_audio_ended(cdda))
+						last_lba = 0;
+						if (m_cdda->audio_ended())
 						{
 							data[1] = 0x13; // ended successfully
 						}
@@ -506,16 +479,6 @@ void scsicd_device::ReadData( UINT8 *data, int dataLength )
 //                          data[1] = 0x14;    // stopped due to error
 							data[1] = 0x15; // No current audio status to return
 						}
-					}
-
-					// if audio is playing, get the latest LBA from the CDROM layer
-					if (audio_active)
-					{
-						last_lba = cdda_get_audio_lba(cdda);
-					}
-					else
-					{
-						last_lba = 0;
 					}
 
 					data[2] = 0;
@@ -752,7 +715,7 @@ void scsicd_device::GetDevice( void **_cdrom )
 void scsicd_device::SetDevice( void *_cdrom )
 {
 	cdrom = (cdrom_file *)_cdrom;
-	cdda_set_cdrom(subdevice("cdda"), cdrom);
+	m_cdda->set_cdrom(cdrom);
 }
 
 int scsicd_device::GetSectorBytes()
