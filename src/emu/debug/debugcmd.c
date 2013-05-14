@@ -129,6 +129,8 @@ static void execute_rpclear(running_machine &machine, int ref, int params, const
 static void execute_rpdisenable(running_machine &machine, int ref, int params, const char **param);
 static void execute_rplist(running_machine &machine, int ref, int params, const char **param);
 static void execute_hotspot(running_machine &machine, int ref, int params, const char **param);
+static void execute_statesave(running_machine &machine, int ref, int params, const char **param);
+static void execute_stateload(running_machine &machine, int ref, int params, const char **param);
 static void execute_save(running_machine &machine, int ref, int params, const char **param);
 static void execute_load(running_machine &machine, int ref, int params, const char **param);
 static void execute_dump(running_machine &machine, int ref, int params, const char **param);
@@ -326,6 +328,11 @@ void debug_command_init(running_machine &machine)
 
 	debug_console_register_command(machine, "hotspot",   CMDFLAG_NONE, 0, 0, 3, execute_hotspot);
 
+	debug_console_register_command(machine, "statesave", CMDFLAG_NONE, 0, 1, 1, execute_statesave);
+	debug_console_register_command(machine, "ss",        CMDFLAG_NONE, 0, 1, 1, execute_statesave);
+	debug_console_register_command(machine, "stateload", CMDFLAG_NONE, 0, 1, 1, execute_stateload);
+	debug_console_register_command(machine, "sl",        CMDFLAG_NONE, 0, 1, 1, execute_stateload);
+
 	debug_console_register_command(machine, "save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, execute_save);
 	debug_console_register_command(machine, "saved",     CMDFLAG_NONE, AS_DATA, 3, 4, execute_save);
 	debug_console_register_command(machine, "savei",     CMDFLAG_NONE, AS_IO, 3, 4, execute_save);
@@ -380,22 +387,22 @@ void debug_command_init(running_machine &machine)
 
 	debug_console_register_command(machine, "source",    CMDFLAG_NONE, 0, 1, 1, execute_source);
 
-	debug_console_register_command(machine, "map",      CMDFLAG_NONE, AS_PROGRAM, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapd",     CMDFLAG_NONE, AS_DATA, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapi",     CMDFLAG_NONE, AS_IO, 1, 1, execute_map);
-	debug_console_register_command(machine, "memdump",  CMDFLAG_NONE, 0, 0, 1, execute_memdump);
+	debug_console_register_command(machine, "map",       CMDFLAG_NONE, AS_PROGRAM, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapd",      CMDFLAG_NONE, AS_DATA, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapi",      CMDFLAG_NONE, AS_IO, 1, 1, execute_map);
+	debug_console_register_command(machine, "memdump",   CMDFLAG_NONE, 0, 0, 1, execute_memdump);
 
-	debug_console_register_command(machine, "symlist",  CMDFLAG_NONE, 0, 0, 1, execute_symlist);
+	debug_console_register_command(machine, "symlist",   CMDFLAG_NONE, 0, 0, 1, execute_symlist);
 
-	debug_console_register_command(machine, "softreset",    CMDFLAG_NONE, 0, 0, 1, execute_softreset);
-	debug_console_register_command(machine, "hardreset",    CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
+	debug_console_register_command(machine, "softreset", CMDFLAG_NONE, 0, 0, 1, execute_softreset);
+	debug_console_register_command(machine, "hardreset", CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
-	debug_console_register_command(machine, "images",   CMDFLAG_NONE, 0, 0, 0, execute_images);
-	debug_console_register_command(machine, "mount",    CMDFLAG_NONE, 0, 2, 2, execute_mount);
-	debug_console_register_command(machine, "unmount",  CMDFLAG_NONE, 0, 1, 1, execute_unmount);
+	debug_console_register_command(machine, "images",    CMDFLAG_NONE, 0, 0, 0, execute_images);
+	debug_console_register_command(machine, "mount",     CMDFLAG_NONE, 0, 2, 2, execute_mount);
+	debug_console_register_command(machine, "unmount",   CMDFLAG_NONE, 0, 1, 1, execute_unmount);
 
-	debug_console_register_command(machine, "input",    CMDFLAG_NONE, 0, 1, 1, execute_input);
-	debug_console_register_command(machine, "dumpkbd",  CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
+	debug_console_register_command(machine, "input",     CMDFLAG_NONE, 0, 1, 1, execute_input);
+	debug_console_register_command(machine, "dumpkbd",   CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_command_exit), &machine));
 
@@ -1691,6 +1698,38 @@ static void execute_hotspot(running_machine &machine, int ref, int params, const
 	/* attempt to install */
 	device->debug()->hotspot_track(count, threshhold);
 	debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", device->tag(), (int)count, (int)threshhold);
+}
+
+
+/*-------------------------------------------------
+    execute_statesave - execute the statesave command
+-------------------------------------------------*/
+
+static void execute_statesave(running_machine &machine, int ref, int params, const char *param[])
+{
+	astring filename(param[0]);
+	machine.immediate_save(filename);
+	debug_console_printf(machine, "State save attempted.  Please refer to window message popup for results.\n");
+}
+
+
+/*-------------------------------------------------
+    execute_stateload - execute the stateload command
+-------------------------------------------------*/
+
+static void execute_stateload(running_machine &machine, int ref, int params, const char *param[])
+{
+	astring filename(param[0]);
+	machine.immediate_load(filename);
+	
+	// Clear all PC & memory tracks
+	device_iterator iter(machine.root_device());
+	for (device_t *device = iter.first(); device != NULL; device = iter.next())
+	{
+		device->debug()->track_pc_data_clear();
+		device->debug()->track_mem_data_clear();
+	}
+	debug_console_printf(machine, "State load attempted.  Please refer to window message popup for results.\n");
 }
 
 

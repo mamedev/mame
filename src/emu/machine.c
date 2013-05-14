@@ -585,6 +585,24 @@ void running_machine::schedule_save(const char *filename)
 
 
 //-------------------------------------------------
+//  immediate_save - save state.
+//-------------------------------------------------
+
+void running_machine::immediate_save(const char *filename)
+{
+	// specify the filename to save or load
+	set_saveload_filename(filename);
+
+	// set up some parameters for handle_saveload()
+	m_saveload_schedule = SLS_SAVE;
+	m_saveload_schedule_time = this->time();
+
+	// jump right into the save, anonymous timers can't hurt us!
+	handle_saveload();
+}
+
+
+//-------------------------------------------------
 //  schedule_load - schedule a load to occur as
 //  soon as possible
 //-------------------------------------------------
@@ -600,6 +618,24 @@ void running_machine::schedule_load(const char *filename)
 
 	// we can't be paused since we need to clear out anonymous timers
 	resume();
+}
+
+
+//-------------------------------------------------
+//  immediate_load - load state.
+//-------------------------------------------------
+
+void running_machine::immediate_load(const char *filename)
+{
+	// specify the filename to save or load
+	set_saveload_filename(filename);
+
+	// set up some parameters for handle_saveload()
+	m_saveload_schedule = SLS_LOAD;
+	m_saveload_schedule_time = this->time();
+
+	// jump right into the load, anonymous timers can't hurt us
+	handle_saveload();
 }
 
 

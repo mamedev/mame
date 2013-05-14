@@ -87,14 +87,16 @@ static const help_item static_help_list[] =
 		"  printf <format>[,<item>[,...]] -- prints one or more <item>s to the console using <format>\n"
 		"  logerror <format>[,<item>[,...]] -- outputs one or more <item>s to the error.log\n"
 		"  tracelog <format>[,<item>[,...]] -- outputs one or more <item>s to the trace file using <format>\n"
-		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes.\n"
-		"  trackpc [<bool>,<cpu>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear].\n"
-		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear].\n"
-		"  pcatmemp <address>[,<cpu>] -- query which PC wrote to a given program memory address for the current CPU.\n"
-		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU.\n"
-		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU.\n"
-		"                                (Note: you can also query this info by right clicking in a memory window.\n"
-		"  snap [<filename>] -- save a screen snapshot\n"
+		"  history [<cpu>,<length>] -- outputs a brief history of visited opcodes\n"
+		"  trackpc [<bool>,<cpu>,<bool>] -- visually track visited opcodes [boolean to turn on and off, for the given cpu, clear]\n"
+		"  trackmem [<bool>,<bool>] -- record which PC writes to each memory address [boolean to turn on and off, clear]\n"
+		"  pcatmemp <address>[,<cpu>] -- query which PC wrote to a given program memory address for the current CPU\n"
+		"  pcatmemd <address>[,<cpu>] -- query which PC wrote to a given data memory address for the current CPU\n"
+		"  pcatmemi <address>[,<cpu>] -- query which PC wrote to a given I/O memory address for the current CPU\n"
+		"                                (Note: you can also query this info by right clicking in a memory window\n"
+		"  statesave[ss] <filename> -- save a state file for the current driver\n"
+		"  stateload[sl] <filename> -- load a state file for the current driver\n"
+		"  snap [<filename>] -- save a screen snapshot.\n"
 		"  source <filename> -- reads commands from <filename> and executes them one by one\n"
 		"  quit -- exits MAME and the debugger\n"
 	},
@@ -433,6 +435,36 @@ static const help_item static_help_list[] =
 		"\n"
 		"pcatmem 400000\n"
 		"  Print which PC wrote this CPU's memory location 0x400000.\n"
+	},
+	{
+		"statesave[ss]",
+		"\n"
+		"  statesave[ss] <filename>\n"
+		"\n"
+		"The statesave command creates a save state at this exact moment in time. "
+		"The given state file gets written to the standard state directory (sta), and gets .sta to it - "
+		"no file extension necessary.  All output for this command is currently echoed into the "
+		"running machine window.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"statesave foo\n"
+		"  Writes file 'foo.sta' in the default state save directory.\n"
+	},
+	{
+		"stateload[sl]",
+		"\n"
+		"  stateload[ss] <filename>\n"
+		"\n"
+		"The stateload command retrieves a save state from disk. "
+		"The given state file gets read from the standard state directory (sta), and gets .sta to it - "
+		"no file extension necessary.  All output for this command is currently echoed into the "
+		"running machine window.  Previous memory and PC tracking statistics are cleared.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"stateload foo\n"
+		"  Reads file 'foo.sta' from the default state save directory.\n"
 	},
 	{
 		"snap",
