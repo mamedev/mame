@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 8, pasogo_state)
 //  ADDRESS_MAP_GLOBAL_MASK(0xfFFF)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x26, 0x27) AM_READWRITE(vg230_io_r, vg230_io_w )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8254", pit8253_r, pit8253_w)
 	AM_RANGE(0x6c, 0x6f) AM_READWRITE(ems_r, ems_w )
@@ -460,7 +460,7 @@ INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
 
 IRQ_CALLBACK_MEMBER(pasogo_state::pasogo_irq_callback)
 {
-	return pic8259_acknowledge( machine().device("pic8259"));
+	return machine().device<pic8259_device>("pic8259")->acknowledge();
 }
 
 void pasogo_state::machine_reset()

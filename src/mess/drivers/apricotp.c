@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	AM_RANGE(0x02a, 0x02b) AM_WRITE8(palette_w, 0x00ff)
 	AM_RANGE(0x02e, 0x02f) AM_WRITE(video_w)
 	AM_RANGE(0x040, 0x05f) AM_DEVREADWRITE8(I8237_TAG, am9517a_device, read, write, 0x00ff)
-	AM_RANGE(0x068, 0x06b) AM_DEVREADWRITE8_LEGACY(I8259A_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x068, 0x06b) AM_DEVREADWRITE8(I8259A_TAG, pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x06c, 0x06d) AM_DEVWRITE8(MC6845_TAG, mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x06e, 0x06f) AM_DEVREADWRITE8(MC6845_TAG, mc6845_device, register_r, register_w, 0x00ff)
 ADDRESS_MAP_END

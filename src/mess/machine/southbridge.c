@@ -194,13 +194,13 @@ void southbridge_device::device_start()
 	address_space& spaceio = machine().device(":maincpu")->memory().space(AS_IO);
 
 	spaceio.install_readwrite_handler(0x0000, 0x001f, read8_delegate(FUNC(am9517a_device::read),&(*m_dma8237_1)), write8_delegate(FUNC(am9517a_device::write),&(*m_dma8237_1)), 0xffffffff);
-	spaceio.install_legacy_readwrite_handler(*m_pic8259_master, 0x0020, 0x003f, FUNC(pic8259_r), FUNC(pic8259_w), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0020, 0x003f, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_master)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_master)), 0xffffffff);
 	spaceio.install_legacy_readwrite_handler(*m_pit8254, 0x0040, 0x005f, FUNC(pit8253_r), FUNC(pit8253_w), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_keybc_r),this), write8_delegate(FUNC(southbridge_device::at_keybc_w),this), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0064, 0x0067, read8_delegate(FUNC(at_keyboard_controller_device::status_r),&(*m_keybc)), write8_delegate(FUNC(at_keyboard_controller_device::command_w),&(*m_keybc)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0070, 0x007f, read8_delegate(FUNC(mc146818_device::read),&(*m_mc146818)), write8_delegate(FUNC(mc146818_device::write),&(*m_mc146818)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r),this), write8_delegate(FUNC(southbridge_device::at_page8_w),this), 0xffffffff);
-	spaceio.install_legacy_readwrite_handler(*m_pic8259_slave, 0x00a0, 0x00bf, FUNC(pic8259_r), FUNC(pic8259_w), 0xffffffff);
+	spaceio.install_readwrite_handler(0x00a0, 0x00bf, read8_delegate(FUNC(pic8259_device::read),&(*m_pic8259_slave)), write8_delegate(FUNC(pic8259_device::write),&(*m_pic8259_slave)), 0xffffffff);
 	spaceio.install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r),this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w),this), 0xffffffff);
 	spaceio.nop_readwrite(0x00e0, 0x00ef);
 
@@ -460,7 +460,7 @@ WRITE8_MEMBER( southbridge_device::at_portb_w )
 
 WRITE_LINE_MEMBER( southbridge_device::at_mc146818_irq )
 {
-	pic8259_ir0_w(m_pic8259_slave, (state) ? 0 : 1);
+	m_pic8259_slave->ir0_w((state) ? 0 : 1);
 }
 
 READ8_MEMBER( southbridge_device::at_dma8237_2_r )

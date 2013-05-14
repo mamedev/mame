@@ -42,7 +42,7 @@ public:
 
 	/* devices */
 	fd1793_t *m_fdc;
-	device_t *m_pic;
+	pic8259_device *m_pic;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	DECLARE_READ8_MEMBER(b2m_keyboard_r);

@@ -34,8 +34,8 @@ public:
 	UINT8 m_vga_address;
 
 	device_t    *m_pit8253;
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
+	pic8259_device  *m_pic8259_1;
+	pic8259_device  *m_pic8259_2;
 	i8237_device    *m_dma8237_1;
 	i8237_device    *m_dma8237_2;
 	DECLARE_READ32_MEMBER(ide_r);
@@ -210,7 +210,7 @@ WRITE_LINE_MEMBER(photoply_state::pic8259_1_set_int_line)
 READ8_MEMBER(photoply_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -224,21 +224,21 @@ static const struct pic8259_interface pic8259_1_config =
 
 static const struct pic8259_interface pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
 
 IRQ_CALLBACK_MEMBER(photoply_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259_1);
+	return m_pic8259_1->acknowledge();
 }
 
 WRITE_LINE_MEMBER(photoply_state::at_pit8254_out0_changed)
 {
 	if ( m_pic8259_1 )
 	{
-		pic8259_ir0_w(m_pic8259_1, state);
+		m_pic8259_1->ir0_w(state);
 	}
 }
 
@@ -282,12 +282,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM//DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_device, i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
@@ -355,8 +355,8 @@ void photoply_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photoply_state::irq_callback),this));
 	m_pit8253 = machine().device( "pit8254" );
-	m_pic8259_1 = machine().device( "pic8259_1" );
-	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
+	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
 	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 }

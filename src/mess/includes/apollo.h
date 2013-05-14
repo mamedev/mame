@@ -25,6 +25,7 @@
 #include "machine/68681.h"
 #include "machine/pc_fdc.h"
 #include "machine/8237dma.h"
+#include "machine/pic8259.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -123,8 +124,8 @@ public:
 
 	i8237_device *dma8237_1;
 	i8237_device *dma8237_2;
-	device_t *pic8259_master;
-	device_t *pic8259_slave;
+	pic8259_device *pic8259_master;
+	pic8259_device *pic8259_slave;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
 	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);

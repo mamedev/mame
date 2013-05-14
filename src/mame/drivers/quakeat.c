@@ -71,8 +71,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
+	pic8259_device    *m_pic8259_1;
+	pic8259_device    *m_pic8259_2;
 	DECLARE_WRITE_LINE_MEMBER(quakeat_pic8259_1_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
@@ -98,12 +98,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
 //  AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 //  AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 //  AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,          kbdc8042_32le_w)
 //  AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 //  AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,              at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 //  AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 //  AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
@@ -129,7 +129,7 @@ WRITE_LINE_MEMBER(quakeat_state::quakeat_pic8259_1_set_int_line)
 READ8_MEMBER(quakeat_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -143,7 +143,7 @@ static const struct pic8259_interface quakeat_pic8259_1_config =
 
 static const struct pic8259_interface quakeat_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -157,15 +157,15 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(quakeat_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259_1);
+	return m_pic8259_1->acknowledge();
 }
 
 void quakeat_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(quakeat_state::irq_callback),this));
 
-	m_pic8259_1 = machine().device( "pic8259_1" );
-	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
+	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 }
 /*************************************************************/
 

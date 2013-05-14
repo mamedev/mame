@@ -454,7 +454,7 @@ void bebox_state::fdc_interrupt(bool state)
 {
 	bebox_set_irq_bit(machine(), 13, state);
 	if ( m_devices.pic8259_master ) {
-		pic8259_ir6_w(m_devices.pic8259_master, state);
+		m_devices.pic8259_master->ir6_w(state);
 	}
 }
 
@@ -474,8 +474,8 @@ void bebox_state::fdc_dma_drq(bool state)
 
 READ64_MEMBER(bebox_state::bebox_interrupt_ack_r )
 {
-	int result;
-	result = pic8259_acknowledge( m_devices.pic8259_master );
+	UINT32 result;
+	result = m_devices.pic8259_master->acknowledge();
 	bebox_set_irq_bit(space.machine(), 5, 0);   /* HACK */
 	return ((UINT64) result) << 56;
 }
@@ -495,13 +495,13 @@ WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_master_set_int_line)
 WRITE_LINE_MEMBER(bebox_state::bebox_pic8259_slave_set_int_line)
 {
 	if (m_devices.pic8259_master)
-		pic8259_ir2_w(m_devices.pic8259_master, state);
+		m_devices.pic8259_master->ir2_w(state);
 }
 
 READ8_MEMBER(bebox_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_devices.pic8259_slave);
+		return m_devices.pic8259_slave->acknowledge();
 	}
 	return 0x00;
 }
@@ -558,7 +558,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_ide_interrupt)
 {
 	bebox_set_irq_bit(machine(), 7, state);
 	if ( m_devices.pic8259_master ) {
-		pic8259_ir6_w(m_devices.pic8259_master, state);
+		m_devices.pic8259_master->ir6_w(state);
 	}
 }
 
@@ -787,7 +787,7 @@ I8237_INTERFACE( bebox_dma8237_2_config )
 WRITE_LINE_MEMBER(bebox_state::bebox_timer0_w)
 {
 	if (m_devices.pic8259_master)
-		pic8259_ir0_w(m_devices.pic8259_master, state);
+		m_devices.pic8259_master->ir0_w(state);
 }
 
 
@@ -969,8 +969,8 @@ void scsi53c810_pci_write(device_t *busdevice, device_t *device, int function, i
 
 
 TIMER_CALLBACK_MEMBER(bebox_state::bebox_get_devices){
-	m_devices.pic8259_master = machine().device("pic8259_master");
-	m_devices.pic8259_slave = machine().device("pic8259_slave");
+	m_devices.pic8259_master = machine().device<pic8259_device>("pic8259_master");
+	m_devices.pic8259_slave = machine().device<pic8259_device>("pic8259_slave");
 	m_devices.dma8237_1 = machine().device<i8237_device>("dma8237_1");
 	m_devices.dma8237_2 = machine().device<i8237_device>("dma8237_2");
 }

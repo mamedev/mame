@@ -36,7 +36,7 @@ enum
 
 static ADDRESS_MAP_START( victor9k_mem, AS_PROGRAM, 8, victor9k_state )
 //  AM_RANGE(0x00000, 0xdffff) AM_RAM
-	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE_LEGACY(I8259A_TAG, pic8259_r, pic8259_w)
+	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_device, read, write)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE_LEGACY(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_device, status_r, address_w)
@@ -180,7 +180,7 @@ static const struct pic8259_interface pic_intf =
 
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir1_w), // interrupt
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir1_w), // interrupt
 	{
 		{
 			0,                  // receive clock

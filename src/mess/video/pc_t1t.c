@@ -991,7 +991,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 	{
 		pcjr.pc_framecnt++;
 	}
-	pic8259_ir5_w(device->machine().device("pic8259"), state);
+	device->machine().device<pic8259_device>("pic8259")->ir5_w(state);
 }
 
 static VIDEO_START( pc_t1t )

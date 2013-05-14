@@ -324,7 +324,7 @@ void b2m_state::b2m_postload()
 
 void b2m_state::machine_start()
 {
-	m_pic = machine().device("pic8259");
+	m_pic = machine().device<pic8259_device>("pic8259");
 	m_fdc = machine().device<fd1793_t>("fd1793");
 
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(b2m_state::b2m_fdc_drq), this));
@@ -347,7 +347,7 @@ void b2m_state::machine_start()
 
 IRQ_CALLBACK_MEMBER(b2m_state::b2m_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->acknowledge();
 }
 
 const struct pic8259_interface b2m_pic8259_config =
@@ -361,7 +361,7 @@ INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
 {
 	m_vblank_state++;
 	if (m_vblank_state>1) m_vblank_state=0;
-	pic8259_ir0_w(m_pic, m_vblank_state);
+	m_pic->ir0_w(m_vblank_state);
 }
 
 void b2m_state::machine_reset()

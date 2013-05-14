@@ -599,11 +599,11 @@ static I8237_INTERFACE( apollo_dma8237_2_config )
 #undef VERBOSE
 #define VERBOSE 0
 
-INLINE device_t *get_pic8259_master(device_t *device) {
+INLINE pic8259_device *get_pic8259_master(device_t *device) {
 	return device->machine().driver_data<apollo_state>()->pic8259_master;
 }
 
-INLINE device_t *get_pic8259_slave(device_t *device) {
+INLINE pic8259_device *get_pic8259_slave(device_t *device) {
 	return device->machine().driver_data<apollo_state>()->pic8259_slave;
 }
 
@@ -613,11 +613,11 @@ INLINE device_t *get_pic8259_slave(device_t *device) {
 
 WRITE8_DEVICE_HANDLER(apollo_pic8259_master_w ) {
 	DLOG1(("writing %s at offset %X = %02x", device->tag(), offset, data));
-	pic8259_w(device, space, offset, data);
+	downcast<pic8259_device *>(device)->write(space, offset, data);
 }
 
 READ8_DEVICE_HANDLER( apollo_pic8259_master_r ) {
-	UINT8 data = pic8259_r(device, space, offset);
+	UINT8 data = downcast<pic8259_device *>(device)->read(space, offset);
 	DLOG1(("reading %s at offset %X = %02x", device->tag(), offset, data));
 	return data;
 }
@@ -628,11 +628,11 @@ READ8_DEVICE_HANDLER( apollo_pic8259_master_r ) {
 
 WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w ) {
 	DLOG1(("writing %s at offset %X = %02x", device->tag(), offset, data));
-	pic8259_w(device, space, offset, data);
+	downcast<pic8259_device *>(device)->write(space, offset, data);
 }
 
 READ8_DEVICE_HANDLER( apollo_pic8259_slave_r ) {
-	UINT8 data = pic8259_r(device, space, offset);
+	UINT8 data = downcast<pic8259_device *>(device)->read(space, offset);
 	DLOG1(("reading %s at offset %X = %02x", device->tag(), offset, data));
 	return data;
 }
@@ -644,31 +644,31 @@ static void apollo_pic_set_irq_line(device_t *device, int irq, int state) {
 	}
 
 	switch (irq) {
-	case 0: pic8259_ir0_w(get_pic8259_master(device), state); break;
-	case 1: pic8259_ir1_w(get_pic8259_master(device), state); break;
-	case 2: pic8259_ir2_w(get_pic8259_master(device), state); break;
-	case 3: pic8259_ir3_w(get_pic8259_master(device), state); break;
-	case 4: pic8259_ir4_w(get_pic8259_master(device), state); break;
-	case 5: pic8259_ir5_w(get_pic8259_master(device), state); break;
-	case 6: pic8259_ir6_w(get_pic8259_master(device), state); break;
-	case 7: pic8259_ir7_w(get_pic8259_master(device), state); break;
+	case 0: get_pic8259_master(device)->ir0_w(state); break;
+	case 1: get_pic8259_master(device)->ir1_w(state); break;
+	case 2: get_pic8259_master(device)->ir2_w(state); break;
+	case 3: get_pic8259_master(device)->ir3_w(state); break;
+	case 4: get_pic8259_master(device)->ir4_w(state); break;
+	case 5: get_pic8259_master(device)->ir5_w(state); break;
+	case 6: get_pic8259_master(device)->ir6_w(state); break;
+	case 7: get_pic8259_master(device)->ir7_w(state); break;
 
-	case 8: pic8259_ir0_w(get_pic8259_slave(device), state); break;
-	case 9: pic8259_ir1_w(get_pic8259_slave(device), state); break;
-	case 10: pic8259_ir2_w(get_pic8259_slave(device), state); break;
-	case 11: pic8259_ir3_w(get_pic8259_slave(device), state); break;
-	case 12: pic8259_ir4_w(get_pic8259_slave(device), state); break;
-	case 13: pic8259_ir5_w(get_pic8259_slave(device), state); break;
-	case 14: pic8259_ir6_w(get_pic8259_slave(device), state); break;
-	case 15: pic8259_ir7_w(get_pic8259_slave(device), state); break;
+	case 8: get_pic8259_slave(device)->ir0_w(state); break;
+	case 9: get_pic8259_slave(device)->ir1_w(state); break;
+	case 10: get_pic8259_slave(device)->ir2_w(state); break;
+	case 11: get_pic8259_slave(device)->ir3_w(state); break;
+	case 12: get_pic8259_slave(device)->ir4_w(state); break;
+	case 13: get_pic8259_slave(device)->ir5_w(state); break;
+	case 14: get_pic8259_slave(device)->ir6_w(state); break;
+	case 15: get_pic8259_slave(device)->ir7_w(state); break;
 	}
 }
 
 IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 {
-	UINT32 vector = pic8259_acknowledge(get_pic8259_master(&device));
+	UINT32 vector = get_pic8259_master(&device)->acknowledge();
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {
-		vector = pic8259_acknowledge(get_pic8259_slave(&device));
+		vector = get_pic8259_slave(&device)->acknowledge();
 	}
 
 	// don't log ptm interrupts
@@ -1419,8 +1419,8 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 
 	dma8237_1 = machine().device<i8237_device>(APOLLO_DMA1_TAG);
 	dma8237_2 = machine().device<i8237_device>(APOLLO_DMA2_TAG);
-	pic8259_master = machine().device(APOLLO_PIC1_TAG);
-	pic8259_slave = machine().device(APOLLO_PIC2_TAG);
+	pic8259_master = machine().device<pic8259_device>(APOLLO_PIC1_TAG);
+	pic8259_slave = machine().device<pic8259_device>(APOLLO_PIC2_TAG);
 
 	// set configuration
 	apollo_csr_set_servicemode(apollo_config(APOLLO_CONF_SERVICE_MODE));

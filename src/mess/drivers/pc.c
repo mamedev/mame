@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)   // not working yet
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
@@ -215,7 +215,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(ec1841_io, AS_IO, 16, pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -259,7 +259,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(iskr1031_io, AS_IO, 16, pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(asst128_io, AS_IO, 16, pc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -309,7 +309,7 @@ READ8_MEMBER(pc_state::unk_r)
 static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r,          europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
@@ -375,7 +375,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237", am9517a_device, read, write)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r,           tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,                pc_page_w)
@@ -405,7 +405,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,          tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -437,7 +437,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, tandy_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,         tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
@@ -466,7 +466,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, tandy_pc_state )
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,                pc_page_w)

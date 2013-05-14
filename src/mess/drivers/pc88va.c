@@ -1010,8 +1010,8 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 {
 	if(m_fdc_ctrl_2 & 4) // XTMASK
 	{
-		pic8259_ir3_w(machine().device( "pic8259_slave"), 0);
-		pic8259_ir3_w(machine().device( "pic8259_slave"), 1);
+		machine().device<pic8259_device>( "pic8259_slave")->ir3_w(0);
+		machine().device<pic8259_device>( "pic8259_slave")->ir3_w(1);
 	}
 }
 
@@ -1142,8 +1142,8 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 {
 	if(m_timer3_io_reg & 0x80)
 	{
-		pic8259_ir5_w(machine().device("pic8259_slave"), 0);
-		pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+		machine().device<pic8259_device>("pic8259_slave")->ir5_w(0);
+		machine().device<pic8259_device>("pic8259_slave")->ir5_w(1);
 		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
 	}
 }
@@ -1160,7 +1160,7 @@ WRITE8_MEMBER(pc88va_state::timer3_ctrl_reg_w)
 		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
 	else
 	{
-		pic8259_ir5_w(machine().device("pic8259_slave"), 0);
+		machine().device<pic8259_device>("pic8259_slave")->ir5_w(0);
 		m_t3_mouse_timer->adjust(attotime::never);
 	}
 }
@@ -1243,8 +1243,8 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 //  AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //  AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
 	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8_LEGACY("dmac", upd71071_r, upd71071_w,0xffff) // DMA Controller
-	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0x00ff)
-	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // ICU, also controls 8214 emulation
+	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0x00ff)
+	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // ICU, also controls 8214 emulation
 //  AM_RANGE(0x0190, 0x0191) System Port 5
 //  AM_RANGE(0x0196, 0x0197) Keyboard sub CPU command port
 	AM_RANGE(0x0198, 0x0199) AM_WRITE(backupram_wp_1_w) //Backup RAM write inhibit
@@ -1620,7 +1620,7 @@ static I8255_INTERFACE( r232c_ctrl_intf )
 
 IRQ_CALLBACK_MEMBER(pc88va_state::pc88va_irq_callback)
 {
-	return pic8259_acknowledge( machine().device( "pic8259_master" ) );
+	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
 }
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
@@ -1632,7 +1632,7 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
 READ8_MEMBER(pc88va_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(machine().device( "pic8259_slave"));
+		return machine().device<pic8259_device>( "pic8259_slave")->acknowledge();
 	}
 	return 0x00;
 }
@@ -1706,16 +1706,16 @@ void pc88va_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 {
-	pic8259_ir2_w(machine().device("pic8259_master"), 0);
-	pic8259_ir2_w(machine().device("pic8259_master"), 1);
+	machine().device<pic8259_device>("pic8259_master")->ir2_w(0);
+	machine().device<pic8259_device>("pic8259_master")->ir2_w(1);
 }
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 {
 	if(state)
 	{
-		pic8259_ir0_w(machine().device("pic8259_master"), 0);
-		pic8259_ir0_w(machine().device("pic8259_master"), 1);
+		machine().device<pic8259_device>("pic8259_master")->ir0_w(0);
+		machine().device<pic8259_device>("pic8259_master")->ir0_w(1);
 	}
 }
 
@@ -1755,8 +1755,8 @@ void pc88va_state::fdc_irq(bool state)
 	if(m_fdc_mode && state)
 	{
 		//printf("%d\n",state);
-		pic8259_ir3_w(machine().device( "pic8259_slave"), 0);
-		pic8259_ir3_w(machine().device( "pic8259_slave"), 1);
+		machine().device<pic8259_device>( "pic8259_slave")->ir3_w(0);
+		machine().device<pic8259_device>( "pic8259_slave")->ir3_w(1);
 	}
 	#if TEST_SUBFDC
 	else

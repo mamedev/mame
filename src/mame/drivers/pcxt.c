@@ -272,7 +272,7 @@ static const struct pit8253_config pc_pit8253_config =
 		{
 			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
@@ -415,7 +415,7 @@ WRITE8_MEMBER(pcxt_state::fdc765_data_w)
 WRITE8_MEMBER(pcxt_state::drive_selection_w)
 {
 	/* TODO: properly hook-up upd765 FDC there */
-	pic8259_ir6_w(machine().device("pic8259_1"), 1);
+	machine().device<pic8259_device>("pic8259_1")->ir6_w(1);
 }
 
 /******************
@@ -525,7 +525,7 @@ WRITE_LINE_MEMBER(pcxt_state::pic8259_1_set_int_line)
 READ8_MEMBER(pcxt_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -539,14 +539,14 @@ static const struct pic8259_interface pic8259_1_config =
 
 static const struct pic8259_interface pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
 
 IRQ_CALLBACK_MEMBER(pcxt_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259_1);
+	return m_pic8259_1->acknowledge();
 }
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
@@ -560,13 +560,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_device, i8237_r, i8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE_LEGACY("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_device, read, write ) //8259 Interrupt control
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)    //8253 PIT
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)  //PPI 8255
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE("rtc", mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE_LEGACY("pic8259_2", pic8259_r, pic8259_w )
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_device, read, write )
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port

@@ -90,8 +90,8 @@ class towns_state : public driver_device
 	device_t* m_dma_1;
 	device_t* m_dma_2;
 	device_t* m_fdc;
-	device_t* m_pic_master;
-	device_t* m_pic_slave;
+	pic8259_device* m_pic_master;
+	pic8259_device* m_pic_slave;
 	device_t* m_pit;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;

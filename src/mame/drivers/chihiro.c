@@ -410,8 +410,8 @@ public:
 	UINT32 screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct chihiro_devices {
-		device_t    *pic8259_1;
-		device_t    *pic8259_2;
+		pic8259_device    *pic8259_1;
+		pic8259_device    *pic8259_2;
 		device_t    *ide;
 	} chihiro_devs;
 
@@ -2317,9 +2317,9 @@ void nv2a_renderer::vblank_callback(screen_device &screen, bool state)
 		pmc[0x100/4] &= ~0x1000000;
 	if ((pmc[0x100/4] != 0) && (pmc[0x140/4] != 0)) {
 		// send interrupt
-		pic8259_ir3_w(chst->chihiro_devs.pic8259_1, 1); // IRQ 3
+		chst->chihiro_devs.pic8259_1->ir3_w(1); // IRQ 3
 	} else
-		pic8259_ir3_w(chst->chihiro_devs.pic8259_1, 0); // IRQ 3
+		chst->chihiro_devs.pic8259_1->ir3_w(0); // IRQ 3
 }
 
 UINT32 nv2a_renderer::screen_update_callback(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2784,7 +2784,7 @@ WRITE_LINE_MEMBER(chihiro_state::chihiro_pic8259_1_set_int_line)
 READ8_MEMBER(chihiro_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(chihiro_devs.pic8259_2);
+		return chihiro_devs.pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -2798,7 +2798,7 @@ static const struct pic8259_interface chihiro_pic8259_1_config =
 
 static const struct pic8259_interface chihiro_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -2806,19 +2806,19 @@ static const struct pic8259_interface chihiro_pic8259_2_config =
 IRQ_CALLBACK_MEMBER(chihiro_state::irq_callback)
 {
 	int r = 0;
-	r = pic8259_acknowledge(chihiro_devs.pic8259_2);
+	r = chihiro_devs.pic8259_2->acknowledge();
 	if (r==0)
 	{
-		r = pic8259_acknowledge(chihiro_devs.pic8259_1);
+		r = chihiro_devs.pic8259_1->acknowledge();
 	}
 	return r;
 }
 
 WRITE_LINE_MEMBER(chihiro_state::chihiro_pit8254_out0_changed)
 {
-	if ( machine().device("pic8259_1") )
+	if ( machine().device<pic8259_device>("pic8259_1") )
 	{
-		pic8259_ir0_w(machine().device("pic8259_1"), state);
+		machine().device<pic8259_device>("pic8259_1")->ir0_w(state);
 	}
 }
 
@@ -2961,7 +2961,7 @@ WRITE32_MEMBER( chihiro_state::smbus_w )
 	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
 	{
 		if (!((smbusst.status ^ data) & 0x10)) // clearing interrupt
-			pic8259_ir3_w(chihiro_devs.pic8259_2, 0); // IRQ 11
+			chihiro_devs.pic8259_2->ir3_w(0); // IRQ 11
 		smbusst.status &= ~data;
 	}
 	if ((offset == 0) && (mem_mask == 0xff0000)) // 2 smbus control
@@ -2982,7 +2982,7 @@ WRITE32_MEMBER( chihiro_state::smbus_w )
 				smbusst.status |= 0x10;
 				if (smbusst.control & 0x10)
 				{
-					pic8259_ir3_w(chihiro_devs.pic8259_2, 1); // IRQ 11
+					chihiro_devs.pic8259_2->ir3_w(1); // IRQ 11
 				}
 			}
 		}
@@ -3010,9 +3010,9 @@ static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32, chihiro_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, chihiro_state )
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
@@ -3033,8 +3033,8 @@ void chihiro_state::machine_start()
 	smbus_register_device(0x45,smbus_callback_cx25871);
 	smbus_register_device(0x54,smbus_callback_eeprom);
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
-	chihiro_devs.pic8259_1 = machine().device( "pic8259_1" );
-	chihiro_devs.pic8259_2 = machine().device( "pic8259_2" );
+	chihiro_devs.pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
+	chihiro_devs.pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 	chihiro_devs.ide = machine().device( "ide" );
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 		debug_console_register_command(machine(),"chihiro",CMDFLAG_NONE,0,1,4,chihiro_debug_commands);

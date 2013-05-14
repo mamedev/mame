@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER(pcat_nit_state::microtouch_in)
 
 WRITE_LINE_MEMBER(pcat_nit_state::at_com_interrupt_1)
 {
-	pic8259_ir4_w(machine().device("pic8259_1"), state);
+	machine().device<pic8259_device>("pic8259_1")->ir4_w(state);
 }
 
 static const ins8250_interface pcat_nit_com0_interface =

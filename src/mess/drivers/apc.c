@@ -296,7 +296,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 			res = 0xff;
 		}
 		else
-			res = pic8259_r(machine().device("pic8259_slave"), space, (offset & 2) >> 1);
+			res = machine().device<pic8259_device>("pic8259_slave")->read(space, (offset & 2) >> 1);
 	}
 
 	return res;
@@ -311,7 +311,7 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 		if(offset & 4)
 			printf("Write undefined port %02x\n",offset+0x28);
 		else
-			pic8259_w(machine().device("pic8259_slave"), space, (offset & 2) >> 1, data);
+			machine().device<pic8259_device>("pic8259_slave")->write(space, (offset & 2) >> 1, data);
 	}
 }
 
@@ -342,7 +342,7 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 
 	switch(offset & 3)
 	{
-		case 0: res = m_keyb.data; pic8259_ir4_w(machine().device("pic8259_master"), 0); break; // according to the source, reading there acks the irq
+		case 0: res = m_keyb.data; machine().device<pic8259_device>("pic8259_master")->ir4_w(0); break; // according to the source, reading there acks the irq
 		case 1: res = m_keyb.status; break;
 		case 2: res = m_keyb.sig; break; // bit 0: CTRL bit 1: function key (or reversed)
 		case 3: res = ioport("KEY_MOD")->read() & 0xff; break; // sh
@@ -410,7 +410,7 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 	    ---x CRT
 	*/
 	if(data & 4)
-		pic8259_ir3_w(machine().device("pic8259_master"), 0);
+		machine().device<pic8259_device>("pic8259_master")->ir3_w(0);
 
 	if(data & ~4)
 		logerror("IRQ ACK %02x\n",data);
@@ -475,7 +475,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0x00ff) // i8259
 	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff) // i8259 (even) / pit8253 (odd)
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
@@ -503,7 +503,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 	{
 		m_keyb.data = (UINT8)(FPTR)(param) & 0xff;
 		//m_keyb.status &= ~1;
-		pic8259_ir4_w(machine().device("pic8259_master"), 1);
+		machine().device<pic8259_device>("pic8259_master")->ir4_w(1);
 	}
 
 	if(oldval && !newval)
@@ -744,12 +744,12 @@ void apc_state::fdc_drq(bool state)
 void apc_state::fdc_irq(bool state)
 {
 //  printf("IRQ %d\n",state);
-	pic8259_ir4_w(machine().device("pic8259_slave"), state);
+	machine().device<pic8259_device>("pic8259_slave")->ir4_w(state);
 }
 
 IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 {
-	return pic8259_acknowledge( machine().device( "pic8259_master" ));
+	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
 }
 
 void apc_state::machine_start()
@@ -845,7 +845,7 @@ static const struct pit8253_config pit8253_config =
 		{
 			MAIN_CLOCK,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w)
 		}, {
 			MAIN_CLOCK,              /* Memory Refresh */
 			DEVCB_NULL,
@@ -893,7 +893,7 @@ WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
 READ8_MEMBER(apc_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge( machine().device( "pic8259_slave" ));
+		return machine().device<pic8259_device>( "pic8259_slave" )->acknowledge();
 	}
 	return 0x00;
 }
@@ -907,7 +907,7 @@ static const struct pic8259_interface pic8259_master_config =
 
 static const struct pic8259_interface pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w), //TODO: check me
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w), //TODO: check me
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };

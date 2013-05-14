@@ -213,7 +213,7 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x80, 0x80 ) AM_WRITE(boot_bank_w)
 	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
-	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
+	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)
 ADDRESS_MAP_END

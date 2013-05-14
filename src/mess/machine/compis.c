@@ -1263,7 +1263,7 @@ WRITE_LINE_MEMBER( compis_state::compis_pic8259_master_set_int_line )
 WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
 {
 	if (m_8259m)
-		pic8259_ir2_w(m_8259m, state);
+		m_8259m->ir2_w(state);
 }
 
 READ8_MEMBER( compis_state::get_slave_ack )

@@ -38,7 +38,7 @@ WRITE8_MEMBER(pc9801_118_device::opn_portb_w){ m_joy_sel = data; }
 WRITE_LINE_MEMBER(pc9801_118_device::pc9801_sound_irq)
 {
 	/* TODO: seems to die very often */
-	pic8259_ir4_w(machine().device("pic8259_slave"), state);
+	machine().device<pic8259_device>(":pic8259_slave")->ir4_w(state);
 }
 
 static const ay8910_interface ay8910_config =

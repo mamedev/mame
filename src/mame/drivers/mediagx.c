@@ -565,7 +565,7 @@ static void mediagx_config_reg_w(device_t *device, UINT8 data)
 
 READ8_MEMBER(mediagx_state::io20_r)
 {
-	device_t *device = machine().device("pic8259_master");
+	pic8259_device *device = machine().device<pic8259_device>("pic8259_master");
 	UINT8 r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -578,14 +578,14 @@ READ8_MEMBER(mediagx_state::io20_r)
 	}
 	else
 	{
-		r = pic8259_r(device, space, offset);
+		r = device->read(space, offset);
 	}
 	return r;
 }
 
 WRITE8_MEMBER(mediagx_state::io20_w)
 {
-	device_t *device = machine().device("pic8259_master");
+	pic8259_device *device = machine().device<pic8259_device>("pic8259_master");
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x02)
@@ -598,7 +598,7 @@ WRITE8_MEMBER(mediagx_state::io20_w)
 	}
 	else
 	{
-		pic8259_w(device, space, offset, data);
+		device->write(space, offset, data);
 	}
 }
 
@@ -963,7 +963,7 @@ static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,              at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
@@ -1055,7 +1055,7 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(mediagx_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259_1);
+	return m_pic8259_1->acknowledge();
 }
 
 void mediagx_state::machine_start()
@@ -1102,7 +1102,7 @@ WRITE_LINE_MEMBER(mediagx_state::mediagx_pic8259_1_set_int_line)
 READ8_MEMBER(mediagx_state::get_slave_ack)
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -1116,7 +1116,7 @@ static const struct pic8259_interface mediagx_pic8259_1_config =
 
 static const struct pic8259_interface mediagx_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -1134,7 +1134,7 @@ static const struct pit8253_config mediagx_pit8254_config =
 		{
 			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir0_w)
 		}, {
 			4772720/4,              /* dram refresh */
 			DEVCB_NULL,

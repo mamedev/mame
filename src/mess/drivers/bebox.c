@@ -47,12 +47,12 @@ static ADDRESS_MAP_START( bebox_mem, AS_PROGRAM, 64, bebox_state )
 	AM_RANGE(0x7FFFF4F0, 0x7FFFF4F7) AM_WRITE(bebox_processor_resets_w )
 
 	AM_RANGE(0x80000000, 0x8000001F) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x80000020, 0x8000003F) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000040, 0x8000005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000060, 0x8000006F) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000070, 0x8000007F) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , U64(0xffffffffffffffff) )
 	AM_RANGE(0x80000080, 0x8000009F) AM_READWRITE8(bebox_page_r, bebox_page_w, U64(0xffffffffffffffff) )
-	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x800000A0, 0x800000BF) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800000C0, 0x800000DF) AM_READWRITE8(at_dma8237_1_r, at_dma8237_1_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x800001F0, 0x800001F7) AM_READWRITE8(bebox_800001F0_r, bebox_800001F0_w, U64(0xffffffffffffffff) )
 	AM_RANGE(0x800002F8, 0x800002FF) AM_DEVREADWRITE8( "ns16550_1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff) )
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER(bebox_state::bebox_keyboard_interrupt)
 {
 	bebox_set_irq_bit(machine(), 16, state);
 	if ( m_devices.pic8259_master ) {
-		pic8259_ir1_w(m_devices.pic8259_master, state);
+		m_devices.pic8259_master->ir1_w(state);
 	}
 }
 

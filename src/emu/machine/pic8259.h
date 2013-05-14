@@ -32,32 +32,80 @@ class pic8259_device : public device_t
 {
 public:
 	pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~pic8259_device() { global_free(m_token); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	UINT32 acknowledge();
 
-	DECLARE_WRITE_LINE_MEMBER( ir0_w );
-	DECLARE_WRITE_LINE_MEMBER( ir1_w );
-	DECLARE_WRITE_LINE_MEMBER( ir2_w );
-	DECLARE_WRITE_LINE_MEMBER( ir3_w );
-	DECLARE_WRITE_LINE_MEMBER( ir4_w );
-	DECLARE_WRITE_LINE_MEMBER( ir5_w );
-	DECLARE_WRITE_LINE_MEMBER( ir6_w );
-	DECLARE_WRITE_LINE_MEMBER( ir7_w );
+	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { set_irq_line(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { set_irq_line(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir2_w ) { set_irq_line(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir3_w ) { set_irq_line(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir4_w ) { set_irq_line(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir5_w ) { set_irq_line(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { set_irq_line(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
 
 	UINT8 inta_r();
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	TIMER_CALLBACK_MEMBER( timerproc );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+
 private:
-	// internal state
-	void *m_token;
+	inline void set_timer() { m_timer->adjust(attotime::zero); }
+	void set_irq_line(int irq, int state);
+
+
+	enum pic8259_state_t
+	{
+		STATE_ICW1,
+		STATE_ICW2,
+		STATE_ICW3,
+		STATE_ICW4,
+		STATE_READY
+	};
+
+	devcb_resolved_write_line m_out_int_func;
+	devcb_resolved_read_line m_sp_en_func;
+	devcb_resolved_read8 m_read_slave_ack_func;
+
+	emu_timer *m_timer;
+
+	pic8259_state_t m_state;
+
+	UINT8 m_isr;
+	UINT8 m_irr;
+	UINT8 m_prio;
+	UINT8 m_imr;
+	UINT8 m_irq_lines;
+
+	UINT8 m_input;
+	UINT8 m_ocw3;
+
+	UINT8 m_master;
+	/* ICW1 state */
+	UINT32 m_level_trig_mode : 1;
+	UINT32 m_vector_size : 1;
+	UINT32 m_cascade : 1;
+	UINT32 m_icw4_needed : 1;
+	UINT32 m_vector_addr_low;
+	/* ICW2 state */
+	UINT8 m_base;
+	UINT8 m_vector_addr_high;
+
+	/* ICW3 state */
+	UINT8 m_slave;
+
+	/* ICW4 state */
+	UINT32 m_nested : 1;
+	UINT32 m_mode : 2;
+	UINT32 m_auto_eoi : 1;
+	UINT32 m_is_x86 : 1;
 };
 
 extern const device_type PIC8259;
@@ -85,22 +133,6 @@ struct pic8259_interface
 #define MCFG_PIC8259_ADD(_tag, _intrf) \
 	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
 	MCFG_DEVICE_CONFIG(_intrf)
-
-
-/* device interface */
-DECLARE_READ8_DEVICE_HANDLER( pic8259_r );
-DECLARE_WRITE8_DEVICE_HANDLER( pic8259_w );
-int pic8259_acknowledge(device_t *device);
-
-/* interrupt requests */
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir0_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir1_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir2_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir3_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir4_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir5_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir6_w );
-WRITE_LINE_DEVICE_HANDLER( pic8259_ir7_w );
 
 
 #endif /* __PIC8259_H__ */

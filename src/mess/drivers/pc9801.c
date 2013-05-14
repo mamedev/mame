@@ -960,7 +960,7 @@ READ8_MEMBER(pc9801_state::pc9801_00_r)
 		if(offset & 0x14)
 			printf("Read to undefined port [%02x]\n",offset+0x00);
 		else
-			return pic8259_r(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), space, (offset & 2) >> 1);
+			return machine().device<pic8259_device>((offset & 8) ? "pic8259_slave" : "pic8259_master")->read(space, (offset & 2) >> 1);
 	}
 	else // odd
 	{
@@ -977,7 +977,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_00_w)
 		if(offset & 0x14)
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x00,data);
 		else
-			pic8259_w(machine().device((offset & 8) ? "pic8259_slave" : "pic8259_master"), space, (offset & 2) >> 1, data);
+			machine().device<pic8259_device>((offset & 8) ? "pic8259_slave" : "pic8259_master")->write(space, (offset & 2) >> 1, data);
 	}
 	else // odd
 	{
@@ -2925,7 +2925,7 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_master_set_int_line)
 READ8_MEMBER(pc9801_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge( machine().device( "pic8259_slave" ));
+		return machine().device<pic8259_device>( "pic8259_slave" )->acknowledge();
 	}
 	return 0x00;
 }
@@ -2964,7 +2964,7 @@ static const struct pit8253_config pc9801_pit8253_config =
 		{
 			MAIN_CLOCK_X1,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir0_w)
 		}, {
 			MAIN_CLOCK_X1,              /* Memory Refresh */
 			DEVCB_NULL,
@@ -2983,7 +2983,7 @@ static const struct pit8253_config pc9821_pit8253_config =
 		{
 			MAIN_CLOCK_X2,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir0_w)
 		}, {
 			MAIN_CLOCK_X2,              /* Memory Refresh */
 			DEVCB_NULL,
@@ -3252,7 +3252,7 @@ SLOT_INTERFACE_END
 void pc9801_state::fdc_2hd_irq(bool state)
 {
 //  printf("IRQ 2HD %d\n",state);
-	pic8259_ir3_w(machine().device("pic8259_slave"), state);
+	machine().device<pic8259_device>("pic8259_slave")->ir3_w(state);
 }
 
 void pc9801_state::fdc_2hd_drq(bool state)
@@ -3267,7 +3267,7 @@ void pc9801_state::fdc_2dd_irq(bool state)
 
 	if(m_fdc_2dd_ctrl & 8)
 	{
-		pic8259_ir2_w(machine().device("pic8259_slave"), state);
+		machine().device<pic8259_device>("pic8259_slave")->ir2_w(state);
 	}
 }
 
@@ -3284,9 +3284,9 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 	//printf("%02x %d\n",m_fdc_ctrl,state);
 
 	if(m_fdc_ctrl & 1)
-		pic8259_ir3_w(machine().device("pic8259_slave"), state);
+		machine().device<pic8259_device>("pic8259_slave")->ir3_w(state);
 	else
-		pic8259_ir2_w(machine().device("pic8259_slave"), state);
+		machine().device<pic8259_device>("pic8259_slave")->ir2_w(state);
 }
 
 void pc9801_state::pc9801rs_fdc_drq(bool state)
@@ -3337,7 +3337,7 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 
 IRQ_CALLBACK_MEMBER(pc9801_state::irq_callback)
 {
-	return pic8259_acknowledge( machine().device( "pic8259_master" ));
+	return machine().device<pic8259_device>( "pic8259_master" )->acknowledge();
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801_common)
@@ -3497,8 +3497,8 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
 	if(m_vrtc_irq_mask)
 	{
-		pic8259_ir2_w(machine().device("pic8259_master"), 0);
-		pic8259_ir2_w(machine().device("pic8259_master"), 1);
+		machine().device<pic8259_device>("pic8259_master")->ir2_w(0);
+		machine().device<pic8259_device>("pic8259_master")->ir2_w(1);
 		m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
 //  else
@@ -3521,15 +3521,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 		{
 //          printf("irq %02x\n",m_mouse.freq_reg);
 			m_mouse.freq_index = 0;
-			pic8259_ir5_w(machine().device("pic8259_slave"), 0);
-			pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+			machine().device<pic8259_device>("pic8259_slave")->ir5_w(0);
+			machine().device<pic8259_device>("pic8259_slave")->ir5_w(1);
 		}
 	}
 }
 
 WRITE_LINE_MEMBER( pc9801_state::keyboard_irq )
 {
-	pic8259_ir1_w(machine().device("pic8259_master"), state);
+	machine().device<pic8259_device>("pic8259_master")->ir1_w(state);
 }
 
 static PC9801_KBD_INTERFACE( pc9801_keyboard_intf )

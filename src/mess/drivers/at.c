@@ -95,13 +95,13 @@ WRITE8_MEMBER( at_state::write_rtc )
 static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREAD8("rtc", mc146818_device, read, 0xffff) AM_WRITE8(write_rtc , 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffff)
 ADDRESS_MAP_END
 
@@ -126,27 +126,27 @@ WRITE16_MEMBER( at_state::neat_chipset_w )
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0022, 0x0023) AM_READWRITE(neat_chipset_r, neat_chipset_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at386_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff)
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -154,10 +154,10 @@ ADDRESS_MAP_END
 READ32_MEMBER( at_state::ct486_chipset_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return pic8259_r(m_pic8259_master, space, 0);
+		return m_pic8259_master->read(space, 0);
 
 	if (ACCESSING_BITS_8_15)
-		return pic8259_r(m_pic8259_master, space, 1) << 8;
+		return m_pic8259_master->read(space, 1) << 8;
 
 	if (ACCESSING_BITS_24_31)
 		return m_cs4031->data_r(space, 0, 0) << 24;
@@ -168,10 +168,10 @@ READ32_MEMBER( at_state::ct486_chipset_r )
 WRITE32_MEMBER( at_state::ct486_chipset_w )
 {
 	if (ACCESSING_BITS_0_7)
-		pic8259_w(m_pic8259_master, space, 0, data);
+		m_pic8259_master->write(space, 0, data);
 
 	if (ACCESSING_BITS_8_15)
-		pic8259_w(m_pic8259_master, space, 1, data >> 8);
+		m_pic8259_master->write(space, 1, data >> 8);
 
 	if (ACCESSING_BITS_16_23)
 		m_cs4031->address_w(space, 0, data >> 16, 0);
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( ct486_io, AS_IO, 32, at_state )
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -202,13 +202,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megapc_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(at_keybc_r, at_keybc_w, 0xffff) // TODO: is this the correct type?
 	AM_RANGE(0x0064, 0x0067) AM_DEVREADWRITE8("keybc", at_keyboard_controller_device, status_r, command_w, 0xffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write , 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 ADDRESS_MAP_END
 

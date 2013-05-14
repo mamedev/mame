@@ -82,7 +82,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<device_t> m_wd1793;
 	required_device<device_t> m_pit8253;
-	required_device<device_t> m_pic8259;
+	required_device<pic8259_device> m_pic8259;
 	required_device<device_t> m_speaker;
 	required_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;

@@ -17,6 +17,7 @@
 #include "sound/speaker.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "machine/pic8259.h"
 
 class pc_state : public driver_device
 {
@@ -31,7 +32,7 @@ public:
 		m_ram(*this, RAM_TAG) { }
 
 	required_device<cpu_device> m_maincpu;
-	device_t *m_pic8259;
+	pic8259_device *m_pic8259;
 	optional_device<am9517a_device> m_dma8237;
 	device_t *m_pit8253;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;

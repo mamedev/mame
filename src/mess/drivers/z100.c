@@ -409,8 +409,8 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 //  AM_RANGE (0xe4, 0xe7) 8253 PIT
 //  AM_RANGE (0xe8, 0xeb) First 2661-2 serial port (printer)
 //  AM_RANGE (0xec, 0xef) Second 2661-2 serial port (modem)
-	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE_LEGACY("pic8259_slave", pic8259_r, pic8259_w)
-	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE_LEGACY("pic8259_master", pic8259_r, pic8259_w)
+	AM_RANGE (0xf0, 0xf1) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
+	AM_RANGE (0xf2, 0xf3) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
 	AM_RANGE (0xf4, 0xf4) AM_READ(keyb_data_r) // -> 8041 MCU
 	AM_RANGE (0xf5, 0xf5) AM_READWRITE(keyb_status_r,keyb_command_w)
 //  AM_RANGE (0xf6, 0xf6) expansion ROM is present (bit 0, active low)

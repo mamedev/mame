@@ -125,7 +125,7 @@ static const struct pit8253_config apricot_pit8253_intf =
 
 WRITE_LINE_MEMBER(apricot_state::apricot_sio_irq_w)
 {
-	pic8259_ir5_w(m_pic, state);
+	m_pic->ir5_w(state);
 }
 
 static const z80sio_interface apricot_z80sio_intf =
@@ -162,7 +162,7 @@ static const struct pic8259_interface apricot_pic8259_intf =
 
 WRITE_LINE_MEMBER( apricot_state::apricot_wd2793_intrq_w )
 {
-	pic8259_ir4_w(m_pic, state);
+	m_pic->ir4_w(state);
 //  i8089 external terminate channel 1
 }
 
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( apricot_mem, AS_PROGRAM, 16, apricot_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apricot_io, AS_IO, 16, apricot_state )
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("ic31", pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ic31", pic8259_device, read, write, 0x00ff)
 	AM_RANGE(0x40, 0x47) AM_DEVREADWRITE8_LEGACY("ic68", wd17xx_r, wd17xx_w, 0x00ff)
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76489_device, write, 0x00ff)

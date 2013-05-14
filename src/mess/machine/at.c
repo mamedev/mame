@@ -66,7 +66,7 @@ void at_state::at_speaker_set_input(UINT8 data)
 WRITE_LINE_MEMBER( at_state::at_pit8254_out0_changed )
 {
 	if (m_pic8259_master)
-		pic8259_ir0_w(m_pic8259_master, state);
+		m_pic8259_master->ir0_w(state);
 }
 
 

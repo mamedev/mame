@@ -108,7 +108,7 @@ WRITE8_MEMBER( multi16_state::multi16_6845_data_w )
 
 static ADDRESS_MAP_START(multi16_io, AS_IO, 16, multi16_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff) // i8259
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259
 	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_address_w, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_data_w, 0xff00)
 ADDRESS_MAP_END
@@ -119,7 +119,7 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(multi16_state::multi16_irq_callback)
 {
-	return pic8259_acknowledge( machine().device("pic8259") );
+	return machine().device<pic8259_device>("pic8259")->acknowledge();
 }
 
 WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )

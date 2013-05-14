@@ -593,7 +593,7 @@ static const struct pic8259_interface qx10_pic8259_slave_config =
 
 IRQ_CALLBACK_MEMBER(qx10_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic_m);
+	return m_pic_m->acknowledge();
 }
 
 READ8_MEMBER( qx10_state::upd7201_r )
@@ -688,8 +688,8 @@ static ADDRESS_MAP_START( qx10_io , AS_IO, 8, qx10_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("pit8253_1", pit8253_r, pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("pit8253_2", pit8253_r, pit8253_w)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE_LEGACY("pic8259_master", pic8259_r, pic8259_w)
-	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE_LEGACY("pic8259_slave", pic8259_r, pic8259_w)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("pic8259_master", pic8259_device, read, write)
+	AM_RANGE(0x0c, 0x0d) AM_DEVREADWRITE("pic8259_slave", pic8259_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(upd7201_r, upd7201_w) //AM_DEVREADWRITE("upd7201", upd7201_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("i8255", i8255_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_READ_PORT("DSW") AM_WRITE(qx10_18_w)

@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0070, 0x0071) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffff)
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, AS_IO, 16, amstrad_pc_state )
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
-	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8(pc1640_port60_r, pc1640_port60_w, 0xffff)
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)

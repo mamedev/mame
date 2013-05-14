@@ -118,12 +118,12 @@ const struct pic8259_interface mbc55x_pic8259_config =
 
 READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
-	return pic8259_r(m_pic, space, offset>>1);
+	return m_pic->read(space, offset>>1);
 }
 
 WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 {
-	pic8259_w(m_pic, space, offset>>1, data);
+	m_pic->write(space, offset>>1, data);
 }
 
 IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)

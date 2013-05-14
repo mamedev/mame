@@ -15,11 +15,12 @@
 #include "machine/53c810.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
+#include "machine/pic8259.h"
 
 struct bebox_devices_t
 {
-	device_t *pic8259_master;
-	device_t *pic8259_slave;
+	pic8259_device *pic8259_master;
+	pic8259_device *pic8259_slave;
 	i8237_device *dma8237_1;
 	i8237_device *dma8237_2;
 };

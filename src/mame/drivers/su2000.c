@@ -71,8 +71,8 @@ public:
 		: pcat_base_state(mconfig, type, tag){ }
 
 	device_t    *m_pit8254;
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
+	pic8259_device  *m_pic8259_1;
+	pic8259_device  *m_pic8259_2;
 	device_t    *m_dma8237_1;
 	device_t    *m_dma8237_2;
 
@@ -145,7 +145,7 @@ READ8_MEMBER(su2000_state::get_slave_ack)
 	{
 		// IRQ = 2
 		logerror("pic8259_slave_ACK!\n");
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -159,7 +159,7 @@ static const struct pic8259_interface su2000_pic8259_1_config =
 
 static const struct pic8259_interface su2000_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -177,7 +177,7 @@ static const struct pit8253_config su2000_pit8254_config =
 		{
 			4772720/4,              /* Heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
 		}, {
 			4772720/4,              /* DRAM refresh */
 			DEVCB_NULL,
@@ -201,8 +201,8 @@ void su2000_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_pit8254 = machine().device("pit8254");
-	m_pic8259_1 = machine().device("pic8259_1");
-	m_pic8259_2 = machine().device("pic8259_2");
+	m_pic8259_1 = machine().device<pic8259_device>("pic8259_1");
+	m_pic8259_2 = machine().device<pic8259_device>("pic8259_2");
 	m_dma8237_1 = machine().device("dma8237_1");
 	m_dma8237_2 = machine().device("dma8237_2");
 

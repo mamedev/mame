@@ -287,7 +287,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 /* everything is 8-bit bus wide */
 static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff) // i8259
 //  AM_RANGE(0x04, 0x07) i8237?
 	AM_RANGE(0x08, 0x0b) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
 	AM_RANGE(0x10, 0x17) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write,0x00ff) // i8255 #1
@@ -405,7 +405,7 @@ static I8255A_INTERFACE( pc100_ppi8255_interface_2 )
 
 IRQ_CALLBACK_MEMBER(pc100_state::pc100_irq_callback)
 {
-	return pic8259_acknowledge( device.machine().device( "pic8259" ) );
+	return device.machine().device<pic8259_device>( "pic8259" )->acknowledge();
 }
 
 WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
@@ -436,16 +436,16 @@ void pc100_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
 {
-	pic8259_ir4_w(machine().device("pic8259"), 0);
-	pic8259_ir4_w(machine().device("pic8259"), 1);
+	machine().device<pic8259_device>("pic8259")->ir4_w(0);
+	machine().device<pic8259_device>("pic8259")->ir4_w(1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
 {
 	if(m_timer_mode == 0)
 	{
-		pic8259_ir2_w(machine().device("pic8259"), 0);
-		pic8259_ir2_w(machine().device("pic8259"), 1);
+		machine().device<pic8259_device>("pic8259")->ir2_w(0);
+		machine().device<pic8259_device>("pic8259")->ir2_w(1);
 	}
 }
 
@@ -453,8 +453,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
 {
 	if(m_timer_mode == 1)
 	{
-		pic8259_ir2_w(machine().device("pic8259"), 0);
-		pic8259_ir2_w(machine().device("pic8259"), 1);
+		machine().device<pic8259_device>("pic8259")->ir2_w(0);
+		machine().device<pic8259_device>("pic8259")->ir2_w(1);
 	}
 }
 
@@ -462,8 +462,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
 {
 	if(m_timer_mode == 2)
 	{
-		pic8259_ir2_w(machine().device("pic8259"), 0);
-		pic8259_ir2_w(machine().device("pic8259"), 1);
+		machine().device<pic8259_device>("pic8259")->ir2_w(0);
+		machine().device<pic8259_device>("pic8259")->ir2_w(1);
 	}
 }
 
@@ -471,8 +471,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 {
 	if(m_timer_mode == 3)
 	{
-		pic8259_ir2_w(machine().device("pic8259"), 0);
-		pic8259_ir2_w(machine().device("pic8259"), 1);
+		machine().device<pic8259_device>("pic8259")->ir2_w(0);
+		machine().device<pic8259_device>("pic8259")->ir2_w(1);
 	}
 }
 

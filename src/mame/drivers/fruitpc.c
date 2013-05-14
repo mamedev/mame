@@ -36,8 +36,8 @@ public:
 	UINT8 m_at_pages[0x10];
 
 	device_t    *m_pit8254;
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
+	pic8259_device  *m_pic8259_1;
+	pic8259_device  *m_pic8259_2;
 	i8237_device    *m_dma8237_1;
 	i8237_device    *m_dma8237_2;
 
@@ -218,12 +218,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_device, i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffffffff)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
@@ -443,7 +443,7 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(fruitpc_state::irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259_1);
+	return m_pic8259_1->acknowledge();
 }
 
 void fruitpc_state::machine_start()
@@ -451,8 +451,8 @@ void fruitpc_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fruitpc_state::irq_callback),this));
 
 	m_pit8254 = machine().device( "pit8254" );
-	m_pic8259_1 = machine().device( "pic8259_1" );
-	m_pic8259_2 = machine().device( "pic8259_2" );
+	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_1" );
+	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_2" );
 	m_dma8237_1 = machine().device<i8237_device>( "dma8237_1" );
 	m_dma8237_2 = machine().device<i8237_device>( "dma8237_2" );
 }
@@ -471,7 +471,7 @@ WRITE_LINE_MEMBER(fruitpc_state::fruitpc_pic8259_1_set_int_line)
 READ8_MEMBER(fruitpc_state::get_slave_ack)
 {
 	if (offset==2) {
-		return pic8259_acknowledge(m_pic8259_2);
+		return m_pic8259_2->acknowledge();
 	}
 	return 0x00;
 }
@@ -485,7 +485,7 @@ static const struct pic8259_interface fruitpc_pic8259_1_config =
 
 static const struct pic8259_interface fruitpc_pic8259_2_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -505,7 +505,7 @@ static const struct pit8253_config fruitpc_pit8254_config =
 		{
 			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259_1", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir0_w)
 		}, {
 			4772720/4,              /* dram refresh */
 			DEVCB_NULL,
