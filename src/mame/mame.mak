@@ -1932,7 +1932,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/skylncr.o \
 	$(DRIVERS)/sliver.o \
 	$(DRIVERS)/slotcarn.o \
-	$(DRIVERS)/sms.o \
+	$(DRIVERS)/smsmcorp.o \
 	$(DRIVERS)/sothello.o \
 	$(DRIVERS)/splus.o \
 	$(DRIVERS)/spool99.o \
