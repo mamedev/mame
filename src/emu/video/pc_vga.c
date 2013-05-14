@@ -80,7 +80,7 @@ enum
 #define VGA_START_ADDRESS (vga.crtc.start_addr)
 #define VGA_LINE_LENGTH (vga.crtc.offset<<3)
 
-#define IBM8514_LINE_LENGTH (m_vga->vga.crtc.offset << 3)
+#define IBM8514_LINE_LENGTH (m_vga->offset())
 
 #define CHAR_WIDTH ((vga.sequencer.data[1]&1)?8:9)
 
@@ -254,8 +254,8 @@ void cirrus_vga_device::device_start()
 
 	// copy over interfaces
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
-	vga.svga_intf.seq_regcount = 0x08;
-	vga.svga_intf.crtc_regcount = 0x19;
+	vga.svga_intf.seq_regcount = 0x1f;
+	vga.svga_intf.crtc_regcount = 0x2d;
 	vga.svga_intf.vram_size = 0x200000;
 
 	vga.memory  = auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
@@ -289,8 +289,8 @@ void s3_vga_device::device_start()
 	// set device ID
 	s3.id_high = 0x88;  // CR2D
 	s3.id_low = 0x11;   // CR2E
-	s3.revision = 0x00; // CR2F
-	s3.id_cr30 = 0xc0;  // CR30
+	s3.revision = 0x40; // CR2F
+	s3.id_cr30 = 0xe0;  // CR30
 }
 
 void tseng_vga_device::device_start()
@@ -320,6 +320,17 @@ void mach8_device::device_start()
 	memset(&mach8, 0, sizeof(mach8));
 }
 
+UINT16 vga_device::offset()
+{
+//	popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+	if(vga.crtc.dw)
+		return vga.crtc.offset << 3;
+	if(vga.crtc.word_mode)
+		return vga.crtc.offset << 1;
+	else
+		return vga.crtc.offset << 2;
+}
+
 void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 ch, attr;
@@ -337,7 +348,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		vga.cursor.visible = 0;
 
 	for (addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
-			line += height, addr += TEXT_LINE_LENGTH)
+			line += height, addr += (offset()>>1))
 	{
 		for (pos = addr, column=0; column<TEXT_COLUMNS; column++, pos++)
 		{
@@ -408,7 +419,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 
 	/**/
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
-			line += height, addr += EGA_LINE_LENGTH)
+			line += height, addr += offset())
 	{
 		for(yi=0;yi<height;yi++)
 		{
@@ -460,7 +471,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	curr_addr = 0;
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH/4, curr_addr+=VGA_LINE_LENGTH/4)
+		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -486,7 +497,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 	else
 	{
-		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=VGA_LINE_LENGTH, curr_addr+=VGA_LINE_LENGTH)
+		for (addr = VGA_START_ADDRESS, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -592,23 +603,23 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xi;
 	UINT8 start_shift;
-	UINT16 line_length;
+//	UINT16 line_length;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff;
 	curr_addr = 0;
 
-	if(vga.crtc.dw)
-		line_length = vga.crtc.offset << 3;  // doubleword mode
-	else
-	{
-		line_length = vga.crtc.offset << 4;
-	}
+//	if(vga.crtc.dw)
+//		line_length = vga.crtc.offset << 3;  // doubleword mode
+//	else
+//	{
+//		line_length = vga.crtc.offset << 4;
+//	}
 
 	start_shift = (!(vga.sequencer.data[4] & 0x08)) ? 2 : 0;
 
 	{
-		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=line_length, curr_addr+=line_length)
+		for (addr = VGA_START_ADDRESS << start_shift, line=0; line<LINES; line+=height, addr+=offset(), curr_addr+=offset())
 		{
 			for(yi = 0;yi < height; yi++)
 			{
@@ -652,7 +663,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
@@ -696,7 +707,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
@@ -740,7 +751,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=TGA_LINE_LENGTH, curr_addr+=TGA_LINE_LENGTH)
+	for (addr = TGA_START_ADDRESS<<1, line=0; line<TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
@@ -781,7 +792,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  mask_comp = 0xff | (TLINES & 0x300);
 	curr_addr = 0;
 	yi=0;
-	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(vga.crtc.offset * 4), curr_addr+=(vga.crtc.offset * 4))
+	for (addr = TGA_START_ADDRESS, line=0; line<TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
 	{
 		bitmapline = &bitmap.pix32(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2659,6 +2670,14 @@ S3 implementation
 
 ******************************************/
 
+UINT16 s3_vga_device::offset()
+{
+	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
+	if(s3.memory_config & 0x08)
+		return vga.crtc.offset << 3;
+	return vga_device::offset();
+}
+
 UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 {
 	UINT8 res;
@@ -2737,6 +2756,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 			case 0x51:
 				res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 				res |= ((svga.bank_w & 0x30) >> 2);
+				res |= ((vga.crtc.offset & 0x0300) >> 4);
 				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;
@@ -5050,6 +5070,16 @@ WRITE8_MEMBER(gamtor_vga_device::port_03d0_w)
 	}
 }
 
+UINT16 ati_vga_device::offset()
+{
+	//popmessage("Offset: %04x  %s %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(ati.ext_reg[0x33] & 0x40) ? "PEL" : "---",(ati.ext_reg[0x30] & 0x20) ? "256" : "---");
+	if(ati.ext_reg[0x30] & 0x20)  // likely wrong, gets 640x400/480 SVGA and tweaked 256 colour modes displaying correctly in Fractint.
+		return vga_device::offset() << 3;
+	if(ati.ext_reg[0x33] & 0x40)
+		return vga_device::offset() << 2;
+	return vga_device::offset();
+}
+
 
 void ati_vga_device::ati_define_video_mode()
 {
@@ -5224,6 +5254,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			//logerror("ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
+
 			if(data & 0x04)
 			{
 				eeprom_device* eep = subdevice<eeprom_device>("ati_eeprom");
@@ -5576,6 +5607,14 @@ void cirrus_vga_device::cirrus_define_video_mode()
 	}
 }
 
+UINT16 cirrus_vga_device::offset()
+{
+	//popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
+	if(gc_mode_ext & 0x10)
+		return vga.crtc.offset << 3;
+	return vga_device::offset();
+}
+
 UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 {
 	UINT8 res;
@@ -5590,6 +5629,8 @@ UINT8 cirrus_vga_device::cirrus_seq_reg_read(UINT8 index)
 		{
 			case 0x06:
 			case 0x07:
+			case 0x09:
+			case 0x0a:
 				//printf("%02x\n",index);
 				res = vga.sequencer.data[index];
 				break;
@@ -5612,12 +5653,91 @@ void cirrus_vga_device::cirrus_seq_reg_write(UINT8 index, UINT8 data)
 		{
 			case 0x06:
 			case 0x07:
+			case 0x09:
+			case 0x0a:
 				//printf("%02x %02x\n",index,data);
 				vga.sequencer.data[vga.sequencer.index] = data;
 				break;
 		}
 	}
 }
+
+UINT8 cirrus_vga_device::cirrus_gc_reg_read(UINT8 index)
+{
+	UINT8 res = 0xff;
+
+	switch(index)
+	{
+	case 0x00:
+		break;
+	case 0x01:
+		break;
+	case 0x09:  // Offset register 0
+		res = gc_bank_0;
+		break;
+	case 0x0a:  // Offset register 1
+		res = gc_bank_1;
+		break;
+	case 0x0b:  // Graphics controller mode extensions
+		res = gc_mode_ext;
+		break;
+	case 0x0c:  // Colour Key
+		break;
+	case 0x0d:  // Colour Key Mask
+		break;
+	case 0x0e:  // Miscellaneous Control
+		break;
+	case 0x10:  // Foreground Colour Byte 1
+		break;
+	case 0x11:  // Background Colour Byte 1
+		break;
+		// later registers are related to the BitBLT hardware
+	default:
+		res = gc_reg_read(index);
+	}
+
+	return res;
+}
+
+void cirrus_vga_device::cirrus_gc_reg_write(UINT8 index, UINT8 data)
+{
+	logerror("CL: GC write %02x to GR%02x\n",data,index);
+	switch(index)
+	{
+	case 0x00:
+	case 0x01:  // if extended writes are enabled (bit 2 of index 0bh), then index 0 and 1 are extended to 8 bits
+		if(gc_mode_ext & 0x02)
+			gc_reg_write(index,data);
+		else
+			gc_reg_write(index,data & 0x0f);
+		break;
+	case 0x09:  // Offset register 0
+		gc_bank_0 = data;
+		logerror("CL: Offset register 0 set to %i\n",data);
+		break;
+	case 0x0a:  // Offset register 1
+		gc_bank_1 = data;
+		logerror("CL: Offset register 1 set to %i\n",data);
+		break;
+	case 0x0b:  // Graphics controller mode extensions
+		gc_mode_ext = data;
+		break;
+	case 0x0c:  // Colour Key
+		break;
+	case 0x0d:  // Colour Key Mask
+		break;
+	case 0x0e:  // Miscellaneous Control
+		break;
+	case 0x10:  // Foreground Colour Byte 1
+		break;
+	case 0x11:  // Background Colour Byte 1
+		break;
+		// later registers are related to the BitBLT hardware
+	default:
+		gc_reg_write(index,data);
+	}
+}
+
 READ8_MEMBER(cirrus_vga_device::port_03c0_r)
 {
 	UINT8 res;
@@ -5626,6 +5746,9 @@ READ8_MEMBER(cirrus_vga_device::port_03c0_r)
 	{
 		case 0x05:
 			res = cirrus_seq_reg_read(vga.sequencer.index);
+			break;
+		case 0x0f:
+			res = cirrus_gc_reg_read(vga.gc.index);
 			break;
 		default:
 			res = vga_device::port_03c0_r(space,offset,mem_mask);
@@ -5642,9 +5765,151 @@ WRITE8_MEMBER(cirrus_vga_device::port_03c0_w)
 		case 0x05:
 			cirrus_seq_reg_write(vga.sequencer.index,data);
 			break;
+		case 0x0f:
+			cirrus_gc_reg_write(vga.gc.index,data);
+			break;
 		default:
 			vga_device::port_03c0_w(space,offset,data,mem_mask);
 			break;
 	}
 	cirrus_define_video_mode();
+}
+
+READ8_MEMBER(cirrus_vga_device::port_03b0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				res = cirrus_crtc_reg_read(vga.crtc.index);
+				break;
+			default:
+				res = vga_device::port_03b0_r(space,offset,mem_mask);
+				break;
+		}
+	}
+
+	return res;
+}
+
+READ8_MEMBER(cirrus_vga_device::port_03d0_r)
+{
+	UINT8 res = 0xff;
+
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			case 5:
+				res = cirrus_crtc_reg_read(vga.crtc.index);
+				break;
+			default:
+				res = vga_device::port_03d0_r(space,offset,mem_mask);
+				break;
+		}
+	}
+
+	return res;
+}
+
+WRITE8_MEMBER(cirrus_vga_device::port_03b0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3b0)
+	{
+		switch(offset)
+		{
+			case 5:
+				vga.crtc.data[vga.crtc.index] = data;
+				cirrus_crtc_reg_write(vga.crtc.index,data);
+				break;
+			default:
+				vga_device::port_03b0_w(space,offset,data,mem_mask);
+				break;
+		}
+	}
+}
+
+WRITE8_MEMBER(cirrus_vga_device::port_03d0_w)
+{
+	if (CRTC_PORT_ADDR == 0x3d0)
+	{
+		switch(offset)
+		{
+			case 5:
+				vga.crtc.data[vga.crtc.index] = data;
+				cirrus_crtc_reg_write(vga.crtc.index,data);
+				break;
+			default:
+				vga_device::port_03d0_w(space,offset,data,mem_mask);
+				break;
+		}
+	}
+}
+
+UINT8 cirrus_vga_device::cirrus_crtc_reg_read(UINT8 index)
+{
+	UINT8 res = 0xff;
+
+	if(index <= 0x18)
+		return crtc_reg_read(index);
+
+	switch(index)
+	{
+	case 0x27:
+		res = 0xa0;
+		break;
+	default:
+		logerror("CL: Unhandled extended CRTC register CR%02x read\n",index);
+	}
+
+	return res;
+}
+
+void cirrus_vga_device::cirrus_crtc_reg_write(UINT8 index, UINT8 data)
+{
+	if(index <= 0x18)
+	{
+		crtc_reg_write(index,data);
+		return;
+	}
+	switch(index)
+	{
+	case 0x27:
+		// Do nothing, read only
+		break;
+	default:
+		logerror("CL: Unhandled extended CRTC register CR%02x write %02x\n",index,data);
+	}
+
+}
+
+READ8_MEMBER(cirrus_vga_device::mem_r)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		offset &= 0xffff;
+		if(gc_mode_ext & 0x20)
+			return vga.memory[(offset+gc_bank_0*0x4000)];
+		else
+			return vga.memory[(offset+gc_bank_0*0x1000)];
+	}
+
+	return vga_device::mem_r(space,offset,mem_mask);
+}
+
+WRITE8_MEMBER(cirrus_vga_device::mem_w)
+{
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
+	{
+		offset &= 0xffff;
+		if(gc_mode_ext & 0x20)
+			vga.memory[(offset+gc_bank_0*0x4000)] = data;
+		else
+			vga.memory[(offset+gc_bank_0*0x1000)] = data;
+	}
+	else
+		vga_device::mem_w(space,offset,data,mem_mask);
 }

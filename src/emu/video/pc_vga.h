@@ -61,6 +61,7 @@ protected:
 	UINT8 gc_reg_read(UINT8 index);
 	void attribute_reg_write(UINT8 index, UINT8 data);
 	void gc_reg_write(UINT8 index,UINT8 data);
+	virtual UINT16 offset();
 private:
 	inline UINT8 rotate_right(UINT8 val);
 	inline UINT8 vga_logical_op(UINT8 data, UINT8 plane, UINT8 mask);
@@ -505,6 +506,7 @@ public:
 	WRITE8_MEMBER(ati_port_ext_w);
 
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual UINT16 offset();
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
@@ -585,6 +587,7 @@ protected:
 		UINT8 cursor_bg_ptr;
 		UINT8 extended_dac_ctrl;
 	} s3;
+	virtual UINT16 offset();
 
 private:
 	UINT8 s3_crtc_reg_read(UINT8 index);
@@ -632,13 +635,28 @@ public:
 
 	virtual READ8_MEMBER(port_03c0_r);
 	virtual WRITE8_MEMBER(port_03c0_w);
+	virtual READ8_MEMBER(port_03b0_r);
+	virtual WRITE8_MEMBER(port_03b0_w);
+	virtual READ8_MEMBER(port_03d0_r);
+	virtual WRITE8_MEMBER(port_03d0_w);
+	virtual READ8_MEMBER(mem_r);
+	virtual WRITE8_MEMBER(mem_w);
 protected:
 	// device-level overrides
 	virtual void device_start();
+	virtual UINT16 offset();
+
+	UINT8 gc_mode_ext;
+	UINT8 gc_bank_0;
+	UINT8 gc_bank_1;
 private:
 	void cirrus_define_video_mode();
 	UINT8 cirrus_seq_reg_read(UINT8 index);
 	void cirrus_seq_reg_write(UINT8 index, UINT8 data);
+	UINT8 cirrus_gc_reg_read(UINT8 index);
+	void cirrus_gc_reg_write(UINT8 index, UINT8 data);
+	UINT8 cirrus_crtc_reg_read(UINT8 index);
+	void cirrus_crtc_reg_write(UINT8 index, UINT8 data);
 };
 
 // device type definition
