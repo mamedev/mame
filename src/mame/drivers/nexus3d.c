@@ -213,26 +213,10 @@ static MACHINE_CONFIG_START( nexus3d, nexus3d_state )
 MACHINE_CONFIG_END
 
 
-// The u1 flash on achertf is clearly recycled from a Happy Fish or Blue Elf multigame.
-// Around 75% of the rom is NeoGeo, CPS2, Semicom etc. MAME romsets used by said multigame bootlegs
-// which explains why the 1Gb flash rom hardly compresses, it's already compressed data.
-//
-// I highly suspect this upgrade (to Full) was done at the PCB shop to boost the value of the PCB, and
-// that the original game used a smaller flash.  It seems highly unlikely that Examu would ship ROMs
-// containing the entire backcatalog of SNK and Capcom material ;-)
-//
-// It's possible this set should be marked as a bootleg due to this although I imagine the actual valid
-// part of the data will match a clean dump.
-//
-// also the types of flash used on both these should probably be double the size they are, I believe this
-// to be a software bug with the tools used to read them, hence the weird 0x898 bytes appended to
-// the end..  this was at least the case with the actual Happy Fish roms.  In this case it shouldn't
-// matter because all the data needed by the game is in the first part of the ROM.
-
 
 ROM_START( acheart )
-	ROM_REGION( 0x42000898, "user1", 0 ) /* ARM 32 bit code */
-	ROM_LOAD( "arcanaheart.u1",     0x000000, 0x42000898, BAD_DUMP CRC(53b7b482) SHA1(28799f8e332966f81fa501ead678d21e3e1c9e2c) )
+	ROM_REGION( 0x10800898, "user1", 0 ) /* ARM 32 bit code */
+	ROM_LOAD( "arcanaheart.u1",     0x000000, 0x10800898, CRC(109bf439) SHA1(33fd39355923ef384d5eaeec8ae3f296509bde93) )
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
 	ROM_LOAD( "u38.bin",     0x000000, 0x200000, CRC(29ecfba3) SHA1(ab02c7a579a3c05a19b79e42342fd5ed84c7b046) )
@@ -247,8 +231,8 @@ ROM_END
 
 
 ROM_START( acheartf )
-	ROM_REGION( 0x42000898, "user1", 0 ) /* ARM 32 bit code */
-	ROM_LOAD( "arcana_heart_full.u1",     0x000000, 0x42000898, BAD_DUMP CRC(1a171ca3) SHA1(774f3b8d5fb366901d819b5dc15ca49b0cd177b9) )
+	ROM_REGION( 0x10800898, "user1", 0 ) /* ARM 32 bit code */
+	ROM_LOAD( "arcanaheartfull.u1",     0x000000, 0x10800898, CRC(54b57a9d) SHA1(dee5a43b3aea854d2b98869dca74c57b66fb06eb))
 
 	ROM_REGION( 0x200000, "user2", 0 ) // QDSP stuff
 	ROM_LOAD( "u38.bin",     0x000000, 0x200000, CRC(29ecfba3) SHA1(ab02c7a579a3c05a19b79e42342fd5ed84c7b046) )
