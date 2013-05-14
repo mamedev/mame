@@ -1538,8 +1538,9 @@ static MACHINE_CONFIG_DERIVED( asst128, iskr1031 )
 	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
 	MCFG_CPU_IO_MAP(asst128_io)
 
-	MCFG_DEVICE_REMOVE("fdc:0");
-	MCFG_DEVICE_REMOVE("fdc:1");
+	MCFG_DEVICE_REMOVE("dma8237")
+	MCFG_DEVICE_REMOVE("fdc:0")
+	MCFG_DEVICE_REMOVE("fdc:1")
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", asst128_floppies, "525ssqd", 0, pc_state::asst128_formats)

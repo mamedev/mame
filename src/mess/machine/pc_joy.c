@@ -7,6 +7,7 @@
  *************************************************************************/
 
 #include "pc_joy.h"
+#include "pc_joy_sw.h"
 
 const device_type PC_JOY = &device_creator<pc_joy_device>;
 
@@ -86,4 +87,5 @@ pc_basic_joy_device::pc_basic_joy_device(const machine_config &mconfig, const ch
 
 SLOT_INTERFACE_START(pc_joysticks)
 	SLOT_INTERFACE("basic_joy", PC_BASIC_JOY)
+	SLOT_INTERFACE("mssw_pad", PC_MSSW_PAD)
 SLOT_INTERFACE_END
