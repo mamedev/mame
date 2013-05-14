@@ -131,6 +131,7 @@ hash/m5.xml svneol=native#text/xml
 hash/mac_flop.xml svneol=native#text/xml
 hash/mac_hdd.xml svneol=native#text/xml
 hash/mbc55x.xml svneol=native#text/xml
+hash/mc1502_flop.xml svneol=native#text/xml
 hash/megacd.xml svneol=native#text/xml
 hash/megacdj.xml svneol=native#text/xml
 hash/megadriv.xml svneol=native#text/xml

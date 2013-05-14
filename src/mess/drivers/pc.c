@@ -895,6 +895,10 @@ static SLOT_INTERFACE_START( asst128_floppies )
 		SLOT_INTERFACE( "525ssqd", FLOPPY_525_SSQD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( mc1502_floppies )
+		SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
 SLOT_INTERFACE_START(ibm5150_com)
 	SLOT_INTERFACE("microsoft_mouse", MSFT_SERIAL_MOUSE)
 	SLOT_INTERFACE("mouse_systems_mouse", MSYSTEM_SERIAL_MOUSE)
@@ -1411,8 +1415,11 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CASSETTE_ADD( "cassette", mc1502_cassette_interface )    // has no motor control
 
 	MCFG_FD1793x_ADD("vg93", XTAL_16MHz / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fd0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", mc1502_floppies, "525qd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", mc1502_floppies, "525qd", 0, pc_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list","mc1502_flop")
+//	MCFG_SOFTWARE_LIST_ADD("cass_list","mc1502_cass")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
