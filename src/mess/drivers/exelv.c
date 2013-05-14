@@ -54,7 +54,7 @@ TODO:
 #include "cpu/tms7000/tms7000.h"
 #include "video/tms3556.h"
 #include "sound/tms5220.h"
-#include "audio/spchroms.h"
+#include "machine/spchrom.h"
 //#include "imagedev/cartslot.h"
 //#include "imagedev/cassette.h"
 
@@ -74,7 +74,6 @@ public:
 	required_device<tms5220c_device> m_tms5220c;
 
 	virtual void machine_start();
-	virtual void machine_reset();
 
 	DECLARE_READ8_MEMBER( mailbox_wx319_r );
 	DECLARE_WRITE8_MEMBER( mailbox_wx318_w );
@@ -281,9 +280,9 @@ READ8_MEMBER(exelv_state::tms7041_porta_r)
 	logerror("tms7041_porta_r\n");
 
 	data |= (m_tms7020_portb & 0x01 ) ? 0x04 : 0x00;
-	data |= tms5220_intq_r(m_tms5220c) ? 0x08 : 0x00;
+	data |= m_tms5220c->intq_r() ? 0x08 : 0x00;
 	data |= (m_tms7020_portb & 0x02) ? 0x10 : 0x00;
-	data |= tms5220_readyq_r(m_tms5220c) ? 0x80 : 0x00;
+	data |= m_tms5220c->readyq_r() ? 0x80 : 0x00;
 
 	return data;
 }
@@ -319,8 +318,8 @@ WRITE8_MEMBER(exelv_state::tms7041_portb_w)
 {
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
-	tms5220_wsq_w(m_tms5220c, (data & 0x01) ? 1 : 0);
-	tms5220_rsq_w(m_tms5220c, (data & 0x02) ? 1 : 0);
+	m_tms5220c->wsq_w((data & 0x01) ? 1 : 0);
+	m_tms5220c->rsq_w((data & 0x02) ? 1 : 0);
 
 	m_maincpu->set_input_line(TMS7000_IRQ1_LINE, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
@@ -381,7 +380,7 @@ WRITE8_MEMBER(exelv_state::tms7041_portd_w)
 {
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 
-	tms5220_data_w(m_tms5220c, space, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
+	m_tms5220c->data_w(space, 0, BITSWAP8(data,0,1,2,3,4,5,6,7));
 	m_tms7041_portd = data;
 }
 
@@ -475,16 +474,6 @@ static INPUT_PORTS_START(exelv)
 INPUT_PORTS_END
 
 
-static const tms5220_interface exl100_tms5220_interface =
-{
-	DEVCB_NULL,                     /* no IRQ callback */
-	DEVCB_NULL,                     /* no Ready callback */
-	spchroms_read,                  /* speech ROM read handler */
-	spchroms_load_address,          /* speech ROM load address handler */
-	spchroms_read_and_branch        /* speech ROM read and branch handler */
-};
-
-
 void exelv_state::palette_init()
 {
 	int i, red, green, blue;
@@ -519,12 +508,6 @@ void exelv_state::machine_start()
 	save_item(NAME(m_wx319));
 }
 
-void exelv_state::machine_reset()
-{
-	static const spchroms_interface exelv_speech_intf = {"tms5220c"};
-	spchroms_config(machine(), &exelv_speech_intf);
-}
-
 static MACHINE_CONFIG_START( exl100, exelv_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7000_EXL, XTAL_4_9152MHz)    /* TMS7020 */
@@ -557,10 +540,12 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
+	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
-	MCFG_SOUND_CONFIG(exl100_tms5220_interface)
+	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -597,10 +582,12 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
+	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("tms5220c", TMS5220C, 640000)
-	MCFG_SOUND_CONFIG(exl100_tms5220_interface)
+	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -618,7 +605,7 @@ ROM_START(exl100)
 	ROM_REGION(0x10000, "user1", ROMREGION_ERASEFF)         /* cartridge area */
 
 	/* is this correct for exl100? */
-	ROM_REGION(0x8000, "tms5220c", 0)
+	ROM_REGION(0x8000, "vsm", 0)
 	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 
@@ -636,7 +623,7 @@ ROM_START(exeltel)
 	ROM_SYSTEM_BIOS( 1, "spanish", "Spanish" )
 	ROMX_LOAD("amper.bin", 0x0000, 0x10000, CRC(45af256c) SHA1(3bff16542f8ac55b9841084ea38034132459facb), ROM_BIOS(2)) /* Spanish system rom */
 
-	ROM_REGION(0x8000, "tms5220c", 0)
+	ROM_REGION(0x8000, "vsm", 0)
 	ROM_LOAD("cm62312.bin", 0x0000, 0x4000, CRC(93b817de) SHA1(03863087a071b8f22d36a52d18243f1c33e17ff7)) /* system speech ROM */
 ROM_END
 

@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( mpf1b_io_map, AS_IO, 8, mpf1_state )
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x3c) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
-	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE_LEGACY(TMS5220_TAG, tms5220_status_r, tms5220_data_w)
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0x01) AM_DEVREADWRITE(TMS5220_TAG, tms5220_device, status_r, data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpf1p_io_map, AS_IO, 8, mpf1_state )
@@ -317,19 +317,6 @@ static const cassette_interface mpf1_cassette_interface =
 	NULL
 };
 
-/* TMS5220 Interface */
-
-static const tms5220_interface mpf1_tms5220_intf =
-{
-	DEVCB_NULL,                 /* no IRQ callback */
-	DEVCB_NULL,                 /* no Ready callback */
-#if 1
-	spchroms_read,              /* speech ROM read handler */
-	spchroms_load_address,      /* speech ROM load address handler */
-	spchroms_read_and_branch    /* speech ROM read and branch handler */
-#endif
-};
-
 /* Machine Initialization */
 
 TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
@@ -404,7 +391,6 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD(TMS5220_TAG, TMS5220, 680000L)
-	MCFG_SOUND_CONFIG(mpf1_tms5220_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("halt_timer", mpf1_state, check_halt_callback, attotime::from_hz(1))

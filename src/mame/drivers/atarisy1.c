@@ -394,37 +394,37 @@ READ8_MEMBER(atarisy1_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy1_state::via_pa_w)
 {
-	device_t *device = machine().device("tms");
-	tms5220_data_w(device, space, 0, data);
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
+	tms5220->data_w(space, 0, data);
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pa_r)
 {
-	device_t *device = machine().device("tms");
-	return tms5220_status_r(device, space, 0);
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
+	return tms5220->status_r(space, 0);
 }
 
 
 WRITE8_MEMBER(atarisy1_state::via_pb_w)
 {
-	device_t *device = machine().device("tms");
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	/* write strobe */
-	tms5220_wsq_w(device, data & 1);
+	tms5220->wsq_w(data & 1);
 
 	/* read strobe */
-	tms5220_rsq_w(device, (data & 2)>>1);
+	tms5220->rsq_w((data & 2)>>1);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
-	tms5220_set_frequency(device, ATARI_CLOCK_14MHz/2 / (16 - data));
+	tms5220->set_frequency(ATARI_CLOCK_14MHz/2 / (16 - data));
 }
 
 
 READ8_MEMBER(atarisy1_state::via_pb_r)
 {
-	device_t *device = machine().device("tms");
-	return (tms5220_readyq_r(device) << 2) | (tms5220_intq_r(device) << 3);
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
+	return (tms5220->readyq_r() << 2) | (tms5220->intq_r() << 3);
 }
 
 

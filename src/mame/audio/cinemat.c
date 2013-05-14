@@ -1410,7 +1410,7 @@ static SOUND_RESET( demon_sound )
 	state->m_last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	ay8910_set_volume(machine.device("ay1"), 0, 0);
+	machine.device<ay8910_device>("ay1")->set_volume(0, 0);
 }
 
 

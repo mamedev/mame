@@ -957,11 +957,6 @@ const namco_06xx_config topracern_namco_06xx_intf =
 	"maincpu", "51xx", NULL, NULL, NULL
 };
 
-static const tms52xx_config tms_intf =
-{
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( topracern, polepos_state )
 
 	/* basic machine hardware */
@@ -1030,10 +1025,9 @@ static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
 	MCFG_CPU_IO_MAP(sound_z80_bootleg_iomap)
 
-	MCFG_SOUND_ADD("tms", TMS5220N, 600000) /* ? Mhz */
+	MCFG_SOUND_ADD("tms", TMS5220, 600000) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-	MCFG_SOUND_CONFIG(tms_intf)
 MACHINE_CONFIG_END
 
 

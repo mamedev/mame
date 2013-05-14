@@ -2707,7 +2707,7 @@ void rmnimbus_state::rmni_sound_reset()
 	//device_t *ay8910 = machine().device(AY8910_TAG);
 	device_t *msm5205 = machine().device(MSM5205_TAG);
 
-	//ay8910_reset_ym(ay8910);
+	//ay8910->reset();
 	msm5205_reset_w(msm5205, 1);
 
 	m_last_playmode=MSM5205_S48_4B;

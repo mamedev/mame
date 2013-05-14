@@ -30,7 +30,6 @@
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
-#include "sound/tms5220.h"
 #include "includes/esripsys.h"
 
 
@@ -521,10 +520,10 @@ READ8_MEMBER(esripsys_state::tms5220_r)
 	if (offset == 0)
 	{
 		/* TMS5220 core returns status bits in D7-D6 */
-		UINT8 status = tms5220_status_r(m_tms, space, 0);
+		UINT8 status = m_tms->status_r(space, 0);
 
 		status = ((status & 0x80) >> 5) | ((status & 0x40) >> 5) | ((status & 0x20) >> 5);
-		return (tms5220_readyq_r(m_tms) << 7) | (tms5220_intq_r(m_tms) << 6) | status;
+		return (m_tms->readyq_r() << 7) | (m_tms->intq_r() << 6) | status;
 	}
 
 	return 0xff;
@@ -536,12 +535,12 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 	if (offset == 0)
 	{
 		m_tms_data = data;
-		tms5220_data_w(m_tms, space, 0, m_tms_data);
+		m_tms->data_w(space, 0, m_tms_data);
 	}
 #if 0
 	if (offset == 1)
 	{
-		tms5220_data_w(m_tms, space, 0, m_tms_data);
+		m_tms->data_w(space, 0, m_tms_data);
 	}
 #endif
 }

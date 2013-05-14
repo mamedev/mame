@@ -350,7 +350,7 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 	if (m_cpu_to_sound_ready) result |= 0x01;
 	if (m_sound_to_cpu_ready) result |= 0x02;
-	if ((m_has_tms5220) && (tms5220_readyq_r(machine().device("tms")) == 0))
+	if ((m_has_tms5220) && (machine().device<tms5220_device>("tms")->readyq_r() == 0))
 		result &= ~0x04;
 	if (!(ioport("1801")->read() & 0x80)) result |= 0x10;
 
@@ -363,7 +363,7 @@ WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 	if (m_has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
-		tms5220_set_frequency(machine().device("tms"), MASTER_CLOCK/4 / (16 - data) / 2);
+		machine().device<tms5220_device>("tms")->set_frequency(MASTER_CLOCK/4 / (16 - data) / 2);
 	}
 }
 
@@ -736,7 +736,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_w)
 {
 	if (m_has_tms5220)
 	{
-		tms5220_data_w(machine().device("tms"), space, 0, data);
+		machine().device<tms5220_device>("tms")->data_w(space, 0, data);
 	}
 }
 
@@ -744,7 +744,7 @@ WRITE8_MEMBER(atarisy2_state::tms5220_strobe_w)
 {
 	if (m_has_tms5220)
 	{
-		tms5220_wsq_w(machine().device("tms"), 1-(offset & 1));
+		machine().device<tms5220_device>("tms")->wsq_w(1-(offset & 1));
 	}
 }
 
@@ -3178,7 +3178,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 
 	m_pedal_count = 0;
 	m_has_tms5220 = 1;
-	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
+	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3191,7 +3191,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 
 	m_pedal_count = -1;
 	m_has_tms5220 = 1;
-	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
+	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 
@@ -3233,7 +3233,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,apb)
 
 	m_pedal_count = 2;
 	m_has_tms5220 = 1;
-	tms5220_rsq_w(machine().device("tms"),  1); // /RS is tied high on sys2 hw
+	machine().device<tms5220_device>("tms")->rsq_w(1); // /RS is tied high on sys2 hw
 }
 
 

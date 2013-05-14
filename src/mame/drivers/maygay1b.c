@@ -795,8 +795,8 @@ READ8_MEMBER(maygay1b_state::latch_st_lo)
 
 READ8_MEMBER(maygay1b_state::m1_meter_r)
 {
-	device_t *ay8910 = machine().device("aysnd");
-	return ~ay8910_read_ym(ay8910);
+	ay8910_device *ay8910 = machine().device<ay8910_device>("aysnd");
+	return ~ay8910->data_r(space, offset);
 }
 
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )

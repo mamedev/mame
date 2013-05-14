@@ -126,8 +126,8 @@ WRITE8_MEMBER( pes_state::rsws_w )
 #ifdef DEBUG_PORTS
 	logerror("port0 write: RSWS states updated: /RS: %d, /WS: %d\n", m_rsstate, m_wsstate);
 #endif
-	tms5220_rsq_w(state->m_speech, m_rsstate);
-	tms5220_wsq_w(state->m_speech, m_wsstate);
+	state->m_speech->rsq_w(m_rsstate);
+	state->m_speech->wsq_w(m_wsstate);
 }
 
 WRITE8_MEMBER( pes_state::port1_w )
@@ -136,7 +136,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 #ifdef DEBUG_PORTS
 	logerror("port1 write: tms5220 data written: %02X\n", data);
 #endif
-	tms5220_data_w(state->m_speech, space, 0, data);
+	state->m_speech->data_w(space, 0, data);
 
 }
 
@@ -144,7 +144,7 @@ READ8_MEMBER( pes_state::port1_r )
 {
 	UINT8 data = 0xFF;
 	pes_state *state = machine().driver_data<pes_state>();
-	data = tms5220_status_r(state->m_speech, space, 0);
+	data = state->m_speech->status_r(space, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
 #endif
@@ -186,8 +186,8 @@ READ8_MEMBER( pes_state::port3_r )
 	{
 		data |= 0x10; // set RTS bit
 	}
-	data |= (tms5220_intq_r(state->m_speech)<<2);
-	data |= (tms5220_readyq_r(state->m_speech)<<3);
+	data |= (state->m_speech->intq_r()<<2);
+	data |= (state->m_speech->readyq_r()<<3);
 #ifdef DEBUG_PORTS
 	logerror("port3 read: returning 0x%02X: ", data);
 	logerror("RXD: %d; ", BIT(data,0));

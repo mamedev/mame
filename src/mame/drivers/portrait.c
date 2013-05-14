@@ -240,11 +240,6 @@ static GFXDECODE_START( portrait )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x800/8 )
 GFXDECODE_END
 
-static const tms52xx_config tms_intf =
-{
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
@@ -270,9 +265,8 @@ static MACHINE_CONFIG_START( portrait, portrait_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms", TMS5200N, 640000)
+	MCFG_SOUND_ADD("tms", TMS5200, 640000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_CONFIG(tms_intf)
 MACHINE_CONFIG_END
 
 

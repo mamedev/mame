@@ -11,6 +11,7 @@
 
 #include "cpu/esrip/esrip.h"
 #include "sound/dac.h"
+#include "sound/tms5220.h"
 
 /* TODO */
 #define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
@@ -48,7 +49,7 @@ public:
 	required_device<esrip_device> m_videocpu;
 	required_device<cpu_device> m_gamecpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<device_t> m_tms;
+	required_device<tms5220_device> m_tms;
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;

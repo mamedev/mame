@@ -163,7 +163,7 @@ INPUT_PORTS_END
 void icecold_state::machine_reset()
 {
 	// CH-C is used for generate a 30hz clock
-	ay8910_set_volume(m_ay8910_0, 2, 0);
+	m_ay8910_0->set_volume(2, 0);
 
 	m_rmotor = m_lmotor = 10;
 	m_sint = 0;

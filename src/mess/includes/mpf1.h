@@ -5,7 +5,7 @@
 
 
 #include "emu.h"
-#include "audio/spchroms.h"
+#include "machine/spchrom.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/cassette.h"

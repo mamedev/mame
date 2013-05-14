@@ -372,12 +372,12 @@ WRITE8_MEMBER(midway_ssio_device::portb1_w)
 
 void midway_ssio_device::update_volumes()
 {
-	ay8910_set_volume(m_ay0, 0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
-	ay8910_set_volume(m_ay0, 1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
-	ay8910_set_volume(m_ay0, 2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
-	ay8910_set_volume(m_ay1, 0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
-	ay8910_set_volume(m_ay1, 1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
-	ay8910_set_volume(m_ay1, 2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
+	m_ay0->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][0]]);
+	m_ay0->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][1]]);
+	m_ay0->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[0][2]]);
+	m_ay1->set_volume(0, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][0]]);
+	m_ay1->set_volume(1, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][1]]);
+	m_ay1->set_volume(2, m_mute ? 0 : m_ayvolume_lookup[m_duty_cycle[1][2]]);
 }
 
 
@@ -1198,7 +1198,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// write strobe -- pass the current command to the TMS5200
 	if (((data ^ m_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		tms5220_data_w(m_tms5200, space, offset, m_tms_command);
+		m_tms5200->data_w(space, offset, m_tms_command);
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);
@@ -1208,7 +1208,7 @@ WRITE8_MEMBER(midway_squawk_n_talk_device::portb2_w)
 	// read strobe -- read the current status from the TMS5200
 	else if (((data ^ m_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		m_pia1->porta_w(tms5220_status_r(m_tms5200, space, offset));
+		m_pia1->porta_w(m_tms5200->status_r(space, offset));
 
 		// DoT expects the ready line to transition on a command/write here, so we oblige
 		m_pia1->ca2_w(1);

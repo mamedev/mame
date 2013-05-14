@@ -351,7 +351,8 @@ WRITE8_MEMBER(firefox_state::sound_to_main_w)
 
 READ8_MEMBER(firefox_state::riot_porta_r)
 {
-	device_t *tms = machine().device("tms");
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
+
 	/* bit 7 = MAINFLAG */
 	/* bit 6 = SOUNDFLAG */
 	/* bit 5 = PA5 */
@@ -361,18 +362,18 @@ READ8_MEMBER(firefox_state::riot_porta_r)
 	/* bit 1 = TMS /read */
 	/* bit 0 = TMS /write */
 
-	return (m_main_to_sound_flag << 7) | (m_sound_to_main_flag << 6) | 0x10 | (tms5220_readyq_r(tms) << 2);
+	return (m_main_to_sound_flag << 7) | (m_sound_to_main_flag << 6) | 0x10 | (tms5220->readyq_r() << 2);
 }
 
 WRITE8_MEMBER(firefox_state::riot_porta_w)
 {
-	device_t *tms = machine().device("tms");
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 
 	/* handle 5220 read */
-	tms5220_rsq_w(tms, (data>>1) & 1);
+	tms5220->rsq_w((data>>1) & 1);
 
 	/* handle 5220 write */
-	tms5220_wsq_w(tms, data & 1);
+	tms5220->wsq_w(data & 1);
 }
 
 WRITE_LINE_MEMBER(firefox_state::riot_irq)
@@ -695,9 +696,9 @@ GFXDECODE_END
 static const riot6532_interface riot_intf =
 {
 	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_r),
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),
 	DEVCB_DRIVER_MEMBER(firefox_state,riot_porta_w),
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),
 	DEVCB_DRIVER_LINE_MEMBER(firefox_state,riot_irq)
 };
 

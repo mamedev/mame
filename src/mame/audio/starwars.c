@@ -34,17 +34,18 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 	/* Note: bit 4 is always set to avoid sound self test */
 	UINT8 olddata = m_riot->porta_in_get();
 
-	return (olddata & 0xc0) | 0x10 | (tms5220_readyq_r(machine().device("tms")) << 2);
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
+	return (olddata & 0xc0) | 0x10 | (tms5220->readyq_r() << 2);
 }
 
 
 WRITE8_MEMBER(starwars_state::r6532_porta_w)
 {
-	device_t *device = machine().device("tms");
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	/* handle 5220 read */
-	tms5220_rsq_w(device, (data & 2)>>1);
+	tms5220->rsq_w((data & 2)>>1);
 	/* handle 5220 write */
-	tms5220_wsq_w(device, (data & 1)>>0);
+	tms5220->wsq_w((data & 1)>>0);
 }
 
 
@@ -57,9 +58,9 @@ WRITE_LINE_MEMBER(starwars_state::snd_interrupt)
 const riot6532_interface starwars_riot6532_intf =
 {
 	DEVCB_DRIVER_MEMBER(starwars_state,r6532_porta_r),
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),
 	DEVCB_DRIVER_MEMBER(starwars_state,r6532_porta_w),
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),
 	DEVCB_DRIVER_LINE_MEMBER(starwars_state,snd_interrupt)
 };
 

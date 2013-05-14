@@ -20,13 +20,12 @@
 
 #include "spchsyn.h"
 #include "sound/wave.h"
+#include "machine/spchrom.h"
 
 #define TMS5220_ADDRESS_MASK 0x3FFFFUL  /* 18-bit mask for tms5220 address */
 
 #define VERBOSE 1
 #define LOG logerror
-
-#define SPEECHROM_TAG "speechrom"
 
 #define REAL_TIMING 0
 
@@ -108,7 +107,7 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 	if ((offset & m_select_mask)==m_select_value)
 	{
 		machine().device("maincpu")->execute().adjust_icount(-(18+3));      /* this is just a minimum, it can be more */
-		*value = m_vsp->read(space, offset, 0xff) & 0xff;
+		*value = m_vsp->status_r(space, offset, 0xff) & 0xff;
 		if (VERBOSE>4) LOG("spchsyn: read value = %02x\n", *value);
 	}
 }
@@ -126,7 +125,7 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 		/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
 		/* it were the case, we would need to store the value on the bus, */
 		/* which would be more complex. */
-		if (!m_vsp->readyq())
+		if (!m_vsp->readyq_r())
 		{
 			attotime time_to_ready = attotime::from_double(m_vsp->time_to_ready());
 			int cycles_to_ready = machine().device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
@@ -136,103 +135,10 @@ WRITE8_MEMBER( ti_speech_synthesizer_device::write )
 			machine().scheduler().timer_set(attotime::zero, FUNC_NULL);
 		}
 		if (VERBOSE>4) LOG("spchsyn: write value = %02x\n", data);
-		m_vsp->write(space, offset, data);
+		m_vsp->data_w(space, offset, data);
 	}
 }
 #endif
-
-/****************************************************************************
-    Callbacks from TMS5220
-*****************************************************************************/
-/*
-    Read 'count' bits serially from speech ROM. The offset is used as the count.
-*/
-READ8_MEMBER( ti_speech_synthesizer_device::spchrom_read )
-{
-	int val;
-	int count = offset;
-
-	if (m_load_pointer != 0)
-	{   // first read after load address is ignored
-		m_load_pointer = 0;
-		count--;
-	}
-
-	if (m_sprom_address < m_sprom_length)
-	{
-		if (count < m_rombits_count)
-		{
-			m_rombits_count -= count;
-			val = (m_speechrom[m_sprom_address] >> m_rombits_count) & (0xFF >> (8 - count));
-		}
-		else
-		{
-			val = ((int)m_speechrom[m_sprom_address]) << 8;
-
-			m_sprom_address = (m_sprom_address + 1) & TMS5220_ADDRESS_MASK;
-
-			if (m_sprom_address < m_sprom_length)
-				val |= m_speechrom[m_sprom_address];
-
-			m_rombits_count += 8 - count;
-
-			val = (val >> m_rombits_count) & (0xFF >> (8 - count));
-		}
-	}
-	else
-		val = 0;
-
-	return val;
-}
-
-/*
-    Write an address nibble to speech ROM. The address nibble is in the data,
-    the offset is ignored.
-*/
-WRITE8_MEMBER( ti_speech_synthesizer_device::spchrom_load_address )
-{
-	// tms5220 data sheet says that if we load only one 4-bit nibble, it won't work.
-	// This code does not care about this.
-	m_sprom_address = ((m_sprom_address & ~(0xf << m_load_pointer))
-		| (((unsigned long) (data & 0xf)) << m_load_pointer) ) & TMS5220_ADDRESS_MASK;
-	m_load_pointer += 4;
-	m_rombits_count = 8;
-}
-
-/*
-    Perform a read and branch command. We do not use the offset or data parameter.
-*/
-WRITE8_MEMBER( ti_speech_synthesizer_device::spchrom_read_and_branch )
-{
-	// tms5220 data sheet says that if more than one speech ROM (tms6100) is present,
-	// there is a bus contention.  This code does not care about this. */
-	if (m_sprom_address < m_sprom_length-1)
-		m_sprom_address = (m_sprom_address & 0x3c000UL)
-			| (((((unsigned long) m_speechrom[m_sprom_address]) << 8)
-			| m_speechrom[m_sprom_address+1]) & 0x3fffUL);
-	else if (m_sprom_address == m_sprom_length-1)
-		m_sprom_address = (m_sprom_address & 0x3c000UL)
-			| ((((unsigned long) m_speechrom[m_sprom_address]) << 8) & 0x3fffUL);
-	else
-		m_sprom_address = (m_sprom_address & 0x3c000UL);
-
-	m_rombits_count = 8;
-}
-
-/****************************************************************************/
-
-/*
-    Callback interface instance
-*/
-static const tms52xx_config ti99_4x_tms5200interface =
-{
-	DEVCB_NULL,                     // no IRQ callback
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ti_speech_synthesizer_device, speech_ready),
-
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_speech_synthesizer_device, spchrom_read),             // speech ROM read handler
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_speech_synthesizer_device, spchrom_load_address),     // speech ROM load address handler
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, ti_speech_synthesizer_device, spchrom_read_and_branch)   // speech ROM read and branch handler
-};
 
 /****************************************************************************/
 
@@ -260,17 +166,11 @@ void ti_speech_synthesizer_device::device_start()
 
 void ti_speech_synthesizer_device::device_config_complete()
 {
-	m_vsp = subdevice<tmc0285n_device>("speechsyn");
+	m_vsp = subdevice<tmc0285_device>("speechsyn");
 }
 
 void ti_speech_synthesizer_device::device_reset()
 {
-	m_speechrom = memregion(SPEECHROM_TAG)->base();
-	m_sprom_length = memregion(SPEECHROM_TAG)->bytes();
-	m_sprom_address = 0;
-	m_load_pointer = 0;
-	m_rombits_count = 0;
-
 	if (m_genmod)
 	{
 		m_select_mask = 0x1ffc01;
@@ -284,14 +184,17 @@ void ti_speech_synthesizer_device::device_reset()
 }
 
 MACHINE_CONFIG_FRAGMENT( ti99_speech )
+	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speechsyn", TMC0285N, 640000L)
-	MCFG_SOUND_CONFIG(ti99_4x_tms5200interface)
+	MCFG_SOUND_ADD("speechsyn", TMC0285, 640000L)
+	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, ti_speech_synthesizer_device, speech_ready))
+	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( ti99_speech )
-	ROM_REGION(0x8000, SPEECHROM_TAG, 0)
+	ROM_REGION(0x8000, "vsm", 0)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END
 

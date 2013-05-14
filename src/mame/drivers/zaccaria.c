@@ -96,7 +96,7 @@ WRITE8_MEMBER(zaccaria_state::ay8910_port0a_w)
 	/* 150 below to scale to volume 100 */
 	v = (150 * table[ba]) / (4700 + table[ba]);
 	//printf("dac1w %02d %04d\n", ba, v);
-	ay8910_set_volume(machine().device("ay2"), 1, v);
+	machine().device<ay8910_device>("ay2")->set_volume(1, v);
 }
 
 
@@ -160,12 +160,12 @@ INTERRUPT_GEN_MEMBER(zaccaria_state::zaccaria_cb1_toggle)
 
 WRITE8_MEMBER(zaccaria_state::zaccaria_port1b_w)
 {
-	device_t *tms = machine().device("tms");
+	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 
 	// bit 0 = /RS
-	tms5220_rsq_w(tms, (data >> 0) & 0x01);
+	tms5220->rsq_w((data >> 0) & 0x01);
 	// bit 1 = /WS
-	tms5220_wsq_w(tms, (data >> 1) & 0x01);
+	tms5220->wsq_w((data >> 1) & 0x01);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	m_acs = ~data & 0x08;
@@ -546,24 +546,18 @@ static const pia6821_interface pia_0_config =
 
 static const pia6821_interface pia_1_config =
 {
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),  /* port A in */
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, status_r),  /* port A in */
 	DEVCB_NULL,                                     /* port B in */
 	DEVCB_NULL,                                     /* line CA1 in */
 	DEVCB_NULL,                                     /* line CB1 in */   // tms5220_intq_r, handled below in tms5220_config
 	DEVCB_NULL,                                     /* line CA2 in */   // tms5220_readyq_r, "
 	DEVCB_NULL,                                     /* line CB2 in */
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),    /* port A out */
+	DEVCB_DEVICE_MEMBER("tms", tms5220_device, data_w),    /* port A out */
 	DEVCB_DRIVER_MEMBER(zaccaria_state,zaccaria_port1b_w),              /* port B out */
 	DEVCB_NULL,                                     /* line CA2 out */
 	DEVCB_NULL,                                     /* port CB2 out */
 	DEVCB_NULL,                                     /* IRQA */
 	DEVCB_NULL                                      /* IRQB */
-};
-
-static const tms5220_interface tms5220_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, cb1_w),    /* IRQ handler */
-	DEVCB_DEVICE_LINE_MEMBER("pia1", pia6821_device, ca2_w)     /* READYQ handler */
 };
 
 INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
@@ -622,7 +616,8 @@ static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
 	MCFG_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
-	MCFG_SOUND_CONFIG(tms5220_config)
+	MCFG_TMS52XX_IRQ_HANDLER(DEVWRITELINE("pia1", pia6821_device, cb1_w))
+	MCFG_TMS52XX_READYQ_HANDLER(DEVWRITELINE("pia1", pia6821_device, ca2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

@@ -23,7 +23,7 @@ public:
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2") { }
 
-	optional_device<tms5220n_device> m_tms;
+	optional_device<tms5220_device> m_tms;
 	UINT8 m_steer_last;
 	UINT8 m_steer_delta;
 	INT16 m_steer_accum;

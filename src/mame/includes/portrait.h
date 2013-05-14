@@ -11,7 +11,7 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_device<tms5200n_device> m_tms;
+	required_device<tms5200_device> m_tms;
 	required_shared_ptr<UINT8> m_bgvideoram;
 	required_shared_ptr<UINT8> m_fgvideoram;
 	int m_scroll;

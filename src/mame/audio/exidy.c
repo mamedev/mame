@@ -103,7 +103,7 @@ struct exidy_sound_state
 
 	/* 5220/CVSD variables */
 	device_t *m_cvsd;
-	device_t *m_tms;
+	tms5220_device *m_tms;
 	pia6821_device *m_pia1;
 
 	/* sound streaming variables */
@@ -533,7 +533,7 @@ static WRITE8_DEVICE_HANDLER( r6532_porta_w )
 	if (state->m_tms != NULL)
 	{
 		logerror("(%f)%s:TMS5220 data write = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), state->m_riot->porta_out_get());
-		tms5220_data_w(state->m_tms, space, 0, data);
+		state->m_tms->data_w(space, 0, data);
 	}
 }
 
@@ -542,8 +542,8 @@ static READ8_DEVICE_HANDLER( r6532_porta_r )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_tms != NULL)
 	{
-		logerror("(%f)%s:TMS5220 status read = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), tms5220_status_r(state->m_tms, space, 0));
-		return tms5220_status_r(state->m_tms, space, 0);
+		logerror("(%f)%s:TMS5220 status read = %02X\n", space.machine().time().as_double(), space.machine().describe_context(), state->m_tms->status_r(space, 0));
+		return state->m_tms->status_r(space, 0);
 	}
 	else
 		return 0xff;
@@ -554,8 +554,8 @@ static WRITE8_DEVICE_HANDLER( r6532_portb_w )
 	exidy_sound_state *state = get_safe_token(device);
 	if (state->m_tms != NULL)
 	{
-		tms5220_rsq_w(state->m_tms, data & 0x01);
-		tms5220_wsq_w(state->m_tms, (data >> 1) & 0x01);
+		state->m_tms->rsq_w(data & 0x01);
+		state->m_tms->wsq_w((data >> 1) & 0x01);
 	}
 }
 
@@ -567,8 +567,8 @@ static READ8_DEVICE_HANDLER( r6532_portb_r )
 	if (state->m_tms != NULL)
 	{
 		newdata &= ~0x0c;
-		if (tms5220_readyq_r(state->m_tms)) newdata |= 0x04;
-		if (tms5220_intq_r(state->m_tms)) newdata |= 0x08;
+		if (state->m_tms->readyq_r()) newdata |= 0x04;
+		if (state->m_tms->intq_r()) newdata |= 0x08;
 	}
 	return newdata;
 }
@@ -1126,7 +1126,7 @@ static DEVICE_START( victory_sound )
 	device->save_item(NAME(state->m_victory_sound_response_ack_clk));
 
 	DEVICE_START_CALL(venture_common_sh_start);
-	state->m_tms = device->machine().device("tms");
+	state->m_tms = device->machine().device<tms5220_device>("tms");
 }
 
 

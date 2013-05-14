@@ -59,7 +59,7 @@ static UINT16 test_mask;
 
 static pokey_device *pokey;
 static ym2151_device *ym2151;
-static device_t *tms5220;
+static tms5220_device *tms5220;
 static okim6295_device *oki6295;
 static okim6295_device *oki6295_l, *oki6295_r;
 
@@ -138,7 +138,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 	bank_source_data = &rgn[0x10000];
 
 	/* determine which sound hardware is installed */
-	tms5220 = machine.device("tms");
+	tms5220 = machine.device<tms5220_device>("tms");
 	ym2151 = machine.device<ym2151_device>("ymsnd");
 	pokey = machine.device<pokey_device>("pokey");
 	oki6295 = machine.device<okim6295_device>("adpcm");
@@ -231,7 +231,7 @@ static READ8_HANDLER( jsa1_io_r )
 			if (!(space.machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
-			if ((tms5220 != NULL) && (tms5220_readyq_r(tms5220) == 0))
+			if ((tms5220 != NULL) && (tms5220->readyq_r() == 0))
 				result |= 0x10;
 			else
 				result &= ~0x10;
@@ -269,7 +269,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 
 		case 0x200:     /* /VOICE */
 			if (tms5220 != NULL)
-				tms5220_data_w(tms5220, space, 0, data);
+				tms5220->data_w(space, 0, data);
 			break;
 
 		case 0x202:     /* /WRP */
@@ -291,10 +291,10 @@ static WRITE8_HANDLER( jsa1_io_w )
 			if (tms5220 != NULL)
 			{
 				int count;
-				tms5220_wsq_w(tms5220, (data&0x02)>>1);
-				tms5220_rsq_w(tms5220, (data&0x04)>>2);
+				tms5220->wsq_w((data&0x02)>>1);
+				tms5220->rsq_w((data&0x04)>>2);
 				count = 5 | ((data >> 2) & 2);
-				tms5220_set_frequency(tms5220, JSA_MASTER_CLOCK*2 / (16 - count));
+				tms5220->set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
 			}
 
 			/* reset the YM2151 if needed */

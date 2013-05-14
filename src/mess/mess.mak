@@ -509,7 +509,6 @@ $(MESSOBJ)/mame.a: \
 
 $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/mea8000.o     \
-	$(MESS_AUDIO)/spchroms.o    \
 	$(MESS_MACHINE)/3c503.o     \
 	$(MESS_MACHINE)/68561mpcc.o \
 	$(MESS_MACHINE)/8530scc.o   \
