@@ -216,14 +216,12 @@ protected:
 	required_shared_ptr<UINT8> m_mainram;
 
 	void setup_rom();
-	void vdp_hcount_lphaser(int hpos);
+	void lphaser_hcount_latch(int hpos);
 	void lphaser1_sensor_check();
 	void lphaser2_sensor_check();
 	UINT16 screen_hpos_nonscaled(int scaled_hpos);
 	UINT16 screen_vpos_nonscaled(int scaled_vpos);
 	int lgun_bright_aim_area(emu_timer *timer, int lgun_x, int lgun_y);
-	void sms_vdp_hcount_latch(address_space &space);
-	UINT8 sms_vdp_hcount();
 	void setup_cart_banks();
 	void setup_banks();
 	void sms_get_inputs(address_space &space);

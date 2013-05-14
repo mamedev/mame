@@ -80,8 +80,10 @@ public:
 	DECLARE_READ8_MEMBER( register_read );
 	DECLARE_WRITE8_MEMBER( register_write );
 	DECLARE_READ8_MEMBER( vcount_read );
-	DECLARE_READ8_MEMBER( hcount_latch_read );
-	DECLARE_WRITE8_MEMBER( hcount_latch_write );
+	DECLARE_READ8_MEMBER( hcount_read );
+
+	void hcount_latch() { hcount_latch_at_hpos( m_screen->hpos() ); };
+	void hcount_latch_at_hpos( int hpos );
 
 	bitmap_rgb32 &get_bitmap() { return m_tmpbitmap; };
 	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
@@ -98,11 +100,11 @@ protected:
 	virtual UINT16 get_name_table_address();
 	void process_line_timer();
 	void draw_scanline_mode4( int *line_buffer, int *priority_selected, int line );
-	void draw_sprites_mode4( int *line_buffer, int *priority_selected, int pixel_plot_y, int line );
-	void draw_sprites_tms9918_mode( int *line_buffer, int pixel_plot_y, int line );
+	void draw_sprites_mode4( int *line_buffer, int *priority_selected, int line );
+	void draw_sprites_tms9918_mode( int *line_buffer, int line );
 	void draw_scanline_mode2( int *line_buffer, int line );
 	void draw_scanline_mode0( int *line_buffer, int line );
-	void select_sprites( int pixel_plot_y, int line );
+	void select_sprites( int line );
 	void check_pending_flags( int hpos );
 
 	// device-level overrides

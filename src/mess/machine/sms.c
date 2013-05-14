@@ -279,18 +279,6 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 	}
 }
 
-/* FIXME: this function is a hack for Light Phaser emulation. Theoretically
-   sms_vdp_hcount_latch() should be used instead, but it returns incorrect
-   position for unknown reason (timing?) */
-void sms_state::vdp_hcount_lphaser( int hpos )
-{
-	int hpos_tmp = hpos + m_lphaser_x_offs;
-	UINT8 tmp = ((hpos_tmp - 46) >> 1) & 0xff;
-
-	//printf ("sms_vdp_hcount_lphaser: hpos %3d hpos_tmp %3d => hcount %2X\n", hpos, hpos_tmp, tmp);
-	m_vdp->hcount_latch_write(*m_space, 0, tmp);
-}
-
 
 /*
     Light Phaser (light gun) emulation notes:
@@ -323,12 +311,13 @@ int sms_state::lgun_bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 	int dx, dy;
 	int result = 0;
 	int pos_changed = 0;
-	double dx_circ;
+	double dx_radius;
 
 	while (1)
 	{
+		/* If beam's y isn't at a line where the aim area is, change it
+		   the next line it enters that area. */
 		dy = abs(beam_y - lgun_y);
-
 		if (dy > LGUN_RADIUS || beam_y < visarea.min_y || beam_y > visarea.max_y)
 		{
 			beam_y = lgun_y - LGUN_RADIUS;
@@ -337,21 +326,38 @@ int sms_state::lgun_bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 			dy = abs(beam_y - lgun_y);
 			pos_changed = 1;
 		}
-		/* step 1: r^2 = dx^2 + dy^2 */
-		/* step 2: dx^2 = r^2 - dy^2 */
-		/* step 3: dx = sqrt(r^2 - dy^2) */
-		dx_circ = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
-		dx = abs(beam_x - lgun_x);
 
-		if (dx > dx_circ || beam_x < visarea.min_x || beam_x > visarea.max_x)
+		/* Caculate distance in x of the radius, relative to beam's y distance.
+		   First try some shortcuts. */
+		switch (dy)
+ 		{
+		case LGUN_RADIUS:
+			dx_radius = 0;
+			break;
+		case 0:
+			dx_radius = LGUN_RADIUS;
+			break;
+		default:
+			/* step 1: r^2 = dx^2 + dy^2 */
+			/* step 2: dx^2 = r^2 - dy^2 */
+			/* step 3: dx = sqrt(r^2 - dy^2) */
+			dx_radius = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
+		}
+
+		/* If beam's x isn't in the circular aim area, change it
+		   to the next point it enters that area. */
+		dx = abs(beam_x - lgun_x);
+		if (dx > dx_radius || beam_x < visarea.min_x || beam_x > visarea.max_x)
 		{
+			/* If beam's x has passed the aim area, advance to
+			   next line and recheck y/x coordinates. */
 			if (beam_x > lgun_x)
 			{
 				beam_x = 0;
 				beam_y++;
 				continue;
 			}
-			beam_x = lgun_x - dx_circ;
+			beam_x = lgun_x - dx_radius;
 			if (beam_x < visarea.min_x)
 				beam_x = visarea.min_x;
 			pos_changed = 1;
@@ -389,45 +395,19 @@ int sms_state::lgun_bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y )
 	return result;
 }
 
-UINT8 sms_state::sms_vdp_hcount()
+
+void sms_state::lphaser_hcount_latch( int hpos )
 {
-	UINT64 cycles_per_line;
-	attotime line_remaining_time;
-	UINT64 line_remaining_cycles;
-	UINT64 line_elapsed_cycles;
-
-	/* Calculate amount of CPU cycles according to screen references.
-	   If some day the screen become always synced to the CPU, in the
-	   proportion of their speeds, this may be replaced by the screen
-	   hpos position only and the function be moved to the VDP file. */
-	cycles_per_line = m_main_cpu->attotime_to_clocks(m_main_scr->scan_period());
-	line_remaining_time = m_main_scr->time_until_pos(m_main_scr->vpos(), m_main_scr->width());
-	line_remaining_cycles = m_main_cpu->attotime_to_clocks(line_remaining_time) % cycles_per_line;
-	line_elapsed_cycles = cycles_per_line - line_remaining_cycles;
-
-	/* HCount equation, being hpos = VDP hclocks: "(hpos - 47) / 2"
-	   Screen hpos based on CPU cycles: "cycles * width / cycles per line"
-	   Do both in same line for one-step rounding only (required). */
-	return ((line_elapsed_cycles * m_main_scr->width() / cycles_per_line) - 47) / 2;
-
-	/* Alternative hcount equation, restricted to the SMS clock:
-	   "(590 - (line_remaining_cycles * 3)) / 4"
-	   Posted by Flubba on SMSPower forum. */
-}
-
-
-void sms_state::sms_vdp_hcount_latch( address_space &space )
-{
-	UINT8 value = sms_vdp_hcount();
-
-	m_vdp->hcount_latch_write(space, 0, value);
+	/* A delay seems to occur when the Light Phaser latches the
+	   VDP hcount, then an offset is added here to the hpos. */
+	m_vdp->hcount_latch_at_hpos(hpos + m_lphaser_x_offs);
 }
 
 
 UINT16 sms_state::screen_hpos_nonscaled(int scaled_hpos)
 {
 	const rectangle &visarea = m_main_scr->visible_area();
-	int offset_x = (scaled_hpos * visarea.width()) / 255;
+	int offset_x = (scaled_hpos * (visarea.max_x - visarea.min_x)) / 255;
 	return visarea.min_x + offset_x;
 }
 
@@ -450,7 +430,7 @@ void sms_state::lphaser1_sensor_check()
 		if (m_lphaser_1_latch == 0)
 		{
 			m_lphaser_1_latch = 1;
-			vdp_hcount_lphaser(x);
+			lphaser_hcount_latch(x);
 		}
 	}
 }
@@ -465,7 +445,7 @@ void sms_state::lphaser2_sensor_check()
 		if (m_lphaser_2_latch == 0)
 		{
 			m_lphaser_2_latch = 1;
-			vdp_hcount_lphaser(x);
+			lphaser_hcount_latch(x);
 		}
 	}
 }
@@ -573,13 +553,13 @@ void sms_state::sms_get_inputs( address_space &space )
 
 	case 0x01:  /* Light Phaser */
 		data = (ioport("CTRLIPT")->read() & 0x01) << 4;
-		if (!(data & 0x10))
-		{
-			if (ioport("RFU")->read() & 0x01)
-				data |= m_rapid_fire_state_1 & 0x10;
-		}
-		/* just consider the button (trigger) bit */
+		/* Check Rapid Fire setting for Trigger */
+		if (!(data & 0x10) && (ioport("RFU")->read() & 0x01))
+			data |= m_rapid_fire_state_1 & 0x10;
+
+		/* just consider the trigger (button) bit */
 		data |= ~0x10;
+
 		m_input_port0 = (m_input_port0 & 0xc0) | (data & 0x3f);
 		break;
 
@@ -635,13 +615,13 @@ void sms_state::sms_get_inputs( address_space &space )
 
 	case 0x10:  /* Light Phaser */
 		data = (ioport("CTRLIPT")->read() & 0x10) >> 2;
-		if (!(data & 0x04))
-		{
-			if (ioport("RFU")->read() & 0x04)
-				data |= m_rapid_fire_state_2 & 0x04;
-		}
-		/* just consider the button (trigger) bit */
+		/* Check Rapid Fire setting for Trigger */
+		if (!(data & 0x04) && (ioport("RFU")->read() & 0x04))
+			data |= m_rapid_fire_state_2 & 0x04;
+
+		/* just consider the trigger (button) bit */
 		data |= ~0x04;
+
 		m_input_port1 = (m_input_port1 & 0xf0) | (data & 0x0f);
 		break;
 
@@ -708,14 +688,14 @@ READ8_MEMBER(sms_state::sms_fm_detect_r)
 
 WRITE8_MEMBER(sms_state::sms_io_control_w)
 {
-	bool hcount_latch = false;
+	bool latch_hcount = false;
 
 	if (data & 0x08)
 	{
 		/* check if TH pin level is high (1) and was low last time */
 		if (data & 0x80 && !(m_ctrl_reg & 0x80))
 		{
-			hcount_latch = true;
+			latch_hcount = true;
 		}
 		sms_input_write(space, 0, (data & 0x20) >> 5);
 	}
@@ -724,14 +704,14 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 	{
 		if (data & 0x20 && !(m_ctrl_reg & 0x20))
 		{
-			hcount_latch = true;
+			latch_hcount = true;
 		}
 		sms_input_write(space, 1, (data & 0x80) >> 7);
 	}
 
-	if (hcount_latch)
+	if (latch_hcount)
 	{
-		sms_vdp_hcount_latch(space);
+		m_vdp->hcount_latch();
 	}
 
 	m_ctrl_reg = data;
@@ -741,7 +721,7 @@ WRITE8_MEMBER(sms_state::sms_io_control_w)
 READ8_MEMBER(sms_state::sms_count_r)
 {
 	if (offset & 0x01)
-		return m_vdp->hcount_latch_read(*m_space, offset);
+		return m_vdp->hcount_read(*m_space, offset);
 	else
 		return m_vdp->vcount_read(*m_space, offset);
 }
@@ -1531,22 +1511,22 @@ int sms_state::detect_lphaser_xoffset( UINT8 *rom )
 	if (!(m_bios_port & IO_CARTRIDGE) && m_cartridge[m_current_cartridge].size >= 0x8000)
 	{
 		if (!memcmp(&rom[0x7ff0], signatures[0], 16) || !memcmp(&rom[0x7ff0], signatures[1], 16))
-			return 40;
+			return 41;
 
 		if (!memcmp(&rom[0x7ff0], signatures[2], 16))
-			return 49;
+			return 50;
 
 		if (!memcmp(&rom[0x7ff0], signatures[3], 16))
-			return 47;
+			return 48;
 
 		if (!memcmp(&rom[0x7ff0], signatures[4], 16))
-			return 44;
+			return 45;
 
 		if (!memcmp(&rom[0x7ff0], signatures[5], 16))
-			return 53;
+			return 54;
 
 	}
-	return 50;
+	return 51;
 }
 
 
@@ -2260,9 +2240,7 @@ UINT32 sms_state::screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap,
 
 VIDEO_START_MEMBER(sms_state,gamegear)
 {
-	screen_device *screen = machine().first_screen();
-
-	screen->register_screen_bitmap(m_prev_bitmap);
+	m_main_scr->register_screen_bitmap(m_prev_bitmap);
 	save_item(NAME(m_prev_bitmap));
 }
 
