@@ -16,7 +16,7 @@
 	MCFG_DEVICE_ADD( _tag, K2GE, _clock ) \
 	k1ge_device::static_set_screen( *device, _screen ); \
 	k1ge_device::static_set_vram( *device, _vram ); \
- 	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
+	devcb = &k1ge_device::static_set_vblank_callback( *device, DEVCB2_##_vblank ); \
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB2_##_hblank );
 
 
@@ -34,8 +34,8 @@ public:
 	// Static methods
 	static void static_set_screen(device_t &device, const char *screen_name) { downcast<k1ge_device &>(device).m_screen_tag = screen_name; }
 	static void static_set_vram(device_t &device, const char *vram_name) { downcast<k1ge_device &>(device).m_vram_tag = vram_name; }
-    template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(object); }
-    template<class _Object> static devcb2_base &static_set_hblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(object); }
+	template<class _Object> static devcb2_base &static_set_hblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(object); }
 
 	static const int K1GE_SCREEN_HEIGHT = 199;
 protected:
