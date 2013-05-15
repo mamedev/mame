@@ -259,12 +259,12 @@ public:
 	int m_output_last[ 0x100 ];
 	int m_last_io_offset;
 	UINT8 m_sector_buffer[ 4096 ];
-	DECLARE_WRITE32_MEMBER(twinkle_io_w);
-	DECLARE_READ32_MEMBER(twinkle_io_r);
-	DECLARE_WRITE32_MEMBER(twinkle_output_w);
-	DECLARE_WRITE32_MEMBER(serial_w);
-	DECLARE_WRITE32_MEMBER(shared_psx_w);
-	DECLARE_READ32_MEMBER(shared_psx_r);
+	DECLARE_WRITE8_MEMBER(twinkle_io_w);
+	DECLARE_READ8_MEMBER(twinkle_io_r);
+	DECLARE_WRITE16_MEMBER(twinkle_output_w);
+	DECLARE_WRITE16_MEMBER(serial_w);
+	DECLARE_WRITE8_MEMBER(shared_psx_w);
+	DECLARE_READ8_MEMBER(shared_psx_r);
 	DECLARE_WRITE16_MEMBER(twinkle_spu_ctrl_w);
 	DECLARE_READ16_MEMBER(twinkle_waveram_r);
 	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
@@ -440,17 +440,14 @@ static const UINT16 asciicharset[]=
 	0, //
 };
 
-WRITE32_MEMBER(twinkle_state::twinkle_io_w)
+WRITE8_MEMBER(twinkle_state::twinkle_io_w)
 {
-	if( ACCESSING_BITS_16_23 )
+	switch( offset )
 	{
-		m_io_offset = ( data >> 16 ) & 0xff;
-	}
-	if( ACCESSING_BITS_0_7 )
-	{
-		if( m_output_last[ m_io_offset ] != ( data & 0xff ) )
+	case 0:
+		if( m_output_last[ m_io_offset ] != data )
 		{
-			m_output_last[ m_io_offset ] = ( data & 0xff );
+			m_output_last[ m_io_offset ] = data;
 
 			switch( m_io_offset )
 			{
@@ -492,48 +489,54 @@ WRITE32_MEMBER(twinkle_state::twinkle_io_w)
 
 				if( ( data & 0xfe ) != 0xfe )
 				{
-					printf("%02x = %02x\n", m_io_offset, data & 0xff );
+					printf("%02x = %02x\n", m_io_offset, data );
 				}
 				break;
 
 			default:
-				printf( "unknown io %02x = %02x\n", m_io_offset, data & 0xff );
+				printf( "unknown io %02x = %02x\n", m_io_offset, data );
 				break;
 			}
 		}
+		break;
+
+	case 1:
+		m_io_offset = data;
+		break;
 	}
 }
 
-READ32_MEMBER(twinkle_state::twinkle_io_r)
+READ8_MEMBER(twinkle_state::twinkle_io_r)
 {
-	UINT32 data = 0;
+	UINT8 data = 0;
 
-	if( ACCESSING_BITS_0_7 )
+	switch( offset )
 	{
+	case 0:
 		switch( m_io_offset )
 		{
 			case 0x07:
-				data |= ioport( "IN0" )->read();
+				data = ioport( "IN0" )->read();
 				break;
 
 			case 0x0f:
-				data |= ioport( "IN1" )->read();
+				data = ioport( "IN1" )->read();
 				break;
 
 			case 0x17:
-				data |= ioport( "IN2" )->read();
+				data = ioport( "IN2" )->read();
 				break;
 
 			case 0x1f:
-				data |= ioport( "IN3" )->read();
+				data = ioport( "IN3" )->read();
 				break;
 
 			case 0x27:
-				data |= ioport( "IN4" )->read();
+				data = ioport( "IN4" )->read();
 				break;
 
 			case 0x2f:
-				data |= ioport( "IN5" )->read();
+				data = ioport( "IN5" )->read();
 				break;
 
 			default:
@@ -541,50 +544,49 @@ READ32_MEMBER(twinkle_state::twinkle_io_r)
 				{
 					m_last_io_offset = m_io_offset;
 				}
-
 				break;
 		}
-	}
+		break;
 
-	if( ACCESSING_BITS_8_15 )
-	{
+	case 1:
 		/* led status? 1100 */
+		break;
 	}
 
 	return data;
 }
 
-WRITE32_MEMBER(twinkle_state::twinkle_output_w)
+WRITE16_MEMBER(twinkle_state::twinkle_output_w)
 {
 	switch( offset )
 	{
 	case 0x00:
 		/* offset */
 		break;
-	case 0x02:
+	case 0x04:
 		/* data */
 		break;
-	case 0x04:
+	case 0x08:
 		/* ?? */
 		break;
-	case 0x08:
+	case 0x10:
 		/* bit 0 = clock?? */
 		/* bit 1 = data?? */
 		/* bit 2 = reset?? */
 		break;
-	case 0x0c:
+	case 0x18:
 		/* ?? */
 		break;
-	case 0x15:
+	case 0x30:
 		/* ?? */
 		break;
-	case 0x24:
+	case 0x48:
 		/* ?? */
 		break;
 	}
 }
 
-WRITE32_MEMBER(twinkle_state::serial_w)
+WRITE16_MEMBER(twinkle_state::serial_w)
 {
 /*
     int _do = ( data >> 4 ) & 1;
@@ -595,31 +597,17 @@ WRITE32_MEMBER(twinkle_state::serial_w)
 */
 }
 
-WRITE32_MEMBER(twinkle_state::shared_psx_w)
+WRITE8_MEMBER(twinkle_state::shared_psx_w)
 {
-	if (mem_mask == 0xff)
-	{
-		m_spu_shared[offset*2] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, space.device().safe_pc());
-	}
-	else if (mem_mask == 0xff0000)
-	{
-		m_spu_shared[(offset*2)+1] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, space.device().safe_pc());
-	}
-	else
-	{
-		fatalerror("shared_psx_w: Unknown mask %x\n", mem_mask);
-	}
+	m_spu_shared[offset] = data;
+//  printf("shared_psx_w: %x to %x, mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
 }
 
-READ32_MEMBER(twinkle_state::shared_psx_r)
+READ8_MEMBER(twinkle_state::shared_psx_r)
 {
-	UINT32 result;
+	UINT32 result = m_spu_shared[offset];
 
-	result = m_spu_shared[offset*2] | m_spu_shared[(offset*2)+1]<<16;
-
-//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, space.device().safe_pc());
+//  printf("shared_psx_r: @ %x, mask %x (PC=%x)\n", offset, mem_mask, result, space.device().safe_pc());
 
 	result = 0; // HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 
@@ -627,22 +615,22 @@ READ32_MEMBER(twinkle_state::shared_psx_r)
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
-	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
+	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE8(shared_psx_r, shared_psx_w, 0x00ff00ff)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_DEVREADWRITE8("scsi:am53cf96", am53cf96_device, read, write, 0x00ff00ff)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
-	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE(watchdog_reset32_w) /* LTC1232 */
-	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE(twinkle_io_w)
-	AM_RANGE(0x1f220004, 0x1f220007) AM_READ(twinkle_io_r)
+	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE8(watchdog_reset_w, 0x000000ff) /* LTC1232 */
+	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE8(twinkle_io_w, 0x00ff00ff)
+	AM_RANGE(0x1f220004, 0x1f220007) AM_READ8(twinkle_io_r, 0x00ff00ff)
 	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
 	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
 	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITENOP
-	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
+	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE16(serial_w, 0x0000ffff)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
 	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
 	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
-	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
+	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE16(twinkle_output_w, 0xffffffff)
 ADDRESS_MAP_END
 
 /* SPU board */
