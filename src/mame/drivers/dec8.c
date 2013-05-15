@@ -132,11 +132,18 @@ READ8_MEMBER(dec8_state::gondo_player_2_r)
 *
 ***************************************************/
 
-TIMER_CALLBACK_MEMBER(dec8_state::dec8_i8751_timer_callback)
+void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// The schematics show a clocked LS194 shift register (3A) is used to automatically
-	// clear the IRQ request.  The MCU does not clear it itself.
-	m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_DEC8_I8751:
+		// The schematics show a clocked LS194 shift register (3A) is used to automatically
+		// clear the IRQ request.  The MCU does not clear it itself.
+		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in dec8_state::device_timer");
+	}
 }
 
 WRITE8_MEMBER(dec8_state::dec8_i8751_w)
@@ -146,7 +153,7 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
 		m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-		machine().scheduler().timer_set(m_mcu->clocks_to_attotime(64), timer_expired_delegate(FUNC(dec8_state::dec8_i8751_timer_callback),this)); // 64 clocks not confirmed
+		timer_set(m_mcu->clocks_to_attotime(64), TIMER_DEC8_I8751); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
 		m_i8751_value = (m_i8751_value & 0xff00) | data;

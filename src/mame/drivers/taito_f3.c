@@ -390,15 +390,22 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-TIMER_CALLBACK_MEMBER(taito_f3_state::f3_interrupt3)
+void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
+	switch (id)
+	{
+	case TIMER_F3_INTERRUPT3:
+		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in taito_f3_state::device_timer");
+	}
 }
 
 INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 {
 	device.execute().set_input_line(2, HOLD_LINE);  // vblank
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taito_f3_state::f3_interrupt3),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);
 }
 
 static SOUND_RESET( f3 )

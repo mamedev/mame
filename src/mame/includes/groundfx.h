@@ -11,6 +11,11 @@ struct tempsprite
 class groundfx_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_GROUNDFX_INTERRUPT5
+	};
+
 	groundfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this,"ram"),
@@ -40,7 +45,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
-	TIMER_CALLBACK_MEMBER(groundfx_interrupt5);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

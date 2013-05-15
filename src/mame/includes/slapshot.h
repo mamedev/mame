@@ -21,6 +21,11 @@ struct slapshot_tempsprite
 class slapshot_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SLAPSHOT_INTERRUPT6
+	};
+
 	slapshot_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_color_ram(*this,"color_ram"),
@@ -77,10 +82,12 @@ public:
 	UINT32 screen_update_slapshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(slapshot_interrupt);
-	TIMER_CALLBACK_MEMBER(slapshot_interrupt6);
 	void reset_sound_region();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
 	void taito_handle_sprite_buffering(  );
 	void taito_update_sprites_active_area(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

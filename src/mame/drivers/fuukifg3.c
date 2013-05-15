@@ -521,25 +521,26 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(fuuki32_state::level_1_interrupt_callback)
+void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(1, HOLD_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), timer_expired_delegate(FUNC(fuuki32_state::level_1_interrupt_callback),this));
-}
-
-
-TIMER_CALLBACK_MEMBER(fuuki32_state::vblank_interrupt_callback)
-{
-	m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), timer_expired_delegate(FUNC(fuuki32_state::vblank_interrupt_callback),this));
-}
-
-
-TIMER_CALLBACK_MEMBER(fuuki32_state::raster_interrupt_callback)
-{
-	m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
-	machine().primary_screen->update_partial(machine().primary_screen->vpos());
-	m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
+	switch (id)
+	{
+	case TIMER_LEVEL_1_INTERRUPT:
+		m_maincpu->set_input_line(1, HOLD_LINE);
+		timer_set(machine().primary_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+		break;
+	case TIMER_VBLANK_INTERRUPT:
+		m_maincpu->set_input_line(3, HOLD_LINE);    // VBlank IRQ
+		timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
+		break;
+	case TIMER_RASTER_INTERRUPT:
+		m_maincpu->set_input_line(5, HOLD_LINE);    // Raster Line IRQ
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_raster_interrupt_timer->adjust(machine().primary_screen->frame_period());
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in fuuki32_state::device_timer");
+	}
 }
 
 
@@ -549,7 +550,7 @@ void fuuki32_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 
-	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fuuki32_state::raster_interrupt_callback),this));
+	m_raster_interrupt_timer = timer_alloc(TIMER_RASTER_INTERRUPT);
 
 	save_item(NAME(m_spr_buffered_tilebank));
 	save_item(NAME(m_shared_ram));
@@ -560,8 +561,8 @@ void fuuki32_state::machine_reset()
 {
 	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(248), timer_expired_delegate(FUNC(fuuki32_state::level_1_interrupt_callback),this));
-	machine().scheduler().timer_set(machine().primary_screen->time_until_vblank_start(), timer_expired_delegate(FUNC(fuuki32_state::vblank_interrupt_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(248), TIMER_LEVEL_1_INTERRUPT);
+	timer_set(machine().primary_screen->time_until_vblank_start(), TIMER_VBLANK_INTERRUPT);
 	m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(0, visarea.max_x + 1));
 }
 

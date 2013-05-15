@@ -41,6 +41,19 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_collision)
 }
 
 
+void sprint4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_NMI:
+		nmi_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in sprint4_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 {
 	int scanline = param;
@@ -103,13 +116,13 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 	if (ioport("IN0")->read() & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(sprint4_state::nmi_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_NMI, scanline);
 }
 
 
 void sprint4_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(sprint4_state::nmi_callback),this), 32);
+	timer_set(machine().primary_screen->time_until_pos(32), TIMER_NMI, 32);
 
 	memset(m_steer_FF1, 0, sizeof m_steer_FF1);
 	memset(m_steer_FF2, 0, sizeof m_steer_FF2);

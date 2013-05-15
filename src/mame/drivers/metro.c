@@ -194,6 +194,25 @@ WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 	update_irq_state();
 }
 
+void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_KARATOUR_IRQ:
+		m_requested_int[5] = 0;
+		break;
+	case TIMER_MOUJA_IRQ:
+		m_requested_int[0] = 1;
+		update_irq_state();
+		break;
+	case TIMER_METRO_BLIT_DONE:
+		metro_blit_done(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in metro_state::device_timer");
+	}
+}
+
 INTERRUPT_GEN_MEMBER(metro_state::metro_vblank_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
@@ -206,26 +225,15 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 	update_irq_state();
 }
 
-TIMER_CALLBACK_MEMBER(metro_state::karatour_irq_callback)
-{
-	m_requested_int[5] = 0;
-}
-
 /* lev 2-7 (lev 1 seems sound related) */
 INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
 
 	/* write to scroll registers, the duration is a guess */
-	machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(metro_state::karatour_irq_callback),this));
+	timer_set(attotime::from_usec(2500), TIMER_KARATOUR_IRQ);
 	m_requested_int[5] = 1;
 
-	update_irq_state();
-}
-
-TIMER_CALLBACK_MEMBER(metro_state::mouja_irq_callback)
-{
-	m_requested_int[0] = 1;
 	update_irq_state();
 }
 
@@ -620,7 +628,7 @@ WRITE16_MEMBER(metro_state::metro_blitter_w)
 				       another blit. */
 				if (b1 == 0)
 				{
-					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(metro_state::metro_blit_done),this));
+					timer_set(attotime::from_usec(500), TIMER_METRO_BLIT_DONE);
 					return;
 				}
 
@@ -6340,7 +6348,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 	metro_common();
 	m_irq_line = -1;    /* split interrupt handlers */
 	m_vblank_bit = 1;
-	m_mouja_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(metro_state::mouja_irq_callback),this));
+	m_mouja_irq_timer = timer_alloc(TIMER_MOUJA_IRQ);
 }
 
 DRIVER_INIT_MEMBER(metro_state,gakusai)

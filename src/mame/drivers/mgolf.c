@@ -10,6 +10,11 @@
 class mgolf_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	mgolf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
@@ -43,6 +48,9 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
 	void update_plunger(  );
 	double calc_plunger_pos();
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -116,6 +124,19 @@ void mgolf_state::update_plunger(  )
 }
 
 
+void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTERRUPT:
+		interrupt_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mgolf_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 {
 	int scanline = param;
@@ -129,7 +150,7 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 	if (scanline >= 262)
 		scanline = 16;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(mgolf_state::interrupt_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
 }
 
 
@@ -314,7 +335,7 @@ void mgolf_state::machine_start()
 
 void mgolf_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(16), timer_expired_delegate(FUNC(mgolf_state::interrupt_callback),this), 16);
+	timer_set(machine().primary_screen->time_until_pos(16), TIMER_INTERRUPT, 16);
 
 	m_mask = 0;
 	m_prev = 0;

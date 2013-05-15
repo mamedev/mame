@@ -23,6 +23,11 @@ struct othunder_tempsprite
 class othunder_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_AD_INTERRUPT
+	};
+
 	othunder_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this,"spriteram"),
@@ -80,9 +85,11 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_othunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(ad_interrupt);
 	void reset_sound_region();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs );
 	void update_irq(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

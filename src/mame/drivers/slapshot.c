@@ -171,15 +171,22 @@ WRITE16_MEMBER(slapshot_state::color_ram_word_w)
                 INTERRUPTS
 ***********************************************************/
 
-TIMER_CALLBACK_MEMBER(slapshot_state::slapshot_interrupt6)
+void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(6, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_SLAPSHOT_INTERRUPT6:
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in slapshot_state::device_timer");
+	}
 }
 
 
 INTERRUPT_GEN_MEMBER(slapshot_state::slapshot_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(slapshot_state::slapshot_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_SLAPSHOT_INTERRUPT6);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 

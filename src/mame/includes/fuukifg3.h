@@ -12,6 +12,13 @@
 class fuuki32_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_LEVEL_1_INTERRUPT,
+		TIMER_VBLANK_INTERRUPT,
+		TIMER_RASTER_INTERRUPT
+	};
+
 	fuuki32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_vram(*this, "vram"),
@@ -74,4 +81,7 @@ public:
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void fuuki32_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

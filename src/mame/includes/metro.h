@@ -12,6 +12,13 @@
 class metro_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_KARATOUR_IRQ,
+		TIMER_MOUJA_IRQ,
+		TIMER_METRO_BLIT_DONE
+	};
+
 	metro_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -192,6 +199,9 @@ public:
 					int sx, int sy, int wx, int wy, int big, UINT16 *tilemapram, int layer );
 	DECLARE_WRITE_LINE_MEMBER(blzntrnd_irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(ymf278b_interrupt);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

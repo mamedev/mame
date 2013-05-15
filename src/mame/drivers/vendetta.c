@@ -194,16 +194,23 @@ WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 	k053246_set_objcha_line(m_k053246, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(vendetta_state::z80_nmi_callback)
+void vendetta_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_Z80_NMI:
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in vendetta_state::device_timer");
+	}
 }
 
 WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(vendetta_state::z80_nmi_callback),this));
+	timer_set(attotime::from_usec(25), TIMER_Z80_NMI);
 }
 
 WRITE8_MEMBER(vendetta_state::z80_irq_w)

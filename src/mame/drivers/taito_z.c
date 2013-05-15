@@ -1016,18 +1016,21 @@ WRITE16_MEMBER(taitoz_state::dblaxle_cpua_ctrl_w)
                         INTERRUPTS
 ***********************************************************/
 
-/* 68000 A */
-
-TIMER_CALLBACK_MEMBER(taitoz_state::taitoz_interrupt6)
+void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(6, HOLD_LINE);
-}
-
-/* 68000 B */
-
-TIMER_CALLBACK_MEMBER(taitoz_state::taitoz_cpub_interrupt5)
-{
-	m_subcpu->set_input_line(5, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_TAITOZ_INTERRUPT6:
+		/* 68000 A */
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		break;
+	case TIMER_TAITOZ_CPUB_INTERRUPT5:
+		/* 68000 B */
+		m_subcpu->set_input_line(5, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in taitoz_state::device_timer");
+	}
 }
 
 
@@ -1042,7 +1045,7 @@ INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
 	m_sci_int6 = !m_sci_int6;
 
 	if (m_sci_int6)
-		machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(taitoz_state::taitoz_interrupt6),this));
+		timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_TAITOZ_INTERRUPT6);
 
 	device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -1226,7 +1229,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 	   but we don't want CPUA to have an int6 before int4 is over (?)
 	*/
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitoz_state::taitoz_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
 }
 
 
@@ -1291,7 +1294,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
 	   Four lightgun interrupts happen before the collected coords
 	   are moved to shared ram where CPUA can use them. */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(taitoz_state::taitoz_cpub_interrupt5),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
 }
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)

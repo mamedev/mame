@@ -4,6 +4,11 @@
 class dec8_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DEC8_I8751
+	};
+
 	dec8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -140,8 +145,10 @@ public:
 	void screen_eof_dec8(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(gondo_interrupt);
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
-	TIMER_CALLBACK_MEMBER(dec8_i8751_timer_callback);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

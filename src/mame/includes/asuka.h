@@ -9,6 +9,11 @@
 class asuka_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_CADASH_INTERRUPT5
+	};
+
 	asuka_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_cadash_shared_ram(*this, "sharedram"),
@@ -59,7 +64,6 @@ public:
 	UINT32 screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_asuka(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
-	TIMER_CALLBACK_MEMBER(cadash_interrupt5);
 
 	/*----------- defined in machine/bonzeadv.c -----------*/
 	void WriteLevelData();
@@ -72,4 +76,7 @@ public:
 	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

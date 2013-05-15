@@ -59,15 +59,22 @@ WRITE8_MEMBER(rollerg_state::soundirq_w)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-TIMER_CALLBACK_MEMBER(rollerg_state::nmi_callback)
+void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_NMI:
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in rollerg_state::device_timer");
+	}
 }
 
 WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(rollerg_state::nmi_callback),this));   /* kludge until the K053260 is emulated correctly */
+	timer_set(attotime::from_usec(50), TIMER_NMI);   /* kludge until the K053260 is emulated correctly */
 }
 
 READ8_MEMBER(rollerg_state::pip_r)

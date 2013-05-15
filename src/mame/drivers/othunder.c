@@ -277,10 +277,17 @@ INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
 	update_irq();
 }
 
-TIMER_CALLBACK_MEMBER(othunder_state::ad_interrupt)
+void othunder_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_ad_irq = 1;
-	update_irq();
+	switch (id)
+	{
+	case TIMER_AD_INTERRUPT:
+		m_ad_irq = 1;
+		update_irq();
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in othunder_state::device_timer");
+	}
 }
 
 
@@ -374,7 +381,7 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
 	   The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
 	   cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(othunder_state::ad_interrupt),this));
+	timer_set(attotime::from_usec(10), TIMER_AD_INTERRUPT);
 }
 
 

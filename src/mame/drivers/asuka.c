@@ -230,14 +230,22 @@ DIP locations verified for:
                 INTERRUPTS
 ***********************************************************/
 
-TIMER_CALLBACK_MEMBER(asuka_state::cadash_interrupt5)
+void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(5, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_CADASH_INTERRUPT5:
+		m_maincpu->set_input_line(5, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in asuka_state::device_timer");
+	}
 }
+
 
 INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), timer_expired_delegate(FUNC(asuka_state::cadash_interrupt5),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_CADASH_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 

@@ -39,9 +39,16 @@ void skullxbo_state::update_interrupts()
 }
 
 
-TIMER_CALLBACK_MEMBER(skullxbo_state::irq_gen)
+void skullxbo_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	scanline_int_gen(m_maincpu);
+	switch (id)
+	{
+	case TIMER_IRQ_GEN:
+		scanline_int_gen(m_maincpu);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in skullxbo_state::device_timer");
+	}
 }
 
 
@@ -55,7 +62,7 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 	{
 		int width = screen.width();
 		attotime period = screen.time_until_pos(screen.vpos() + 6, width * 0.9);
-		machine().scheduler().timer_set(period, timer_expired_delegate(FUNC(skullxbo_state::irq_gen), this));
+		timer_set(period, TIMER_IRQ_GEN);
 	}
 
 	/* update the playfield and motion objects */

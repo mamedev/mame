@@ -225,9 +225,16 @@ WRITE32_MEMBER(undrfire_state::color_ram_w)
                 INTERRUPTS
 ***********************************************************/
 
-TIMER_CALLBACK_MEMBER(undrfire_state::interrupt5)
+void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(5, HOLD_LINE);
+	switch (id)
+	{
+	case TIMER_INTERRUPT5:
+		m_maincpu->set_input_line(5, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in undrfire_state::device_timer");
+	}
 }
 
 
@@ -358,7 +365,7 @@ READ32_MEMBER(undrfire_state::unknown_hardware_r)
 WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(undrfire_state::interrupt5),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_INTERRUPT5);
 }
 
 
@@ -463,7 +470,7 @@ WRITE32_MEMBER(undrfire_state::cbombers_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
 	    1000 cycle delay is arbitrary */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), timer_expired_delegate(FUNC(undrfire_state::interrupt5),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), TIMER_INTERRUPT5);
 }
 
 /***********************************************************

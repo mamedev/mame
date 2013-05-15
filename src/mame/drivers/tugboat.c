@@ -31,6 +31,11 @@ always false - counter was reloaded and incremented before interrupt occurs
 class tugboat_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	tugboat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
@@ -51,8 +56,10 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_tugboat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -205,15 +212,22 @@ static const pia6821_interface pia1_intf =
 	DEVCB_NULL      /* IRQB */
 };
 
-TIMER_CALLBACK_MEMBER(tugboat_state::interrupt_gen)
+void tugboat_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, HOLD_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->frame_period(), timer_expired_delegate(FUNC(tugboat_state::interrupt_gen),this));
+	switch (id)
+	{
+	case TIMER_INTERRUPT:
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		timer_set(machine().primary_screen->frame_period(), TIMER_INTERRUPT);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in tugboat_state::device_timer");
+	}
 }
 
 void tugboat_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(30*8+4), timer_expired_delegate(FUNC(tugboat_state::interrupt_gen),this));
+	timer_set(machine().primary_screen->time_until_pos(30*8+4), TIMER_INTERRUPT);
 }
 
 

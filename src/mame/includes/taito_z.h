@@ -12,6 +12,12 @@
 class taitoz_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TAITOZ_INTERRUPT6,
+		TIMER_TAITOZ_CPUB_INTERRUPT5
+	};
+
 	taitoz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
@@ -96,8 +102,6 @@ public:
 	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
-	TIMER_CALLBACK_MEMBER(taitoz_interrupt6);
-	TIMER_CALLBACK_MEMBER(taitoz_cpub_interrupt5);
 	void taitoz_postload();
 	void contcirc_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void chasehq_draw_sprites_16x16( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
@@ -109,4 +113,7 @@ public:
 	void reset_sound_region(  );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_WRITE_LINE_MEMBER(irqhandlerb);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
