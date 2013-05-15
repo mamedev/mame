@@ -9,6 +9,13 @@
 class wgp_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_WGP_INTERRUPT4,
+		TIMER_WGP_INTERRUPT6,
+		TIMER_WGP_CPUB_INTERRUPT6
+	};
+
 	wgp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
@@ -77,9 +84,6 @@ public:
 	DECLARE_VIDEO_START(wgp2);
 	UINT32 screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wgp_cpub_interrupt);
-	TIMER_CALLBACK_MEMBER(wgp_interrupt4);
-	TIMER_CALLBACK_MEMBER(wgp_interrupt6);
-	TIMER_CALLBACK_MEMBER(wgp_cpub_interrupt6);
 	void wgp_postload();
 	inline void common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num );
 	void wgp_core_vh_start( int piv_xoffs, int piv_yoffs );
@@ -88,4 +92,7 @@ public:
 	void parse_control();
 	void reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */;
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

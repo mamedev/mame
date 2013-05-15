@@ -7,6 +7,11 @@
 class policetr_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ5_GEN
+	};
+
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
@@ -50,8 +55,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq4_gen);
-	TIMER_CALLBACK_MEMBER(irq5_gen);
 	void render_display_list(offs_t offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_device> m_eeprom;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

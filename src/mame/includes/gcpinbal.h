@@ -5,6 +5,12 @@
 class gcpinbal_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_GCPINBAL_INTERRUPT1,
+		TIMER_GCPINBAL_INTERRUPT3
+	};
+
 	gcpinbal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -60,9 +66,10 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
-	TIMER_CALLBACK_MEMBER(gcpinbal_interrupt1);
-	TIMER_CALLBACK_MEMBER(gcpinbal_interrupt3);
 	void gcpinbal_core_vh_start(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

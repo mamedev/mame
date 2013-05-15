@@ -17,6 +17,11 @@
 class mjsister_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_DAC
+	};
+
 	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
@@ -58,14 +63,17 @@ public:
 	DECLARE_WRITE8_MEMBER(mjsister_input_sel1_w);
 	DECLARE_WRITE8_MEMBER(mjsister_input_sel2_w);
 	DECLARE_READ8_MEMBER(mjsister_keys_r);
+	TIMER_CALLBACK_MEMBER(dac_callback);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(dac_callback);
 	void mjsister_redraw();
 	void mjsister_plot0( int offset, UINT8 data );
 	void mjsister_plot1( int offset, UINT8 data );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -168,6 +176,18 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
+void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_DAC:
+		dac_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in mjsister_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 {
 	UINT8 *DACROM = memregion("samples")->base();
@@ -175,7 +195,7 @@ TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
 	m_dac->write_unsigned8(DACROM[(m_dac_bank * 0x10000 + m_dac_adr++) & 0x1ffff]);
 
 	if (((m_dac_adr & 0xff00 ) >> 8) !=  m_dac_adr_e)
-		machine().scheduler().timer_set(attotime::from_hz(MCLK) * 1024, timer_expired_delegate(FUNC(mjsister_state::dac_callback),this));
+		timer_set(attotime::from_hz(MCLK) * 1024, TIMER_DAC);
 	else
 		m_dac_busy = 0;
 }
@@ -191,7 +211,7 @@ WRITE8_MEMBER(mjsister_state::mjsister_dac_adr_e_w)
 	m_dac_adr = m_dac_adr_s << 8;
 
 	if (m_dac_busy == 0)
-		machine().scheduler().synchronize(timer_expired_delegate(FUNC(mjsister_state::dac_callback),this));
+		synchronize(TIMER_DAC);
 
 	m_dac_busy = 1;
 }

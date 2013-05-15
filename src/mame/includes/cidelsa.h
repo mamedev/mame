@@ -37,6 +37,11 @@
 class cidelsa_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_SET_CPU_MODE
+	};
+
 	cidelsa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
@@ -72,7 +77,9 @@ public:
 	UINT8 *m_charram;
 	DECLARE_CUSTOM_INPUT_MEMBER(cdp1869_pcb_r);
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
-	TIMER_CALLBACK_MEMBER(set_cpu_mode);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 class draco_state : public cidelsa_state

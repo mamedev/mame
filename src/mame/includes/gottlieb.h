@@ -229,6 +229,14 @@ private:
 class gottlieb_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_LASERDISC_PHILIPS,
+		TIMER_LASERDISC_BIT_OFF,
+		TIMER_LASERDISC_BIT,
+		TIMER_NMI_CLEAR
+	};
+
 	gottlieb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
@@ -319,6 +327,9 @@ public:
 	void audio_process_clock(int logit);
 	void audio_handle_zero_crossing(attotime zerotime, int logit);
 	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in audio/gottlieb.c -----------*/

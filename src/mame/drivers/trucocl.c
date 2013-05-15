@@ -43,10 +43,18 @@ WRITE8_MEMBER(trucocl_state::irq_enable_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(trucocl_state::dac_irq)
+void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
+	switch (id)
+	{
+	case TIMER_DAC_IRQ:
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in trucocl_state::device_timer");
+	}
 }
+
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
@@ -74,7 +82,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	m_dac->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
 
-	machine().scheduler().timer_set( attotime::from_hz( 16000 ), timer_expired_delegate(FUNC(trucocl_state::dac_irq),this));
+	timer_set( attotime::from_hz( 16000 ), TIMER_DAC_IRQ);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )

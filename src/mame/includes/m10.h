@@ -31,6 +31,11 @@
 class m10_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	m10_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_memory(*this, "memory"),
@@ -97,4 +102,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);
 	DECLARE_WRITE8_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

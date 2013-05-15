@@ -47,28 +47,31 @@ Stephh's notes (based on the game M68000 code and some tests) :
                       INTERRUPTS
 ***********************************************************/
 
-TIMER_CALLBACK_MEMBER(gcpinbal_state::gcpinbal_interrupt1)
+void gcpinbal_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(1, HOLD_LINE);
-}
-
-#ifdef UNUSED_FUNCTION
-TIMER_CALLBACK_MEMBER(gcpinbal_state::gcpinbal_interrupt3)
-{
-	// IRQ3 is from the M6585
-//  if (!ADPCM_playing(0))
+	switch (id)
 	{
-		m_maincpu->set_input_line(3, HOLD_LINE);
+	case TIMER_GCPINBAL_INTERRUPT1:
+		m_maincpu->set_input_line(1, HOLD_LINE);
+		break;
+	case TIMER_GCPINBAL_INTERRUPT3:
+		// IRQ3 is from the M6585
+		//if (!ADPCM_playing(0))
+		{
+			m_maincpu->set_input_line(3, HOLD_LINE);
+		}
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gcpinbal_state::device_timer");
 	}
 }
-#endif
 
 INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 {
 	/* Unsure of actual sequence */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), timer_expired_delegate(FUNC(gcpinbal_state::gcpinbal_interrupt1),this));
-//  machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), timer_expired_delegate(FUNC(gcpinbal_state::gcpinbal_interrupt3),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_GCPINBAL_INTERRUPT1);
+//  timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(1000), TIMER_GCPINBAL_INTERRUPT3);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 

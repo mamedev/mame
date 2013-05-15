@@ -319,32 +319,35 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
                         INTERRUPTS
 ***********************************************************/
 
-/* 68000 A */
-
-TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_interrupt6)
+void topspeed_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(6, HOLD_LINE);
-}
-
-/* 68000 B */
-
-TIMER_CALLBACK_MEMBER(topspeed_state::topspeed_cpub_interrupt6)
-{
-	m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
+	switch (id)
+	{
+	/* 68000 A */
+	case TIMER_TOPSPEED_INTERRUPT6:
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		break;
+	/* 68000 B */
+	case TIMER_TOPSPEED_CPUB_INTERRUPT6:
+		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in topspeed_state::device_timer");
+	}
 }
 
 
 INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(topspeed_state::topspeed_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_TOPSPEED_INTERRUPT6);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(topspeed_state::topspeed_cpub_interrupt)
 {
 	/* Unsure how many int6's per frame */
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), timer_expired_delegate(FUNC(topspeed_state::topspeed_cpub_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000 - 500), TIMER_TOPSPEED_CPUB_INTERRUPT6);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 

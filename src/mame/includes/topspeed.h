@@ -9,6 +9,12 @@
 class topspeed_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TOPSPEED_INTERRUPT6,
+		TIMER_TOPSPEED_CPUB_INTERRUPT6
+	};
+
 	topspeed_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spritemap(*this, "spritemap"),
@@ -68,8 +74,6 @@ public:
 	UINT32 screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(topspeed_interrupt);
 	INTERRUPT_GEN_MEMBER(topspeed_cpub_interrupt);
-	TIMER_CALLBACK_MEMBER(topspeed_interrupt6);
-	TIMER_CALLBACK_MEMBER(topspeed_cpub_interrupt6);
 	void topspeed_postload();
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
@@ -77,4 +81,7 @@ public:
 	void topspeed_msm5205_clock(device_t *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_1);
 	DECLARE_WRITE_LINE_MEMBER(topspeed_msm5205_vck_2);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };

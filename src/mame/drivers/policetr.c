@@ -101,16 +101,23 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(policetr_state::irq5_gen)
+void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(R3000_IRQ5, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ5_GEN:
+		m_maincpu->set_input_line(R3000_IRQ5, ASSERT_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in policetr_state::device_timer");
+	}
 }
 
 
 INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(policetr_state::irq5_gen),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_IRQ5_GEN);
 }
 
 

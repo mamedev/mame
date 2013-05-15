@@ -3,6 +3,12 @@
 class simpsons_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NMI,
+		TIMER_DMAEND
+	};
+
 	simpsons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
@@ -55,6 +61,9 @@ public:
 	void simpsons_video_banking( int bank );
 	void sound_nmi_callback( int param );
 	void simpsons_objdma(  );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

@@ -23,6 +23,12 @@
 class boxer_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_POT_INTERRUPT,
+		TIMER_PERIODIC
+	};
+
 	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tile_ram(*this, "tile_ram"),
@@ -54,6 +60,9 @@ public:
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
 	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*************************************
@@ -61,6 +70,21 @@ public:
  *  Interrupts / Timers
  *
  *************************************/
+
+void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+	case TIMER_POT_INTERRUPT:
+		pot_interrupt(ptr, param);
+		break;
+	case TIMER_PERIODIC:
+		periodic_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in boxer_state::device_timer");
+	}
+}
 
 TIMER_CALLBACK_MEMBER(boxer_state::pot_interrupt)
 {
@@ -96,7 +120,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				machine().scheduler().timer_set(machine().primary_screen->time_until_pos(i), timer_expired_delegate(FUNC(boxer_state::pot_interrupt),this), mask[i]);
+				timer_set(machine().primary_screen->time_until_pos(i), TIMER_POT_INTERRUPT, mask[i]);
 
 		m_pot_state = 0;
 	}
@@ -106,7 +130,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
 	if (scanline >= 262)
 		scanline = 0;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(boxer_state::periodic_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_PERIODIC, scanline);
 }
 
 
@@ -434,7 +458,7 @@ void boxer_state::machine_start()
 
 void boxer_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(boxer_state::periodic_callback),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_PERIODIC);
 
 	m_pot_state = 0;
 	m_pot_latch = 0;

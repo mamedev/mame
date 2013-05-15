@@ -119,15 +119,28 @@ void simpsons_state::sound_nmi_callback( int param )
 }
 #endif
 
-TIMER_CALLBACK_MEMBER(simpsons_state::nmi_callback)
+
+void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	switch (id)
+	{
+	case TIMER_NMI:
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		break;
+	case TIMER_DMAEND:
+		if (m_firq_enabled)
+			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in simpsons_state::device_timer");
+	}
 }
+
 
 WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(25), timer_expired_delegate(FUNC(simpsons_state::nmi_callback),this));  /* kludge until the K053260 is emulated correctly */
+	timer_set(attotime::from_usec(25), TIMER_NMI);  /* kludge until the K053260 is emulated correctly */
 }
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
@@ -249,20 +262,13 @@ void simpsons_state::simpsons_objdma(  )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-TIMER_CALLBACK_MEMBER(simpsons_state::dmaend_callback)
-{
-	if (m_firq_enabled)
-		m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
-}
-
-
 INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 {
 	if (k053246_is_irq_enabled(m_k053246))
 	{
 		simpsons_objdma();
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
-		machine().scheduler().timer_set(attotime::from_usec(30), timer_expired_delegate(FUNC(simpsons_state::dmaend_callback),this));
+		timer_set(attotime::from_usec(30), TIMER_DMAEND);
 	}
 
 	if (k052109_is_irq_enabled(m_k052109))

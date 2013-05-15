@@ -236,8 +236,8 @@ void gottlieb_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),this));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
-		m_laserdisc_bit_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_callback),this));
-		m_laserdisc_philips_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gottlieb_state::laserdisc_philips_callback),this));
+		m_laserdisc_bit_timer = timer_alloc(TIMER_LASERDISC_BIT);
+		m_laserdisc_philips_timer = timer_alloc(TIMER_LASERDISC_PHILIPS);
 
 		/* create some audio RAM */
 		m_laserdisc_audio_buffer = auto_alloc_array(machine(), UINT8, AUDIORAM_SIZE);
@@ -458,7 +458,7 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
 
 	/* assert the line and set a timer for deassertion */
 	m_laserdisc->control_w(ASSERT_LINE);
-	machine().scheduler().timer_set(LASERDISC_CLOCK * 10, timer_expired_delegate(FUNC(gottlieb_state::laserdisc_bit_off_callback),this));
+	timer_set(LASERDISC_CLOCK * 10, TIMER_LASERDISC_BIT_OFF);
 
 	/* determine how long for the next command; there is a 555 timer with a
 	   variable resistor controlling the timing of the pulses. Nominally, the
@@ -644,11 +644,32 @@ void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int sampl
 
 
 
-	/*************************************
-	*
-	*  Interrupt generation
-	*
-	*************************************/
+/*************************************
+*
+*  Interrupt generation
+*
+*************************************/
+
+void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LASERDISC_PHILIPS:
+		laserdisc_philips_callback(ptr, param);
+		break;
+	case TIMER_LASERDISC_BIT_OFF:
+		laserdisc_bit_off_callback(ptr, param);
+		break;
+	case TIMER_LASERDISC_BIT:
+		laserdisc_bit_callback(ptr, param);
+		break;
+	case TIMER_NMI_CLEAR:
+		nmi_clear(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gottlieb_state::device_timer");
+	}
+}
 
 TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
 {
@@ -660,7 +681,7 @@ INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(gottlieb_state::nmi_clear),this));
+	timer_set(machine().primary_screen->time_until_pos(0), TIMER_NMI_CLEAR);
 
 	/* if we have a laserdisc, update it */
 	if (m_laserdisc != NULL)

@@ -7,6 +7,11 @@
 class tmnt_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NMI
+	};
+
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_spriteram(*this, "spriteram"),
@@ -161,11 +166,13 @@ public:
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
 	INTERRUPT_GEN_MEMBER(tmnt_vblank_irq);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void sound_nmi_callback( int param );
 	inline UINT32 tmnt2_get_word( UINT32 addr );
 	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

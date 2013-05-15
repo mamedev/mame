@@ -424,9 +424,16 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-TIMER_CALLBACK_MEMBER(cidelsa_state::set_cpu_mode)
+void cidelsa_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_reset = 1;
+	switch (id)
+	{
+	case TIMER_SET_CPU_MODE:
+		m_reset = 1;
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in cidelsa_state::device_timer");
+	}
 }
 
 void cidelsa_state::machine_start()
@@ -453,7 +460,7 @@ void cidelsa_state::machine_reset()
 {
 	/* reset the CPU */
 	m_reset = 0;
-	machine().scheduler().timer_set(attotime::from_msec(200), timer_expired_delegate(FUNC(cidelsa_state::set_cpu_mode),this));
+	timer_set(attotime::from_msec(200), TIMER_SET_CPU_MODE);
 }
 
 /* Machine Drivers */

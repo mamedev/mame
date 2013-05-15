@@ -439,27 +439,25 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
                         INTERRUPTS
 ***********************************************************/
 
-/* 68000 A */
-
-#ifdef UNUSED_FUNCTION
-TIMER_CALLBACK_MEMBER(wgp_state::wgp_interrupt4)
+void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(4, HOLD_LINE);
+	switch (id)
+	{
+	/* 68000 A */
+	case TIMER_WGP_INTERRUPT4:
+		m_maincpu->set_input_line(4, HOLD_LINE);
+		break;
+	case TIMER_WGP_INTERRUPT6:
+		m_maincpu->set_input_line(6, HOLD_LINE);
+		break;
+	/* 68000 B */
+	case TIMER_WGP_CPUB_INTERRUPT6:
+		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in wgp_state::device_timer");
+	}
 }
-#endif
-
-TIMER_CALLBACK_MEMBER(wgp_state::wgp_interrupt6)
-{
-	m_maincpu->set_input_line(6, HOLD_LINE);
-}
-
-/* 68000 B */
-
-TIMER_CALLBACK_MEMBER(wgp_state::wgp_cpub_interrupt6)
-{
-	m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
-}
-
 
 
 /***** Routines for particular games *****/
@@ -469,7 +467,7 @@ TIMER_CALLBACK_MEMBER(wgp_state::wgp_cpub_interrupt6)
 
 INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
 {
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), timer_expired_delegate(FUNC(wgp_state::wgp_cpub_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_WGP_CPUB_INTERRUPT6);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
@@ -592,7 +590,7 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
 	   hardware has got the next a/d conversion ready. We set a token
 	   delay of 10000 cycles although our inputs are always ready. */
 
-	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), timer_expired_delegate(FUNC(wgp_state::wgp_interrupt6),this));
+	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_WGP_INTERRUPT6);
 }
 
 

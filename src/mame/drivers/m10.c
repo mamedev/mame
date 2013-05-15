@@ -499,23 +499,34 @@ TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 	if (param == 0)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 16), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), 1);
+		timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 16), TIMER_INTERRUPT, 1);
 	}
 	if (param == 1)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 24), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), 2);
+		timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 24), TIMER_INTERRUPT, 2);
 	}
 	if (param == -1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
 
+void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTERRUPT:
+		interrupt_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in m10_state::device_timer");
+	}
 }
 
 #if 0
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	//machine().scheduler().timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), -1);
+	//timer_set(machine.primary_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
 }
 
 INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
@@ -527,7 +538,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), timer_expired_delegate(FUNC(m10_state::interrupt_callback),this), -1);
+	timer_set(machine().primary_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
 }
 
 /*************************************

@@ -139,6 +139,11 @@ Notes:
 class kinst_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_IRQ0_STOP
+	};
+
 	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_rambase(*this, "rambase"),
@@ -166,8 +171,10 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq0_start);
-	TIMER_CALLBACK_MEMBER(irq0_stop);
 	required_device<cpu_device> m_maincpu;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -280,16 +287,23 @@ UINT32 kinst_state::screen_update_kinst(screen_device &screen, bitmap_ind16 &bit
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(kinst_state::irq0_stop)
+void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	switch (id)
+	{
+	case TIMER_IRQ0_STOP:
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in kinst_state::device_timer");
+	}
 }
 
 
 INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(kinst_state::irq0_stop),this));
+	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);
 }
 
 
