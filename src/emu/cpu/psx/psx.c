@@ -222,8 +222,6 @@ READ32_MEMBER( psxcpu_device::exp_config_r )
 
 WRITE32_MEMBER( psxcpu_device::exp_config_w )
 {
-	UINT32 old = m_exp_config;
-
 	COMBINE_DATA( &m_exp_config ); // TODO: check byte writes
 
 	m_exp_config &= 0xaf1fffff;
