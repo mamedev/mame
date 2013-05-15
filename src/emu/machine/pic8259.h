@@ -48,16 +48,17 @@ public:
 
 	UINT8 inta_r();
 
-	TIMER_CALLBACK_MEMBER( timerproc );
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	inline void set_timer() { m_timer->adjust(attotime::zero); }
+	static const device_timer_id TIMER_CHECK_IRQ = 0;
+
+	inline void set_timer() { timer_set(attotime::zero, TIMER_CHECK_IRQ); }
 	void set_irq_line(int irq, int state);
 
 
@@ -73,8 +74,6 @@ private:
 	devcb_resolved_write_line m_out_int_func;
 	devcb_resolved_read_line m_sp_en_func;
 	devcb_resolved_read8 m_read_slave_ack_func;
-
-	emu_timer *m_timer;
 
 	pic8259_state_t m_state;
 

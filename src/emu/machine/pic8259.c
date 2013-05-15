@@ -21,7 +21,7 @@
 #define LOG_GENERAL  0
 
 
-TIMER_CALLBACK_MEMBER( pic8259_device::timerproc )
+void pic8259_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int irq;
 	UINT8 mask;
@@ -380,8 +380,6 @@ void pic8259_device::device_start()
 	const struct pic8259_interface *intf = (const struct pic8259_interface *)this->static_config();
 
 	assert(intf != NULL);
-
-	m_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC(pic8259_device::timerproc), this) );
 
 	/* resolve callbacks */
 	m_out_int_func.resolve(intf->out_int_func, *this);
