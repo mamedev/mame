@@ -43,6 +43,19 @@ void videopin_state::update_plunger()
 }
 
 
+void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_INTERRUPT:
+		interrupt_callback(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in videopin_state::device_timer");
+	}
+}
+
+
 TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 {
 	int scanline = param;
@@ -56,13 +69,13 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 	if (scanline >= 263)
 		scanline = 32;
 
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(scanline), timer_expired_delegate(FUNC(videopin_state::interrupt_callback),this), scanline);
+	timer_set(machine().primary_screen->time_until_pos(scanline), TIMER_INTERRUPT, scanline);
 }
 
 
 void videopin_state::machine_reset()
 {
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(videopin_state::interrupt_callback),this), 32);
+	timer_set(machine().primary_screen->time_until_pos(32), TIMER_INTERRUPT, 32);
 
 	/* both output latches are cleared on reset */
 

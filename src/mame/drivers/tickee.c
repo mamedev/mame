@@ -31,6 +31,13 @@
 class tickee_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_TRIGGER_GUN_INTERRUPT,
+		TIMER_CLEAR_GUN_INTERRUPT,
+		TIMER_SETUP_GUN_INTERRUPTS
+	};
+
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_tlc34076(*this, "tlc34076"),
@@ -65,6 +72,9 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 
@@ -94,6 +104,25 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
  *  Light gun interrupts
  *
  *************************************/
+
+void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_TRIGGER_GUN_INTERRUPT:
+		trigger_gun_interrupt(ptr, param);
+		break;
+	case TIMER_CLEAR_GUN_INTERRUPT:
+		clear_gun_interrupt(ptr, param);
+		break;
+	case TIMER_SETUP_GUN_INTERRUPTS:
+		setup_gun_interrupts(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in tickee_state::device_timer");
+	}
+}
+
 
 TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 {
@@ -129,13 +158,13 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine(), 0, &beamx, &beamy);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt),this), 0);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt),this), 0);
+	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 0);
+	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 0);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine(), 1, &beamx, &beamy);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::trigger_gun_interrupt),this), 1);
-	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), timer_expired_delegate(FUNC(tickee_state::clear_gun_interrupt),this), 1);
+	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd, beamx + m_beamxadd), TIMER_TRIGGER_GUN_INTERRUPT, 1);
+	timer_set(machine().primary_screen->time_until_pos(beamy + m_beamyadd + 1, beamx + m_beamxadd), TIMER_CLEAR_GUN_INTERRUPT, 1);
 }
 
 
@@ -149,7 +178,7 @@ TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
 VIDEO_START_MEMBER(tickee_state,tickee)
 {
 	/* start a timer going on the first scanline of every frame */
-	m_setup_gun_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tickee_state::setup_gun_interrupts),this));
+	m_setup_gun_timer = timer_alloc(TIMER_SETUP_GUN_INTERRUPTS);
 	m_setup_gun_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 

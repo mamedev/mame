@@ -18,6 +18,11 @@
 class videopin_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_INTERRUPT
+	};
+
 	videopin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
@@ -49,6 +54,9 @@ public:
 	double calc_plunger_pos();
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in audio/videopin.c -----------*/

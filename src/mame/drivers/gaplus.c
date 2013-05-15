@@ -234,6 +234,18 @@ void gaplus_state::machine_reset()
 	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
+void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_NAMCOIO_RUN:
+		namcoio_run(ptr, param);
+		break;
+	default:
+		assert_always(FALSE, "Unknown id in gaplus_state::device_timer");
+	}
+}
+
 TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 {
 	device_t *io58xx = machine().device("58xx");
@@ -259,10 +271,10 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(io58xx))       /* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gaplus_state::namcoio_run),this));
+		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN);
 
 	if (!namcoio_read_reset_line(io56xx))       /* give the cpu a tiny bit of time to write the command before processing it */
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gaplus_state::namcoio_run),this), 1);
+		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)

@@ -8,6 +8,11 @@
 class parodius_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NMI
+	};
+
 	parodius_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_ram(*this, "ram"),
@@ -51,7 +56,9 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_parodius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(parodius_interrupt);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 /*----------- defined in video/parodius.c -----------*/

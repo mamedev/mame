@@ -10,6 +10,11 @@ struct star {
 class gaplus_state : public driver_device
 {
 public:
+	enum
+	{
+		TIMER_NAMCOIO_RUN
+	};
+
 	gaplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_customio_3(*this,"customio_3"),
@@ -63,4 +68,7 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
 	required_device<samples_device> m_samples;
+
+protected:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
