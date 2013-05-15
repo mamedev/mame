@@ -6344,45 +6344,246 @@
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="sprsnap5">
-		<description>Super Snapshot 5 (NTSC)</description>
-		<year>1989</year>
+	
+	<software name="codebust">
+		<description>Codebuster</description>
+		<year>198?</year>
 		<publisher>LMS Tech</publisher>
+
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="super_snapshot_5" />
+			<feature name="slot" value="codebuster" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x10000">
-				<rom name="super snapshot 5 ntsc (1989)(lms tech).80" size="0x10000" crc="8d281cf8" sha1="2420ad183577371d323fb9efa81adc513acbd682" offset="0x0000" />
+
+			<dataarea name="roml" size="0x1000">
+				<rom name="codebuster.bin" size="0x1000" crc="f549da3e" sha1="6a1cdc9f51c0df5cc2b4833b6002443c4e54565b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sprsnap5p" cloneof="sprsnap5">
-		<description>Super Snapshot 5 (PAL)</description>
-		<year>1989</year>
+	<software name="snapshot">
+		<description>Snapshot 64 (v1)</description>
+		<year>1985</year>
 		<publisher>LMS Tech</publisher>
+
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="super_snapshot_5" />
+			<feature name="slot" value="snapshot" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x10000">
-				<rom name="super snapshot 5 pal (1989)(lms tech).80" size="0x10000" crc="ed5cb065" sha1="10c34bd6d4651c2549e62cc448412e6d2b193609" offset="0x0000" />
+
+			<dataarea name="roml" size="0x1000">
+				<rom name="snapshot64_v1_1985.bin" size="0x1000" crc="2a29a872" sha1="0f0096c25246123a236b61540d38949290d887d2" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sprsnap5pa" cloneof="sprsnap5">
-		<description>Super Snapshot 5 (PAL, Alt)</description>
-		<year>1989</year>
+	<software name="snapshot2" cloneof="snapshot">
+		<description>Snapshot 64 (v2)</description>
+		<year>1985</year>
 		<publisher>LMS Tech</publisher>
+
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="super_snapshot_5" />
+			<feature name="slot" value="snapshot" />
 			<feature name="exrom" value="1" />
 			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x1000">
+				<rom name="snapshot64_v2_1985.bin" size="0x1000" crc="ea336bcb" sha1="3010ae8189e2f78fe5e94841ec0d33cfa6f8d0c7" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="snapshot64.d64" size="174848" crc="f86a0bfc" sha1="2d5f5bdb4711a02662bc18e75bd056abc81086e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap2" cloneof="snapshot">
+		<description>Super Snapshot (v2.0)</description>
+		<year>198</year>
+		<publisher>LMS Tech</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="snapshot" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x8000">
+				<rom name="super_snapshot_v2.0_plus_b.bin" size="0x8000" crc="86b17f3c" sha1="a19a9a6dcfd99a91b23422494359783f7ea2f138" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap3" cloneof="snapshot">
+		<description>Super Snapshot (v3.0, NTSC)</description>
+		<year>1988</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap3" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x8000">
+				<rom name="super_snapshot_v3.0_1988_ntsc.bin" size="0x8000" crc="1ea0d9f9" sha1="c3f907ff40ab8c8179fa322e3c361eadf949e818" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap4" cloneof="snapshot">
+		<description>Super Snapshot (v4.0, NTSC)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap4" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x8000">
+				<rom name="super_snapshot_v4.0_1989_ntsc.bin" size="0x8000" crc="8f7e9eef" sha1="0c33e86cf98eb23f4a866efff0bf1c007d5fc422" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap4p" cloneof="snapshot">
+		<description>Super Snapshot (v4.0, PAL)</description>
+		<year>1989</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap4" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+			
+			<dataarea name="roml" size="0x8000">
+				<rom name="super_snapshot_v4.0_1989_pal.bin" size="0x8000" crc="bf736f28" sha1="6819c655b7b3e08346236f649de5245bc9a41d25" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap501" cloneof="snapshot">
+		<description>Super Snapshot (v5.01, NTSC)</description>
+		<year>1990</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap5" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
 			<dataarea name="roml" size="0x10000">
-				<rom name="super snapshot 5 pal (1989)(lms tech)[a].80" size="0x10000" crc="58b404e8" sha1="0eae11f615090fd38c049865f494a0cd2922679f" offset="0x0000" />
+				<rom name="super_snapshot_v5.01_1990_ntsc.bin" size="0x10000" crc="8d281cf8" sha1="2420ad183577371d323fb9efa81adc513acbd682" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap522" cloneof="snapshot">
+		<description>Super Snapshot (v5.22, NTSC)</description>
+		<year>1990</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap5" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x10000">
+				<rom name="super_snapshot_v5.22_1990_ntsc.bin" size="0x10000" crc="fece58ea" sha1="63aa52b3b76c7a844109e43516a655b7373e602c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_a_ntsc.d64" size="174848" crc="3e4734ba" sha1="6b4595ad96b97412a46253b335b5ae6e5cb828d5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap522p1" cloneof="snapshot">
+		<description>Super Snapshot (v5.22 v1, PAL)</description>
+		<year>1990</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap5" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x10000">
+				<rom name="super_snapshot_v5.22_v1_1990_pal.bin" size="0x10000" crc="58b404e8" sha1="0eae11f615090fd38c049865f494a0cd2922679f" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supsnap522p2" cloneof="snapshot">
+		<description>Super Snapshot (v5.22 v2, PAL)</description>
+		<year>1990</year>
+		<publisher>LMS Tech</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supersnap5" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x10000">
+				<rom name="super_snapshot_v5.22_v2_1990_pal.bin" size="0x10000" crc="ed5cb065" sha1="10c34bd6d4651c2549e62cc448412e6d2b193609" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_a_pal.d64" size="174848" crc="82cf52bd" sha1="f9d5067d6a1b77ce6453b940e37fed3b2ea582f3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="super_snapshot_v5.00_system_b.d64" size="174848" crc="ec09a1e4" sha1="cb5213f272e80b882c6b8673667d2928428a8337" offset="0" />
 			</dataarea>
 		</part>
 	</software>
