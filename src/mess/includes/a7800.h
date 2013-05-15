@@ -49,7 +49,9 @@ public:
 	UINT32 m_cart_size;
 	unsigned char m_stick_type;
 	UINT8 *m_ROM;
-	int m_maria_palette[8][4];
+	int m_maria_palette[32];
+	int m_line_ram[2][160];
+	int m_active_buffer;
 	int m_maria_write_mode;
 	unsigned int m_maria_dll;
 	unsigned int m_maria_dl;
@@ -58,7 +60,7 @@ public:
 	int m_maria_vblank;
 	int m_maria_dli;
 	int m_maria_dmaon;
-	int m_maria_dodma;
+	int m_maria_dpp;
 	int m_maria_wsync;
 	int m_maria_backcolor;
 	int m_maria_color_kill;
@@ -86,6 +88,7 @@ public:
 	DECLARE_PALETTE_INIT(a7800p);
 	UINT32 screen_update_a7800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(a7800_interrupt);
+	TIMER_CALLBACK_MEMBER(a7800_maria_startdma);
 	DECLARE_READ8_MEMBER(riot_joystick_r);
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
@@ -113,6 +116,8 @@ protected:
 	memory_bank *m_bank11;
 
 	void maria_draw_scanline();
+	int is_holey(unsigned int addr);
+	int write_line_ram(int addr, UINT8 offset, int pal);
 	int a7800_verify_cart(char header[128]);
 	UINT16 a7800_get_pcb_id(const char *pcb);
 };
