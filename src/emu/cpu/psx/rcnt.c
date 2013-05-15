@@ -55,7 +55,7 @@ void psxrcnt_device::device_start()
 
 	for( n = 0; n < 3; n++ )
 	{
-		root_counter[ n ].timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxrcnt_device::root_finished ), this ) );
+		root_counter[ n ].timer = timer_alloc(n);
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_count );
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_mode );
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_target );
@@ -223,9 +223,9 @@ void psxrcnt_device::root_timer_adjust( int n_counter )
 	}
 }
 
-TIMER_CALLBACK_MEMBER(psxrcnt_device::root_finished)
+void psxrcnt_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int n_counter = param;
+	int n_counter = id;
 	psx_root *root = &root_counter[ n_counter ];
 
 	verboselog( machine(), 2, "root_finished( %d ) %04x\n", n_counter, root_current( n_counter ) );

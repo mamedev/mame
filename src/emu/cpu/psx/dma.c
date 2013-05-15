@@ -62,7 +62,7 @@ void psxdma_device::device_start()
 	{
 		psx_dma_channel *dma = &m_channel[ index ];
 
-		dma->timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxdma_device::dma_finished_callback ), this) );
+		dma->timer = timer_alloc(index);
 
 		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_base ) );
 		machine().save().save_item( "psxdma", tag(), index, NAME( dma->n_blockcontrol ) );
@@ -194,9 +194,9 @@ void psxdma_device::dma_finished( int index )
 	dma_stop_timer( index );
 }
 
-TIMER_CALLBACK_MEMBER(psxdma_device::dma_finished_callback)
+void psxdma_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	dma_finished(param);
+	dma_finished(id);
 }
 
 void psxdma_device::install_read_handler( int index, psx_dma_read_delegate p_fn_dma_read )
