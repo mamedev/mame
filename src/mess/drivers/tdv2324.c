@@ -268,18 +268,6 @@ static I8085_CONFIG( i8085_sub_intf )
 
 
 //-------------------------------------------------
-//  pic8259_interface pic_intf
-//-------------------------------------------------
-
-static const struct pic8259_interface pic_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  pit8253_config pit0_intf
 //-------------------------------------------------
 
@@ -411,7 +399,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_TMS9927_ADD(TMS9937NL_TAG, XTAL_25_39836MHz, vtac_intf)
 
 	// devices
-	MCFG_PIC8259_ADD(P8259A_TAG, pic_intf)
+	MCFG_PIC8259_ADD(P8259A_TAG, NULL, NULL, NULL)
 	MCFG_PIT8253_ADD(P8253_5_0_TAG, pit0_intf)
 	MCFG_PIT8253_ADD(P8253_5_1_TAG, pit1_intf)
 	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, sio_intf)

@@ -1637,20 +1637,6 @@ READ8_MEMBER(pc88va_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface pc88va_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_pic_irq),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(pc88va_state,get_slave_ack)
-};
-
-static const struct pic8259_interface pc88va_pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 void pc88va_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc88va_state::pc88va_irq_callback),this));
@@ -1856,8 +1842,9 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_I8255_ADD( "d8255_2s", slave_fdd_intf )
 
-	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc88va_state, pc88va_pic_irq), VCC, READ8(pc88va_state,get_slave_ack) )
+
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL )
 
 	MCFG_UPD71071_ADD("dmac",pc88va_dma_config)
 

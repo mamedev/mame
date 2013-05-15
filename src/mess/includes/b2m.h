@@ -77,7 +77,6 @@ public:
 /*----------- defined in machine/b2m.c -----------*/
 
 extern const struct pit8253_config b2m_pit8253_intf;
-extern const struct pic8259_interface b2m_pic8259_config;
 
 extern const i8255_interface b2m_ppi8255_interface_1;
 extern const i8255_interface b2m_ppi8255_interface_2;

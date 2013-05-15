@@ -197,9 +197,9 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, bebox_dma8237_2_config )
 
-	MCFG_PIC8259_ADD( "pic8259_master", bebox_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(bebox_state,bebox_pic8259_master_set_int_line), VCC, READ8(bebox_state,get_slave_ack) )
 
-	MCFG_PIC8259_ADD( "pic8259_slave", bebox_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(bebox_state,bebox_pic8259_slave_set_int_line), GND, NULL )
 
 	MCFG_NS16550_ADD( "ns16550_0", bebox_uart_inteface_0, 0 )   /* TODO: Verify model */
 	MCFG_NS16550_ADD( "ns16550_1", bebox_uart_inteface_1, 0 )   /* TODO: Verify model */

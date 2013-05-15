@@ -148,14 +148,6 @@ IRQ_CALLBACK_MEMBER(apricot_state::apricot_irq_ack)
 	return m_pic->inta_r();
 }
 
-static const struct pic8259_interface apricot_pic8259_intf =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
-
 /***************************************************************************
     FLOPPY
 ***************************************************************************/
@@ -394,7 +386,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	/* Devices */
 	MCFG_MC6845_ADD("ic30", MC6845, XTAL_15MHz / 10, apricot_mc6845_intf)
 	MCFG_I8255A_ADD("ic17", apricot_i8255a_intf)
-	MCFG_PIC8259_ADD("ic31", apricot_pic8259_intf)
+	MCFG_PIC8259_ADD("ic31", INPUTLINE("maincpu",0), VCC, NULL)
 	MCFG_PIT8253_ADD("ic16", apricot_pit8253_intf)
 	MCFG_Z80SIO_ADD("ic15", 0, apricot_z80sio_intf)
 

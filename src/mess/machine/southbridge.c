@@ -9,19 +9,6 @@
 #include "machine/southbridge.h"
 #include "machine/pc_keyboards.h"
 
-const struct pic8259_interface at_pic8259_master_config =
-{
-	DEVCB_CPU_INPUT_LINE(":maincpu", 0),
-	DEVCB_LINE_VCC,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, southbridge_device, get_slave_ack)
-};
-
-const struct pic8259_interface at_pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
 
 const struct pit8253_config at_pit8254_config =
 {
@@ -127,8 +114,8 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, at_dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, at_dma8237_2_config )
 
-	MCFG_PIC8259_ADD( "pic8259_master", at_pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", at_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE(":maincpu", 0), VCC, DEVREAD8(DEVICE_SELF_OWNER, southbridge_device, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
 
 	MCFG_AT_KEYBOARD_CONTROLLER_ADD("keybc", XTAL_12MHz, keyboard_controller_intf)
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)

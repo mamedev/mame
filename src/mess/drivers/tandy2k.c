@@ -568,13 +568,6 @@ static I8255A_INTERFACE( ppi_intf )
 
 */
 
-static const struct pic8259_interface pic0_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 /*
 
     IR0     KBDINT10
@@ -587,13 +580,6 @@ static const struct pic8259_interface pic0_intf =
     IR7     BUSINT17
 
 */
-
-static const struct pic8259_interface pic1_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I80186_TAG, INPUT_LINE_INT1),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
 
 // Intel 8272 Interface
 
@@ -715,8 +701,8 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_I8251_ADD(I8251A_TAG, usart_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
-	MCFG_PIC8259_ADD(I8259A_0_TAG, pic0_intf)
-	MCFG_PIC8259_ADD(I8259A_1_TAG, pic1_intf)
+	MCFG_PIC8259_ADD(I8259A_0_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT0), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259A_1_TAG, INPUTLINE(I80186_TAG, INPUT_LINE_INT1), VCC, NULL)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)

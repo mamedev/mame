@@ -564,12 +564,6 @@ READ8_MEMBER( qx10_state::get_slave_ack )
 	return 0x00;
 }
 
-static const struct pic8259_interface qx10_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(qx10_state, qx10_pic8259_master_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(qx10_state, get_slave_ack)
-};
 
 /*
     Slave PIC8259
@@ -583,13 +577,6 @@ static const struct pic8259_interface qx10_pic8259_master_config =
     IR7     External interrupt #5
 
 */
-
-static const struct pic8259_interface qx10_pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
 
 IRQ_CALLBACK_MEMBER(qx10_state::irq_callback)
 {
@@ -1048,8 +1035,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	/* Devices */
 	MCFG_PIT8253_ADD("pit8253_1", qx10_pit8253_1_config)
 	MCFG_PIT8253_ADD("pit8253_2", qx10_pit8253_2_config)
-	MCFG_PIC8259_ADD("pic8259_master", qx10_pic8259_master_config)
-	MCFG_PIC8259_ADD("pic8259_slave", qx10_pic8259_slave_config)
+	MCFG_PIC8259_ADD("pic8259_master", WRITELINE(qx10_state, qx10_pic8259_master_set_int_line), VCC, READ8(qx10_state, get_slave_ack))
+	MCFG_PIC8259_ADD("pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 	MCFG_UPD7201_ADD("upd7201", MAIN_CLK/4, qx10_upd7201_interface)
 	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)

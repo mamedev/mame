@@ -737,13 +737,6 @@ IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
 	return m_pic->inta_r();
 }
 
-static const struct pic8259_interface pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 
 //**************************************************************************
@@ -901,7 +894,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
-	MCFG_PIC8259_ADD(AM9519A_TAG, pic_intf)
+	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
 	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
 
 	// internal RAM

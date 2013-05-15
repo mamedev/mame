@@ -134,20 +134,6 @@ READ8_MEMBER(quakeat_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface quakeat_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(quakeat_state,quakeat_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(quakeat_state,get_slave_ack)
-};
-
-static const struct pic8259_interface quakeat_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 /*************************************************************/
 
 static INPUT_PORTS_START( quake )
@@ -176,8 +162,8 @@ static MACHINE_CONFIG_START( quake, quakeat_state )
 	MCFG_CPU_IO_MAP(quake_io)
 
 
-	MCFG_PIC8259_ADD( "pic8259_1", quakeat_pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", quakeat_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(quakeat_state,quakeat_pic8259_1_set_int_line), VCC, READ8(quakeat_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

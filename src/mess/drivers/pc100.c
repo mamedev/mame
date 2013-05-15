@@ -414,13 +414,6 @@ WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface pc100_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc100_state, pc100_set_int_line),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 void pc100_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
@@ -500,7 +493,7 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
 	MCFG_I8255_ADD( "ppi8255_1", pc100_ppi8255_interface_1 )
 	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
-	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc100_state, pc100_set_int_line), GND, NULL )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_MSM58321_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 

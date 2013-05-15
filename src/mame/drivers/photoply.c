@@ -215,20 +215,6 @@ READ8_MEMBER(photoply_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(photoply_state,pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(photoply_state,get_slave_ack)
-};
-
-static const struct pic8259_interface pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 IRQ_CALLBACK_MEMBER(photoply_state::irq_callback)
 {
 	return m_pic8259_1->acknowledge();
@@ -388,8 +374,8 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 //  MCFG_FRAGMENT_ADD( at_kbdc8042 )
-	MCFG_PIC8259_ADD( "pic8259_1", pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(photoply_state,pic8259_1_set_int_line), VCC, READ8(photoply_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )

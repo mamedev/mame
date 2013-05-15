@@ -128,13 +128,6 @@ WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface multi16_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(multi16_state, multi16_set_int_line),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 void multi16_state::machine_start()
 {
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(multi16_state::multi16_irq_callback),this));
@@ -179,7 +172,7 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/5, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_PIC8259_ADD( "pic8259", multi16_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(multi16_state, multi16_set_int_line), GND, NULL )
 MACHINE_CONFIG_END
 
 /* ROM definition */

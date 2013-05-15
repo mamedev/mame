@@ -374,14 +374,6 @@ UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
-
-const struct pic8259_interface iq151_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(iq151_state, pic_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 static I8255_INTERFACE( iq151_ppi8255_intf )
 {
 	DEVCB_DRIVER_MEMBER(iq151_state, keyboard_row_r),
@@ -448,7 +440,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIC8259_ADD("pic8259", iq151_pic8259_config)
+	MCFG_PIC8259_ADD("pic8259", WRITELINE(iq151_state, pic_set_int_line), VCC, NULL)
 
 	MCFG_I8255_ADD("ppi8255", iq151_ppi8255_intf)
 

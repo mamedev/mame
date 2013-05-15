@@ -373,8 +373,8 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
-	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(compis_state, compis_pic8259_master_set_int_line), VCC, READ8(compis_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(compis_state, compis_pic8259_slave_set_int_line), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
@@ -413,8 +413,8 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	/* Devices */
 	MCFG_PIT8253_ADD( "pit8253", compis_pit8253_config )
 	MCFG_PIT8254_ADD( "pit8254", compis_pit8254_config )
-	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(compis_state, compis_pic8259_master_set_int_line), VCC, READ8(compis_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", WRITELINE(compis_state, compis_pic8259_slave_set_int_line), GND, NULL )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
 	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)

@@ -748,13 +748,6 @@ IRQ_CALLBACK_MEMBER( wangpc_state::wangpc_irq_callback )
 	return m_pic->inta_r();
 }
 
-static const struct pic8259_interface pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_IRQ0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  I8255A_INTERFACE( ppi_intf )
@@ -1203,7 +1196,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 
 	// devices
 	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
-	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
+	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)

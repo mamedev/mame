@@ -434,14 +434,6 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 
 */
 
-static const struct pic8259_interface pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(I8086_TAG, INPUT_LINE_IRQ0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
-
 //-------------------------------------------------
 //  pit8253_config pit_intf
 //-------------------------------------------------
@@ -660,7 +652,7 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	/* Devices */
 	MCFG_APRICOT_KEYBOARD_ADD(kb_intf)
 	MCFG_I8237_ADD(I8237_TAG, 250000, dmac_intf)
-	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
+	MCFG_PIC8259_ADD(I8259A_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_PIT8253_ADD(I8253A5_TAG, pit_intf)
 	MCFG_Z80DART_ADD(Z80SIO0_TAG, 2500000, sio_intf)
 	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)

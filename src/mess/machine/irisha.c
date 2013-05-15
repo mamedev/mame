@@ -127,13 +127,6 @@ WRITE_LINE_MEMBER(irisha_state::irisha_pic_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct pic8259_interface irisha_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(irisha_state,irisha_pic_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 const struct pit8253_config irisha_pit8253_intf =
 {
 	{

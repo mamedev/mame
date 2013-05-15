@@ -495,13 +495,6 @@ WRITE_LINE_MEMBER(pasogo_state::pasogo_pic8259_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const pic8259_interface pasogo_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pasogo_state, pasogo_pic8259_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
@@ -513,7 +506,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 
 	MCFG_PIT8254_ADD( "pit8254", pc_pit8254_config )
 
-	MCFG_PIC8259_ADD( "pic8259", pasogo_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pasogo_state, pasogo_pic8259_set_int_line), VCC, NULL )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)

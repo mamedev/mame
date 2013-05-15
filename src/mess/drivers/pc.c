@@ -995,7 +995,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1079,7 +1079,7 @@ static MACHINE_CONFIG_START( europc, europc_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1131,7 +1131,7 @@ static MACHINE_CONFIG_START( t1000hx, tandy_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1185,7 +1185,7 @@ static MACHINE_CONFIG_START( t1000_16, tandy_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1234,7 +1234,7 @@ static MACHINE_CONFIG_START( t1000_286, tandy_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -1303,7 +1303,7 @@ static MACHINE_CONFIG_START( ibmpcjr, tandy_pc_state )
 
 	MCFG_PIT8253_ADD( "pit8253", pcjr_pit8253_config )
 
-	MCFG_PIC8259_ADD( "pic8259", pcjr_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pc_state,pcjr_pic8259_set_int_line), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pcjr_ppi8255_interface )
 
@@ -1392,7 +1392,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 
 	MCFG_PIT8253_ADD( "pit8253", mc1502_pit8253_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", mc1502_ppi8255_interface )       /* not complete */
 	MCFG_I8255_ADD( "ppi8255n2", mc1502_ppi8255_interface_2 )   /* not complete */
@@ -1442,7 +1442,7 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 	// maybe XTAL_12_288MHz
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1492,7 +1492,7 @@ static MACHINE_CONFIG_START( iskr1031, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1565,7 +1565,7 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1620,7 +1620,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1675,7 +1675,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1730,7 +1730,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
@@ -1785,7 +1785,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 

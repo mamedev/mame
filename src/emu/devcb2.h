@@ -58,6 +58,8 @@
 #define DEVCB2_CONSTANT(_value) devcb2_base::constant_desc(_value)
 #define DEVCB2_LOGGER(_string, _value) devcb2_base::logger_desc(_string, _value)
 #define DEVCB2_INPUTLINE(_tag, _line) devcb2_base::inputline_desc(_tag, _line)
+#define DEVCB2_VCC DEVCB2_CONSTANT(1)
+#define DEVCB2_GND DEVCB2_CONSTANT(0)
 
 // wrappers for read callbacks into the owner device
 #define DEVCB2_READLINE(_class, _func) read_line_delegate(&_class::_func, #_class "::" #_func, DEVICE_SELF, (_class *)0)

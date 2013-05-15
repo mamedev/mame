@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( irisha, irisha_state )
 
 	MCFG_PIT8253_ADD( "pit8253", irisha_pit8253_intf )
 
-	MCFG_PIC8259_ADD( "pic8259", irisha_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(irisha_state,irisha_pic_set_int_line), VCC, NULL )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

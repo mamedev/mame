@@ -2930,20 +2930,6 @@ READ8_MEMBER(pc9801_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_master_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(pc9801_state,get_slave_ack)
-};
-
-static const struct pic8259_interface pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w), //TODO: check me
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 /****************************************
 *
 * I8253 PIT interface
@@ -3571,8 +3557,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
 	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
-	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc9801_state, pc9801_master_set_int_line), VCC, READ8(pc9801_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
@@ -3640,8 +3626,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK_X1*8, pc9801rs_dmac_intf) // unknown clock
-	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc9801_state, pc9801_master_set_int_line), VCC, READ8(pc9801_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
@@ -3706,8 +3692,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_PIT8253_ADD( "pit8253", pc9821_pit8253_config )
 	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
-	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pc9801_state, pc9801_master_set_int_line), VCC, READ8(pc9801_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: Check ir7_w
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )

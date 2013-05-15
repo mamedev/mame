@@ -108,8 +108,6 @@ public:
 extern const struct pit8253_config bebox_pit8254_config;
 extern const i8237_interface bebox_dma8237_1_config;
 extern const i8237_interface bebox_dma8237_2_config;
-extern const struct pic8259_interface bebox_pic8259_master_config;
-extern const struct pic8259_interface bebox_pic8259_slave_config;
 extern const ins8250_interface bebox_uart_inteface_0;
 extern const ins8250_interface bebox_uart_inteface_1;
 extern const ins8250_interface bebox_uart_inteface_2;

@@ -614,21 +614,6 @@ READ8_MEMBER( z100_state::get_slave_ack )
 	return 0;
 }
 
-static const struct pic8259_interface z100_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(z100_state, z100_pic_irq),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(z100_state, get_slave_ack)
-};
-
-static const struct pic8259_interface z100_pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
-
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
@@ -791,8 +776,8 @@ static MACHINE_CONFIG_START( z100, z100_state )
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_14_31818MHz/8, mc6845_intf)    /* unknown clock, hand tuned to get ~50/~60 fps */
 
-	MCFG_PIC8259_ADD( "pic8259_master", z100_pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", z100_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(z100_state, z100_pic_irq), VCC, READ8(z100_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir3_w), GND, NULL )
 
 	MCFG_PIA6821_ADD("pia0", pia0_intf)
 	MCFG_PIA6821_ADD("pia1", pia1_intf)

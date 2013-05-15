@@ -946,13 +946,6 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pic_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct pic8259_interface pk8020_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pk8020_state,pk8020_pic_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 IRQ_CALLBACK_MEMBER(pk8020_state::pk8020_irq_callback)
 {
 	return m_pic8259->acknowledge();

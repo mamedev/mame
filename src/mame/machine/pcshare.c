@@ -151,20 +151,6 @@ READ8_MEMBER( pcat_base_state::get_slave_ack )
 	return 0x00;
 }
 
-static const struct pic8259_interface pic8259_1_config =
-{
-	DEVCB_CPU_INPUT_LINE("maincpu", 0),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(pcat_base_state, get_slave_ack)
-};
-
-static const struct pic8259_interface pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 IRQ_CALLBACK_MEMBER(pcat_base_state::irq_callback)
 {
 	return m_pic8259_1->acknowledge();
@@ -240,8 +226,8 @@ ADDRESS_MAP_START( pcat32_io_common, AS_IO, 32, pcat_base_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT(pcat_common)
-	MCFG_PIC8259_ADD( "pic8259_1", pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", INPUTLINE("maincpu", 0), VCC, READ8(pcat_base_state, get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )

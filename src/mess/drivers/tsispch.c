@@ -173,13 +173,6 @@ WRITE_LINE_MEMBER(tsispch_state::pic8259_set_int_line)
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(tsispch_state,pic8259_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 IRQ_CALLBACK_MEMBER(tsispch_state::irq_callback)
 {
 	return machine().device<pic8259_device>("pic8259")->acknowledge();
@@ -418,7 +411,7 @@ static MACHINE_CONFIG_START( prose2k, tsispch_state )
 	MCFG_CPU_CONFIG(upd7720_config)
 
 	/* PIC 8259 */
-	MCFG_PIC8259_ADD("pic8259", pic8259_config)
+	MCFG_PIC8259_ADD("pic8259", WRITELINE(tsispch_state,pic8259_set_int_line), VCC, NULL)
 
 	/* uarts */
 	MCFG_I8251_ADD("i8251a_u15", i8251_config)

@@ -350,13 +350,6 @@ IRQ_CALLBACK_MEMBER(b2m_state::b2m_irq_callback)
 	return m_pic->acknowledge();
 }
 
-const struct pic8259_interface b2m_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(b2m_state,b2m_pic_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
 {
 	m_vblank_state++;

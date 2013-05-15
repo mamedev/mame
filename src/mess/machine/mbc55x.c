@@ -109,13 +109,6 @@ WRITE8_MEMBER( mbc55x_state::mbc55x_usart_w )
 
 /* PIC 8259 Configuration */
 
-const struct pic8259_interface mbc55x_pic8259_config =
-{
-	DEVCB_CPU_INPUT_LINE(MAINCPU_TAG, INPUT_LINE_IRQ0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 READ8_MEMBER(mbc55x_state::mbcpic8259_r)
 {
 	return m_pic->read(space, offset>>1);

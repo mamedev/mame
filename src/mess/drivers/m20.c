@@ -950,13 +950,6 @@ const struct pit8253_config pit8253_intf =
 	}
 };
 
-const struct pic8259_interface pic_intf =
-{
-	DEVCB_DRIVER_LINE_MEMBER(m20_state, pic_irq_line_w),
-	DEVCB_LINE_VCC, // we're the only 8259, so we're the master
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( m20_floppies )
 	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -1003,7 +996,7 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)
 	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
 	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
-	MCFG_PIC8259_ADD("i8259", pic_intf)
+	MCFG_PIC8259_ADD("i8259", WRITELINE(m20_state, pic_irq_line_w), VCC, NULL)
 
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 

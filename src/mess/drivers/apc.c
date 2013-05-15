@@ -898,20 +898,6 @@ READ8_MEMBER(apc_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_master_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(apc_state,get_slave_ack)
-};
-
-static const struct pic8259_interface pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w), //TODO: check me
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 /****************************************
 *
 * I8237 DMA interface
@@ -1030,8 +1016,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_CPU_IO_MAP(apc_io)
 
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
-	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
-	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(apc_state, apc_master_set_int_line), VCC, READ8(apc_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL ) // TODO: check ir7_w
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 
 	MCFG_NVRAM_ADD_1FILL("cmos")

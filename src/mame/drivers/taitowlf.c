@@ -582,20 +582,6 @@ READ8_MEMBER(taitowlf_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface taitowlf_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(taitowlf_state,taitowlf_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(taitowlf_state,get_slave_ack)
-};
-
-static const struct pic8259_interface taitowlf_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 
 /*************************************************************
  *
@@ -666,8 +652,8 @@ static MACHINE_CONFIG_START( taitowlf, taitowlf_state )
 	MCFG_PIT8254_ADD( "pit8254", taitowlf_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIC8259_ADD( "pic8259_1", taitowlf_pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", taitowlf_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(taitowlf_state,taitowlf_pic8259_1_set_int_line), VCC, READ8(taitowlf_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )

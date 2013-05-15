@@ -150,19 +150,19 @@ READ8_MEMBER(su2000_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface su2000_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(su2000_state,su2000_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(su2000_state,get_slave_ack)
-};
-
-static const struct pic8259_interface su2000_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
+//static const struct pic8259_interface su2000_pic8259_1_config =
+//{
+//	DEVCB_DRIVER_LINE_MEMBER(su2000_state,su2000_pic8259_1_set_int_line),
+//	DEVCB_LINE_VCC,
+//	DEVCB_DRIVER_MEMBER(su2000_state,get_slave_ack)
+//};
+//
+//static const struct pic8259_interface su2000_pic8259_2_config =
+//{
+//	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
+//	DEVCB_LINE_GND,
+//	DEVCB_NULL
+//};
 
 
 /*************************************************************

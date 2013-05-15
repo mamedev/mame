@@ -1274,20 +1274,6 @@ READ8_MEMBER( compis_state::get_slave_ack )
 	return 0;
 }
 
-const struct pic8259_interface compis_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(compis_state, compis_pic8259_master_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(compis_state, get_slave_ack)
-};
-
-const struct pic8259_interface compis_pic8259_slave_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(compis_state, compis_pic8259_slave_set_int_line),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 
 IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
 {

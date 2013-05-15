@@ -207,8 +207,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_I8255_ADD( "ppi8255_3", b2m_ppi8255_interface_3 )
 
-	MCFG_PIC8259_ADD( "pic8259", b2m_pic8259_config )
-
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(b2m_state,b2m_pic_set_int_line), VCC, NULL )
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

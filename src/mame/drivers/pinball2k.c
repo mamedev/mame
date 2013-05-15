@@ -809,20 +809,6 @@ READ8_MEMBER(pinball2k_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface mediagx_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(pinball2k_state,mediagx_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(pinball2k_state,get_slave_ack)
-};
-
-static const struct pic8259_interface mediagx_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 
 /*************************************************************
  *
@@ -892,9 +878,9 @@ static MACHINE_CONFIG_START( mediagx, pinball2k_state )
 
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 
-	MCFG_PIC8259_ADD( "pic8259_master", mediagx_pic8259_1_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(pinball2k_state,mediagx_pic8259_1_set_int_line), VCC, READ8(pinball2k_state,get_slave_ack) )
 
-	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir2_w), GND, NULL )
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))

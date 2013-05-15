@@ -286,12 +286,6 @@ WRITE_LINE_MEMBER( paso1600_state::paso1600_set_int_line )
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct pic8259_interface paso1600_pic8259_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(paso1600_state, paso1600_set_int_line),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
 
 void paso1600_state::machine_start()
 {
@@ -352,7 +346,7 @@ static MACHINE_CONFIG_START( paso1600, paso1600_state )
 
 	/* Devices */
 	MCFG_MC6845_ADD("crtc", H46505, 16000000/4, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_PIC8259_ADD( "pic8259", paso1600_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(paso1600_state, paso1600_set_int_line), GND, NULL )
 	MCFG_I8237_ADD("8237dma", 16000000/4, paso1600_dma8237_interface)
 MACHINE_CONFIG_END
 

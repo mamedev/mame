@@ -59,6 +59,5 @@ public:
 
 extern const i8255_interface irisha_ppi8255_interface;
 extern const struct pit8253_config irisha_pit8253_intf;
-extern const struct pic8259_interface irisha_pic8259_config;
 
 #endif /* IRISHA_H_ */

@@ -689,9 +689,10 @@ IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
  * pic8259 configuration
  *************************************************************/
 
-static WRITE_LINE_DEVICE_HANDLER( apollo_pic8259_master_set_int_line ) {
+WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_master_set_int_line ) {
 	static int interrupt_line = -1;
 	if (state != interrupt_line) {
+		device_t *device = pic8259_master;
 		DLOG1(("apollo_pic8259_master_set_int_line: %x", state));
 	}
 	interrupt_line = state;
@@ -704,23 +705,19 @@ static WRITE_LINE_DEVICE_HANDLER( apollo_pic8259_master_set_int_line ) {
 		apollo_set_cache_status_register(0x10, state ? 0x10 : 0x00);
 	}
 
-	device->machine().device(MAINCPU)->execute().set_input_line_and_vector(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	machine().device(MAINCPU)->execute().set_input_line_and_vector(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( apollo_pic8259_slave_set_int_line ) {
+WRITE_LINE_MEMBER( apollo_state::apollo_pic8259_slave_set_int_line ) {
 	static int interrupt_line = -1;
 	if (state != interrupt_line) {
+		device_t *device = pic8259_slave;
 		DLOG1(("apollo_pic8259_slave_set_int_line: %x", state));
 		interrupt_line = state;
 		apollo_pic_set_irq_line(device, 3, state);
 	}
 }
 
-static const struct pic8259_interface apollo_pic8259_master_config = {
-		DEVCB_LINE(apollo_pic8259_master_set_int_line) };
-
-static const struct pic8259_interface apollo_pic8259_slave_config = {
-		DEVCB_LINE(apollo_pic8259_slave_set_int_line) };
 
 //##########################################################################
 // machine/apollo_ptm.c - APOLLO DS3500 Programmable Timer 6840
@@ -1370,8 +1367,8 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 
 	MCFG_I8237_ADD( APOLLO_DMA1_TAG, XTAL_14_31818MHz/3, apollo_dma8237_1_config )
 	MCFG_I8237_ADD( APOLLO_DMA2_TAG, XTAL_14_31818MHz/3, apollo_dma8237_2_config )
-	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, apollo_pic8259_master_config )
-	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, apollo_pic8259_slave_config )
+	MCFG_PIC8259_ADD( APOLLO_PIC1_TAG, WRITELINE(apollo_state,apollo_pic8259_master_set_int_line), NULL, NULL ) // TODO: Doublecheck config
+	MCFG_PIC8259_ADD( APOLLO_PIC2_TAG, WRITELINE(apollo_state,apollo_pic8259_slave_set_int_line), NULL, NULL ) // TODO: Doublecheck config
 	MCFG_PTM6840_ADD(APOLLO_PTM_TAG, apollo_ptm_config)
 	MCFG_MC146818_ADD( APOLLO_RTC_TAG, MC146818_UTC )
 	MCFG_DUART68681_ADD( APOLLO_SIO_TAG, XTAL_3_6864MHz, apollo_sio_config )

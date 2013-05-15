@@ -2691,20 +2691,6 @@ READ8_MEMBER(towns_state::get_slave_ack)
 	}
 	return 0x00;
 }
-static const struct pic8259_interface towns_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(towns_state,towns_pic_irq),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(towns_state,get_slave_ack)
-};
-
-
-static const struct pic8259_interface towns_pic8259_slave_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
 
 static const wd17xx_interface towns_mb8877a_interface =
 {
@@ -2820,9 +2806,9 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_PIT8253_ADD("pit",towns_pit8253_config)
 	MCFG_PIT8253_ADD("pit2",towns_pit8253_config_2)
 
-	MCFG_PIC8259_ADD( "pic8259_master", towns_pic8259_master_config )
+	MCFG_PIC8259_ADD( "pic8259_master", WRITELINE(towns_state,towns_pic_irq), VCC, READ8(towns_state,get_slave_ack))
 
-	MCFG_PIC8259_ADD( "pic8259_slave", towns_pic8259_slave_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NULL)
 
 	MCFG_MB8877_ADD("fdc",towns_mb8877a_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(towns_floppy_interface)

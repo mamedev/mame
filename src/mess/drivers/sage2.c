@@ -206,13 +206,6 @@ INPUT_PORTS_END
 
 */
 
-static const struct pic8259_interface pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_1),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  I8255A_INTERFACE( ppi0_intf )
@@ -568,7 +561,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	// devices
-	MCFG_PIC8259_ADD(I8259_TAG, pic_intf)
+	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NULL)
 	MCFG_I8255A_ADD(I8255A_0_TAG, ppi0_intf)
 	MCFG_I8255A_ADD(I8255A_1_TAG, ppi1_intf)
 	MCFG_PIT8253_ADD(I8253_0_TAG, pit0_intf)

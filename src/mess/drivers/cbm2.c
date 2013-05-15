@@ -1688,13 +1688,6 @@ IRQ_CALLBACK_MEMBER(cbm2_state::pic_irq_callback)
 	return m_ext_pic->inta_r();
 }
 
-static pic8259_interface ext_pic_intf =
-{
-	DEVCB_CPU_INPUT_LINE(EXT_I8088_TAG, INPUT_LINE_IRQ0),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  tpi6525_interface ext_tpi_intf
@@ -2431,7 +2424,7 @@ static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
 
-	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
+	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
 	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 60, DEVWRITELINE(DEVICE_SELF, cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w), DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
@@ -2490,7 +2483,7 @@ static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
 
-	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
+	MCFG_PIC8259_ADD(EXT_I8259A_TAG, INPUTLINE(EXT_I8088_TAG, INPUT_LINE_IRQ0), VCC, NULL)
 	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
 	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 50, DEVWRITELINE(DEVICE_SELF, cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w), DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))

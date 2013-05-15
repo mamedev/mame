@@ -590,20 +590,6 @@ READ8_MEMBER( xtom3d_state::get_slave_ack )
 	return 0x00;
 }
 
-static const struct pic8259_interface xtom3d_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(xtom3d_state,xtom3d_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(xtom3d_state,get_slave_ack)
-};
-
-static const struct pic8259_interface xtom3d_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 READ8_MEMBER(xtom3d_state::get_out2)
 {
 	return pit8253_get_output( m_pit8254, 2 );
@@ -660,8 +646,8 @@ static MACHINE_CONFIG_START( xtom3d, xtom3d_state )
 	MCFG_PIT8254_ADD( "pit8254", xtom3d_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
-	MCFG_PIC8259_ADD( "pic8259_1", xtom3d_pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", xtom3d_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(xtom3d_state,xtom3d_pic8259_1_set_int_line), VCC, READ8(xtom3d_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

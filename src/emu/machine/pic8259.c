@@ -377,14 +377,10 @@ WRITE8_MEMBER( pic8259_device::write )
 
 void pic8259_device::device_start()
 {
-	const struct pic8259_interface *intf = (const struct pic8259_interface *)this->static_config();
-
-	assert(intf != NULL);
-
 	/* resolve callbacks */
-	m_out_int_func.resolve(intf->out_int_func, *this);
-	m_sp_en_func.resolve(intf->sp_en_func, *this);
-	m_read_slave_ack_func.resolve(intf->read_slave_ack_func, *this);
+	m_out_int_func.resolve();
+	m_sp_en_func.resolve();
+	m_read_slave_ack_func.resolve();
 }
 
 
@@ -422,16 +418,9 @@ const device_type PIC8259 = &device_creator<pic8259_device>;
 
 pic8259_device::pic8259_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PIC8259, "Intel PIC8259", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pic8259_device::device_config_complete()
+	, m_out_int_func(*this)
+	, m_sp_en_func(*this)
+	, m_read_slave_ack_func(*this)
 {
 }
 

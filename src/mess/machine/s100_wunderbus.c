@@ -54,13 +54,6 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 	m_bus->int_w(state);
 }
 
-static struct pic8259_interface pic_intf =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, s100_wunderbus_device, pic_int_w),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  ins8250_interface ace1_intf
@@ -148,7 +141,7 @@ static UPD1990A_INTERFACE( rtc_intf )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
-	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
+	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF_OWNER, s100_wunderbus_device, pic_int_w), VCC, NULL)
 	MCFG_INS8250_ADD(INS8250_1_TAG, ace1_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_2_TAG, ace2_intf, XTAL_18_432MHz/10)
 	MCFG_INS8250_ADD(INS8250_3_TAG, ace3_intf, XTAL_18_432MHz/10)

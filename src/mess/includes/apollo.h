@@ -207,6 +207,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
+	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
+	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

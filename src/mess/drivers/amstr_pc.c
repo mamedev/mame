@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( ppc512, amstrad_pc_state )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NULL )
 
 	MCFG_I8255_ADD( "ppi8255", pc_ppi8255_interface )
 

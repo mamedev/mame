@@ -506,20 +506,6 @@ READ8_MEMBER(bebox_state::get_slave_ack)
 	return 0x00;
 }
 
-const struct pic8259_interface bebox_pic8259_master_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_pic8259_master_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(bebox_state,get_slave_ack)
-};
-
-const struct pic8259_interface bebox_pic8259_slave_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(bebox_state,bebox_pic8259_slave_set_int_line),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 
 /*************************************
  *

@@ -191,14 +191,6 @@ WRITE_LINE_MEMBER(ibm5160_mb_device::pc_cpu_line)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-const struct pic8259_interface pc_pic8259_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line),
-	DEVCB_LINE_VCC,
-	DEVCB_NULL
-};
-
-
 WRITE_LINE_MEMBER(ibm5160_mb_device::pc_speaker_set_spkrdata)
 {
 	m_pc_spkrdata = state ? 1 : 0;
@@ -481,7 +473,7 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	MCFG_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, pc_dma8237_config )
 
-	MCFG_PIC8259_ADD( "pic8259", pc_pic8259_config )
+	MCFG_PIC8259_ADD( "pic8259", DEVWRITELINE(DEVICE_SELF_OWNER, ibm5160_mb_device, pc_cpu_line), VCC, NULL )
 
 	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 

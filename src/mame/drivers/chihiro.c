@@ -2789,20 +2789,6 @@ READ8_MEMBER(chihiro_state::get_slave_ack)
 	return 0x00;
 }
 
-static const struct pic8259_interface chihiro_pic8259_1_config =
-{
-	DEVCB_DRIVER_LINE_MEMBER(chihiro_state, chihiro_pic8259_1_set_int_line),
-	DEVCB_LINE_VCC,
-	DEVCB_DRIVER_MEMBER(chihiro_state,get_slave_ack)
-};
-
-static const struct pic8259_interface chihiro_pic8259_2_config =
-{
-	DEVCB_DEVICE_LINE_MEMBER("pic8259_1", pic8259_device, ir2_w),
-	DEVCB_LINE_GND,
-	DEVCB_NULL
-};
-
 IRQ_CALLBACK_MEMBER(chihiro_state::irq_callback)
 {
 	int r = 0;
@@ -3062,8 +3048,8 @@ static MACHINE_CONFIG_START( chihiro_base, chihiro_state )
 	MCFG_PCI_BUS_LEGACY_ADD("agpbus", 1)
 	MCFG_PCI_BUS_LEGACY_SIBLING("pcibus")
 	MCFG_PCI_BUS_LEGACY_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", geforce_pci_r, geforce_pci_w)
-	MCFG_PIC8259_ADD( "pic8259_1", chihiro_pic8259_1_config )
-	MCFG_PIC8259_ADD( "pic8259_2", chihiro_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_1", WRITELINE(chihiro_state, chihiro_pic8259_1_set_int_line), VCC, READ8(chihiro_state,get_slave_ack) )
+	MCFG_PIC8259_ADD( "pic8259_2", DEVWRITELINE("pic8259_1", pic8259_device, ir2_w), GND, NULL )
 	MCFG_PIT8254_ADD( "pit8254", chihiro_pit8254_config )
 	MCFG_IDE_CONTROLLER_ADD( "ide", ide_baseboard, NULL, "bb", true)
 	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
