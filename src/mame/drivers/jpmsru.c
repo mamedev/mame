@@ -10,7 +10,9 @@
     the sound hardware seems to be a basic discrete circuit (complete
     with tone pot), and the hardware uses the older TMS9980A as a CPU.
 
-    TODO: Everything!
+    TODO: Everything!, there are 10 different SRU subtypes, including 
+	one purely for export, though this is a layout change rather than
+	anything significant.
 
 **********************************************************************/
 

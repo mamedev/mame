@@ -1665,7 +1665,7 @@ incorrect behaviour manifesting in ridiculously large payouts.
 In fact, the software seems deliberately designed to mislead, but is (fortunately for
 us) prone to similar weaknesses that allow a per game solution.
 
-See MPU4.c for more info
+See mpu4hw.c for more info
 
 As BwB games aren't yet booting on the 16-bit board, we're duplicating the 8-bit program
 Precedent suggests this is not that dangerous an assumption to make.

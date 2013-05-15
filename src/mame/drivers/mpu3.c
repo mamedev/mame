@@ -77,6 +77,17 @@ A800-A803  |R/W| D D D D D D D D | PIA6821 IC6 PA0-PA7, AUX1 connector (ALPHA)
 ??? B000-FFFF | R | D D D D D D D D | ROM
 -----------+---+-----------------+--------------------------------------------------------------------------
 
+NOTES:
+A number of different modifications exist to the main board, essentially all are compatible with one another aside from RAM sizes.
+
+MOD0- 3 - early boards with small RAM allocations
+MOD4- Some modifications on the PCB that didnt work, so field engineers reverted them to MOD3.
+MOD5- board revision with bigger RAM and reset sensitivity circuit added on the PCB.
+
+MOD6- adaption of the PCB to use small daughter card with 6116 RAM
+
+Collectors have gone further with zero power RAM and the like, but these are the ones out in the wild.
+
 TODO: - Distinguish door switches using manual
       - Add discrete sound functionality (same as MPU4 alarm)
       - Is pulse timer ic11 right?

@@ -13,9 +13,11 @@
 
  ---
 
- there are also older platforms also using the TMS CPU, we load some of those roms here too
+ There are also older platforms also using the TMS CPU, we load some of those roms here too, but many should go into the SRU folder.
 
 
+System80 is based on the SRU platform, but with more outputs and finally a separate CPU and sound board setup to permit easy repair.
+ 
 */
 
 

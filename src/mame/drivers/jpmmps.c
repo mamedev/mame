@@ -17,8 +17,13 @@
 
 /*
   Notes:
-   this should be pretty easy to get going, my only concern is patches other drivers have to work around
-   what appear to be i8255 issues?
+  MPS1- The hardware still uses TMS CPUs, but now with matrix driven lamps amongst other things. Later games used AY8910 as a sound chip instead of the SN76489.
+
+  MPS2- Basically MPS1 manufactured on a more compact board, replacing discrete logic with 'custom cells' - which are rebaged 8255 PPIs. This is the better
+  target to emulate, but some BwBs may struggle with the timing.
+
+  this should be pretty easy to get going, my only concern is patches other drivers have to work around
+  what appear to be i8255 issues?
 */
 
 

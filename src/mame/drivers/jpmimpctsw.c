@@ -3462,9 +3462,17 @@ ROM_END
 
 
 
-
-
 ROM_START( j6indyge )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "indy04040.p1", 0x00000, 0x10000, CRC(e80066ce) SHA1(6b6fcd1e1d307469031acd83a9acb7488536dccc) )
+	ROM_LOAD16_BYTE( "indy04040.p2", 0x00001, 0x10000, CRC(ddf59c2c) SHA1(bbe523f11db98c6141d7a43beee98e4ec8af7408) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "indy04020.snd", 0x00000, 0x080000, CRC(0266d48e) SHA1(c16ebdc6f73a6c832f765b909ca5511eaf728897) )
+ROM_END
+
+
+ROM_START( j6indyge2 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "indy04020.p1", 0x00000, 0x10000, CRC(52ca267c) SHA1(7cd90b536d974afd504620f12868c5efe83ef9dd) )
 	ROM_LOAD16_BYTE( "indy04020.p2", 0x00001, 0x10000, CRC(d96e3937) SHA1(902bb6021f5e1fa7471bce9de207e4df5f071fc4) )
@@ -8365,7 +8373,8 @@ GAME( 199?, j6indyh     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, 
 GAME( 199?, j6indyi     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 10)", GAME_FLAGS )
 GAME( 199?, j6indyj     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 11)", GAME_FLAGS )
 GAME( 199?, j6indyk     , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 12)", GAME_FLAGS )
-GAME( 199?, j6indyge    , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
+GAME( 199?, j6indyge    , j6indy    , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German set 1)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
+GAME( 199?, j6indyge2   , j6indyge  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German set 2)", GAME_FLAGS )
 
 GAME( 199?, j6showtm    , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6showtma   , j6showtm  , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 2)", GAME_FLAGS )
