@@ -214,7 +214,7 @@ const rom_entry *isa8_ide_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_ide_device::isa8_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-		: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock),
+		: device_t(mconfig, ISA8_IDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_ide", __FILE__),
 		device_isa8_card_interface( mconfig, *this )
 {
 }
